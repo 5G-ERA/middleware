@@ -1,0 +1,36 @@
+# Copyright 2021 Bartosz Bratuś
+# See LICENSE file for licensing details.
+
+# For a complete list of supported options, see:
+# https://discourse.charmhub.io/t/charm-metadata-v2/3674/15
+name: redis-operator
+display-name: |
+  5G-ERA Redis 
+description: |
+  This is a testing operator and it is not to be used in production
+summary: |
+  redis!!!!!!!
+
+series: 
+  - kubernetes
+
+deployment:
+  min-version: '1.16'
+  type: stateful
+  service: loadbalancer
+# TODO: replace with containers for your workload (delete for non-k8s)
+# containers:
+#   redis:
+#     resource: redis-image #394603622351.dkr.ecr.eu-west-1.amazonaws.com/5g-era-redis:latest
+    
+
+# TODO: each container defined above must specify an oci-image resource
+resources:
+  redis-image:
+    type: oci-image
+    description: OCI image for redis
+    upstream-source: '394603622351.dkr.ecr.eu-west-1.amazonaws.com/5g-era-redis:latest'
+
+provides:
+  redis: 
+    interface: redis
