@@ -5,23 +5,25 @@
 # https://discourse.charmhub.io/t/charm-metadata-v2/3674/15
 name: redis-operator
 display-name: |
-  5G-ERA Redis 
+  5G-ERA Redis Operator
 description: |
-  This is a testing operator and it is not to be used in production
+  An operator that manages the deployment of the 5G-ERA Redis server
 summary: |
-  redis!!!!!!!
+  
 
 series: 
   - kubernetes
 
-deployment:
-  min-version: '1.16'
-  type: stateful
-  service: loadbalancer
+# Uncomment to expose the service behind the load balancer by default
+# deployment:
+#   min-version: '1.16'
+#   type: stateful
+#   service: loadbalancer
+
 # TODO: replace with containers for your workload (delete for non-k8s)
 # containers:
 #   redis:
-#     resource: redis-image #394603622351.dkr.ecr.eu-west-1.amazonaws.com/5g-era-redis:latest
+#     resource: 
     
 
 # TODO: each container defined above must specify an oci-image resource
@@ -29,7 +31,6 @@ resources:
   redis-image:
     type: oci-image
     description: OCI image for redis
-    upstream-source: '394603622351.dkr.ecr.eu-west-1.amazonaws.com/5g-era-redis:latest'
 
 provides:
   redis: 

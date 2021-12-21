@@ -10,15 +10,13 @@ Create and activate a virtualenv with the development requirements:
 
 ## Code overview
 
-The code inside of a charm is responsible for the deployment and management of the charm by handling the configuration changes. The default settings needed to launch the `itzg/redis-server` container are located in the `_pebble_layer(self):` function. 
-The handle of the configuration itself is located inside the function:
-`_on_config_changed(self, event: ConfigChangedEvent):`
+TODO: write simple code overview, what each part does
 
 The tests for the code written are placed in the `tests/test_charm.py` file.
 
 ## Intended use case
 
-This demo operator is to be used as a minimal source for development of the new charms. It provides the minimal required functions that are to be used to correctly build and deploy the charm.
+This operator is designed to serve as a deployment helper used by the Juju deployment tool. It allows to manage the scaling and replication of the 5G-ERA Redis container that contains the specific features needed by the requirements of the project. By default it has built-in support for RedisGraph and RedisJSON extensions
 
 ## Testing
 
