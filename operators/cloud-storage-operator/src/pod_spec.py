@@ -15,7 +15,7 @@
 
 from typing import Dict, List
 
-from src.models import RedisRelation
+from models import RedisRelation
 
 
 class PodSpecBuilder:

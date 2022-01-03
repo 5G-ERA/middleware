@@ -12,7 +12,7 @@ develop a new k8s charm using the Operator Framework:
     https://discourse.charmhub.io/t/4208
 """
 # Charmcraft libs
-from lib.charms.redis_k8s.v0.redis import RedisRelationUpdatedEvent, RedisRequires
+from charms.redis_k8s.v0.redis import RedisRelationUpdatedEvent, RedisRequires
 # OPS modules references
 from ops.charm import CharmBase, ConfigChangedEvent, StartEvent, StopEvent
 from oci_image import OCIImageResource, OCIImageResourceError
@@ -21,9 +21,9 @@ from ops.main import main
 from ops.model import ActiveStatus, BlockedStatus, MaintenanceStatus
 from ops.model import RelationNotFoundError, WaitingStatus
 # Charm
-from src.redis_client import RedisClient
-from src.pod_spec import PodSpecBuilder
-from src.models import RedisRelation
+from redis_client import RedisClient
+from pod_spec import PodSpecBuilder
+from models import RedisRelation
 # Other tools
 import functools
 import logging
@@ -33,6 +33,7 @@ logger = logging.getLogger(__name__)
 
 DEFAULT_REDIS_PORT = 6379
 WAITING_FOR_RELATION_MSG = "Waiting for Redis relation ..."
+DEFAULT_APP_PORT=80
 
 
 def log_event_handler(method):
@@ -122,7 +123,7 @@ class CloudStorageOperator(CharmBase):
 
         builder = PodSpecBuilder(
             name=self.model.app.name,
-            port=DEFAULT_REDIS_PORT,
+            port=DEFAULT_APP_PORT,
             image_info=image_info)
 
         spec = builder.build_pod_spec(redis_relation)
@@ -146,7 +147,7 @@ class CloudStorageOperator(CharmBase):
             logger.debug("Unit status: Active")
             return
 
-        if not self.redis.is_ready():
+        if not self.is_valid_status():
             self.unit.status = WaitingStatus(WAITING_FOR_RELATION_MSG)
             logger.debug("Unit status: Waiting")
             return
@@ -167,7 +168,12 @@ class CloudStorageOperator(CharmBase):
 
     def is_valid_status(self) -> bool:
         length = len(self._stored.redis_relation)
-        ready = self.redis.is_ready()
+
+        try:
+            ready = self.redis.is_ready(self._get_redis_relation())
+        except RelationNotFoundError:
+            return False
+
         return length > 0 and ready
 
     def set_waiting_for_redis_status(self) -> None:
