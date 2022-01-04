@@ -15,10 +15,10 @@ series:
   - kubernetes
 
 # Uncomment to expose the service behind the load balancer by default
-# deployment:
-#   min-version: '1.16'
-#   type: stateful
-#   service: loadbalancer
+deployment:
+  min-version: '1.16'
+  type: stateful
+  service: loadbalancer
 
 # TODO: replace with containers for your workload (delete for non-k8s)
 # containers:

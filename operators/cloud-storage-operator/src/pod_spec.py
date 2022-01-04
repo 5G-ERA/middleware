@@ -54,11 +54,11 @@ class PodSpecBuilder:
                 "imagePullPolicy": "Always",
                 "ports": self._build_port_spec(),
                 # "volumeConfig": vol_config,
-                "envConfig": self._build_env_config(redis_relation),
-                "kubernetes": {
-                    "readinessProbe": self._build_readiness_spec(),
-                    "livenessProbe": self._build_liveness_spec()
-                },
+                "envConfig": self._build_env_config(redis_relation)
+                # "kubernetes": {
+                #     "readinessProbe": self._build_readiness_spec(),
+                #     "livenessProbe": self._build_liveness_spec()
+                # },
             }],
             "kubernetesResources": {},
         }
