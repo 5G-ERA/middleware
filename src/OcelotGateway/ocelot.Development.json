@@ -1,3 +1,11 @@
 {
+  "Routes": [
+    //ResourcePlanner
+
+    //TaskPlanner
+  ],
+  "GlobalConfiguration": {
+    "BaseUrl": "https://localhost:7047"
+  }
 
 }
