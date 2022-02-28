@@ -9,11 +9,11 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{96C1E2A9-733
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OsmClient", "src\OsmClient\OsmClient.csproj", "{76C83A45-8C45-4F3C-A305-9F98D2796E53}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ResourcePlanner", "src\ResourcePlanner\ResourcePlanner.csproj", "{033557EE-C93D-46CF-9843-71C3497F0634}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ResourcePlanner", "src\ResourcePlanner\ResourcePlanner.csproj", "{033557EE-C93D-46CF-9843-71C3497F0634}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TaskPlanner", "src\TaskPlanner\TaskPlanner.csproj", "{4997B86A-8252-4C47-824F-7059EF7D56DF}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TaskPlanner", "src\TaskPlanner\TaskPlanner.csproj", "{4997B86A-8252-4C47-824F-7059EF7D56DF}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OcelotGateway", "src\OcelotGateway\OcelotGateway.csproj", "{0EE2EFD6-C2B3-4437-BF12-D0E5E91D40E3}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OcelotGateway", "src\OcelotGateway\OcelotGateway.csproj", "{0EE2EFD6-C2B3-4437-BF12-D0E5E91D40E3}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

@@ -1,8 +1,31 @@
 {
   "Routes": [
     //ResourcePlanner
-
+    {
+      "DownstreamPathTemplate": "/api/v1/ResourcesInstance",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": "7253"
+        }
+      ],
+      "UpstreamPathTemplate": "/api/v1/ResourcesInstance",
+      "UpstreamHttpMethod": [ "GET" ]
+    },
     //TaskPlanner
+    {
+      "DownstreamPathTemplate": "/api/v1/TaskInstance",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": "7084"
+        }
+      ],
+      "UpstreamPathTemplate": "/api/v1/TaskInstance",
+      "UpstreamHttpMethod": [ "GET" ]
+    }
   ],
   "GlobalConfiguration": {
     "BaseUrl": "https://localhost:7047"
