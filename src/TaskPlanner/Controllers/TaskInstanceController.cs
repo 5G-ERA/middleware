@@ -7,7 +7,8 @@ namespace Middleware.TaskPlanner.Controllers
     [Route("api/v1/[controller]")]
     public class TaskInstanceController : ControllerBase
     {
-        [HttpGet(Name = "GetTaskInstance")]
+        [HttpGet]
+        [Route("[action]", Name = "GetTaskInstance")]
         [ProducesResponseType(typeof(TaskInstance), (int)HttpStatusCode.OK)]
         public async Task<ActionResult<TaskInstance>> GetTaskInstance()
         {

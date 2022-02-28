@@ -2,7 +2,7 @@
   "Routes": [
     //ResourcePlanner
     {
-      "DownstreamPathTemplate": "/api/v1/ResourcesInstance",
+      "DownstreamPathTemplate": "/api/v1/ResourcesInstance/GetResourcesInstance",
       "DownstreamScheme": "https",
       "DownstreamHostAndPorts": [
         {
@@ -10,12 +10,12 @@
           "Port": "7253"
         }
       ],
-      "UpstreamPathTemplate": "/api/v1/ResourcesInstance",
+      "UpstreamPathTemplate": "/api/v1/ResourcesInstance/GetResourcesInstance",
       "UpstreamHttpMethod": [ "GET" ]
     },
     //TaskPlanner
     {
-      "DownstreamPathTemplate": "/api/v1/TaskInstance",
+      "DownstreamPathTemplate": "/api/v1/TaskInstance/GetTaskInstance",
       "DownstreamScheme": "https",
       "DownstreamHostAndPorts": [
         {
@@ -23,7 +23,7 @@
           "Port": "7084"
         }
       ],
-      "UpstreamPathTemplate": "/api/v1/TaskInstance",
+      "UpstreamPathTemplate": "/api/v1/TaskInstance/GetTaskInstance",
       "UpstreamHttpMethod": [ "GET" ]
     }
   ],
