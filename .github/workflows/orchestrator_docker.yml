@@ -1,4 +1,4 @@
-name: Docker build
+name: Orchestrator docker build
 
 on:
   workflow_dispatch:
