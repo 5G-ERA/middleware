@@ -7,10 +7,10 @@ EXPOSE 443
 
 FROM mcr.microsoft.com/dotnet/sdk:6.0 AS build
 WORKDIR /src
-COPY ["src/OcelotGateway/OcelotGateway.csproj", "src/OcelotGateway/"]
-RUN dotnet restore "src/OcelotGateway/OcelotGateway.csproj"
+COPY ["OcelotGateway/OcelotGateway.csproj", "OcelotGateway/"]
+RUN dotnet restore "OcelotGateway/OcelotGateway.csproj"
 COPY . .
-WORKDIR "/src/src/OcelotGateway"
+WORKDIR "/src/OcelotGateway"
 RUN dotnet build "OcelotGateway.csproj" -c Release -o /app/build
 
 FROM build AS publish
