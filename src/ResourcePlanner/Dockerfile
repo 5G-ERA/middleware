@@ -7,10 +7,10 @@ EXPOSE 443
 
 FROM mcr.microsoft.com/dotnet/sdk:6.0 AS build
 WORKDIR /src
-COPY ["src/ResourcePlanner/ResourcePlanner.csproj", "src/ResourcePlanner/"]
-RUN dotnet restore "src/ResourcePlanner/ResourcePlanner.csproj"
+COPY ["ResourcePlanner/ResourcePlanner.csproj", "ResourcePlanner/"]
+RUN dotnet restore "ResourcePlanner/ResourcePlanner.csproj"
 COPY . .
-WORKDIR "/src/src/ResourcePlanner"
+WORKDIR "/src/ResourcePlanner"
 RUN dotnet build "ResourcePlanner.csproj" -c Release -o /app/build
 
 FROM build AS publish

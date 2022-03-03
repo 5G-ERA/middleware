@@ -7,10 +7,10 @@ EXPOSE 443
 
 FROM mcr.microsoft.com/dotnet/sdk:6.0 AS build
 WORKDIR /src
-COPY ["src/TaskPlanner/TaskPlanner.csproj", "src/TaskPlanner/"]
-RUN dotnet restore "src/TaskPlanner/TaskPlanner.csproj"
+COPY ["TaskPlanner/TaskPlanner.csproj", "TaskPlanner/"]
+RUN dotnet restore "TaskPlanner/TaskPlanner.csproj"
 COPY . .
-WORKDIR "/src/src/TaskPlanner"
+WORKDIR "/src/TaskPlanner"
 RUN dotnet build "TaskPlanner.csproj" -c Release -o /app/build
 
 FROM build AS publish
