@@ -1,7 +1,6 @@
-﻿using System.Data.Common;
-using System.Text.Json.Serialization;
+﻿using System.Text.Json.Serialization;
 
-namespace Common.Models;
+namespace Middleware.Common.Models;
 
 public class VnfPkgInfoModel
 {
