@@ -9,7 +9,6 @@ namespace Middleware.ResourcePlanner.Controllers
     public class ResourceController : ControllerBase
     {
         [HttpGet]
-        [Route("[action]", Name = "GetResource")]
         [ProducesResponseType(typeof(ResourceModel), (int)HttpStatusCode.OK)]
         public async Task<ActionResult<ResourceModel>> GetResource()
         {

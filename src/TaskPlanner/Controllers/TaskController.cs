@@ -9,7 +9,6 @@ namespace Middleware.TaskPlanner.Controllers
     public class TaskController : ControllerBase
     {
         [HttpGet]
-        [Route("[action]", Name = "GetTask")]
         [ProducesResponseType(typeof(TaskModel), (int)HttpStatusCode.OK)]
         public async Task<ActionResult<TaskModel>> GetTask()
         {
