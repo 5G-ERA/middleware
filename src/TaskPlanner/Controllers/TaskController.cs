@@ -8,7 +8,7 @@ namespace Middleware.TaskPlanner.Controllers
     [Route("api/v1/[controller]")]
     public class TaskController : ControllerBase
     {
-        [HttpGet]
+        [HttpGet] //http get request
         [ProducesResponseType(typeof(TaskModel), (int)HttpStatusCode.OK)]
         public async Task<ActionResult<TaskModel>> GetTask()
         {
