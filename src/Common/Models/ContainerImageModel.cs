@@ -5,7 +5,7 @@ namespace Middleware.Common.Models;
 public class ContainerImageModel
 {
     [JsonPropertyName("ImageId")]
-    public string ImageId { get; set; }
+    public Guid ImageId { get; set; }
 
     [JsonPropertyName("Name")]
     public string Name { get; set; }

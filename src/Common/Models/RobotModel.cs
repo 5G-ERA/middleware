@@ -5,13 +5,13 @@ namespace Middleware.Common.Models;
 public class RobotModel
 {
     [JsonPropertyName("RobotID")]
-    public long RobotId { get; set; }
+    public Guid RobotId { get; set; }
 
     [JsonPropertyName("RobotStatus")]
     public string RobotStatus { get; set; }
 
     [JsonPropertyName("CurrentTaskID")]
-    public string CurrentTaskId { get; set; }
+    public Guid CurrentTaskId { get; set; }
 
     [JsonPropertyName("TaskList")]
     public List<string> TaskList { get; set; }
