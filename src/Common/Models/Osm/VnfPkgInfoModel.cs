@@ -1,6 +1,6 @@
 ﻿using System.Text.Json.Serialization;
 
-namespace Middleware.Common.Models;
+namespace Middleware.Common.Models.Osm;
 
 public class VnfPkgInfoModel
 {

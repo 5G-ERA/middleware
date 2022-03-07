@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 
 namespace Middleware.Common.Models
 {
+    [Obsolete]
     public class ResourceModel
     {
         public Guid Id { get; set; } = Guid.NewGuid();
