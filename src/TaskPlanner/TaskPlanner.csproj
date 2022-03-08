@@ -7,7 +7,9 @@
     <UserSecretsId>63de4809-7568-443d-a99f-6af48952dc47</UserSecretsId>
     <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
 	<RootNamespace>Middleware.TaskPlanner</RootNamespace>  
-    <DockerfileContext>..\..</DockerfileContext>
+    <DockerfileContext>..\..</DockerfileContext>  
+    <BaseOutputPath>..\..\bin\</BaseOutputPath>  
+    <BaseIntermediateOutputPath>..\..\obj\</BaseIntermediateOutputPath>
   </PropertyGroup>
 
   <ItemGroup>
