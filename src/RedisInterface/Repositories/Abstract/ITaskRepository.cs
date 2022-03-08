@@ -2,7 +2,7 @@
 
 namespace Middleware.RedisInterface.Repositories
 {
-    public interface ITaskRepository
+    public interface ITaskRepository : IBaseRepository<TaskModel>
     {
         Task<List<TaskModel>> GetTaskAsync();
 
