@@ -15,5 +15,7 @@ namespace Middleware.ResourcePlanner.Controllers
             var resource = new ResourceModel();
             return Ok(resource);
         }
+
+        
     }
 }

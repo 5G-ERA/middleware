@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
+using RedisInterface;
 
-namespace RedisInterface.Controllers
+namespace Middleware.RedisInterface.Controllers
 {
     [ApiController]
     [Route("[controller]")]
@@ -9,7 +10,7 @@ namespace RedisInterface.Controllers
         private static readonly string[] Summaries = new[]
         {
         "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
-    };
+        };
 
         private readonly ILogger<WeatherForecastController> _logger;
 

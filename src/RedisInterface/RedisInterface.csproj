@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk.Web">
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
   <PropertyGroup>
     <TargetFramework>net6.0</TargetFramework>
@@ -8,11 +8,12 @@
     <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
 	<RootNamespace>Middleware.RedisInterface</RootNamespace>
     <DockerfileContext>..\..</DockerfileContext>
+    <BaseOutputPath>..\..\bin\</BaseOutputPath>
+    <BaseIntermediateOutputPath>..\..\obj\</BaseIntermediateOutputPath>
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.14.0" />
-    <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
     <PackageReference Include="NReJSON" Version="4.0.0" />
     <PackageReference Include="RedisGraphDotNet.Client" Version="0.1.0-alpha" />
     <PackageReference Include="StackExchange.Redis" Version="2.5.43" />

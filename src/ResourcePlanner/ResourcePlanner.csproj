@@ -8,6 +8,8 @@
     <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
 	<RootNamespace>Middleware.ResourcePlanner</RootNamespace>
     <DockerfileContext>..\..</DockerfileContext>
+    <BaseOutputPath>..\..\bin\</BaseOutputPath>
+    <BaseIntermediateOutputPath>..\..\obj\</BaseIntermediateOutputPath>
   </PropertyGroup>
 
   <ItemGroup>
