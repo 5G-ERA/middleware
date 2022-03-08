@@ -5,13 +5,6 @@
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>disable</Nullable>
         <RootNamespace>Middleware.Common</RootNamespace>
-        <BaseOutputPath>..\..\bin\</BaseOutputPath>
-        <BaseIntermediateOutputPath>..\..\obj\</BaseIntermediateOutputPath>
     </PropertyGroup>
-	
-	<ItemGroup>
-		<Content Include="LuaQueries\**">
-			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-		</Content>
-	</ItemGroup>
+
 </Project>

@@ -6,8 +6,6 @@
         <ImplicitUsings>enable</ImplicitUsings>
         <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
         <RootNamespace>Middleware.Orchestrator</RootNamespace>
-        <BaseOutputPath>..\..\bin\</BaseOutputPath>
-        <BaseIntermediateOutputPath>..\..\obj\</BaseIntermediateOutputPath>
     </PropertyGroup>
 
     <ItemGroup>
