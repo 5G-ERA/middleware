@@ -9,7 +9,7 @@ namespace Middleware.RedisInterface.Repositories
         private readonly int _redisDbIndex;
         protected readonly IConnectionMultiplexer RedisClient;
         protected readonly IDatabase Db;
-        private readonly IRedisGraphClient RedisGraph;
+        protected readonly IRedisGraphClient RedisGraph;
 
 
         public BaseRepository(int redisDbIndex, IConnectionMultiplexer redisClient, IRedisGraphClient redisGraph)
