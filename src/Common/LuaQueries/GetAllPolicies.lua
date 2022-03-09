@@ -1,4 +1,4 @@
--- This LUA script will query for all the policies inside redis returning the at parameter and the Policy_Id.
+-- This LUA script will query for all the policies inside redis returning only the ones with active policy check. Retur params are: policy name, id and description.
 
 redis.call('select', '3')
 
