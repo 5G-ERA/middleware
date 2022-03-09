@@ -1,5 +1,5 @@
 
---This lua script will return only the active policies with all parameters.
+--This lua script will return only the active policies.
 
 redis.call('select', '3')
 
