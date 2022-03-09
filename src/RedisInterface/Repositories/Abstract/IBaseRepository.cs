@@ -2,5 +2,5 @@
 
 public interface IBaseRepository<T> where T : class
 {
-    List<T> ExecuteLuaQuery(string queryName);
+    Task<List<T>> ExecuteLuaQueryAsync(string queryName);
 }

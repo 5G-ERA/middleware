@@ -20,12 +20,12 @@ namespace Middleware.RedisInterface.Repositories
             Db = redisClient.GetDatabase(_redisDbIndex);
         }
 
-        public List<T> ExecuteLuaQuery(string queryName)
+        public async Task<List<T>> ExecuteLuaQueryAsync(string queryName)
         {
-            var script = File.ReadAllText(GetScriptPath(queryName));
+            var script = await File.ReadAllTextAsync(GetScriptPath(queryName));
             
             var prepared = LuaScript.Prepare(script);
-            var redisResult = Db.ScriptEvaluate(prepared);
+            var redisResult = await Db.ScriptEvaluateAsync(prepared);
 
             var models = new List<T>();
 
