@@ -7,10 +7,10 @@ EXPOSE 443
 
 FROM mcr.microsoft.com/dotnet/sdk:6.0 AS build
 WORKDIR /src
-COPY ["src/RedisInterface/RedisInterface.csproj", "src/RedisInterface/"]
-RUN dotnet restore "src/RedisInterface/RedisInterface.csproj"
+COPY ["RedisInterface/RedisInterface.csproj", "RedisInterface/"]
+RUN dotnet restore "RedisInterface/RedisInterface.csproj"
 COPY . .
-WORKDIR "/src/src/RedisInterface"
+WORKDIR "/src/RedisInterface"
 RUN dotnet build "RedisInterface.csproj" -c Release -o /app/build
 
 FROM build AS publish
