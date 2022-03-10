@@ -8,11 +8,11 @@ namespace Middleware.ResourcePlanner.Controllers
     [Route("api/v1/[controller]")]
     public class ResourceController : ControllerBase
     {
-        [HttpGet]
-        [ProducesResponseType(typeof(ResourceModel), (int)HttpStatusCode.OK)]
-        public async Task<ActionResult<ResourceModel>> GetResource()
+        [HttpPost]
+        [ProducesResponseType(typeof(TaskModel), (int)HttpStatusCode.OK)]
+        public async Task<ActionResult<TaskModel>> GetResource([FromBody] TaskModel inputmodel)
         {
-            var resource = new ResourceModel();
+            var resource = new TaskModel();
             return Ok(resource);
         }
 
