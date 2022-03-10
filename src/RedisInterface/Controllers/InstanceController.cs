@@ -29,7 +29,7 @@ namespace Middleware.RedisInterface.Controllers
         [HttpDelete]
         [Route("{id}")]
         [ProducesResponseType(typeof(void), (int)HttpStatusCode.OK)]
-        public async Task<ActionResult> DeleteInstance(Guid id)
+        public async Task<ActionResult> DeleteInstanceAsync(Guid id)
         {
             //Delete Instance by id
             return Ok();
