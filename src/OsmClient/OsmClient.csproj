@@ -1,12 +1,10 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
         <TargetFramework>net6.0</TargetFramework>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>disable</Nullable>
         <RootNamespace>Middleware.OsmClient</RootNamespace>
-        <BaseOutputPath>..\..\bin\</BaseOutputPath>
-        <BaseIntermediateOutputPath>..\..\obj\</BaseIntermediateOutputPath>
     </PropertyGroup>
 
     <ItemGroup>

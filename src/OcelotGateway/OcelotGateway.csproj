@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+<Project Sdk="Microsoft.NET.Sdk.Web">
 
   <PropertyGroup>
     <TargetFramework>net6.0</TargetFramework>
@@ -8,8 +8,6 @@
     <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
 	<RootNamespace>Middleware.OcelotGateway</RootNamespace>
     <DockerfileContext>..\..</DockerfileContext>
-    <BaseOutputPath>..\..\bin\</BaseOutputPath>
-    <BaseIntermediateOutputPath>..\..\obj\</BaseIntermediateOutputPath>
   </PropertyGroup>
 
   <ItemGroup>

@@ -9,7 +9,7 @@ namespace Middleware.RedisInterface.Repositories
         private readonly int _redisDbIndex;
         protected readonly IConnectionMultiplexer RedisClient;
         protected readonly IDatabase Db;
-        private readonly IRedisGraphClient RedisGraph;
+        protected readonly IRedisGraphClient RedisGraph;
 
 
         public BaseRepository(int redisDbIndex, IConnectionMultiplexer redisClient, IRedisGraphClient redisGraph)
@@ -20,12 +20,12 @@ namespace Middleware.RedisInterface.Repositories
             Db = redisClient.GetDatabase(_redisDbIndex);
         }
 
-        public List<T> ExecuteLuaQuery(string queryName)
+        public async Task<List<T>> ExecuteLuaQueryAsync(string queryName)
         {
-            var script = File.ReadAllText(GetScriptPath(queryName));
+            var script = await File.ReadAllTextAsync(GetScriptPath(queryName));
             
             var prepared = LuaScript.Prepare(script);
-            var redisResult = Db.ScriptEvaluate(prepared);
+            var redisResult = await Db.ScriptEvaluateAsync(prepared);
 
             var models = new List<T>();
 
