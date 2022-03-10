@@ -4,8 +4,8 @@ namespace Middleware.Common.Models;
 
 public class ActionModel
 {
-  [JsonPropertyName("ActionId")]
-  public Guid ActionId { get; set; }
+  [JsonPropertyName("ActionPlanId")]
+  public Guid ActionPlanId { get; set; }
 
   [JsonPropertyName("Order")]
   public int Order { get; set; }

@@ -7,13 +7,10 @@ using System.Threading.Tasks;
 
 namespace Middleware.Common.Models
 {
-    public class TaskModel
+    public class TaskReplanModel
     {
         [JsonPropertyName("TaskId")]
         public Guid Id { get; set; }
-
-        [JsonPropertyName("TaskPriority")]
-        public int TaskPriority { get; set; }
 
         [JsonPropertyName("ActionPlanId")]
         public Guid ActionPlanId { get; set; }
@@ -21,14 +18,11 @@ namespace Middleware.Common.Models
         [JsonPropertyName("ActionSequence")]
         public List<ActionModel> ActionSequence { get; set; }
 
-        public TaskModel()
+        public TaskReplanModel(Guid taskId)
         {
+            Id = taskId;
+            
+        }
 
-        }
-        public TaskModel(Guid id, int priority)
-        {
-            Id = id;
-            TaskPriority = priority;
-        }
     }
 }
