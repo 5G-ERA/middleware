@@ -2,7 +2,7 @@
 
 namespace Middleware.Common.Models;
 
-public class ServiceDataModel
+public class InstanceModel
 {
     [JsonPropertyName("ServiceId")]
     public Guid ServiceId { get; set; }

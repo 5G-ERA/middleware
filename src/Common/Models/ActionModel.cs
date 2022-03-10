@@ -17,5 +17,5 @@ public class ActionModel
   public string ActionPriority { get; set; }
 
   [JsonPropertyName("Services")]
-  public List<ServiceDataModel> Services { get; set; }
+  public List<InstanceModel> Services { get; set; }
 }

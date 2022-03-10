@@ -53,11 +53,11 @@ public class ActionController : Controller
     /// <returns>Http Status code and List of instantiated services</returns>
     [HttpPost]
     [Route("execute")]
-    [ProducesResponseType(typeof(List<ServiceDataModel>), (int)HttpStatusCode.OK)]
+    [ProducesResponseType(typeof(List<InstanceModel>), (int)HttpStatusCode.OK)]
     public async Task<IActionResult> InstantiateResources([FromBody] List<ActionModel> actions)
     {
         //TODO: instantiate services for action
-        return Ok(new List<ServiceDataModel>());
+        return Ok(new List<InstanceModel>());
     }
 
     /// <summary>
