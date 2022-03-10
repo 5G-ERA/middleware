@@ -39,6 +39,23 @@ namespace Middleware.RedisInterface.Repositories
             return models;
         }
 
+        public async Task<List<string>> GetKeysAsync(string queryName)
+        {
+            var script = await File.ReadAllTextAsync(GetScriptPath(queryName));
+
+            var prepared = LuaScript.Prepare(script);
+            var redisResult = await Db.ScriptEvaluateAsync(prepared);
+
+            var models = new List<string>();
+
+            foreach (var pair in redisResult.ToDictionary())
+            {
+               models.Add((string)pair.Value);
+            }
+
+            return models;
+        }
+
         private string GetScriptPath(string queryName)
         {
             return Path.Combine(Directory.GetCurrentDirectory(), "LuaQueries", $"{queryName}.lua");

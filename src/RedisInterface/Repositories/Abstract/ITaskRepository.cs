@@ -4,9 +4,9 @@ namespace Middleware.RedisInterface.Repositories
 {
     public interface ITaskRepository : IBaseRepository<TaskModel>
     {
-        Task<List<TaskModel>> GetTaskAsync();
+        Task<List<TaskModel>> GetAllTasksAsync(Guid id);
 
-        Task<TaskModel> GetTaskIdAsync(string id);
+        Task<TaskModel> GetTaskByIdAsync(Guid id);
 
         Task<TaskModel> GetTaskRelationshipsAsync();
 

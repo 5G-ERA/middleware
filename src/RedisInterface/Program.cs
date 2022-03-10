@@ -1,3 +1,5 @@
+using Middleware.RedisInterface.Repositories;
+using RedisGraphDotNet.Client;
 using StackExchange.Redis;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -15,6 +17,11 @@ var redisPort = Environment.GetEnvironmentVariable("REDIS_PORT") ?? "6379";
 ConnectionMultiplexer multiplexer = ConnectionMultiplexer.Connect($"{redisHostname}:{redisPort}");
 builder.Services.AddSingleton<IConnectionMultiplexer>(multiplexer);
 //ConnectionMultiplexer multiplexer = ConnectionMultiplexer.Connect("127.0.0.1:6379");
+RedisGraphClient redisGraphClient = new RedisGraphClient(redisHostname, int.Parse(redisPort));
+builder.Services.AddSingleton<IRedisGraphClient>(redisGraphClient);    
+
+builder.Services.AddScoped<ITaskRepository, TaskRepository>();
+builder.Services.AddScoped<IInstanceRepository, InstanceRepository>();
 
 var app = builder.Build();
 
