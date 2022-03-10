@@ -22,6 +22,7 @@ builder.Services.AddSingleton<IRedisGraphClient>(redisGraphClient);
 
 builder.Services.AddScoped<ITaskRepository, TaskRepository>();
 builder.Services.AddScoped<IInstanceRepository, InstanceRepository>();
+builder.Services.AddScoped<IPolicyRepository, PolicyRepository>();
 
 var app = builder.Build();
 

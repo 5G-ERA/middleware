@@ -10,21 +10,21 @@ namespace Middleware.RedisInterface.Controllers
     [ApiController]
     public class TaskController : ControllerBase
     {
-        private readonly ITaskRepository _repository;
+        private readonly ITaskRepository _taskRepository;
+        private readonly IPolicyRepository _policyRepository;
 
-        public TaskController(ITaskRepository repository)
+        public TaskController(ITaskRepository taskRepository, IPolicyRepository policyRepository)
         {
-            _repository = repository ?? throw new ArgumentNullException(nameof(repository));
+            _taskRepository = taskRepository ?? throw new ArgumentNullException(nameof(taskRepository));
+            _policyRepository = policyRepository;
         }
-
-
 
         [HttpGet]
         [ProducesResponseType(typeof(TaskModel), (int)HttpStatusCode.OK)]
         public async Task<List<TaskModel>> GetAllTasksAsync(Guid id)
         {
-            List<TaskModel> tasks = await _repository.GetAllTasksAsync(id);
-            return tasks;    
+            List<PolicyModel> tasks = await _policyRepository.GetAllPoliciesAsync();
+            return new();
         }
     }
 }

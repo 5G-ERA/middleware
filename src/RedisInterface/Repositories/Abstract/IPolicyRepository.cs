@@ -4,5 +4,6 @@ namespace Middleware.RedisInterface.Repositories
 {
     public interface IPolicyRepository : IBaseRepository<PolicyModel>
     {
+        Task<List<PolicyModel>> GetAllPoliciesAsync();
     }
 }
