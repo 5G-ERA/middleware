@@ -25,7 +25,7 @@ namespace Middleware.RedisInterface.Controllers
         [ProducesResponseType(typeof(TaskModel), (int)HttpStatusCode.OK)]
         public async Task<List<TaskModel>> GetAllTasksAsync(Guid id)
         {
-            List<PolicyModel> tasks = await _policyRepository.GetAllPoliciesAsync();
+            List<TaskModel> tasks = await _repository.GetAllTasksAsync(id);
             return new();
         }
 

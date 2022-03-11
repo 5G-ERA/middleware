@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
 using Middleware.Common.Models;
 using System.Net;
@@ -21,6 +22,15 @@ namespace Middleware.RedisInterface.Controllers
         [HttpPost] 
         [ProducesResponseType(typeof(InstanceModel), (int)HttpStatusCode.OK)]
         public async Task<ActionResult<InstanceModel>> PostInstanceAsync([FromBody] InstanceModel instanceModel)
+        {
+            InstanceModel instance = new InstanceModel();
+            return Ok(instance);
+        }
+
+        [HttpPatch]
+        [Route("{id}")]
+        [ProducesResponseType(typeof(InstanceModel), (int)HttpStatusCode.OK)]
+        public async Task<IActionResult> PatchInstanceAsync([FromBody] JsonPatchDocument instanceModel, [FromRoute] Guid id) 
         {
             InstanceModel instance = new InstanceModel();
             return Ok(instance);

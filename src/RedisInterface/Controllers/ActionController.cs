@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
 using Middleware.Common.Models;
 using System.Net;
@@ -25,6 +26,17 @@ namespace Middleware.RedisInterface.Controllers
             ActionModel action = new ActionModel();
             return Ok(action);
         }
+
+
+        [HttpPatch]
+        [Route("{id}")]
+        [ProducesResponseType(typeof(ActionModel), (int)HttpStatusCode.OK)]
+        public async Task<IActionResult> PatchActionAsync([FromBody] JsonPatchDocument actionModel, [FromRoute] Guid id)
+        {
+            ActionModel action = new ActionModel();
+            return Ok(action);
+        }
+
 
         [HttpDelete]
         [Route("{id}")]

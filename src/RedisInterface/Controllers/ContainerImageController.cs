@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
 using Middleware.Common.Models;
 using System.Net;
@@ -21,6 +22,15 @@ namespace Middleware.RedisInterface.Controllers
         [HttpPost]
         [ProducesResponseType(typeof(ContainerImageModel), (int)HttpStatusCode.OK)]
         public async Task<ActionResult<ContainerImageModel>> PostContainerImageAsync([FromBody] ContainerImageModel containerImageModel)
+        {
+            ContainerImageModel containerImage = new ContainerImageModel();
+            return Ok(containerImage);
+        }
+
+        [HttpPatch]
+        [Route("{id}")]
+        [ProducesResponseType(typeof(ContainerImageModel), (int)HttpStatusCode.OK)]
+        public async Task<IActionResult> PatchContainerImageAsync([FromBody] JsonPatchDocument containerImageModel, [FromRoute] Guid id)
         {
             ContainerImageModel containerImage = new ContainerImageModel();
             return Ok(containerImage);
