@@ -1,4 +1,5 @@
 ﻿using Middleware.Common.Models;
+using Middleware.RedisInterface.Enums;
 using NReJSON;
 using RedisGraphDotNet.Client;
 using StackExchange.Redis;
@@ -6,13 +7,11 @@ using System.Text.Json;
 
 namespace Middleware.RedisInterface.Repositories
 {
-    public class InstanceRepository : BaseRepository<InstanceModel>,  IInstanceRepository
+    public class InstanceRepository : BaseRepository<InstanceModel>, IInstanceRepository
     {
-        public InstanceRepository(IConnectionMultiplexer redisClient, IRedisGraphClient redisGraph) : base(2, redisClient, redisGraph)
+        public InstanceRepository(IConnectionMultiplexer redisClient, IRedisGraphClient redisGraph) : base(RedisDbIndexEnum.Instance, redisClient, redisGraph)
         {
         }
-
-        
 
         public async Task<InstanceModel> GetInstanceByIdAsync(Guid id)
         {
@@ -22,8 +21,6 @@ namespace Middleware.RedisInterface.Repositories
 
             return model;
         }
-
-        
 
         public Task<InstanceModel> PostInstanceAsync()
         {

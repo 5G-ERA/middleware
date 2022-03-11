@@ -1,4 +1,5 @@
 ﻿using System.Text.Json;
+using Middleware.RedisInterface.Enums;
 using RedisGraphDotNet.Client;
 using StackExchange.Redis;
 
@@ -6,17 +7,17 @@ namespace Middleware.RedisInterface.Repositories
 {
     public class BaseRepository<T> : IBaseRepository<T> where T : class
     {
-        private readonly int _redisDbIndex;
+        private readonly RedisDbIndexEnum _redisDbIndex;
         protected readonly IConnectionMultiplexer RedisClient;
         protected readonly IDatabase Db;
         protected readonly IRedisGraphClient RedisGraph;
 
-        public BaseRepository(int redisDbIndex, IConnectionMultiplexer redisClient, IRedisGraphClient redisGraph)
+        public BaseRepository(RedisDbIndexEnum redisDbIndex, IConnectionMultiplexer redisClient, IRedisGraphClient redisGraph)
         {
             RedisClient = redisClient ?? throw new ArgumentNullException(nameof(redisClient));
             RedisGraph = redisGraph ?? throw new ArgumentNullException(nameof(redisGraph));
             _redisDbIndex = redisDbIndex;
-            Db = redisClient.GetDatabase(_redisDbIndex);
+            Db = redisClient.GetDatabase((int)_redisDbIndex);
         }
 
         protected async Task<List<T>> ExecuteLuaQueryAsync(string queryName)

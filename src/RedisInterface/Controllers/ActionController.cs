@@ -27,7 +27,6 @@ namespace Middleware.RedisInterface.Controllers
             return Ok(action);
         }
 
-
         [HttpPatch]
         [Route("{id}")]
         [ProducesResponseType(typeof(ActionModel), (int)HttpStatusCode.OK)]
@@ -36,7 +35,6 @@ namespace Middleware.RedisInterface.Controllers
             ActionModel action = new ActionModel();
             return Ok(action);
         }
-
 
         [HttpDelete]
         [Route("{id}")]

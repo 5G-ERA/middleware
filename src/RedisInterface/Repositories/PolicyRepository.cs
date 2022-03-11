@@ -1,5 +1,6 @@
 ﻿using System.Text.Json;
 using Middleware.Common.Models;
+using Middleware.RedisInterface.Enums;
 using NReJSON;
 using RedisGraphDotNet.Client;
 using StackExchange.Redis;
@@ -8,7 +9,7 @@ namespace Middleware.RedisInterface.Repositories
 {
     public class PolicyRepository : BaseRepository<PolicyModel>, IPolicyRepository
     {
-        public PolicyRepository(IConnectionMultiplexer redisClient, IRedisGraphClient redisGraph) : base(3, redisClient, redisGraph)
+        public PolicyRepository(IConnectionMultiplexer redisClient, IRedisGraphClient redisGraph) : base(RedisDbIndexEnum.Policies, redisClient, redisGraph)
         {
         }
 

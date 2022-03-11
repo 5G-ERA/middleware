@@ -1,19 +1,15 @@
 ﻿using System.Text.Json;
-using Microsoft.AspNetCore.DataProtection.KeyManagement;
 using Middleware.Common.Models;
+using Middleware.RedisInterface.Enums;
+using NReJSON;
 using RedisGraphDotNet.Client;
 using StackExchange.Redis;
-using NReJSON;
 
 namespace Middleware.RedisInterface.Repositories
 {
     public class TaskRepository : BaseRepository<TaskModel>,  ITaskRepository   
     {
-
-        
-        
-
-        public TaskRepository(IConnectionMultiplexer redisClient, IRedisGraphClient redisGraph) : base(6, redisClient, redisGraph)
+        public TaskRepository(IConnectionMultiplexer redisClient, IRedisGraphClient redisGraph) : base(RedisDbIndexEnum.Tasks, redisClient, redisGraph)
         {
         }
 
