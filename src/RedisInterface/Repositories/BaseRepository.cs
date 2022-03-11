@@ -11,7 +11,6 @@ namespace Middleware.RedisInterface.Repositories
         protected readonly IDatabase Db;
         protected readonly IRedisGraphClient RedisGraph;
 
-
         public BaseRepository(int redisDbIndex, IConnectionMultiplexer redisClient, IRedisGraphClient redisGraph)
         {
             RedisClient = redisClient ?? throw new ArgumentNullException(nameof(redisClient));
@@ -20,7 +19,7 @@ namespace Middleware.RedisInterface.Repositories
             Db = redisClient.GetDatabase(_redisDbIndex);
         }
 
-        public async Task<List<T>> ExecuteLuaQueryAsync(string queryName)
+        protected async Task<List<T>> ExecuteLuaQueryAsync(string queryName)
         {
             var script = await File.ReadAllTextAsync(GetScriptPath(queryName));
             
@@ -28,14 +27,17 @@ namespace Middleware.RedisInterface.Repositories
             var redisResult = await Db.ScriptEvaluateAsync(prepared);
 
             var models = new List<T>();
-
-            foreach (var pair in redisResult.ToDictionary())
+            var results = new List<string>();
+            if (redisResult.Type == ResultType.MultiBulk)
             {
-                var val = (string)pair.Value;
-                T model = JsonSerializer.Deserialize<T>(val);
-                models.Add(model);
+                results.AddRange(((RedisValue[])redisResult).Select(x => x.ToString()));
             }
 
+            foreach (var result in results)
+            {
+                T model = JsonSerializer.Deserialize<T>(result);
+                models.Add(model);
+            }
             return models;
         }
 

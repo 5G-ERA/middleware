@@ -24,7 +24,12 @@ namespace Middleware.RedisInterface.Repositories
                 policies.Add(policy);
             }
             return policies;
+        }
+        public async Task<List<PolicyModel>> GetActivePoliciesAsync()
+        {
+            List<PolicyModel> activePolicies = await ExecuteLuaQueryAsync("GetActivePolicies");
 
+            return activePolicies;
         }
     }
 }

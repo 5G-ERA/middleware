@@ -20,18 +20,38 @@ namespace Middleware.RedisInterface.Controllers
         [HttpGet]
         [Route("{id}")]
         [ProducesResponseType(typeof(PolicyModel), (int)HttpStatusCode.OK)]
-        public async Task<PolicyModel> GetPolicyByIdAsync(Guid id)
+        public async Task<ActionResult<PolicyModel>> GetPolicyByIdAsync(Guid id)
         {
             PolicyModel policy = new PolicyModel();
-            return policy;
+            return Ok(policy);
         }
 
         [HttpGet]
         [ProducesResponseType(typeof(PolicyModel), (int)HttpStatusCode.OK)]
-        public async Task<List<PolicyModel>> GetAllPolicyAsync()
+        public async Task<ActionResult<List<PolicyModel>>> GetAllPoliciesAsync()
         {
             List<PolicyModel> policies = await _policyRepository.GetAllPoliciesAsync();
-            return policies;
+            return Ok(policies);
+        }
+
+        /// <summary>
+        /// Represents the single currently active policy
+        /// </summary>
+        /// <param name="Id"></param>
+        /// <param name="PolicyName"></param>
+        /// <param name="PolicyDescription"></param>
+        public record ActivePolicy(Guid Id, string PolicyName, string PolicyDescription);
+
+        [HttpGet]
+        [Route("current")]
+        [ProducesResponseType(typeof(ActivePolicy), (int)HttpStatusCode.OK)]
+        public async Task<ActionResult<List<ActivePolicy>>> GetActivePolicies()
+        {
+            List<PolicyModel> activePolicies = await _policyRepository.GetActivePoliciesAsync();
+
+            List<ActivePolicy> activePoliciesRecords = activePolicies.Select(p => new ActivePolicy(p.Id, p.PolicyName, p.Description)).ToList();
+
+            return Ok(activePoliciesRecords);
         }
     }
 }
