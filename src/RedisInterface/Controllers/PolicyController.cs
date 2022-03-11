@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Middleware.Common.Models;
+using Middleware.RedisInterface.Repositories;
 using System.Net;
 
 namespace Middleware.RedisInterface.Controllers
@@ -9,6 +10,13 @@ namespace Middleware.RedisInterface.Controllers
     [ApiController]
     public class PolicyController : ControllerBase
     {
+        private readonly IPolicyRepository _policyRepository;
+
+        public PolicyController(IPolicyRepository policyRepository)
+        {
+            _policyRepository = policyRepository;
+        }
+
         [HttpGet]
         [Route("{id}")]
         [ProducesResponseType(typeof(PolicyModel), (int)HttpStatusCode.OK)]
@@ -18,12 +26,11 @@ namespace Middleware.RedisInterface.Controllers
             return policy;
         }
 
-
         [HttpGet]
         [ProducesResponseType(typeof(PolicyModel), (int)HttpStatusCode.OK)]
         public async Task<List<PolicyModel>> GetAllPolicyAsync()
         {
-            List<PolicyModel> policies = new List<PolicyModel>();
+            List<PolicyModel> policies = await _policyRepository.GetAllPoliciesAsync();
             return policies;
         }
     }
