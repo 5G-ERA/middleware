@@ -17,7 +17,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OcelotGateway", "src\Ocelot
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Common", "src\Common\Common.csproj", "{06FE080E-EB3C-47F7-A062-11113D526F25}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RedisInterface", "src\RedisInterface\RedisInterface.csproj", "{2DF96F25-BEA1-4B5D-A84D-E8FAA8B66D4E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RedisInterface", "src\RedisInterface\RedisInterface.csproj", "{2DF96F25-BEA1-4B5D-A84D-E8FAA8B66D4E}"
+EndProject
+Project("{E53339B2-1760-4266-BCC7-CA923CBCF16C}") = "docker-compose", "docker-compose.dcproj", "{09CBBAA9-15BE-4341-864B-D646231F4AAD}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -53,6 +55,10 @@ Global
 		{2DF96F25-BEA1-4B5D-A84D-E8FAA8B66D4E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{2DF96F25-BEA1-4B5D-A84D-E8FAA8B66D4E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{2DF96F25-BEA1-4B5D-A84D-E8FAA8B66D4E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{09CBBAA9-15BE-4341-864B-D646231F4AAD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{09CBBAA9-15BE-4341-864B-D646231F4AAD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{09CBBAA9-15BE-4341-864B-D646231F4AAD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{09CBBAA9-15BE-4341-864B-D646231F4AAD}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

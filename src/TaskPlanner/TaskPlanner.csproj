@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk.Web">
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
   <PropertyGroup>
     <TargetFramework>net6.0</TargetFramework>
@@ -7,7 +7,8 @@
     <UserSecretsId>63de4809-7568-443d-a99f-6af48952dc47</UserSecretsId>
     <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
 	<RootNamespace>Middleware.TaskPlanner</RootNamespace>  
-    <DockerfileContext>..\..</DockerfileContext>
+    <DockerfileContext>..\..</DockerfileContext>  
+    <DockerComposeProjectPath>..\..\docker-compose.dcproj</DockerComposeProjectPath>
   </PropertyGroup>
 
   <ItemGroup>

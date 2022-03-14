@@ -8,6 +8,7 @@
     <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
 	<RootNamespace>Middleware.ResourcePlanner</RootNamespace>
     <DockerfileContext>..\..</DockerfileContext>
+    <DockerComposeProjectPath>..\..\docker-compose.dcproj</DockerComposeProjectPath>
   </PropertyGroup>
 
   <ItemGroup>
