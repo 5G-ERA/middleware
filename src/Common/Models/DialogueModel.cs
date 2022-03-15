@@ -2,10 +2,10 @@
 
 namespace Middleware.Common.Models;
 
-public class DialogueModel
+public class DialogueModel : BaseModel
 {
     [JsonPropertyName("Question_Id")]
-    public Guid QuestionId { get; set; }
+    public override Guid Id { get; set; }
 
     [JsonPropertyName("Question")]
     public string Question { get; set; }

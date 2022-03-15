@@ -2,10 +2,10 @@
 
 namespace Middleware.Common.Models;
 
-public class RobotModel
+public class RobotModel : BaseModel
 {
     [JsonPropertyName("RobotID")]
-    public Guid RobotId { get; set; }
+    public override Guid Id { get; set; }
 
     [JsonPropertyName("RobotStatus")]
     public string RobotStatus { get; set; }

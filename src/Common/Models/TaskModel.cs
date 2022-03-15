@@ -10,7 +10,7 @@ namespace Middleware.Common.Models
     public class TaskModel : BaseModel
     {
         [JsonPropertyName("TaskId")]
-        public Guid Id { get; set; }
+        public override Guid Id { get; set; }
 
         [JsonPropertyName("TaskPriority")]
         public int TaskPriority { get; set; }

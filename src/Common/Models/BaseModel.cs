@@ -8,6 +8,6 @@ namespace Middleware.Common.Models
 {
     public abstract class BaseModel
     {
-        public Guid Id { get; set; }
+        public abstract Guid Id { get; set; }
     }
 }

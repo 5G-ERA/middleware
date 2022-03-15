@@ -5,7 +5,7 @@ namespace Middleware.Common.Models;
 public class InstanceModel : BaseModel
 {
     [JsonPropertyName("Id")]
-    public Guid ServiceId { get; set; }
+    public override Guid Id { get; set; }
 
     [JsonPropertyName("ImageName")]
     public string ImageName { get; set; }

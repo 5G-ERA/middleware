@@ -7,10 +7,10 @@ using System.Threading.Tasks;
 
 namespace Middleware.Common.Models
 {
-    public class TaskReplanModel
+    public class TaskReplanModel : BaseModel
     {
         [JsonPropertyName("TaskId")]
-        public Guid Id { get; set; }
+        public override Guid Id { get; set; }
 
         [JsonPropertyName("ActionPlanId")]
         public Guid ActionPlanId { get; set; }
