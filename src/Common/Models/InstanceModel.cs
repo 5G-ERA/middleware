@@ -2,9 +2,9 @@
 
 namespace Middleware.Common.Models;
 
-public class InstanceModel
+public class InstanceModel : BaseModel
 {
-    [JsonPropertyName("ServiceId")]
+    [JsonPropertyName("Id")]
     public Guid ServiceId { get; set; }
 
     [JsonPropertyName("ImageName")]

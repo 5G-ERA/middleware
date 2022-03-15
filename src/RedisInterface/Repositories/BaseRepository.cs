@@ -1,11 +1,13 @@
 ﻿using System.Text.Json;
+using Middleware.Common.Models;
 using Middleware.RedisInterface.Enums;
+using NReJSON;
 using RedisGraphDotNet.Client;
 using StackExchange.Redis;
 
 namespace Middleware.RedisInterface.Repositories
 {
-    public class BaseRepository<T> : IBaseRepository<T> where T : class
+    public class BaseRepository<T> : IBaseRepository<T> where T : BaseModel
     {
         private readonly RedisDbIndexEnum _redisDbIndex;
         protected readonly IConnectionMultiplexer RedisClient;
@@ -19,6 +21,43 @@ namespace Middleware.RedisInterface.Repositories
             _redisDbIndex = redisDbIndex;
             Db = redisClient.GetDatabase((int)_redisDbIndex);
         }
+
+        public async Task<T> AddAsync(T model)
+        {
+            model.Id = Guid.NewGuid();
+            await Db.JsonSetAsync(model.Id.ToString(), JsonSerializer.Serialize(model));
+
+            return model;
+        }
+
+        public async Task<T> GetByIdAsync(Guid id) 
+        { 
+            T model = await Db.JsonGetAsync<T>(id.ToString());
+            
+            return model;
+        }
+
+        public async Task<List<T>> GetAllAsync(Guid id) 
+        {
+            List<T> models = new List<T>();
+            var keys = await GetKeysAsync("GetKeys");
+
+            foreach (string key in keys)
+            {
+                string value = (string)await Db.JsonGetAsync(key);
+                T currentModel = JsonSerializer.Deserialize<T>(value);
+                models.Add(currentModel);
+            }
+            return models;
+        }
+
+        public async Task<bool> DeleteByIdAsync(Guid id) 
+        {
+            int deleted = await Db.JsonDeleteAsync(id.ToString());
+            
+            return deleted > 0;
+        }
+
 
         protected async Task<List<T>> ExecuteLuaQueryAsync(string queryName)
         {

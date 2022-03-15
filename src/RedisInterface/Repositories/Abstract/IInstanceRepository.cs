@@ -2,15 +2,12 @@
 
 namespace Middleware.RedisInterface.Repositories
 {
-    public interface IInstanceRepository
+    public interface IInstanceRepository : IBaseRepository<InstanceModel>
     {
-        Task<InstanceModel> GetInstanceByIdAsync(Guid id);
+        
+        Task<InstanceModel> PatchInstanceAsync(Guid id);
 
-        Task<InstanceModel> PostInstanceAsync();
-
-        Task<InstanceModel> PatchInstanceAsync();
-
-        Task DeleteInstance(Guid id);
+        
 
 
     }

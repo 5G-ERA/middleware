@@ -13,28 +13,23 @@ namespace Middleware.RedisInterface.Repositories
         {
         }
 
-        public async Task<InstanceModel> GetInstanceByIdAsync(Guid id)
+        /*public async Task<InstanceModel> GetInstanceByIdAsync(Guid id)
         {
             string value = (string)await Db.JsonGetAsync(id.ToString());
 
             InstanceModel model = JsonSerializer.Deserialize<InstanceModel>(value);
 
             return model;
-        }
+        }*/
 
-        public Task<InstanceModel> PostInstanceAsync()
+        public Task<InstanceModel> PatchInstanceAsync(Guid id)
         {
             throw new NotImplementedException();
         }
 
-        public Task<InstanceModel> PatchInstanceAsync()
+        /*public async Task DeleteByIdAsync(Guid id)
         {
-            throw new NotImplementedException();
-        }
-
-        public Task DeleteInstance(Guid id)
-        {
-            throw new NotImplementedException();
-        }
+            await Db.JsonDeleteAsync(id.ToString());
+        }*/
     }
 }

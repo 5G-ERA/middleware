@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Middleware.Common.Models
 {
-    public class TaskModel
+    public class TaskModel : BaseModel
     {
         [JsonPropertyName("TaskId")]
         public Guid Id { get; set; }

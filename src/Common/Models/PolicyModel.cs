@@ -5,7 +5,7 @@ using System.Text.Json.Serialization;
 
 namespace Middleware.Common.Models;
 
-public class PolicyModel
+public class PolicyModel : BaseModel
 {
     [JsonPropertyName("Policy_Id")]
     public Guid Id { get; set; }

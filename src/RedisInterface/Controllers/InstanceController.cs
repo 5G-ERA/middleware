@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
 using Middleware.Common.Models;
+using Middleware.RedisInterface.Repositories;
 using System.Net;
 
 namespace Middleware.RedisInterface.Controllers
@@ -10,21 +11,30 @@ namespace Middleware.RedisInterface.Controllers
     [ApiController]
     public class InstanceController : ControllerBase
     {
+        private readonly IInstanceRepository _instanceRepository;
+
+        public InstanceController(IInstanceRepository instanceRepository)
+        {
+           _instanceRepository = instanceRepository;
+        }
+
         [HttpGet]
         [Route("{id}")]
         [ProducesResponseType(typeof(InstanceModel), (int)HttpStatusCode.OK)]
-        public async Task<InstanceModel> GetInstanceByIdAsync(Guid id)
-        {
-            InstanceModel instance = new InstanceModel();
-            return instance;
+        public async Task<IActionResult> GetByIdAsync(Guid id)
+        { 
+            InstanceModel instanceModel = await _instanceRepository.GetByIdAsync(id);
+
+            return Ok(instanceModel);  
         }
+
 
         [HttpPost] 
         [ProducesResponseType(typeof(InstanceModel), (int)HttpStatusCode.OK)]
-        public async Task<ActionResult<InstanceModel>> PostInstanceAsync([FromBody] InstanceModel instanceModel)
+        public async Task<ActionResult<InstanceModel>> AddAsync([FromBody] InstanceModel instanceModel)
         {
-            InstanceModel instance = new InstanceModel();
-            return Ok(instance);
+            await _instanceRepository.AddAsync(instanceModel);
+            return Ok(instanceModel);
         }
 
         [HttpPatch]
@@ -39,9 +49,9 @@ namespace Middleware.RedisInterface.Controllers
         [HttpDelete]
         [Route("{id}")]
         [ProducesResponseType(typeof(void), (int)HttpStatusCode.OK)]
-        public async Task<ActionResult> DeleteInstanceAsync(Guid id)
+        public async Task<ActionResult> DeleteByIdAsync(Guid id)
         {
-            //Delete Instance by id
+            await _instanceRepository.DeleteByIdAsync(id);
             return Ok();
         }
     }
