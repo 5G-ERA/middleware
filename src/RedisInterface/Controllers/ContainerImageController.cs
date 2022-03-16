@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
 using Middleware.Common.Models;
+using Middleware.RedisInterface.Repositories.Abstract;
 using System.Net;
 
 namespace Middleware.RedisInterface.Controllers
@@ -10,21 +11,31 @@ namespace Middleware.RedisInterface.Controllers
     [ApiController]
     public class ContainerImageController : ControllerBase
     {
+        private readonly IContainerImageRepository _containerImageRepository;
+
+        public ContainerImageController(IContainerImageRepository containerImageRepository)
+        {
+            _containerImageRepository = containerImageRepository ?? throw new ArgumentNullException(nameof(containerImageRepository));
+        }
+
+
         [HttpGet]
         [Route("{id}")]
         [ProducesResponseType(typeof(ContainerImageModel), (int)HttpStatusCode.OK)]
-        public async Task<ContainerImageModel> GetContainerImageByIdAsync(Guid id)
+        public async Task<IActionResult> GetByIdAsync(Guid id)
         {
-            ContainerImageModel containerImage = new ContainerImageModel();
-            return containerImage;
+            ContainerImageModel containerImageModel = await _containerImageRepository.GetByIdAsync(id);
+
+            return Ok(containerImageModel);
         }
+
 
         [HttpPost]
         [ProducesResponseType(typeof(ContainerImageModel), (int)HttpStatusCode.OK)]
-        public async Task<ActionResult<ContainerImageModel>> PostContainerImageAsync([FromBody] ContainerImageModel containerImageModel)
+        public async Task<ActionResult<ContainerImageModel>> AddAsync([FromBody] ContainerImageModel containerImageModel)
         {
-            ContainerImageModel containerImage = new ContainerImageModel();
-            return Ok(containerImage);
+            await _containerImageRepository.AddAsync(containerImageModel);
+            return Ok(containerImageModel);
         }
 
         [HttpPatch]
@@ -39,9 +50,9 @@ namespace Middleware.RedisInterface.Controllers
         [HttpDelete]
         [Route("{id}")]
         [ProducesResponseType(typeof(void), (int)HttpStatusCode.OK)]
-        public async Task<ActionResult> DeleteContainerImageAsync(Guid id)
+        public async Task<ActionResult> DeleteByIdAsync(Guid id)
         {
-            //Delete ContainerImage by id
+            await _containerImageRepository.DeleteByIdAsync(id);
             return Ok();
         }
     }

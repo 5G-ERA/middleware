@@ -37,7 +37,7 @@ namespace Middleware.RedisInterface.Repositories
             return model;
         }
 
-        public async Task<List<T>> GetAllAsync(Guid id) 
+        public async Task<List<T>> GetAllAsync() 
         {
             List<T> models = new List<T>();
             var keys = await GetKeysAsync("GetKeys");

@@ -10,44 +10,38 @@ namespace Middleware.RedisInterface.Controllers
     [ApiController]
     public class TaskController : ControllerBase
     {
-        private readonly ITaskRepository _repository;
-
-        
+        private readonly ITaskRepository _taskRepository;
 
         public TaskController(ITaskRepository repository)
         {
-            _repository = repository ?? throw new ArgumentNullException(nameof(repository));
+            _taskRepository = repository ?? throw new ArgumentNullException(nameof(repository));
         }
 
-       
+
         [HttpGet]
         [Route("{id}")]
         [ProducesResponseType(typeof(TaskModel), (int)HttpStatusCode.OK)]
-        public async Task<List<TaskModel>> GetAllTasksAsync(Guid id)
+        public async Task<IActionResult> GetByIdAsync(Guid id)
         {
-            List<TaskModel> tasks = await _repository.GetAllTasksAsync(id);
-            return new();
+            TaskModel model = await _taskRepository.GetByIdAsync(id);
+
+            return Ok(model);
         }
 
 
-        [HttpPost]
+        [HttpGet]
         [ProducesResponseType(typeof(TaskModel), (int)HttpStatusCode.OK)]
-        public async Task<ActionResult<TaskModel>> PostTaskAsync([FromBody] TaskModel taskModel)
+        public async Task<ActionResult<IEnumerable<TaskModel>>> GetAllAsync()
         {
-            TaskModel task = new TaskModel();
-            return Ok(task);
-        }
+            List<TaskModel> models = await _taskRepository.GetAllAsync();
 
-        [HttpDelete]
-        [Route("{id}")]
-        [ProducesResponseType(typeof(void), (int)HttpStatusCode.OK)]
-        public async Task<ActionResult> DeleteTaskAsync(Guid id)
-        {
-            //Delete Task by id
-            return Ok();
+            return Ok(models);
         }
 
 
-        
+
+
+
+
     }
 }
