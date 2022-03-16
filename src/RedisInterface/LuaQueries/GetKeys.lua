@@ -2,8 +2,6 @@
 
 --[Obsolete] 
 
-redis.call('select', '3')
-
 local KeysArray = {};
 local matches = redis.call('KEYS', '*')
 
