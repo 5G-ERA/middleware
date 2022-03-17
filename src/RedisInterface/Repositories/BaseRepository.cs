@@ -32,9 +32,10 @@ namespace Middleware.RedisInterface.Repositories
 
         public async Task<T> GetByIdAsync(Guid id) 
         { 
-            T model = await Db.JsonGetAsync<T>(id.ToString());
+            string model = (string)await Db.JsonGetAsync(id.ToString());
+            T newModel = JsonSerializer.Deserialize<T>(model);
             
-            return model;
+            return newModel;
         }
 
         public async Task<List<T>> GetAllAsync() 

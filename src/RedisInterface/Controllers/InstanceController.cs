@@ -40,10 +40,11 @@ namespace Middleware.RedisInterface.Controllers
         [HttpPatch]
         [Route("{id}")]
         [ProducesResponseType(typeof(InstanceModel), (int)HttpStatusCode.OK)]
-        public async Task<IActionResult> PatchInstanceAsync([FromBody] JsonPatchDocument instanceModel, [FromRoute] Guid id) 
+        public async Task<IActionResult> PatchInstanceAsync([FromBody] InstanceModel patch, [FromRoute] Guid id) 
         {
-            InstanceModel instance = new InstanceModel();
-            return Ok(instance);
+
+            InstanceModel model = await _instanceRepository.PatchInstanceAsync(id, patch) ;
+            return Ok(model);
         }
 
         [HttpDelete]
