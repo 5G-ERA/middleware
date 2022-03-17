@@ -1,6 +1,7 @@
 ﻿using System.Net;
 using Microsoft.AspNetCore.Mvc;
 using Middleware.Common.Models;
+using Middleware.Orchestrator.Osm;
 
 namespace Middleware.Orchestrator.Controllers;
 
@@ -8,6 +9,12 @@ namespace Middleware.Orchestrator.Controllers;
 [Route("api/v1/[controller]")]
 public class ActionController : Controller
 {
+    private readonly IOsmClient _client;
+
+    public ActionController(HttpClient httpClient)
+    {
+        _client = new OsmClient(httpClient);
+    }
 
     /// <summary>
     /// Get plan information by its id
