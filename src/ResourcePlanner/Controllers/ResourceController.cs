@@ -8,6 +8,13 @@ namespace Middleware.ResourcePlanner.Controllers
     [Route("api/v1/[controller]")]
     public class ResourceController : ControllerBase
     {
+        private readonly RedisInterface.RedisApiClient _redisApiClient;
+
+        public ResourceController(RedisInterface.RedisApiClient redisApiClient)
+        {
+            _redisApiClient = redisApiClient;
+        }
+
         [HttpPost]
         [ProducesResponseType(typeof(TaskModel), (int)HttpStatusCode.OK)]
         public async Task<ActionResult<TaskModel>> GetResource([FromBody] TaskModel inputmodel)
