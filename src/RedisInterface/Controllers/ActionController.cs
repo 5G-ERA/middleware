@@ -19,7 +19,7 @@ namespace Middleware.RedisInterface.Controllers
         }
 
         [HttpGet]
-        [Route("{id}")]
+        [Route("{id}", Name = "ActionGetById")]
         [ProducesResponseType(typeof(ActionModel), (int)HttpStatusCode.OK)]
         public async Task<IActionResult> GetByIdAsync(Guid id)
         {
@@ -28,8 +28,7 @@ namespace Middleware.RedisInterface.Controllers
             return Ok(actionModel);
         }
 
-
-        [HttpPost]
+        [HttpPost(Name = "ActionAddAsync")]
         [ProducesResponseType(typeof(ActionModel), (int)HttpStatusCode.OK)]
         public async Task<ActionResult<ActionModel>> AddAsync([FromBody] ActionModel actionModel)
         {
@@ -38,16 +37,16 @@ namespace Middleware.RedisInterface.Controllers
         }
 
         [HttpPatch]
-        [Route("{id}")]
+        [Route("{id}", Name ="ActionPatch")]
         [ProducesResponseType(typeof(ActionModel), (int)HttpStatusCode.OK)]
-        public async Task<IActionResult> PatchInstanceAsync([FromBody] JsonPatchDocument actionModel, [FromRoute] Guid id)
+        public async Task<IActionResult> PatchActionAsync([FromBody] JsonPatchDocument actionModel, [FromRoute] Guid id)
         {
             ActionModel action = new ActionModel();
             return Ok(action);
         }
 
         [HttpDelete]
-        [Route("{id}")]
+        [Route("{id}", Name ="ActionDelete")]
         [ProducesResponseType(typeof(void), (int)HttpStatusCode.OK)]
         public async Task<ActionResult> DeleteByIdAsync(Guid id)
         {
