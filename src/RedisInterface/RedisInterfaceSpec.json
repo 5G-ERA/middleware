@@ -10,6 +10,7 @@
         "tags": [
           "Action"
         ],
+        "operationId": "ActionGetById",
         "parameters": [
           {
             "name": "id",
@@ -48,6 +49,7 @@
         "tags": [
           "Action"
         ],
+        "operationId": "ActionPatch",
         "parameters": [
           {
             "name": "id",
@@ -63,22 +65,34 @@
           "content": {
             "application/json-patch+json": {
               "schema": {
-                "$ref": "#/components/schemas/JsonPatchDocument"
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/Operation"
+                }
               }
             },
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/JsonPatchDocument"
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/Operation"
+                }
               }
             },
             "text/json": {
               "schema": {
-                "$ref": "#/components/schemas/JsonPatchDocument"
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/Operation"
+                }
               }
             },
             "application/*+json": {
               "schema": {
-                "$ref": "#/components/schemas/JsonPatchDocument"
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/Operation"
+                }
               }
             }
           }
@@ -110,6 +124,7 @@
         "tags": [
           "Action"
         ],
+        "operationId": "ActionDelete",
         "parameters": [
           {
             "name": "id",
@@ -133,6 +148,7 @@
         "tags": [
           "Action"
         ],
+        "operationId": "ActionAddAsync",
         "requestBody": {
           "content": {
             "application/json-patch+json": {
@@ -308,22 +324,34 @@
           "content": {
             "application/json-patch+json": {
               "schema": {
-                "$ref": "#/components/schemas/JsonPatchDocument"
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/Operation"
+                }
               }
             },
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/JsonPatchDocument"
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/Operation"
+                }
               }
             },
             "text/json": {
               "schema": {
-                "$ref": "#/components/schemas/JsonPatchDocument"
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/Operation"
+                }
               }
             },
             "application/*+json": {
               "schema": {
-                "$ref": "#/components/schemas/JsonPatchDocument"
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/Operation"
+                }
               }
             }
           }
@@ -529,7 +557,7 @@
         "tags": [
           "Health"
         ],
-        "operationId": "CheckHelth",
+        "operationId": "HealthCheck",
         "responses": {
           "200": {
             "description": "Success"
@@ -542,7 +570,7 @@
         "tags": [
           "Health"
         ],
-        "operationId": "GetSpecAsync",
+        "operationId": "GetSpec",
         "responses": {
           "200": {
             "description": "Success"
@@ -608,22 +636,22 @@
           "content": {
             "application/json-patch+json": {
               "schema": {
-                "$ref": "#/components/schemas/JsonPatchDocument"
+                "$ref": "#/components/schemas/InstanceModel"
               }
             },
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/JsonPatchDocument"
+                "$ref": "#/components/schemas/InstanceModel"
               }
             },
             "text/json": {
               "schema": {
-                "$ref": "#/components/schemas/JsonPatchDocument"
+                "$ref": "#/components/schemas/InstanceModel"
               }
             },
             "application/*+json": {
               "schema": {
-                "$ref": "#/components/schemas/JsonPatchDocument"
+                "$ref": "#/components/schemas/InstanceModel"
               }
             }
           }
@@ -1138,10 +1166,6 @@
         },
         "additionalProperties": false
       },
-      "IContractResolver": {
-        "type": "object",
-        "additionalProperties": false
-      },
       "InstanceModel": {
         "type": "object",
         "properties": {
@@ -1162,7 +1186,8 @@
             "nullable": true
           },
           "IsReusable": {
-            "type": "boolean"
+            "type": "boolean",
+            "nullable": true
           },
           "DesiredStatus": {
             "type": "string",
@@ -1176,22 +1201,6 @@
           "ServiceStatus": {
             "type": "string",
             "nullable": true
-          }
-        },
-        "additionalProperties": false
-      },
-      "JsonPatchDocument": {
-        "type": "object",
-        "properties": {
-          "operations": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/Operation"
-            },
-            "nullable": true
-          },
-          "contractResolver": {
-            "$ref": "#/components/schemas/IContractResolver"
           }
         },
         "additionalProperties": false

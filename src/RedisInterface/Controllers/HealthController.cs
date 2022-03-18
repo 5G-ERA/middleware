@@ -13,11 +13,12 @@ namespace Middleware.RedisInterface.Controllers
         {
             _client = factory.CreateClient("helthCheckClinet");
         }
-        [HttpGet(Name="HelthCheck")]
+        [HttpGet(Name="HealthCheck")]
         public IActionResult Get()
         {
             return Ok();
         }
+
         [HttpGet]
         [Route("spec", Name = "GetSpec")]
         public async Task<IActionResult> GetSpec()
