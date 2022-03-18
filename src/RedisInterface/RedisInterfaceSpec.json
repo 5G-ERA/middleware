@@ -406,6 +406,7 @@
         "tags": [
           "ContainerImage"
         ],
+        "operationId": "ContainerImageAdd",
         "requestBody": {
           "content": {
             "application/json-patch+json": {
@@ -573,7 +574,24 @@
         "operationId": "GetSpec",
         "responses": {
           "200": {
-            "description": "Success"
+            "description": "Success",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
           }
         }
       }

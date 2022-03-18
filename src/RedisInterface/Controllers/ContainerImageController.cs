@@ -30,7 +30,7 @@ namespace Middleware.RedisInterface.Controllers
         }
 
 
-        [HttpPost]
+        [HttpPost(Name = "ContainerImageAdd")]
         [ProducesResponseType(typeof(ContainerImageModel), (int)HttpStatusCode.OK)]
         public async Task<ActionResult<ContainerImageModel>> AddAsync([FromBody] ContainerImageModel containerImageModel)
         {

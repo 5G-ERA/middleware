@@ -1,5 +1,7 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using System.Net;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Middleware.Common.Models;
 
 namespace Middleware.RedisInterface.Controllers
 {
@@ -21,6 +23,7 @@ namespace Middleware.RedisInterface.Controllers
 
         [HttpGet]
         [Route("spec", Name = "GetSpec")]
+        [ProducesResponseType(typeof(string), (int)HttpStatusCode.OK)]
         public async Task<IActionResult> GetSpec()
         {
             string path = string.Empty;
