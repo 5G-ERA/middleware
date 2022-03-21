@@ -18,27 +18,37 @@ namespace Middleware.RedisInterface.Controllers
            _instanceRepository = instanceRepository;
         }
 
+        [HttpGet(Name = "InstanceGetAll")]
+        [ProducesResponseType(typeof(InstanceModel), (int)HttpStatusCode.OK)]
+        public async Task<ActionResult<IEnumerable<InstanceModel>>> GetAllAsync()
+        {
+            List<InstanceModel> models = await _instanceRepository.GetAllAsync();
+
+            return Ok(models);
+        }
+
+
         [HttpGet]
-        [Route("{id}")]
+        [Route("{id}", Name = "InstanceGetById")]
         [ProducesResponseType(typeof(InstanceModel), (int)HttpStatusCode.OK)]
         public async Task<IActionResult> GetByIdAsync(Guid id)
         { 
-            InstanceModel instanceModel = await _instanceRepository.GetByIdAsync(id);
+            InstanceModel model = await _instanceRepository.GetByIdAsync(id);
 
-            return Ok(instanceModel);  
+            return Ok(model);  
         }
 
 
-        [HttpPost] 
+        [HttpPost(Name = "InstanceAdd")] 
         [ProducesResponseType(typeof(InstanceModel), (int)HttpStatusCode.OK)]
-        public async Task<ActionResult<InstanceModel>> AddAsync([FromBody] InstanceModel instanceModel)
+        public async Task<ActionResult<InstanceModel>> AddAsync([FromBody] InstanceModel model)
         {
-            await _instanceRepository.AddAsync(instanceModel);
-            return Ok(instanceModel);
+            await _instanceRepository.AddAsync(model);
+            return Ok(model);
         }
 
         [HttpPatch]
-        [Route("{id}")]
+        [Route("{id}", Name = "InstancePatch")]
         [ProducesResponseType(typeof(InstanceModel), (int)HttpStatusCode.OK)]
         public async Task<IActionResult> PatchInstanceAsync([FromBody] InstanceModel patch, [FromRoute] Guid id) 
         {
@@ -48,7 +58,7 @@ namespace Middleware.RedisInterface.Controllers
         }
 
         [HttpDelete]
-        [Route("{id}")]
+        [Route("{id}", Name = "InstanceDelete")]
         [ProducesResponseType(typeof(void), (int)HttpStatusCode.OK)]
         public async Task<ActionResult> DeleteByIdAsync(Guid id)
         {

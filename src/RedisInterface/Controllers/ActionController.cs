@@ -18,32 +18,47 @@ namespace Middleware.RedisInterface.Controllers
             _actionRepository = actionRepository ?? throw new ArgumentNullException(nameof(actionRepository));
         }
 
+
+        [HttpGet(Name = "ActionGetAll")]
+        [ProducesResponseType(typeof(ActionModel), (int)HttpStatusCode.OK)]
+        public async Task<ActionResult<IEnumerable<ActionModel>>> GetAllAsync()
+        {
+            List<ActionModel> models = await _actionRepository.GetAllAsync();
+
+            return Ok(models);
+        }
+
+
         [HttpGet]
         [Route("{id}", Name = "ActionGetById")]
         [ProducesResponseType(typeof(ActionModel), (int)HttpStatusCode.OK)]
         public async Task<IActionResult> GetByIdAsync(Guid id)
         {
-            ActionModel actionModel = await _actionRepository.GetByIdAsync(id);
+            ActionModel model = await _actionRepository.GetByIdAsync(id);
 
-            return Ok(actionModel);
+            return Ok(model);
         }
 
-        [HttpPost(Name = "ActionAddAsync")]
+
+        [HttpPost(Name = "ActionAdd")]
         [ProducesResponseType(typeof(ActionModel), (int)HttpStatusCode.OK)]
-        public async Task<ActionResult<ActionModel>> AddAsync([FromBody] ActionModel actionModel)
+        public async Task<ActionResult<ActionModel>> AddAsync([FromBody] ActionModel model)
         {
-            await _actionRepository.AddAsync(actionModel);
-            return Ok(actionModel);
+            await _actionRepository.AddAsync(model);
+            return Ok(model);
         }
+
 
         [HttpPatch]
         [Route("{id}", Name ="ActionPatch")]
         [ProducesResponseType(typeof(ActionModel), (int)HttpStatusCode.OK)]
-        public async Task<IActionResult> PatchActionAsync([FromBody] JsonPatchDocument actionModel, [FromRoute] Guid id)
+        public async Task<IActionResult> PatchActionAsync([FromBody] ActionModel patch, [FromRoute] Guid id)
         {
-            ActionModel action = new ActionModel();
-            return Ok(action);
+            ActionModel model = await _actionRepository.PatchActionAsync(id, patch);
+            return Ok(model);
         }
+
+        
 
         [HttpDelete]
         [Route("{id}", Name ="ActionDelete")]

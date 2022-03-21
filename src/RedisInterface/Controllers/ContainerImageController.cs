@@ -19,36 +19,48 @@ namespace Middleware.RedisInterface.Controllers
         }
 
 
+        [HttpGet(Name = "ContainerImageGetAll")]
+        [ProducesResponseType(typeof(ContainerImageModel), (int)HttpStatusCode.OK)]
+        public async Task<ActionResult<IEnumerable<ContainerImageModel>>> GetAllAsync()
+        {
+            List<ContainerImageModel> models = await _containerImageRepository.GetAllAsync();
+
+            return Ok(models);
+        }
+
+
         [HttpGet]
-        [Route("{id}")]
+        [Route("{id}", Name = "ContainerImageGetbyId")]
         [ProducesResponseType(typeof(ContainerImageModel), (int)HttpStatusCode.OK)]
         public async Task<IActionResult> GetByIdAsync(Guid id)
         {
-            ContainerImageModel containerImageModel = await _containerImageRepository.GetByIdAsync(id);
+            ContainerImageModel model = await _containerImageRepository.GetByIdAsync(id);
 
-            return Ok(containerImageModel);
+            return Ok(model);
         }
 
 
-        [HttpPost]
+        [HttpPost(Name = "ContainerImageAdd")]
         [ProducesResponseType(typeof(ContainerImageModel), (int)HttpStatusCode.OK)]
-        public async Task<ActionResult<ContainerImageModel>> AddAsync([FromBody] ContainerImageModel containerImageModel)
+        public async Task<ActionResult<ContainerImageModel>> AddAsync([FromBody] ContainerImageModel model)
         {
-            await _containerImageRepository.AddAsync(containerImageModel);
-            return Ok(containerImageModel);
+            await _containerImageRepository.AddAsync(model);
+            return Ok(model);
         }
 
         [HttpPatch]
-        [Route("{id}")]
+        [Route("{id}", Name = "ContainerImagePatch")]
         [ProducesResponseType(typeof(ContainerImageModel), (int)HttpStatusCode.OK)]
-        public async Task<IActionResult> PatchContainerImageAsync([FromBody] JsonPatchDocument containerImageModel, [FromRoute] Guid id)
+        public async Task<IActionResult> PatchContainerImageAsync([FromBody] ContainerImageModel patch, [FromRoute] Guid id)
         {
-            ContainerImageModel containerImage = new ContainerImageModel();
-            return Ok(containerImage);
+            ContainerImageModel model = await _containerImageRepository.PatchContainerImageAsync(id, patch);
+            return Ok(model);
         }
 
+
+
         [HttpDelete]
-        [Route("{id}")]
+        [Route("{id}", Name = "ContainerImageDelete")]
         [ProducesResponseType(typeof(void), (int)HttpStatusCode.OK)]
         public async Task<ActionResult> DeleteByIdAsync(Guid id)
         {

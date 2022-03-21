@@ -17,8 +17,18 @@ namespace Middleware.RedisInterface.Controllers
             _cloudRepository = cloudRepository ?? throw new ArgumentNullException(nameof(cloudRepository));
         }
 
+        [HttpGet(Name = "CloudGetAll")]
+        [ProducesResponseType(typeof(CloudModel), (int)HttpStatusCode.OK)]
+        public async Task<ActionResult<IEnumerable<CloudModel>>> GetAllAsync()
+        {
+            List<CloudModel> models = await _cloudRepository.GetAllAsync();
+
+            return Ok(models);
+        }
+
+
         [HttpGet]
-        [Route("{id}")]
+        [Route("{id}", Name = "CloudGetById")]
         [ProducesResponseType(typeof(CloudModel), (int)HttpStatusCode.OK)]
         public async Task<IActionResult> GetByIdAsync(Guid id)
         {
@@ -28,13 +38,22 @@ namespace Middleware.RedisInterface.Controllers
         }
 
 
-        [HttpGet]
+        [HttpPost(Name = "CloudAdd")]
         [ProducesResponseType(typeof(CloudModel), (int)HttpStatusCode.OK)]
-        public async Task<ActionResult<IEnumerable<CloudModel>>> GetAllAsync()
+        public async Task<ActionResult<CloudModel>> AddAsync([FromBody] CloudModel model)
         {
-            List<CloudModel> models = await _cloudRepository.GetAllAsync();
+            await _cloudRepository.AddAsync(model);
+            return Ok(model);
+        }
 
-            return Ok(models);
+
+        [HttpDelete]
+        [Route("{id}", Name = "CloudDelete")]
+        [ProducesResponseType(typeof(void), (int)HttpStatusCode.OK)]
+        public async Task<ActionResult> DeleteByIdAsync(Guid id)
+        {
+            await _cloudRepository.DeleteByIdAsync(id);
+            return Ok();
         }
     }
 }

@@ -17,22 +17,43 @@ namespace Middleware.RedisInterface.Controllers
             _robotRepository = robotRepository ?? throw new ArgumentNullException(nameof(robotRepository));
         }
 
+        [HttpGet(Name = "RobotGetAll")]
+        [ProducesResponseType(typeof(RobotModel), (int)HttpStatusCode.OK)]
+        public async Task<ActionResult<IEnumerable<RobotModel>>> GetAllAsync()
+        {
+            List<RobotModel> models = await _robotRepository.GetAllAsync();
+
+            return Ok(models);
+        }
+
+
         [HttpGet]
-        [Route("{id}")]
+        [Route("{id}", Name = "RobotGetById")]
         [ProducesResponseType(typeof(RobotModel), (int)HttpStatusCode.OK)]
         public async Task<IActionResult> GetByIdAsync(Guid id)
         {
-            RobotModel robotModel = await _robotRepository.GetByIdAsync(id);
+            RobotModel model = await _robotRepository.GetByIdAsync(id);
 
-            return Ok(robotModel);
+            return Ok(model);
         }
 
-        [HttpGet]
+
+        [HttpPost(Name = "RobotAdd")]
         [ProducesResponseType(typeof(RobotModel), (int)HttpStatusCode.OK)]
-        public async Task<ActionResult<IEnumerable<RobotModel>>> GetAllAsync() 
+        public async Task<ActionResult<RobotModel>> AddAsync([FromBody] RobotModel model)
         {
-            List<RobotModel> models = await _robotRepository.GetAllAsync();
-            return Ok(models);
+            await _robotRepository.AddAsync(model);
+            return Ok(model);
+        }
+
+
+        [HttpDelete]
+        [Route("{id}", Name = "RobotDelete")]
+        [ProducesResponseType(typeof(void), (int)HttpStatusCode.OK)]
+        public async Task<ActionResult> DeleteByIdAsync(Guid id)
+        {
+            await _robotRepository.DeleteByIdAsync(id);
+            return Ok();
         }
     }
 }
