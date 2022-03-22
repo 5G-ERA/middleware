@@ -17,7 +17,7 @@ builder.Services.AddControllers().AddNewtonsoftJson();
 
 builder.Services.AddSwaggerGen();
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddHttpClient("helthCheckClinet");
+builder.Services.AddHttpClient("healthCheckClient");
 
 var redisHostname = Environment.GetEnvironmentVariable("REDIS_HOSTNAME") ?? "127.0.0.1";
 var redisPort = Environment.GetEnvironmentVariable("REDIS_PORT") ?? "6379";
@@ -40,7 +40,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-app.UseHttpsRedirection();
+//app.UseHttpsRedirection();
 
 app.UseAuthorization();
 

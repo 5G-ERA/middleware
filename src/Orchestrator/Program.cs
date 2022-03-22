@@ -23,10 +23,8 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
-ServicePointManager
-        .ServerCertificateValidationCallback +=
-    (sender, cert, chain, sslPolicyErrors) => true;
-app.UseHttpsRedirection();
+
+//app.UseHttpsRedirection();
 
 app.UseAuthorization();
 

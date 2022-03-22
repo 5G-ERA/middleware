@@ -6,7 +6,9 @@
     <ProjectGuid>09cbbaa9-15be-4341-864b-d646231f4aad</ProjectGuid>
     <DockerLaunchAction>LaunchBrowser</DockerLaunchAction>
     <DockerServiceUrl>{Scheme}://localhost:{ServicePort}/swagger</DockerServiceUrl>
-    <DockerServiceName>redisinterface</DockerServiceName>
+  </PropertyGroup>
+  <PropertyGroup>
+    <DockerServiceName>orchestrator</DockerServiceName>
   </PropertyGroup>
   <ItemGroup>
     <None Include="docker-compose.override.yml">
