@@ -5,30 +5,12 @@ namespace Middleware.TaskPlanner
 {
     public class ActionPlanner
     {
-        //**Get all the data neccesary to plan**
-        //============================================
-        // --> get task_id
-        // --> get task_priority
-        // --> Get all questions and answers
-        // --> get list of all task_ids registered in the system
-        //--> get robot model
-        //--> get LocomotionSystem
-        //--> get "ArticulationAvailable": "false",
-        //--> get "NumberOfArticulation": 0,
-        //-->  "ArticulationDof": [],
-        //-->  "Sensors": [ "lidar", "camera", "IMU" ],
-        //============================================
 
-        // taskModel
-        // robot model
         private TaskModel _taskModel;
         private RobotModel _robotModel;
         private ActionModel _actionModel;
 
         
-     
-
-
         public Guid ActionPlanId { get; set; }
         public List<ActionModel> ActionSequence { get; set; }
         public DateTime CurrentTime { get; set; }
@@ -46,7 +28,7 @@ namespace Middleware.TaskPlanner
             ActionSequence = SequenceActions; //Empty at the begining
             CurrentTime = Currenttime;
             InferingProcess = ""; //Predefined actionsequence by id or IA infering based on new task.
-            string rotobName = _robotModel.RobotName;
+            string robotName = _robotModel.RobotName;
         }
 
         public void InferActionSequence ()
