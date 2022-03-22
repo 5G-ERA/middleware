@@ -15,6 +15,7 @@ namespace Middleware.RedisInterface.Controllers
         {
             _client = factory.CreateClient("healthCheckClient");
         }
+
         [HttpGet(Name="HealthCheck")]
         public IActionResult Get()
         {

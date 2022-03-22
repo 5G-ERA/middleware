@@ -17,7 +17,10 @@ namespace Middleware.RedisInterface.Controllers
             _edgeRepository = edgeRepository ?? throw new ArgumentNullException(nameof(edgeRepository));
         }
 
-
+        /// <summary>
+        /// Get all the EdgeModel entities
+        /// </summary>
+        /// <returns> the list of EdgeModel entities </returns>
         [HttpGet(Name = "EdgeGetAll")]
         [ProducesResponseType(typeof(EdgeModel), (int)HttpStatusCode.OK)]
         public async Task<ActionResult<IEnumerable<EdgeModel>>> GetAllAsync()
@@ -27,7 +30,11 @@ namespace Middleware.RedisInterface.Controllers
             return Ok(models);
         }
 
-
+        /// <summary>
+        /// Get an EdgeModel entity by id
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns> the EdgeModel entity for the specified id </returns>
         [HttpGet]
         [Route("{id}", Name = "EdgeGetById")]
         [ProducesResponseType(typeof(EdgeModel), (int)HttpStatusCode.OK)]
@@ -38,7 +45,11 @@ namespace Middleware.RedisInterface.Controllers
             return Ok(model);
         }
 
-
+        /// <summary>
+        /// Add a new EdgeModel entity
+        /// </summary>
+        /// <param name="model"></param>
+        /// <returns> the newly created EdgeModel entity </returns>
         [HttpPost(Name = "EdgeAdd")]
         [ProducesResponseType(typeof(EdgeModel), (int)HttpStatusCode.OK)]
         public async Task<ActionResult<EdgeModel>> AddAsync([FromBody] EdgeModel model)
@@ -47,7 +58,11 @@ namespace Middleware.RedisInterface.Controllers
             return Ok(model);
         }
 
-
+        /// <summary>
+        /// Delete an EdgeModel entity for the given id
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns> no return </returns>
         [HttpDelete]
         [Route("{id}", Name = "EdgeDelete")]
         [ProducesResponseType(typeof(void), (int)HttpStatusCode.OK)]

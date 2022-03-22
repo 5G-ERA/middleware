@@ -17,6 +17,10 @@ namespace Middleware.RedisInterface.Controllers
             _cloudRepository = cloudRepository ?? throw new ArgumentNullException(nameof(cloudRepository));
         }
 
+        /// <summary>
+        /// Get all the CloudModel entities
+        /// </summary>
+        /// <returns> the list of CloudModel entities </returns>
         [HttpGet(Name = "CloudGetAll")]
         [ProducesResponseType(typeof(CloudModel), (int)HttpStatusCode.OK)]
         public async Task<ActionResult<IEnumerable<CloudModel>>> GetAllAsync()
@@ -26,7 +30,11 @@ namespace Middleware.RedisInterface.Controllers
             return Ok(models);
         }
 
-
+        /// <summary>
+        /// Get a CloudModel entity by id 
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns> the CloudModel entity for the specified id </returns>
         [HttpGet]
         [Route("{id}", Name = "CloudGetById")]
         [ProducesResponseType(typeof(CloudModel), (int)HttpStatusCode.OK)]
@@ -38,6 +46,11 @@ namespace Middleware.RedisInterface.Controllers
         }
 
 
+        /// <summary>
+        /// Add a new CloudModel entity
+        /// </summary>
+        /// <param name="model"></param>
+        /// <returns> the newly created CloudModel entity </returns>
         [HttpPost(Name = "CloudAdd")]
         [ProducesResponseType(typeof(CloudModel), (int)HttpStatusCode.OK)]
         public async Task<ActionResult<CloudModel>> AddAsync([FromBody] CloudModel model)
@@ -47,6 +60,11 @@ namespace Middleware.RedisInterface.Controllers
         }
 
 
+        /// <summary>
+        /// Delete an CloudModel entity for the given id
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns> no return </returns>
         [HttpDelete]
         [Route("{id}", Name = "CloudDelete")]
         [ProducesResponseType(typeof(void), (int)HttpStatusCode.OK)]
