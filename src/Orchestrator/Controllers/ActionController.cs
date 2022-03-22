@@ -20,12 +20,12 @@ public class ActionController : Controller
         _client = apiClientBuilder.CreateRedisApiClient();
     }
 
-    [HttpGet]
-    public async Task<IActionResult> Get()
-    {
-        string path = await _client.GetSpecAsync();
-        return Ok(path);
-    }
+    //[HttpGet]
+    //public async Task<IActionResult> Get()
+    //{
+    //    string path = await _client.GetSpecAsync();
+    //    return Ok(path);
+    //}
 
     /// <summary>
     /// Get plan information by its id
