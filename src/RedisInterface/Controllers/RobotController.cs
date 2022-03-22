@@ -17,6 +17,10 @@ namespace Middleware.RedisInterface.Controllers
             _robotRepository = robotRepository ?? throw new ArgumentNullException(nameof(robotRepository));
         }
 
+        /// <summary>
+        /// Get all the RobotModel entities
+        /// </summary>
+        /// <returns> the list of RobotModel entities </returns>
         [HttpGet(Name = "RobotGetAll")]
         [ProducesResponseType(typeof(RobotModel), (int)HttpStatusCode.OK)]
         public async Task<ActionResult<IEnumerable<RobotModel>>> GetAllAsync()
@@ -26,7 +30,11 @@ namespace Middleware.RedisInterface.Controllers
             return Ok(models);
         }
 
-
+        /// <summary>
+        /// Get a RobotModel entity by id
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns> the RobotModel entity for the specified id </returns>
         [HttpGet]
         [Route("{id}", Name = "RobotGetById")]
         [ProducesResponseType(typeof(RobotModel), (int)HttpStatusCode.OK)]
@@ -37,7 +45,11 @@ namespace Middleware.RedisInterface.Controllers
             return Ok(model);
         }
 
-
+        /// <summary>
+        /// Add a new RobotModel entity
+        /// </summary>
+        /// <param name="model"></param>
+        /// <returns> the newly created RobotModel entity </returns>
         [HttpPost(Name = "RobotAdd")]
         [ProducesResponseType(typeof(RobotModel), (int)HttpStatusCode.OK)]
         public async Task<ActionResult<RobotModel>> AddAsync([FromBody] RobotModel model)
@@ -46,7 +58,11 @@ namespace Middleware.RedisInterface.Controllers
             return Ok(model);
         }
 
-
+        /// <summary>
+        /// Delete an RobotModel entity for the given id
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns> no return </returns>
         [HttpDelete]
         [Route("{id}", Name = "RobotDelete")]
         [ProducesResponseType(typeof(void), (int)HttpStatusCode.OK)]

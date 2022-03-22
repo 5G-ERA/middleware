@@ -17,7 +17,10 @@ namespace Middleware.RedisInterface.Controllers
             _taskRepository = repository ?? throw new ArgumentNullException(nameof(repository));
         }
 
-
+        /// <summary>
+        /// Get all the TaskModel entities
+        /// </summary>
+        /// <returns> the list of TaskModel entities </returns>
         [HttpGet(Name = "TaskGetAll")]
         [ProducesResponseType(typeof(TaskModel), (int)HttpStatusCode.OK)]
         public async Task<ActionResult<IEnumerable<TaskModel>>> GetAllAsync()
@@ -27,7 +30,11 @@ namespace Middleware.RedisInterface.Controllers
             return Ok(models);
         }
 
-
+        /// <summary>
+        /// Get a TaskModel entity by id
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns> the TaskModel entity for the specified id </returns>
         [HttpGet]
         [Route("{id}", Name = "TaskGetById")]
         [ProducesResponseType(typeof(TaskModel), (int)HttpStatusCode.OK)]
@@ -38,7 +45,11 @@ namespace Middleware.RedisInterface.Controllers
             return Ok(model);
         }
 
-
+        /// <summary>
+        /// Add a new TaskModel entity
+        /// </summary>
+        /// <param name="model"></param>
+        /// <returns> the newly created TaskModel entity </returns>
         [HttpPost(Name = "TaskAdd")]
         [ProducesResponseType(typeof(TaskModel), (int)HttpStatusCode.OK)]
         public async Task<ActionResult<TaskModel>> AddAsync([FromBody] TaskModel model)
@@ -47,7 +58,11 @@ namespace Middleware.RedisInterface.Controllers
             return Ok(model);
         }
 
-
+        /// <summary>
+        /// Delete an TaskModel entity for the given id
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns> no return </returns>
         [HttpDelete]
         [Route("{id}", Name = "TaskDelete")]
         [ProducesResponseType(typeof(void), (int)HttpStatusCode.OK)]
