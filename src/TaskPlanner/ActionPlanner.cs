@@ -42,6 +42,20 @@ namespace Middleware.TaskPlanner
                 {
                 //manual action Sequence with minimum config from dialogues table.
 
+                //TaskId maps with preDefined ActionPlan --> Redis query to get PlanId by TaskId
+
+                //Loop over each action in actionSequence.
+                // If navigationFamily --> get answer do you have map, what types of maps, what sensors do you have.
+                //if no map, add a new action before this one with SLAM. --> Check if timelimit exists.
+                //Check the ROS version and distro for SLAM based upon dialogues table. --> run LUA script with search parameters.
+                //if map, Check the ROS version and distro for SLAM based upon dialogues table
+
+                //If manipulationFamily --> get answer, do you have neccesary articulations. --> run LUA script with search parameters.
+
+                //If perception --> get answer, what sensors do you have sensor --> run LUA script with search parameters.
+
+                //Return ActionSequence
+
 
             }
             else
@@ -54,10 +68,14 @@ namespace Middleware.TaskPlanner
 
         }
 
+        private static void ReInferActionSequence(Guid CurrentTaskId)
+        {
+
+            //Replan
+
+        }
 
     }
-
-    
 
 }
 
