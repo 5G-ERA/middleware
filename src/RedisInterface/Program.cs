@@ -1,5 +1,6 @@
 using Middleware.RedisInterface;
 using Middleware.RedisInterface.Repositories;
+using Middleware.RedisInterface.Repositories.Abstract;
 using RedisGraphDotNet.Client;
 using StackExchange.Redis;
 
@@ -27,9 +28,16 @@ builder.Services.AddSingleton<IConnectionMultiplexer>(multiplexer);
 RedisGraphClient redisGraphClient = new RedisGraphClient(redisHostname, int.Parse(redisPort));
 builder.Services.AddSingleton<IRedisGraphClient>(redisGraphClient);
 
-builder.Services.AddScoped<ITaskRepository, TaskRepository>();
+builder.Services.AddScoped<IActionRepository, ActionRepository>();
+builder.Services.AddScoped<ICloudRepository, CloudRepository>();
+builder.Services.AddScoped<IContainerImageRepository, ContainerImageRepository>();
+builder.Services.AddScoped<IEdgeRepository, EdgeRepository>();
 builder.Services.AddScoped<IInstanceRepository, InstanceRepository>();
 builder.Services.AddScoped<IPolicyRepository, PolicyRepository>();
+builder.Services.AddScoped<IRobotRepository, RobotRepository>();
+builder.Services.AddScoped<ITaskRepository, TaskRepository>();
+
+
 
 var app = builder.Build();
 

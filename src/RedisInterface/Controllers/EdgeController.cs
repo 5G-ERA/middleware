@@ -18,8 +18,18 @@ namespace Middleware.RedisInterface.Controllers
         }
 
 
+        [HttpGet(Name = "EdgeGetAll")]
+        [ProducesResponseType(typeof(EdgeModel), (int)HttpStatusCode.OK)]
+        public async Task<ActionResult<IEnumerable<EdgeModel>>> GetAllAsync()
+        {
+            List<EdgeModel> models = await _edgeRepository.GetAllAsync();
+
+            return Ok(models);
+        }
+
+
         [HttpGet]
-        [Route("{id}")]
+        [Route("{id}", Name = "EdgeGetById")]
         [ProducesResponseType(typeof(EdgeModel), (int)HttpStatusCode.OK)]
         public async Task<IActionResult> GetByIdAsync(Guid id)
         {
@@ -29,12 +39,22 @@ namespace Middleware.RedisInterface.Controllers
         }
 
 
-        [HttpGet]
+        [HttpPost(Name = "EdgeAdd")]
         [ProducesResponseType(typeof(EdgeModel), (int)HttpStatusCode.OK)]
-        public async Task<ActionResult<IEnumerable<EdgeModel>>> GetAllAsync()
+        public async Task<ActionResult<EdgeModel>> AddAsync([FromBody] EdgeModel model)
         {
-            List<EdgeModel> models = await _edgeRepository.GetAllAsync();
-            return Ok(models);
+            await _edgeRepository.AddAsync(model);
+            return Ok(model);
+        }
+
+
+        [HttpDelete]
+        [Route("{id}", Name = "EdgeDelete")]
+        [ProducesResponseType(typeof(void), (int)HttpStatusCode.OK)]
+        public async Task<ActionResult> DeleteByIdAsync(Guid id)
+        {
+            await _edgeRepository.DeleteByIdAsync(id);
+            return Ok();
         }
     }
 }

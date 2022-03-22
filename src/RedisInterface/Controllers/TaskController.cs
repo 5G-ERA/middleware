@@ -18,8 +18,18 @@ namespace Middleware.RedisInterface.Controllers
         }
 
 
+        [HttpGet(Name = "TaskGetAll")]
+        [ProducesResponseType(typeof(TaskModel), (int)HttpStatusCode.OK)]
+        public async Task<ActionResult<IEnumerable<TaskModel>>> GetAllAsync()
+        {
+            List<TaskModel> models = await _taskRepository.GetAllAsync();
+
+            return Ok(models);
+        }
+
+
         [HttpGet]
-        [Route("{id}")]
+        [Route("{id}", Name = "TaskGetById")]
         [ProducesResponseType(typeof(TaskModel), (int)HttpStatusCode.OK)]
         public async Task<IActionResult> GetByIdAsync(Guid id)
         {
@@ -29,13 +39,22 @@ namespace Middleware.RedisInterface.Controllers
         }
 
 
-        [HttpGet]
+        [HttpPost(Name = "TaskAdd")]
         [ProducesResponseType(typeof(TaskModel), (int)HttpStatusCode.OK)]
-        public async Task<ActionResult<IEnumerable<TaskModel>>> GetAllAsync()
+        public async Task<ActionResult<TaskModel>> AddAsync([FromBody] TaskModel model)
         {
-            List<TaskModel> models = await _taskRepository.GetAllAsync();
+            await _taskRepository.AddAsync(model);
+            return Ok(model);
+        }
 
-            return Ok(models);
+
+        [HttpDelete]
+        [Route("{id}", Name = "TaskDelete")]
+        [ProducesResponseType(typeof(void), (int)HttpStatusCode.OK)]
+        public async Task<ActionResult> DeleteByIdAsync(Guid id)
+        {
+            await _taskRepository.DeleteByIdAsync(id);
+            return Ok();
         }
 
 
