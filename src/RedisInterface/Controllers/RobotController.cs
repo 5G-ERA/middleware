@@ -71,5 +71,13 @@ namespace Middleware.RedisInterface.Controllers
             await _robotRepository.DeleteByIdAsync(id);
             return Ok();
         }
+
+        [HttpGet]
+        [ProducesResponseType(typeof(List <TaskModel>), (int)HttpStatusCode.OK)]
+        public async Task<ActionResult<IEnumerable<TaskModel>>> GetTaskForRobotByIdAsync()
+        {
+          //  List<TaskModel> models = await _robotRepository.GetAllAsync();
+            return Ok();
+        }
     }
 }

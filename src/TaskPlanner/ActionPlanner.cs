@@ -10,8 +10,10 @@ namespace Middleware.TaskPlanner
         private RobotModel _robotModel;
         private ActionModel _actionModel;
 
-        
-        public Guid ActionPlanId { get; set; }
+        public List<Guid> TasksIDs { get; set; } //List with all tasks ids registered in Redis
+
+
+        public Guid ActionPlanId { get; set; } //Pregenerated Id for task planner request
         public List<ActionModel> ActionSequence { get; set; }
         public DateTime CurrentTime { get; set; }
         public string LocomotionSystem { get; set; }
@@ -31,18 +33,28 @@ namespace Middleware.TaskPlanner
             string robotName = _robotModel.RobotName;
         }
 
-        public void InferActionSequence ()
+        public void InferActionSequence (Guid CurrentTaskId)
             {
-            // query redis for single ID.
+            // TasksIDs = GetAllTasksID.lua
+            bool alreadyExist = TasksIDs.Contains(CurrentTaskId);
 
-            // if taskId not in all TasksId registered: 
-            //Activate flexible planner, infer possible action sequence.
+            if (alreadyExist==true)  
+                {
+                //manual action Sequence with minimum config from dialogues table.
 
-            //else:
-            //manual action Sequence with minimum config from dialogues table.
-             }
 
-        
+            }
+            else
+            {
+
+                //Activate flexible planner, infer possible action sequence.
+
+            }
+
+
+        }
+
+
     }
 
     
