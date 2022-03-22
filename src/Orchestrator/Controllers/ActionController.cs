@@ -1,7 +1,11 @@
 ﻿using System.Net;
 using Microsoft.AspNetCore.Mvc;
-using Middleware.Common.Models;
+using Middleware.Orchestrator.ApiReference;
 using Middleware.Orchestrator.Osm;
+using Middleware.Orchestrator.RedisInterface;
+using ActionModel = Middleware.Common.Models.ActionModel;
+using InstanceModel = Middleware.Common.Models.InstanceModel;
+using TaskModel = Middleware.Common.Models.TaskModel;
 
 namespace Middleware.Orchestrator.Controllers;
 
@@ -9,11 +13,18 @@ namespace Middleware.Orchestrator.Controllers;
 [Route("api/v1/[controller]")]
 public class ActionController : Controller
 {
-    private readonly IOsmClient _client;
+    private readonly RedisApiClient _client;
 
-    public ActionController(HttpClient httpClient)
+    public ActionController(IApiClientBuilder apiClientBuilder)
     {
-        _client = new OsmClient(httpClient);
+        _client = apiClientBuilder.CreateRedisApiClient();
+    }
+
+    [HttpGet]
+    public async Task<IActionResult> Get()
+    {
+        string path = await _client.GetSpecAsync();
+        return Ok(path);
     }
 
     /// <summary>
