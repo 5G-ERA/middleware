@@ -14,18 +14,9 @@ namespace Middleware.Common.Models
 
         public List<string> AvailableResources { get; } = new List<string>() { "CPU, GPU, RAM" };
 
-        {
 
-  "ActionSequence": [
-   {
-      "ActionId": 2,
-      "Order": 0,
-      "ActionPriority": "1/2/3",
-      "Placement": "EDGE/CLOUD",
-      "ServiceId/Image name": "Object detection service"
-   } 
-  ]
-}
+
     }
-
 }
+
+
