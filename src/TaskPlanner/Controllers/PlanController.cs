@@ -17,7 +17,7 @@ namespace Middleware.TaskPlanner.Controllers
         {
             var plan =  new TaskModel();
 
-            ActionPlanner Plan = new ActionPlanner(Guid.NewGuid(), new List<ActionModel>() /*ActionSequence*/, DateTime.UtcNow);
+            //ActionPlanner Plan = new ActionPlanner(Guid.NewGuid(), new List<ActionModel>() /*ActionSequence*/, DateTime.UtcNow);
             //Plan.InferActionSequence();
 
 
