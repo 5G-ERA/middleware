@@ -15,6 +15,7 @@ builder.Services.ConfigureAutoMapper();
 builder.Services.AddHttpClient(AppConfig.RedisApiClientName);
 builder.Services.AddHttpClient(AppConfig.RedisApiClientName);
 builder.Services.AddScoped<IApiClientBuilder, ApiClientBuilder>();
+builder.Services.AddHttpClient("healthCheckClient");
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.

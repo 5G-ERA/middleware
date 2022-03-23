@@ -23,54 +23,78 @@ public class OrchestrateController : Controller
         _client = apiClientBuilder.CreateRedisApiClient();
     }
 
-    [HttpGet]
-    public async Task<IActionResult> Get()
+    /// <summary>
+    /// Request orchestration of the resources defied in the plan
+    /// </summary>
+    /// <param name="task"></param>
+    /// <returns></returns>
+    [HttpPost]
+    [Route("plan", Name = "InstantiateNewPlan")]
+    [ProducesResponseType(typeof(TaskModel), (int)HttpStatusCode.OK)]
+    public async Task<IActionResult> InstantiateNewPlan([FromBody] TaskModel task)
     {
-        var actions = await _client.ActionGetAllAsync();
-        var first = actions.FirstOrDefault();
-        var action = _mapper.Map<ActionModel>(first);
-        return Ok(action);
+        //TODO: instantiate new plan
+        return Ok(task);
     }
 
     /// <summary>
-    /// Get plan information by its id
+    /// Get actions deployed with the plan by the plan Id
     /// </summary>
     /// <param name="id"></param>
     /// <returns></returns>
     [HttpGet]
-    [Route("{id}")]
-    public async Task<ActionResult<TaskModel>> GetPlanById(Guid id)
+    [Route("plan/{id}", Name = "GetActionsByPlanId")]
+    [ProducesResponseType(typeof(List<ActionModel>), (int)HttpStatusCode.OK)]
+    [ProducesResponseType((int)HttpStatusCode.NotFound)]
+    public async Task<ActionResult<List<ActionModel>>> GetActionsByPlanId(Guid id)
     {
         return Ok(new List<ActionModel>());
     }
 
     /// <summary>
-    /// Execute the plan from the body of the request
+    /// Request orchestration of the resources defied in the plan
     /// </summary>
     /// <param name="task"></param>
     /// <returns></returns>
-    [HttpPost]
-    [Route("plan")]
-    public async Task<IActionResult> ExecutePlan([FromBody] TaskModel task)
+    [HttpPatch]
+    [Route("plan", Name = "UpdatePlan")]
+    [ProducesResponseType(typeof(TaskModel), (int)HttpStatusCode.OK)]
+    public async Task<IActionResult> UpdatePlan([FromBody] TaskModel task)
     {
-        //TODO: do something with a task
+        //TODO: redeploy services for new plan
         return Ok(task);
     }
 
+    /// <summary>
+    /// Deletes the instances instantiated with the specified action 
+    /// </summary>
+    /// <param name="id"></param>
+    /// <returns></returns>
+    [HttpDelete]
+    [Route("action/{id}", Name = "DeleteActionById")]
+    [ProducesResponseType((int)HttpStatusCode.OK)]
+    [ProducesResponseType((int)HttpStatusCode.NotFound)]
+    public async Task<IActionResult> DeleteActionById(Guid id)
+    {
+        // TODO: Delete plan with specified Id
+        return Ok();
+    }
     /// <summary>
     /// Delete plan by its id
     /// </summary>
     /// <param name="id"></param>
     /// <returns></returns>
     [HttpDelete]
-    [Route("plan/{id}")]
+    [Route("plan/{id}", Name = "DeletePlanById")]
     public async Task<ActionResult> DeletePlanById(Guid id)
     {
         // TODO: Delete plan with specified Id
         return Ok();
     }
+
+
     /// <summary>
-    /// Instantiate the resources specified in the list
+    /// Instantiate the resources for specified actions
     /// </summary>
     /// <param name="actions">List of actions to be instantiated</param>
     /// <returns>Http Status code and List of instantiated services</returns>
@@ -81,19 +105,6 @@ public class OrchestrateController : Controller
     {
         //TODO: instantiate services for action
         return Ok(new List<InstanceModel>());
-    }
-
-    /// <summary>
-    /// Deleted the specified action and its resources by its id
-    /// </summary>
-    /// <param name="id">Id of an action</param>
-    /// <returns>HttpStatus Code if action has succeeded</returns>
-    [HttpDelete]
-    [Route("{id}")]
-    public async Task<ActionResult> DeleteActionById(Guid id)
-    {
-        // TODO: Delete plan with specified Id
-        return Ok();
     }
 
 }
