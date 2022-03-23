@@ -17,9 +17,26 @@ namespace Middleware.RedisInterface.Controllers
             _taskRepository = repository ?? throw new ArgumentNullException(nameof(repository));
         }
 
+        /// <summary>
+        /// Get all the TaskModel entities
+        /// </summary>
+        /// <returns> the list of TaskModel entities </returns>
+        [HttpGet(Name = "TaskGetAll")]
+        [ProducesResponseType(typeof(TaskModel), (int)HttpStatusCode.OK)]
+        public async Task<ActionResult<IEnumerable<TaskModel>>> GetAllAsync()
+        {
+            List<TaskModel> models = await _taskRepository.GetAllAsync();
 
+            return Ok(models);
+        }
+
+        /// <summary>
+        /// Get a TaskModel entity by id
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns> the TaskModel entity for the specified id </returns>
         [HttpGet]
-        [Route("{id}")]
+        [Route("{id}", Name = "TaskGetById")]
         [ProducesResponseType(typeof(TaskModel), (int)HttpStatusCode.OK)]
         public async Task<IActionResult> GetByIdAsync(Guid id)
         {
@@ -28,14 +45,31 @@ namespace Middleware.RedisInterface.Controllers
             return Ok(model);
         }
 
-
-        [HttpGet]
+        /// <summary>
+        /// Add a new TaskModel entity
+        /// </summary>
+        /// <param name="model"></param>
+        /// <returns> the newly created TaskModel entity </returns>
+        [HttpPost(Name = "TaskAdd")]
         [ProducesResponseType(typeof(TaskModel), (int)HttpStatusCode.OK)]
-        public async Task<ActionResult<IEnumerable<TaskModel>>> GetAllAsync()
+        public async Task<ActionResult<TaskModel>> AddAsync([FromBody] TaskModel model)
         {
-            List<TaskModel> models = await _taskRepository.GetAllAsync();
+            await _taskRepository.AddAsync(model);
+            return Ok(model);
+        }
 
-            return Ok(models);
+        /// <summary>
+        /// Delete an TaskModel entity for the given id
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns> no return </returns>
+        [HttpDelete]
+        [Route("{id}", Name = "TaskDelete")]
+        [ProducesResponseType(typeof(void), (int)HttpStatusCode.OK)]
+        public async Task<ActionResult> DeleteByIdAsync(Guid id)
+        {
+            await _taskRepository.DeleteByIdAsync(id);
+            return Ok();
         }
 
 

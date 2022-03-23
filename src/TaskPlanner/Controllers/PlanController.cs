@@ -15,7 +15,12 @@ namespace Middleware.TaskPlanner.Controllers
         [ProducesResponseType(typeof(TaskModel), (int)HttpStatusCode.OK)]
         public async Task<ActionResult<TaskModel>> GetPlan([FromBody]TaskPlannerInputModel inputModel)
         {
-            var plan =  new TaskModel();  
+            var plan =  new TaskModel();
+
+            ActionPlanner Plan = new ActionPlanner(Guid.NewGuid(), new List<ActionModel>() /*ActionSequence*/, DateTime.UtcNow);
+            //Plan.InferActionSequence();
+
+
             return Ok(plan);
         }
 

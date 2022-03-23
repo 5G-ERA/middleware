@@ -4,21 +4,29 @@ namespace Middleware.ResourcePlanner
 {
     public class ResourcePlanner
     {
-      private object closestmachine;
+        private object closestmachine;
         private Guid ActionSequence;
 
         public string ActionName { get; }
-        public Guid actionId { get; }
+        public Guid ActionId { get; }
         public List<Priority> ActionPriority { get; }
         public string Placement { get; }
 
-        public List<ActionModel> GetActionId()
+        private TaskModel _taskModel;
+        public Guid GetTaskId()
         {
-            return actionId;
+            if (_taskModel != null)
+            {
+                return _taskModel.Id;
+            }
+            return Guid.Empty;
         }
+
+        public List<ActionModel> GetActionId(List<ActionModel> actionId) => actionId;
 
         public async Task<TaskModel> Plan(TaskModel taskModel, List<ActionModel> actionId)
         {
+            _taskModel = taskModel;
             // actionPlanner will give resource planner the actionSequence. 
 
             // Get action sequence 
@@ -30,9 +38,15 @@ namespace Middleware.ResourcePlanner
             //
             //
             // iterate throught actions in actionSequence
-            List<Func<ActionModel>> sequence = new List<Func<ActionModel>> { () => actionId(1), () => Order(2), () => ActionPriority(3) };
+            List<ActionModel> sequence = new List<ActionModel>
+            { new ActionModel() {
+                ActionPriority = "3", Order = 2, Id = Guid.NewGuid() } };
+
+            List<ActionModel> sortedSequence = sequence.OrderBy(s=>s.Order).ThenBy(s=>int.Parse(s.ActionPriority)).ToList();
+
+
             if (actionSequence.Count == 1)
-                actionSequence = actionId; 
+                actionSequence = actionId;
 
 
             // "ActionId": 2,
@@ -60,9 +74,8 @@ namespace Middleware.ResourcePlanner
 
             // set services for action from result of the redis
 
+
             return taskModel;
-
-
             
 
         }
@@ -75,7 +88,7 @@ namespace Middleware.ResourcePlanner
         {
             ActionSequence = ActionPlanId;
             ActionName = ActionTaskDescription;
-            actionId = ActionPlanId;
+            //actionId = ActionPlanId;
             ActionPriority = PrioritySequence;
             Placement = BestPlacement;
 

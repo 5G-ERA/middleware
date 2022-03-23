@@ -17,6 +17,11 @@ namespace Middleware.RedisInterface.Controllers
             _policyRepository = policyRepository;
         }
 
+        /// <summary>
+        /// Get a PolicyModel entity by id
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns> the PolicyModel entity for the specified id </returns>
         [HttpGet]
         [Route("{id}")]
         [ProducesResponseType(typeof(PolicyModel), (int)HttpStatusCode.OK)]
@@ -26,6 +31,10 @@ namespace Middleware.RedisInterface.Controllers
             return Ok(policy);
         }
 
+        /// <summary>
+        /// Get all the PolicyModel entities
+        /// </summary>
+        /// <returns> the list of PolicyModel entities </returns>
         [HttpGet]
         [ProducesResponseType(typeof(PolicyModel), (int)HttpStatusCode.OK)]
         public async Task<ActionResult<List<PolicyModel>>> GetAllPoliciesAsync()

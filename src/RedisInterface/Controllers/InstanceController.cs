@@ -18,36 +18,70 @@ namespace Middleware.RedisInterface.Controllers
            _instanceRepository = instanceRepository;
         }
 
+        /// <summary>
+        /// Get all the InstanceModel entities
+        /// </summary>
+        /// <returns> the list of InstanceModel entities </returns>
+        [HttpGet(Name = "InstanceGetAll")]
+        [ProducesResponseType(typeof(InstanceModel), (int)HttpStatusCode.OK)]
+        public async Task<ActionResult<IEnumerable<InstanceModel>>> GetAllAsync()
+        {
+            List<InstanceModel> models = await _instanceRepository.GetAllAsync();
+
+            return Ok(models);
+        }
+
+        /// <summary>
+        /// Get an InstanceModel entity by id
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns> the InstanceModel entity for the specified id </returns>
         [HttpGet]
-        [Route("{id}")]
+        [Route("{id}", Name = "InstanceGetById")]
         [ProducesResponseType(typeof(InstanceModel), (int)HttpStatusCode.OK)]
         public async Task<IActionResult> GetByIdAsync(Guid id)
         { 
-            InstanceModel instanceModel = await _instanceRepository.GetByIdAsync(id);
+            InstanceModel model = await _instanceRepository.GetByIdAsync(id);
 
-            return Ok(instanceModel);  
+            return Ok(model);  
         }
 
-
-        [HttpPost] 
+        /// <summary>
+        /// Add a new InstanceModel entity
+        /// </summary>
+        /// <param name="model"></param>
+        /// <returns> the newly created InstanceModel entity </returns>
+        [HttpPost(Name = "InstanceAdd")] 
         [ProducesResponseType(typeof(InstanceModel), (int)HttpStatusCode.OK)]
-        public async Task<ActionResult<InstanceModel>> AddAsync([FromBody] InstanceModel instanceModel)
+        public async Task<ActionResult<InstanceModel>> AddAsync([FromBody] InstanceModel model)
         {
-            await _instanceRepository.AddAsync(instanceModel);
-            return Ok(instanceModel);
+            await _instanceRepository.AddAsync(model);
+            return Ok(model);
         }
 
+        /// <summary>
+        /// Partially update an existing InstanceModel entity
+        /// </summary>
+        /// <param name="patch"></param>
+        /// <param name="id"></param>
+        /// <returns> the modified InstanceModel entity </returns>
         [HttpPatch]
-        [Route("{id}")]
+        [Route("{id}", Name = "InstancePatch")]
         [ProducesResponseType(typeof(InstanceModel), (int)HttpStatusCode.OK)]
-        public async Task<IActionResult> PatchInstanceAsync([FromBody] JsonPatchDocument instanceModel, [FromRoute] Guid id) 
+        public async Task<IActionResult> PatchInstanceAsync([FromBody] InstanceModel patch, [FromRoute] Guid id) 
         {
-            InstanceModel instance = new InstanceModel();
-            return Ok(instance);
+
+            InstanceModel model = await _instanceRepository.PatchInstanceAsync(id, patch) ;
+            return Ok(model);
         }
 
+        /// <summary>
+        /// Delete an InstanceModel entity for the given id
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns> no return </returns>
         [HttpDelete]
-        [Route("{id}")]
+        [Route("{id}", Name = "InstanceDelete")]
         [ProducesResponseType(typeof(void), (int)HttpStatusCode.OK)]
         public async Task<ActionResult> DeleteByIdAsync(Guid id)
         {

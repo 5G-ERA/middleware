@@ -6,6 +6,8 @@
     <ProjectGuid>09cbbaa9-15be-4341-864b-d646231f4aad</ProjectGuid>
     <DockerLaunchAction>LaunchBrowser</DockerLaunchAction>
     <DockerServiceUrl>{Scheme}://localhost:{ServicePort}/swagger</DockerServiceUrl>
+  </PropertyGroup>
+  <PropertyGroup>
     <DockerServiceName>redisinterface</DockerServiceName>
   </PropertyGroup>
   <ItemGroup>

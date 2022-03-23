@@ -7,6 +7,15 @@ public class RobotModel : BaseModel
     [JsonPropertyName("RobotID")]
     public override Guid Id { get; set; }
 
+    [JsonPropertyName("RobotName")]
+    public string RobotName { get; set; }
+
+    [JsonPropertyName("Manufacturer")]
+    public string Manufacturer { get; set; }
+
+    [JsonPropertyName("RobotModel")]
+    public string RobotModelName { get; set; }
+
     [JsonPropertyName("RobotStatus")]
     public string RobotStatus { get; set; }
 

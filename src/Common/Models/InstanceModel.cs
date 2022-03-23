@@ -17,7 +17,7 @@ public class InstanceModel : BaseModel
     public string ServiceType { get; set; }
 
     [JsonPropertyName("IsReusable")]
-    public bool IsReusable { get; set; }
+    public bool? IsReusable { get; set; }
 
     [JsonPropertyName("DesiredStatus")]
     public string DesiredStatus { get; set; }
