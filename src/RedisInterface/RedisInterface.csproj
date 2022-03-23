@@ -34,4 +34,8 @@
     </Content>
   </ItemGroup>
 
+  <ItemGroup>
+    <None Remove="LuaQueries\GetKeys.lua" />
+  </ItemGroup>
+
 </Project>

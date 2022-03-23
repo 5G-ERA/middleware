@@ -17,17 +17,26 @@
             "content": {
               "text/plain": {
                 "schema": {
-                  "$ref": "#/components/schemas/ActionModel"
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ActionModel"
+                  }
                 }
               },
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ActionModel"
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ActionModel"
+                  }
                 }
               },
               "text/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ActionModel"
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ActionModel"
+                  }
                 }
               }
             }

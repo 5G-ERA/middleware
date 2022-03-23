@@ -23,7 +23,7 @@ namespace Middleware.RedisInterface.Controllers
         /// </summary>
         /// <returns> the list of ActionModel entities </returns>
         [HttpGet(Name = "ActionGetAll")]
-        [ProducesResponseType(typeof(ActionModel), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(List<ActionModel>), (int)HttpStatusCode.OK)]
         public async Task<ActionResult<IEnumerable<ActionModel>>> GetAllAsync()
         {
             List<ActionModel> models = await _actionRepository.GetAllAsync();
