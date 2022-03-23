@@ -14,6 +14,7 @@ public static class AutoMapperConfig
     {
         services.AddAutoMapper(cfg =>
         {
+            //Redis Interface
             cfg.CreateMap<ActionModel, RedisInterface.ActionModel>();
             cfg.CreateMap<CloudModel, RedisInterface.CloudModel>();
             cfg.CreateMap<ContainerImageModel, RedisInterface.ContainerImageModel>();
@@ -26,6 +27,10 @@ public static class AutoMapperConfig
             cfg.CreateMap<TaskModel, RedisInterface.TaskModel>();
             cfg.CreateMap<PolicyModel, RedisInterface.PolicyModel>();
 
+            // Orchestrator
+            cfg.CreateMap<ActionModel, Orchestrator.ActionModel>();
+            cfg.CreateMap<InstanceModel, Orchestrator.InstanceModel>();
+            cfg.CreateMap<TaskModel, Orchestrator.TaskModel>();
         });
         return services;
     }
