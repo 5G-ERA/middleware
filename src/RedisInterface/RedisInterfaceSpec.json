@@ -1365,7 +1365,7 @@
       "ActionModel": {
         "type": "object",
         "properties": {
-          "ActionPlanId": {
+          "Id": {
             "type": "string",
             "format": "uuid"
           },
@@ -1412,7 +1412,7 @@
       "CloudModel": {
         "type": "object",
         "properties": {
-          "CloudID": {
+          "Id": {
             "type": "string",
             "format": "uuid"
           },
@@ -1431,7 +1431,7 @@
       "ContainerImageModel": {
         "type": "object",
         "properties": {
-          "ImageId": {
+          "Id": {
             "type": "string",
             "format": "uuid"
           },
@@ -1453,7 +1453,7 @@
       "DialogueModel": {
         "type": "object",
         "properties": {
-          "Question_Id": {
+          "Id": {
             "type": "string",
             "format": "uuid"
           },
@@ -1481,7 +1481,7 @@
       "EdgeModel": {
         "type": "object",
         "properties": {
-          "EdgeID": {
+          "Id": {
             "type": "string",
             "format": "uuid"
           },
@@ -1576,7 +1576,7 @@
       "PolicyModel": {
         "type": "object",
         "properties": {
-          "Policy_Id": {
+          "Id": {
             "type": "string",
             "format": "uuid"
           },
@@ -1601,7 +1601,7 @@
       "RobotModel": {
         "type": "object",
         "properties": {
-          "RobotID": {
+          "Id": {
             "type": "string",
             "format": "uuid"
           },
@@ -1684,7 +1684,7 @@
       "TaskModel": {
         "type": "object",
         "properties": {
-          "TaskId": {
+          "Id": {
             "type": "string",
             "format": "uuid"
           },

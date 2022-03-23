@@ -4,7 +4,7 @@ namespace Middleware.Common.Models;
 
 public class ContainerImageModel : BaseModel
 {
-    [JsonPropertyName("ImageId")]
+    [JsonPropertyName("Id")]
     public override Guid Id { get; set; }
 
     [JsonPropertyName("Name")]

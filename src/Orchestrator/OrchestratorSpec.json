@@ -352,7 +352,7 @@
       "ActionModel": {
         "type": "object",
         "properties": {
-          "ActionPlanId": {
+          "Id": {
             "type": "string",
             "format": "uuid"
           },
@@ -447,7 +447,7 @@
       "TaskModel": {
         "type": "object",
         "properties": {
-          "TaskId": {
+          "Id": {
             "type": "string",
             "format": "uuid"
           },

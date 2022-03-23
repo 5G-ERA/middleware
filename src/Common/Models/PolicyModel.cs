@@ -7,7 +7,7 @@ namespace Middleware.Common.Models;
 
 public class PolicyModel : BaseModel
 {
-    [JsonPropertyName("Policy_Id")]
+    [JsonPropertyName("Id")]
     public override Guid Id { get; set; }
 
     [JsonPropertyName("Timestamp")]

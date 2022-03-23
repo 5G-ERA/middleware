@@ -4,7 +4,7 @@ namespace Middleware.Common.Models;
 
 public class ActionModel : BaseModel
 {
-    [JsonPropertyName("ActionPlanId")]
+    [JsonPropertyName("Id")]
     public override Guid Id { get; set; }
     [JsonPropertyName("Order")]
     public int Order { get; set; }

@@ -9,7 +9,7 @@ namespace Middleware.Common.Models
 {
     public class TaskReplanModel : BaseModel
     {
-        [JsonPropertyName("TaskId")]
+        [JsonPropertyName("Id")]
         public override Guid Id { get; set; }
 
         [JsonPropertyName("ActionPlanId")]

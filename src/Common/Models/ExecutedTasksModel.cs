@@ -9,7 +9,7 @@ namespace Middleware.Common.Models
 {
     public class ExecutedTasksModel
     {
-        [JsonPropertyName("RobotID")]
+        [JsonPropertyName("Id")]
         public Guid RobotId { get; set; }
 
         [JsonPropertyName("TaskId")]
