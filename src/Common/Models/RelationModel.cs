@@ -11,7 +11,6 @@ namespace Middleware.Common.Models
         public GraphEntityModel InitiatesFrom { get; set; }
         public string RelationName { get; set; }
         public List <KeyValuePair> RelationAttributes { get; set; } = new List<KeyValuePair>();
-
         public GraphEntityModel PointsTo { get; set; }
 
 
