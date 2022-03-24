@@ -6,9 +6,11 @@ using System.Threading.Tasks;
 
 namespace Middleware.Common.Models
 {
-    public abstract class BaseModel
+    public class GraphEntityModel
     {
-        public abstract Guid Id { get; set; }
-        public List<RelationModel> Relations { get; set; } = new List<RelationModel>();
+        public Guid Id { get; set; }
+        public string Type { get; set; }
+
+        public string Name { get; set; }
     }
 }
