@@ -16,7 +16,7 @@ namespace Middleware.RedisInterface.Repositories
         public async Task<List<RelationModel>> GetRelation(string relationName)
         {
             List<RelationModel> relationModels = new List<RelationModel>();
-            relationName = relationName.ToUpper();
+            relationName = relationName?.ToUpper();
             ResultSet resultSet = await RedisGraph.Query("RESOURCE_PLANNER",
                 "MATCH (x:ROBOT {ID:'ROBOT_1'}) MATCH (y) WHERE (x)-[: " + relationName + "]->(y) RETURN x,y");
 
