@@ -67,18 +67,18 @@ namespace Middleware.TaskPlanner
 
                 {
                     ActionModel action = _mapper.Map<ActionModel>(ActionSequence[i]);
-                    //Family = ActionSequence.ActionFamily;
-                    if (Family == "Navigation")
+                    string family = action.ActionFamily;
+                    if (family == "Navigation")
                     {
                         //Execute Redis query: Give me back the result of question 73b43f02-0a95-41f8-a1b6-b4c90d5acccf registerd for robot with Guid ...
                         //452d7946-aeed-488c-9fc3-06f378bbfb30 --> Do you have a map
                     }
-                    if (Family == "Manipulation")
+                    if (family == "Manipulation")
                     {
                         //Execute Redis query: Give me back the result of param ArticulationAvailable registerd for robot with Guid ...
-                        
+
                     }
-                    if (Family == "Perception")
+                    if (family == "Perception")
                     {
                         //Execute Redis query: Give me back the result of param Sensors registerd for robot with Guid ...
 
