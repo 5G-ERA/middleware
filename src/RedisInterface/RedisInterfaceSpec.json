@@ -720,6 +720,37 @@
         }
       }
     },
+    "/api/v1/Edge/relation/{name}": {
+      "get": {
+        "tags": [
+          "Edge"
+        ],
+        "operationId": "GetEdgeRelationByName",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "name",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
     "/api/Health": {
       "get": {
         "tags": [
@@ -1214,6 +1245,37 @@
         }
       }
     },
+    "/api/v1/Robot/relation/{name}": {
+      "get": {
+        "tags": [
+          "Robot"
+        ],
+        "operationId": "GetRobotRelationByName",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "name",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
     "/api/v1/Task": {
       "get": {
         "tags": [
@@ -1365,11 +1427,22 @@
       "ActionModel": {
         "type": "object",
         "properties": {
+          "relations": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/RelationModel"
+            },
+            "nullable": true
+          },
           "Id": {
             "type": "string",
             "format": "uuid"
           },
           "Order": {
+            "type": "string",
+            "nullable": true
+          },
+          "ActionFamily": {
             "type": "integer",
             "format": "int32"
           },
@@ -1412,6 +1485,13 @@
       "CloudModel": {
         "type": "object",
         "properties": {
+          "relations": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/RelationModel"
+            },
+            "nullable": true
+          },
           "Id": {
             "type": "string",
             "format": "uuid"
@@ -1431,6 +1511,13 @@
       "ContainerImageModel": {
         "type": "object",
         "properties": {
+          "relations": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/RelationModel"
+            },
+            "nullable": true
+          },
           "Id": {
             "type": "string",
             "format": "uuid"
@@ -1453,6 +1540,13 @@
       "DialogueModel": {
         "type": "object",
         "properties": {
+          "relations": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/RelationModel"
+            },
+            "nullable": true
+          },
           "Id": {
             "type": "string",
             "format": "uuid"
@@ -1481,6 +1575,13 @@
       "EdgeModel": {
         "type": "object",
         "properties": {
+          "relations": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/RelationModel"
+            },
+            "nullable": true
+          },
           "Id": {
             "type": "string",
             "format": "uuid"
@@ -1521,9 +1622,34 @@
         },
         "additionalProperties": false
       },
+      "GraphEntityModel": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "type": {
+            "type": "string",
+            "nullable": true
+          },
+          "name": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
       "InstanceModel": {
         "type": "object",
         "properties": {
+          "relations": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/RelationModel"
+            },
+            "nullable": true
+          },
           "Id": {
             "type": "string",
             "format": "uuid"
@@ -1576,6 +1702,13 @@
       "PolicyModel": {
         "type": "object",
         "properties": {
+          "relations": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/RelationModel"
+            },
+            "nullable": true
+          },
           "Id": {
             "type": "string",
             "format": "uuid"
@@ -1598,9 +1731,39 @@
         },
         "additionalProperties": false
       },
+      "RelationModel": {
+        "type": "object",
+        "properties": {
+          "initiatesFrom": {
+            "$ref": "#/components/schemas/GraphEntityModel"
+          },
+          "relationName": {
+            "type": "string",
+            "nullable": true
+          },
+          "relationAttributes": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/KeyValuePair"
+            },
+            "nullable": true
+          },
+          "pointsTo": {
+            "$ref": "#/components/schemas/GraphEntityModel"
+          }
+        },
+        "additionalProperties": false
+      },
       "RobotModel": {
         "type": "object",
         "properties": {
+          "relations": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/RelationModel"
+            },
+            "nullable": true
+          },
           "Id": {
             "type": "string",
             "format": "uuid"
@@ -1684,6 +1847,13 @@
       "TaskModel": {
         "type": "object",
         "properties": {
+          "relations": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/RelationModel"
+            },
+            "nullable": true
+          },
           "Id": {
             "type": "string",
             "format": "uuid"

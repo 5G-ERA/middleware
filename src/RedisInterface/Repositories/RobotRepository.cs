@@ -13,7 +13,7 @@ namespace Middleware.RedisInterface.Repositories
         {
         }
 
-        public async Task<List<RelationModel>> GetRelation(string relationName)
+        public async Task<List<RelationModel>> GetRelation(Guid id, string relationName)
         {
             List<RelationModel> relationModels = new List<RelationModel>();
             relationName = relationName?.ToUpper();
