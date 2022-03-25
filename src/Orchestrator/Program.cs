@@ -1,3 +1,8 @@
+using System.Net;
+using Middleware.Orchestrator.ApiReference;
+using Middleware.Orchestrator.Config;
+using Middleware.Orchestrator.RedisInterface;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
@@ -7,6 +12,11 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+builder.Services.ConfigureAutoMapper();
+builder.Services.AddHttpClient(AppConfig.RedisApiClientName);
+builder.Services.AddHttpClient(AppConfig.RedisApiClientName);
+builder.Services.AddScoped<IApiClientBuilder, ApiClientBuilder>();
+builder.Services.AddHttpClient("healthCheckClient");
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -16,7 +26,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-app.UseHttpsRedirection();
+//app.UseHttpsRedirection();
 
 app.UseAuthorization();
 

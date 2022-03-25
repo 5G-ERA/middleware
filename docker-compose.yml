@@ -1,0 +1,41 @@
+version: '3.4'
+
+services:
+  redisinterface:
+    container_name: redisinterface.api
+    image: ${DOCKER_REGISTRY-}redisinterface
+    build:
+      context: .
+      dockerfile: src/RedisInterface/Dockerfile
+
+  orchestrator:
+    container_name: orchestrator.api
+    image: ${DOCKER_REGISTRY-}orchestrator
+    build:
+      context: .
+      dockerfile: src/Orchestrator/Dockerfile
+
+
+  taskplanner:
+    container_name: taskplanner.api
+    image: ${DOCKER_REGISTRY-}taskplanner
+    build:
+      context: .
+      dockerfile: src/TaskPlanner/Dockerfile
+
+
+  resourceplanner:
+    container_name: resourceplanner.api
+    image: ${DOCKER_REGISTRY-}resourceplanner
+    build:
+      context: .
+      dockerfile: src/ResourcePlanner/Dockerfile
+
+
+  ocelotgateway:
+    container_name: ocelotgateway.api
+    image: ${DOCKER_REGISTRY-}ocelotgateway
+    build:
+      context: .
+      dockerfile: src/OcelotGateway/Dockerfile
+

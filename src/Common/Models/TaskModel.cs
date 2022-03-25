@@ -7,10 +7,10 @@ using System.Threading.Tasks;
 
 namespace Middleware.Common.Models
 {
-    public class TaskModel
+    public class TaskModel : BaseModel
     {
-        [JsonPropertyName("TaskId")]
-        public Guid Id { get; set; }
+        [JsonPropertyName("Id")]
+        public override Guid Id { get; set; }
 
         [JsonPropertyName("TaskPriority")]
         public int TaskPriority { get; set; }

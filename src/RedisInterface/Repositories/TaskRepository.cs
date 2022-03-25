@@ -1,6 +1,7 @@
 ﻿using System.Text.Json;
-using Microsoft.AspNetCore.DataProtection.KeyManagement;
 using Middleware.Common.Models;
+using Middleware.RedisInterface.Enums;
+using NReJSON;
 using RedisGraphDotNet.Client;
 using StackExchange.Redis;
 
@@ -8,27 +9,24 @@ namespace Middleware.RedisInterface.Repositories
 {
     public class TaskRepository : BaseRepository<TaskModel>,  ITaskRepository   
     {
-
-        private readonly IConnectionMultiplexer _redisClient;
-        
-
-        public TaskRepository(IConnectionMultiplexer redisClient, IRedisGraphClient redisGraph) : base(6, redisClient, redisGraph)
+        public TaskRepository(IConnectionMultiplexer redisClient, IRedisGraphClient redisGraph) : base(RedisDbIndexEnum.Tasks, redisClient, redisGraph)
         {
         }
 
-        public Task<List<TaskModel>> GetTaskAsync()
+        public async Task<TaskModel> PatchTaskAsync(Guid id, TaskModel patch) 
         {
-            throw new NotImplementedException();
-        }
-
-        public Task<TaskModel> GetTaskIdAsync(string id)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task<TaskModel> GetTaskRelationshipsAsync()
-        {
-            throw new NotImplementedException();
+            string model = (string)await Db.JsonGetAsync(id.ToString());
+            TaskModel currentModel = JsonSerializer.Deserialize<TaskModel>(model);
+            if (!string.IsNullOrEmpty(patch.TaskPriority.ToString()))
+            {
+                currentModel.TaskPriority = patch.TaskPriority;
+            }
+            if (!string.IsNullOrEmpty(patch.ActionSequence.ToString()))
+            {
+                currentModel.ActionSequence = patch.ActionSequence;
+            }
+            await Db.JsonSetAsync(id.ToString(), JsonSerializer.Serialize(currentModel));
+            return currentModel;
         }
     }
 }

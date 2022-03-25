@@ -17,7 +17,5 @@ namespace Middleware.Common.Models
 
         [JsonPropertyName("Questions")]
         public List<DialogueModel> Questions { get; set; }
-
-
     }
 }

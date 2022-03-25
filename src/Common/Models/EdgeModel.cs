@@ -2,10 +2,10 @@
 
 namespace Middleware.Common.Models;
 
-public class EdgeModel
+public class EdgeModel : BaseModel
 {
-    [JsonPropertyName("EdgeID")]
-    public Guid EdgeId { get; set; }
+    [JsonPropertyName("Id")]
+    public override Guid Id { get; set; }
 
     [JsonPropertyName("EdgeStatus")]
     public string EdgeStatus { get; set; }

@@ -1,12 +1,9 @@
-
---This lua script will return only the active policies.
+-- This LUA script will query for all the policies inside redis with the attribute IsActive set to True. It will return to IsActive parameter and the Policy_Id.
 
 redis.call('select', '3')
 
 local ActivePoliciesArray = {};
 local matches = redis.call('KEYS', '*')
-
-
 local index = 0
 
 for value,key in ipairs(matches) do
@@ -20,3 +17,4 @@ for value,key in ipairs(matches) do
 end
 
 return ActivePoliciesArray
+

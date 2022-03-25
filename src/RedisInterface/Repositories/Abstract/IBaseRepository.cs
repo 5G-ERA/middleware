@@ -2,5 +2,8 @@
 
 public interface IBaseRepository<T> where T : class
 {
-    Task<List<T>> ExecuteLuaQueryAsync(string queryName);
+    Task<T> AddAsync(T model);
+    Task<T> GetByIdAsync(Guid id);
+    Task<List<T>> GetAllAsync();
+    Task<bool> DeleteByIdAsync(Guid id);
 }

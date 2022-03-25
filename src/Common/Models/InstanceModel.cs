@@ -2,10 +2,10 @@
 
 namespace Middleware.Common.Models;
 
-public class ServiceDataModel
+public class InstanceModel : BaseModel
 {
-    [JsonPropertyName("ServiceId")]
-    public Guid ServiceId { get; set; }
+    [JsonPropertyName("Id")]
+    public override Guid Id { get; set; }
 
     [JsonPropertyName("ImageName")]
     public string ImageName { get; set; }
@@ -17,7 +17,7 @@ public class ServiceDataModel
     public string ServiceType { get; set; }
 
     [JsonPropertyName("IsReusable")]
-    public bool IsReusable { get; set; }
+    public bool? IsReusable { get; set; }
 
     [JsonPropertyName("DesiredStatus")]
     public string DesiredStatus { get; set; }

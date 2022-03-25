@@ -2,14 +2,19 @@
 
 namespace Middleware.Common.Models;
 
-public class DialogueModel
+public class DialogueModel : BaseModel
 {
-    [JsonPropertyName("Question_Id")]
-    public Guid QuestionId { get; set; }
+    [JsonPropertyName("Id")]
+    public override Guid Id { get; set; }
 
     [JsonPropertyName("Question")]
     public string Question { get; set; }
 
+    [JsonPropertyName("IsSingleAnswer")]
+    public bool IsSingleAnswer { get; set; }
+
     [JsonPropertyName("Answer")]
-    public string Answer { get; set; }
+    public List<KeyValuePair> Answer { get; set; }
+
+    public DateTime TimeStamp { get; set; }
 }

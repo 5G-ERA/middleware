@@ -7,8 +7,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Orchestrator", "src\Orchest
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{96C1E2A9-733B-49C1-966F-C3B3C8102E09}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OsmClient", "src\OsmClient\OsmClient.csproj", "{76C83A45-8C45-4F3C-A305-9F98D2796E53}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ResourcePlanner", "src\ResourcePlanner\ResourcePlanner.csproj", "{033557EE-C93D-46CF-9843-71C3497F0634}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TaskPlanner", "src\TaskPlanner\TaskPlanner.csproj", "{4997B86A-8252-4C47-824F-7059EF7D56DF}"
@@ -17,7 +15,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OcelotGateway", "src\Ocelot
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Common", "src\Common\Common.csproj", "{06FE080E-EB3C-47F7-A062-11113D526F25}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RedisInterface", "src\RedisInterface\RedisInterface.csproj", "{2DF96F25-BEA1-4B5D-A84D-E8FAA8B66D4E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RedisInterface", "src\RedisInterface\RedisInterface.csproj", "{2DF96F25-BEA1-4B5D-A84D-E8FAA8B66D4E}"
+EndProject
+Project("{E53339B2-1760-4266-BCC7-CA923CBCF16C}") = "docker-compose", "docker-compose.dcproj", "{09CBBAA9-15BE-4341-864B-D646231F4AAD}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -29,10 +29,6 @@ Global
 		{D1C222A9-7DCC-475F-AC98-AE6AD7CAC1F9}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D1C222A9-7DCC-475F-AC98-AE6AD7CAC1F9}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D1C222A9-7DCC-475F-AC98-AE6AD7CAC1F9}.Release|Any CPU.Build.0 = Release|Any CPU
-		{76C83A45-8C45-4F3C-A305-9F98D2796E53}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{76C83A45-8C45-4F3C-A305-9F98D2796E53}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{76C83A45-8C45-4F3C-A305-9F98D2796E53}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{76C83A45-8C45-4F3C-A305-9F98D2796E53}.Release|Any CPU.Build.0 = Release|Any CPU
 		{033557EE-C93D-46CF-9843-71C3497F0634}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{033557EE-C93D-46CF-9843-71C3497F0634}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{033557EE-C93D-46CF-9843-71C3497F0634}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -53,13 +49,16 @@ Global
 		{2DF96F25-BEA1-4B5D-A84D-E8FAA8B66D4E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{2DF96F25-BEA1-4B5D-A84D-E8FAA8B66D4E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{2DF96F25-BEA1-4B5D-A84D-E8FAA8B66D4E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{09CBBAA9-15BE-4341-864B-D646231F4AAD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{09CBBAA9-15BE-4341-864B-D646231F4AAD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{09CBBAA9-15BE-4341-864B-D646231F4AAD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{09CBBAA9-15BE-4341-864B-D646231F4AAD}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{D1C222A9-7DCC-475F-AC98-AE6AD7CAC1F9} = {96C1E2A9-733B-49C1-966F-C3B3C8102E09}
-		{76C83A45-8C45-4F3C-A305-9F98D2796E53} = {96C1E2A9-733B-49C1-966F-C3B3C8102E09}
 		{033557EE-C93D-46CF-9843-71C3497F0634} = {96C1E2A9-733B-49C1-966F-C3B3C8102E09}
 		{4997B86A-8252-4C47-824F-7059EF7D56DF} = {96C1E2A9-733B-49C1-966F-C3B3C8102E09}
 		{0EE2EFD6-C2B3-4437-BF12-D0E5E91D40E3} = {96C1E2A9-733B-49C1-966F-C3B3C8102E09}
