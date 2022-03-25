@@ -1482,6 +1482,37 @@
           }
         }
       }
+    },
+    "/api/v1/Task/relation/{name}": {
+      "get": {
+        "tags": [
+          "Task"
+        ],
+        "operationId": "GetTaskRelationByName",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "name",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
     }
   },
   "components": {
