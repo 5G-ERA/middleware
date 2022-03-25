@@ -1,4 +1,5 @@
-﻿using Quartz;
+﻿using k8s;
+using Quartz;
 
 namespace Middleware.Orchestrator.Jobs
 {
@@ -9,6 +10,7 @@ namespace Middleware.Orchestrator.Jobs
         public MiddlewareStartupJob(ILogger<MiddlewareStartupJob> logger)
         {
             _logger = logger;
+            var client = new Kubernetes()
         }
         public async Task Execute(IJobExecutionContext context)
         {
