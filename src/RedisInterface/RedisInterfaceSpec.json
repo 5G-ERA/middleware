@@ -367,6 +367,37 @@
         }
       }
     },
+    "/api/v1/Cloud/relation/{name}": {
+      "get": {
+        "tags": [
+          "Cloud"
+        ],
+        "operationId": "GetCloudRelationByName",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "name",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
     "/api/v1/ContainerImage": {
       "get": {
         "tags": [
