@@ -43,8 +43,4 @@
       <ProjectReference Include="..\Common\Common.csproj" />
     </ItemGroup>
 
-    <ItemGroup>
-      <Folder Include="Kubernetes\" />
-    </ItemGroup>
-
 </Project>

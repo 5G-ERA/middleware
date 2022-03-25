@@ -1,5 +1,6 @@
 using Middleware.Orchestrator.ApiReference;
 using Middleware.Orchestrator.Config;
+using Middleware.Orchestrator.Deployment;
 using Middleware.Orchestrator.Jobs;
 using Quartz;
 using Serilog;
@@ -21,6 +22,8 @@ builder.Services.ConfigureAutoMapper();
 builder.Services.AddHttpClient(AppConfig.RedisApiClientName);
 builder.Services.AddHttpClient(AppConfig.RedisApiClientName);
 builder.Services.AddScoped<IApiClientBuilder, ApiClientBuilder>();
+builder.Services.AddScoped<IKubernetesBuilder, KubernetesBuilder>();
+
 builder.Services.AddHttpClient("healthCheckClient");
 
 // quartz 
