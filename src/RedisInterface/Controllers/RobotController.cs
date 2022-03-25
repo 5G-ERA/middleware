@@ -59,6 +59,22 @@ namespace Middleware.RedisInterface.Controllers
         }
 
         /// <summary>
+        /// Partially update an existing InstanceModel entity
+        /// </summary>
+        /// <param name="patch"></param>
+        /// <param name="id"></param>
+        /// <returns> the modified InstanceModel entity </returns>
+        [HttpPatch]
+        [Route("{id}", Name = "RobotPatch")]
+        [ProducesResponseType(typeof(RobotModel), (int)HttpStatusCode.OK)]
+        public async Task<IActionResult> PatchRobotAsync([FromBody] RobotModel patch, [FromRoute] Guid id)
+        {
+
+            RobotModel model = await _robotRepository.PatchRobotAsync(id, patch);
+            return Ok(model);
+        }
+
+        /// <summary>
         /// Delete an RobotModel entity for the given id
         /// </summary>
         /// <param name="id"></param>

@@ -58,6 +58,24 @@ namespace Middleware.RedisInterface.Controllers
             return Ok(model);
         }
 
+
+        /// <summary>
+        /// Partially update an existing InstanceModel entity
+        /// </summary>
+        /// <param name="patch"></param>
+        /// <param name="id"></param>
+        /// <returns> the modified InstanceModel entity </returns>
+        [HttpPatch]
+        [Route("{id}", Name = "TaskPatch")]
+        [ProducesResponseType(typeof(TaskModel), (int)HttpStatusCode.OK)]
+        public async Task<IActionResult> PatchTaskAsync([FromBody] TaskModel patch, [FromRoute] Guid id)
+        {
+
+            TaskModel model = await _taskRepository.PatchTaskAsync(id, patch);
+            return Ok(model);
+        }
+
+
         /// <summary>
         /// Delete an TaskModel entity for the given id
         /// </summary>
