@@ -1033,6 +1033,37 @@
         }
       }
     },
+    "/api/v1/Instance/relation/{name}": {
+      "get": {
+        "tags": [
+          "Instance"
+        ],
+        "operationId": "GetInstanceRelationByName",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "name",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
     "/api/v1/Policy/{id}": {
       "get": {
         "tags": [
