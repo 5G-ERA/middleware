@@ -637,6 +637,37 @@
         }
       }
     },
+    "/api/v1/ContainerImage/relation/{name}": {
+      "get": {
+        "tags": [
+          "ContainerImage"
+        ],
+        "operationId": "GetContainerImageRelationByName",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "name",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
     "/api/v1/Edge": {
       "get": {
         "tags": [

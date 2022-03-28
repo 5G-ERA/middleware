@@ -88,5 +88,14 @@ namespace Middleware.RedisInterface.Controllers
             await _containerImageRepository.DeleteByIdAsync(id);
             return Ok();
         }
+
+
+        [HttpGet]
+        [Route("relation/{name}", Name = "GetContainerImageRelationByName")]
+        public async Task<IActionResult> GetRelationAsync(Guid id, string name)
+        {
+            var relations = await _containerImageRepository.GetRelation(id, name);
+            return Ok(relations);
+        }
     }
 }
