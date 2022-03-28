@@ -97,10 +97,11 @@ namespace Middleware.RedisInterface.Controllers
         //}
 
         [HttpGet]
-        [Route("relation/{name}", Name ="GetRelationByName")]
-        public async Task<IActionResult> GetRelationAsync(string name)
+        [Route("relation/{name}", Name ="RobotGetRelationByName")]
+        [ProducesResponseType(typeof(List<RelationModel>), (int)HttpStatusCode.OK)]
+        public async Task<IActionResult> GetRelationAsync(Guid id, string name)
         {
-            var relations =await _robotRepository.GetRelation(name);
+            var relations =await _robotRepository.GetRelation(id, name);
             return Ok(relations);
         }
     }

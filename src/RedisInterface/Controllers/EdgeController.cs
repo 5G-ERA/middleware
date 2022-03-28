@@ -89,5 +89,14 @@ namespace Middleware.RedisInterface.Controllers
             await _edgeRepository.DeleteByIdAsync(id);
             return Ok();
         }
+
+        [HttpGet]
+        [Route("relation/{name}", Name = "EdgeGetRelationByName")]
+        [ProducesResponseType(typeof(List<RelationModel>), (int)HttpStatusCode.OK)]
+        public async Task<IActionResult> GetRelationAsync(Guid id, string name)
+        {
+            var relations = await _edgeRepository.GetRelation(id, name);
+            return Ok(relations);
+        }
     }
 }
