@@ -73,8 +73,8 @@ namespace Middleware.ResourcePlanner
             List<ActionModel> policySequence = new List<ActionModel>();
 
 
-            new List<ActionModel>(){ new ActionModel() { Imagename = "SLAM", Id = Guid.NewGuid() },
-            new ActionModel() { Imagename = "Object detection", Id = Guid.NewGuid() } };
+            new List<ActionModel>(){ new ActionModel() { ImageName = "SLAM", Id = Guid.NewGuid() },
+            new ActionModel() { ImageName = "Object detection", Id = Guid.NewGuid() } };
 
             //what actions needs to be instancaited to complete the action from RADU###############
             //needs the redis query for the instances for the specified actions // give action id - and return the instnaces that are connected to the graph
