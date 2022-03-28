@@ -227,7 +227,7 @@
         "tags": [
           "Action"
         ],
-        "operationId": "GetActionRelationByName",
+        "operationId": "ActionGetRelationByName",
         "parameters": [
           {
             "name": "id",
@@ -248,7 +248,33 @@
         ],
         "responses": {
           "200": {
-            "description": "Success"
+            "description": "Success",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/RelationModel"
+                  }
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/RelationModel"
+                  }
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/RelationModel"
+                  }
+                }
+              }
+            }
           }
         }
       }
@@ -466,7 +492,7 @@
         "tags": [
           "Cloud"
         ],
-        "operationId": "GetCloudRelationByName",
+        "operationId": "CloudGetRelationByName",
         "parameters": [
           {
             "name": "id",
@@ -487,7 +513,33 @@
         ],
         "responses": {
           "200": {
-            "description": "Success"
+            "description": "Success",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/RelationModel"
+                  }
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/RelationModel"
+                  }
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/RelationModel"
+                  }
+                }
+              }
+            }
           }
         }
       }
@@ -705,7 +757,7 @@
         "tags": [
           "ContainerImage"
         ],
-        "operationId": "GetContainerImageRelationByName",
+        "operationId": "ContainerImageGetRelationByName",
         "parameters": [
           {
             "name": "id",
@@ -726,7 +778,33 @@
         ],
         "responses": {
           "200": {
-            "description": "Success"
+            "description": "Success",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/RelationModel"
+                  }
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/RelationModel"
+                  }
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/RelationModel"
+                  }
+                }
+              }
+            }
           }
         }
       }
@@ -944,7 +1022,7 @@
         "tags": [
           "Edge"
         ],
-        "operationId": "GetEdgeRelationByName",
+        "operationId": "EdgeGetRelationByName",
         "parameters": [
           {
             "name": "id",
@@ -965,7 +1043,33 @@
         ],
         "responses": {
           "200": {
-            "description": "Success"
+            "description": "Success",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/RelationModel"
+                  }
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/RelationModel"
+                  }
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/RelationModel"
+                  }
+                }
+              }
+            }
           }
         }
       }
@@ -1226,7 +1330,7 @@
         "tags": [
           "Instance"
         ],
-        "operationId": "GetInstanceRelationByName",
+        "operationId": "InstanceGetRelationByName",
         "parameters": [
           {
             "name": "id",
@@ -1247,7 +1351,33 @@
         ],
         "responses": {
           "200": {
-            "description": "Success"
+            "description": "Success",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/RelationModel"
+                  }
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/RelationModel"
+                  }
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/RelationModel"
+                  }
+                }
+              }
+            }
           }
         }
       }
@@ -1626,7 +1756,7 @@
         "tags": [
           "Robot"
         ],
-        "operationId": "GetRobotRelationByName",
+        "operationId": "RobotGetRelationByName",
         "parameters": [
           {
             "name": "id",
@@ -1647,7 +1777,33 @@
         ],
         "responses": {
           "200": {
-            "description": "Success"
+            "description": "Success",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/RelationModel"
+                  }
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/RelationModel"
+                  }
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/RelationModel"
+                  }
+                }
+              }
+            }
           }
         }
       }
@@ -1865,7 +2021,7 @@
         "tags": [
           "Task"
         ],
-        "operationId": "GetTaskRelationByName",
+        "operationId": "TaskGetRelationByName",
         "parameters": [
           {
             "name": "id",
@@ -1886,7 +2042,33 @@
         ],
         "responses": {
           "200": {
-            "description": "Success"
+            "description": "Success",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/RelationModel"
+                  }
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/RelationModel"
+                  }
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/RelationModel"
+                  }
+                }
+              }
+            }
           }
         }
       }
@@ -1921,6 +2103,10 @@
             "nullable": true
           },
           "ActionPriority": {
+            "type": "string",
+            "nullable": true
+          },
+          "ImageName": {
             "type": "string",
             "nullable": true
           },

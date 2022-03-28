@@ -91,7 +91,8 @@ namespace Middleware.RedisInterface.Controllers
 
 
         [HttpGet]
-        [Route("relation/{name}", Name = "GetContainerImageRelationByName")]
+        [Route("relation/{name}", Name = "ContainerImageGetRelationByName")]
+        [ProducesResponseType(typeof(List<RelationModel>), (int)HttpStatusCode.OK)]
         public async Task<IActionResult> GetRelationAsync(Guid id, string name)
         {
             var relations = await _containerImageRepository.GetRelation(id, name);
