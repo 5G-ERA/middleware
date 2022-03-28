@@ -14,5 +14,7 @@ namespace Middleware.RedisInterface.Repositories
         /// </summary>
         /// <returns></returns>
         Task<List<PolicyModel>> GetActivePoliciesAsync();
+
+        Task<PolicyModel> PatchPolicyAsync(Guid id, PolicyModel patch);
     }
 }

@@ -62,5 +62,22 @@ namespace Middleware.RedisInterface.Controllers
 
             return Ok(activePoliciesRecords);
         }
+
+
+        /// <summary>
+        /// Partially update an existing InstanceModel entity
+        /// </summary>
+        /// <param name="patch"></param>
+        /// <param name="id"></param>
+        /// <returns> the modified InstanceModel entity </returns>
+        [HttpPatch]
+        [Route("{id}", Name = "PolicyPatch")]
+        [ProducesResponseType(typeof(PolicyModel), (int)HttpStatusCode.OK)]
+        public async Task<IActionResult> PatchPolicyAsync([FromBody] PolicyModel patch, [FromRoute] Guid id)
+        {
+
+            PolicyModel model = await _policyRepository.PatchPolicyAsync(id, patch);
+            return Ok(model);
+        }
     }
 }

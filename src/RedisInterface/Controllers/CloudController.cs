@@ -59,6 +59,21 @@ namespace Middleware.RedisInterface.Controllers
             return Ok(model);
         }
 
+        /// <summary>
+        /// Partially update an existing CloudModel entity
+        /// </summary>
+        /// <param name="patch"></param>
+        /// <param name="id"></param>
+        /// <returns> the modified CloudModel entity </returns>
+        [HttpPatch]
+        [Route("{id}", Name = "CloudPatch")]
+        [ProducesResponseType(typeof(CloudModel), (int)HttpStatusCode.OK)]
+        public async Task<IActionResult> PatchCloudAsync([FromBody] CloudModel patch, [FromRoute] Guid id)
+        {
+
+            CloudModel model = await _cloudRepository.PatchCloudAsync(id, patch);
+            return Ok(model);
+        }
 
         /// <summary>
         /// Delete an CloudModel entity for the given id

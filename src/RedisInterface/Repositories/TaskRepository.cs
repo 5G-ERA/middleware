@@ -13,6 +13,7 @@ namespace Middleware.RedisInterface.Repositories
         {
         }
 
+
         public async Task<List<RelationModel>> GetRelation(Guid id, string relationName) 
         {
             List<RelationModel> relationModels = new List<RelationModel>();
@@ -49,6 +50,22 @@ namespace Middleware.RedisInterface.Repositories
                 }
             }
             return relationModels;
+
+        public async Task<TaskModel> PatchTaskAsync(Guid id, TaskModel patch) 
+        {
+            string model = (string)await Db.JsonGetAsync(id.ToString());
+            TaskModel currentModel = JsonSerializer.Deserialize<TaskModel>(model);
+            if (!string.IsNullOrEmpty(patch.TaskPriority.ToString()))
+            {
+                currentModel.TaskPriority = patch.TaskPriority;
+            }
+            if (!string.IsNullOrEmpty(patch.ActionSequence.ToString()))
+            {
+                currentModel.ActionSequence = patch.ActionSequence;
+            }
+            await Db.JsonSetAsync(id.ToString(), JsonSerializer.Serialize(currentModel));
+            return currentModel;
+
         }
     }
 }
