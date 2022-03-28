@@ -47,13 +47,18 @@ namespace Middleware.ResourcePlanner
 
             if (actionSequence.Count == 1)
                 actionSequence = actionId;
+            else
+                actionSequence = sortedSequence;
 
 
             // "ActionId": 2,
             //    "Order": 0,
             //    "ActionPriority": "1/2/3", 
+            // We get the answer here. in Action Sequence 
 
             // for each action get required services (call redis API?)#
+            RedisInterface.ActionModel actionModel = new RedisInterface.ActionModel();
+            ActionModel actionModel1 = new ActionModel();
 
 
             // //get active policies: get closet machine.
@@ -61,11 +66,39 @@ namespace Middleware.ResourcePlanner
             policy.Add(new PolicyModel() { Description = (string)closestmachine } as PolicyModel);
 
 
+            //query graph for resources to perform on task 
+            //slam //object detection 
+            //return back to action
 
+            List<ActionModel> policySequence = new List<ActionModel>();
+
+
+            new List<ActionModel>(){ new ActionModel() { Imagename = "SLAM", Id = Guid.NewGuid() },
+            new ActionModel() { Imagename = "Object detection", Id = Guid.NewGuid() } };
+
+            //what actions needs to be instancaited to complete the action from RADU###############
+            //needs the redis query for the instances for the specified actions // give action id - and return the instnaces that are connected to the graph
+
+
+
+
+           
             // // query redis for best placement.
+            // Get BEST Placement
+            // if (EDGE_1 = closest machine and/or not occupied with any Task)
+
+            // return "Edge_1 is free to perform task"
+            //else if
+            // (Cloud_1 = closest machine and/or not occupied with any Task)
+
+            //return "Cloud_1 is free to perfrom task"
+            //
 
 
             // // the actors that are free to perform task 
+
+
+
             // // [edge1,cloud1]
             // // call redis API
 

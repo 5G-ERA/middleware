@@ -15,6 +15,10 @@ public class ActionModel : BaseModel
     [JsonPropertyName("ActionPriority")]
     public string ActionPriority { get; set; }
 
+    [JsonPropertyName("ImageName")]
+
+    public string ImageName { get; set; } 
+
     [JsonPropertyName("Services")]
     public List<InstanceModel> Services { get; set; }
 }
