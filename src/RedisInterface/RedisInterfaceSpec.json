@@ -222,6 +222,37 @@
         }
       }
     },
+    "/api/v1/Action/relation/{name}": {
+      "get": {
+        "tags": [
+          "Action"
+        ],
+        "operationId": "GetActionRelationByName",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "name",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
     "/api/v1/Cloud": {
       "get": {
         "tags": [
