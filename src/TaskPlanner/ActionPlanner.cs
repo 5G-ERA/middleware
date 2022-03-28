@@ -43,15 +43,16 @@ namespace Middleware.TaskPlanner
             CurrentTime = Currenttime;
             InferingProcess = ""; //Predefined actionsequence by id or IA infering based on new task.
             string robotName = _robotModel.RobotName;
+            Guid RobotId = _robotModel.Id;
         }
 
         public async Task InferActionSequence(Guid currentTaskId)
         {
             // TasksIDs = GetAllTasksID.lua
-            RedisInterface.TaskModel tmpTask = await _apiClient.TaskGetByIdAsync(currentTaskId);
+            RedisInterface.TaskModel tmpTask = await _apiClient.TaskGetByIdAsync(currentTaskId); 
             TaskModel task = _mapper.Map<TaskModel>(tmpTask);
 
-            bool alreadyExist = task != null; //TasksIDs.Contains(currentTaskId);
+            bool alreadyExist = task != null; //Check if CurrentTask is inside Redis model
 
             // Use . after task to access the properties of the task
             //task.TaskPriority
@@ -61,17 +62,41 @@ namespace Middleware.TaskPlanner
 
                 //TaskId maps with preDefined ActionPlan --> Redis query to get PlanId by TaskId
 
+                List<ActionModel> ActionSequence = new List<ActionModel>(); //Simulate for now the output of lua query to get actionSequence predefined by TaskID. 
+                for(int i=0; i < ActionSequence.Count;i++)
+
+                {
+                    ActionModel action = _mapper.Map<ActionModel>(ActionSequence[i]);
+                    string family = action.ActionFamily;
+                    if (family == "Navigation")
+                    {
+                        //Execute Redis query: Give me back the result of question 73b43f02-0a95-41f8-a1b6-b4c90d5acccf registerd for robot with Guid ...
+                        //452d7946-aeed-488c-9fc3-06f378bbfb30 --> Do you have a map
+                    }
+                    if (family == "Manipulation")
+                    {
+                        //Execute Redis query: Give me back the result of param ArticulationAvailable registerd for robot with Guid ...
+
+                    }
+                    if (family == "Perception")
+                    {
+                        //Execute Redis query: Give me back the result of param Sensors registerd for robot with Guid ...
+
+                    }
+
+                }
+
                 //Loop over each action in actionSequence.
                 // If navigationFamily --> get answer do you have map, what types of maps, what sensors do you have.
                 //if no map, add a new action before this one with SLAM. --> Check if timelimit exists.
                 //Check the ROS version and distro for SLAM based upon dialogues table. --> run LUA script with search parameters.
                 //if map, Check the ROS version and distro for SLAM based upon dialogues table
 
-                //If manipulationFamily --> get answer, do you have neccesary articulations. --> run LUA script with search parameters.
+                    //If manipulationFamily --> get answer, do you have neccesary articulations. --> run LUA script with search parameters.
 
-                //If perception --> get answer, what sensors do you have sensor --> run LUA script with search parameters.
+                    //If perception --> get answer, what sensors do you have sensor --> run LUA script with search parameters.
 
-                //Return ActionSequence
+                    //Return ActionSequence
             }
             else
             {

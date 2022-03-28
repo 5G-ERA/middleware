@@ -1,7 +1,7 @@
 ﻿using Middleware.Common.Models;
 using KeyValuePair = Middleware.Common.Models.KeyValuePair;
 
-namespace Middleware.TaskPlanner.Config;
+namespace Middleware.ResourcePlanner.Config;
 
 public static class AutoMapperConfig
 {
@@ -31,7 +31,6 @@ public static class AutoMapperConfig
             cfg.CreateMap<ActionModel, Orchestrator.ActionModel>();
             cfg.CreateMap<InstanceModel, Orchestrator.InstanceModel>();
             cfg.CreateMap<TaskModel, Orchestrator.TaskModel>();
-
         });
         return services;
     }

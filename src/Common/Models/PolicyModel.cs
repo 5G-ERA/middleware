@@ -7,14 +7,14 @@ namespace Middleware.Common.Models;
 
 public class PolicyModel : BaseModel
 {
-    [JsonPropertyName("Policy_Id")]
+    [JsonPropertyName("Id")]
     public override Guid Id { get; set; }
 
     [JsonPropertyName("Timestamp")]
     public DateTime Timestamp { get; set; }
 
     [JsonPropertyName("IsActive")]
-    public bool IsActive { get; set; }
+    public bool? IsActive { get; set; }
 
     [JsonPropertyName("Description")]
     public string Description { get; set; }

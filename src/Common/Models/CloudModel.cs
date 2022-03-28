@@ -4,7 +4,7 @@ namespace Middleware.Common.Models;
 
 public class CloudModel : BaseModel
 {
-    [JsonPropertyName("CloudID")]
+    [JsonPropertyName("Id")]
     public override Guid Id { get; set; }
 
     [JsonPropertyName("CloudStatus")]

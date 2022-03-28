@@ -9,6 +9,7 @@ namespace Middleware.RedisInterface.Repositories
 {
     public class BaseRepository<T> : IBaseRepository<T> where T : BaseModel
     {
+
         private readonly RedisDbIndexEnum _redisDbIndex;
         protected readonly IConnectionMultiplexer RedisClient;
         protected readonly IDatabase Db;
@@ -30,15 +31,15 @@ namespace Middleware.RedisInterface.Repositories
             return model;
         }
 
-        public async Task<T> GetByIdAsync(Guid id) 
-        { 
+        public async Task<T> GetByIdAsync(Guid id)
+        {
             string model = (string)await Db.JsonGetAsync(id.ToString());
             T newModel = JsonSerializer.Deserialize<T>(model);
-            
+
             return newModel;
         }
 
-        public async Task<List<T>> GetAllAsync() 
+        public async Task<List<T>> GetAllAsync()
         {
             List<T> models = new List<T>();
             var keys = await GetKeysAsync("GetKeys");
@@ -52,18 +53,17 @@ namespace Middleware.RedisInterface.Repositories
             return models;
         }
 
-        public async Task<bool> DeleteByIdAsync(Guid id) 
+        public async Task<bool> DeleteByIdAsync(Guid id)
         {
             int deleted = await Db.JsonDeleteAsync(id.ToString());
-            
+
             return deleted > 0;
         }
-
 
         protected async Task<List<T>> ExecuteLuaQueryAsync(string queryName)
         {
             var script = await File.ReadAllTextAsync(GetScriptPath(queryName));
-            
+
             var prepared = LuaScript.Prepare(script);
             var redisResult = await Db.ScriptEvaluateAsync(prepared);
 
@@ -91,7 +91,7 @@ namespace Middleware.RedisInterface.Repositories
             var models = new List<string>();
             if (redisResult.Type == ResultType.MultiBulk)
             {
-                models.AddRange(((RedisValue[])redisResult).Select(x=>x.ToString()));
+                models.AddRange(((RedisValue[])redisResult).Select(x => x.ToString()));
             }
             return models;
         }
@@ -99,6 +99,22 @@ namespace Middleware.RedisInterface.Repositories
         private string GetScriptPath(string queryName)
         {
             return Path.Combine(Directory.GetCurrentDirectory(), "LuaQueries", $"{queryName}.lua");
+        }
+        /// <summary>
+        /// Sets the values for the <see cref="GraphEntityModel"/> from the specified node
+        /// </summary>
+        /// <param name="graphEntity"></param>
+        /// <param name="nd"></param>
+        protected static void SetGraphModelValues(GraphEntityModel graphEntity, Node nd)
+        {
+            var props = nd.Properties;
+            RedisValue id = props["ID"];
+            //RedisValue type = props["Type"];
+            //RedisValue name = props["Name"];
+            graphEntity.Name = id.ToString();
+            //graphEntity.Id = Guid.Parse(id.ToString());
+            //graphEntity.Type = type.ToString();
+            //graphEntity.Name = name.ToString();
         }
     }
 }

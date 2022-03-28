@@ -4,7 +4,7 @@ namespace Middleware.Common.Models;
 
 public class RobotModel : BaseModel
 {
-    [JsonPropertyName("RobotID")]
+    [JsonPropertyName("Id")]
     public override Guid Id { get; set; }
 
     [JsonPropertyName("RobotName")]

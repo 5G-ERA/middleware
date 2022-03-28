@@ -58,6 +58,24 @@ namespace Middleware.RedisInterface.Controllers
             return Ok(model);
         }
 
+
+        /// <summary>
+        /// Partially update an existing InstanceModel entity
+        /// </summary>
+        /// <param name="patch"></param>
+        /// <param name="id"></param>
+        /// <returns> the modified InstanceModel entity </returns>
+        [HttpPatch]
+        [Route("{id}", Name = "EdgePatch")]
+        [ProducesResponseType(typeof(EdgeModel), (int)HttpStatusCode.OK)]
+        public async Task<IActionResult> PatchEdgeAsync([FromBody] EdgeModel patch, [FromRoute] Guid id)
+        {
+
+            EdgeModel model = await _edgeRepository.PatchEdgeAsync(id, patch);
+            return Ok(model);
+        }
+
+
         /// <summary>
         /// Delete an EdgeModel entity for the given id
         /// </summary>
