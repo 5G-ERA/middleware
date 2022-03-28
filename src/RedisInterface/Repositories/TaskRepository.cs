@@ -14,7 +14,7 @@ namespace Middleware.RedisInterface.Repositories
         }
 
 
-        public async Task<List<RelationModel>> GetRelation(Guid id, string relationName) 
+        public async Task<List<RelationModel>> GetRelation(Guid id, string relationName)
         {
             List<RelationModel> relationModels = new List<RelationModel>();
             relationName = relationName?.ToUpper();
@@ -50,6 +50,7 @@ namespace Middleware.RedisInterface.Repositories
                 }
             }
             return relationModels;
+        }
 
         public async Task<TaskModel> PatchTaskAsync(Guid id, TaskModel patch) 
         {
