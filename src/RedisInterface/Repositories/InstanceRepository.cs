@@ -62,7 +62,7 @@ namespace Middleware.RedisInterface.Repositories
             List<RelationModel> relationModels = new List<RelationModel>();
             relationName = relationName?.ToUpper();
             ResultSet resultSet = await RedisGraph.Query("RESOURCE_PLANNER",
-                "MATCH (x:IMAGE {ID:'IMAGE_1'}) MATCH (y) WHERE (x)-[: " + relationName + "]->(y) RETURN x,y");
+                "MATCH (x:INSTANCE {ID:'INSTANCE_1'}) MATCH (y) WHERE (x)-[: " + relationName + "]->(y) RETURN x,y");
             for (int i = 0; i < resultSet.Results.Count; i++)
             {
                 var res = resultSet.Results.ElementAt(i);
