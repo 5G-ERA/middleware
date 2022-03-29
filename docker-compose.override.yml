@@ -6,32 +6,32 @@ services:
       - ASPNETCORE_ENVIRONMENT=Development
       - ASPNETCORE_URLS=https://+:443;http://+:80      
       - ASPNETCORE_HTTPS_PORT=7081
-      - ASPNETCORE_Kestrel__Certificates__Default__Password=ros
-      - ASPNETCORE_Kestrel__Certificates__Default__Path=/https/aspnetapp.pfx
+      #- ASPNETCORE_Kestrel__Certificates__Default__Password=ros
+      #- ASPNETCORE_Kestrel__Certificates__Default__Path=/https/aspnetapp.pfx
       - REDIS_HOSTNAME=${REDIS_HOSTNAME}
       - REDIS_PORT=${REDIS_PORT}
     ports:
       - "5081:80"
       - "7081:443"
     volumes:
-      #- ${APPDATA}/Microsoft/UserSecrets:/root/.microsoft/usersecrets:ro
-      #- ${APPDATA}/ASP.NET/Https:/root/.aspnet/https:ro
-      - ~/.aspnet/https:/https:ro
+      - ${APPDATA}/Microsoft/UserSecrets:/root/.microsoft/usersecrets:ro
+      - ${APPDATA}/ASP.NET/Https:/root/.aspnet/https:ro
+      #- ~/.aspnet/https:/https:ro
   orchestrator:
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
       - ASPNETCORE_URLS=https://+:443;http://+:80
       - ASPNETCORE_HTTPS_PORT=7026
-      - ASPNETCORE_Kestrel__Certificates__Default__Password=ros
-      - ASPNETCORE_Kestrel__Certificates__Default__Path=/https/aspnetapp.pfx 
+      #- ASPNETCORE_Kestrel__Certificates__Default__Password=ros
+      #- ASPNETCORE_Kestrel__Certificates__Default__Path=/https/aspnetapp.pfx 
       - REDIS_INTERFACE_ADDRESS=http://redisinterface.api
     ports:
       - "5026:80"
       - "7026:443"
     volumes:
-      #- ${APPDATA}/Microsoft/UserSecrets:/root/.microsoft/usersecrets:ro
-      #- ${APPDATA}/ASP.NET/Https:/root/.aspnet/https:ro
-      - ~/.aspnet/https:/https:ro
+      - ${APPDATA}/Microsoft/UserSecrets:/root/.microsoft/usersecrets:ro
+      - ${APPDATA}/ASP.NET/Https:/root/.aspnet/https:ro
+      #- ~/.aspnet/https:/https:ro
 
   taskplanner:
     environment:
