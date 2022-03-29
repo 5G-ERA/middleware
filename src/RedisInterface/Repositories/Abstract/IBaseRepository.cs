@@ -1,4 +1,6 @@
-﻿namespace Middleware.RedisInterface.Repositories;
+﻿using Middleware.Common.Models;
+
+namespace Middleware.RedisInterface.Repositories;
 
 public interface IBaseRepository<T> where T : class
 {
@@ -6,4 +8,8 @@ public interface IBaseRepository<T> where T : class
     Task<T> GetByIdAsync(Guid id);
     Task<List<T>> GetAllAsync();
     Task<bool> DeleteByIdAsync(Guid id);
+
+    Task<List<RelationModel>> GetRelation(Guid id, string relationName);
+
+    Task<List<RelationModel>> GetRelations(Guid id, List<string> relationNames);
 }

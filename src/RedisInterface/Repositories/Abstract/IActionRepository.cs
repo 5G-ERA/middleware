@@ -6,6 +6,5 @@ namespace Middleware.RedisInterface.Repositories.Abstract
     {
         Task<ActionModel> PatchActionAsync(Guid id, ActionModel patch);
 
-        Task<List<RelationModel>> GetRelation(Guid id, string relationName);
     }
 }
