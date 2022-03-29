@@ -6,7 +6,7 @@ namespace Middleware.Orchestrator.Jobs
     {
         protected readonly ILogger<T> Logger;
 
-        public BaseJob(ILogger<T> logger)
+        protected BaseJob(ILogger<T> logger)
         {
             Logger = logger;
         }

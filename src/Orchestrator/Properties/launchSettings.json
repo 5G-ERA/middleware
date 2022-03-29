@@ -33,6 +33,10 @@
       "launchUrl": "{Scheme}://{ServiceHost}:{ServicePort}/swagger",
       "publishAllPorts": true,
       "useSSL": true
+    },
+    "Bridge to Kubernetes": {
+      "commandName": "AzureDevSpacesLocal",
+      "launchBrowser": true
     }
   }
 }

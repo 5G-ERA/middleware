@@ -1,0 +1,39 @@
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: orchestrator-api
+spec:
+  selector:
+    matchLabels:
+      name: orchestrator-api
+  template:
+    metadata:
+      labels:
+        name: orchestrator-api
+    spec:    
+      nodeSelector:
+        kubernetes.io/os: linux
+      containers:        
+      - name: orchestrator-api
+        image: 394603622351.dkr.ecr.eu-west-1.amazonaws.com/orchestrator-api:latest
+        imagePullPolicy: IfNotPresent
+        resources: {}
+        env:
+        - name: REDIS_INTERFACE_ADDRESS
+          value: http://redisinterface.api        
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: orchestrator-api
+spec:
+  selector:
+    name: orchestrator-api
+  ports:
+  - port: 80
+    targetPort: 80
+    name: http
+  - port: 433
+    targetPort: 433
+    name: https

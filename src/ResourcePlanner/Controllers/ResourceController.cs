@@ -22,7 +22,5 @@ namespace Middleware.ResourcePlanner.Controllers
             var resource = new TaskModel();
             return Ok(resource);
         }
-
-        
     }
 }
