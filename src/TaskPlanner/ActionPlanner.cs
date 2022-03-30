@@ -58,6 +58,15 @@ namespace Middleware.TaskPlanner
             //task.TaskPriority
             if (alreadyExist == true)
             {
+                // For now query graph to get action sequence. It will be modified in later iterations.
+                RedisInterface.TaskModel tempAction = (RedisInterface.TaskModel)await _apiClient.TaskGetRelationByNameAsync(currentTaskId, "EXTENDS"); //returns x and y --> taskId and ActionID
+                TaskModel tempActionSequence = _mapper.Map<TaskModel>(tempAction);
+                object p = tempActionSequence.ActionSequence;
+                //return p
+                
+
+
+
                 //manual action Sequence with minimum config from dialogues table.
 
                 //TaskId maps with preDefined ActionPlan --> Redis query to get PlanId by TaskId
