@@ -27,6 +27,7 @@ Add 2 new Environment Variables if not defined already:
 
 * **REDIS_HOSTNAME** - Address for the Redis server. It can be address of locally running server or the instance hosted by the 5G-ERA on AWS. The Redis needs to have installed additional modules: RedisGraph and RedisJSON
 * **REDIS_PORT** - The port on which the Redis server is operating. The default is `6379`, for the AWS server it has different port
+* **AWS_IMAGE_REGISTRY** - the address of the AWS Container Image Registry that hosts the official images for the 5G-ERA middleware
 
 ### Visual Studio Configuration
 

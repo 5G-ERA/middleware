@@ -21,5 +21,8 @@ spec:
         resources: {}
         env:
         - name: REDIS_INTERFACE_ADDRESS
-          value: http://redisinterface.api        
+          value: http://redisinterface.api
+        - name: AWS_IMAGE_REGISTRY
+          value: $(AWS_IMAGE_REGISTRY)
+
 
