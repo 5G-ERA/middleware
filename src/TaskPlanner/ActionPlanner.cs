@@ -46,10 +46,10 @@ namespace Middleware.TaskPlanner
             Guid RobotId = _robotModel.Id;
         }
 
-        public async Task InferActionSequence(Guid currentTaskId)
+        public async Task<TaskModel> InferActionSequence(Guid currentTaskId)
         {
             // TasksIDs = GetAllTasksID.lua
-            RedisInterface.TaskModel tmpTask = await _apiClient.TaskGetByIdAsync(currentTaskId); 
+            RedisInterface.TaskModel tmpTask = await _apiClient.TaskGetByIdAsync(currentTaskId);
             TaskModel task = _mapper.Map<TaskModel>(tmpTask);
 
             bool alreadyExist = task != null; //Check if CurrentTask is inside Redis model
@@ -58,61 +58,78 @@ namespace Middleware.TaskPlanner
             //task.TaskPriority
             if (alreadyExist == true)
             {
+                // BB: 2022-03-30
                 // For now query graph to get action sequence. It will be modified in later iterations.
-                RedisInterface.TaskModel tempAction = (RedisInterface.TaskModel)await _apiClient.TaskGetRelationByNameAsync(currentTaskId, "EXTENDS"); //returns x and y --> taskId and ActionID
-                TaskModel tempActionSequence = _mapper.Map<TaskModel>(tempAction);
-                object p = tempActionSequence.ActionSequence;
-                //return p
-                
+                List<RedisInterface.RelationModel> tempRelations = (await _apiClient.TaskGetRelationByNameAsync(currentTaskId, "EXTENDS"))?.ToList(); //returns x and y --> taskId and ActionID
 
+                // according to the StackOverflow this should work, if not let's map objects in the list one by one
+                List<RelationModel> relations = _mapper.Map<List<RelationModel>>(tempRelations);
 
+                //here is the list of the Ids of actions retrieved from the relation
+                List<Guid> actionGuids = relations.Select(r => r.PointsTo.Id).ToList();
 
-                //manual action Sequence with minimum config from dialogues table.
-
-                //TaskId maps with preDefined ActionPlan --> Redis query to get PlanId by TaskId
-
-                List<ActionModel> ActionSequence = new List<ActionModel>(); //Simulate for now the output of lua query to get actionSequence predefined by TaskID. 
-                for(int i=0; i < ActionSequence.Count;i++)
-
+                foreach (Guid actionId in actionGuids)
                 {
-                    ActionModel action = _mapper.Map<ActionModel>(ActionSequence[i]);
-                    string family = action.ActionFamily;
-                    if (family == "Navigation")
-                    {
-                        //Execute Redis query: Give me back the result of question 73b43f02-0a95-41f8-a1b6-b4c90d5acccf registerd for robot with Guid ...
-                        //452d7946-aeed-488c-9fc3-06f378bbfb30 --> Do you have a map
-                    }
-                    if (family == "Manipulation")
-                    {
-                        //Execute Redis query: Give me back the result of param ArticulationAvailable registerd for robot with Guid ...
-
-                    }
-                    if (family == "Perception")
-                    {
-                        //Execute Redis query: Give me back the result of param Sensors registerd for robot with Guid ...
-
-                    }
-
+                    //here call to retrieve specific action
+                    //add action to the action sequence in TaskModel
                 }
 
-                //Loop over each action in actionSequence.
-                // If navigationFamily --> get answer do you have map, what types of maps, what sensors do you have.
-                //if no map, add a new action before this one with SLAM. --> Check if timelimit exists.
-                //Check the ROS version and distro for SLAM based upon dialogues table. --> run LUA script with search parameters.
-                //if map, Check the ROS version and distro for SLAM based upon dialogues table
-
-                    //If manipulationFamily --> get answer, do you have neccesary articulations. --> run LUA script with search parameters.
-
-                    //If perception --> get answer, what sensors do you have sensor --> run LUA script with search parameters.
-
-                    //Return ActionSequence
             }
-            else
-            {
+            return task;
+            
+            //    TaskModel tempActionSequence = _mapper.Map<TaskModel>(tempAction);
+            //    object p = tempActionSequence.ActionSequence;
+            //    //return p
 
-                //Activate flexible planner, infer possible action sequence.
 
-            }
+
+
+            //    //manual action Sequence with minimum config from dialogues table.
+
+            //    //TaskId maps with preDefined ActionPlan --> Redis query to get PlanId by TaskId
+
+            //    List<ActionModel> ActionSequence = new List<ActionModel>(); //Simulate for now the output of lua query to get actionSequence predefined by TaskID. 
+            //    for(int i=0; i < ActionSequence.Count;i++)
+
+            //    {
+            //        ActionModel action = _mapper.Map<ActionModel>(ActionSequence[i]);
+            //        string family = action.ActionFamily;
+            //        if (family == "Navigation")
+            //        {
+            //            //Execute Redis query: Give me back the result of question 73b43f02-0a95-41f8-a1b6-b4c90d5acccf registerd for robot with Guid ...
+            //            //452d7946-aeed-488c-9fc3-06f378bbfb30 --> Do you have a map
+            //        }
+            //        if (family == "Manipulation")
+            //        {
+            //            //Execute Redis query: Give me back the result of param ArticulationAvailable registerd for robot with Guid ...
+
+            //        }
+            //        if (family == "Perception")
+            //        {
+            //            //Execute Redis query: Give me back the result of param Sensors registerd for robot with Guid ...
+
+            //        }
+
+            //    }
+
+            //    //Loop over each action in actionSequence.
+            //    // If navigationFamily --> get answer do you have map, what types of maps, what sensors do you have.
+            //    //if no map, add a new action before this one with SLAM. --> Check if timelimit exists.
+            //    //Check the ROS version and distro for SLAM based upon dialogues table. --> run LUA script with search parameters.
+            //    //if map, Check the ROS version and distro for SLAM based upon dialogues table
+
+            //        //If manipulationFamily --> get answer, do you have neccesary articulations. --> run LUA script with search parameters.
+
+            //        //If perception --> get answer, what sensors do you have sensor --> run LUA script with search parameters.
+
+            //        //Return ActionSequence
+            //}
+            //else
+            //{
+
+            //    //Activate flexible planner, infer possible action sequence.
+
+            //}
 
 
         }
