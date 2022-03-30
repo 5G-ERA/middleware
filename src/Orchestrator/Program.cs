@@ -14,7 +14,7 @@ builder.Services.AddSwaggerGen();
 
 builder.Services.ConfigureAutoMapper();
 builder.Services.AddHttpClient(AppConfig.RedisApiClientName);
-builder.Services.AddHttpClient(AppConfig.RedisApiClientName);
+builder.Services.AddHttpClient(AppConfig.OsmApiClientName);
 builder.Services.AddScoped<IApiClientBuilder, ApiClientBuilder>();
 builder.Services.AddHttpClient("healthCheckClient");
 var app = builder.Build();

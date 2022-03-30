@@ -34,6 +34,11 @@ public static class AutoMapperConfig
             cfg.CreateMap<InstanceModel, Orchestrator.InstanceModel>();
             cfg.CreateMap<TaskModel, Orchestrator.TaskModel>();
 
+            // Resource Planner
+            cfg.CreateMap<TaskModel, ResourcePlanner.TaskModel>();
+            cfg.CreateMap<ActionModel, ResourcePlanner.ActionModel>();
+            cfg.CreateMap<InstanceModel, ResourcePlanner.InstanceModel>();
+
         });
         return services;
     }

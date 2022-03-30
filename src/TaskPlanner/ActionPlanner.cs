@@ -1,5 +1,6 @@
 ﻿using System.Linq;
 using AutoMapper;
+using Middleware.TaskPlanner.ApiReference;
 using Middleware.TaskPlanner.RedisInterface;
 using ActionModel = Middleware.Common.Models.ActionModel;
 using RobotModel = Middleware.Common.Models.RobotModel;
@@ -7,7 +8,13 @@ using TaskModel = Middleware.Common.Models.TaskModel;
 
 namespace Middleware.TaskPlanner
 {
-    public class ActionPlanner
+    public interface IActionPlanner
+    {
+        void Initialize(List<ActionModel> actionSequence, DateTime currentTime);
+        Task<TaskModel> InferActionSequence(Guid currentTaskId);
+    }
+
+    public class ActionPlanner : IActionPlanner
     {
         /// <summary>
         /// Client to access Redis Interface API
@@ -34,16 +41,20 @@ namespace Middleware.TaskPlanner
         public Guid RobotId { get; set; }
         public string RobotName { get; set; }
 
-        public ActionPlanner(RedisApiClient apiClient, IMapper mapper, Guid ActionPlanningId, List<ActionModel> SequenceActions, DateTime Currenttime)
+        public ActionPlanner(IApiClientBuilder apiBuilder, IMapper mapper)
         {
-            _apiClient = apiClient;
+            _apiClient = apiBuilder.CreateRedisApiClient();
             _mapper = mapper;
-            ActionPlanId = ActionPlanningId; //Automatically generated Guid.
-            ActionSequence = SequenceActions; //Empty at the begining
-            CurrentTime = Currenttime;
+            
             InferingProcess = ""; //Predefined actionsequence by id or IA infering based on new task.
-            string robotName = _robotModel.RobotName;
-            Guid RobotId = _robotModel.Id;
+            //string robotName = _robotModel.RobotName;
+            //Guid RobotId = _robotModel.Id;
+        }
+
+        public void Initialize(List<ActionModel> actionSequence, DateTime currentTime)
+        {
+            ActionSequence = actionSequence; //Empty at the begining
+            CurrentTime = currentTime;
         }
 
         public async Task<TaskModel> InferActionSequence(Guid currentTaskId)
@@ -54,6 +65,7 @@ namespace Middleware.TaskPlanner
 
             bool alreadyExist = task != null; //Check if CurrentTask is inside Redis model
 
+            task.ActionPlanId = Guid.NewGuid();
             // Use . after task to access the properties of the task
             //task.TaskPriority
             if (alreadyExist == true)
@@ -72,11 +84,17 @@ namespace Middleware.TaskPlanner
                 {
                     //here call to retrieve specific action
                     //add action to the action sequence in TaskModel
-                    //ActionModel actionItem = new ActionModel (actionId);
+                    RedisInterface.ActionModel tempAction = await _apiClient.ActionGetByIdAsync(actionId);
+                    ActionModel actionItem = _mapper.Map<ActionModel>(tempAction);
+
+                    ActionSequence.Add(actionItem);
+                    //ActionModel actionItem = new ActionModel(actionId);
                     //ActionSequence.Add(actionItem.Id(actionId));
                 }
 
             }
+
+            task.ActionSequence = ActionSequence;
             return task;
             
             //    TaskModel tempActionSequence = _mapper.Map<TaskModel>(tempAction);

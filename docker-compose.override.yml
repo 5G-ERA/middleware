@@ -38,6 +38,7 @@ services:
       - ASPNETCORE_ENVIRONMENT=Development
       - ASPNETCORE_URLS=https://+:443;http://+:80
       - REDIS_INTERFACE_ADDRESS=http://redisinterface.api
+      - RESOURCE_PLANNER_ADDRESS=http://resourceplanner.api
     ports:
       - "80"
       - "443"

@@ -9,6 +9,7 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.ConfigureAutoMapper();
+builder.Services.AddHttpClient("healthCheckClient");
 
 var app = builder.Build();
 
