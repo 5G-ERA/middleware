@@ -1,3 +1,4 @@
+using Middleware.ResourcePlanner;
 using Middleware.ResourcePlanner.Config;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -10,6 +11,7 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.ConfigureAutoMapper();
 builder.Services.AddHttpClient("healthCheckClient");
+builder.Services.AddScoped<IResourcePlanner, ResourcePlanner>();
 
 var app = builder.Build();
 

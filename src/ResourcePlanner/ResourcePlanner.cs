@@ -3,7 +3,12 @@ using AutoMapper;
 using Middleware.Common.Models;
 namespace Middleware.ResourcePlanner
 {
-    public class ResourcePlanner
+    public interface IResourcePlanner
+    {
+        Task<TaskModel> Plan(TaskModel taskModel);
+    }
+
+    public class ResourcePlanner : IResourcePlanner
     {
         private object closestmachine;
         private Guid ActionSequence;
@@ -17,6 +22,13 @@ namespace Middleware.ResourcePlanner
         private TaskModel _taskModel;
         private readonly IMapper _mapper;
 
+        public ResourcePlanner(IHttpClientFactory factory, IMapper mapper)
+        {
+            HttpClient client = factory.CreateClient();
+            _redisApiClient = new RedisInterface.RedisApiClient("http://redisinterface.api", client);
+            _mapper = mapper;
+        }
+
         public Guid GetTaskId()
         {
             if (_taskModel != null)
@@ -28,7 +40,7 @@ namespace Middleware.ResourcePlanner
 
         public List<ActionModel> GetActionId(List<ActionModel> actionId) => actionId;
 
-        public async Task<TaskModel> Plan(TaskModel taskModel, List<ActionModel> actionId)
+        public async Task<TaskModel> Plan(TaskModel taskModel)
         {
             _taskModel = taskModel;
             // actionPlanner will give resource planner the actionSequence. 
@@ -37,13 +49,11 @@ namespace Middleware.ResourcePlanner
             List<ActionModel> actionSequence = taskModel.ActionSequence;
             if (actionSequence == null || actionSequence.Count == 0)
                 throw new ArgumentException("Action sequence cannot be empty");
-    
+
 
             // iterate throught actions in actionSequence
             foreach (ActionModel action in actionSequence)
             {
-
-                // do sth 
                 List<RedisInterface.RelationModel> imagesTmp = (await _redisApiClient.ActionGetRelationByNameAsync(action.Id, "OWNS")).ToList();
                 List<RelationModel> images = new List<RelationModel>();
                 foreach (RedisInterface.RelationModel imgTmp in imagesTmp)
@@ -58,15 +68,11 @@ namespace Middleware.ResourcePlanner
                     RedisInterface.InstanceModel instanceTmp = await _redisApiClient.InstanceGetByIdAsync(relation.PointsTo.Id);
                     //map
                     InstanceModel instance = _mapper.Map<InstanceModel>(instanceTmp);
-                    
+
                     // add instance to actions 
                     action.Services.Add(instance);
-
-                    //adding service to the list `                    
-                    //action.Services.Add(List<ActionModel>.ReferenceEquals(instance, action)); 
-                    
                 }
-                
+
             }
 
             //List<ActionModel> sequence = new List<ActionModel>
@@ -101,34 +107,34 @@ namespace Middleware.ResourcePlanner
             //slam //object detection 
             //return back to action
 
-           // List<ActionModel> policySequence = new List<ActionModel>();
+            // List<ActionModel> policySequence = new List<ActionModel>();
 
-           // TaskModel.ActionSequence actionModels = new TaskModel();
+            // TaskModel.ActionSequence actionModels = new TaskModel();
 
 
-           // new List<ActionModel>(){ new ActionModel() { ImageName = "SLAM", Id = Guid.NewGuid() },
-           // new ActionModel() { ImageName = "Object detection", Id = Guid.NewGuid() } };
+            // new List<ActionModel>(){ new ActionModel() { ImageName = "SLAM", Id = Guid.NewGuid() },
+            // new ActionModel() { ImageName = "Object detection", Id = Guid.NewGuid() } };
 
-           // RedisInterface.InstanceModel instancetmp = await _redisApiClient.InstanceGetByIdAsync(Guid.Empty); //TODO: chnage to real guid
-           // InstanceModel instance = _mapper.Map<InstanceModel>(instancetmp);
+            // RedisInterface.InstanceModel instancetmp = await _redisApiClient.InstanceGetByIdAsync(Guid.Empty); //TODO: chnage to real guid
+            // InstanceModel instance = _mapper.Map<InstanceModel>(instancetmp);
 
-            
 
-           // //what actions needs to be instancaited to complete the action from RADU###############
-           // //needs the redis query for the instances for the specified actions // give action id - and return the instnaces that are connected to the graph
-           //RedisInterface.InstanceModel instanceModel = new RedisInterface.InstanceModel();
-           // instanceModel.Id = Guid.NewGuid();
-             
+
+            // //what actions needs to be instancaited to complete the action from RADU###############
+            // //needs the redis query for the instances for the specified actions // give action id - and return the instnaces that are connected to the graph
+            //RedisInterface.InstanceModel instanceModel = new RedisInterface.InstanceModel();
+            // instanceModel.Id = Guid.NewGuid();
+
 
 
             //1.  get the images that are needed to be deployed 
             // get IMAGENAME SLAM and OBJECT DETECTION 
             //List<ImageName> images = new List<ImageName>();
-           
+
 
             //2.  assigning these images to the actions 
             //ImageName imageName;
-            
+
 
             ////3.  returning the task model with the updated images 
             //taskModel = new TaskModel();
@@ -144,25 +150,20 @@ namespace Middleware.ResourcePlanner
 
             //return "Cloud_1 is free to perfrom task"
             //            // // the actors that are free to perform task 
-                        // // [edge1,cloud1]
+            // // [edge1,cloud1]
             // // call redis API
 
             // //  
 
 
             // set services for action from result of the redis
-            return taskModel;          
+            return taskModel;
 
         }
 
 
-    
-        public ResourcePlanner (IHttpClientFactory factory, IMapper mapper)
-        {            
-            HttpClient client = factory.CreateClient();
-            _redisApiClient = new RedisInterface.RedisApiClient ("HTTP://redisinterface.api", client);
-            _mapper = mapper;
-        }
+
+
 
         //
     }
