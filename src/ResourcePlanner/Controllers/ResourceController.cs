@@ -15,7 +15,7 @@ namespace Middleware.ResourcePlanner.Controllers
             _redisApiClient = redisApiClient;
         }
 
-        [HttpPost]
+        [HttpPost(Name = "GetResourcePlan")]
         [ProducesResponseType(typeof(TaskModel), (int)HttpStatusCode.OK)]
         public async Task<ActionResult<TaskModel>> GetResource([FromBody] TaskModel inputmodel)
         {

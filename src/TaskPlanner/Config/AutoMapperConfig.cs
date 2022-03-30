@@ -26,11 +26,18 @@ public static class AutoMapperConfig
             cfg.CreateMap<RobotModel, RedisInterface.RobotModel>();
             cfg.CreateMap<TaskModel, RedisInterface.TaskModel>();
             cfg.CreateMap<PolicyModel, RedisInterface.PolicyModel>();
+            cfg.CreateMap<RelationModel, RedisInterface.RelationModel>();
+            cfg.CreateMap<GraphEntityModel, RedisInterface.GraphEntityModel>();
 
             // Orchestrator
             cfg.CreateMap<ActionModel, Orchestrator.ActionModel>();
             cfg.CreateMap<InstanceModel, Orchestrator.InstanceModel>();
             cfg.CreateMap<TaskModel, Orchestrator.TaskModel>();
+
+            // Resource Planner
+            cfg.CreateMap<TaskModel, ResourcePlanner.TaskModel>();
+            cfg.CreateMap<ActionModel, ResourcePlanner.ActionModel>();
+            cfg.CreateMap<InstanceModel, ResourcePlanner.InstanceModel>();
 
         });
         return services;

@@ -1,4 +1,7 @@
+using Middleware.TaskPlanner;
+using Middleware.TaskPlanner.ApiReference;
 using Middleware.TaskPlanner.Config;
+using Middleware.TaskPlanner.RedisInterface;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -9,6 +12,12 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.ConfigureAutoMapper();
+
+builder.Services.AddHttpClient("redisApiClient");
+builder.Services.AddHttpClient("resourcePlannerApiClient");
+builder.Services.AddScoped<IApiClientBuilder, ApiClientBuilder>();
+builder.Services.AddScoped<IActionPlanner, ActionPlanner>();
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
