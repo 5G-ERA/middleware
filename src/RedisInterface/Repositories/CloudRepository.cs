@@ -10,7 +10,7 @@ namespace Middleware.RedisInterface.Repositories
 {
     public class CloudRepository : BaseRepository<CloudModel>, ICloudRepository
     {
-        public CloudRepository(IConnectionMultiplexer redisClient, IRedisGraphClient redisGraph) : base(RedisDbIndexEnum.Clouds, redisClient, redisGraph)
+        public CloudRepository(IConnectionMultiplexer redisClient, IRedisGraphClient redisGraph) : base(RedisDbIndexEnum.Cloud, redisClient, redisGraph)
         {
         }
 

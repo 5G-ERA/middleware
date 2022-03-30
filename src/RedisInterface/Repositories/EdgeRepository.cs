@@ -10,7 +10,7 @@ namespace Middleware.RedisInterface.Repositories
 {
     public class EdgeRepository : BaseRepository<EdgeModel>, IEdgeRepository
     {
-        public EdgeRepository(IConnectionMultiplexer redisClient, IRedisGraphClient redisGraph) : base(RedisDbIndexEnum.Edges, redisClient, redisGraph)
+        public EdgeRepository(IConnectionMultiplexer redisClient, IRedisGraphClient redisGraph) : base(RedisDbIndexEnum.Edge, redisClient, redisGraph)
         {
         }
 

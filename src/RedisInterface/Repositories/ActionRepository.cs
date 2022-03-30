@@ -10,7 +10,7 @@ namespace Middleware.RedisInterface.Repositories
 {
     public class ActionRepository : BaseRepository<ActionModel>, IActionRepository
     {
-        public ActionRepository(IConnectionMultiplexer redisClient, IRedisGraphClient redisGraph) : base(RedisDbIndexEnum.Actions, redisClient, redisGraph)
+        public ActionRepository(IConnectionMultiplexer redisClient, IRedisGraphClient redisGraph) : base(RedisDbIndexEnum.Action, redisClient, redisGraph)
         {
         }
 
