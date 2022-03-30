@@ -34,6 +34,7 @@ namespace Middleware.RedisInterface.Repositories
         public async Task<T> GetByIdAsync(Guid id)
         {
             string model = (string)await Db.JsonGetAsync(id.ToString());
+            //TODO: null check!!!!!
             T newModel = JsonSerializer.Deserialize<T>(model);
 
             return newModel;
