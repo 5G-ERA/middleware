@@ -47,11 +47,18 @@ namespace Middleware.Orchestrator.Jobs
 
             if (exists)
                 return;
-            
-            var metadata = new V1ObjectMeta() { Name = K8SNamespaceName };
-            var ns = new V1Namespace(metadata: metadata);
 
-            await kubeClient.CreateNamespaceAsync(ns);
+            var ns = new V1Namespace()
+            {
+                Metadata = new V1ObjectMeta()
+                {
+                    Name = "five-g-era"
+                }
+            };
+
+            var result = await kubeClient.CreateNamespaceAsync(ns);
+            Logger.LogDebug(result.ToString());
+
         }
     }
 }
