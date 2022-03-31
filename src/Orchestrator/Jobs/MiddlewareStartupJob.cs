@@ -17,7 +17,7 @@ namespace Middleware.Orchestrator.Jobs
         public MiddlewareStartupJob(ILogger<MiddlewareStartupJob> logger, IKubernetesBuilder kubeBuilder) : base(logger)
         {
             _kubeBuilder = kubeBuilder;
-            _awsRegistryName = Environment.GetEnvironmentVariable("AWS_IMAGE_REGISTRY"); //TODO: replace with the ENV Variable
+            _awsRegistryName = Environment.GetEnvironmentVariable("AWS_IMAGE_REGISTRY"); //TODO: replace with the parameters from the command line
         }
 
         protected override async Task ExecuteJobAsync(IJobExecutionContext context)
@@ -51,50 +51,69 @@ namespace Middleware.Orchestrator.Jobs
             if (exists == false)
                 return;
 
-            var dV1Deployment = CreateDeployment("gateway");
-
             try
             {
-                var result = await kubeClient.CreateNamespacedDeploymentAsync(dV1Deployment, K8SNamespaceName);
+                var deployments = await kubeClient.ListNamespacedDeploymentAsync(K8SNamespaceName);
+                var deploymentNames = deployments.Items.Select(d => d.Metadata.Name).ToArray();
+                var images = new List<string>
+                    {"gateway", "redis-interface-api", "resource-planner-api", "task-planner-api"};
 
+                foreach (string service in images)
+                {
+                    var v1Deployment = CreateDeployment(service);
+
+                    if (deploymentNames.Contains(v1Deployment.Metadata.Name))
+                        continue;
+
+                    var result = await kubeClient.CreateNamespacedDeploymentAsync(v1Deployment, K8SNamespaceName);
+                }
             }
             catch (k8s.Autorest.HttpOperationException httpOperationException)
             {
                 var phase = httpOperationException.Response.ReasonPhrase;
                 var content = httpOperationException.Response.Content;
+                Logger.LogError(httpOperationException, "Unable to deploy the resource to k8s:{phase}, {content}", phase, content);
             }
-
         }
 
         public V1Deployment CreateDeployment(string name)
         {
+            var dnsName = CreateDnsName(name);
             var selector = new V1LabelSelector
             {
                 MatchLabels = new Dictionary<string, string> { { "app", name } }
             };
             var meta = new V1ObjectMeta()
             {
-                Name = name,
+                Name = dnsName,
                 Labels = new Dictionary<string, string>()
                 {
                     { "app", name }
                 }
             };
+            var envList = new List<V1EnvVar>
+            {
+                new ("REDIS_INTERFACE_ADDRESS", $"http://redis-interface-api"),
+                new ("ORCHESTRATOR_ADDRESS", $"http://orchestrator-api"),
+                new ("TASK_PLANNER_ADDRESS", $"http://task-planner-api"),
+                new ("RESOURCE_PLANNER_ADDRESS", $"http://resource-planner-api")
+            };
+            if (name.Contains("redis"))
+            {
+                envList.Add(new V1EnvVar("REDIS_HOSTNAME", Environment.GetEnvironmentVariable("REDIS_HOSTNAME")));
+                envList.Add(new V1EnvVar("REDIS_PORT", Environment.GetEnvironmentVariable("REDIS_PORT")));
+            }
 
             var container = new V1Container()
             {
                 Name = name,
                 Image = K8SImageHelper.BuildImageName(_awsRegistryName, name, "latest"),
                 ImagePullPolicy = "Always",
-                Env = new List<V1EnvVar>()
-                {
-                    new V1EnvVar("REDIS_INTERFACE_ADDRESS", $"http://redisinterface.api"),
-                    new V1EnvVar("ORCHESTRATOR_ADDRESS", $"http://orchestrator.api"),
-                    new V1EnvVar("TASK_PLANNER_ADDRESS", $"http://taskplanner.api"),
-                    new V1EnvVar("RESOURCE_PLANNER_ADDRESS", $"http://resourceplanner.api")
-                },
-                Ports = new List<V1ContainerPort>(){new V1ContainerPort(80), new V1ContainerPort(433)}
+                Env = envList,
+                Ports = new List<V1ContainerPort>() { new (80), new (433) }
             };
+
+
             var podSpec = new V1PodSpec(new List<V1Container>() { container });
 
             var template = new V1PodTemplateSpec(meta, podSpec);
@@ -111,14 +130,17 @@ namespace Middleware.Orchestrator.Jobs
             return dep;
         }
 
-        /// <summary>
-        ///
-        /// </summary>
-        /// <param name="imageName"></param>
-        /// <returns></returns>
-        private static string NameToUrlString(string imageName)
+        private string CreateDnsName(string name)
         {
-            return imageName.Replace('-', '.');
+            var idx = name.LastIndexOf('-');
+            if (idx <=0)
+            {
+                return name;
+            }
+
+            var arr = name.ToCharArray();
+            arr[idx] = '.';
+            return new string(arr);
         }
     }
 }

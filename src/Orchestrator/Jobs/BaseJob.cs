@@ -20,7 +20,6 @@ namespace Middleware.Orchestrator.Jobs
             catch (Exception ex)
             {
                 Logger.LogError("Something went wrong during the execution of the action", ex);
-                throw;
             }
         }
 
