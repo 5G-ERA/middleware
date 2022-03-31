@@ -2797,11 +2797,11 @@
             "type": "string",
             "format": "uuid"
           },
-          "Order": {
+          "ActionFamily": {
             "type": "string",
             "nullable": true
           },
-          "ActionFamily": {
+          "Order": {
             "type": "integer",
             "format": "int32"
           },
