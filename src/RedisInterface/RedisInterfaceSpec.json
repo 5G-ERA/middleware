@@ -279,7 +279,7 @@
         }
       }
     },
-    "/api/v1/Action/relation/{firstName}/{secondName}": {
+    "/api/v1/Action/relations/{firstName}/{secondName}": {
       "get": {
         "tags": [
           "Action"
@@ -311,42 +311,6 @@
             }
           }
         ],
-        "requestBody": {
-          "content": {
-            "application/json-patch+json": {
-              "schema": {
-                "type": "array",
-                "items": {
-                  "type": "string"
-                }
-              }
-            },
-            "application/json": {
-              "schema": {
-                "type": "array",
-                "items": {
-                  "type": "string"
-                }
-              }
-            },
-            "text/json": {
-              "schema": {
-                "type": "array",
-                "items": {
-                  "type": "string"
-                }
-              }
-            },
-            "application/*+json": {
-              "schema": {
-                "type": "array",
-                "items": {
-                  "type": "string"
-                }
-              }
-            }
-          }
-        },
         "responses": {
           "200": {
             "description": "Success",
@@ -645,7 +609,7 @@
         }
       }
     },
-    "/api/v1/Cloud/relation/{firstName}/{secondName}": {
+    "/api/v1/Cloud/relations/{firstName}/{secondName}": {
       "get": {
         "tags": [
           "Cloud"
@@ -677,42 +641,6 @@
             }
           }
         ],
-        "requestBody": {
-          "content": {
-            "application/json-patch+json": {
-              "schema": {
-                "type": "array",
-                "items": {
-                  "type": "string"
-                }
-              }
-            },
-            "application/json": {
-              "schema": {
-                "type": "array",
-                "items": {
-                  "type": "string"
-                }
-              }
-            },
-            "text/json": {
-              "schema": {
-                "type": "array",
-                "items": {
-                  "type": "string"
-                }
-              }
-            },
-            "application/*+json": {
-              "schema": {
-                "type": "array",
-                "items": {
-                  "type": "string"
-                }
-              }
-            }
-          }
-        },
         "responses": {
           "200": {
             "description": "Success",
@@ -1011,7 +939,7 @@
         }
       }
     },
-    "/api/v1/ContainerImage/relation/{firstName}/{secondName}": {
+    "/api/v1/ContainerImage/relations/{firstName}/{secondName}": {
       "get": {
         "tags": [
           "ContainerImage"
@@ -1043,42 +971,6 @@
             }
           }
         ],
-        "requestBody": {
-          "content": {
-            "application/json-patch+json": {
-              "schema": {
-                "type": "array",
-                "items": {
-                  "type": "string"
-                }
-              }
-            },
-            "application/json": {
-              "schema": {
-                "type": "array",
-                "items": {
-                  "type": "string"
-                }
-              }
-            },
-            "text/json": {
-              "schema": {
-                "type": "array",
-                "items": {
-                  "type": "string"
-                }
-              }
-            },
-            "application/*+json": {
-              "schema": {
-                "type": "array",
-                "items": {
-                  "type": "string"
-                }
-              }
-            }
-          }
-        },
         "responses": {
           "200": {
             "description": "Success",
@@ -1377,7 +1269,7 @@
         }
       }
     },
-    "/api/v1/Edge/relation/{firstName}/{secondName}": {
+    "/api/v1/Edge/relations/{firstName}/{secondName}": {
       "get": {
         "tags": [
           "Edge"
@@ -1409,42 +1301,6 @@
             }
           }
         ],
-        "requestBody": {
-          "content": {
-            "application/json-patch+json": {
-              "schema": {
-                "type": "array",
-                "items": {
-                  "type": "string"
-                }
-              }
-            },
-            "application/json": {
-              "schema": {
-                "type": "array",
-                "items": {
-                  "type": "string"
-                }
-              }
-            },
-            "text/json": {
-              "schema": {
-                "type": "array",
-                "items": {
-                  "type": "string"
-                }
-              }
-            },
-            "application/*+json": {
-              "schema": {
-                "type": "array",
-                "items": {
-                  "type": "string"
-                }
-              }
-            }
-          }
-        },
         "responses": {
           "200": {
             "description": "Success",
@@ -1786,7 +1642,7 @@
         }
       }
     },
-    "/api/v1/Instance/relation/{firstName}/{secondName}": {
+    "/api/v1/Instance/relations/{firstName}/{secondName}": {
       "get": {
         "tags": [
           "Instance"
@@ -1818,42 +1674,6 @@
             }
           }
         ],
-        "requestBody": {
-          "content": {
-            "application/json-patch+json": {
-              "schema": {
-                "type": "array",
-                "items": {
-                  "type": "string"
-                }
-              }
-            },
-            "application/json": {
-              "schema": {
-                "type": "array",
-                "items": {
-                  "type": "string"
-                }
-              }
-            },
-            "text/json": {
-              "schema": {
-                "type": "array",
-                "items": {
-                  "type": "string"
-                }
-              }
-            },
-            "application/*+json": {
-              "schema": {
-                "type": "array",
-                "items": {
-                  "type": "string"
-                }
-              }
-            }
-          }
-        },
         "responses": {
           "200": {
             "description": "Success",
@@ -2313,7 +2133,7 @@
         }
       }
     },
-    "/api/v1/Robot/relation/{firstName}/{secondName}": {
+    "/api/v1/Robot/relations/{firstName}/{secondName}": {
       "get": {
         "tags": [
           "Robot"
@@ -2345,42 +2165,6 @@
             }
           }
         ],
-        "requestBody": {
-          "content": {
-            "application/json-patch+json": {
-              "schema": {
-                "type": "array",
-                "items": {
-                  "type": "string"
-                }
-              }
-            },
-            "application/json": {
-              "schema": {
-                "type": "array",
-                "items": {
-                  "type": "string"
-                }
-              }
-            },
-            "text/json": {
-              "schema": {
-                "type": "array",
-                "items": {
-                  "type": "string"
-                }
-              }
-            },
-            "application/*+json": {
-              "schema": {
-                "type": "array",
-                "items": {
-                  "type": "string"
-                }
-              }
-            }
-          }
-        },
         "responses": {
           "200": {
             "description": "Success",
@@ -2679,7 +2463,7 @@
         }
       }
     },
-    "/api/v1/Task/relation/{firstName}/{secondName}": {
+    "/api/v1/Task/relations/{firstName}/{secondName}": {
       "get": {
         "tags": [
           "Task"
@@ -2711,42 +2495,6 @@
             }
           }
         ],
-        "requestBody": {
-          "content": {
-            "application/json-patch+json": {
-              "schema": {
-                "type": "array",
-                "items": {
-                  "type": "string"
-                }
-              }
-            },
-            "application/json": {
-              "schema": {
-                "type": "array",
-                "items": {
-                  "type": "string"
-                }
-              }
-            },
-            "text/json": {
-              "schema": {
-                "type": "array",
-                "items": {
-                  "type": "string"
-                }
-              }
-            },
-            "application/*+json": {
-              "schema": {
-                "type": "array",
-                "items": {
-                  "type": "string"
-                }
-              }
-            }
-          }
-        },
         "responses": {
           "200": {
             "description": "Success",

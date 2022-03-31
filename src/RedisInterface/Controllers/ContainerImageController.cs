@@ -101,10 +101,11 @@ namespace Middleware.RedisInterface.Controllers
 
 
         [HttpGet]
-        [Route("relation/{firstName}/{secondName}", Name = "ContainerImageGetRelationsByName")]
+        [Route("relations/{firstName}/{secondName}", Name = "ContainerImageGetRelationsByName")]
         [ProducesResponseType(typeof(List<RelationModel>), (int)HttpStatusCode.OK)]
-        public async Task<IActionResult> GetRelationsAsync(Guid id, List<string> relationNames)
+        public async Task<IActionResult> GetRelationsAsync(Guid id, string firstName, string secondName)
         {
+            List<string> relationNames = new List<string>() { firstName, secondName };
             var relations = await _containerImageRepository.GetRelations(id, relationNames);
             return Ok(relations);
         }

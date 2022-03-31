@@ -106,7 +106,7 @@ namespace Middleware.RedisInterface.Repositories
         {
             List<RelationModel> relationModels = new List<RelationModel>();
             relationName = relationName?.ToUpper();
-            string query = "MATCH (x: " + _redisDbIndex.ToString().ToUpper() + " {ID: " + id + " }) MATCH (y) WHERE (x)-[: " + relationName + "]->(y) RETURN x,y";
+            string query = "MATCH (x: " + _redisDbIndex.ToString().ToUpper() + " {ID: '" + id + "' }) MATCH (y) WHERE (x)-[: " + relationName + "]->(y) RETURN x,y";
             ResultSet resultSet = await RedisGraph.Query("RESOURCE_PLANNER", query);
             // BB: 24.03.2022
             // We are using the loop with 2 nested loops to retrieve the values from the graph

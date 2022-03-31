@@ -101,10 +101,11 @@ namespace Middleware.RedisInterface.Controllers
 
 
         [HttpGet]
-        [Route("relation/{firstName}/{secondName}", Name = "EdgeGetRelationsByName")]
+        [Route("relations/{firstName}/{secondName}", Name = "EdgeGetRelationsByName")]
         [ProducesResponseType(typeof(List<RelationModel>), (int)HttpStatusCode.OK)]
-        public async Task<IActionResult> GetRelationsAsync(Guid id, List<string> relationNames)
+        public async Task<IActionResult> GetRelationsAsync(Guid id, string firstName, string secondName)
         {
+            List<string> relationNames = new List<string>() { firstName, secondName };
             var relations = await _edgeRepository.GetRelations(id, relationNames);
             return Ok(relations);
         }
