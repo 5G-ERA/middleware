@@ -98,5 +98,16 @@ namespace Middleware.RedisInterface.Controllers
             var relations = await _cloudRepository.GetRelation(id, name);
             return Ok(relations);
         }
+
+
+        [HttpGet]
+        [Route("relations/{firstName}/{secondName}", Name = "CloudGetRelationsByName")]
+        [ProducesResponseType(typeof(List<RelationModel>), (int)HttpStatusCode.OK)]
+        public async Task<IActionResult> GetRelationsAsync(Guid id, string firstName, string secondName)
+        {
+            List<string> relationNames = new List<string>() { firstName, secondName };
+            var relations = await _cloudRepository.GetRelations(id, relationNames);
+            return Ok(relations);
+        }
     }
 }
