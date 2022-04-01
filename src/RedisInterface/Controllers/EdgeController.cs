@@ -58,6 +58,24 @@ namespace Middleware.RedisInterface.Controllers
             return Ok(model);
         }
 
+
+        /// <summary>
+        /// Partially update an existing InstanceModel entity
+        /// </summary>
+        /// <param name="patch"></param>
+        /// <param name="id"></param>
+        /// <returns> the modified InstanceModel entity </returns>
+        [HttpPatch]
+        [Route("{id}", Name = "EdgePatch")]
+        [ProducesResponseType(typeof(EdgeModel), (int)HttpStatusCode.OK)]
+        public async Task<IActionResult> PatchEdgeAsync([FromBody] EdgeModel patch, [FromRoute] Guid id)
+        {
+
+            EdgeModel model = await _edgeRepository.PatchEdgeAsync(id, patch);
+            return Ok(model);
+        }
+
+
         /// <summary>
         /// Delete an EdgeModel entity for the given id
         /// </summary>
@@ -70,6 +88,26 @@ namespace Middleware.RedisInterface.Controllers
         {
             await _edgeRepository.DeleteByIdAsync(id);
             return Ok();
+        }
+
+        [HttpGet]
+        [Route("relation/{name}", Name = "EdgeGetRelationByName")]
+        [ProducesResponseType(typeof(List<RelationModel>), (int)HttpStatusCode.OK)]
+        public async Task<IActionResult> GetRelationAsync(Guid id, string name)
+        {
+            var relations = await _edgeRepository.GetRelation(id, name);
+            return Ok(relations);
+        }
+
+
+        [HttpGet]
+        [Route("relations/{firstName}/{secondName}", Name = "EdgeGetRelationsByName")]
+        [ProducesResponseType(typeof(List<RelationModel>), (int)HttpStatusCode.OK)]
+        public async Task<IActionResult> GetRelationsAsync(Guid id, string firstName, string secondName)
+        {
+            List<string> relationNames = new List<string>() { firstName, secondName };
+            var relations = await _edgeRepository.GetRelations(id, relationNames);
+            return Ok(relations);
         }
     }
 }

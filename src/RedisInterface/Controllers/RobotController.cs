@@ -59,6 +59,22 @@ namespace Middleware.RedisInterface.Controllers
         }
 
         /// <summary>
+        /// Partially update an existing InstanceModel entity
+        /// </summary>
+        /// <param name="patch"></param>
+        /// <param name="id"></param>
+        /// <returns> the modified InstanceModel entity </returns>
+        [HttpPatch]
+        [Route("{id}", Name = "RobotPatch")]
+        [ProducesResponseType(typeof(RobotModel), (int)HttpStatusCode.OK)]
+        public async Task<IActionResult> PatchRobotAsync([FromBody] RobotModel patch, [FromRoute] Guid id)
+        {
+
+            RobotModel model = await _robotRepository.PatchRobotAsync(id, patch);
+            return Ok(model);
+        }
+
+        /// <summary>
         /// Delete an RobotModel entity for the given id
         /// </summary>
         /// <param name="id"></param>
@@ -81,10 +97,22 @@ namespace Middleware.RedisInterface.Controllers
         //}
 
         [HttpGet]
-        [Route("relation/{name}", Name ="GetRelationByName")]
-        public async Task<IActionResult> GetRelationAsync(string name)
+        [Route("relation/{name}", Name ="RobotGetRelationByName")]
+        [ProducesResponseType(typeof(List<RelationModel>), (int)HttpStatusCode.OK)]
+        public async Task<IActionResult> GetRelationAsync(Guid id, string name)
         {
-            var relations =await _robotRepository.GetRelation(name);
+            var relations =await _robotRepository.GetRelation(id, name);
+            return Ok(relations);
+        }
+
+
+        [HttpGet]
+        [Route("relations/{firstName}/{secondName}", Name = "RobotGetRelationsByName")]
+        [ProducesResponseType(typeof(List<RelationModel>), (int)HttpStatusCode.OK)]
+        public async Task<IActionResult> GetRelationsAsync(Guid id, string firstName, string secondName)
+        {
+            List<string> relationNames = new List<string>() { firstName, secondName}; 
+            var relations = await _robotRepository.GetRelations(id, relationNames);
             return Ok(relations);
         }
     }

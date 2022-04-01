@@ -11,7 +11,7 @@ namespace Middleware.RedisInterface.Repositories
 {
     public class InstanceRepository : BaseRepository<InstanceModel>, IInstanceRepository
     {
-        public InstanceRepository(IConnectionMultiplexer redisClient, IRedisGraphClient redisGraph) : base(RedisDbIndexEnum.Instance, redisClient, redisGraph)
+        public InstanceRepository(IConnectionMultiplexer redisClient, IRedisGraphClient redisGraph, ILogger logger) : base(RedisDbIndexEnum.Instance, redisClient, redisGraph, logger)
         {
         }
 
@@ -54,6 +54,7 @@ namespace Middleware.RedisInterface.Repositories
             }    
             await Db.JsonSetAsync(id.ToString(), JsonSerializer.Serialize(currentModel));
             return currentModel;
-        }     
+        }
+
     }
 }

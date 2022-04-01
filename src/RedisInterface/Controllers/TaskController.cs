@@ -58,6 +58,24 @@ namespace Middleware.RedisInterface.Controllers
             return Ok(model);
         }
 
+
+        /// <summary>
+        /// Partially update an existing InstanceModel entity
+        /// </summary>
+        /// <param name="patch"></param>
+        /// <param name="id"></param>
+        /// <returns> the modified InstanceModel entity </returns>
+        [HttpPatch]
+        [Route("{id}", Name = "TaskPatch")]
+        [ProducesResponseType(typeof(TaskModel), (int)HttpStatusCode.OK)]
+        public async Task<IActionResult> PatchTaskAsync([FromBody] TaskModel patch, [FromRoute] Guid id)
+        {
+
+            TaskModel model = await _taskRepository.PatchTaskAsync(id, patch);
+            return Ok(model);
+        }
+
+
         /// <summary>
         /// Delete an TaskModel entity for the given id
         /// </summary>
@@ -73,8 +91,25 @@ namespace Middleware.RedisInterface.Controllers
         }
 
 
+        [HttpGet]
+        [Route("relation/{name}", Name = "TaskGetRelationByName")]
+        [ProducesResponseType(typeof(List<RelationModel>), (int)HttpStatusCode.OK)]
+        public async Task<IActionResult> GetRelationAsync(Guid id, string name)
+        {
+            var relations = await _taskRepository.GetRelation(id, name);
+            return Ok(relations);
+        }
 
 
+        [HttpGet]
+        [Route("relations/{firstName}/{secondName}", Name = "TaskGetRelationsByName")]
+        [ProducesResponseType(typeof(List<RelationModel>), (int)HttpStatusCode.OK)]
+        public async Task<IActionResult> GetRelationsAsync(Guid id, string firstName, string secondName)
+        {
+            List<string> relationNames = new List<string>() { firstName, secondName };
+            var relations = await _taskRepository.GetRelations(id, relationNames);
+            return Ok(relations);
+        }
 
 
     }
