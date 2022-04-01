@@ -11,7 +11,7 @@ namespace Middleware.RedisInterface.Repositories
 {
     public class InstanceRepository : BaseRepository<InstanceModel>, IInstanceRepository
     {
-        public InstanceRepository(IConnectionMultiplexer redisClient, IRedisGraphClient redisGraph, ILogger logger) : base(RedisDbIndexEnum.Instance, redisClient, redisGraph, logger)
+        public InstanceRepository(IConnectionMultiplexer redisClient, IRedisGraphClient redisGraph, ILogger<InstanceRepository> logger) : base(RedisDbIndexEnum.Instance, redisClient, redisGraph, logger)
         {
         }
 

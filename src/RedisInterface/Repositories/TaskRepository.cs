@@ -9,7 +9,7 @@ namespace Middleware.RedisInterface.Repositories
 {
     public class TaskRepository : BaseRepository<TaskModel>,  ITaskRepository   
     {
-        public TaskRepository(IConnectionMultiplexer redisClient, IRedisGraphClient redisGraph, ILogger logger) : base(RedisDbIndexEnum.Task, redisClient, redisGraph, logger)
+        public TaskRepository(IConnectionMultiplexer redisClient, IRedisGraphClient redisGraph, ILogger<TaskRepository> logger) : base(RedisDbIndexEnum.Task, redisClient, redisGraph, logger)
         {
         }
 

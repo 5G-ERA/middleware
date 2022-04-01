@@ -10,7 +10,7 @@ namespace Middleware.RedisInterface.Repositories
 {
     public class RobotRepository : BaseRepository<RobotModel>, IRobotRepository
     {
-        public RobotRepository(IConnectionMultiplexer redisClient, IRedisGraphClient redisGraph, ILogger logger) : base(RedisDbIndexEnum.Robot, redisClient, redisGraph, logger)
+        public RobotRepository(IConnectionMultiplexer redisClient, IRedisGraphClient redisGraph, ILogger<RobotRepository> logger) : base(RedisDbIndexEnum.Robot, redisClient, redisGraph, logger)
         {
         }
 

@@ -10,7 +10,7 @@ namespace Middleware.RedisInterface.Repositories
 {
     public class ContainerImageRepository : BaseRepository<ContainerImageModel>, IContainerImageRepository
     {
-        public ContainerImageRepository(IConnectionMultiplexer redisClient, IRedisGraphClient redisGraph, ILogger logger) : base(RedisDbIndexEnum.Container, redisClient, redisGraph, logger)
+        public ContainerImageRepository(IConnectionMultiplexer redisClient, IRedisGraphClient redisGraph, ILogger<ContainerImageRepository> logger) : base(RedisDbIndexEnum.Container, redisClient, redisGraph, logger)
         {
         }
 
