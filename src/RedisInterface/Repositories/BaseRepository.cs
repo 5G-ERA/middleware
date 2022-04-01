@@ -14,13 +14,15 @@ namespace Middleware.RedisInterface.Repositories
         protected readonly IConnectionMultiplexer RedisClient;
         protected readonly IDatabase Db;
         protected readonly IRedisGraphClient RedisGraph;
+        protected readonly ILogger Logger;
 
-        public BaseRepository(RedisDbIndexEnum redisDbIndex, IConnectionMultiplexer redisClient, IRedisGraphClient redisGraph)
+        public BaseRepository(RedisDbIndexEnum redisDbIndex, IConnectionMultiplexer redisClient, IRedisGraphClient redisGraph, ILogger logger)
         {
             RedisClient = redisClient ?? throw new ArgumentNullException(nameof(redisClient));
             RedisGraph = redisGraph ?? throw new ArgumentNullException(nameof(redisGraph));
             _redisDbIndex = redisDbIndex;
             Db = redisClient.GetDatabase((int)_redisDbIndex);
+            Logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
         public async Task<T> AddAsync(T model)
