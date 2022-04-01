@@ -26,7 +26,5 @@ namespace Middleware.ResourcePlanner.Controllers
             
             return Ok(updatedTask);
         }
-
-        
     }
 }
