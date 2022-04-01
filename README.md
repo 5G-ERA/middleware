@@ -84,7 +84,7 @@ The API schema specification needs to be updated after each change to the endpoi
 
 ## Orchestrator
 
-Orchestrator is the entrypoint of the application when started. Its task is to first deploy the rest of the services after its deployment. Orchestrator automatically detects if it is deployed in the Kubernetes cluster and if is it will automatically proceed to the deployment of teh services.
+Orchestrator is the entrypoint of the application when started. Its task is to first deploy the rest of the services after its deployment. Orchestrator automatically detects if it is deployed in the Kubernetes cluster and if is it will automatically proceed to the deployment of the services.
 
 It will instantiate the following services in the current cluster:
 
@@ -132,7 +132,7 @@ There are known issues with the `snap` package on the Ubuntu WSL2 due to the sys
 snap info microk8s
 ```
 
-If the command does not execute after a few seconds the systemd dependency needs to be fixed acording to the following [Github thread](https://github.com/microsoft/WSL/issues/5126).
+If the command does not execute after a few seconds the systemd dependency needs to be fixed according to the following [Github thread](https://github.com/microsoft/WSL/issues/5126).
 
 Use the following command to restore the systemd dependency
 
@@ -159,18 +159,17 @@ It will install microk8s which is the minimal kubernetes installation. Next step
 sudo ln -s ~/.docker/config.json   /var/snap/microk8s/common/var/lib/kubelet/  
 ```
 
-Next step is to configure the `Kubectl` binary on the Windows system. Install the Kubectl, place the binary in the desred location and add the location to the path using the [official guide](https://kubernetes.io/docs/tasks/tools/instal-kubectldeployments/).
+Next step is to configure the `kubectl` binary on the Windows system. Install the `kubectl`, place the binary in the desired location and add the location to the path using the [official guide](https://kubernetes.io/docs/tasks/tools/instal-kubectldeployments/).
 kubectl-windows/).
 
-The depl
-After tl is installed we can export the config of the Microk8s cluster to the `kubeconfig` file.
+After it is installed we can export the config of the Microk8s cluster to the `kubeconfig` file.
 
 Lets start with creating the `.kube` directory in the Windows home directory. Replace the `<your-windows-user-here>` with the name of your user on the Windows system. The second command creates the symlink between the `.kube` folder on WSL and the folder that we have created in the Windows Home directory.
 
 ```shell
 mkdir /mnt/c/Users/<your-windows-user-here>/.kube
 
-ln -s $HOME/.kube /mnt/c/Users/Bartosz/.kube
+ln -s $HOME/.kube /mnt/c/Users/<your-windows-user-here>/.kube
 ```
 
 After this step is done, export the configuration of the microk8s cluster to the `kubeconfig` file.
