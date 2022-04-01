@@ -20,6 +20,11 @@
 			<Namespace>Middleware.TaskPlanner.RedisInterface</Namespace>
 			<Options>/AdditionalNamespaceUsages:Middleware.TaskPlanner.Orchestrator</Options>
 		</OpenApiReference>
+
+		<OpenApiReference Include="..\ResourcePlanner\ResourcePlannerSpec.json" CodeGenerator="NSwagCSharp" ClassName="ResourcePlannerApiClient" Link="OpenAPIs\ResourcePlannerSpec.json">
+			<Namespace>Middleware.TaskPlanner.ResourcePlanner</Namespace>
+			<Options>/AdditionalNamespaceUsages:Middleware.TaskPlanner.Orchestrator</Options>
+		</OpenApiReference>
 	</ItemGroup>
 
 	<ItemGroup>

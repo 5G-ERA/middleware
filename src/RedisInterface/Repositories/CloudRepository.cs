@@ -1,4 +1,4 @@
-﻿using Middleware.Common.Models;
+using Middleware.Common.Models;
 using Middleware.RedisInterface.Enums;
 using Middleware.RedisInterface.Repositories.Abstract;
 using NReJSON;
@@ -10,7 +10,7 @@ namespace Middleware.RedisInterface.Repositories
 {
     public class CloudRepository : BaseRepository<CloudModel>, ICloudRepository
     {
-        public CloudRepository(IConnectionMultiplexer redisClient, IRedisGraphClient redisGraph) : base(RedisDbIndexEnum.Clouds, redisClient, redisGraph)
+        public CloudRepository(IConnectionMultiplexer redisClient, IRedisGraphClient redisGraph, ILogger<CloudRepository> logger) : base(RedisDbIndexEnum.Cloud, redisClient, redisGraph, logger)
         {
         }
 

@@ -4,14 +4,14 @@
     {
         Graph = 0,
         Instance =2,
-        Policies =3,
-        Dialogues =4,
-        Containers =5,
-        Tasks =6,
-        Robots =7,
-        Edges =8,
-        Clouds =9,
-        Actions =10,
+        Policy =3,
+        Dialogue =4,
+        Container =5,
+        Task =6,
+        Robot =7,
+        Edge =8,
+        Cloud =9,
+        Action =10,
         QoS =11
     }
 }

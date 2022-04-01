@@ -1,0 +1,28 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: orchestrator-api
+spec:
+  selector:
+    matchLabels:
+      name: orchestrator-api
+  template:
+    metadata:
+      labels:
+        name: orchestrator-api
+    spec:
+      serviceAccountName: orchestrator
+      nodeSelector:
+        kubernetes.io/os: linux
+      containers:        
+      - name: orchestrator-api
+        image: 394603622351.dkr.ecr.eu-west-1.amazonaws.com/orchestrator-api:latest
+        imagePullPolicy: IfNotPresent
+        resources: {}
+        env:
+        - name: AWS_IMAGE_REGISTRY
+          value: $(AWS_IMAGE_REGISTRY)
+        - name: REDIS_HOSTNAME
+          value: $(REDIS_HOSTNAME)
+        - name: REDIS_PORT
+          value: $(REDIS_PORT)

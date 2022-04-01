@@ -9,7 +9,7 @@ namespace Middleware.RedisInterface.Repositories
 {
     public class TaskRepository : BaseRepository<TaskModel>,  ITaskRepository   
     {
-        public TaskRepository(IConnectionMultiplexer redisClient, IRedisGraphClient redisGraph) : base(RedisDbIndexEnum.Tasks, redisClient, redisGraph)
+        public TaskRepository(IConnectionMultiplexer redisClient, IRedisGraphClient redisGraph, ILogger<TaskRepository> logger) : base(RedisDbIndexEnum.Task, redisClient, redisGraph, logger)
         {
         }
 
@@ -27,6 +27,7 @@ namespace Middleware.RedisInterface.Repositories
             }
             await Db.JsonSetAsync(id.ToString(), JsonSerializer.Serialize(currentModel));
             return currentModel;
+
         }
     }
 }

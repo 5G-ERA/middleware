@@ -352,9 +352,20 @@
       "ActionModel": {
         "type": "object",
         "properties": {
+          "relations": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/RelationModel"
+            },
+            "nullable": true
+          },
           "Id": {
             "type": "string",
             "format": "uuid"
+          },
+          "ActionFamily": {
+            "type": "string",
+            "nullable": true
           },
           "Order": {
             "type": "integer",
@@ -368,6 +379,10 @@
             "type": "string",
             "nullable": true
           },
+          "ImageName": {
+            "type": "string",
+            "nullable": true
+          },
           "Services": {
             "type": "array",
             "items": {
@@ -378,9 +393,34 @@
         },
         "additionalProperties": false
       },
+      "GraphEntityModel": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "type": {
+            "type": "string",
+            "nullable": true
+          },
+          "name": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
       "InstanceModel": {
         "type": "object",
         "properties": {
+          "relations": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/RelationModel"
+            },
+            "nullable": true
+          },
           "Id": {
             "type": "string",
             "format": "uuid"
@@ -417,6 +457,19 @@
         },
         "additionalProperties": false
       },
+      "KeyValuePair": {
+        "type": "object",
+        "properties": {
+          "key": {
+            "type": "string",
+            "nullable": true
+          },
+          "value": {
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
       "ProblemDetails": {
         "type": "object",
         "properties": {
@@ -444,9 +497,39 @@
         },
         "additionalProperties": { }
       },
+      "RelationModel": {
+        "type": "object",
+        "properties": {
+          "initiatesFrom": {
+            "$ref": "#/components/schemas/GraphEntityModel"
+          },
+          "relationName": {
+            "type": "string",
+            "nullable": true
+          },
+          "relationAttributes": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/KeyValuePair"
+            },
+            "nullable": true
+          },
+          "pointsTo": {
+            "$ref": "#/components/schemas/GraphEntityModel"
+          }
+        },
+        "additionalProperties": false
+      },
       "TaskModel": {
         "type": "object",
         "properties": {
+          "relations": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/RelationModel"
+            },
+            "nullable": true
+          },
           "Id": {
             "type": "string",
             "format": "uuid"

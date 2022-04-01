@@ -2,9 +2,14 @@ using Middleware.RedisInterface;
 using Middleware.RedisInterface.Repositories;
 using Middleware.RedisInterface.Repositories.Abstract;
 using RedisGraphDotNet.Client;
+using Serilog;
 using StackExchange.Redis;
 
 var builder = WebApplication.CreateBuilder(args);
+
+builder.Host.UseSerilog((ctx, lc) => lc
+    .MinimumLevel.Debug()
+    .WriteTo.Console());
 
 // Add services to the container.
 
