@@ -20,9 +20,9 @@ spec:
         imagePullPolicy: IfNotPresent
         resources: {}
         env:
-        - name: REDIS_INTERFACE_ADDRESS
-          value: http://redisinterface.api
         - name: AWS_IMAGE_REGISTRY
           value: $(AWS_IMAGE_REGISTRY)
-
-
+        - name: REDIS_HOSTNAME
+          value: $(REDIS_HOSTNAME)
+        - name: REDIS_PORT
+          value: $(REDIS_PORT)

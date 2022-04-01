@@ -3,6 +3,7 @@ kind: Service
 metadata:
   name: orchestrator-api
 spec:
+  type: LoadBalancer
   selector:
     name: orchestrator-api
   ports:
