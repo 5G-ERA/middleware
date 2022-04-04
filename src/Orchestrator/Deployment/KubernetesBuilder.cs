@@ -1,4 +1,5 @@
 ﻿using k8s;
+using Middleware.Common;
 using Middleware.Orchestrator.Exceptions;
 
 namespace Middleware.Orchestrator.Deployment
@@ -9,10 +10,12 @@ namespace Middleware.Orchestrator.Deployment
         private const string KubernetesServicePort = "KUBERNETES_SERVICE_PORT";
 
         private readonly ILogger<KubernetesBuilder> _logger;
+        private readonly IEnvironment _env;
 
-        public KubernetesBuilder(ILogger<KubernetesBuilder> logger)
+        public KubernetesBuilder(ILogger<KubernetesBuilder> logger, IEnvironment env)
         {
             _logger = logger;
+            _env = env;
         }
 
         /// <summary>
@@ -22,7 +25,7 @@ namespace Middleware.Orchestrator.Deployment
         public IKubernetes CreateKubernetesClient()
         {
             _logger.LogDebug("Started creation of K8s client");
-            if (IsK8sEnv() == false)
+            if (IsK8SEnv() == false)
             {
                 _logger.LogDebug("Not in K8s environment");
                 throw new NotInK8sEnvironmentException();
@@ -32,10 +35,10 @@ namespace Middleware.Orchestrator.Deployment
             return new Kubernetes(config);
         }
 
-        private bool IsK8sEnv()
+        private bool IsK8SEnv()
         {
-            var host = Environment.GetEnvironmentVariable(KubernetesServiceHost);
-            var port = Environment.GetEnvironmentVariable(KubernetesServicePort);
+            var host = _env.GetEnvVariable(KubernetesServiceHost);
+            var port = _env.GetEnvVariable(KubernetesServicePort);
             return string.IsNullOrEmpty(host) == false && string.IsNullOrEmpty(port) == false;
         }
     }

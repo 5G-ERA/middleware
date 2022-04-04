@@ -1,3 +1,4 @@
+using Middleware.Common.ExtensionMethods;
 using Middleware.Orchestrator.ApiReference;
 using Middleware.Orchestrator.Config;
 using Middleware.Orchestrator.Deployment;
@@ -21,6 +22,7 @@ builder.Services.AddSwaggerGen();
 builder.Services.ConfigureAutoMapper();
 builder.Services.AddHttpClient(AppConfig.RedisApiClientName);
 builder.Services.AddHttpClient(AppConfig.OsmApiClientName);
+builder.Services.RegisterCommonServices();
 builder.Services.AddScoped<IApiClientBuilder, ApiClientBuilder>();
 builder.Services.AddScoped<IKubernetesBuilder, KubernetesBuilder>();
 

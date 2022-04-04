@@ -4,6 +4,7 @@ using Middleware.Common;
 using Middleware.Orchestrator.Deployment;
 using Middleware.Orchestrator.Exceptions;
 using Quartz;
+using Environment = System.Environment;
 
 namespace Middleware.Orchestrator.Jobs
 {
