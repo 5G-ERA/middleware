@@ -2644,6 +2644,14 @@
           "Description": {
             "type": "string",
             "nullable": true
+          },
+          "K8SDeployment": {
+            "type": "string",
+            "nullable": true
+          },
+          "K8SService": {
+            "type": "string",
+            "nullable": true
           }
         },
         "additionalProperties": false
