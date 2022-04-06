@@ -25,6 +25,7 @@ builder.Services.AddHttpClient(AppConfig.OsmApiClientName);
 builder.Services.RegisterCommonServices();
 builder.Services.AddScoped<IApiClientBuilder, ApiClientBuilder>();
 builder.Services.AddScoped<IKubernetesBuilder, KubernetesBuilder>();
+builder.Services.AddScoped<IDeploymentService, DeploymentService>();
 
 builder.Services.AddHttpClient("healthCheckClient");
 
