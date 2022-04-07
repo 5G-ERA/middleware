@@ -1,5 +1,4 @@
-﻿using System.Text;
-using k8s;
+﻿using k8s;
 using k8s.Models;
 using Middleware.Common;
 using Middleware.Orchestrator.ApiReference;
@@ -53,19 +52,17 @@ public class DeploymentService : IDeploymentService
                     continue;
 
                 var result = await client.CreateNamespacedDeploymentAsync(v1Deployment, AppConfig.K8SNamespaceName);
-
-                var k8sService = CreateLoadBalancerService(service.ImageName, v1Deployment.Metadata);
             }
         }
 
         return false;
     }
 
-    private V1Service CreateLoadBalancerService(string serviceImageName, V1ObjectMeta meta)
+    public V1Service CreateLoadBalancerService(string serviceImageName, V1ObjectMeta meta)
     {
         var spec = new V1ServiceSpec()
         {
-            Ports = new List<V1ServicePort>(){new (80), new(443) },
+            Ports = new List<V1ServicePort>() { new(80), new(443) },
             Selector = new Dictionary<string, string> { { "app", serviceImageName } }
 
         };
@@ -82,14 +79,13 @@ public class DeploymentService : IDeploymentService
 
     public V1Deployment CreateStartupDeployment(string name)
     {
-        var dnsName = CreateDnsName(name);
         var selector = new V1LabelSelector
         {
             MatchLabels = new Dictionary<string, string> { { "app", name } }
         };
         var meta = new V1ObjectMeta()
         {
-            Name = dnsName,
+            Name = name,
             Labels = new Dictionary<string, string>()
             {
                 { "app", name }
@@ -131,17 +127,5 @@ public class DeploymentService : IDeploymentService
             Kind = "Deployment"
         };
         return dep;
-    }
-    private string CreateDnsName(string name)
-    {
-        var idx = name.LastIndexOf('-');
-        if (idx <= 0)
-        {
-            return name;
-        }
-
-        var arr = name.ToCharArray();
-        arr[idx] = '.';
-        return new string(arr);
     }
 }

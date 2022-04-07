@@ -1,6 +1,5 @@
 ﻿using k8s;
 using k8s.Models;
-using Middleware.Common;
 using Middleware.Orchestrator.Config;
 using Middleware.Orchestrator.Deployment;
 using Middleware.Orchestrator.Exceptions;
@@ -54,6 +53,7 @@ namespace Middleware.Orchestrator.Jobs
             {
                 var deployments = await kubeClient.ListNamespacedDeploymentAsync(AppConfig.K8SNamespaceName);
                 var deploymentNames = deployments.Items.Select(d => d.Metadata.Name).ToArray();
+
                 var images = new List<string>
                     {"gateway", "redis-interface-api", "resource-planner-api", "task-planner-api"};
 
@@ -65,6 +65,12 @@ namespace Middleware.Orchestrator.Jobs
                         continue;
 
                     var result = await kubeClient.CreateNamespacedDeploymentAsync(v1Deployment, AppConfig.K8SNamespaceName);
+
+                    if (service == "gateway")
+                    {
+                        var lbService = _deploymentService.CreateLoadBalancerService(service, result.Metadata);
+                        var createdService = await kubeClient.CreateNamespacedServiceAsync(lbService, AppConfig.K8SNamespaceName);
+                    }
                 }
             }
             catch (k8s.Autorest.HttpOperationException httpOperationException)
