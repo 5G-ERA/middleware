@@ -29,14 +29,13 @@ namespace Middleware.RedisInterface.Repositories
         {
             model.Id = Guid.NewGuid();
             await Db.JsonSetAsync(model.Id.ToString(), JsonSerializer.Serialize(model));
-
             return model;
         }
 
         public async Task<T> GetByIdAsync(Guid id)
         {
             string model = (string)await Db.JsonGetAsync(id.ToString());
-            //TODO: null check!!!!!
+            
             T newModel = JsonSerializer.Deserialize<T>(model);
 
             return newModel;
@@ -59,7 +58,7 @@ namespace Middleware.RedisInterface.Repositories
         public async Task<bool> DeleteByIdAsync(Guid id)
         {
             int deleted = await Db.JsonDeleteAsync(id.ToString());
-
+            
             return deleted > 0;
         }
 

@@ -38,6 +38,10 @@ namespace Middleware.RedisInterface.Repositories
         {
             string model = (string)await Db.JsonGetAsync(id.ToString());
             PolicyModel currentModel = JsonSerializer.Deserialize<PolicyModel>(model);
+            if (currentModel == null)
+            {
+                return null;
+            }
             if (!string.IsNullOrEmpty(patch.Timestamp.ToString()))
             {
                 currentModel.Timestamp = patch.Timestamp;

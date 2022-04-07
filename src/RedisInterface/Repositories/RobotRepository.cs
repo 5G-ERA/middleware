@@ -18,6 +18,10 @@ namespace Middleware.RedisInterface.Repositories
         {
             string model = (string)await Db.JsonGetAsync(id.ToString());
             RobotModel currentModel = JsonSerializer.Deserialize<RobotModel>(model);
+            if (currentModel == null)
+            {
+                return null;
+            }
             if (!string.IsNullOrEmpty(patch.RobotName))
             {
                 currentModel.RobotName = patch.RobotName;

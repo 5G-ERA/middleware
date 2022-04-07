@@ -19,6 +19,10 @@ namespace Middleware.RedisInterface.Repositories
         {
             string model = (string)await Db.JsonGetAsync(id.ToString());
             EdgeModel currentModel = JsonSerializer.Deserialize<EdgeModel>(model);
+            if (currentModel == null)
+            {
+                return null;
+            }
             if (!string.IsNullOrEmpty(patch.EdgeStatus))
             {
                 currentModel.EdgeStatus = patch.EdgeStatus;

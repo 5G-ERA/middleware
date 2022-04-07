@@ -18,6 +18,10 @@ namespace Middleware.RedisInterface.Repositories
         {
             string model = (string)await Db.JsonGetAsync(id.ToString());
             CloudModel currentModel = JsonSerializer.Deserialize<CloudModel>(model);
+            if (currentModel == null)
+            {
+                return null;
+            }
             if (!string.IsNullOrEmpty(patch.CloudStatus))
             {
                 currentModel.CloudStatus = patch.CloudStatus;

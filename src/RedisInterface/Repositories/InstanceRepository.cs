@@ -20,14 +20,10 @@ namespace Middleware.RedisInterface.Repositories
         {
             string model = (string)await Db.JsonGetAsync(id.ToString());
             InstanceModel currentModel = JsonSerializer.Deserialize<InstanceModel>(model);
-            /*if (!string.IsNullOrEmpty(patch.Id.ToString())) 
+            if (currentModel == null)
             {
-                currentModel.Id = patch.Id;
+                return null;
             }
-            if (!string.IsNullOrEmpty(patch.ServiceInstanceId.ToString())) 
-            {
-                currentModel.ServiceInstanceId = patch.ServiceInstanceId;
-            }*/
             if (!string.IsNullOrEmpty(patch.ImageName))
             {
                 currentModel.ImageName = patch.ImageName;

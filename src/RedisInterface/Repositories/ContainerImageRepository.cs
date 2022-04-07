@@ -18,6 +18,10 @@ namespace Middleware.RedisInterface.Repositories
         {
             string model = (string)await Db.JsonGetAsync(id.ToString());
             ContainerImageModel currentModel = JsonSerializer.Deserialize<ContainerImageModel>(model);
+            if (currentModel == null)
+            {
+                return null;
+            }
             if (!string.IsNullOrEmpty(patch.Name))
             {
                 currentModel.Name = patch.Name;

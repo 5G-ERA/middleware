@@ -1712,6 +1712,7 @@
         "tags": [
           "Policy"
         ],
+        "operationId": "PolicyGetById",
         "parameters": [
           {
             "name": "id",
@@ -1815,6 +1816,7 @@
         "tags": [
           "Policy"
         ],
+        "operationId": "PolicyGetAll",
         "responses": {
           "200": {
             "description": "Success",
@@ -1844,6 +1846,7 @@
         "tags": [
           "Policy"
         ],
+        "operationId": "PolicyGetActive",
         "responses": {
           "200": {
             "description": "Success",

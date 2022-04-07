@@ -17,6 +17,10 @@ namespace Middleware.RedisInterface.Repositories
         {
             string model = (string)await Db.JsonGetAsync(id.ToString());
             TaskModel currentModel = JsonSerializer.Deserialize<TaskModel>(model);
+            if (currentModel == null)
+            {
+                return null;
+            }
             if (!string.IsNullOrEmpty(patch.TaskPriority.ToString()))
             {
                 currentModel.TaskPriority = patch.TaskPriority;

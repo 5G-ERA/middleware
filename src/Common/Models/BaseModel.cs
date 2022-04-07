@@ -10,5 +10,6 @@ namespace Middleware.Common.Models
     {
         public abstract Guid Id { get; set; }
         public List<RelationModel> Relations { get; set; } = new List<RelationModel>();
+
     }
 }
