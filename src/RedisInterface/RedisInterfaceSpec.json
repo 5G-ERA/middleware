@@ -1004,12 +1004,12 @@
         }
       }
     },
-    "/api/v1/ContainerImage/action/{id}": {
+    "/api/v1/ContainerImage/instance/{id}": {
       "get": {
         "tags": [
           "ContainerImage"
         ],
-        "operationId": "ContainerImageGetForAction",
+        "operationId": "ContainerImageGetForInstance",
         "parameters": [
           {
             "name": "id",

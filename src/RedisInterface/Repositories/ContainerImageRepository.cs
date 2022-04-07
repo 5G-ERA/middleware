@@ -10,11 +10,11 @@ namespace Middleware.RedisInterface.Repositories
 {
     public class ContainerImageRepository : BaseRepository<ContainerImageModel>, IContainerImageRepository
     {
-        private readonly IActionRepository _actionRepository;
+        private readonly IInstanceRepository _instanceRepository;
 
-        public ContainerImageRepository(IActionRepository actionRepository, IConnectionMultiplexer redisClient, IRedisGraphClient redisGraph, ILogger<ContainerImageRepository> logger) : base(RedisDbIndexEnum.Container, redisClient, redisGraph, logger)
+        public ContainerImageRepository(IInstanceRepository instanceRepository, IConnectionMultiplexer redisClient, IRedisGraphClient redisGraph, ILogger<ContainerImageRepository> logger) : base(RedisDbIndexEnum.Container, redisClient, redisGraph, logger)
         {
-            _actionRepository = actionRepository;
+            _instanceRepository = instanceRepository;
         }
 
         public async Task<ContainerImageModel> PatchContainerImageAsync(Guid id, ContainerImageModel patch)
@@ -41,7 +41,7 @@ namespace Middleware.RedisInterface.Repositories
         public async Task<List<ContainerImageModel>> GetImagesForActionAsync(Guid actionId)
         {
 
-            List<RelationModel> imageRelations = await _actionRepository.GetRelation(actionId, "needs");
+            List<RelationModel> imageRelations = await _instanceRepository.GetRelation(actionId, "needs");
 
             List<Guid> actionIds = imageRelations.Select(i => i.PointsTo.Id).ToList();
 

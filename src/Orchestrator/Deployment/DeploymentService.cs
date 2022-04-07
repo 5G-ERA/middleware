@@ -1,8 +1,10 @@
 ﻿using k8s;
 using k8s.Models;
 using Middleware.Common;
+using Middleware.Common.ExtensionMethods;
 using Middleware.Orchestrator.ApiReference;
 using Middleware.Orchestrator.Config;
+using Middleware.Orchestrator.Exceptions;
 using Middleware.Orchestrator.RedisInterface;
 using TaskModel = Middleware.Common.Models.TaskModel;
 
@@ -13,11 +15,16 @@ public class DeploymentService : IDeploymentService
     /// <summary>
     /// Kubernetes client connection builder
     /// </summary>
-    private readonly IKubernetesBuilder _k8SBuilder;
+    private readonly IKubernetes _k8SClient;
     /// <summary>
     /// Environments access to the configuration of a pod
     /// </summary>
     private readonly IEnvironment _env;
+    /// <summary>
+    /// Logger instance
+    /// </summary>
+    private readonly ILogger _logger;
+
     /// <summary>
     /// Redis Interface client allowing to make calls to the Redis Cache
     /// </summary>
@@ -27,35 +34,92 @@ public class DeploymentService : IDeploymentService
     /// </summary>
     private readonly string _awsRegistryName;
 
-    public DeploymentService(IKubernetesBuilder k8SBuilder, IApiClientBuilder apiClientBuilder, IEnvironment env)
+    public DeploymentService(IKubernetesBuilder kubernetesBuilder, IApiClientBuilder apiClientBuilder, IEnvironment env, ILogger<DeploymentService> logger)
     {
-        _k8SBuilder = k8SBuilder;
+        _k8SClient = kubernetesBuilder.CreateKubernetesClient();
         _env = env;
+        _logger = logger;
         _redisClient = apiClientBuilder.CreateRedisApiClient();
         _awsRegistryName = _env.GetEnvVariable("AWS_IMAGE_REGISTRY"); //TODO: replace with the parameters from the command line
     }
 
     public async Task<bool> DeployAsync(TaskModel task)
     {
-        var client = _k8SBuilder.CreateKubernetesClient();
-
-        var deployments = await client.ListNamespacedDeploymentAsync(AppConfig.K8SNamespaceName);
+        var deployments = await _k8SClient.ListNamespacedDeploymentAsync(AppConfig.K8SNamespaceName);
         var deploymentNames = deployments.Items.Select(d => d.Metadata.Name).ToArray();
+
+        bool isSuccess = true;
 
         foreach (var seq in task.ActionSequence)
         {
             foreach (var service in seq.Services)
             {
-                var v1Deployment = CreateStartupDeployment(service.ImageName);
+                try
+                {
+                    var images = (await _redisClient.ContainerImageGetForInstanceAsync(seq.Id))?.ToList();
+                    if (images is null || images.Any() == false)
+                    {
+                        throw new IncorrectDataException("Images not defined for the Instance deployment");
+                    }
+                    // should only be just one image
+                    foreach (var cim in images)
+                    {
+                        var deployment = await CreateAndDeployDeployment(cim);
+                        if (deployment is null)
+                        {
+                            //TODO: sth
+                        }
 
-                if (deploymentNames.Contains(v1Deployment.Metadata.Name))
-                    continue;
+                        var deplService = await CreateAndDeployService(cim);
 
-                var result = await client.CreateNamespacedDeploymentAsync(v1Deployment, AppConfig.K8SNamespaceName);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError(ex, "There was an error while deploying the service");
+                    isSuccess = false;
+                }
             }
         }
 
-        return false;
+        return isSuccess;
+    }
+
+    private async Task<V1Service> CreateAndDeployService(ContainerImageModel cim)
+    {
+        if (string.IsNullOrWhiteSpace(cim.K8SDeployment))
+        {
+            _logger.LogInformation("Service definition for {Name} has not been specified, the instantiation of the service has been skipped", cim.Name);
+            return null;
+        }
+        var sanitized = cim.K8SService.SanitizeAsK8SYaml();
+        var tmpDeployment = Yaml.LoadFromString<V1Service>(sanitized);
+
+        if (tmpDeployment == null)
+        {
+            throw new UnableToParseYamlConfigException(cim.Name, nameof(cim.K8SService));
+        }
+
+        var result = await _k8SClient.CreateNamespacedServiceAsync(tmpDeployment, AppConfig.K8SNamespaceName);
+        return result;
+    }
+
+    private async Task<V1Deployment> CreateAndDeployDeployment(ContainerImageModel cim)
+    {
+        if (string.IsNullOrWhiteSpace(cim.K8SDeployment))
+        {
+            throw new IncorrectDataException($"Deployment for {cim.Name} not set");
+        }
+        var sanitized = cim.K8SDeployment.SanitizeAsK8SYaml();
+        var tmpDeployment = Yaml.LoadFromString<V1Deployment>(sanitized);
+
+        if (tmpDeployment == null)
+        {
+            throw new UnableToParseYamlConfigException(cim.Name, nameof(cim.K8SDeployment));
+        }
+
+        var result = await _k8SClient.CreateNamespacedDeploymentAsync(tmpDeployment, AppConfig.K8SNamespaceName);
+        return result;
     }
 
     public V1Service CreateLoadBalancerService(string serviceImageName, V1ObjectMeta meta)

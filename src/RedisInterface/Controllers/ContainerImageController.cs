@@ -110,11 +110,16 @@ namespace Middleware.RedisInterface.Controllers
             return Ok(relations);
         }
 
+        /// <summary>
+        /// Gets the images associated with the specified instance
+        /// </summary>
+        /// <param name="id">Identifier of the action</param>
+        /// <returns></returns>
         [HttpGet]
-        [Route("action/{id}", Name = "ContainerImageGetForAction")]
+        [Route("instance/{id}", Name = "ContainerImageGetForInstance")]
         [ProducesResponseType(typeof(List<ContainerImageModel>), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.NotFound)]
-        public async Task<IActionResult> GetImagesForActionAsync(Guid id)
+        public async Task<IActionResult> GetImagesForInstanceAsync(Guid id)
         {
             try
             {
