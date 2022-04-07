@@ -20,6 +20,6 @@ spec:
         resources: {}
         env:
         - name: REDIS_HOSTNAME
-          value: $(REDIS_HOSTNAME) # to be changed with real value
+          value: ec2-18-133-117-215.eu-west-2.compute.amazonaws.com # to be changed with real value
         - name: REDIS_PORT
-          value: $(REDIS_PORT) # to be changed with real value
+          value: '6309' # to be changed with real value
