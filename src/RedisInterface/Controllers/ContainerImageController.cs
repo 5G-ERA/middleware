@@ -1,9 +1,7 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.JsonPatch;
+﻿using System.Net;
 using Microsoft.AspNetCore.Mvc;
 using Middleware.Common.Models;
-using Middleware.RedisInterface.Repositories.Abstract;
-using System.Net;
+using Middleware.RedisInterface.Repositories;
 
 namespace Middleware.RedisInterface.Controllers
 {
@@ -12,10 +10,12 @@ namespace Middleware.RedisInterface.Controllers
     public class ContainerImageController : ControllerBase
     {
         private readonly IContainerImageRepository _containerImageRepository;
+        private readonly ILogger _logger;
 
-        public ContainerImageController(IContainerImageRepository containerImageRepository)
+        public ContainerImageController(IContainerImageRepository containerImageRepository, ILogger<ContainerImageController> logger)
         {
             _containerImageRepository = containerImageRepository ?? throw new ArgumentNullException(nameof(containerImageRepository));
+            _logger = logger;
         }
 
         /// <summary>
@@ -108,6 +108,28 @@ namespace Middleware.RedisInterface.Controllers
             List<string> relationNames = new List<string>() { firstName, secondName };
             var relations = await _containerImageRepository.GetRelations(id, relationNames);
             return Ok(relations);
+        }
+
+        [HttpGet]
+        [Route("action/{id}", Name = "ContainerImageGetForAction")]
+        [ProducesResponseType(typeof(List<ContainerImageModel>), (int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.NotFound)]
+        public async Task<IActionResult> GetImagesForActionAsync(Guid id)
+        {
+            try
+            {
+                var images = await _containerImageRepository.GetImagesForActionAsync(id);
+                if (images.Any() == false)
+                {
+                    return NotFound();
+                }
+                return Ok(images);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An unexpected error has happened: ");
+                return Problem($"An unexpected error has occurred: {ex.Message}");
+            }
         }
     }
 }
