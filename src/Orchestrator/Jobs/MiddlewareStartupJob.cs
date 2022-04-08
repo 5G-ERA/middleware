@@ -1,5 +1,6 @@
 ﻿using k8s;
 using k8s.Models;
+using Middleware.Common.Enums;
 using Middleware.Orchestrator.Config;
 using Middleware.Orchestrator.Deployment;
 using Middleware.Orchestrator.Exceptions;
@@ -28,7 +29,7 @@ namespace Middleware.Orchestrator.Jobs
                 await InstantiateMiddleware(client);
 
             }
-            catch (NotInK8sEnvironmentException ex)
+            catch (NotInK8SEnvironmentException ex)
             {
                 Logger.LogWarning("Could not instantiate the Kubernetes Client", ex);
                 throw;
@@ -66,11 +67,11 @@ namespace Middleware.Orchestrator.Jobs
 
                     var result = await kubeClient.CreateNamespacedDeploymentAsync(v1Deployment, AppConfig.K8SNamespaceName);
 
-                    if (service == "gateway")
-                    {
-                        var lbService = _deploymentService.CreateLoadBalancerService(service, result.Metadata);
-                        var createdService = await kubeClient.CreateNamespacedServiceAsync(lbService, AppConfig.K8SNamespaceName);
-                    }
+                    var kind = service != "gateway" ? K8SServiceKindEnum.ClusterIp : K8SServiceKindEnum.LoadBalancer;
+
+                    var lbService = _deploymentService.CreateService(service, kind, result.Metadata);
+                    var createdService = await kubeClient.CreateNamespacedServiceAsync(lbService, AppConfig.K8SNamespaceName);
+
                 }
             }
             catch (k8s.Autorest.HttpOperationException httpOperationException)

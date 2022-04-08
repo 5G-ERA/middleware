@@ -41,6 +41,6 @@ public class KubernetesBuilderTests
         // act
         Func<IKubernetes> act = () => _sut.CreateKubernetesClient();
         // assess
-        act.Should().Throw<NotInK8sEnvironmentException>().WithMessage("The environment is not a Kubernetes environment, cannot instantiate the Middleware");
+        act.Should().Throw<NotInK8SEnvironmentException>().WithMessage("The environment is not a Kubernetes environment, cannot instantiate the Middleware");
     }
 }

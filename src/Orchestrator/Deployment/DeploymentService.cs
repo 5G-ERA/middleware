@@ -1,10 +1,13 @@
-﻿using k8s;
+﻿using System.Linq;
+using k8s;
 using k8s.Models;
 using Middleware.Common;
+using Middleware.Common.Enums;
 using Middleware.Common.ExtensionMethods;
 using Middleware.Orchestrator.ApiReference;
 using Middleware.Orchestrator.Config;
 using Middleware.Orchestrator.Exceptions;
+using Middleware.Orchestrator.Models;
 using Middleware.Orchestrator.RedisInterface;
 using TaskModel = Middleware.Common.Models.TaskModel;
 
@@ -43,6 +46,7 @@ public class DeploymentService : IDeploymentService
         _awsRegistryName = _env.GetEnvVariable("AWS_IMAGE_REGISTRY"); //TODO: replace with the parameters from the command line
     }
 
+    /// <inheritdoc/>
     public async Task<bool> DeployAsync(TaskModel task)
     {
         var deployments = await _k8SClient.ListNamespacedDeploymentAsync(AppConfig.K8SNamespaceName);
@@ -64,14 +68,18 @@ public class DeploymentService : IDeploymentService
                     // should only be just one image
                     foreach (var cim in images)
                     {
-                        var deployment = await CreateAndDeployDeployment(cim);
-                        if (deployment is null)
+                        var deployedPair = await Deploy(cim);
+
+                        service.ServiceStatus = ServiceStatusEnum.Idle.GetStringValue();
+                        service.ServiceInstanceId = Guid.Parse(deployedPair.Deployment.GetLabel("serviceId"));
+
+                        if (deployedPair.Service is not null && deployedPair.Service.Spec.ExternalIPs.Any())
                         {
-                            //TODO: sth
+                            service.ServiceUrl = new Uri(deployedPair.Service.Spec.ExternalIPs[0]);
                         }
 
-                        var deplService = await CreateAndDeployService(cim);
-
+                        //TODO save the specified actionPlan to the Redis
+                        
                     }
                 }
                 catch (Exception ex)
@@ -84,63 +92,93 @@ public class DeploymentService : IDeploymentService
 
         return isSuccess;
     }
-
-    private async Task<V1Service> CreateAndDeployService(ContainerImageModel cim)
+    /// <summary>
+    /// Deploy the service based on the container information
+    /// </summary>
+    /// <param name="cim"></param>
+    /// <returns></returns>
+    public async Task<DeploymentPairModel> Deploy(ContainerImageModel cim)
     {
-        if (string.IsNullOrWhiteSpace(cim.K8SDeployment))
-        {
-            _logger.LogInformation("Service definition for {Name} has not been specified, the instantiation of the service has been skipped", cim.Name);
-            return null;
-        }
-        var sanitized = cim.K8SService.SanitizeAsK8SYaml();
-        var tmpDeployment = Yaml.LoadFromString<V1Service>(sanitized);
+        var instanceId = Guid.NewGuid();
 
-        if (tmpDeployment == null)
+        var service = await Deploy<V1Service>(cim.K8SService, cim.Name, instanceId, nameof(cim.K8SService));
+
+        var deployment = await Deploy<V1Deployment>(cim.K8SDeployment, cim.Name, instanceId, nameof(cim.K8SDeployment));
+
+        return new DeploymentPairModel(deployment, service);
+    }
+    /// <summary>
+    /// Deploy the Service of the specified type. Available types are <seealso cref="V1Service"/> and <seealso cref="V1Deployment"/>
+    /// </summary>
+    /// <typeparam name="T">Type of the service</typeparam>
+    /// <param name="objectDefinition">string representation of the k8s yaml object</param>
+    /// <param name="name">Name of the service to be deployed</param>
+    /// <param name="instanceId"></param>
+    /// <param name="propName"></param>
+    /// <returns></returns>
+    /// <exception cref="IncorrectDataException"></exception>
+    /// <exception cref="UnableToParseYamlConfigException"></exception>
+    public async Task<T> Deploy<T>(string objectDefinition, string name, Guid instanceId, string propName = null) where T: class
+    {
+        var type = typeof(T);
+
+        if (string.IsNullOrWhiteSpace(objectDefinition))
         {
-            throw new UnableToParseYamlConfigException(cim.Name, nameof(cim.K8SService));
+            _logger.LogInformation("Definition for {ObjectName} - {Name} has not been specified, the instantiation of the service has been skipped", type.Name, name);
+
+            if (type == typeof(V1Deployment))
+                throw new IncorrectDataException($"Deployment for {name} not set");
+            
+            return default;
+        }
+        var sanitized = objectDefinition.SanitizeAsK8SYaml();
+        T obj = Yaml.LoadFromString<T>(sanitized);
+
+        if (obj == null)
+        {
+            throw new UnableToParseYamlConfigException(name, propName);
         }
 
-        var result = await _k8SClient.CreateNamespacedServiceAsync(tmpDeployment, AppConfig.K8SNamespaceName);
-        return result;
+        if (obj is V1Service srv)
+        {
+            srv.Metadata.SetServiceLabel(instanceId);
+
+            obj = await _k8SClient.CreateNamespacedServiceAsync(srv, AppConfig.K8SNamespaceName) as T;
+            return obj;
+        }
+        if (obj is V1Deployment depl)
+        {
+            depl.Metadata.SetServiceLabel(instanceId);
+
+            obj = await _k8SClient.CreateNamespacedDeploymentAsync(depl, AppConfig.K8SNamespaceName) as T;
+            return obj;
+        }
+
+        return default;
+        
     }
 
-    private async Task<V1Deployment> CreateAndDeployDeployment(ContainerImageModel cim)
-    {
-        if (string.IsNullOrWhiteSpace(cim.K8SDeployment))
-        {
-            throw new IncorrectDataException($"Deployment for {cim.Name} not set");
-        }
-        var sanitized = cim.K8SDeployment.SanitizeAsK8SYaml();
-        var tmpDeployment = Yaml.LoadFromString<V1Deployment>(sanitized);
-
-        if (tmpDeployment == null)
-        {
-            throw new UnableToParseYamlConfigException(cim.Name, nameof(cim.K8SDeployment));
-        }
-
-        var result = await _k8SClient.CreateNamespacedDeploymentAsync(tmpDeployment, AppConfig.K8SNamespaceName);
-        return result;
-    }
-
-    public V1Service CreateLoadBalancerService(string serviceImageName, V1ObjectMeta meta)
+    
+    /// <inheritdoc/>
+    public V1Service CreateService(string serviceImageName, K8SServiceKindEnum kind, V1ObjectMeta meta)
     {
         var spec = new V1ServiceSpec()
         {
             Ports = new List<V1ServicePort>() { new(80), new(443) },
             Selector = new Dictionary<string, string> { { "app", serviceImageName } }
-
         };
-
+        
         var service = new V1Service()
         {
             Metadata = meta,
             ApiVersion = "api/v1",
-            Kind = "LoadBalancer",
+            Kind = kind.GetStringValue(),
             Spec = spec
         };
         return service;
     }
 
+    /// <inheritdoc/>
     public V1Deployment CreateStartupDeployment(string name)
     {
         var selector = new V1LabelSelector
@@ -176,8 +214,7 @@ public class DeploymentService : IDeploymentService
             Env = envList,
             Ports = new List<V1ContainerPort>() { new(80), new(433) }
         };
-
-
+        
         var podSpec = new V1PodSpec(new List<V1Container>() { container });
 
         var template = new V1PodTemplateSpec(meta, podSpec);

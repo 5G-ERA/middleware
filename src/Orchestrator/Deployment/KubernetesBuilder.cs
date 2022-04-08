@@ -28,7 +28,7 @@ namespace Middleware.Orchestrator.Deployment
             if (IsK8SEnv() == false)
             {
                 _logger.LogDebug("Not in K8s environment");
-                throw new NotInK8sEnvironmentException();
+                throw new NotInK8SEnvironmentException();
             }
             var config = KubernetesClientConfiguration.BuildDefaultConfig();
             //var config2 = KubernetesClientConfiguration.
