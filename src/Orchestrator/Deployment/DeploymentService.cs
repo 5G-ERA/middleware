@@ -164,16 +164,22 @@ public class DeploymentService : IDeploymentService
     {
         var spec = new V1ServiceSpec()
         {
-            Ports = new List<V1ServicePort>() { new(80), new(443) },
-            Selector = new Dictionary<string, string> { { "app", serviceImageName } }
+            Ports = new List<V1ServicePort>() { new(80, "TCP", "http"), new(443, "TCP", "https") },
+            Selector = new Dictionary<string, string> { { "app", serviceImageName } },
+            Type = kind.GetStringValue(),
+            
         };
         
         var service = new V1Service()
         {
-            Metadata = meta,
-            ApiVersion = "api/v1",
-            Kind = kind.GetStringValue(),
-            Spec = spec
+            Metadata = new V1ObjectMeta()
+            {
+                Name = meta.Name,
+                Labels = meta.Labels
+            },
+            ApiVersion = "v1",
+            Spec = spec,
+            Kind = "Service"
         };
         return service;
     }
@@ -224,7 +230,7 @@ public class DeploymentService : IDeploymentService
         {
             Metadata = meta,
             Spec = spec,
-            ApiVersion = "v1",
+            ApiVersion = "apps/v1",
             Kind = "Deployment"
         };
         return dep;
