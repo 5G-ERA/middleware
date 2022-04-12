@@ -12,24 +12,24 @@ namespace Middleware.OcelotGateway.Controllers
     [ApiController]
     public class LoginController : ControllerBase
     {
-        private readonly IUserRepository _userRepository;
+        /*private readonly IUserRepository _userRepository;
         private readonly ILogger _logger;
 
         public LoginController(IUserRepository userRepository, ILogger logger)
         {
             _userRepository = userRepository ?? throw new ArgumentNullException(nameof(userRepository));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-        }
+        }*/
 
 
 
-        [AllowAnonymous]
+        /*[AllowAnonymous]
         [HttpPost(Name = "Register")]
         public IActionResult Register([FromBody] UserModel register)
         {
             UserModel user = new UserModel();
             return (IActionResult)user;
-        }
+        }*/
 
 
         [AllowAnonymous]

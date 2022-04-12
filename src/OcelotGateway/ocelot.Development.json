@@ -53,7 +53,7 @@
           "Port": "5143"
         }
       ],
-      "UpstreamPathTemplate": "/Data/{all}",
+      "UpstreamPathTemplate": "/Task/{all}",
       "UpstreamHttpMethod": [ "GET" ]
     }
   ],
