@@ -1,6 +1,6 @@
 ﻿using Middleware.Common.Models;
 
-namespace Middleware.RedisInterface.Repositories;
+namespace Middleware.Common.Repositories;
 
 public interface IBaseRepository<T> where T : class
 {

@@ -1,4 +1,4 @@
-﻿namespace Middleware.RedisInterface.Enums
+﻿namespace Middleware.Common.Enums
 {
     public enum RedisDbIndexEnum
     {
@@ -12,6 +12,7 @@
         Edge =8,
         Cloud =9,
         Action =10,
-        QoS =11
+        QoS =11,
+        User =18
     }
 }

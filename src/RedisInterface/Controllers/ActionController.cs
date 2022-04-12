@@ -2,7 +2,7 @@
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
 using Middleware.Common.Models;
-using Middleware.RedisInterface.Repositories.Abstract;
+using Middleware.Common.Repositories.Abstract;
 using System.Net;
 
 namespace Middleware.RedisInterface.Controllers

@@ -1,13 +1,43 @@
 {
   "Routes": [
-    //ResourcePlanner API
+    //OcelotGateway API
     {
-      "DownstreamPathTemplate": "/api/v1/{all}",
-      "DownstreamScheme": "https",
+      "DownstreamPathTemplate": "/api/v1/Login",
+      "DownstreamScheme": "http",
       "DownstreamHostAndPorts": [
         {
           "Host": "localhost",
-          "Port": "7253"
+          "Port": "5047"
+        }
+      ],
+      "UpstreamPathTemplate": "/Login",
+      "UpstreamHttpMethod": [ "POST" ]
+    },
+    //RedisInterface API
+    {
+      "DownstreamPathTemplate": "/api/v1/{all}",
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": "5091"
+        }
+      ],
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "Bearer",
+        "AllowedScopes": []
+      },
+      "UpstreamPathTemplate": "/Data/{all}",
+      "UpstreamHttpMethod": [ "GET", "POST" ]
+    },
+    //ResourcePlanner API
+    {
+      "DownstreamPathTemplate": "/api/v1/{all}",
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": "5263"
         }
       ],
       "UpstreamPathTemplate": "/Resource/{all}",
@@ -20,10 +50,10 @@
       "DownstreamHostAndPorts": [
         {
           "Host": "localhost",
-          "Port": "7084"
+          "Port": "5143"
         }
       ],
-      "UpstreamPathTemplate": "/Task/{all}",
+      "UpstreamPathTemplate": "/Data/{all}",
       "UpstreamHttpMethod": [ "GET" ]
     }
   ],

@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Middleware.Common.Models;
-using Middleware.RedisInterface.Repositories;
+using Middleware.Common.Repositories;
 using System.Net;
 
 namespace Middleware.RedisInterface.Controllers
