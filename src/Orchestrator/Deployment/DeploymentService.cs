@@ -79,7 +79,7 @@ public class DeploymentService : IDeploymentService
                         }
 
                         //TODO save the specified actionPlan to the Redis
-                        
+
                     }
                 }
                 catch (Exception ex)
@@ -118,7 +118,7 @@ public class DeploymentService : IDeploymentService
     /// <returns></returns>
     /// <exception cref="IncorrectDataException"></exception>
     /// <exception cref="UnableToParseYamlConfigException"></exception>
-    public async Task<T> Deploy<T>(string objectDefinition, string name, Guid instanceId, string propName = null) where T: class
+    public async Task<T> Deploy<T>(string objectDefinition, string name, Guid instanceId, string propName = null) where T : class
     {
         var type = typeof(T);
 
@@ -128,7 +128,7 @@ public class DeploymentService : IDeploymentService
 
             if (type == typeof(V1Deployment))
                 throw new IncorrectDataException($"Deployment for {name} not set");
-            
+
             return default;
         }
         var sanitized = objectDefinition.SanitizeAsK8SYaml();
@@ -155,21 +155,25 @@ public class DeploymentService : IDeploymentService
         }
 
         return default;
-        
+
     }
 
-    
+
     /// <inheritdoc/>
     public V1Service CreateService(string serviceImageName, K8SServiceKindEnum kind, V1ObjectMeta meta)
     {
         var spec = new V1ServiceSpec()
         {
-            Ports = new List<V1ServicePort>() { new(80, "TCP", "http"), new(443, "TCP", "https") },
+            Ports = new List<V1ServicePort>()
+            {
+                new(80, "TCP", "http", null, "TCP", 80),
+                new(443, "TCP", "https", null, "TCP", 80)
+            },
             Selector = new Dictionary<string, string> { { "app", serviceImageName } },
             Type = kind.GetStringValue(),
-            
+
         };
-        
+
         var service = new V1Service()
         {
             Metadata = new V1ObjectMeta()
@@ -220,7 +224,7 @@ public class DeploymentService : IDeploymentService
             Env = envList,
             Ports = new List<V1ContainerPort>() { new(80), new(433) }
         };
-        
+
         var podSpec = new V1PodSpec(new List<V1Container>() { container });
 
         var template = new V1PodTemplateSpec(meta, podSpec);
