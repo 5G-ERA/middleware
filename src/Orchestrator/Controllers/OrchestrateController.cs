@@ -49,7 +49,7 @@ public class OrchestrateController : Controller
             if (result == false)
             {
                 //TODO: provide more detailed information on what went wrong with the deployment of the task
-                return Problem("There was a problem while deploying the task instance: {ex}");
+                return Problem("There was a problem while deploying the task instance: {ex");
             }
         }
         catch (Exception ex)

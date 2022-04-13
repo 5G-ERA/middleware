@@ -1,3 +1,4 @@
+using System.Net;
 using Middleware.Common.ExtensionMethods;
 using Middleware.Orchestrator.ApiReference;
 using Middleware.Orchestrator.Config;
@@ -11,6 +12,13 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Host.UseSerilog((ctx, lc) => lc
     .MinimumLevel.Debug()
     .WriteTo.Console());
+
+builder.Host.ConfigureAppConfiguration((hostingContext, config) =>
+{
+    AppConfig.AppConfiguration = hostingContext.HostingEnvironment.EnvironmentName;
+    ServicePointManager.DnsRefreshTimeout = 60000;
+    ServicePointManager.EnableDnsRoundRobin = true;
+});
 
 // Add services to the container.
 

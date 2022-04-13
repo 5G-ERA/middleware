@@ -60,7 +60,7 @@ public class DeploymentService : IDeploymentService
             {
                 try
                 {
-                    var images = (await _redisClient.ContainerImageGetForInstanceAsync(seq.Id))?.ToList();
+                    var images = (await _redisClient.ContainerImageGetForInstanceAsync(service.Id))?.ToList();
                     if (images is null || images.Any() == false)
                     {
                         throw new IncorrectDataException("Images not defined for the Instance deployment");
@@ -70,13 +70,14 @@ public class DeploymentService : IDeploymentService
                     {
                         var deployedPair = await Deploy(cim);
 
+                        //TODO: handle the check if the deployment or a service already exists
                         service.ServiceStatus = ServiceStatusEnum.Idle.GetStringValue();
                         service.ServiceInstanceId = Guid.Parse(deployedPair.Deployment.GetLabel("serviceId"));
 
-                        if (deployedPair.Service is not null && deployedPair.Service.Spec.ExternalIPs.Any())
-                        {
-                            service.ServiceUrl = new Uri(deployedPair.Service.Spec.ExternalIPs[0]);
-                        }
+                        //if (deployedPair.Service is not null && deployedPair.Service.Spec.ExternalIPs.Any())
+                        //{
+                        //    service.ServiceUrl = new Uri(deployedPair.Service.Spec.ExternalIPs[0]);
+                        //}
 
                         //TODO save the specified actionPlan to the Redis
 
@@ -220,7 +221,7 @@ public class DeploymentService : IDeploymentService
         {
             Name = name,
             Image = K8SImageHelper.BuildImageName(_awsRegistryName, name, "latest"),
-            ImagePullPolicy = "Always",
+            ImagePullPolicy = AppConfig.AppConfiguration == "Release" && name == "redis-interface-api" ? "Always" : "Never",
             Env = envList,
             Ports = new List<V1ContainerPort>() { new(80), new(433) }
         };

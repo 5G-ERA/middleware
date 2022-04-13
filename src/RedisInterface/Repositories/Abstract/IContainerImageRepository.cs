@@ -8,8 +8,8 @@ namespace Middleware.RedisInterface.Repositories
         /// <summary>
         /// Get images needed to be deployed by the action
         /// </summary>
-        /// <param name="actionId"></param>
+        /// <param name="instanceId"></param>
         /// <returns></returns>
-        Task<List<ContainerImageModel>> GetImagesForActionAsync(Guid actionId);
+        Task<List<ContainerImageModel>> GetImagesForInstanceAsync(Guid instanceId);
     }
 }

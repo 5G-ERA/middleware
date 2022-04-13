@@ -113,7 +113,7 @@ namespace Middleware.RedisInterface.Controllers
         /// <summary>
         /// Gets the images associated with the specified instance
         /// </summary>
-        /// <param name="id">Identifier of the action</param>
+        /// <param name="id">Identifier of the instance</param>
         /// <returns></returns>
         [HttpGet]
         [Route("instance/{id}", Name = "ContainerImageGetForInstance")]
@@ -123,7 +123,7 @@ namespace Middleware.RedisInterface.Controllers
         {
             try
             {
-                var images = await _containerImageRepository.GetImagesForActionAsync(id);
+                var images = await _containerImageRepository.GetImagesForInstanceAsync(id);
                 if (images.Any() == false)
                 {
                     return NotFound();

@@ -1,4 +1,5 @@
-﻿using k8s.Models;
+﻿using System.Security.Policy;
+using k8s.Models;
 
 namespace Middleware.Orchestrator.Config;
 
@@ -21,4 +22,8 @@ public static class AppConfig
     /// </summary>
     public static readonly Dictionary<string, Type> K8STypeMappings = new()
         {{"v1/Pod", typeof(V1Pod)}, {"v1/Service", typeof(V1Service)}, {"apps/v1", typeof(V1Deployment)}};
+    /// <summary>
+    /// Configuration of the application Development / Release
+    /// </summary>
+    public static string AppConfiguration { get; set; }
 }

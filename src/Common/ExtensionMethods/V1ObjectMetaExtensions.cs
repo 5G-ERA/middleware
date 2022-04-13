@@ -11,6 +11,10 @@ public static class V1ObjectMetaExtensions
     /// <param name="serviceId"></param>
     public static void SetServiceLabel(this V1ObjectMeta meta, Guid serviceId)
     {
+        if (meta.Labels is null)
+        {
+            meta.Labels = new Dictionary<string, string>();
+        }
         meta.Labels.Add("serviceId", serviceId.ToString());
     }
 }

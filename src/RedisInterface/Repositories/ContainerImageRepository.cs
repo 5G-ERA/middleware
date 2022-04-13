@@ -38,10 +38,10 @@ namespace Middleware.RedisInterface.Repositories
         }
         
         /// <inheritdoc/>
-        public async Task<List<ContainerImageModel>> GetImagesForActionAsync(Guid actionId)
+        public async Task<List<ContainerImageModel>> GetImagesForInstanceAsync(Guid instanceId)
         {
 
-            List<RelationModel> imageRelations = await _instanceRepository.GetRelation(actionId, "needs");
+            List<RelationModel> imageRelations = await _instanceRepository.GetRelation(instanceId, "needs");
 
             List<Guid> actionIds = imageRelations.Select(i => i.PointsTo.Id).ToList();
 
