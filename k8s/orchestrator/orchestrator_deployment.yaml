@@ -12,6 +12,7 @@ spec:
         name: orchestrator-api
     spec:
       serviceAccountName: orchestrator
+      automountServiceAccountToken: true
       nodeSelector:
         kubernetes.io/os: linux
       containers:        
@@ -26,3 +27,5 @@ spec:
           value: $(REDIS_HOSTNAME) # to be replaced with real value
         - name: REDIS_PORT
           value: $(REDIS_PORT) # to be replaced with real value
+        - name: REDIS_INTERFACE_ADDRESS
+          value: http://redis-interface-api # to be replaced with real value

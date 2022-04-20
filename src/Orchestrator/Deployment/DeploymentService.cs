@@ -49,9 +49,10 @@ public class DeploymentService : IDeploymentService
     /// <inheritdoc/>
     public async Task<bool> DeployAsync(TaskModel task)
     {
+        _logger.LogDebug("Entered DeploymentService.DeployAsync");
         var deployments = await _k8SClient.ListNamespacedDeploymentAsync(AppConfig.K8SNamespaceName);
-        var deploymentNames = deployments.Items.Select(d => d.Metadata.Name).ToArray();
-
+        var deploymentNames = deployments.Items.Select(d => d.Metadata.Name).OrderBy(d => d).ToArray();
+        _logger.LogDebug("Current deployments: {deployments}", string.Join(", ", deploymentNames));
         bool isSuccess = true;
 
         foreach (var seq in task.ActionSequence)
@@ -60,20 +61,23 @@ public class DeploymentService : IDeploymentService
             {
                 try
                 {
+                    _logger.LogDebug("Querying for redis for service {Id}", service.Id);
                     var images = (await _redisClient.ContainerImageGetForInstanceAsync(service.Id))?.ToList();
                     if (images is null || images.Any() == false)
                     {
                         throw new IncorrectDataException("Images not defined for the Instance deployment");
                     }
+                    _logger.LogDebug("Retrieved service with Id: {Id}", service.Id);
                     // should only be just one image
                     foreach (var cim in images)
                     {
+                        _logger.LogDebug("Deploying the image {ImageName}", service.ImageName);
                         var deployedPair = await Deploy(cim);
-
+                        
                         //TODO: handle the check if the deployment or a service already exists
                         service.ServiceStatus = ServiceStatusEnum.Idle.GetStringValue();
                         service.ServiceInstanceId = Guid.Parse(deployedPair.Deployment.GetLabel("serviceId"));
-
+                        _logger.LogDebug("Deployed the image {ImageName} with the Id {ServiceInstanceId}", service.ImageName, service.ServiceInstanceId);
                         //if (deployedPair.Service is not null && deployedPair.Service.Spec.ExternalIPs.Any())
                         //{
                         //    service.ServiceUrl = new Uri(deployedPair.Service.Spec.ExternalIPs[0]);
