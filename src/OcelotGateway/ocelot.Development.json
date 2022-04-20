@@ -7,7 +7,7 @@
       "DownstreamHostAndPorts": [
         {
           "Host": "localhost",
-          "Port": "5047"
+          "Port": "80"
         }
       ],
       "UpstreamPathTemplate": "/Login",
