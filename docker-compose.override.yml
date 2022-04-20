@@ -60,12 +60,15 @@ services:
       - ${APPDATA}/ASP.NET/Https:/root/.aspnet/https:ro
 
   ocelotgateway:
+
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
       - ASPNETCORE_URLS=https://+:443;http://+:80
+      - REDIS_HOSTNAME=${REDIS_HOSTNAME}
+      - REDIS_PORT=${REDIS_PORT}
     ports:
-      - "80"
-      - "443"
+      - "5047:80"
+      - "7047:443"
     volumes:
       - ${APPDATA}/Microsoft/UserSecrets:/root/.microsoft/usersecrets:ro
       - ${APPDATA}/ASP.NET/Https:/root/.aspnet/https:ro
