@@ -7,13 +7,9 @@
       "DownstreamHostAndPorts": [
         {
           "Host": "localhost",
-          "Port": "5047"
+          "Port": "7047"
         }
       ],
-      "AuthenticationOptions": {
-        "AuthenticationProviderKey": "Bearer",
-        "AllowedScopes": []
-      },
       "UpstreamPathTemplate": "/Login",
       "UpstreamHttpMethod": [ "POST" ]
     },
@@ -62,7 +58,7 @@
     }
   ],
   "GlobalConfiguration": {
-    "BaseUrl": "http://localhost:5047"
+    "BaseUrl": "http://localhost:7047"
   }
 
 }

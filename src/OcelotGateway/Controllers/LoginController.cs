@@ -12,24 +12,38 @@ namespace Middleware.OcelotGateway.Controllers
     [ApiController]
     public class LoginController : ControllerBase
     {
-        /*private readonly IUserRepository _userRepository;
+        private readonly IUserRepository _userRepository;
         private readonly ILogger _logger;
 
-        public LoginController(IUserRepository userRepository, ILogger logger)
+        public LoginController(IUserRepository userRepository, ILogger<LoginController> logger)
         {
             _userRepository = userRepository ?? throw new ArgumentNullException(nameof(userRepository));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-        }*/
+        }
 
 
 
-        /*[AllowAnonymous]
-        [HttpPost(Name = "Register")]
-        public IActionResult Register([FromBody] UserModel register)
+        [AllowAnonymous]
+        [HttpPost]
+        [Route("register", Name = "Register")]
+        public async Task<ActionResult<UserModel>> Register([FromBody] UserModel register)
         {
-            UserModel user = new UserModel();
-            return (IActionResult)user;
-        }*/
+            if (register == null)
+            {
+                BadRequest("Please enter valid credentials");
+            }
+            try
+            {
+                register.Salt = "saltstring";
+                await _userRepository.AddAsync(register);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex.Message);
+                return Problem("Something went wrong while calling the API");
+            }
+            return Ok(register);
+        }
 
 
         [AllowAnonymous]
