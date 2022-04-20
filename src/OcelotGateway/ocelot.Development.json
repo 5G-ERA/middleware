@@ -6,7 +6,7 @@
       "DownstreamScheme": "http",
       "DownstreamHostAndPorts": [
         {
-          "Host": "localhost",
+          "Host": "ocelotgateway.api",
           "Port": "80"
         }
       ],
@@ -19,8 +19,8 @@
       "DownstreamScheme": "http",
       "DownstreamHostAndPorts": [
         {
-          "Host": "localhost",
-          "Port": "5091"
+          "Host": "redisinterface.api",
+          "Port": "80"
         }
       ],
       "AuthenticationOptions": {
@@ -36,8 +36,8 @@
       "DownstreamScheme": "http",
       "DownstreamHostAndPorts": [
         {
-          "Host": "localhost",
-          "Port": "5263"
+          "Host": "resourceplanner.api",
+          "Port": "80"
         }
       ],
       "UpstreamPathTemplate": "/Resource/{all}",
@@ -46,11 +46,11 @@
     //TaskPlanner API
     {
       "DownstreamPathTemplate": "/api/v1/{all}",
-      "DownstreamScheme": "https",
+      "DownstreamScheme": "http",
       "DownstreamHostAndPorts": [
         {
-          "Host": "localhost",
-          "Port": "5143"
+          "Host": "taskplanner.api",
+          "Port": "80"
         }
       ],
       "UpstreamPathTemplate": "/Task/{all}",
