@@ -25,6 +25,8 @@ namespace Middleware.RedisInterface.Controllers
         /// <returns> the list of CloudModel entities </returns>
         [HttpGet(Name = "CloudGetAll")]
         [ProducesResponseType(typeof(CloudModel), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(string), (int)HttpStatusCode.NotFound)]
+        [ProducesResponseType(typeof(string), (int)HttpStatusCode.InternalServerError)]
         public async Task<ActionResult<IEnumerable<CloudModel>>> GetAllAsync()
         {
             try
@@ -51,6 +53,8 @@ namespace Middleware.RedisInterface.Controllers
         [HttpGet]
         [Route("{id}", Name = "CloudGetById")]
         [ProducesResponseType(typeof(CloudModel), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(string), (int)HttpStatusCode.NotFound)]
+        [ProducesResponseType(typeof(string), (int)HttpStatusCode.InternalServerError)]
         public async Task<IActionResult> GetByIdAsync(Guid id)
         {
             try
@@ -77,6 +81,8 @@ namespace Middleware.RedisInterface.Controllers
         /// <returns> the newly created CloudModel entity </returns>
         [HttpPost(Name = "CloudAdd")]
         [ProducesResponseType(typeof(CloudModel), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(string), (int)HttpStatusCode.BadRequest)]
+        [ProducesResponseType(typeof(string), (int)HttpStatusCode.InternalServerError)]
         public async Task<ActionResult<CloudModel>> AddAsync([FromBody] CloudModel model)
         {
             if (model == null)
@@ -104,6 +110,8 @@ namespace Middleware.RedisInterface.Controllers
         [HttpPatch]
         [Route("{id}", Name = "CloudPatch")]
         [ProducesResponseType(typeof(CloudModel), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(string), (int)HttpStatusCode.NotFound)]
+        [ProducesResponseType(typeof(string), (int)HttpStatusCode.InternalServerError)]
         public async Task<IActionResult> PatchCloudAsync([FromBody] CloudModel patch, [FromRoute] Guid id)
         {
             try
@@ -130,6 +138,7 @@ namespace Middleware.RedisInterface.Controllers
         [HttpDelete]
         [Route("{id}", Name = "CloudDelete")]
         [ProducesResponseType(typeof(void), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(string), (int)HttpStatusCode.InternalServerError)]
         public async Task<ActionResult> DeleteByIdAsync(Guid id)
         {
             try
@@ -148,12 +157,14 @@ namespace Middleware.RedisInterface.Controllers
         [HttpGet]
         [Route("relation/{name}", Name = "CloudGetRelationByName")]
         [ProducesResponseType(typeof(List<RelationModel>), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(string), (int)HttpStatusCode.NotFound)]
+        [ProducesResponseType(typeof(string), (int)HttpStatusCode.InternalServerError)]
         public async Task<IActionResult> GetRelationAsync(Guid id, string name)
         {
             try
             {
                 var relations = await _cloudRepository.GetRelation(id, name);
-                if (relations.Any())
+                if (!relations.Any())
                 {
                     return NotFound("Relations were not found.");
                 }
@@ -170,13 +181,15 @@ namespace Middleware.RedisInterface.Controllers
         [HttpGet]
         [Route("relations/{firstName}/{secondName}", Name = "CloudGetRelationsByName")]
         [ProducesResponseType(typeof(List<RelationModel>), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(string), (int)HttpStatusCode.NotFound)]
+        [ProducesResponseType(typeof(string), (int)HttpStatusCode.InternalServerError)]
         public async Task<IActionResult> GetRelationsAsync(Guid id, string firstName, string secondName)
         {
             try
             {
                 List<string> relationNames = new List<string>() { firstName, secondName };
                 var relations = await _cloudRepository.GetRelations(id, relationNames);
-                if (relations.Any())
+                if (!relations.Any())
                 {
                     return NotFound("Relations were not found");
                 }

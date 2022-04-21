@@ -2,7 +2,7 @@
   "Routes": [
     //OcelotGateway API
     {
-      "DownstreamPathTemplate": "/api/v1/Login",
+      "DownstreamPathTemplate": "/api/v1/login",
       "DownstreamScheme": "http",
       "DownstreamHostAndPorts": [
         {
@@ -11,6 +11,18 @@
         }
       ],
       "UpstreamPathTemplate": "/Login",
+      "UpstreamHttpMethod": [ "POST" ]
+    },
+    {
+      "DownstreamPathTemplate": "/api/v1/register",
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "ocelotgateway.api",
+          "Port": "80"
+        }
+      ],
+      "UpstreamPathTemplate": "/Register",
       "UpstreamHttpMethod": [ "POST" ]
     },
     //RedisInterface API
@@ -28,20 +40,7 @@
         "AllowedScopes": []
       },
       "UpstreamPathTemplate": "/Data/{all}",
-      "UpstreamHttpMethod": [ "GET", "POST" ]
-    },
-    //ResourcePlanner API
-    {
-      "DownstreamPathTemplate": "/api/v1/{all}",
-      "DownstreamScheme": "http",
-      "DownstreamHostAndPorts": [
-        {
-          "Host": "resourceplanner.api",
-          "Port": "80"
-        }
-      ],
-      "UpstreamPathTemplate": "/Resource/{all}",
-      "UpstreamHttpMethod": [ "GET" ]
+      "UpstreamHttpMethod": [ "GET", "POST", "PATCH", "DELETE" ]
     },
     //TaskPlanner API
     {
@@ -53,8 +52,29 @@
           "Port": "80"
         }
       ],
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "Bearer",
+        "AllowedScopes": []
+      },
       "UpstreamPathTemplate": "/Task/{all}",
-      "UpstreamHttpMethod": [ "GET" ]
+      "UpstreamHttpMethod": [ "GET", "POST", "PATCH", "DELETE" ]
+    },
+    //Orchestrator API
+    {
+      "DownstreamPathTemplate": "/api/v1/{all}",
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "orchestrator.api",
+          "Port": "80"
+        }
+      ],
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "Bearer",
+        "AllowedScopes": []
+      },
+      "UpstreamPathTemplate": "/Orchestrate/{all}",
+      "UpstreamHttpMethod": [ "GET", "POST", "PATCH", "DELETE" ]
     }
   ],
   "GlobalConfiguration": {

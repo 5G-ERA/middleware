@@ -36,7 +36,10 @@ namespace Middleware.Common.Repositories
         public async Task<T> GetByIdAsync(Guid id)
         {
             string model = (string)await Db.JsonGetAsync(id.ToString());
-            
+            if (string.IsNullOrEmpty(model)) 
+            {
+                return default;
+            }
             T newModel = JsonSerializer.Deserialize<T>(model);
 
             return newModel;

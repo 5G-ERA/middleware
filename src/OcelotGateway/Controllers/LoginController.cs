@@ -8,7 +8,7 @@ using Middleware.Common.Repositories.Abstract;
 
 namespace Middleware.OcelotGateway.Controllers
 {
-    [Route("api/v1/[controller]")]
+    [Route("api/v1")]
     [ApiController]
     public class LoginController : ControllerBase
     {
@@ -47,7 +47,8 @@ namespace Middleware.OcelotGateway.Controllers
 
 
         [AllowAnonymous]
-        [HttpPost(Name = "Login")]
+        [HttpPost]
+        [Route("login", Name = "Login")]
         public IActionResult Login([FromBody] UserModel login) 
         {
             IActionResult response = Unauthorized();

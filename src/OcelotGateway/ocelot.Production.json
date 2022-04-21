@@ -2,15 +2,27 @@
   "Routes": [
     //OcelotGateway API
     {
-      "DownstreamPathTemplate": "/api/v1/Login",
+      "DownstreamPathTemplate": "/api/v1/login",
       "DownstreamScheme": "http",
       "DownstreamHostAndPorts": [
         {
-          "Host": "localhost",
-          "Port": "7047"
+          "Host": "ocelot-gateway-api.middleware.svc.cluster.local",
+          "Port": "80"
         }
       ],
       "UpstreamPathTemplate": "/Login",
+      "UpstreamHttpMethod": [ "POST" ]
+    },
+    {
+      "DownstreamPathTemplate": "/api/v1/register",
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "ocelot-gateway-api.middleware.svc.cluster.local",
+          "Port": "80"
+        }
+      ],
+      "UpstreamPathTemplate": "/Register",
       "UpstreamHttpMethod": [ "POST" ]
     },
     //RedisInterface API
@@ -19,8 +31,8 @@
       "DownstreamScheme": "http",
       "DownstreamHostAndPorts": [
         {
-          "Host": "localhost",
-          "Port": "5091"
+          "Host": "redis-interface-api.middleware.svc.cluster.local",
+          "Port": "80"
         }
       ],
       "AuthenticationOptions": {
@@ -28,20 +40,7 @@
         "AllowedScopes": []
       },
       "UpstreamPathTemplate": "/Data/{all}",
-      "UpstreamHttpMethod": [ "GET", "POST" ]
-    },
-    //ResourcePlanner API
-    {
-      "DownstreamPathTemplate": "/api/v1/{all}",
-      "DownstreamScheme": "http",
-      "DownstreamHostAndPorts": [
-        {
-          "Host": "localhost",
-          "Port": "5263"
-        }
-      ],
-      "UpstreamPathTemplate": "/Resource/{all}",
-      "UpstreamHttpMethod": [ "GET" ]
+      "UpstreamHttpMethod": [ "GET", "POST", "PATCH", "DELETE" ]
     },
     //TaskPlanner API
     {
@@ -49,16 +48,36 @@
       "DownstreamScheme": "http",
       "DownstreamHostAndPorts": [
         {
-          "Host": "localhost",
-          "Port": "5143"
+          "Host": "task-planner-api.middleware.svc.cluster.local",
+          "Port": "80"
         }
       ],
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "Bearer",
+        "AllowedScopes": []
+      },
       "UpstreamPathTemplate": "/Task/{all}",
-      "UpstreamHttpMethod": [ "GET" ]
+      "UpstreamHttpMethod": [ "GET", "POST", "PATCH", "DELETE" ]
+    },
+    //Orchestrator API
+    {
+      "DownstreamPathTemplate": "/api/v1/{all}",
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "orchestrator-api.middleware.svc.cluster.local",
+          "Port": "80"
+        }
+      ],
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "Bearer",
+        "AllowedScopes": []
+      },
+      "UpstreamPathTemplate": "/Orchestrate/{all}",
+      "UpstreamHttpMethod": [ "GET", "POST", "PATCH", "DELETE" ]
     }
   ],
   "GlobalConfiguration": {
-    "BaseUrl": "http://localhost:7047"
+    "BaseUrl": "https://localhost:5047"
   }
-
 }

@@ -26,6 +26,8 @@ namespace Middleware.RedisInterface.Controllers
         /// <returns> the list of InstanceModel entities </returns>
         [HttpGet(Name = "InstanceGetAll")]
         [ProducesResponseType(typeof(InstanceModel), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(string), (int)HttpStatusCode.NotFound)]
+        [ProducesResponseType(typeof(string), (int)HttpStatusCode.InternalServerError)]
         public async Task<ActionResult<IEnumerable<InstanceModel>>> GetAllAsync()
         {
             try
@@ -52,6 +54,8 @@ namespace Middleware.RedisInterface.Controllers
         [HttpGet]
         [Route("{id}", Name = "InstanceGetById")]
         [ProducesResponseType(typeof(InstanceModel), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(string), (int)HttpStatusCode.NotFound)]
+        [ProducesResponseType(typeof(string), (int)HttpStatusCode.InternalServerError)]
         public async Task<IActionResult> GetByIdAsync(Guid id)
         {
             try
@@ -77,6 +81,8 @@ namespace Middleware.RedisInterface.Controllers
         /// <returns> the newly created InstanceModel entity </returns>
         [HttpPost(Name = "InstanceAdd")]
         [ProducesResponseType(typeof(InstanceModel), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(string), (int)HttpStatusCode.BadRequest)]
+        [ProducesResponseType(typeof(string), (int)HttpStatusCode.InternalServerError)]
         public async Task<ActionResult<InstanceModel>> AddAsync([FromBody] InstanceModel model)
         {
             if (model == null)
@@ -104,6 +110,8 @@ namespace Middleware.RedisInterface.Controllers
         [HttpPatch]
         [Route("{id}", Name = "InstancePatch")]
         [ProducesResponseType(typeof(InstanceModel), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(string), (int)HttpStatusCode.NotFound)]
+        [ProducesResponseType(typeof(string), (int)HttpStatusCode.InternalServerError)]
         public async Task<IActionResult> PatchInstanceAsync([FromBody] InstanceModel patch, [FromRoute] Guid id)
         {
             try
@@ -130,6 +138,7 @@ namespace Middleware.RedisInterface.Controllers
         [HttpDelete]
         [Route("{id}", Name = "InstanceDelete")]
         [ProducesResponseType(typeof(void), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(string), (int)HttpStatusCode.InternalServerError)]
         public async Task<ActionResult> DeleteByIdAsync(Guid id)
         {
             try
@@ -147,12 +156,14 @@ namespace Middleware.RedisInterface.Controllers
         [HttpGet]
         [Route("relation/{name}", Name = "InstanceGetRelationByName")]
         [ProducesResponseType(typeof(List<RelationModel>), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(string), (int)HttpStatusCode.NotFound)]
+        [ProducesResponseType(typeof(string), (int)HttpStatusCode.InternalServerError)]
         public async Task<IActionResult> GetRelationAsync(Guid id, string name)
         {
             try
             {
                 var relations = await _instanceRepository.GetRelation(id, name);
-                if (relations.Any()) 
+                if (!relations.Any()) 
                 {
                     return NotFound("Relations were not found.");
                 }
@@ -169,13 +180,15 @@ namespace Middleware.RedisInterface.Controllers
         [HttpGet]
         [Route("relations/{firstName}/{secondName}", Name = "InstanceGetRelationsByName")]
         [ProducesResponseType(typeof(List<RelationModel>), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(string), (int)HttpStatusCode.NotFound)]
+        [ProducesResponseType(typeof(string), (int)HttpStatusCode.InternalServerError)]
         public async Task<IActionResult> GetRelationsAsync(Guid id, string firstName, string secondName)
         {
             try
             {
                 List<string> relationNames = new List<string>() { firstName, secondName };
                 var relations = await _instanceRepository.GetRelations(id, relationNames);
-                if (relations.Any())
+                if (!relations.Any())
                 {
                     return NotFound("Relations were not found");
                 }
