@@ -11,6 +11,10 @@
         <DockerfileContext>..\..</DockerfileContext>
     </PropertyGroup>
 
+	<ItemGroup>
+		<InternalsVisibleTo Include="Orchestrator.Tests.Unit" />
+	</ItemGroup>
+
     <ItemGroup>
       <OpenApiReference Include="..\RedisInterface\RedisInterfaceSpec.json" CodeGenerator="NSwagCSharp" Namespace="Middleware.Orchestrator.RedisInterface" ClassName="RedisApiClient" Link="OpenAPIs\RedisInterfaceSpec.json" />
     </ItemGroup>
@@ -39,9 +43,11 @@
         <PackageReference Include="Swashbuckle.AspNetCore" Version="6.2.3" />
     </ItemGroup>
 
-    <ItemGroup>
-      <ProjectReference Include="..\Common\Common.csproj" />
-    </ItemGroup>
+	<ItemGroup>
+		<ProjectReference Include="..\Common\Common.csproj" />
+	</ItemGroup>
+
+	
 
     <ItemGroup>
       <Folder Include="Models\" />
