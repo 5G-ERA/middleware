@@ -1,5 +1,4 @@
-﻿using System.Linq;
-using k8s;
+﻿using k8s;
 using k8s.Models;
 using Middleware.Common;
 using Middleware.Common.Enums;
@@ -27,7 +26,6 @@ public class DeploymentService : IDeploymentService
     /// Logger instance
     /// </summary>
     private readonly ILogger _logger;
-
     /// <summary>
     /// Redis Interface client allowing to make calls to the Redis Cache
     /// </summary>
@@ -43,7 +41,7 @@ public class DeploymentService : IDeploymentService
         _env = env;
         _logger = logger;
         _redisClient = apiClientBuilder.CreateRedisApiClient();
-        _awsRegistryName = _env.GetEnvVariable("AWS_IMAGE_REGISTRY"); //TODO: replace with the parameters from the command line
+        _awsRegistryName = _env.GetEnvVariable("AWS_IMAGE_REGISTRY");
     }
 
     /// <inheritdoc/>
@@ -72,9 +70,15 @@ public class DeploymentService : IDeploymentService
                     foreach (var cim in images)
                     {
                         _logger.LogDebug("Deploying the image {ImageName}", service.ImageName);
+
+                        if (deploymentNames.Contains(cim.Name))
+                        {
+                            //TODO: handle the check if the deployment or a service already exists
+                            continue;
+                        }
+
                         var deployedPair = await Deploy(cim);
-                        
-                        //TODO: handle the check if the deployment or a service already exists
+
                         service.ServiceStatus = ServiceStatusEnum.Idle.GetStringValue();
                         service.ServiceInstanceId = Guid.Parse(deployedPair.Deployment.GetLabel("serviceId"));
                         _logger.LogDebug("Deployed the image {ImageName} with the Id {ServiceInstanceId}", service.ImageName, service.ServiceInstanceId);
@@ -83,7 +87,8 @@ public class DeploymentService : IDeploymentService
                         //    service.ServiceUrl = new Uri(deployedPair.Service.Spec.ExternalIPs[0]);
                         //}
 
-                        //TODO save the specified actionPlan to the Redis
+
+                        //TODO: save the specified actionPlan to the Redis
 
                     }
                 }
@@ -123,7 +128,7 @@ public class DeploymentService : IDeploymentService
     /// <returns></returns>
     /// <exception cref="IncorrectDataException"></exception>
     /// <exception cref="UnableToParseYamlConfigException"></exception>
-    public async Task<T> Deploy<T>(string objectDefinition, string name, Guid instanceId, string propName = null) where T : class
+    private async Task<T> Deploy<T>(string objectDefinition, string name, Guid instanceId, string propName = null) where T : class
     {
         var type = typeof(T);
 
@@ -215,7 +220,7 @@ public class DeploymentService : IDeploymentService
             new ("TASK_PLANNER_ADDRESS", $"http://task-planner-api"),
             new ("RESOURCE_PLANNER_ADDRESS", $"http://resource-planner-api")
         };
-        if (name.Contains("redis"))
+        if (name.Contains("redis") || name == "gateway")
         {
             envList.Add(new V1EnvVar("REDIS_HOSTNAME", _env.GetEnvVariable("REDIS_HOSTNAME")));
             envList.Add(new V1EnvVar("REDIS_PORT", _env.GetEnvVariable("REDIS_PORT")));
