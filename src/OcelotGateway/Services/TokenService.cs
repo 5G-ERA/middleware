@@ -9,7 +9,7 @@ namespace Middleware.OcelotGateway.Services
 {
     public class TokenService
     {
-        public TokenModel GenerateToken(UserModel user) 
+        public TokenModel GenerateToken(Guid id) 
         {
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("my_secure_api_secret"));
             var credentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha256Signature);
@@ -17,7 +17,7 @@ namespace Middleware.OcelotGateway.Services
 
             var claims = new[]
             {
-                new Claim(ClaimTypes.Name, user.Id.ToString()),
+                new Claim(ClaimTypes.Name, id.ToString()),
                 new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
             };
 

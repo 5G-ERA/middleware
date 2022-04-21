@@ -5,6 +5,9 @@ using Middleware.Common.Repositories;
 using Middleware.Common.Models;
 using Middleware.OcelotGateway.Services;
 using Middleware.Common.Repositories.Abstract;
+using System;
+using System.Security.Cryptography;
+using Microsoft.AspNetCore.Cryptography.KeyDerivation;
 
 namespace Middleware.OcelotGateway.Controllers
 {
@@ -34,7 +37,20 @@ namespace Middleware.OcelotGateway.Controllers
             }
             try
             {
-                register.Salt = "saltstring";
+                byte[] salt = new byte[128 / 8];
+                using (var rngCsp = new RNGCryptoServiceProvider())
+                {
+                    rngCsp.GetNonZeroBytes(salt);
+                }
+                register.Salt = Convert.ToBase64String(salt);
+                string hashedPassword = Convert.ToBase64String(KeyDerivation.Pbkdf2(
+                password: register.Password,
+                salt: salt,
+                prf: KeyDerivationPrf.HMACSHA256,
+                iterationCount: 100000,
+                numBytesRequested: 256 / 8));
+                register.Password = hashedPassword;
+        
                 await _userRepository.AddAsync(register);
             }
             catch (Exception ex)
@@ -49,29 +65,40 @@ namespace Middleware.OcelotGateway.Controllers
         [AllowAnonymous]
         [HttpPost]
         [Route("login", Name = "Login")]
-        public IActionResult Login([FromBody] UserModel login) 
+        public async Task<IActionResult> Login([FromBody] UserModel login) 
         {
             IActionResult response = Unauthorized();
             
-            UserModel user = AuthenticateUser(login);
-            if (user != null)
+            bool authenticated = await AuthenticateUser(login);
+            if (authenticated)
             {
                 TokenService token = new TokenService();
-                var newToken = token.GenerateToken(user);
+                var newToken = token.GenerateToken(login.Id);
                 response = Ok(newToken);
             }
             return response;
         }
 
 
-        private  UserModel AuthenticateUser(UserModel login) 
+        private async Task<bool> AuthenticateUser(UserModel login) 
         {
-            UserModel user = null;
-            if (login.Id.ToString() == "1e309941-4cbb-47e9-98ef-c2e38b5f157b") 
+            UserModel storedCredentials = await _userRepository.GetByIdAsync(login.Id);
+            byte[] salt = Convert.FromBase64String(storedCredentials.Salt);
+            string computedHashedPassword = Convert.ToBase64String(KeyDerivation.Pbkdf2(
+                password: login.Password,
+                salt: salt,
+                prf: KeyDerivationPrf.HMACSHA256,
+                iterationCount: 100000,
+                numBytesRequested: 256 / 8));
+            return (computedHashedPassword.Equals(storedCredentials.Password)) ? true : false;
+
+
+            /*if (login.Id.ToString() == "1e309941-4cbb-47e9-98ef-c2e38b5f157b") 
             {
                 user = new UserModel() { Id = Guid.Parse("1e309941-4cbb-47e9-98ef-c2e38b5f157b"), Password = "password" };
             }
-            return user;
+            return user;*/
+            //return user;
         }
     }
 }
