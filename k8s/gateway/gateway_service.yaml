@@ -1,11 +1,11 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: orchestrator-api
+  name: gateway
 spec:
   type: LoadBalancer
   selector:
-    name: orchestrator-api
+    name: gateway
   ports:
   - port: 80
     targetPort: 80

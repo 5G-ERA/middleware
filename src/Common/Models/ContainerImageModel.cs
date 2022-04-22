@@ -15,4 +15,10 @@ public class ContainerImageModel : BaseModel
 
     [JsonPropertyName("Description")]
     public string Description { get; set; }
+
+    [JsonPropertyName("K8SDeployment")]
+    public string K8SDeployment { get; set; }
+
+    [JsonPropertyName("K8SService")]
+    public string K8SService { get; set; }
 }

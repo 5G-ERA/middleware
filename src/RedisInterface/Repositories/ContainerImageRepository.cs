@@ -1,17 +1,20 @@
-﻿using Middleware.Common.Models;
+﻿using System.Text.Json;
+using Middleware.Common.Models;
 using Middleware.RedisInterface.Enums;
 using Middleware.RedisInterface.Repositories.Abstract;
 using NReJSON;
 using RedisGraphDotNet.Client;
 using StackExchange.Redis;
-using System.Text.Json;
 
 namespace Middleware.RedisInterface.Repositories
 {
     public class ContainerImageRepository : BaseRepository<ContainerImageModel>, IContainerImageRepository
     {
-        public ContainerImageRepository(IConnectionMultiplexer redisClient, IRedisGraphClient redisGraph, ILogger<ContainerImageRepository> logger) : base(RedisDbIndexEnum.Container, redisClient, redisGraph, logger)
+        private readonly IInstanceRepository _instanceRepository;
+
+        public ContainerImageRepository(IInstanceRepository instanceRepository, IConnectionMultiplexer redisClient, IRedisGraphClient redisGraph, ILogger<ContainerImageRepository> logger) : base(RedisDbIndexEnum.Container, redisClient, redisGraph, logger)
         {
+            _instanceRepository = instanceRepository;
         }
 
         public async Task<ContainerImageModel> PatchContainerImageAsync(Guid id, ContainerImageModel patch)
@@ -33,6 +36,22 @@ namespace Middleware.RedisInterface.Repositories
             await Db.JsonSetAsync(id.ToString(), JsonSerializer.Serialize(currentModel));
             return currentModel;
         }
+        
+        /// <inheritdoc/>
+        public async Task<List<ContainerImageModel>> GetImagesForInstanceAsync(Guid instanceId)
+        {
 
+            List<RelationModel> imageRelations = await _instanceRepository.GetRelation(instanceId, "needs");
+
+            List<Guid> actionIds = imageRelations.Select(i => i.PointsTo.Id).ToList();
+
+            List<ContainerImageModel> images = new();
+            foreach (var id in actionIds)
+            {
+                images.Add(await GetByIdAsync(id));
+            }
+
+            return images;
+        }
     }
 }

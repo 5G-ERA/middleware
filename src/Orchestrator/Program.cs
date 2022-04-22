@@ -1,3 +1,5 @@
+using System.Net;
+using Middleware.Common.ExtensionMethods;
 using Middleware.Orchestrator.ApiReference;
 using Middleware.Orchestrator.Config;
 using Middleware.Orchestrator.Deployment;
@@ -11,6 +13,13 @@ builder.Host.UseSerilog((ctx, lc) => lc
     .MinimumLevel.Debug()
     .WriteTo.Console());
 
+builder.Host.ConfigureAppConfiguration((hostingContext, config) =>
+{
+    AppConfig.AppConfiguration = hostingContext.HostingEnvironment.EnvironmentName;
+    ServicePointManager.DnsRefreshTimeout = 60000;
+    ServicePointManager.EnableDnsRoundRobin = true;
+});
+
 // Add services to the container.
 
 builder.Services.AddControllers();
@@ -21,8 +30,10 @@ builder.Services.AddSwaggerGen();
 builder.Services.ConfigureAutoMapper();
 builder.Services.AddHttpClient(AppConfig.RedisApiClientName);
 builder.Services.AddHttpClient(AppConfig.OsmApiClientName);
+builder.Services.RegisterCommonServices();
 builder.Services.AddScoped<IApiClientBuilder, ApiClientBuilder>();
 builder.Services.AddScoped<IKubernetesBuilder, KubernetesBuilder>();
+builder.Services.AddScoped<IDeploymentService, DeploymentService>();
 
 builder.Services.AddHttpClient("healthCheckClient");
 

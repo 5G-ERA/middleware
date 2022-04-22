@@ -181,9 +181,36 @@ When accessed from the Windows filesystem, the contents of the `kubeconfig` file
 
 To finish the configuration of the development environment, the `Bridge to Kubernetes` extension has to be installed.   Follow the guide on the [official extension](https://docs.microsoft.com/en-us/visualstudio/bridge/bridge-to-kubernetes-vs) website to complete the configuration of the environment.
 
+#### K8s cluster configuration 
+
+To ensure the correct work of the Orchestrator, the cluster needs to have the specific configuration enabled. Orchestrator is managing the deployment, removal and listing of the kubernetes services, deployments, pods and replica sets. For automating this it needs the required permissions. The permissions required are configured in the [k8s/cluster-config](k8s/cluster-config/) folder of this repository.
+
+The required configuration creates the `ClusterRole` that allows to watch, list, deploy, and delete the resources in the namespaces. By default, the Orchestrator will work only in the `middleware` namespace of the cluster.
+
+Other files are responsible for binding the `ClusterRole` to the namespace and creating the `ServiceAccount` that will allow to access the role from the Orchestrator deployment.
+
+Orchestrator deployment must have the `ServiceAccount` specified in its deployment configuration. 
+
+```yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: orchestrator-api
+spec:  
+    ...
+  template:    
+    ...
+    spec:
+      serviceAccountName: orchestrator
+      automountServiceAccountToken: true      
+      containers:        
+      ...
+```
+#### Launching and debugging the application
+
 To launch the application using `Bridge to Kubernetes`, the service with the backing pod has to be deployed. Example scripts are in the `k8s` folder of this repository and can be deployed using the commands below. The `middleware_deployment.yaml` file has to be filled with the appropriate values for the environment variables specified in the file.
 
 ```shell
-kubectl apply -f k8s/middleware_service.yaml -n middleware
-kubectl apply -f k8s/middleware_deployment.yaml -n middleware
+kubectl apply -f k8s/orchestrator/orchestrator_service.yaml -n middleware
+kubectl apply -f k8s/orchestrator/orchestrator_deployment.yaml -n middleware
 ```
