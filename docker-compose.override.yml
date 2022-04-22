@@ -40,6 +40,7 @@ services:
       - ASPNETCORE_URLS=https://+:443;http://+:80
       - REDIS_INTERFACE_ADDRESS=http://redisinterface.api
       - RESOURCE_PLANNER_ADDRESS=http://resourceplanner.api
+      - ORCHESTRATOR_ADDRESS=http://orchestrator.api
     ports:
       - "5143:80"
       - "7094:443"

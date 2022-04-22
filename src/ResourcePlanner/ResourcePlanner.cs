@@ -1,5 +1,6 @@
 ﻿using System.Text.Json.Serialization;
 using AutoMapper;
+using Middleware.Common;
 using Middleware.Common.Models;
 namespace Middleware.ResourcePlanner
 {
@@ -21,12 +22,15 @@ namespace Middleware.ResourcePlanner
 
         private TaskModel _taskModel;
         private readonly IMapper _mapper;
+        private readonly IEnvironment _env;
 
-        public ResourcePlanner(IHttpClientFactory factory, IMapper mapper)
+        public ResourcePlanner(IHttpClientFactory factory, IMapper mapper, IEnvironment env)
         {
+            _env = env;
             HttpClient client = factory.CreateClient();
-            _redisApiClient = new RedisInterface.RedisApiClient("http://redisinterface.api", client);
+            _redisApiClient = new RedisInterface.RedisApiClient(_env.GetEnvVariable("REDIS_INTERFACE_ADDRESS"), client);
             _mapper = mapper;
+            
         }
 
         public Guid GetTaskId()
@@ -72,7 +76,6 @@ namespace Middleware.ResourcePlanner
                     // add instance to actions 
                     action.Services.Add(instance);
                 }
-
             }
 
             //List<ActionModel> sequence = new List<ActionModel>
