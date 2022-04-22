@@ -1,11 +1,12 @@
 ﻿using System.Text.Json;
 using Middleware.Common.Models;
-using Middleware.RedisInterface.Enums;
+using Middleware.Common.Enums;
 using NReJSON;
 using RedisGraphDotNet.Client;
 using StackExchange.Redis;
+using Microsoft.Extensions.Logging;
 
-namespace Middleware.RedisInterface.Repositories
+namespace Middleware.Common.Repositories
 {
     public class BaseRepository<T> : IBaseRepository<T> where T : BaseModel
     {
@@ -29,14 +30,16 @@ namespace Middleware.RedisInterface.Repositories
         {
             model.Id = Guid.NewGuid();
             await Db.JsonSetAsync(model.Id.ToString(), JsonSerializer.Serialize(model));
-
             return model;
         }
 
         public async Task<T> GetByIdAsync(Guid id)
         {
             string model = (string)await Db.JsonGetAsync(id.ToString());
-            //TODO: null check!!!!!
+            if (string.IsNullOrEmpty(model)) 
+            {
+                return default;
+            }
             T newModel = JsonSerializer.Deserialize<T>(model);
 
             return newModel;
@@ -59,7 +62,7 @@ namespace Middleware.RedisInterface.Repositories
         public async Task<bool> DeleteByIdAsync(Guid id)
         {
             int deleted = await Db.JsonDeleteAsync(id.ToString());
-
+            
             return deleted > 0;
         }
 

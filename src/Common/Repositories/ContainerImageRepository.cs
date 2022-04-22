@@ -1,12 +1,13 @@
-﻿using System.Text.Json;
+using System.Text.Json;
+using Microsoft.Extensions.Logging;
 using Middleware.Common.Models;
-using Middleware.RedisInterface.Enums;
-using Middleware.RedisInterface.Repositories.Abstract;
+using Middleware.Common.Enums;
+using Middleware.Common.Repositories.Abstract;
 using NReJSON;
 using RedisGraphDotNet.Client;
 using StackExchange.Redis;
 
-namespace Middleware.RedisInterface.Repositories
+namespace Middleware.Common.Repositories
 {
     public class ContainerImageRepository : BaseRepository<ContainerImageModel>, IContainerImageRepository
     {
@@ -21,6 +22,10 @@ namespace Middleware.RedisInterface.Repositories
         {
             string model = (string)await Db.JsonGetAsync(id.ToString());
             ContainerImageModel currentModel = JsonSerializer.Deserialize<ContainerImageModel>(model);
+            if (currentModel == null)
+            {
+                return null;
+            }
             if (!string.IsNullOrEmpty(patch.Name))
             {
                 currentModel.Name = patch.Name;
@@ -36,7 +41,7 @@ namespace Middleware.RedisInterface.Repositories
             await Db.JsonSetAsync(id.ToString(), JsonSerializer.Serialize(currentModel));
             return currentModel;
         }
-        
+
         /// <inheritdoc/>
         public async Task<List<ContainerImageModel>> GetImagesForInstanceAsync(Guid instanceId)
         {

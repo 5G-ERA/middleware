@@ -1,11 +1,12 @@
 ﻿using System.Text.Json;
 using Middleware.Common.Models;
-using Middleware.RedisInterface.Enums;
+using Middleware.Common.Enums;
 using NReJSON;
 using RedisGraphDotNet.Client;
 using StackExchange.Redis;
+using Microsoft.Extensions.Logging;
 
-namespace Middleware.RedisInterface.Repositories
+namespace Middleware.Common.Repositories
 {
     public class PolicyRepository : BaseRepository<PolicyModel>, IPolicyRepository
     {
@@ -38,6 +39,10 @@ namespace Middleware.RedisInterface.Repositories
         {
             string model = (string)await Db.JsonGetAsync(id.ToString());
             PolicyModel currentModel = JsonSerializer.Deserialize<PolicyModel>(model);
+            if (currentModel == null)
+            {
+                return null;
+            }
             if (!string.IsNullOrEmpty(patch.Timestamp.ToString()))
             {
                 currentModel.Timestamp = patch.Timestamp;

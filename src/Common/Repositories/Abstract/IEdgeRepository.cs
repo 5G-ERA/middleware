@@ -1,6 +1,6 @@
 ﻿using Middleware.Common.Models;
 
-namespace Middleware.RedisInterface.Repositories.Abstract
+namespace Middleware.Common.Repositories.Abstract
 {
     public interface IEdgeRepository : IBaseRepository<EdgeModel>
     {

@@ -1,7 +1,8 @@
 ﻿using System.Net;
 using Microsoft.AspNetCore.Mvc;
 using Middleware.Common.Models;
-using Middleware.RedisInterface.Repositories;
+using Middleware.Common.Repositories.Abstract;
+using System.Net;
 
 namespace Middleware.RedisInterface.Controllers
 {
@@ -12,10 +13,10 @@ namespace Middleware.RedisInterface.Controllers
         private readonly IContainerImageRepository _containerImageRepository;
         private readonly ILogger _logger;
 
-        public ContainerImageController(IContainerImageRepository containerImageRepository, ILogger<ContainerImageController> logger)
+        public ContainerImageController(IContainerImageRepository containerImageRepository, ILogger<ActionController> logger)
         {
             _containerImageRepository = containerImageRepository ?? throw new ArgumentNullException(nameof(containerImageRepository));
-            _logger = logger;
+            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
         /// <summary>
@@ -24,11 +25,24 @@ namespace Middleware.RedisInterface.Controllers
         /// <returns> the list of ContainerImageModel entities </returns>
         [HttpGet(Name = "ContainerImageGetAll")]
         [ProducesResponseType(typeof(ContainerImageModel), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(string), (int)HttpStatusCode.NotFound)]
+        [ProducesResponseType(typeof(string), (int)HttpStatusCode.InternalServerError)]
         public async Task<ActionResult<IEnumerable<ContainerImageModel>>> GetAllAsync()
         {
-            List<ContainerImageModel> models = await _containerImageRepository.GetAllAsync();
-
-            return Ok(models);
+            try
+            {
+                List<ContainerImageModel> models = await _containerImageRepository.GetAllAsync();
+                if (models.Any() == false)
+                {
+                    return NotFound("Objects were not found.");
+                }
+                return Ok(models);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An error occurred:");
+                return Problem(ex.Message);
+            }
         }
 
         /// <summary>
@@ -39,11 +53,24 @@ namespace Middleware.RedisInterface.Controllers
         [HttpGet]
         [Route("{id}", Name = "ContainerImageGetbyId")]
         [ProducesResponseType(typeof(ContainerImageModel), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(string), (int)HttpStatusCode.NotFound)]
+        [ProducesResponseType(typeof(string), (int)HttpStatusCode.InternalServerError)]
         public async Task<IActionResult> GetByIdAsync(Guid id)
         {
-            ContainerImageModel model = await _containerImageRepository.GetByIdAsync(id);
-
-            return Ok(model);
+            try
+            {
+                ContainerImageModel model = await _containerImageRepository.GetByIdAsync(id);
+                if (model == null)
+                {
+                    return NotFound("Object was not found.");
+                }
+                return Ok(model);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An error occurred:");
+                return Problem(ex.Message);
+            }
         }
 
         /// <summary>
@@ -53,9 +80,23 @@ namespace Middleware.RedisInterface.Controllers
         /// <returns> the newly created ContainerImageModel entity </returns>
         [HttpPost(Name = "ContainerImageAdd")]
         [ProducesResponseType(typeof(ContainerImageModel), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(string), (int)HttpStatusCode.BadRequest)]
+        [ProducesResponseType(typeof(string), (int)HttpStatusCode.InternalServerError)]
         public async Task<ActionResult<ContainerImageModel>> AddAsync([FromBody] ContainerImageModel model)
         {
-            await _containerImageRepository.AddAsync(model);
+            if (model == null)
+            {
+                BadRequest("Parameters were not specified.");
+            }
+            try
+            {
+                await _containerImageRepository.AddAsync(model);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex.Message);
+                return Problem("Something went wrong while calling the API");
+            }
             return Ok(model);
         }
 
@@ -68,10 +109,24 @@ namespace Middleware.RedisInterface.Controllers
         [HttpPatch]
         [Route("{id}", Name = "ContainerImagePatch")]
         [ProducesResponseType(typeof(ContainerImageModel), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(string), (int)HttpStatusCode.NotFound)]
+        [ProducesResponseType(typeof(string), (int)HttpStatusCode.InternalServerError)]
         public async Task<IActionResult> PatchContainerImageAsync([FromBody] ContainerImageModel patch, [FromRoute] Guid id)
         {
-            ContainerImageModel model = await _containerImageRepository.PatchContainerImageAsync(id, patch);
-            return Ok(model);
+            try
+            {
+                ContainerImageModel model = await _containerImageRepository.PatchContainerImageAsync(id, patch);
+                if (model == null)
+                {
+                    return NotFound("Object to be updated was not found.");
+                }
+                return Ok(model);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An error occurred:");
+                return Problem(ex.Message);
+            }
         }
 
 
@@ -83,9 +138,18 @@ namespace Middleware.RedisInterface.Controllers
         [HttpDelete]
         [Route("{id}", Name = "ContainerImageDelete")]
         [ProducesResponseType(typeof(void), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(string), (int)HttpStatusCode.InternalServerError)]
         public async Task<ActionResult> DeleteByIdAsync(Guid id)
         {
-            await _containerImageRepository.DeleteByIdAsync(id);
+            try
+            {
+                await _containerImageRepository.DeleteByIdAsync(id);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An error occurred:");
+                return Problem(ex.Message);
+            }
             return Ok();
         }
 
@@ -93,21 +157,49 @@ namespace Middleware.RedisInterface.Controllers
         [HttpGet]
         [Route("relation/{name}", Name = "ContainerImageGetRelationByName")]
         [ProducesResponseType(typeof(List<RelationModel>), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(string), (int)HttpStatusCode.NotFound)]
+        [ProducesResponseType(typeof(string), (int)HttpStatusCode.InternalServerError)]
         public async Task<IActionResult> GetRelationAsync(Guid id, string name)
         {
-            var relations = await _containerImageRepository.GetRelation(id, name);
-            return Ok(relations);
+            try
+            {
+                var relations = await _containerImageRepository.GetRelation(id, name);
+                if (!relations.Any())
+                {
+                    return NotFound("Relations were not found.");
+                }
+                return Ok(relations);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An error occurred:");
+                return Problem(ex.Message);
+            }
         }
 
 
         [HttpGet]
         [Route("relations/{firstName}/{secondName}", Name = "ContainerImageGetRelationsByName")]
         [ProducesResponseType(typeof(List<RelationModel>), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(string), (int)HttpStatusCode.NotFound)]
+        [ProducesResponseType(typeof(string), (int)HttpStatusCode.InternalServerError)]
         public async Task<IActionResult> GetRelationsAsync(Guid id, string firstName, string secondName)
         {
-            List<string> relationNames = new List<string>() { firstName, secondName };
-            var relations = await _containerImageRepository.GetRelations(id, relationNames);
-            return Ok(relations);
+            try
+            {
+                List<string> relationNames = new List<string>() { firstName, secondName };
+                var relations = await _containerImageRepository.GetRelations(id, relationNames);
+                if (!relations.Any())
+                {
+                    return NotFound("Relations were not found");
+                }
+                return Ok(relations);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An error occurred:");
+                return Problem(ex.Message);
+            }
         }
 
         /// <summary>

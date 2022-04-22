@@ -5,14 +5,14 @@ services:
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
       - ASPNETCORE_URLS=https://+:443;http://+:80      
-      - ASPNETCORE_HTTPS_PORT=7081
+      - ASPNETCORE_HTTPS_PORT=7091
       #- ASPNETCORE_Kestrel__Certificates__Default__Password=ros
       #- ASPNETCORE_Kestrel__Certificates__Default__Path=/https/aspnetapp.pfx
       - REDIS_HOSTNAME=${REDIS_HOSTNAME}
       - REDIS_PORT=${REDIS_PORT}
     ports:
-      - "5081:80"
-      - "7081:443"
+      - "5091:80"
+      - "7091:443"
     volumes:
       - ${APPDATA}/Microsoft/UserSecrets:/root/.microsoft/usersecrets:ro
       - ${APPDATA}/ASP.NET/Https:/root/.aspnet/https:ro
@@ -27,8 +27,8 @@ services:
       - REDIS_INTERFACE_ADDRESS=http://redisinterface.api
       - AWS_IMAGE_REGISTRY=${AWS_IMAGE_REGISTRY}
     ports:
-      - "5026:80"
-      - "7026:443"
+      - "5036:80"
+      - "7036:443"
     volumes:
       - ${APPDATA}/Microsoft/UserSecrets:/root/.microsoft/usersecrets:ro
       - ${APPDATA}/ASP.NET/Https:/root/.aspnet/https:ro
@@ -41,8 +41,8 @@ services:
       - REDIS_INTERFACE_ADDRESS=http://redisinterface.api
       - RESOURCE_PLANNER_ADDRESS=http://resourceplanner.api
     ports:
-      - "80"
-      - "443"
+      - "5143:80"
+      - "7094:443"
     volumes:
       - ${APPDATA}/Microsoft/UserSecrets:/root/.microsoft/usersecrets:ro
       - ${APPDATA}/ASP.NET/Https:/root/.aspnet/https:ro
@@ -53,19 +53,22 @@ services:
       - ASPNETCORE_URLS=https://+:443;http://+:80
       - REDIS_INTERFACE_ADDRESS=http://redisinterface.api
     ports:
-      - "80"
-      - "443"
+      - "5263:80"
+      - "7263:443"
     volumes:
       - ${APPDATA}/Microsoft/UserSecrets:/root/.microsoft/usersecrets:ro
       - ${APPDATA}/ASP.NET/Https:/root/.aspnet/https:ro
 
   ocelotgateway:
+
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
       - ASPNETCORE_URLS=https://+:443;http://+:80
+      - REDIS_HOSTNAME=${REDIS_HOSTNAME}
+      - REDIS_PORT=${REDIS_PORT}
     ports:
-      - "80"
-      - "443"
+      - "5047:80"
+      - "7047:443"
     volumes:
       - ${APPDATA}/Microsoft/UserSecrets:/root/.microsoft/usersecrets:ro
       - ${APPDATA}/ASP.NET/Https:/root/.aspnet/https:ro

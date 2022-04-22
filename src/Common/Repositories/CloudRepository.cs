@@ -1,12 +1,13 @@
 using Middleware.Common.Models;
-using Middleware.RedisInterface.Enums;
-using Middleware.RedisInterface.Repositories.Abstract;
+using Middleware.Common.Enums;
+using Middleware.Common.Repositories.Abstract;
 using NReJSON;
 using RedisGraphDotNet.Client;
 using StackExchange.Redis;
 using System.Text.Json;
+using Microsoft.Extensions.Logging;
 
-namespace Middleware.RedisInterface.Repositories
+namespace Middleware.Common.Repositories
 {
     public class CloudRepository : BaseRepository<CloudModel>, ICloudRepository
     {
@@ -18,6 +19,10 @@ namespace Middleware.RedisInterface.Repositories
         {
             string model = (string)await Db.JsonGetAsync(id.ToString());
             CloudModel currentModel = JsonSerializer.Deserialize<CloudModel>(model);
+            if (currentModel == null)
+            {
+                return null;
+            }
             if (!string.IsNullOrEmpty(patch.CloudStatus))
             {
                 currentModel.CloudStatus = patch.CloudStatus;

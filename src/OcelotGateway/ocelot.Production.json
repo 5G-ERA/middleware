@@ -6,7 +6,7 @@
       "DownstreamScheme": "http",
       "DownstreamHostAndPorts": [
         {
-          "Host": "ocelotgateway.api",
+          "Host": "gateway.middleware.svc.cluster.local",
           "Port": "80"
         }
       ],
@@ -18,7 +18,7 @@
       "DownstreamScheme": "http",
       "DownstreamHostAndPorts": [
         {
-          "Host": "ocelotgateway.api",
+          "Host": "gateway.middleware.svc.cluster.local",
           "Port": "80"
         }
       ],
@@ -31,7 +31,7 @@
       "DownstreamScheme": "http",
       "DownstreamHostAndPorts": [
         {
-          "Host": "redisinterface.api",
+          "Host": "redis-interface-api.middleware.svc.cluster.local",
           "Port": "80"
         }
       ],
@@ -48,7 +48,7 @@
       "DownstreamScheme": "http",
       "DownstreamHostAndPorts": [
         {
-          "Host": "taskplanner.api",
+          "Host": "task-planner-api.middleware.svc.cluster.local",
           "Port": "80"
         }
       ],
@@ -65,7 +65,7 @@
       "DownstreamScheme": "http",
       "DownstreamHostAndPorts": [
         {
-          "Host": "orchestrator.api",
+          "Host": "orchestrator-api.middleware.svc.cluster.local",
           "Port": "80"
         }
       ],
@@ -80,5 +80,4 @@
   "GlobalConfiguration": {
     "BaseUrl": "https://localhost:5047"
   }
-
 }

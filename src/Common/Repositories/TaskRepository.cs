@@ -1,11 +1,12 @@
 ﻿using System.Text.Json;
 using Middleware.Common.Models;
-using Middleware.RedisInterface.Enums;
+using Middleware.Common.Enums;
 using NReJSON;
 using RedisGraphDotNet.Client;
 using StackExchange.Redis;
+using Microsoft.Extensions.Logging;
 
-namespace Middleware.RedisInterface.Repositories
+namespace Middleware.Common.Repositories
 {
     public class TaskRepository : BaseRepository<TaskModel>,  ITaskRepository   
     {
@@ -17,6 +18,10 @@ namespace Middleware.RedisInterface.Repositories
         {
             string model = (string)await Db.JsonGetAsync(id.ToString());
             TaskModel currentModel = JsonSerializer.Deserialize<TaskModel>(model);
+            if (currentModel == null)
+            {
+                return null;
+            }
             if (!string.IsNullOrEmpty(patch.TaskPriority.ToString()))
             {
                 currentModel.TaskPriority = patch.TaskPriority;

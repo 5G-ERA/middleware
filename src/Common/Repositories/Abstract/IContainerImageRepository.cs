@@ -1,6 +1,6 @@
 ﻿using Middleware.Common.Models;
 
-namespace Middleware.RedisInterface.Repositories
+namespace Middleware.Common.Repositories.Abstract
 {
     public interface IContainerImageRepository : IBaseRepository<ContainerImageModel>
     {

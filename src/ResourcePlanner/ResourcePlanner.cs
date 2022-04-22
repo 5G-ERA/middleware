@@ -54,7 +54,7 @@ namespace Middleware.ResourcePlanner
             // iterate throught actions in actionSequence
             foreach (ActionModel action in actionSequence)
             {
-                List<RedisInterface.RelationModel> imagesTmp = (await _redisApiClient.ActionGetRelationByNameAsync(action.Id, "OWNS")).ToList();
+                List<RedisInterface.RelationModel> imagesTmp = (await _redisApiClient.ActionGetRelationByNameAsync(action.Id, "NEEDS")).ToList();
                 List<RelationModel> images = new List<RelationModel>();
                 foreach (RedisInterface.RelationModel imgTmp in imagesTmp)
                 {

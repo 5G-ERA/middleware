@@ -8,7 +8,7 @@ local index = 0
 
 for value,key in ipairs(matches) do
 
-    local PolicyId = redis.call('json.get', key, 'Policy_Id')
+    local PolicyId = redis.call('json.get', key, 'Id')
          local IsActive = redis.call('json.get', key, 'IsActive')
          local PolicyAllObject = redis.call('json.get',key)
          if (IsActive =="true") then table.insert(ActivePoliciesArray,PolicyAllObject) end
