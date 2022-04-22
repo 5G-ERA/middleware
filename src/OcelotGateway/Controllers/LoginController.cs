@@ -1,13 +1,10 @@
-﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
-using Middleware.Common.Repositories;
-using Middleware.Common.Models;
-using Middleware.OcelotGateway.Services;
-using Middleware.Common.Repositories.Abstract;
-using System;
-using System.Security.Cryptography;
+﻿using System.Security.Cryptography;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Cryptography.KeyDerivation;
+using Microsoft.AspNetCore.Mvc;
+using Middleware.Common.Models;
+using Middleware.Common.Repositories.Abstract;
+using Middleware.OcelotGateway.Services;
 
 namespace Middleware.OcelotGateway.Controllers
 {
@@ -17,11 +14,13 @@ namespace Middleware.OcelotGateway.Controllers
     {
         private readonly IUserRepository _userRepository;
         private readonly ILogger _logger;
+        
 
         public LoginController(IUserRepository userRepository, ILogger<LoginController> logger)
         {
             _userRepository = userRepository ?? throw new ArgumentNullException(nameof(userRepository));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+            
         }
 
 
@@ -37,12 +36,9 @@ namespace Middleware.OcelotGateway.Controllers
             }
             try
             {
-                byte[] salt = new byte[128 / 8];
-                using (var rngCsp = new RNGCryptoServiceProvider())
-                {
-                    rngCsp.GetNonZeroBytes(salt);
-                }
+                byte[] salt = RandomNumberGenerator.GetBytes(128 / 8);
                 register.Salt = Convert.ToBase64String(salt);
+
                 string hashedPassword = Convert.ToBase64String(KeyDerivation.Pbkdf2(
                 password: register.Password,
                 salt: salt,
@@ -90,15 +86,7 @@ namespace Middleware.OcelotGateway.Controllers
                 prf: KeyDerivationPrf.HMACSHA256,
                 iterationCount: 100000,
                 numBytesRequested: 256 / 8));
-            return (computedHashedPassword.Equals(storedCredentials.Password)) ? true : false;
-
-
-            /*if (login.Id.ToString() == "1e309941-4cbb-47e9-98ef-c2e38b5f157b") 
-            {
-                user = new UserModel() { Id = Guid.Parse("1e309941-4cbb-47e9-98ef-c2e38b5f157b"), Password = "password" };
-            }
-            return user;*/
-            //return user;
+            return (computedHashedPassword.Equals(storedCredentials.Password)) ? true : false; 
         }
     }
 }
