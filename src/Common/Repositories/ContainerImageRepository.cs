@@ -1,18 +1,20 @@
-﻿using Middleware.Common.Models;
-using Middleware.Common.Enums;
-using Middleware.Common.Repositories.Abstract;
+using System.Text.Json;
+using Middleware.Common.Models;
+using Middleware.RedisInterface.Enums;
+using Middleware.RedisInterface.Repositories.Abstract;
 using NReJSON;
 using RedisGraphDotNet.Client;
 using StackExchange.Redis;
-using System.Text.Json;
-using Microsoft.Extensions.Logging;
 
 namespace Middleware.Common.Repositories
 {
     public class ContainerImageRepository : BaseRepository<ContainerImageModel>, IContainerImageRepository
     {
-        public ContainerImageRepository(IConnectionMultiplexer redisClient, IRedisGraphClient redisGraph, ILogger<ContainerImageRepository> logger) : base(RedisDbIndexEnum.Container, redisClient, redisGraph, logger)
+        private readonly IInstanceRepository _instanceRepository;
+
+        public ContainerImageRepository(IInstanceRepository instanceRepository, IConnectionMultiplexer redisClient, IRedisGraphClient redisGraph, ILogger<ContainerImageRepository> logger) : base(RedisDbIndexEnum.Container, redisClient, redisGraph, logger)
         {
+            _instanceRepository = instanceRepository;
         }
 
         public async Task<ContainerImageModel> PatchContainerImageAsync(Guid id, ContainerImageModel patch)
@@ -39,5 +41,21 @@ namespace Middleware.Common.Repositories
             return currentModel;
         }
 
+        /// <inheritdoc/>
+        public async Task<List<ContainerImageModel>> GetImagesForInstanceAsync(Guid instanceId)
+        {
+
+            List<RelationModel> imageRelations = await _instanceRepository.GetRelation(instanceId, "needs");
+
+            List<Guid> actionIds = imageRelations.Select(i => i.PointsTo.Id).ToList();
+
+            List<ContainerImageModel> images = new();
+            foreach (var id in actionIds)
+            {
+                images.Add(await GetByIdAsync(id));
+            }
+
+            return images;
+        }
     }
 }

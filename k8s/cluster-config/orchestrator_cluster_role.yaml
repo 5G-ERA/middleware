@@ -2,7 +2,7 @@
 kind: ClusterRole
 apiVersion: rbac.authorization.k8s.io/v1
 metadata:
-  #namespace: middleware # not used as the ClusterRole is cluster wide
+  namespace: middleware # not used as the ClusterRole is cluster wide
   name: orchestrator
 rules:
 - apiGroups: [""]

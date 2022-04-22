@@ -2,7 +2,7 @@
 using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 using Middleware.Orchestrator.ApiReference;
-using Middleware.Orchestrator.Osm;
+using Middleware.Orchestrator.Deployment;
 using Middleware.Orchestrator.RedisInterface;
 using ActionModel = Middleware.Common.Models.ActionModel;
 using InstanceModel = Middleware.Common.Models.InstanceModel;
@@ -14,12 +14,16 @@ namespace Middleware.Orchestrator.Controllers;
 [Route("api/v1/[controller]")]
 public class OrchestrateController : Controller
 {
+    private readonly IDeploymentService _deploymentService;
     private readonly IMapper _mapper;
+    private readonly ILogger _logger;
     private readonly RedisApiClient _client;
 
-    public OrchestrateController(IApiClientBuilder apiClientBuilder, IMapper mapper)
+    public OrchestrateController(IDeploymentService deploymentService, IApiClientBuilder apiClientBuilder, IMapper mapper, ILogger<OrchestrateController> logger)
     {
+        _deploymentService = deploymentService;
         _mapper = mapper;
+        _logger = logger;
         _client = apiClientBuilder.CreateRedisApiClient();
     }
 
@@ -33,7 +37,27 @@ public class OrchestrateController : Controller
     [ProducesResponseType(typeof(TaskModel), (int)HttpStatusCode.OK)]
     public async Task<IActionResult> InstantiateNewPlan([FromBody] TaskModel task)
     {
-        //TODO: instantiate new plan
+
+        if (task is null)
+        {
+            return BadRequest("Plan is not specified");
+        }
+
+        try
+        {
+            var result = await _deploymentService.DeployAsync(task);
+            if (result == false)
+            {
+                //TODO: provide more detailed information on what went wrong with the deployment of the task
+                return Problem("There was a problem while deploying the task instance: {ex");
+            }
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "There was a problem while deploying the task instance: {task}", task);
+            return Problem("There was a problem while deploying the task instance: {ex}", ex.Message);
+        }
+
         return Ok(task);
     }
 

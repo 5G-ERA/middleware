@@ -1,41 +1,86 @@
 ﻿using k8s;
+using Middleware.Common;
 using Middleware.Orchestrator.Exceptions;
 
 namespace Middleware.Orchestrator.Deployment
 {
     public class KubernetesBuilder : IKubernetesBuilder
     {
+        public static string ServiceAccountPath =
+            Path.Combine(new string[]
+            {
+                $"{Path.DirectorySeparatorChar}var", "run", "secrets", "kubernetes.io", "serviceaccount",
+            });
+       internal static string KubeConfigPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), ".kube", "config");
+       internal const string ServiceAccountTokenKeyFileName = "token";
+       internal const string ServiceAccountRootCAKeyFileName = "ca.crt";
+       internal const string ServiceAccountNamespaceFileName = "namespace";
+
         private const string KubernetesServiceHost = "KUBERNETES_SERVICE_HOST";
         private const string KubernetesServicePort = "KUBERNETES_SERVICE_PORT";
 
         private readonly ILogger<KubernetesBuilder> _logger;
+        private readonly IEnvironment _env;
 
-        public KubernetesBuilder(ILogger<KubernetesBuilder> logger)
+        public KubernetesBuilder(ILogger<KubernetesBuilder> logger, IEnvironment env)
         {
             _logger = logger;
+            _env = env;
         }
 
-        /// <summary>
-        /// Initializes the Kubernetes Client
-        /// </summary>
-        /// <returns></returns>
+        /// <inheritdoc />
         public IKubernetes CreateKubernetesClient()
         {
             _logger.LogDebug("Started creation of K8s client");
-            if (IsK8sEnv() == false)
+
+            var isValidInCLusterConfig = IsValidInClusterConfig();
+            if (isValidInCLusterConfig == false && _env.FileExists(KubeConfigPath) == false)
             {
                 _logger.LogDebug("Not in K8s environment");
-                throw new NotInK8sEnvironmentException();
+                throw new NotInK8SEnvironmentException();
             }
-            var config = KubernetesClientConfiguration.BuildDefaultConfig();
-            //var config2 = KubernetesClientConfiguration.
+
+            var config = isValidInCLusterConfig
+                ? KubernetesClientConfiguration.InClusterConfig()
+                : KubernetesClientConfiguration.BuildConfigFromConfigFile(KubeConfigPath);
+
             return new Kubernetes(config);
         }
 
-        private bool IsK8sEnv()
+        /// <inheritdoc />
+        public bool IsValidInClusterConfig()
         {
-            var host = Environment.GetEnvironmentVariable(KubernetesServiceHost);
-            var port = Environment.GetEnvironmentVariable(KubernetesServicePort);
+            var retVal = IsK8SEnv();
+
+            var exists = _env.DirectoryExists(ServiceAccountPath);
+
+            _logger.LogDebug("K8s ServiceAccountPath exists {exists}", exists);
+
+            if (retVal == false)
+            {
+                return false;
+            }
+
+            var fileNames = _env.GetFileNamesInDir(ServiceAccountPath);
+
+            var filesExist = fileNames.Contains(ServiceAccountTokenKeyFileName)
+                             && fileNames.Contains(ServiceAccountRootCAKeyFileName)
+                             && fileNames.Contains(ServiceAccountNamespaceFileName);
+
+            _logger.LogDebug("K8s ServiceAccount files exist {filesExist}", filesExist);
+            retVal &= exists && filesExist;
+
+            return retVal;
+
+        }
+
+        private bool IsK8SEnv()
+        {
+            var host = _env.GetEnvVariable(KubernetesServiceHost);
+            var port = _env.GetEnvVariable(KubernetesServicePort);
+            _logger.LogDebug("K8s {env} has value {value}", KubernetesServiceHost, host);
+            _logger.LogDebug("K8s {env} has value {value}", KubernetesServicePort, port);
+
             return string.IsNullOrEmpty(host) == false && string.IsNullOrEmpty(port) == false;
         }
     }

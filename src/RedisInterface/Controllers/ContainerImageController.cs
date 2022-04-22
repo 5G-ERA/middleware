@@ -1,5 +1,4 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.JsonPatch;
+﻿using System.Net;
 using Microsoft.AspNetCore.Mvc;
 using Middleware.Common.Models;
 using Middleware.Common.Repositories.Abstract;
@@ -200,6 +199,33 @@ namespace Middleware.RedisInterface.Controllers
             {
                 _logger.LogError(ex, "An error occurred:");
                 return Problem(ex.Message);
+            }
+        }
+
+        /// <summary>
+        /// Gets the images associated with the specified instance
+        /// </summary>
+        /// <param name="id">Identifier of the instance</param>
+        /// <returns></returns>
+        [HttpGet]
+        [Route("instance/{id}", Name = "ContainerImageGetForInstance")]
+        [ProducesResponseType(typeof(List<ContainerImageModel>), (int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.NotFound)]
+        public async Task<IActionResult> GetImagesForInstanceAsync(Guid id)
+        {
+            try
+            {
+                var images = await _containerImageRepository.GetImagesForInstanceAsync(id);
+                if (images.Any() == false)
+                {
+                    return NotFound();
+                }
+                return Ok(images);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An unexpected error has happened: ");
+                return Problem($"An unexpected error has occurred: {ex.Message}");
             }
         }
     }

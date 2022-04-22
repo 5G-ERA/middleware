@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: redis-interface-api
+spec:
+  type: ClusterIP
+  selector:
+    name: redis-interface-api
+  ports:
+  - port: 80
+    targetPort: 80
+    name: http
+  - port: 433
+    targetPort: 433
+    name: https

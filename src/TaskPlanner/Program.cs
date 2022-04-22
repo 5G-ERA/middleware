@@ -1,7 +1,7 @@
+using Middleware.Common.ExtensionMethods;
 using Middleware.TaskPlanner;
 using Middleware.TaskPlanner.ApiReference;
 using Middleware.TaskPlanner.Config;
-using Middleware.TaskPlanner.RedisInterface;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -15,6 +15,8 @@ builder.Services.ConfigureAutoMapper();
 
 builder.Services.AddHttpClient("redisApiClient");
 builder.Services.AddHttpClient("resourcePlannerApiClient");
+builder.Services.AddHttpClient("orchestratorApiClient");
+builder.Services.RegisterCommonServices();
 builder.Services.AddScoped<IApiClientBuilder, ApiClientBuilder>();
 builder.Services.AddScoped<IActionPlanner, ActionPlanner>();
 
