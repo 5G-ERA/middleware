@@ -7,6 +7,8 @@ services:
     build:
       context: .
       dockerfile: src/RedisInterface/Dockerfile
+    networks: 
+      - middleware
 
   orchestrator:
     container_name: orchestrator.api
@@ -14,6 +16,8 @@ services:
     build:
       context: .
       dockerfile: src/Orchestrator/Dockerfile
+    networks: 
+      - middleware
 
 
   taskplanner:
@@ -22,6 +26,8 @@ services:
     build:
       context: .
       dockerfile: src/TaskPlanner/Dockerfile
+    networks: 
+      - middleware
 
 
   resourceplanner:
@@ -30,6 +36,8 @@ services:
     build:
       context: .
       dockerfile: src/ResourcePlanner/Dockerfile
+    networks: 
+      - middleware
 
 
   ocelotgateway:
@@ -38,4 +46,12 @@ services:
     build:
       context: .
       dockerfile: src/OcelotGateway/Dockerfile
+    networks: 
+      - middleware
+
+
+networks:
+     middleware:
+       driver: bridge
+       name: middleware_network
 

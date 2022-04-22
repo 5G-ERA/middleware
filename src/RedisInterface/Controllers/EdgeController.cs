@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Middleware.Common.Models;
-using Middleware.RedisInterface.Repositories.Abstract;
+using Middleware.Common.Repositories.Abstract;
 using System.Net;
 
 namespace Middleware.RedisInterface.Controllers
@@ -25,6 +25,8 @@ namespace Middleware.RedisInterface.Controllers
         /// <returns> the list of EdgeModel entities </returns>
         [HttpGet(Name = "EdgeGetAll")]
         [ProducesResponseType(typeof(EdgeModel), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(string), (int)HttpStatusCode.NotFound)]
+        [ProducesResponseType(typeof(string), (int)HttpStatusCode.InternalServerError)]
         public async Task<ActionResult<IEnumerable<EdgeModel>>> GetAllAsync()
         {
             try
@@ -51,6 +53,8 @@ namespace Middleware.RedisInterface.Controllers
         [HttpGet]
         [Route("{id}", Name = "EdgeGetById")]
         [ProducesResponseType(typeof(EdgeModel), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(string), (int)HttpStatusCode.NotFound)]
+        [ProducesResponseType(typeof(string), (int)HttpStatusCode.InternalServerError)]
         public async Task<IActionResult> GetByIdAsync(Guid id)
         {
             try
@@ -76,6 +80,8 @@ namespace Middleware.RedisInterface.Controllers
         /// <returns> the newly created EdgeModel entity </returns>
         [HttpPost(Name = "EdgeAdd")]
         [ProducesResponseType(typeof(EdgeModel), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(string), (int)HttpStatusCode.BadRequest)]
+        [ProducesResponseType(typeof(string), (int)HttpStatusCode.InternalServerError)]
         public async Task<ActionResult<EdgeModel>> AddAsync([FromBody] EdgeModel model)
         {
             if (model == null)
@@ -104,6 +110,8 @@ namespace Middleware.RedisInterface.Controllers
         [HttpPatch]
         [Route("{id}", Name = "EdgePatch")]
         [ProducesResponseType(typeof(EdgeModel), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(string), (int)HttpStatusCode.NotFound)]
+        [ProducesResponseType(typeof(string), (int)HttpStatusCode.InternalServerError)]
         public async Task<IActionResult> PatchEdgeAsync([FromBody] EdgeModel patch, [FromRoute] Guid id)
         {
 
@@ -132,6 +140,7 @@ namespace Middleware.RedisInterface.Controllers
         [HttpDelete]
         [Route("{id}", Name = "EdgeDelete")]
         [ProducesResponseType(typeof(void), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(string), (int)HttpStatusCode.InternalServerError)]
         public async Task<ActionResult> DeleteByIdAsync(Guid id)
         {
             try
@@ -149,12 +158,14 @@ namespace Middleware.RedisInterface.Controllers
         [HttpGet]
         [Route("relation/{name}", Name = "EdgeGetRelationByName")]
         [ProducesResponseType(typeof(List<RelationModel>), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(string), (int)HttpStatusCode.NotFound)]
+        [ProducesResponseType(typeof(string), (int)HttpStatusCode.InternalServerError)]
         public async Task<IActionResult> GetRelationAsync(Guid id, string name)
         {
             try
             {
                 var relations = await _edgeRepository.GetRelation(id, name);
-                if (relations.Any())
+                if (!relations.Any())
                 {
                     return NotFound("Relations were not found.");
                 }
@@ -171,13 +182,15 @@ namespace Middleware.RedisInterface.Controllers
         [HttpGet]
         [Route("relations/{firstName}/{secondName}", Name = "EdgeGetRelationsByName")]
         [ProducesResponseType(typeof(List<RelationModel>), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(string), (int)HttpStatusCode.NotFound)]
+        [ProducesResponseType(typeof(string), (int)HttpStatusCode.InternalServerError)]
         public async Task<IActionResult> GetRelationsAsync(Guid id, string firstName, string secondName)
         {
             try
             {
                 List<string> relationNames = new List<string>() { firstName, secondName };
                 var relations = await _edgeRepository.GetRelations(id, relationNames);
-                if (relations.Any())
+                if (!relations.Any())
                 {
                     return NotFound("Relations were not found");
                 }

@@ -1,6 +1,6 @@
 using Middleware.RedisInterface;
-using Middleware.RedisInterface.Repositories;
-using Middleware.RedisInterface.Repositories.Abstract;
+using Middleware.Common.Repositories;
+using Middleware.Common.Repositories.Abstract;
 using RedisGraphDotNet.Client;
 using Serilog;
 using StackExchange.Redis;
