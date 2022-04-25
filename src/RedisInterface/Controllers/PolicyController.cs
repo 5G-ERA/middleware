@@ -96,7 +96,7 @@ namespace Middleware.RedisInterface.Controllers
                 {
                     return NotFound("Object was not found.");
                 }
-                List<ActivePolicy> activePoliciesRecords = activePolicies.Select(p => new ActivePolicy(p.Id, p.PolicyName, p.Description)).ToList();
+                List<ActivePolicy> activePoliciesRecords = activePolicies.Select(p => new ActivePolicy(p.Id, p.Name, p.Description)).ToList();
                 return Ok(activePoliciesRecords);     
             }
             catch (Exception ex) 
