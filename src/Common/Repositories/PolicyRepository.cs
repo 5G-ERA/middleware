@@ -55,9 +55,9 @@ namespace Middleware.Common.Repositories
             {
                 currentModel.Description = patch.Description;
             }
-            if (!string.IsNullOrEmpty(patch.PolicyName))
+            if (!string.IsNullOrEmpty(patch.Name))
             {
-                currentModel.PolicyName = patch.PolicyName;
+                currentModel.Name = patch.Name;
             }
             await Db.JsonSetAsync(id.ToString(), JsonSerializer.Serialize(currentModel));
             return currentModel;

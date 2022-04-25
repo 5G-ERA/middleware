@@ -7,6 +7,9 @@ public class InstanceModel : BaseModel
     [JsonPropertyName("Id")]
     public override Guid Id { get; set; }
 
+    [JsonPropertyName("InstanceName")]
+    public override string Name { get; set; }
+
     [JsonPropertyName("ImageName")]
     public string ImageName { get; set; }
 

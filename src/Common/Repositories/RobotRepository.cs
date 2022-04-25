@@ -23,9 +23,9 @@ namespace Middleware.Common.Repositories
             {
                 return null;
             }
-            if (!string.IsNullOrEmpty(patch.RobotName))
+            if (!string.IsNullOrEmpty(patch.Name))
             {
-                currentModel.RobotName = patch.RobotName;
+                currentModel.Name = patch.Name;
             }
             if (!string.IsNullOrEmpty(patch.Manufacturer))
             {

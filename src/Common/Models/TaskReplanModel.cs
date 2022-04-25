@@ -12,6 +12,9 @@ namespace Middleware.Common.Models
         [JsonPropertyName("Id")]
         public override Guid Id { get; set; }
 
+        [JsonPropertyName("TaskReplanName")]
+        public override string Name { get; set; }
+
         [JsonPropertyName("ActionPlanId")]
         public Guid ActionPlanId { get; set; }
 

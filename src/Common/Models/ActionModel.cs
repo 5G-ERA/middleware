@@ -6,6 +6,10 @@ public class ActionModel : BaseModel
 {
     [JsonPropertyName("Id")]
     public override Guid Id { get; set; }
+
+    [JsonPropertyName("ActionName")]
+    public override string Name { get; set; }
+
     [JsonPropertyName("ActionFamily")]
     public string ActionFamily { get; set; }
     [JsonPropertyName("Order")]
@@ -16,10 +20,6 @@ public class ActionModel : BaseModel
 
     [JsonPropertyName("ActionPriority")]
     public string ActionPriority { get; set; }
-
-    [JsonPropertyName("ImageName")]
-
-    public string ImageName { get; set; } 
 
     [JsonPropertyName("Services")]
     public List<InstanceModel> Services { get; set; }

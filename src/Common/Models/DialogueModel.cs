@@ -7,6 +7,9 @@ public class DialogueModel : BaseModel
     [JsonPropertyName("Id")]
     public override Guid Id { get; set; }
 
+    [JsonPropertyName("DialogueName")]
+    public override string Name { get; set; }
+
     [JsonPropertyName("Question")]
     public string Question { get; set; }
 

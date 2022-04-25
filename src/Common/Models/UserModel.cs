@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.Text.Json.Serialization;
 
 namespace Middleware.Common.Models
 {
@@ -9,7 +10,10 @@ namespace Middleware.Common.Models
 
         [Required]
         public string Password { get; set; }
-        
+
+        [JsonPropertyName("UserName")]
+        public override string Name { get; set; }
+
         public string Salt { get; set; }    
         
     }

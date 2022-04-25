@@ -10,6 +10,9 @@ public class PolicyModel : BaseModel
     [JsonPropertyName("Id")]
     public override Guid Id { get; set; }
 
+    [JsonPropertyName("PolicyName")]
+    public override string Name { get; set; }
+
     [JsonPropertyName("Timestamp")]
     public DateTime Timestamp { get; set; }
 
@@ -18,7 +21,4 @@ public class PolicyModel : BaseModel
 
     [JsonPropertyName("Description")]
     public string Description { get; set; }
-
-    [JsonPropertyName("PolicyName")]
-    public string PolicyName { get; set; }
 }

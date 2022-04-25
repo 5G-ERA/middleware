@@ -30,7 +30,15 @@ namespace Middleware.Common.Repositories
         {
             model.Id = Guid.NewGuid();
             await Db.JsonSetAsync(model.Id.ToString(), JsonSerializer.Serialize(model));
-            return model;
+            GraphEntityModel newGraphModel = new GraphEntityModel();
+            newGraphModel.Id = model.Id;
+            newGraphModel.Name = model.Name;
+            bool isValid = await AddGraphAsync(newGraphModel);
+            if (isValid == true) 
+            {
+                return model;
+            }
+            return null;
         }
 
         public async Task<T> GetByIdAsync(Guid id)
@@ -164,6 +172,24 @@ namespace Middleware.Common.Repositories
             }
             return relations;
         }
+
+
+        public async Task<bool> AddGraphAsync(GraphEntityModel model) 
+        {
+            
+            model.Type = _redisDbIndex.ToString().ToUpper();
+           
+            string query = "CREATE (x: " + model.Type + " {ID: '" + model.Id +"', Type: '" + model.Type + "', Name: '" + model.Name + "'})";
+            ResultSet resultSet = await RedisGraph.Query("RESOURCE_PLANNER", query);
+            if (resultSet == null || resultSet.Metrics.NodesCreated != 1) 
+            {
+                return false;
+            }
+            return true;
+        }
+
+
+        
 
         /// <summary>
         /// Sets the values for the <see cref="GraphEntityModel"/> from the specified node

@@ -7,8 +7,8 @@ public class ContainerImageModel : BaseModel
     [JsonPropertyName("Id")]
     public override Guid Id { get; set; }
 
-    [JsonPropertyName("Name")]
-    public string Name { get; set; }
+    [JsonPropertyName("ContainerImageName")]
+    public override string Name { get; set; }
 
     [JsonPropertyName("Timestamp")]
     public string Timestamp { get; set; }
