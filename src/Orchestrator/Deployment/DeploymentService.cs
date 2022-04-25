@@ -230,7 +230,7 @@ public class DeploymentService : IDeploymentService
         {
             Name = name,
             Image = K8SImageHelper.BuildImageName(_awsRegistryName, name, "latest"),
-            ImagePullPolicy = AppConfig.AppConfiguration == "Release" && name == "redis-interface-api" ? "Always" : "Never",
+            ImagePullPolicy = AppConfig.AppConfiguration == "Release" ? "Always" : "IfNotPresent",
             Env = envList,
             Ports = new List<V1ContainerPort>() { new(80), new(433) }
         };

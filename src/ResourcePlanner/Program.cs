@@ -1,3 +1,4 @@
+using Middleware.Common.ExtensionMethods;
 using Middleware.ResourcePlanner;
 using Middleware.ResourcePlanner.Config;
 
@@ -10,6 +11,7 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.ConfigureAutoMapper();
+builder.Services.RegisterCommonServices();
 builder.Services.AddHttpClient("healthCheckClient");
 builder.Services.AddScoped<IResourcePlanner, ResourcePlanner>();
 

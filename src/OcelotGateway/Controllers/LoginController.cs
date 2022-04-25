@@ -19,8 +19,7 @@ namespace Middleware.OcelotGateway.Controllers
         public LoginController(IUserRepository userRepository, ILogger<LoginController> logger)
         {
             _userRepository = userRepository ?? throw new ArgumentNullException(nameof(userRepository));
-            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-            
+            _logger = logger ?? throw new ArgumentNullException(nameof(logger));   
         }
 
 
@@ -39,13 +38,7 @@ namespace Middleware.OcelotGateway.Controllers
                 byte[] salt = RandomNumberGenerator.GetBytes(128 / 8);
                 register.Salt = Convert.ToBase64String(salt);
 
-                string hashedPassword = Convert.ToBase64String(KeyDerivation.Pbkdf2(
-                password: register.Password,
-                salt: salt,
-                prf: KeyDerivationPrf.HMACSHA256,
-                iterationCount: 100000,
-                numBytesRequested: 256 / 8));
-                register.Password = hashedPassword;
+                register.Password = ComputeHashPassword(register.Password, salt);
         
                 await _userRepository.AddAsync(register);
             }
@@ -80,13 +73,22 @@ namespace Middleware.OcelotGateway.Controllers
         {
             UserModel storedCredentials = await _userRepository.GetByIdAsync(login.Id);
             byte[] salt = Convert.FromBase64String(storedCredentials.Salt);
-            string computedHashedPassword = Convert.ToBase64String(KeyDerivation.Pbkdf2(
-                password: login.Password,
+            
+            string computedHashedPassword = ComputeHashPassword(login.Password, salt);
+
+            return computedHashedPassword.Equals(storedCredentials.Password) ? true : false; 
+        }
+
+
+        private string ComputeHashPassword(string clearTextPassword, byte[] salt) 
+        {
+            string hashedPassword = Convert.ToBase64String(KeyDerivation.Pbkdf2(
+                password: clearTextPassword,
                 salt: salt,
                 prf: KeyDerivationPrf.HMACSHA256,
                 iterationCount: 100000,
                 numBytesRequested: 256 / 8));
-            return (computedHashedPassword.Equals(storedCredentials.Password)) ? true : false; 
+            return hashedPassword;
         }
     }
 }

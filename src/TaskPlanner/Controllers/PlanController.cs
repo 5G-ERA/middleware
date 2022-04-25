@@ -45,7 +45,7 @@ namespace Middleware.TaskPlanner.Controllers
             TaskModel resourcePlan = _mapper.Map<TaskModel>(tmpFinalTask);
 
             // call orchestrator for deployment of the resources
-            Orchestrator.TaskModel tmpTaskOrchestratorSend = _mapper.Map<Orchestrator.TaskModel>(plan);
+            Orchestrator.TaskModel tmpTaskOrchestratorSend = _mapper.Map<Orchestrator.TaskModel>(resourcePlan);
             Orchestrator.TaskModel tmpFinalOrchestratorTask = await _orchestratorClient.InstantiateNewPlanAsync(tmpTaskOrchestratorSend);
             TaskModel finalPlan = _mapper.Map<TaskModel>(tmpFinalOrchestratorTask);
 
