@@ -8,6 +8,7 @@ using Middleware.Orchestrator.Config;
 using Middleware.Orchestrator.Exceptions;
 using Middleware.Orchestrator.Models;
 using Middleware.Orchestrator.RedisInterface;
+using InstanceModel = Middleware.Common.Models.InstanceModel;
 using TaskModel = Middleware.Common.Models.TaskModel;
 
 namespace Middleware.Orchestrator.Deployment;
@@ -59,38 +60,7 @@ public class DeploymentService : IDeploymentService
             {
                 try
                 {
-                    _logger.LogDebug("Querying for redis for service {Id}", service.Id);
-                    var images = (await _redisClient.ContainerImageGetForInstanceAsync(service.Id))?.ToList();
-                    if (images is null || images.Any() == false)
-                    {
-                        throw new IncorrectDataException("Images not defined for the Instance deployment");
-                    }
-                    _logger.LogDebug("Retrieved service with Id: {Id}", service.Id);
-                    // should only be just one image
-                    foreach (var cim in images)
-                    {
-                        _logger.LogDebug("Deploying the image {ImageName}", service.ImageName);
-
-                        if (deploymentNames.Contains(cim.Name))
-                        {
-                            //TODO: handle the check if the deployment or a service already exists
-                            continue;
-                        }
-
-                        var deployedPair = await Deploy(cim);
-
-                        service.ServiceStatus = ServiceStatusEnum.Idle.GetStringValue();
-                        service.ServiceInstanceId = Guid.Parse(deployedPair.Deployment.GetLabel("serviceId"));
-                        _logger.LogDebug("Deployed the image {ImageName} with the Id {ServiceInstanceId}", service.ImageName, service.ServiceInstanceId);
-                        //if (deployedPair.Service is not null && deployedPair.Service.Spec.ExternalIPs.Any())
-                        //{
-                        //    service.ServiceUrl = new Uri(deployedPair.Service.Spec.ExternalIPs[0]);
-                        //}
-
-
-                        //TODO: save the specified actionPlan to the Redis
-
-                    }
+                    await DeployService(service, deploymentNames);
                 }
                 catch (Exception ex)
                 {
@@ -102,6 +72,44 @@ public class DeploymentService : IDeploymentService
 
         return isSuccess;
     }
+
+    private async Task DeployService(InstanceModel service, string[] deploymentNames)
+    {
+        _logger.LogDebug("Querying for redis for service {Id}", service.Id);
+        var images = (await _redisClient.ContainerImageGetForInstanceAsync(service.Id))?.ToList();
+        if (images is null || images.Any() == false)
+        {
+            throw new IncorrectDataException("Images not defined for the Instance deployment");
+        }
+
+        _logger.LogDebug("Retrieved service with Id: {Id}", service.Id);
+        // should only be just one image
+        foreach (var cim in images)
+        {
+            _logger.LogDebug("Deploying the image {ImageName}", service.ImageName);
+
+            if (deploymentNames.Contains(cim.Name))
+            {
+                //TODO: handle the check if the deployment or a service already exists
+                continue;
+            }
+
+            var deployedPair = await Deploy(cim);
+
+            service.ServiceStatus = ServiceStatusEnum.Idle.GetStringValue();
+            service.ServiceInstanceId = Guid.Parse(deployedPair.Deployment.GetLabel("serviceId"));
+            _logger.LogDebug("Deployed the image {ImageName} with the Id {ServiceInstanceId}", service.ImageName,
+                service.ServiceInstanceId);
+            //if (deployedPair.Service is not null && deployedPair.Service.Spec.ExternalIPs.Any())
+            //{
+            //    service.ServiceUrl = new Uri(deployedPair.Service.Spec.ExternalIPs[0]);
+            //}
+
+
+            //TODO: save the specified actionPlan to the Redis
+        }
+    }
+
     /// <summary>
     /// Deploy the service based on the container information
     /// </summary>

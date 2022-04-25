@@ -6,12 +6,11 @@ public class DialogueModel : BaseModel
 {
     [JsonPropertyName("Id")]
     public override Guid Id { get; set; }
-
-    [JsonPropertyName("DialogueName")]
-    public override string Name { get; set; }
-
+    /// <summary>
+    /// Question / Name
+    /// </summary>
     [JsonPropertyName("Question")]
-    public string Question { get; set; }
+    public override string Name { get; set; }
 
     [JsonPropertyName("IsSingleAnswer")]
     public bool IsSingleAnswer { get; set; }
@@ -19,5 +18,4 @@ public class DialogueModel : BaseModel
     [JsonPropertyName("Answer")]
     public List<KeyValuePair> Answer { get; set; }
 
-    public DateTime TimeStamp { get; set; }
 }

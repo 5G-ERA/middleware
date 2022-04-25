@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Middleware.Common.Models
+﻿namespace Middleware.Common.Models
 {
     public class RelationModel
     {
@@ -13,6 +7,6 @@ namespace Middleware.Common.Models
         public List <KeyValuePair> RelationAttributes { get; set; } = new List<KeyValuePair>();
         public GraphEntityModel PointsTo { get; set; } = new GraphEntityModel();
 
-
+        
     }
 }
