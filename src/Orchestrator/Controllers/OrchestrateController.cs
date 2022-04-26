@@ -3,7 +3,6 @@ using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 using Middleware.Orchestrator.ApiReference;
 using Middleware.Orchestrator.Deployment;
-using Middleware.Orchestrator.RedisInterface;
 using ActionModel = Middleware.Common.Models.ActionModel;
 using InstanceModel = Middleware.Common.Models.InstanceModel;
 using TaskModel = Middleware.Common.Models.TaskModel;
@@ -17,14 +16,12 @@ public class OrchestrateController : Controller
     private readonly IDeploymentService _deploymentService;
     private readonly IMapper _mapper;
     private readonly ILogger _logger;
-    private readonly RedisApiClient _client;
 
-    public OrchestrateController(IDeploymentService deploymentService, IApiClientBuilder apiClientBuilder, IMapper mapper, ILogger<OrchestrateController> logger)
+    public OrchestrateController(IDeploymentService deploymentService, IMapper mapper, ILogger<OrchestrateController> logger)
     {
         _deploymentService = deploymentService;
         _mapper = mapper;
         _logger = logger;
-        _client = apiClientBuilder.CreateRedisApiClient();
     }
 
     /// <summary>

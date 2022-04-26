@@ -18,7 +18,7 @@ public class DeploymentService : IDeploymentService
     /// <summary>
     /// Kubernetes client connection builder
     /// </summary>
-    private readonly IKubernetes _k8SClient;
+    private readonly IKubernetesBuilder _kubernetesBuilder;
     /// <summary>
     /// Environments access to the configuration of a pod
     /// </summary>
@@ -38,7 +38,7 @@ public class DeploymentService : IDeploymentService
 
     public DeploymentService(IKubernetesBuilder kubernetesBuilder, IApiClientBuilder apiClientBuilder, IEnvironment env, ILogger<DeploymentService> logger)
     {
-        _k8SClient = kubernetesBuilder.CreateKubernetesClient();
+        _kubernetesBuilder = kubernetesBuilder;
         _env = env;
         _logger = logger;
         _redisClient = apiClientBuilder.CreateRedisApiClient();
@@ -48,32 +48,48 @@ public class DeploymentService : IDeploymentService
     /// <inheritdoc/>
     public async Task<bool> DeployAsync(TaskModel task)
     {
-        _logger.LogDebug("Entered DeploymentService.DeployAsync");
-        var deployments = await _k8SClient.ListNamespacedDeploymentAsync(AppConfig.K8SNamespaceName);
-        var deploymentNames = deployments.Items.Select(d => d.Metadata.Name).OrderBy(d => d).ToArray();
-        _logger.LogDebug("Current deployments: {deployments}", string.Join(", ", deploymentNames));
         bool isSuccess = true;
-
-        foreach (var seq in task.ActionSequence)
+        try
         {
-            foreach (var service in seq.Services)
+            var k8SClient = _kubernetesBuilder.CreateKubernetesClient();
+            _logger.LogDebug("Entered DeploymentService.DeployAsync");
+            var deployments = await k8SClient.ListNamespacedDeploymentAsync(AppConfig.K8SNamespaceName);
+            var deploymentNames = deployments.Items.Select(d => d.Metadata.Name).OrderBy(d => d).ToArray();
+            _logger.LogDebug("Current deployments: {deployments}", string.Join(", ", deploymentNames));
+
+
+            foreach (var seq in task.ActionSequence)
             {
-                try
+                foreach (var service in seq.Services)
                 {
-                    await DeployService(service, deploymentNames);
+                    try
+                    {
+                        await DeployService(k8SClient, service, deploymentNames);
+                    }
+                    catch (Exception ex)
+                    {
+                        _logger.LogError(ex, "There was an error while deploying the service");
+                        isSuccess = false;
+                    }
                 }
-                catch (Exception ex)
-                {
-                    _logger.LogError(ex, "There was an error while deploying the service");
-                    isSuccess = false;
-                }
+            }
+        }
+        catch (NotInK8SEnvironmentException ex)
+        {
+            _logger.LogInformation("The instantiation of the kubernetes client has failed in {env} environment.", AppConfig.AppConfiguration);
+
+            isSuccess = AppConfig.AppConfiguration == AppVersionEnum.Dev.GetStringValue();
+
+            if (isSuccess)
+            {
+                _logger.LogWarning("Deployment of the services has been skipped in the Development environment");
             }
         }
 
         return isSuccess;
     }
 
-    private async Task DeployService(InstanceModel service, string[] deploymentNames)
+    private async Task DeployService(IKubernetes k8SClient, InstanceModel service, string[] deploymentNames)
     {
         _logger.LogDebug("Querying for redis for service {Id}", service.Id);
         var images = (await _redisClient.ContainerImageGetForInstanceAsync(service.Id))?.ToList();
@@ -94,7 +110,7 @@ public class DeploymentService : IDeploymentService
                 continue;
             }
 
-            var deployedPair = await Deploy(cim);
+            var deployedPair = await Deploy(k8SClient, cim);
 
             service.ServiceStatus = ServiceStatusEnum.Idle.GetStringValue();
             service.ServiceInstanceId = Guid.Parse(deployedPair.Deployment.GetLabel("serviceId"));
@@ -113,22 +129,25 @@ public class DeploymentService : IDeploymentService
     /// <summary>
     /// Deploy the service based on the container information
     /// </summary>
+    /// <param name="k8SClient"></param>
     /// <param name="cim"></param>
     /// <returns></returns>
-    public async Task<DeploymentPairModel> Deploy(ContainerImageModel cim)
+    public async Task<DeploymentPairModel> Deploy(IKubernetes k8SClient, ContainerImageModel cim)
     {
         var instanceId = Guid.NewGuid();
 
-        var service = await Deploy<V1Service>(cim.K8SService, cim.Name, instanceId, nameof(cim.K8SService));
+        var service = await Deploy<V1Service>(k8SClient, cim.K8SService, cim.Name, instanceId, nameof(cim.K8SService));
 
-        var deployment = await Deploy<V1Deployment>(cim.K8SDeployment, cim.Name, instanceId, nameof(cim.K8SDeployment));
+        var deployment = await Deploy<V1Deployment>(k8SClient, cim.K8SDeployment, cim.Name, instanceId, nameof(cim.K8SDeployment));
 
         return new DeploymentPairModel(deployment, service);
     }
+
     /// <summary>
     /// Deploy the Service of the specified type. Available types are <seealso cref="V1Service"/> and <seealso cref="V1Deployment"/>
     /// </summary>
     /// <typeparam name="T">Type of the service</typeparam>
+    /// <param name="k8SClient"></param>
     /// <param name="objectDefinition">string representation of the k8s yaml object</param>
     /// <param name="name">Name of the service to be deployed</param>
     /// <param name="instanceId"></param>
@@ -136,7 +155,8 @@ public class DeploymentService : IDeploymentService
     /// <returns></returns>
     /// <exception cref="IncorrectDataException"></exception>
     /// <exception cref="UnableToParseYamlConfigException"></exception>
-    private async Task<T> Deploy<T>(string objectDefinition, string name, Guid instanceId, string propName = null) where T : class
+    private async Task<T> Deploy<T>(IKubernetes k8SClient, string objectDefinition, string name, Guid instanceId,
+        string propName = null) where T : class
     {
         var type = typeof(T);
 
@@ -161,14 +181,14 @@ public class DeploymentService : IDeploymentService
         {
             srv.Metadata.SetServiceLabel(instanceId);
 
-            obj = await _k8SClient.CreateNamespacedServiceAsync(srv, AppConfig.K8SNamespaceName) as T;
+            obj = await k8SClient.CreateNamespacedServiceAsync(srv, AppConfig.K8SNamespaceName) as T;
             return obj;
         }
         if (obj is V1Deployment depl)
         {
             depl.Metadata.SetServiceLabel(instanceId);
 
-            obj = await _k8SClient.CreateNamespacedDeploymentAsync(depl, AppConfig.K8SNamespaceName) as T;
+            obj = await k8SClient.CreateNamespacedDeploymentAsync(depl, AppConfig.K8SNamespaceName) as T;
             return obj;
         }
 
