@@ -1,7 +1,7 @@
 using System.Text.Json;
 using Microsoft.Extensions.Logging;
-using Middleware.Common.Models;
 using Middleware.Common.Enums;
+using Middleware.Common.Models;
 using Middleware.Common.Repositories.Abstract;
 using NReJSON;
 using RedisGraphDotNet.Client;
@@ -13,7 +13,7 @@ namespace Middleware.Common.Repositories
     {
         private readonly IInstanceRepository _instanceRepository;
 
-        public ContainerImageRepository(IInstanceRepository instanceRepository, IConnectionMultiplexer redisClient, IRedisGraphClient redisGraph, ILogger<ContainerImageRepository> logger) : base(RedisDbIndexEnum.Container, redisClient, redisGraph, logger)
+        public ContainerImageRepository(IInstanceRepository instanceRepository, IConnectionMultiplexer redisClient, IRedisGraphClient redisGraph, ILogger<ContainerImageRepository> logger) : base(RedisDbIndexEnum.Container, redisClient, redisGraph, logger, true)
         {
             _instanceRepository = instanceRepository;
         }

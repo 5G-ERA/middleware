@@ -1,44 +1,83 @@
 ﻿using System.Text.Json;
-using Middleware.Common.Models;
+using Microsoft.Extensions.Logging;
 using Middleware.Common.Enums;
+using Middleware.Common.Models;
 using NReJSON;
 using RedisGraphDotNet.Client;
 using StackExchange.Redis;
-using Microsoft.Extensions.Logging;
 
 namespace Middleware.Common.Repositories
 {
     public class BaseRepository<T> : IBaseRepository<T> where T : BaseModel
     {
-
+        /// <summary>
+        /// Name of the graph to be queried for
+        /// </summary>
+        private const string GraphName = "RESOURCE_PLANNER";
+        /// <summary>
+        /// Index of the database in the Redis to be used
+        /// </summary>
         private readonly RedisDbIndexEnum _redisDbIndex;
+        /// <summary>
+        /// Redis Client
+        /// </summary>
         protected readonly IConnectionMultiplexer RedisClient;
+        /// <summary>
+        /// Database used to query the Redis
+        /// </summary>
         protected readonly IDatabase Db;
+        /// <summary>
+        /// Redis Graph client
+        /// </summary>
         protected readonly IRedisGraphClient RedisGraph;
+        /// <summary>
+        /// Logger instance
+        /// </summary>
         protected readonly ILogger Logger;
-
-        public BaseRepository(RedisDbIndexEnum redisDbIndex, IConnectionMultiplexer redisClient, IRedisGraphClient redisGraph, ILogger logger)
+        /// <summary>
+        /// Specifies if the used model should be saved to the graph
+        /// </summary>
+        protected readonly bool IsWritableToGraph;
+        /// <summary>
+        /// Default c-tor
+        /// </summary>
+        /// <param name="redisDbIndex">Index of the Redis Db to be used</param>
+        /// <param name="redisClient">Redis client </param>
+        /// <param name="redisGraph">Redis Graph client</param>
+        /// <param name="logger">Logger instance</param>
+        /// <param name="isWritableToGraph">Should the object be saved on the graph</param>
+        /// <exception cref="ArgumentNullException"></exception>
+        public BaseRepository(RedisDbIndexEnum redisDbIndex, IConnectionMultiplexer redisClient, IRedisGraphClient redisGraph, ILogger logger, bool isWritableToGraph)
         {
             RedisClient = redisClient ?? throw new ArgumentNullException(nameof(redisClient));
             RedisGraph = redisGraph ?? throw new ArgumentNullException(nameof(redisGraph));
             _redisDbIndex = redisDbIndex;
             Db = redisClient.GetDatabase((int)_redisDbIndex);
             Logger = logger ?? throw new ArgumentNullException(nameof(logger));
+            IsWritableToGraph = isWritableToGraph;
         }
 
         public async Task<T> AddAsync(T model)
         {
             model.Id = Guid.NewGuid();
-            await Db.JsonSetAsync(model.Id.ToString(), JsonSerializer.Serialize(model));
-            GraphEntityModel newGraphModel = new GraphEntityModel();
-            newGraphModel.Id = model.Id;
-            newGraphModel.Name = model.Name;
-            bool isValid = await AddGraphAsync(newGraphModel);
-            if (isValid == true) 
+            var result = await Db.JsonSetAsync(model.Id.ToString(), JsonSerializer.Serialize(model));
+            bool retVal = result.IsSuccess;
+            if (retVal == false)
             {
-                return model;
+                return null;
             }
-            return null;
+            
+            if (IsWritableToGraph)
+            {
+                GraphEntityModel newGraphModel = new GraphEntityModel
+                {
+                    Id = model.Id,
+                    Name = model.Name
+                };
+                retVal &= await AddGraphAsync(newGraphModel);
+            }
+            
+            return retVal ? model : null;
         }
 
         public async Task<T> GetByIdAsync(Guid id)
@@ -115,13 +154,12 @@ namespace Middleware.Common.Repositories
             return Path.Combine(Directory.GetCurrentDirectory(), "LuaQueries", $"{queryName}.lua");
         }
 
-
         public async Task<List<RelationModel>> GetRelation(Guid id, string relationName)
         {
             List<RelationModel> relationModels = new List<RelationModel>();
             relationName = relationName?.ToUpper();
             string query = "MATCH (x: " + _redisDbIndex.ToString().ToUpper() + " {ID: '" + id + "' }) MATCH (y) WHERE (x)-[: " + relationName + "]->(y) RETURN x,y";
-            ResultSet resultSet = await RedisGraph.Query("RESOURCE_PLANNER", query);
+            ResultSet resultSet = await RedisGraph.Query(GraphName, query);
             // BB: 24.03.2022
             // We are using the loop with 2 nested loops to retrieve the values from the graph
             // The values are structured in the following way:
@@ -135,8 +173,10 @@ namespace Middleware.Common.Repositories
                 {
                     foreach (RedisGraphResult node in res.Value)
                     {
-                        var relationModel = new RelationModel();
-                        relationModel.RelationName = relationName;
+                        var relationModel = new RelationModel
+                        {
+                            RelationName = relationName
+                        };
                         if (node is Node nd)
                         {
                             SetGraphModelValues(relationModel.InitiatesFrom, nd);
@@ -176,16 +216,12 @@ namespace Middleware.Common.Repositories
 
         public async Task<bool> AddGraphAsync(GraphEntityModel model) 
         {
-            
             model.Type = _redisDbIndex.ToString().ToUpper();
            
             string query = "CREATE (x: " + model.Type + " {ID: '" + model.Id +"', Type: '" + model.Type + "', Name: '" + model.Name + "'})";
-            ResultSet resultSet = await RedisGraph.Query("RESOURCE_PLANNER", query);
-            if (resultSet == null || resultSet.Metrics.NodesCreated != 1) 
-            {
-                return false;
-            }
-            return true;
+            ResultSet resultSet = await RedisGraph.Query(GraphName, query);
+            
+            return resultSet != null && resultSet.Metrics.NodesCreated == 1;
         }
 
 
@@ -195,12 +231,9 @@ namespace Middleware.Common.Repositories
             relationName = relationName?.ToUpper();
 
             string query = "MATCH (x: " + model.Type + " {ID: '" + model.Id + "'}), (c: " + model.Type + " {ID: '" + model.Id + "'}) CREATE (x)-[:" + relationName + "]->(c) ";
-            ResultSet resultSet = await RedisGraph.Query("RESOURCE_PLANNER", query);
-            if (resultSet == null || resultSet.Metrics.RelationshipsCreated != 1) 
-            {
-                return false;
-            }
-            return true;
+            ResultSet resultSet = await RedisGraph.Query(GraphName, query);
+            
+            return resultSet != null && resultSet.Metrics.RelationshipsCreated == 1;
         }
 
 
@@ -209,12 +242,9 @@ namespace Middleware.Common.Repositories
             model.Type = _redisDbIndex.ToString().ToUpper();
 
             string query = "MATCH (e: " + model.Type + " {ID: '" + model.Id + "', Name: '" + model.Name + "'}) DELETE e";
-            ResultSet resultSet = await RedisGraph.Query("RESOURCE_PLANNER", query);
-            if (resultSet != null || resultSet.Metrics.NodesDeleted != 1) 
-            {
-                return false;
-            }
-            return true;
+            ResultSet resultSet = await RedisGraph.Query(GraphName, query);
+            
+            return resultSet != null && resultSet.Metrics.NodesDeleted == 1;
         }
 
 
@@ -224,17 +254,10 @@ namespace Middleware.Common.Repositories
             relationName = relationName?.ToUpper();
 
             string query = "MATCH (x: " + model.Type + " {ID: '" + model.Id + "'})-[e: " + relationName + " ]->(y: " + model.Type + " {ID: '" + model.Id + "'}) DELETE e";
-            ResultSet resultSet = await RedisGraph.Query("RESOURCE_PLANNER", query);
-            if (resultSet != null || resultSet.Metrics.RelationshipsDeleted != 1) 
-            {
-                return false;
-            }
-            return true;
-
+            ResultSet resultSet = await RedisGraph.Query(GraphName, query);
+            
+            return resultSet != null && resultSet.Metrics.RelationshipsDeleted == 1;
         }
-
-
-        
 
         /// <summary>
         /// Sets the values for the <see cref="GraphEntityModel"/> from the specified node

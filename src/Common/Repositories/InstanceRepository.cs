@@ -1,18 +1,16 @@
-﻿using Microsoft.AspNetCore.JsonPatch;
-using Microsoft.AspNetCore.Mvc;
-using Middleware.Common.Models;
+﻿using System.Text.Json;
+using Microsoft.Extensions.Logging;
 using Middleware.Common.Enums;
+using Middleware.Common.Models;
 using NReJSON;
 using RedisGraphDotNet.Client;
 using StackExchange.Redis;
-using System.Text.Json;
-using Microsoft.Extensions.Logging;
 
 namespace Middleware.Common.Repositories
 {
     public class InstanceRepository : BaseRepository<InstanceModel>, IInstanceRepository
     {
-        public InstanceRepository(IConnectionMultiplexer redisClient, IRedisGraphClient redisGraph, ILogger<InstanceRepository> logger) : base(RedisDbIndexEnum.Instance, redisClient, redisGraph, logger)
+        public InstanceRepository(IConnectionMultiplexer redisClient, IRedisGraphClient redisGraph, ILogger<InstanceRepository> logger) : base(RedisDbIndexEnum.Instance, redisClient, redisGraph, logger, true)
         {
         }
 

@@ -1,7 +1,6 @@
 ﻿using System.Net;
 using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
-using Middleware.Orchestrator.ApiReference;
 using Middleware.Orchestrator.Deployment;
 using ActionModel = Middleware.Common.Models.ActionModel;
 using InstanceModel = Middleware.Common.Models.InstanceModel;

@@ -1,17 +1,17 @@
-using Middleware.Common.Models;
+using System.Text.Json;
+using Microsoft.Extensions.Logging;
 using Middleware.Common.Enums;
+using Middleware.Common.Models;
 using Middleware.Common.Repositories.Abstract;
 using NReJSON;
 using RedisGraphDotNet.Client;
 using StackExchange.Redis;
-using System.Text.Json;
-using Microsoft.Extensions.Logging;
 
 namespace Middleware.Common.Repositories
 {
     public class CloudRepository : BaseRepository<CloudModel>, ICloudRepository
     {
-        public CloudRepository(IConnectionMultiplexer redisClient, IRedisGraphClient redisGraph, ILogger<CloudRepository> logger) : base(RedisDbIndexEnum.Cloud, redisClient, redisGraph, logger)
+        public CloudRepository(IConnectionMultiplexer redisClient, IRedisGraphClient redisGraph, ILogger<CloudRepository> logger) : base(RedisDbIndexEnum.Cloud, redisClient, redisGraph, logger, true)
         {
         }
 

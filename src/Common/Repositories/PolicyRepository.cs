@@ -10,7 +10,7 @@ namespace Middleware.Common.Repositories
 {
     public class PolicyRepository : BaseRepository<PolicyModel>, IPolicyRepository
     {
-        public PolicyRepository(IConnectionMultiplexer redisClient, IRedisGraphClient redisGraph, ILogger<PolicyRepository> logger) : base(RedisDbIndexEnum.Policy, redisClient, redisGraph, logger)
+        public PolicyRepository(IConnectionMultiplexer redisClient, IRedisGraphClient redisGraph, ILogger<PolicyRepository> logger) : base(RedisDbIndexEnum.Policy, redisClient, redisGraph, logger, false)
         {
         }
 
