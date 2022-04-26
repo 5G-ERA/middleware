@@ -18,7 +18,7 @@ namespace Middleware.Common.Models
         {
             Id = id;
             Name = name;
-
+            Type = dbIndex.ToString().ToUpper();
         }
     }
 }

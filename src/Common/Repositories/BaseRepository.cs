@@ -57,33 +57,38 @@ namespace Middleware.Common.Repositories
             IsWritableToGraph = isWritableToGraph;
         }
 
+
+        /// <inheritdoc/>
         public async Task<T> AddAsync(T model)
         {
-            model.Id = Guid.NewGuid();
+            return await AddAsync(model, () => Guid.NewGuid());
+        }
+        /// <inheritdoc/>
+        public async Task<T> AddAsync(T model, Func<Guid> guidProvider)
+        {
+            if (guidProvider == null) throw new ArgumentNullException(nameof(guidProvider));
+
+            model.Id = guidProvider.Invoke();
             var result = await Db.JsonSetAsync(model.Id.ToString(), JsonSerializer.Serialize(model));
             bool retVal = result.IsSuccess;
             if (retVal == false)
             {
                 return null;
             }
-            
+
             if (IsWritableToGraph)
             {
-                GraphEntityModel newGraphModel = new GraphEntityModel
-                {
-                    Id = model.Id,
-                    Name = model.Name
-                };
+                GraphEntityModel newGraphModel = new GraphEntityModel(model.Id, model.Name, _redisDbIndex);
                 retVal &= await AddGraphAsync(newGraphModel);
             }
-            
+
             return retVal ? model : null;
         }
-
+        /// <inheritdoc/>
         public async Task<T> GetByIdAsync(Guid id)
         {
             string model = (string)await Db.JsonGetAsync(id.ToString());
-            if (string.IsNullOrEmpty(model)) 
+            if (string.IsNullOrEmpty(model))
             {
                 return default;
             }
@@ -91,7 +96,7 @@ namespace Middleware.Common.Repositories
 
             return newModel;
         }
-
+        /// <inheritdoc/>
         public async Task<List<T>> GetAllAsync()
         {
             List<T> models = new List<T>();
@@ -105,14 +110,18 @@ namespace Middleware.Common.Repositories
             }
             return models;
         }
-
+        /// <inheritdoc/>
         public async Task<bool> DeleteByIdAsync(Guid id)
         {
             int deleted = await Db.JsonDeleteAsync(id.ToString());
-            
+
             return deleted > 0;
         }
-
+        /// <summary>
+        /// Execute the given Lua query against the redis data store
+        /// </summary>
+        /// <param name="queryName"></param>
+        /// <returns></returns>
         protected async Task<List<T>> ExecuteLuaQueryAsync(string queryName)
         {
             var script = await File.ReadAllTextAsync(GetScriptPath(queryName));
@@ -153,7 +162,7 @@ namespace Middleware.Common.Repositories
         {
             return Path.Combine(Directory.GetCurrentDirectory(), "LuaQueries", $"{queryName}.lua");
         }
-
+        /// <inheritdoc/>
         public async Task<List<RelationModel>> GetRelation(Guid id, string relationName)
         {
             List<RelationModel> relationModels = new List<RelationModel>();
@@ -200,7 +209,7 @@ namespace Middleware.Common.Repositories
             return relationModels;
         }
 
-
+        /// <inheritdoc/>
         public async Task<List<RelationModel>> GetRelations(Guid id, List<string> relationNames)
         {
             List<RelationModel> relations = new List<RelationModel>();
@@ -214,48 +223,48 @@ namespace Middleware.Common.Repositories
         }
 
 
-        public async Task<bool> AddGraphAsync(GraphEntityModel model) 
+        public async Task<bool> AddGraphAsync(GraphEntityModel model)
         {
             model.Type = _redisDbIndex.ToString().ToUpper();
-           
-            string query = "CREATE (x: " + model.Type + " {ID: '" + model.Id +"', Type: '" + model.Type + "', Name: '" + model.Name + "'})";
+
+            string query = "CREATE (x: " + model.Type + " {ID: '" + model.Id + "', Type: '" + model.Type + "', Name: '" + model.Name + "'})";
             ResultSet resultSet = await RedisGraph.Query(GraphName, query);
-            
+
             return resultSet != null && resultSet.Metrics.NodesCreated == 1;
         }
 
 
-        public async Task<bool> AddRelationAsync(GraphEntityModel model, string relationName) 
+        public async Task<bool> AddRelationAsync(GraphEntityModel model, string relationName)
         {
             model.Type = _redisDbIndex.ToString().ToUpper();
             relationName = relationName?.ToUpper();
 
             string query = "MATCH (x: " + model.Type + " {ID: '" + model.Id + "'}), (c: " + model.Type + " {ID: '" + model.Id + "'}) CREATE (x)-[:" + relationName + "]->(c) ";
             ResultSet resultSet = await RedisGraph.Query(GraphName, query);
-            
+
             return resultSet != null && resultSet.Metrics.RelationshipsCreated == 1;
         }
 
 
-        public async Task<bool> DeleteGraphModelAsync(GraphEntityModel model) 
+        public async Task<bool> DeleteGraphModelAsync(GraphEntityModel model)
         {
             model.Type = _redisDbIndex.ToString().ToUpper();
 
             string query = "MATCH (e: " + model.Type + " {ID: '" + model.Id + "', Name: '" + model.Name + "'}) DELETE e";
             ResultSet resultSet = await RedisGraph.Query(GraphName, query);
-            
+
             return resultSet != null && resultSet.Metrics.NodesDeleted == 1;
         }
 
 
-        public async Task<bool> DeleteRelationAsync(GraphEntityModel model, string relationName) 
+        public async Task<bool> DeleteRelationAsync(GraphEntityModel model, string relationName)
         {
             model.Type = _redisDbIndex.ToString().ToUpper();
             relationName = relationName?.ToUpper();
 
             string query = "MATCH (x: " + model.Type + " {ID: '" + model.Id + "'})-[e: " + relationName + " ]->(y: " + model.Type + " {ID: '" + model.Id + "'}) DELETE e";
             ResultSet resultSet = await RedisGraph.Query(GraphName, query);
-            
+
             return resultSet != null && resultSet.Metrics.RelationshipsDeleted == 1;
         }
 

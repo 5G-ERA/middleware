@@ -1,4 +1,5 @@
-﻿using k8s;
+﻿using AutoMapper;
+using k8s;
 using k8s.Models;
 using Middleware.Common;
 using Middleware.Common.Enums;
@@ -8,6 +9,7 @@ using Middleware.Orchestrator.Config;
 using Middleware.Orchestrator.Exceptions;
 using Middleware.Orchestrator.Models;
 using Middleware.Orchestrator.RedisInterface;
+using ContainerImageModel = Middleware.Common.Models.ContainerImageModel;
 using InstanceModel = Middleware.Common.Models.InstanceModel;
 using TaskModel = Middleware.Common.Models.TaskModel;
 
@@ -23,6 +25,9 @@ public class DeploymentService : IDeploymentService
     /// Environments access to the configuration of a pod
     /// </summary>
     private readonly IEnvironment _env;
+
+    private readonly IMapper _mapper;
+
     /// <summary>
     /// Logger instance
     /// </summary>
@@ -36,10 +41,11 @@ public class DeploymentService : IDeploymentService
     /// </summary>
     private readonly string _awsRegistryName;
 
-    public DeploymentService(IKubernetesBuilder kubernetesBuilder, IApiClientBuilder apiClientBuilder, IEnvironment env, ILogger<DeploymentService> logger)
+    public DeploymentService(IKubernetesBuilder kubernetesBuilder, IApiClientBuilder apiClientBuilder, IEnvironment env, IMapper mapper, ILogger<DeploymentService> logger)
     {
         _kubernetesBuilder = kubernetesBuilder;
         _env = env;
+        _mapper = mapper;
         _logger = logger;
         _redisClient = apiClientBuilder.CreateRedisApiClient();
         _awsRegistryName = _env.GetEnvVariable("AWS_IMAGE_REGISTRY");
@@ -93,14 +99,17 @@ public class DeploymentService : IDeploymentService
     {
         _logger.LogDebug("Querying for redis for service {Id}", service.Id);
         var images = (await _redisClient.ContainerImageGetForInstanceAsync(service.Id))?.ToList();
+
         if (images is null || images.Any() == false)
         {
             throw new IncorrectDataException("Images not defined for the Instance deployment");
         }
 
+        var mappedImages = _mapper.Map<List<ContainerImageModel>>(images);
+
         _logger.LogDebug("Retrieved service with Id: {Id}", service.Id);
         // should only be just one image
-        foreach (var cim in images)
+        foreach (var cim in mappedImages)
         {
             _logger.LogDebug("Deploying the image {ImageName}", service.ImageName);
 
@@ -120,7 +129,6 @@ public class DeploymentService : IDeploymentService
             //{
             //    service.ServiceUrl = new Uri(deployedPair.Service.Spec.ExternalIPs[0]);
             //}
-
 
             //TODO: save the specified actionPlan to the Redis
         }
