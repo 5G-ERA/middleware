@@ -4,14 +4,11 @@ using k8s.Models;
 using Middleware.Common;
 using Middleware.Common.Enums;
 using Middleware.Common.ExtensionMethods;
+using Middleware.Common.Models;
 using Middleware.Orchestrator.ApiReference;
 using Middleware.Orchestrator.Config;
 using Middleware.Orchestrator.Exceptions;
 using Middleware.Orchestrator.Models;
-using Middleware.Orchestrator.RedisInterface;
-using ContainerImageModel = Middleware.Common.Models.ContainerImageModel;
-using InstanceModel = Middleware.Common.Models.InstanceModel;
-using TaskModel = Middleware.Common.Models.TaskModel;
 
 namespace Middleware.Orchestrator.Deployment;
 
@@ -25,9 +22,10 @@ public class DeploymentService : IDeploymentService
     /// Environments access to the configuration of a pod
     /// </summary>
     private readonly IEnvironment _env;
-
+    /// <summary>
+    /// Object mapper
+    /// </summary>
     private readonly IMapper _mapper;
-
     /// <summary>
     /// Logger instance
     /// </summary>
@@ -35,7 +33,7 @@ public class DeploymentService : IDeploymentService
     /// <summary>
     /// Redis Interface client allowing to make calls to the Redis Cache
     /// </summary>
-    private readonly RedisApiClient _redisClient;
+    private readonly RedisInterface.RedisApiClient _redisClient;
     /// <summary>
     /// Name of the AWS registry used 
     /// </summary>
@@ -79,8 +77,10 @@ public class DeploymentService : IDeploymentService
                     }
                 }
             }
+
+            isSuccess &= await SaveActionSequence(task);
         }
-        catch (NotInK8SEnvironmentException ex)
+        catch (NotInK8SEnvironmentException)
         {
             _logger.LogInformation("The instantiation of the kubernetes client has failed in {env} environment.", AppConfig.AppConfiguration);
 
@@ -93,6 +93,21 @@ public class DeploymentService : IDeploymentService
         }
 
         return isSuccess;
+    }
+
+    /// <summary>
+    /// Saves the specified task to the redis as an action plan
+    /// </summary>
+    /// <param name="task"></param>
+    /// <returns></returns>
+    private async Task<bool> SaveActionSequence(TaskModel task)
+    {
+        var actionPlan = new ActionPlanModel(task.ActionPlanId, task.Name, task.ActionSequence);
+
+        var riActionPlan = _mapper.Map<RedisInterface.ActionPlanModel>(actionPlan);
+        var result = await _redisClient.ActionPlanAddAsync(riActionPlan);
+
+        return result != null;
     }
 
     private async Task DeployService(IKubernetes k8SClient, InstanceModel service, string[] deploymentNames)
@@ -108,7 +123,8 @@ public class DeploymentService : IDeploymentService
         var mappedImages = _mapper.Map<List<ContainerImageModel>>(images);
 
         _logger.LogDebug("Retrieved service with Id: {Id}", service.Id);
-        // should only be just one image
+
+        // usually should only be just one image
         foreach (var cim in mappedImages)
         {
             _logger.LogDebug("Deploying the image {ImageName}", service.ImageName);
@@ -125,12 +141,7 @@ public class DeploymentService : IDeploymentService
             service.ServiceInstanceId = Guid.Parse(deployedPair.Deployment.GetLabel("serviceId"));
             _logger.LogDebug("Deployed the image {ImageName} with the Id {ServiceInstanceId}", service.ImageName,
                 service.ServiceInstanceId);
-            //if (deployedPair.Service is not null && deployedPair.Service.Spec.ExternalIPs.Any())
-            //{
-            //    service.ServiceUrl = new Uri(deployedPair.Service.Spec.ExternalIPs[0]);
-            //}
-
-            //TODO: save the specified actionPlan to the Redis
+            //TODO: assign values to the instance data
         }
     }
 
@@ -266,7 +277,7 @@ public class DeploymentService : IDeploymentService
         {
             Name = name,
             Image = K8SImageHelper.BuildImageName(_awsRegistryName, name, "latest"),
-            ImagePullPolicy = AppConfig.AppConfiguration == "Release" ? "Always" : "IfNotPresent",
+            ImagePullPolicy = AppConfig.AppConfiguration == AppVersionEnum.Prod.GetStringValue() ? "Always" : "IfNotPresent",
             Env = envList,
             Ports = new List<V1ContainerPort>() { new(80), new(433) }
         };

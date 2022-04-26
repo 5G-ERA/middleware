@@ -40,7 +40,8 @@ public static class AutoMapperConfig
             cfg.CreateMap<RedisInterface.RelationModel, RelationModel>();
             cfg.CreateMap<GraphEntityModel, RedisInterface.GraphEntityModel>();
             cfg.CreateMap<RedisInterface.GraphEntityModel, GraphEntityModel>();
-
+            cfg.CreateMap<ActionPlanModel, RedisInterface.ActionPlanModel>();
+            cfg.CreateMap<RedisInterface.ActionPlanModel, ActionPlanModel>();
         });
         return services;
     }

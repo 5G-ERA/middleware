@@ -12,5 +12,17 @@ public class ActionPlanModel : BaseModel
 
     [JsonPropertyName("ActionSequence")]
     public List<ActionModel> ActionSequence { get; set; }
+
+    public ActionPlanModel()
+    {
+        
+    }
+
+    public ActionPlanModel(Guid id, string name, List<ActionModel> actionSequence)
+    {
+        Id = id;
+        Name = name;
+        ActionSequence = actionSequence;
+    }
     
 }
