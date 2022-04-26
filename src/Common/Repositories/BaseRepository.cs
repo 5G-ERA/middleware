@@ -189,6 +189,51 @@ namespace Middleware.Common.Repositories
         }
 
 
+        public async Task<bool> AddRelationAsync(GraphEntityModel model, string relationName) 
+        {
+            model.Type = _redisDbIndex.ToString().ToUpper();
+            relationName = relationName?.ToUpper();
+
+            string query = "MATCH (x: " + model.Type + " {ID: '" + model.Id + "'}), (c: " + model.Type + " {ID: '" + model.Id + "'}) CREATE (x)-[:" + relationName + "]->(c) ";
+            ResultSet resultSet = await RedisGraph.Query("RESOURCE_PLANNER", query);
+            if (resultSet == null || resultSet.Metrics.RelationshipsCreated != 1) 
+            {
+                return false;
+            }
+            return true;
+        }
+
+
+        public async Task<bool> DeleteGraphModelAsync(GraphEntityModel model) 
+        {
+            model.Type = _redisDbIndex.ToString().ToUpper();
+
+            string query = "MATCH (e: " + model.Type + " {ID: '" + model.Id + "', Name: '" + model.Name + "'}) DELETE e";
+            ResultSet resultSet = await RedisGraph.Query("RESOURCE_PLANNER", query);
+            if (resultSet != null || resultSet.Metrics.NodesDeleted != 1) 
+            {
+                return false;
+            }
+            return true;
+        }
+
+
+        public async Task<bool> DeleteRelationAsync(GraphEntityModel model, string relationName) 
+        {
+            model.Type = _redisDbIndex.ToString().ToUpper();
+            relationName = relationName?.ToUpper();
+
+            string query = "MATCH (x: " + model.Type + " {ID: '" + model.Id + "'})-[e: " + relationName + " ]->(y: " + model.Type + " {ID: '" + model.Id + "'}) DELETE e";
+            ResultSet resultSet = await RedisGraph.Query("RESOURCE_PLANNER", query);
+            if (resultSet != null || resultSet.Metrics.RelationshipsDeleted != 1) 
+            {
+                return false;
+            }
+            return true;
+
+        }
+
+
         
 
         /// <summary>
