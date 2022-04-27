@@ -1,10 +1,9 @@
 ﻿using System.Net;
 using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
+using Middleware.Common.Models;
+using Middleware.Orchestrator.ApiReference;
 using Middleware.Orchestrator.Deployment;
-using ActionModel = Middleware.Common.Models.ActionModel;
-using InstanceModel = Middleware.Common.Models.InstanceModel;
-using TaskModel = Middleware.Common.Models.TaskModel;
 
 namespace Middleware.Orchestrator.Controllers;
 
@@ -15,12 +14,14 @@ public class OrchestrateController : Controller
     private readonly IDeploymentService _deploymentService;
     private readonly IMapper _mapper;
     private readonly ILogger _logger;
+    private readonly RedisInterface.RedisApiClient _redisClient;
 
-    public OrchestrateController(IDeploymentService deploymentService, IMapper mapper, ILogger<OrchestrateController> logger)
+    public OrchestrateController(IDeploymentService deploymentService, IApiClientBuilder clientBuilder, IMapper mapper, ILogger<OrchestrateController> logger)
     {
         _deploymentService = deploymentService;
         _mapper = mapper;
         _logger = logger;
+        _redisClient = clientBuilder.CreateRedisApiClient();
     }
 
     /// <summary>
@@ -58,17 +59,39 @@ public class OrchestrateController : Controller
     }
 
     /// <summary>
-    /// Get actions deployed with the plan by the plan Id
+    /// Get the action plan by the ActionPlanId identifier 
     /// </summary>
-    /// <param name="id"></param>
+    /// <param name="id">Identifier of the created ActionPlan</param>
     /// <returns></returns>
     [HttpGet]
-    [Route("plan/{id}", Name = "GetActionsByPlanId")]
-    [ProducesResponseType(typeof(List<ActionModel>), (int)HttpStatusCode.OK)]
-    [ProducesResponseType((int)HttpStatusCode.NotFound)]
-    public async Task<ActionResult<List<ActionModel>>> GetActionsByPlanId(Guid id)
+    [Route("plan/{id}", Name = "GetActionPlanByPlanId")]
+    [ProducesResponseType(typeof(ActionPlanModel), (int)HttpStatusCode.OK)]
+    [ProducesResponseType(typeof(string), (int)HttpStatusCode.NotFound)]
+    [ProducesResponseType(typeof(string), (int)HttpStatusCode.BadRequest)]
+    [ProducesResponseType(typeof(string), (int)HttpStatusCode.InternalServerError)]
+    public async Task<ActionResult<ActionPlanModel>> GetActionsByPlanId(Guid id)
     {
-        return Ok(new List<ActionModel>());
+        if (id == Guid.Empty)
+        {
+            return BadRequest("Guid has not been specified");
+        }
+        try
+        {
+            RedisInterface.ActionPlanModel riActionPlan = await _redisClient.ActionPlanGetByIdAsync(id);
+            if (riActionPlan is null)
+            {
+                return NotFound("Specified action plan with specified id not found");
+            }
+            ActionPlanModel actionPlan = _mapper.Map<ActionPlanModel>(riActionPlan);
+
+            //TODO: retrieve the latest info about the plan?
+            return Ok(actionPlan);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "There was an error while retrieving the action plan information");
+            return Problem($"There was an error while retrieving the action plan information: {ex.Message}");
+        }
     }
 
     /// <summary>

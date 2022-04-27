@@ -149,7 +149,7 @@
         "tags": [
           "Orchestrate"
         ],
-        "operationId": "GetActionsByPlanId",
+        "operationId": "GetActionPlanByPlanId",
         "parameters": [
           {
             "name": "id",
@@ -167,26 +167,17 @@
             "content": {
               "text/plain": {
                 "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/ActionModel"
-                  }
+                  "$ref": "#/components/schemas/ActionPlanModel"
                 }
               },
               "application/json": {
                 "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/ActionModel"
-                  }
+                  "$ref": "#/components/schemas/ActionPlanModel"
                 }
               },
               "text/json": {
                 "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/ActionModel"
-                  }
+                  "$ref": "#/components/schemas/ActionPlanModel"
                 }
               }
             }
@@ -196,17 +187,57 @@
             "content": {
               "text/plain": {
                 "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
+                  "type": "string"
                 }
               },
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
+                  "type": "string"
                 }
               },
               "text/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Server Error",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "type": "string"
                 }
               }
             }
@@ -363,6 +394,10 @@
             "type": "string",
             "format": "uuid"
           },
+          "ActionName": {
+            "type": "string",
+            "nullable": true
+          },
           "ActionFamily": {
             "type": "string",
             "nullable": true
@@ -379,14 +414,38 @@
             "type": "string",
             "nullable": true
           },
-          "ImageName": {
-            "type": "string",
-            "nullable": true
-          },
           "Services": {
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/InstanceModel"
+            },
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "ActionPlanModel": {
+        "type": "object",
+        "properties": {
+          "relations": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/RelationModel"
+            },
+            "nullable": true
+          },
+          "ActionPlanId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "TaskName": {
+            "type": "string",
+            "nullable": true
+          },
+          "ActionSequence": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ActionModel"
             },
             "nullable": true
           }
@@ -424,6 +483,10 @@
           "Id": {
             "type": "string",
             "format": "uuid"
+          },
+          "InstanceName": {
+            "type": "string",
+            "nullable": true
           },
           "ImageName": {
             "type": "string",
@@ -533,6 +596,10 @@
           "Id": {
             "type": "string",
             "format": "uuid"
+          },
+          "TaskName": {
+            "type": "string",
+            "nullable": true
           },
           "TaskPriority": {
             "type": "integer",
