@@ -264,9 +264,9 @@ namespace Middleware.RedisInterface.Controllers
             {
                 if (actionPlan == null)
                 {
-                    BadRequest("Plan cannot be null");
+                    return BadRequest("Plan cannot be null");
                 }
-                var plan = await _actionPlanRepository.AddAsync(actionPlan);
+                var plan = await _actionPlanRepository.AddAsync(actionPlan, () => actionPlan.Id);
                 if (plan == null)
                 {
                     return BadRequest("The specified plan has not been added.");
