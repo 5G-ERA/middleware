@@ -48,4 +48,11 @@ public interface IBaseRepository<T> where T : class
     /// <param name="relationNames">Names of the relations</param>
     /// <returns></returns>
     Task<List<RelationModel>> GetRelations(Guid id, List<string> relationNames);
+
+    Task<bool> AddGraphAsync(GraphEntityModel model);
+    Task<bool> AddRelationAsync(RelationModel relation);
+
+    Task<bool> DeleteGraphModelAsync(GraphEntityModel model);
+
+    Task<bool> DeleteRelationAsync(RelationModel relation);
 }

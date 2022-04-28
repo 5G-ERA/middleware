@@ -20,5 +20,11 @@ namespace Middleware.Common.Models
             Name = name;
             Type = dbIndex.ToString().ToUpper();
         }
+
+        public GraphEntityModel(Guid id, RedisDbIndexEnum dbIndex)
+        {
+            Id = id;
+            Type = dbIndex.ToString().ToUpper();
+        }
     }
 }

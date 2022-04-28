@@ -69,7 +69,7 @@ namespace Middleware.Common.Repositories
             if (guidProvider == null) throw new ArgumentNullException(nameof(guidProvider));
 
             model.Id = guidProvider.Invoke();
-            var result = await Db.JsonSetAsync(model.Id.ToString(), JsonSerializer.Serialize(model));
+            OperationResult result = await Db.JsonSetAsync(model.Id.ToString(), JsonSerializer.Serialize(model));
             bool retVal = result.IsSuccess;
             if (retVal == false)
             {
@@ -114,9 +114,22 @@ namespace Middleware.Common.Repositories
         public async Task<bool> DeleteByIdAsync(Guid id)
         {
             int deleted = await Db.JsonDeleteAsync(id.ToString());
+            bool success = deleted > 0;
+            if (success == false) 
+            { 
+                return false; 
+            }
+            if (IsWritableToGraph)
+            {
+                GraphEntityModel model = new GraphEntityModel(id, _redisDbIndex); 
 
-            return deleted > 0;
+                bool isDeleted = await DeleteGraphModelAsync(model);
+                
+                return isDeleted;
+            }
+            return success;
         }
+
         /// <summary>
         /// Execute the given Lua query against the redis data store
         /// </summary>
@@ -234,12 +247,9 @@ namespace Middleware.Common.Repositories
         }
 
 
-        public async Task<bool> AddRelationAsync(GraphEntityModel model, string relationName)
+        public async Task<bool> AddRelationAsync(RelationModel relation)
         {
-            model.Type = _redisDbIndex.ToString().ToUpper();
-            relationName = relationName?.ToUpper();
-
-            string query = "MATCH (x: " + model.Type + " {ID: '" + model.Id + "'}), (c: " + model.Type + " {ID: '" + model.Id + "'}) CREATE (x)-[:" + relationName + "]->(c) ";
+            string query = "MATCH (x: " + relation.InitiatesFrom.Type + " {ID: '" + relation.InitiatesFrom.Id + "'}), (c: " + relation.PointsTo.Type + " {ID: '" + relation.PointsTo.Id + "'}) CREATE (x)-[:" + relation.RelationName + "]->(c) ";
             ResultSet resultSet = await RedisGraph.Query(GraphName, query);
 
             return resultSet != null && resultSet.Metrics.RelationshipsCreated == 1;
@@ -250,19 +260,16 @@ namespace Middleware.Common.Repositories
         {
             model.Type = _redisDbIndex.ToString().ToUpper();
 
-            string query = "MATCH (e: " + model.Type + " {ID: '" + model.Id + "', Name: '" + model.Name + "'}) DELETE e";
+            string query = "MATCH (e: " + model.Type + " {ID: '" + model.Id + "'}) DELETE e";
             ResultSet resultSet = await RedisGraph.Query(GraphName, query);
 
             return resultSet != null && resultSet.Metrics.NodesDeleted == 1;
         }
 
 
-        public async Task<bool> DeleteRelationAsync(GraphEntityModel model, string relationName)
+        public async Task<bool> DeleteRelationAsync(RelationModel relation)
         {
-            model.Type = _redisDbIndex.ToString().ToUpper();
-            relationName = relationName?.ToUpper();
-
-            string query = "MATCH (x: " + model.Type + " {ID: '" + model.Id + "'})-[e: " + relationName + " ]->(y: " + model.Type + " {ID: '" + model.Id + "'}) DELETE e";
+            string query = "MATCH (x: " + relation.InitiatesFrom.Type + " {ID: '" + relation.InitiatesFrom.Id + "'})-[e: " + relation.RelationName + " ]->(y: " + relation.PointsTo.Type + " {ID: '" + relation.PointsTo.Id + "'}) DELETE e";
             ResultSet resultSet = await RedisGraph.Query(GraphName, query);
 
             return resultSet != null && resultSet.Metrics.RelationshipsDeleted == 1;

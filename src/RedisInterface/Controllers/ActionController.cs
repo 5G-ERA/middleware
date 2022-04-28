@@ -158,6 +158,30 @@ namespace Middleware.RedisInterface.Controllers
         }
 
 
+        [HttpPost]
+        [Route("AddRelation", Name = "ActionAddRelation")]
+        [ProducesResponseType(typeof(RelationModel), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(string), (int)HttpStatusCode.BadRequest)]
+        [ProducesResponseType(typeof(string), (int)HttpStatusCode.InternalServerError)]
+        public async Task<ActionResult<RelationModel>> AddRelationAsync([FromBody] RelationModel model)
+        {
+            if (model == null)
+            {
+                BadRequest("Parameters were not specified.");
+            }
+            try
+            {
+                await _actionRepository.AddRelationAsync(model);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex.Message);
+                return Problem("Something went wrong while calling the API");
+            }
+            return Ok(model);
+        }
+
+
         [HttpGet]
         [Route("relation/{name}", Name = "ActionGetRelationByName")]
         [ProducesResponseType(typeof(List<RelationModel>), (int)HttpStatusCode.OK)]
