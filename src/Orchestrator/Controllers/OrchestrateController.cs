@@ -136,7 +136,6 @@ public class OrchestrateController : Controller
 
     public async Task<ActionResult> DeletePlanById(Guid id)
     {
-        // TODO: Delete plan with specified Id
         if (id == Guid.Empty)
         {
             return BadRequest("Id of the plan  has to be specified");
