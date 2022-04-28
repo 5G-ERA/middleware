@@ -119,7 +119,7 @@ public class OrchestrateController : Controller
     [ProducesResponseType((int)HttpStatusCode.NotFound)]
     public async Task<IActionResult> DeleteActionById(Guid id)
     {
-        // TODO: Delete plan with specified Id
+        // TODO: Delete action with specified Id
         return Ok();
     }
     /// <summary>
@@ -129,10 +129,44 @@ public class OrchestrateController : Controller
     /// <returns></returns>
     [HttpDelete]
     [Route("plan/{id}", Name = "DeletePlanById")]
+    [ProducesResponseType(typeof(void), (int)HttpStatusCode.OK)]
+    [ProducesResponseType(typeof(string),(int)HttpStatusCode.NotFound)]
+    [ProducesResponseType(typeof(string),(int)HttpStatusCode.BadRequest)]
+    [ProducesResponseType(typeof(string), (int)HttpStatusCode.InternalServerError)]
+
     public async Task<ActionResult> DeletePlanById(Guid id)
     {
         // TODO: Delete plan with specified Id
-        return Ok();
+        if (id == Guid.Empty)
+        {
+            return BadRequest("Id of the plan  has to be specified");
+        }
+
+        try
+        {
+            RedisInterface.ActionPlanModel riActionPlan = await _redisClient.ActionPlanGetByIdAsync(id);
+            if (riActionPlan is null)
+            {
+                return NotFound($"Could not find the Action Plan with specified id: {id}");
+            }
+
+            ActionPlanModel actionPlan = _mapper.Map<ActionPlanModel>(riActionPlan);
+
+            var isSuccess = await _deploymentService.DeletePlanAsync(actionPlan);
+
+            if (isSuccess == false)
+            {
+                return Problem($"Unable to delete the services for the action plan with id {id}");
+            }
+
+            await _redisClient.ActionPlanDeleteAsync(id);
+            return Ok();
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error while deleting the specified action plan with id {id}", id);
+            return Problem($"Could not delete the action plan with id {id}");
+        }
     }
 
 

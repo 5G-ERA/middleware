@@ -1,5 +1,6 @@
-﻿using System.Security.Policy;
-using k8s.Models;
+﻿using k8s.Models;
+using Middleware.Common.Enums;
+using Middleware.Common.ExtensionMethods;
 
 namespace Middleware.Orchestrator.Config;
 
@@ -26,4 +27,9 @@ public static class AppConfig
     /// Configuration of the application Development / Release
     /// </summary>
     public static string AppConfiguration { get; set; }
+    /// <summary>
+    /// Is the application running in the Development environment
+    /// </summary>
+    /// <returns></returns>
+    public static bool IsDevEnvironment() => AppConfiguration == AppVersionEnum.Dev.GetStringValue();
 }

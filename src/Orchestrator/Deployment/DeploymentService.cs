@@ -246,6 +246,67 @@ public class DeploymentService : IDeploymentService
     }
 
     /// <inheritdoc/>
+    public async Task<bool> DeletePlanAsync(ActionPlanModel actionPlan)
+    {
+        bool retVal = true;
+        try
+        {
+            var k8sClient = _kubernetesBuilder.CreateKubernetesClient();
+            foreach (var action in actionPlan.ActionSequence)
+            {
+                foreach (var srv in action.Services)
+                {
+                    retVal &= await DeleteInstance(k8sClient, srv);
+                }
+            }
+        }
+        catch (NotInK8SEnvironmentException)
+        {
+            _logger.LogInformation("The instantiation of the kubernetes client has failed in {env} environment.", AppConfig.AppConfiguration);
+
+            retVal = AppConfig.AppConfiguration == AppVersionEnum.Dev.GetStringValue();
+            if (retVal)
+                _logger.LogWarning("Deployment of the services has been skipped in the Development environment");
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "The deletion of the Action Plan has failed!");
+            retVal = false;
+        }
+        return retVal;
+    }
+    /// <summary>
+    /// Deletes the instance specified. The deletion includes associated deployment and service
+    /// </summary>
+    /// <param name="k8sClient"></param>
+    /// <param name="instance"></param>
+    /// <returns></returns>
+    private async Task<bool> DeleteInstance(IKubernetes k8sClient, InstanceModel instance)
+    {
+        const string success = "Success";
+        var retVal = true;
+
+        var deployments = await k8sClient.ListNamespacedDeploymentAsync(AppConfig.K8SNamespaceName,
+            labelSelector: V1ObjectMetaExtensions.GetServiceLabelSelector(instance.ServiceInstanceId));
+        var services = await k8sClient.ListNamespacedServiceAsync(AppConfig.K8SNamespaceName,
+            labelSelector: V1ObjectMetaExtensions.GetServiceLabelSelector(instance.ServiceInstanceId));
+
+        foreach (var deployment in deployments.Items)
+        {
+            var status = await k8sClient.DeleteNamespacedDeploymentAsync(deployment.Name(), AppConfig.K8SNamespaceName);
+            retVal &= status.Status == success;
+        }
+
+        foreach (var service in services.Items)
+        {
+            var status = await k8sClient.DeleteNamespacedDeploymentAsync(service.Name(), AppConfig.K8SNamespaceName);
+            retVal &= status.Status == success;
+        }
+
+        return retVal;
+    }
+
+    /// <inheritdoc/>
     public V1Deployment CreateStartupDeployment(string name)
     {
         var selector = new V1LabelSelector
