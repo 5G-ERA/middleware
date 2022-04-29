@@ -167,7 +167,11 @@ namespace Middleware.RedisInterface.Controllers
             }
             try
             {
-                await _instanceRepository.AddRelationAsync(model);
+                bool isValid = await _instanceRepository.AddRelationAsync(model);
+                if (!isValid)
+                {
+                    return Problem("The relation was not created");
+                }
             }
             catch (Exception ex)
             {
