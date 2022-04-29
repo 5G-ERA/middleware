@@ -8,7 +8,7 @@ namespace Middleware.Common.Repositories;
 
 public class ActionPlanRepository : BaseRepository<ActionPlanModel>, IActionPlanRepository
 {
-    public ActionPlanRepository(IConnectionMultiplexer redisClient, IRedisGraphClient redisGraph, ILogger logger) : base(RedisDbIndexEnum.ActionSequence, redisClient, redisGraph, logger, false)
+    public ActionPlanRepository(IConnectionMultiplexer redisClient, IRedisGraphClient redisGraph, ILogger<ActionPlanRepository> logger) : base(RedisDbIndexEnum.ActionSequence, redisClient, redisGraph, logger, false)
     {
     }
 }

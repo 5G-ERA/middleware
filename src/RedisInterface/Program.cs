@@ -37,6 +37,7 @@ RedisGraphClient redisGraphClient = new RedisGraphClient(redisHostname, int.Pars
 builder.Services.AddSingleton<IRedisGraphClient>(redisGraphClient);
 
 builder.Services.AddScoped<IActionRepository, ActionRepository>();
+builder.Services.AddScoped<IActionPlanRepository, ActionPlanRepository>();
 builder.Services.AddScoped<ICloudRepository, CloudRepository>();
 builder.Services.AddScoped<IContainerImageRepository, ContainerImageRepository>();
 builder.Services.AddScoped<IEdgeRepository, EdgeRepository>();
