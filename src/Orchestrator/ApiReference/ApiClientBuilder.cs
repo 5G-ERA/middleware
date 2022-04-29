@@ -24,7 +24,7 @@ public class ApiClientBuilder : IApiClientBuilder
         var address = _env.GetEnvVariable("REDIS_INTERFACE_ADDRESS") ??
                       throw new ArgumentNullException("REDIS_INTERFACE_ADDRESS", "REDIS_INTERFACE_ADDRESS environment variable not specified");
         var client = _httpClientFactory.CreateClient(AppConfig.RedisApiClientName);
-        return new RedisApiClient($"{address}.{AppConfig.K8SNamespaceName}.svc.cluster.local", client);
+        return new RedisApiClient($"{address}", client);
     }
     
     /// <summary>
