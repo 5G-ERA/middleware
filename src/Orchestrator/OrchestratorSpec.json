@@ -454,7 +454,7 @@
             "type": "string",
             "format": "uuid"
           },
-          "ActionName": {
+          "Name": {
             "type": "string",
             "nullable": true
           },
@@ -512,6 +512,43 @@
         },
         "additionalProperties": false
       },
+      "ContainerImageModel": {
+        "type": "object",
+        "properties": {
+          "relations": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/RelationModel"
+            },
+            "nullable": true
+          },
+          "Id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "Name": {
+            "type": "string",
+            "nullable": true
+          },
+          "Timestamp": {
+            "type": "string",
+            "nullable": true
+          },
+          "Description": {
+            "type": "string",
+            "nullable": true
+          },
+          "K8SDeployment": {
+            "type": "string",
+            "nullable": true
+          },
+          "K8SService": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
       "GraphEntityModel": {
         "type": "object",
         "properties": {
@@ -544,7 +581,7 @@
             "type": "string",
             "format": "uuid"
           },
-          "InstanceName": {
+          "Name": {
             "type": "string",
             "nullable": true
           },
@@ -576,6 +613,9 @@
           "ServiceStatus": {
             "type": "string",
             "nullable": true
+          },
+          "ContainerImage": {
+            "$ref": "#/components/schemas/ContainerImageModel"
           }
         },
         "additionalProperties": false
@@ -657,7 +697,7 @@
             "type": "string",
             "format": "uuid"
           },
-          "TaskName": {
+          "Name": {
             "type": "string",
             "nullable": true
           },

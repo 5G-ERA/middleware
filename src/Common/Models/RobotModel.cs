@@ -7,7 +7,7 @@ public class RobotModel : BaseModel
     [JsonPropertyName("Id")]
     public override Guid Id { get; set; }
 
-    [JsonPropertyName("RobotName")]
+    [JsonPropertyName("Name")]
     public override string Name { get; set; }
 
     [JsonPropertyName("Manufacturer")]

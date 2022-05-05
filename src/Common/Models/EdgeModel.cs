@@ -7,7 +7,7 @@ public class EdgeModel : BaseModel
     [JsonPropertyName("Id")]
     public override Guid Id { get; set; }
 
-    [JsonPropertyName("EdgeName")]
+    [JsonPropertyName("Name")]
     public override string Name { get; set; }
 
     [JsonPropertyName("EdgeStatus")]

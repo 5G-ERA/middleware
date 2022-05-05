@@ -349,6 +349,10 @@
             "type": "string",
             "format": "uuid"
           },
+          "Name": {
+            "type": "string",
+            "nullable": true
+          },
           "ActionFamily": {
             "type": "string",
             "nullable": true
@@ -365,15 +369,48 @@
             "type": "string",
             "nullable": true
           },
-          "ImageName": {
-            "type": "string",
-            "nullable": true
-          },
           "Services": {
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/InstanceModel"
             },
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "ContainerImageModel": {
+        "type": "object",
+        "properties": {
+          "relations": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/RelationModel"
+            },
+            "nullable": true
+          },
+          "Id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "Name": {
+            "type": "string",
+            "nullable": true
+          },
+          "Timestamp": {
+            "type": "string",
+            "nullable": true
+          },
+          "Description": {
+            "type": "string",
+            "nullable": true
+          },
+          "K8SDeployment": {
+            "type": "string",
+            "nullable": true
+          },
+          "K8SService": {
+            "type": "string",
             "nullable": true
           }
         },
@@ -411,6 +448,10 @@
             "type": "string",
             "format": "uuid"
           },
+          "Name": {
+            "type": "string",
+            "nullable": true
+          },
           "ImageName": {
             "type": "string",
             "nullable": true
@@ -439,6 +480,9 @@
           "ServiceStatus": {
             "type": "string",
             "nullable": true
+          },
+          "ContainerImage": {
+            "$ref": "#/components/schemas/ContainerImageModel"
           }
         },
         "additionalProperties": false
@@ -470,6 +514,10 @@
             "type": "string",
             "format": "uuid"
           },
+          "Name": {
+            "type": "string",
+            "nullable": true
+          },
           "Timestamp": {
             "type": "string",
             "format": "date-time"
@@ -479,10 +527,6 @@
             "nullable": true
           },
           "Description": {
-            "type": "string",
-            "nullable": true
-          },
-          "PolicyName": {
             "type": "string",
             "nullable": true
           }
@@ -543,6 +587,10 @@
           "Id": {
             "type": "string",
             "format": "uuid"
+          },
+          "Name": {
+            "type": "string",
+            "nullable": true
           },
           "TaskPriority": {
             "type": "integer",

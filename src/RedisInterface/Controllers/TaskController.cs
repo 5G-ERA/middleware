@@ -1,8 +1,11 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Middleware.Common.Enums;
 using Middleware.Common.Models;
 using Middleware.Common.Repositories;
+using Middleware.Common.Repositories.Abstract;
 using System.Net;
+using System.Text.Json;
 
 namespace Middleware.RedisInterface.Controllers
 {
@@ -11,12 +14,18 @@ namespace Middleware.RedisInterface.Controllers
     public class TaskController : ControllerBase
     {
         private readonly ITaskRepository _taskRepository;
+        private readonly IActionRepository _actionRepository;
+        private readonly IInstanceRepository _instanceRepository;
+        private readonly IContainerImageRepository _containerImageRepository;
         private readonly ILogger _logger;
 
-        public TaskController(ITaskRepository repository, ILogger<TaskController> logger)
+        public TaskController(ITaskRepository taskRepository, IActionRepository actionRepository, IInstanceRepository instanceRepository, IContainerImageRepository containerImageRepository, ILogger<TaskController> logger)
         {
-            _taskRepository = repository ?? throw new ArgumentNullException(nameof(repository));
+            _taskRepository = taskRepository ?? throw new ArgumentNullException(nameof(taskRepository));
+            _actionRepository = actionRepository ?? throw new ArgumentNullException(nameof(actionRepository));
+            _instanceRepository = instanceRepository ?? throw new ArgumentNullException(nameof(instanceRepository));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+            _containerImageRepository = containerImageRepository ?? throw new ArgumentNullException(nameof(containerImageRepository));  
         }
 
         /// <summary>
@@ -229,6 +238,71 @@ namespace Middleware.RedisInterface.Controllers
                 return Problem(ex.Message);
             }
         }
+
+
+        [HttpPost]
+        [Route("ImportTask", Name = "ImportTaskAsync")]
+        [ProducesResponseType(typeof(ActionResult<TaskModel>), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(string), (int)HttpStatusCode.BadRequest)]
+        [ProducesResponseType(typeof(string), (int)HttpStatusCode.InternalServerError)]
+        public async Task<ActionResult<TaskModel>> ImportTaskAsync([FromBody] TaskModel model) 
+        {
+            if (model == null)
+            {
+                BadRequest("Parameters for TaskModel were not specified corectly.");
+            }
+            if (!model.ActionSequence.Any()) { return BadRequest("Parameters for ActionSequence were not specified."); }
+            foreach (ActionModel actionModel in model.ActionSequence) 
+            {
+                
+                await _actionRepository.AddAsync(actionModel);
+
+                if (!actionModel.Services.Any()) { return BadRequest("Parameters for Services were not specified."); }
+                foreach (InstanceModel instanceModel in actionModel.Services) 
+                {
+                    
+                    await _instanceRepository.AddAsync(instanceModel);
+
+                    if (instanceModel.ContainerImage == null) { return BadRequest("Parameters for ContainerImage were not specified."); }
+                    await _containerImageRepository.AddAsync(instanceModel.ContainerImage);
+
+                    //RELATIONSHIP--NEEDS (INSTANCE-IMAGE)
+                    GraphEntityModel initatesFrom, pointsTo;
+                    string relationname = "NEEDS";
+                    initatesFrom = new GraphEntityModel(instanceModel.Id, instanceModel.Name, RedisDbIndexEnum.Instance);
+                    pointsTo = new GraphEntityModel(instanceModel.ContainerImage.Id, instanceModel.ContainerImage.Name, RedisDbIndexEnum.Container);
+                    RelationModel imageRelation = new RelationModel(initatesFrom, pointsTo, relationname);
+                    bool isImageValid = await _containerImageRepository.AddRelationAsync(imageRelation);
+                    if (!isImageValid) { return Problem("The relation was not created"); }
+                }
+                //RELATIONSHIP--NEEDS (ACTION-INSTANCE)
+                foreach (var action in actionModel.Services)
+                {
+                    GraphEntityModel initiatesFrom, pointsTo;
+                    string relationname = "NEEDS";
+                    initiatesFrom = new GraphEntityModel(actionModel.Id, actionModel.Name, RedisDbIndexEnum.Action);
+                    pointsTo = new GraphEntityModel(action.Id, action.Name, RedisDbIndexEnum.Instance);
+                    RelationModel instanceRelation = new RelationModel(initiatesFrom, pointsTo, relationname);
+                    bool isInstanceValid = await _instanceRepository.AddRelationAsync(instanceRelation);
+                    if (!isInstanceValid) { return Problem("The relation was not created"); }
+                }
+                
+            }
+            TaskModel importModel = await _taskRepository.AddAsync(model);
+            foreach (var action  in model.ActionSequence) 
+            {
+                //RELATIONSHIP--EXTENDS (TASK->ACTION)
+                GraphEntityModel initiatesFrom, pointsTo;
+                string relationName = "EXTENDS";
+                initiatesFrom = new GraphEntityModel(importModel.Id, importModel.Name, RedisDbIndexEnum.Task);
+                pointsTo = new GraphEntityModel(action.Id, action.Name, RedisDbIndexEnum.Action);
+                RelationModel taskRelation = new RelationModel(initiatesFrom, pointsTo, relationName);
+                bool isTaskValid = await _taskRepository.AddRelationAsync(taskRelation);
+                if (!isTaskValid) { return Problem("The relation was not created"); } 
+            }
+            return Ok(importModel);
+        }
+
 
 
     }
