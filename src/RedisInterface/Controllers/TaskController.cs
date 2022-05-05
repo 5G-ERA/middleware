@@ -276,12 +276,12 @@ namespace Middleware.RedisInterface.Controllers
                     if (!isImageValid) { return Problem("The relation was not created"); }
                 }
                 //RELATIONSHIP--NEEDS (ACTION-INSTANCE)
-                foreach (var action in actionModel.Services)
+                foreach (var instance in actionModel.Services)
                 {
                     GraphEntityModel initiatesFrom, pointsTo;
                     string relationname = "NEEDS";
                     initiatesFrom = new GraphEntityModel(actionModel.Id, actionModel.Name, RedisDbIndexEnum.Action);
-                    pointsTo = new GraphEntityModel(action.Id, action.Name, RedisDbIndexEnum.Instance);
+                    pointsTo = new GraphEntityModel(instance.Id, instance.Name, RedisDbIndexEnum.Instance);
                     RelationModel instanceRelation = new RelationModel(initiatesFrom, pointsTo, relationname);
                     bool isInstanceValid = await _instanceRepository.AddRelationAsync(instanceRelation);
                     if (!isInstanceValid) { return Problem("The relation was not created"); }
