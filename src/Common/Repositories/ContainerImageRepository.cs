@@ -30,7 +30,7 @@ namespace Middleware.Common.Repositories
             {
                 currentModel.Name = patch.Name;
             }
-            if (!string.IsNullOrEmpty(patch.Timestamp))
+            if (!string.IsNullOrEmpty(patch.Timestamp.ToString()))
             {
                 currentModel.Timestamp = patch.Timestamp;
             }
