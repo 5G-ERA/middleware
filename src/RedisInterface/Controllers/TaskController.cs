@@ -254,13 +254,11 @@ namespace Middleware.RedisInterface.Controllers
             if (!model.ActionSequence.Any()) { return BadRequest("Parameters for ActionSequence were not specified."); }
             foreach (ActionModel actionModel in model.ActionSequence) 
             {
-                
                 await _actionRepository.AddAsync(actionModel);
 
                 if (!actionModel.Services.Any()) { return BadRequest("Parameters for Services were not specified."); }
                 foreach (InstanceModel instanceModel in actionModel.Services) 
-                {
-                    
+                { 
                     await _instanceRepository.AddAsync(instanceModel);
 
                     if (instanceModel.ContainerImage == null) { return BadRequest("Parameters for ContainerImage were not specified."); }
@@ -285,8 +283,7 @@ namespace Middleware.RedisInterface.Controllers
                     RelationModel instanceRelation = new RelationModel(initiatesFrom, pointsTo, relationname);
                     bool isInstanceValid = await _instanceRepository.AddRelationAsync(instanceRelation);
                     if (!isInstanceValid) { return Problem("The relation was not created"); }
-                }
-                
+                }  
             }
             TaskModel importModel = await _taskRepository.AddAsync(model);
             foreach (var action  in model.ActionSequence) 
