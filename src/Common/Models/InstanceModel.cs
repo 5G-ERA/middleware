@@ -32,5 +32,6 @@ public class InstanceModel : BaseModel
     public string ServiceStatus { get; set; }
 
     [JsonPropertyName("ContainerImage")]
+    [JsonIgnore]
     public ContainerImageModel ContainerImage { get; set; }
 }
