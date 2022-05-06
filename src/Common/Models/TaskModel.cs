@@ -17,6 +17,7 @@ namespace Middleware.Common.Models
         public Guid ActionPlanId { get; set; }
 
         [JsonPropertyName("ActionSequence")]
+        [JsonIgnore]
         public List<ActionModel> ActionSequence { get; set; }
 
         public TaskModel()
