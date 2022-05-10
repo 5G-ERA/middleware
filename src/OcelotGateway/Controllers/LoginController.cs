@@ -1,4 +1,5 @@
-﻿using System.Security.Cryptography;
+﻿using System.Net;
+using System.Security.Cryptography;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Cryptography.KeyDerivation;
 using Microsoft.AspNetCore.Mvc;
@@ -47,7 +48,7 @@ namespace Middleware.OcelotGateway.Controllers
                 _logger.LogError(ex.Message);
                 return Problem("Something went wrong while calling the API");
             }
-            return Ok(register);
+            return StatusCode((int)HttpStatusCode.Created);
         }
 
 
