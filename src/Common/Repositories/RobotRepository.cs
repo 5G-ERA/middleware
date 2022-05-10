@@ -11,10 +11,22 @@ namespace Middleware.Common.Repositories
 {
     public class RobotRepository : BaseRepository<RobotModel>, IRobotRepository
     {
+        /// <summary>
+        /// Default constructor
+        /// </summary>
+        /// <param name="redisClient"></param>
+        /// <param name="redisGraph"></param>
+        /// <param name="logger"></param>
         public RobotRepository(IConnectionMultiplexer redisClient, IRedisGraphClient redisGraph, ILogger<RobotRepository> logger) : base(RedisDbIndexEnum.Robot, redisClient, redisGraph, logger, true)
         {
         }
 
+        /// <summary>
+        /// Patching properties for RobotModel
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="patch"></param>
+        /// <returns> Patched model </returns>
         public async Task<RobotModel> PatchRobotAsync(Guid id, RobotModel patch) 
         {
             string model = (string)await Db.JsonGetAsync(id.ToString());

@@ -10,10 +10,20 @@ namespace Middleware.Common.Repositories
 {
     public class PolicyRepository : BaseRepository<PolicyModel>, IPolicyRepository
     {
+        /// <summary>
+        /// Default constructor
+        /// </summary>
+        /// <param name="redisClient"></param>
+        /// <param name="redisGraph"></param>
+        /// <param name="logger"></param>
         public PolicyRepository(IConnectionMultiplexer redisClient, IRedisGraphClient redisGraph, ILogger<PolicyRepository> logger) : base(RedisDbIndexEnum.Policy, redisClient, redisGraph, logger, false)
         {
         }
 
+        /// <summary>
+        /// Retrieve all Policy models
+        /// </summary>
+        /// <returns> The list of policies </returns>
         public async Task<List<PolicyModel>> GetAllPoliciesAsync()
         {
             var keys = await GetKeysAsync("GetKeys");
@@ -28,6 +38,10 @@ namespace Middleware.Common.Repositories
             return policies;
         }
 
+        /// <summary>
+        /// Retrieves active policies
+        /// </summary>
+        /// <returns> Active policies </returns>
         public async Task<List<PolicyModel>> GetActivePoliciesAsync()
         {
             List<PolicyModel> activePolicies = await ExecuteLuaQueryAsync("GetActivePolicies");
@@ -35,6 +49,12 @@ namespace Middleware.Common.Repositories
             return activePolicies;
         }
 
+        /// <summary>
+        /// Patching properties for PolicyModel
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="patch"></param>
+        /// <returns> Patched model </returns>
         public async Task<PolicyModel> PatchPolicyAsync(Guid id, PolicyModel patch) 
         {
             string model = (string)await Db.JsonGetAsync(id.ToString());

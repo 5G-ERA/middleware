@@ -11,11 +11,22 @@ namespace Middleware.Common.Repositories
 {
     public class ActionRepository : BaseRepository<ActionModel>, IActionRepository
     {
+        /// <summary>
+        /// Default constructor
+        /// </summary>
+        /// <param name="redisClient"></param>
+        /// <param name="redisGraph"></param>
+        /// <param name="logger"></param>
         public ActionRepository(IConnectionMultiplexer redisClient, IRedisGraphClient redisGraph, ILogger<ActionRepository> logger) : base(RedisDbIndexEnum.Action, redisClient, redisGraph, logger, true)
         {
         }
 
-
+        /// <summary>
+        /// Patching properties for ActionModel
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="patch"></param>
+        /// <returns> Patched model </returns>
         public async Task<ActionModel> PatchActionAsync(Guid id, ActionModel patch)
         {
             string model = (string)await Db.JsonGetAsync(id.ToString());

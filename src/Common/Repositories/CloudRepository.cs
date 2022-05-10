@@ -11,10 +11,22 @@ namespace Middleware.Common.Repositories
 {
     public class CloudRepository : BaseRepository<CloudModel>, ICloudRepository
     {
+        /// <summary>
+        /// Default constructor
+        /// </summary>
+        /// <param name="redisClient"></param>
+        /// <param name="redisGraph"></param>
+        /// <param name="logger"></param>
         public CloudRepository(IConnectionMultiplexer redisClient, IRedisGraphClient redisGraph, ILogger<CloudRepository> logger) : base(RedisDbIndexEnum.Cloud, redisClient, redisGraph, logger, true)
         {
         }
 
+        /// <summary>
+        /// Patching properties for CloudModel
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="patch"></param>
+        /// <returns> Patched model </returns>
         public async Task<CloudModel> PatchCloudAsync(Guid id, CloudModel patch) 
         {
             string model = (string)await Db.JsonGetAsync(id.ToString());

@@ -11,11 +11,22 @@ namespace Middleware.Common.Repositories
 {
     public class EdgeRepository : BaseRepository<EdgeModel>, IEdgeRepository
     {
+        /// <summary>
+        /// Default constructor
+        /// </summary>
+        /// <param name="redisClient"></param>
+        /// <param name="redisGraph"></param>
+        /// <param name="logger"></param>
         public EdgeRepository(IConnectionMultiplexer redisClient, IRedisGraphClient redisGraph, ILogger<EdgeRepository> logger) : base(RedisDbIndexEnum.Edge, redisClient, redisGraph, logger, true)
         {
         }
 
-
+        /// <summary>
+        /// Patching properties for EdgeModel
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="patch"></param>
+        /// <returns> Patched model </returns>
         public async Task<EdgeModel> PatchEdgeAsync(Guid id, EdgeModel patch) 
         {
             string model = (string)await Db.JsonGetAsync(id.ToString());

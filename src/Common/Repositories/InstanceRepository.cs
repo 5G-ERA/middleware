@@ -10,11 +10,22 @@ namespace Middleware.Common.Repositories
 {
     public class InstanceRepository : BaseRepository<InstanceModel>, IInstanceRepository
     {
+        /// <summary>
+        /// Default constructor
+        /// </summary>
+        /// <param name="redisClient"></param>
+        /// <param name="redisGraph"></param>
+        /// <param name="logger"></param>
         public InstanceRepository(IConnectionMultiplexer redisClient, IRedisGraphClient redisGraph, ILogger<InstanceRepository> logger) : base(RedisDbIndexEnum.Instance, redisClient, redisGraph, logger, true)
         {
         }
 
-        
+        /// <summary>
+        /// Patching properties for InstaceModel
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="patch"></param>
+        /// <returns> Patched model </returns>
         public async Task<InstanceModel> PatchInstanceAsync(Guid id, InstanceModel patch)
         {
             string model = (string)await Db.JsonGetAsync(id.ToString());

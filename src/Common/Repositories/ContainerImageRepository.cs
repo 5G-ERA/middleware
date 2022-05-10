@@ -13,11 +13,24 @@ namespace Middleware.Common.Repositories
     {
         private readonly IInstanceRepository _instanceRepository;
 
+        /// <summary>
+        /// Default constructor
+        /// </summary>
+        /// <param name="instanceRepository"></param>
+        /// <param name="redisClient"></param>
+        /// <param name="redisGraph"></param>
+        /// <param name="logger"></param>
         public ContainerImageRepository(IInstanceRepository instanceRepository, IConnectionMultiplexer redisClient, IRedisGraphClient redisGraph, ILogger<ContainerImageRepository> logger) : base(RedisDbIndexEnum.Container, redisClient, redisGraph, logger, true)
         {
             _instanceRepository = instanceRepository;
         }
 
+        /// <summary>
+        /// Patching properties for ContainerImageModel
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="patch"></param>
+        /// <returns> Patched model </returns>
         public async Task<ContainerImageModel> PatchContainerImageAsync(Guid id, ContainerImageModel patch)
         {
             string model = (string)await Db.JsonGetAsync(id.ToString());
