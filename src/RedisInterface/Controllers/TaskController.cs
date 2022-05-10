@@ -95,7 +95,7 @@ namespace Middleware.RedisInterface.Controllers
         {
             if (model == null)
             {
-                BadRequest("Parameters were not specified.");
+                return BadRequest("Parameters were not specified.");
             }
             try
             {
@@ -173,7 +173,7 @@ namespace Middleware.RedisInterface.Controllers
         {
             if (model == null)
             {
-                BadRequest("Parameters were not specified.");
+                return BadRequest("Parameters were not specified.");
             }
             try
             {
@@ -249,7 +249,7 @@ namespace Middleware.RedisInterface.Controllers
         {
             if (model == null)
             {
-                BadRequest("Parameters for TaskModel were not specified corectly.");
+                return BadRequest("Parameters for TaskModel were not specified corectly.");
             }
             if (!model.ActionSequence.Any()) { return BadRequest("Parameters for ActionSequence were not specified."); }
             foreach (ActionModel actionModel in model.ActionSequence) 

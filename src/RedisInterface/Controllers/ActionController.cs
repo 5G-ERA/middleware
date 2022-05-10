@@ -167,7 +167,7 @@ namespace Middleware.RedisInterface.Controllers
         {
             if (model == null)
             {
-                BadRequest("Parameters were not specified.");
+                return BadRequest("Parameters were not specified.");
             }
             try
             {
