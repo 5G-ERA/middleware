@@ -2,7 +2,7 @@
 
 namespace Middleware.Common.Models;
 
-public class ActionPlanModel : BaseModel
+public sealed class ActionPlanModel : BaseModel
 {
     [JsonPropertyName("ActionPlanId")]
     public override Guid Id { get; set; }

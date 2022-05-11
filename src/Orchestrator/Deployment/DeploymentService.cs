@@ -61,7 +61,6 @@ public class DeploymentService : IDeploymentService
             var deploymentNames = deployments.Items.Select(d => d.Metadata.Name).OrderBy(d => d).ToArray();
             _logger.LogDebug("Current deployments: {deployments}", string.Join(", ", deploymentNames));
 
-
             foreach (var seq in task.ActionSequence)
             {
                 foreach (var service in seq.Services)
@@ -77,7 +76,6 @@ public class DeploymentService : IDeploymentService
                     }
                 }
             }
-
             isSuccess &= await SaveActionSequence(task);
         }
         catch (NotInK8SEnvironmentException)
@@ -131,6 +129,7 @@ public class DeploymentService : IDeploymentService
 
             if (deploymentNames.Contains(cim.Name))
             {
+
                 //TODO: handle the check if the deployment or a service already exists
                 continue;
             }
@@ -141,6 +140,7 @@ public class DeploymentService : IDeploymentService
             service.ServiceInstanceId = Guid.Parse(deployedPair.Deployment.GetLabel("serviceId"));
             _logger.LogDebug("Deployed the image {ImageName} with the Id {ServiceInstanceId}", service.ImageName,
                 service.ServiceInstanceId);
+
             //TODO: assign values to the instance data
         }
     }

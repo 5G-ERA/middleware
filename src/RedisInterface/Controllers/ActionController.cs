@@ -239,8 +239,8 @@ namespace Middleware.RedisInterface.Controllers
         [HttpGet]
         [Route("plan", Name = "ActionPlanGetAll")]
         [ProducesResponseType(typeof(List<ActionPlanModel>), (int)HttpStatusCode.OK)]
-        [ProducesResponseType(typeof(string), (int)HttpStatusCode.NotFound)]
-        [ProducesResponseType(typeof(string), (int)HttpStatusCode.InternalServerError)]
+        [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.NotFound)]
+        [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.InternalServerError)]
         public async Task<IActionResult> GetAllActionPlansAsync()
         {
             try
@@ -248,22 +248,23 @@ namespace Middleware.RedisInterface.Controllers
                 var plans = await _actionPlanRepository.GetAllAsync();
                 if (plans == null || plans.Any() == false)
                 {
-                    return NotFound("No plans have been found.");
+                    return NotFound(new ApiResponse((int)HttpStatusCode.NotFound, "No plans have been found."));
                 }
                 return Ok(plans);
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "An error occurred:");
-                return Problem(ex.Message);
+                int statusCode = (int) HttpStatusCode.InternalServerError;
+                return StatusCode(statusCode, new ApiResponse(statusCode, ex.Message));
             }
         }
 
         [HttpGet]
         [Route("plan/{id:guid}", Name = "ActionPlanGetById")]
         [ProducesResponseType(typeof(ActionPlanModel), (int)HttpStatusCode.OK)]
-        [ProducesResponseType(typeof(string), (int)HttpStatusCode.NotFound)]
-        [ProducesResponseType(typeof(string), (int)HttpStatusCode.InternalServerError)]
+        [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.NotFound)]
+        [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.InternalServerError)]
         public async Task<IActionResult> GetActionPlanByIdAsync(Guid id)
         {
             try
@@ -271,14 +272,15 @@ namespace Middleware.RedisInterface.Controllers
                 var plan = await _actionPlanRepository.GetByIdAsync(id);
                 if (plan == null)
                 {
-                    return NotFound("Specified plan was not found.");
+                    return NotFound(new ApiResponse((int)HttpStatusCode.NotFound, "Specified plan was not found."));
                 }
                 return Ok(plan);
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "An error occurred:");
-                return Problem(ex.Message);
+                int statusCode = (int) HttpStatusCode.InternalServerError;
+                return StatusCode(statusCode, new ApiResponse(statusCode, ex.Message));
             }
         }
         [HttpPost]

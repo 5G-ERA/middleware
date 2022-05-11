@@ -71,10 +71,10 @@ public class OrchestrateController : Controller
     [ProducesResponseType(typeof(string), (int)HttpStatusCode.InternalServerError)]
     public async Task<ActionResult<ActionPlanModel>> GetActionsByPlanId(Guid id)
     {
-        if (id == Guid.Empty)
-        {
-            return BadRequest("Guid has not been specified");
-        }
+        //if (id == Guid.Empty)
+        //{
+        //    return BadRequest("Guid has not been specified");
+        //}
         try
         {
             RedisInterface.ActionPlanModel riActionPlan = await _redisClient.ActionPlanGetByIdAsync(id);
@@ -82,10 +82,16 @@ public class OrchestrateController : Controller
             {
                 return NotFound("Specified action plan with specified id not found");
             }
+
             ActionPlanModel actionPlan = _mapper.Map<ActionPlanModel>(riActionPlan);
 
             //TODO: retrieve the latest info about the plan?
             return Ok(actionPlan);
+        }
+        catch (RedisInterface.ApiException<RedisInterface.ApiResponse> apiEx)
+        {
+            _logger.LogError(apiEx, "Error while querying the redis-api");
+            return StatusCode(apiEx.StatusCode, apiEx.Result);
         }
         catch (Exception ex)
         {

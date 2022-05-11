@@ -739,17 +739,17 @@
             "content": {
               "text/plain": {
                 "schema": {
-                  "type": "string"
+                  "$ref": "#/components/schemas/ApiResponse"
                 }
               },
               "application/json": {
                 "schema": {
-                  "type": "string"
+                  "$ref": "#/components/schemas/ApiResponse"
                 }
               },
               "text/json": {
                 "schema": {
-                  "type": "string"
+                  "$ref": "#/components/schemas/ApiResponse"
                 }
               }
             }
@@ -759,17 +759,17 @@
             "content": {
               "text/plain": {
                 "schema": {
-                  "type": "string"
+                  "$ref": "#/components/schemas/ApiResponse"
                 }
               },
               "application/json": {
                 "schema": {
-                  "type": "string"
+                  "$ref": "#/components/schemas/ApiResponse"
                 }
               },
               "text/json": {
                 "schema": {
-                  "type": "string"
+                  "$ref": "#/components/schemas/ApiResponse"
                 }
               }
             }
@@ -973,17 +973,17 @@
             "content": {
               "text/plain": {
                 "schema": {
-                  "type": "string"
+                  "$ref": "#/components/schemas/ApiResponse"
                 }
               },
               "application/json": {
                 "schema": {
-                  "type": "string"
+                  "$ref": "#/components/schemas/ApiResponse"
                 }
               },
               "text/json": {
                 "schema": {
-                  "type": "string"
+                  "$ref": "#/components/schemas/ApiResponse"
                 }
               }
             }
@@ -993,17 +993,17 @@
             "content": {
               "text/plain": {
                 "schema": {
-                  "type": "string"
+                  "$ref": "#/components/schemas/ApiResponse"
                 }
               },
               "application/json": {
                 "schema": {
-                  "type": "string"
+                  "$ref": "#/components/schemas/ApiResponse"
                 }
               },
               "text/json": {
                 "schema": {
-                  "type": "string"
+                  "$ref": "#/components/schemas/ApiResponse"
                 }
               }
             }
@@ -5788,13 +5788,6 @@
           "ActionPriority": {
             "type": "string",
             "nullable": true
-          },
-          "Services": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/InstanceModel"
-            },
-            "nullable": true
           }
         },
         "additionalProperties": false
@@ -5843,6 +5836,20 @@
             "nullable": true
           },
           "policyDescription": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "ApiResponse": {
+        "type": "object",
+        "properties": {
+          "statusCode": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "message": {
             "type": "string",
             "nullable": true
           }
@@ -5899,7 +5906,7 @@
           },
           "Timestamp": {
             "type": "string",
-            "nullable": true
+            "format": "date-time"
           },
           "Description": {
             "type": "string",
@@ -6065,9 +6072,6 @@
           "ServiceStatus": {
             "type": "string",
             "nullable": true
-          },
-          "ContainerImage": {
-            "$ref": "#/components/schemas/ContainerImageModel"
           }
         },
         "additionalProperties": false
@@ -6283,13 +6287,6 @@
           "ActionPlanId": {
             "type": "string",
             "format": "uuid"
-          },
-          "ActionSequence": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/ActionModel"
-            },
-            "nullable": true
           }
         },
         "additionalProperties": false
