@@ -35,6 +35,10 @@ namespace Middleware.Common.Repositories
             {
                 return null;
             }
+            if (!string.IsNullOrEmpty(patch.Name))
+            {
+                currentModel.Name = patch.Name;
+            }
             if (!string.IsNullOrEmpty(patch.CloudStatus))
             {
                 currentModel.CloudStatus = patch.CloudStatus;

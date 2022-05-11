@@ -35,6 +35,14 @@ namespace Middleware.Common.Repositories
             {
                 return null;
             }
+            if (!string.IsNullOrEmpty(patch.Name))
+            {
+                currentModel.Name = patch.Name;
+            }
+            if (!string.IsNullOrEmpty(patch.ActionFamily))
+            {
+                currentModel.ActionFamily = patch.ActionFamily;
+            }
             if (!string.IsNullOrEmpty(patch.Order.ToString()))
             {
                 currentModel.Order = patch.Order;
@@ -46,10 +54,6 @@ namespace Middleware.Common.Repositories
             if (!string.IsNullOrEmpty(patch.ActionPriority))
             {
                 currentModel.ActionPriority = patch.ActionPriority;
-            }
-            if (!string.IsNullOrEmpty(patch.Services.ToString()))
-            {
-                currentModel.Services = patch.Services;
             }
             await Db.JsonSetAsync(id.ToString(), JsonSerializer.Serialize(currentModel));
             return currentModel;

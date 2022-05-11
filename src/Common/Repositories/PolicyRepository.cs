@@ -63,6 +63,10 @@ namespace Middleware.Common.Repositories
             {
                 return null;
             }
+            if (!string.IsNullOrEmpty(patch.Name))
+            {
+                currentModel.Name = patch.Name;
+            }
             if (!string.IsNullOrEmpty(patch.Timestamp.ToString()))
             {
                 currentModel.Timestamp = patch.Timestamp;
@@ -74,10 +78,6 @@ namespace Middleware.Common.Repositories
             if (!string.IsNullOrEmpty(patch.Description))
             {
                 currentModel.Description = patch.Description;
-            }
-            if (!string.IsNullOrEmpty(patch.Name))
-            {
-                currentModel.Name = patch.Name;
             }
             await Db.JsonSetAsync(id.ToString(), JsonSerializer.Serialize(currentModel));
             return currentModel;

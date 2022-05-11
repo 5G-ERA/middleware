@@ -51,6 +51,14 @@ namespace Middleware.Common.Repositories
             {
                 currentModel.Description = patch.Description;
             }
+            if (!string.IsNullOrEmpty(patch.K8SDeployment))
+            {
+                currentModel.K8SDeployment = patch.K8SDeployment;
+            }
+            if (!string.IsNullOrEmpty(patch.K8SService))
+            {
+                currentModel.K8SService = patch.K8SService;
+            }
             await Db.JsonSetAsync(id.ToString(), JsonSerializer.Serialize(currentModel));
             return currentModel;
         }
