@@ -51,9 +51,9 @@ namespace Middleware.Common.Repositories
             {
                 currentModel.RobotStatus = patch.RobotStatus;
             }
-            if (!string.IsNullOrEmpty(patch.TaskList.ToString()))
+            if (patch.TaskList != null)
             {
-                currentModel.TaskList = patch.TaskList;
+                currentModel.TaskList = patch.TaskList; 
             }
             if (!string.IsNullOrEmpty(patch.BatteryStatus.ToString()))
             {
@@ -67,7 +67,7 @@ namespace Middleware.Common.Repositories
             {
                 currentModel.LocomotionSystem = patch.LocomotionSystem;
             }
-            if (!string.IsNullOrEmpty(patch.Sensors.ToString()))
+            if (patch.Sensors != null)
             {
                 currentModel.Sensors = patch.Sensors;
             }
@@ -91,7 +91,7 @@ namespace Middleware.Common.Repositories
             {
                 currentModel.NumberCores = patch.NumberCores;
             }
-            if (!string.IsNullOrEmpty(patch.Questions.ToString()))
+            if (patch.Questions != null)
             {
                 currentModel.Questions = patch.Questions;
             }

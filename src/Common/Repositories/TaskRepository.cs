@@ -42,10 +42,6 @@ namespace Middleware.Common.Repositories
             {
                 currentModel.TaskPriority = patch.TaskPriority;
             }
-            if (!string.IsNullOrEmpty(patch.ActionSequence.ToString()))
-            {
-                currentModel.ActionSequence = patch.ActionSequence;
-            }
             await Db.JsonSetAsync(id.ToString(), JsonSerializer.Serialize(currentModel));
             return currentModel;
 
