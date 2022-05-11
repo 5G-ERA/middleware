@@ -473,46 +473,11 @@
           "ActionPriority": {
             "type": "string",
             "nullable": true
-          },
-          "Services": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/InstanceModel"
-            },
-            "nullable": true
           }
         },
         "additionalProperties": false
       },
       "ActionPlanModel": {
-        "type": "object",
-        "properties": {
-          "relations": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/RelationModel"
-            },
-            "nullable": true
-          },
-          "ActionPlanId": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "TaskName": {
-            "type": "string",
-            "nullable": true
-          },
-          "ActionSequence": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/ActionModel"
-            },
-            "nullable": true
-          }
-        },
-        "additionalProperties": false
-      },
-      "ContainerImageModel": {
         "type": "object",
         "properties": {
           "relations": {
@@ -530,20 +495,11 @@
             "type": "string",
             "nullable": true
           },
-          "Timestamp": {
-            "type": "string",
-            "nullable": true
-          },
-          "Description": {
-            "type": "string",
-            "nullable": true
-          },
-          "K8SDeployment": {
-            "type": "string",
-            "nullable": true
-          },
-          "K8SService": {
-            "type": "string",
+          "ActionSequence": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ActionModel"
+            },
             "nullable": true
           }
         },
@@ -613,9 +569,6 @@
           "ServiceStatus": {
             "type": "string",
             "nullable": true
-          },
-          "ContainerImage": {
-            "$ref": "#/components/schemas/ContainerImageModel"
           }
         },
         "additionalProperties": false
@@ -708,13 +661,6 @@
           "ActionPlanId": {
             "type": "string",
             "format": "uuid"
-          },
-          "ActionSequence": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/ActionModel"
-            },
-            "nullable": true
           }
         },
         "additionalProperties": false

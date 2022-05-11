@@ -310,7 +310,7 @@ namespace Middleware.RedisInterface.Controllers
             }
         }
         [HttpDelete]
-        [Route("plan", Name = "ActionPlanDelete")]
+        [Route("plan/{id}", Name = "ActionPlanDelete")]
         [ProducesResponseType(typeof(void), (int)HttpStatusCode.OK)]
         [ProducesResponseType(typeof(string), (int)HttpStatusCode.NotFound)]
         [ProducesResponseType(typeof(string), (int)HttpStatusCode.InternalServerError)]

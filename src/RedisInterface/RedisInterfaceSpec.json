@@ -867,16 +867,19 @@
             }
           }
         }
-      },
-      "delete": {
+      }
+    },
+    "/api/v1/Action/plan/{id}": {
+      "get": {
         "tags": [
           "Action"
         ],
-        "operationId": "ActionPlanDelete",
+        "operationId": "ActionPlanGetById",
         "parameters": [
           {
             "name": "id",
-            "in": "query",
+            "in": "path",
+            "required": true,
             "schema": {
               "type": "string",
               "format": "uuid"
@@ -885,7 +888,24 @@
         ],
         "responses": {
           "200": {
-            "description": "Success"
+            "description": "Success",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ActionPlanModel"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ActionPlanModel"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ActionPlanModel"
+                }
+              }
+            }
           },
           "404": {
             "description": "Not Found",
@@ -928,14 +948,12 @@
             }
           }
         }
-      }
-    },
-    "/api/v1/Action/plan/{id}": {
-      "get": {
+      },
+      "delete": {
         "tags": [
           "Action"
         ],
-        "operationId": "ActionPlanGetById",
+        "operationId": "ActionPlanDelete",
         "parameters": [
           {
             "name": "id",
@@ -949,24 +967,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Success",
-            "content": {
-              "text/plain": {
-                "schema": {
-                  "$ref": "#/components/schemas/ActionPlanModel"
-                }
-              },
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ActionPlanModel"
-                }
-              },
-              "text/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ActionPlanModel"
-                }
-              }
-            }
+            "description": "Success"
           },
           "404": {
             "description": "Not Found",
@@ -5802,11 +5803,11 @@
             },
             "nullable": true
           },
-          "ActionPlanId": {
+          "Id": {
             "type": "string",
             "format": "uuid"
           },
-          "TaskName": {
+          "Name": {
             "type": "string",
             "nullable": true
           },

@@ -4,10 +4,10 @@ namespace Middleware.Common.Models;
 
 public sealed class ActionPlanModel : BaseModel
 {
-    [JsonPropertyName("ActionPlanId")]
+    [JsonPropertyName("Id")]
     public override Guid Id { get; set; }
 
-    [JsonPropertyName("TaskName")]
+    [JsonPropertyName("Name")]
     public override string Name { get; set; }
 
     [JsonPropertyName("ActionSequence")]
