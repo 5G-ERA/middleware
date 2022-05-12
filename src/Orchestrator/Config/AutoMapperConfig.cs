@@ -28,6 +28,7 @@ public static class AutoMapperConfig
             cfg.CreateMap<RelationModel, RedisInterface.RelationModel>().ReverseMap();
             cfg.CreateMap<GraphEntityModel, RedisInterface.GraphEntityModel>().ReverseMap();
             cfg.CreateMap<ActionPlanModel, RedisInterface.ActionPlanModel>().ReverseMap();
+            cfg.CreateMap<ApiResponse, RedisInterface.ApiResponse>().ReverseMap();
         });
         return services;
     }

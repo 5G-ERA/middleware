@@ -76,7 +76,13 @@ public class DeploymentService : IDeploymentService
                     }
                 }
             }
+
             isSuccess &= await SaveActionSequence(task);
+        }
+        catch (RedisInterface.ApiException<ApiResponse> apiEx)
+        {
+            _logger.LogError(apiEx, "There was an error while retrieving the information from Redis");
+            isSuccess = false;
         }
         catch (NotInK8SEnvironmentException)
         {
@@ -115,7 +121,7 @@ public class DeploymentService : IDeploymentService
 
         if (images is null || images.Any() == false)
         {
-            throw new IncorrectDataException("Images not defined for the Instance deployment");
+            throw new IncorrectDataException("Image is not defined for the Instance deployment");
         }
 
         var mappedImages = _mapper.Map<List<ContainerImageModel>>(images);

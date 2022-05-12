@@ -32,27 +32,30 @@ public class OrchestrateController : Controller
     [HttpPost]
     [Route("plan", Name = "InstantiateNewPlan")]
     [ProducesResponseType(typeof(TaskModel), (int)HttpStatusCode.OK)]
+    [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.InternalServerError)]
     public async Task<IActionResult> InstantiateNewPlan([FromBody] TaskModel task)
     {
-
+        int statusCode = (int)HttpStatusCode.BadRequest;
         if (task is null)
         {
             return BadRequest("Plan is not specified");
         }
-
         try
         {
+            statusCode = (int)HttpStatusCode.OK;
             var result = await _deploymentService.DeployAsync(task);
             if (result == false)
             {
+                statusCode = (int)HttpStatusCode.InternalServerError;
                 //TODO: provide more detailed information on what went wrong with the deployment of the task
-                return Problem("There was a problem while deploying the task instance: {ex");
+                return StatusCode(statusCode, new ApiResponse(statusCode, "There was a problem while deploying the task instance"));
             }
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "There was a problem while deploying the task instance: {task}", task);
-            return Problem("There was a problem while deploying the task instance: {ex}", ex.Message);
+            statusCode = (int)HttpStatusCode.InternalServerError;
+            return StatusCode(statusCode, new ApiResponse(statusCode, $"There was a problem while deploying the task instance: {ex.Message}"));
         }
 
         return Ok(task);
@@ -66,21 +69,18 @@ public class OrchestrateController : Controller
     [HttpGet]
     [Route("plan/{id}", Name = "GetActionPlanByPlanId")]
     [ProducesResponseType(typeof(ActionPlanModel), (int)HttpStatusCode.OK)]
-    [ProducesResponseType(typeof(string), (int)HttpStatusCode.NotFound)]
-    [ProducesResponseType(typeof(string), (int)HttpStatusCode.BadRequest)]
-    [ProducesResponseType(typeof(string), (int)HttpStatusCode.InternalServerError)]
+    [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.NotFound)]
+    [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.InternalServerError)]
     public async Task<ActionResult<ActionPlanModel>> GetActionsByPlanId(Guid id)
     {
-        //if (id == Guid.Empty)
-        //{
-        //    return BadRequest("Guid has not been specified");
-        //}
+        int statusCode = (int)HttpStatusCode.OK;
         try
         {
             RedisInterface.ActionPlanModel riActionPlan = await _redisClient.ActionPlanGetByIdAsync(id);
             if (riActionPlan is null)
             {
-                return NotFound("Specified action plan with specified id not found");
+                statusCode = (int)HttpStatusCode.NotFound;
+                return NotFound(new ApiResponse(statusCode, "Specified action plan with specified id not found"));
             }
 
             ActionPlanModel actionPlan = _mapper.Map<ActionPlanModel>(riActionPlan);
@@ -91,12 +91,13 @@ public class OrchestrateController : Controller
         catch (RedisInterface.ApiException<RedisInterface.ApiResponse> apiEx)
         {
             _logger.LogError(apiEx, "Error while querying the redis-api");
-            return StatusCode(apiEx.StatusCode, apiEx.Result);
+            return StatusCode(apiEx.StatusCode, _mapper.Map<ApiResponse>(apiEx.Result));
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "There was an error while retrieving the action plan information");
-            return Problem($"There was an error while retrieving the action plan information: {ex.Message}");
+            statusCode = (int)HttpStatusCode.InternalServerError;
+            return StatusCode(statusCode, new ApiResponse(statusCode, $"There was an error while retrieving the action plan information: {ex.Message}"));
         }
     }
 
@@ -136,23 +137,22 @@ public class OrchestrateController : Controller
     [HttpDelete]
     [Route("plan/{id}", Name = "DeletePlanById")]
     [ProducesResponseType(typeof(void), (int)HttpStatusCode.OK)]
-    [ProducesResponseType(typeof(string),(int)HttpStatusCode.NotFound)]
-    [ProducesResponseType(typeof(string),(int)HttpStatusCode.BadRequest)]
-    [ProducesResponseType(typeof(string), (int)HttpStatusCode.InternalServerError)]
+    [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.NotFound)]
+    [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.BadRequest)]
+    [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.InternalServerError)]
 
     public async Task<ActionResult> DeletePlanById(Guid id)
     {
         if (id == Guid.Empty)
         {
-            return BadRequest("Id of the plan  has to be specified");
+            return BadRequest(new ApiResponse((int)HttpStatusCode.BadRequest, "Id of the plan  has to be specified"));
         }
-
         try
         {
             RedisInterface.ActionPlanModel riActionPlan = await _redisClient.ActionPlanGetByIdAsync(id);
             if (riActionPlan is null)
             {
-                return NotFound($"Could not find the Action Plan with specified id: {id}");
+                return NotFound(new ApiResponse((int)HttpStatusCode.NotFound, $"Could not find the Action Plan with specified id: {id}"));
             }
 
             ActionPlanModel actionPlan = _mapper.Map<ActionPlanModel>(riActionPlan);
@@ -161,7 +161,9 @@ public class OrchestrateController : Controller
 
             if (isSuccess == false)
             {
-                return Problem($"Unable to delete the services for the action plan with id {id}");
+                int statusCode = (int)HttpStatusCode.InternalServerError;
+                return StatusCode(statusCode,
+                    new ApiResponse(statusCode, $"Unable to delete the services for the action plan with id {id}"));
             }
 
             await _redisClient.ActionPlanDeleteAsync(id);
@@ -170,7 +172,9 @@ public class OrchestrateController : Controller
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error while deleting the specified action plan with id {id}", id);
-            return Problem($"Could not delete the action plan with id {id}");
+            int statusCode = (int)HttpStatusCode.InternalServerError;
+            return StatusCode(statusCode,
+                new ApiResponse(statusCode, $"Could not delete the action plan with id: {id}"));
         }
     }
 
