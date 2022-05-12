@@ -48,7 +48,7 @@ namespace Middleware.OcelotGateway.Controllers
 
                 register.Password = ComputeHashPassword(register.Password, salt);
         
-                await _userRepository.AddAsync(register);
+                await _userRepository.AddAsync(register, () => register.Id);
             }
             catch (Exception ex)
             {
