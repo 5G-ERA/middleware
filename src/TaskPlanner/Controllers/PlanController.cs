@@ -1,13 +1,8 @@
 ﻿using System.Net;
 using AutoMapper;
-using Middleware.Common.Models;
 using Microsoft.AspNetCore.Mvc;
+using Middleware.Common.Models;
 using Middleware.TaskPlanner.ApiReference;
-using Middleware.TaskPlanner.Orchestrator;
-using Middleware.TaskPlanner.ResourcePlanner;
-using ActionModel = Middleware.Common.Models.ActionModel;
-using TaskModel = Middleware.Common.Models.TaskModel;
-
 
 namespace Middleware.TaskPlanner.Controllers
 {
@@ -17,8 +12,8 @@ namespace Middleware.TaskPlanner.Controllers
     {
         private readonly IActionPlanner _actionPlanner;
         private readonly IMapper _mapper;
-        private readonly ResourcePlannerApiClient _resourcePlannerClient;
-        private readonly OrchestratorApiClient _orchestratorClient;
+        private readonly ResourcePlanner.ResourcePlannerApiClient _resourcePlannerClient;
+        private readonly Orchestrator.OrchestratorApiClient _orchestratorClient;
 
         public PlanController(IActionPlanner actionPlanner, IApiClientBuilder builder, IMapper mapper)
         {
@@ -30,26 +25,47 @@ namespace Middleware.TaskPlanner.Controllers
 
         [HttpPost] //http get request
         [ProducesResponseType(typeof(TaskModel), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.NotFound)]
+        [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.BadRequest)]
+        [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.InternalServerError)]
         public async Task<ActionResult<TaskModel>> GetPlan([FromBody] TaskPlannerInputModel inputModel)
         {
             Guid id = inputModel.Id;
 
-            _actionPlanner.Initialize(new List<ActionModel>(), DateTime.Now);
+            try
+            {
 
-            TaskModel plan = await _actionPlanner.InferActionSequence(id);
+                _actionPlanner.Initialize(new List<ActionModel>(), DateTime.Now);
 
-            // call resource planner for resources
-            ResourcePlanner.TaskModel tmpTaskSend = _mapper.Map<ResourcePlanner.TaskModel>(plan);
-            ResourcePlanner.TaskModel tmpFinalTask = await _resourcePlannerClient.GetResourcePlanAsync(tmpTaskSend);
+                TaskModel plan = await _actionPlanner.InferActionSequence(id);
 
-            TaskModel resourcePlan = _mapper.Map<TaskModel>(tmpFinalTask);
+                // call resource planner for resources
+                ResourcePlanner.TaskModel tmpTaskSend = _mapper.Map<ResourcePlanner.TaskModel>(plan);
+                ResourcePlanner.TaskModel tmpFinalTask = await _resourcePlannerClient.GetResourcePlanAsync(tmpTaskSend);
 
-            // call orchestrator for deployment of the resources
-            Orchestrator.TaskModel tmpTaskOrchestratorSend = _mapper.Map<Orchestrator.TaskModel>(resourcePlan);
-            Orchestrator.TaskModel tmpFinalOrchestratorTask = await _orchestratorClient.InstantiateNewPlanAsync(tmpTaskOrchestratorSend);
-            TaskModel finalPlan = _mapper.Map<TaskModel>(tmpFinalOrchestratorTask);
+                TaskModel resourcePlan = _mapper.Map<TaskModel>(tmpFinalTask);
 
-            return Ok(finalPlan);
+                // call orchestrator for deployment of the resources
+                Orchestrator.TaskModel tmpTaskOrchestratorSend = _mapper.Map<Orchestrator.TaskModel>(resourcePlan);
+                Orchestrator.TaskModel tmpFinalOrchestratorTask =
+                    await _orchestratorClient.InstantiateNewPlanAsync(tmpTaskOrchestratorSend);
+                TaskModel finalPlan = _mapper.Map<TaskModel>(tmpFinalOrchestratorTask);
+
+                return Ok(finalPlan);
+            }
+            catch (Orchestrator.ApiException<ResourcePlanner.ApiResponse> apiEx)
+            {
+                return StatusCode(apiEx.StatusCode, _mapper.Map<ApiResponse>(apiEx.Result));
+            }
+            catch (Orchestrator.ApiException<Orchestrator.ApiResponse> apiEx)
+            {
+                return StatusCode(apiEx.StatusCode, _mapper.Map<ApiResponse>(apiEx.Result));
+            }
+            catch (Exception ex)
+            {
+
+                throw;
+            }
         }
 
 
