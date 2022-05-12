@@ -328,6 +328,46 @@
                 }
               }
             }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Server Error",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              }
+            }
           }
         }
       }
@@ -335,81 +375,14 @@
   },
   "components": {
     "schemas": {
-      "ActionModel": {
+      "ApiResponse": {
         "type": "object",
         "properties": {
-          "relations": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/RelationModel"
-            },
-            "nullable": true
-          },
-          "Id": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "Name": {
-            "type": "string",
-            "nullable": true
-          },
-          "ActionFamily": {
-            "type": "string",
-            "nullable": true
-          },
-          "Order": {
+          "statusCode": {
             "type": "integer",
             "format": "int32"
           },
-          "Placement": {
-            "type": "string",
-            "nullable": true
-          },
-          "ActionPriority": {
-            "type": "string",
-            "nullable": true
-          },
-          "Services": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/InstanceModel"
-            },
-            "nullable": true
-          }
-        },
-        "additionalProperties": false
-      },
-      "ContainerImageModel": {
-        "type": "object",
-        "properties": {
-          "relations": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/RelationModel"
-            },
-            "nullable": true
-          },
-          "Id": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "Name": {
-            "type": "string",
-            "nullable": true
-          },
-          "Timestamp": {
-            "type": "string",
-            "nullable": true
-          },
-          "Description": {
-            "type": "string",
-            "nullable": true
-          },
-          "K8SDeployment": {
-            "type": "string",
-            "nullable": true
-          },
-          "K8SService": {
+          "message": {
             "type": "string",
             "nullable": true
           }
@@ -430,59 +403,6 @@
           "name": {
             "type": "string",
             "nullable": true
-          }
-        },
-        "additionalProperties": false
-      },
-      "InstanceModel": {
-        "type": "object",
-        "properties": {
-          "relations": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/RelationModel"
-            },
-            "nullable": true
-          },
-          "Id": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "Name": {
-            "type": "string",
-            "nullable": true
-          },
-          "ImageName": {
-            "type": "string",
-            "nullable": true
-          },
-          "ServiceInstanceId": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "ServiceType": {
-            "type": "string",
-            "nullable": true
-          },
-          "IsReusable": {
-            "type": "boolean",
-            "nullable": true
-          },
-          "DesiredStatus": {
-            "type": "string",
-            "nullable": true
-          },
-          "ServiceUrl": {
-            "type": "string",
-            "format": "uri",
-            "nullable": true
-          },
-          "ServiceStatus": {
-            "type": "string",
-            "nullable": true
-          },
-          "ContainerImage": {
-            "$ref": "#/components/schemas/ContainerImageModel"
           }
         },
         "additionalProperties": false
@@ -599,13 +519,6 @@
           "ActionPlanId": {
             "type": "string",
             "format": "uuid"
-          },
-          "ActionSequence": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/ActionModel"
-            },
-            "nullable": true
           }
         },
         "additionalProperties": false
