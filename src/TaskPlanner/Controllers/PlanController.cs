@@ -63,8 +63,9 @@ namespace Middleware.TaskPlanner.Controllers
             }
             catch (Exception ex)
             {
-
-                throw;
+                int statusCode = (int) HttpStatusCode.InternalServerError;
+                return StatusCode(statusCode,
+                    new ApiResponse(statusCode, $"There was an error while preparing the task plan: {ex.Message}"));
             }
         }
 

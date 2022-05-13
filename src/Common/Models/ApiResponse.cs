@@ -1,4 +1,6 @@
-﻿namespace Middleware.Common.Models;
+﻿using System;
+
+namespace Middleware.Common.Models;
 
 /// <summary>
 /// Represents the Response from the API
@@ -13,10 +15,15 @@ public class ApiResponse
     /// Message with the description of the problem from the API
     /// </summary>
     public string Message { get; private set; }
+    /// <summary>
+    /// Timestamp of response being created in UTC
+    /// </summary>
+    public DateTime TimeStamp { get; }
     
     public ApiResponse(int statusCode, string message)
     {
         StatusCode = statusCode;
         Message = message;
+        TimeStamp = DateTime.UtcNow;
     }
 }

@@ -1,8 +1,7 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using System.Net;
 using Microsoft.AspNetCore.Mvc;
 using Middleware.Common.Models;
 using Middleware.Common.Repositories.Abstract;
-using System.Net;
 
 namespace Middleware.RedisInterface.Controllers
 {
@@ -25,8 +24,8 @@ namespace Middleware.RedisInterface.Controllers
         /// <returns> the list of EdgeModel entities </returns>
         [HttpGet(Name = "EdgeGetAll")]
         [ProducesResponseType(typeof(EdgeModel), (int)HttpStatusCode.OK)]
-        [ProducesResponseType(typeof(string), (int)HttpStatusCode.NotFound)]
-        [ProducesResponseType(typeof(string), (int)HttpStatusCode.InternalServerError)]
+        [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.NotFound)]
+        [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.InternalServerError)]
         public async Task<ActionResult<IEnumerable<EdgeModel>>> GetAllAsync()
         {
             try
@@ -34,14 +33,15 @@ namespace Middleware.RedisInterface.Controllers
                 List<EdgeModel> models = await _edgeRepository.GetAllAsync();
                 if (models.Any() == false)
                 {
-                    return NotFound("Objects were not found.");
+                    return NotFound(new ApiResponse((int)HttpStatusCode.NotFound, "Objects were not found."));
                 }
                 return Ok(models);
             }
             catch (Exception ex)
             {
+                int statusCode = (int)HttpStatusCode.InternalServerError;
                 _logger.LogError(ex, "An error occurred:");
-                return Problem(ex.Message);
+                return StatusCode(statusCode, new ApiResponse(statusCode, $"An error has occurred: {ex.Message}"));
             }
         }
 
@@ -53,8 +53,8 @@ namespace Middleware.RedisInterface.Controllers
         [HttpGet]
         [Route("{id}", Name = "EdgeGetById")]
         [ProducesResponseType(typeof(EdgeModel), (int)HttpStatusCode.OK)]
-        [ProducesResponseType(typeof(string), (int)HttpStatusCode.NotFound)]
-        [ProducesResponseType(typeof(string), (int)HttpStatusCode.InternalServerError)]
+        [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.NotFound)]
+        [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.InternalServerError)]
         public async Task<IActionResult> GetByIdAsync(Guid id)
         {
             try
@@ -62,14 +62,15 @@ namespace Middleware.RedisInterface.Controllers
                 EdgeModel model = await _edgeRepository.GetByIdAsync(id);
                 if (model == null)
                 {
-                    return NotFound("Object was not found.");
+                    return NotFound(new ApiResponse((int)HttpStatusCode.NotFound, "Object was not found."));
                 }
                 return Ok(model);
             }
             catch (Exception ex)
             {
+                int statusCode = (int)HttpStatusCode.InternalServerError;
                 _logger.LogError(ex, "An error occurred:");
-                return Problem(ex.Message);
+                return StatusCode(statusCode, new ApiResponse(statusCode, $"An error has occurred: {ex.Message}"));
             }
         }
 
@@ -80,22 +81,29 @@ namespace Middleware.RedisInterface.Controllers
         /// <returns> the newly created EdgeModel entity </returns>
         [HttpPost(Name = "EdgeAdd")]
         [ProducesResponseType(typeof(EdgeModel), (int)HttpStatusCode.OK)]
-        [ProducesResponseType(typeof(string), (int)HttpStatusCode.BadRequest)]
-        [ProducesResponseType(typeof(string), (int)HttpStatusCode.InternalServerError)]
+        [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.BadRequest)]
+        [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.InternalServerError)]
         public async Task<ActionResult<EdgeModel>> AddAsync([FromBody] EdgeModel model)
         {
             if (model == null)
             {
-                return BadRequest("Parameters were not specified.");
+                return BadRequest(new ApiResponse((int)HttpStatusCode.BadRequest, "Parameters were not specified."));
             }
             try
             {
-                await _edgeRepository.AddAsync(model);
+                EdgeModel edge = await _edgeRepository.AddAsync(model);
+                if (edge is null)
+                {
+                    return StatusCode((int) HttpStatusCode.InternalServerError,
+                        new ApiResponse((int) HttpStatusCode.NotFound,
+                            "Problem while adding the Edge to the data store"));
+                }
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex.Message);
-                return Problem("Something went wrong while calling the API");
+                int statusCode = (int)HttpStatusCode.InternalServerError;
+                _logger.LogError(ex, "An error occurred:");
+                return StatusCode(statusCode, new ApiResponse(statusCode, $"An error has occurred: {ex.Message}"));
             }
             return Ok(model);
         }
@@ -110,8 +118,8 @@ namespace Middleware.RedisInterface.Controllers
         [HttpPatch]
         [Route("{id}", Name = "EdgePatch")]
         [ProducesResponseType(typeof(EdgeModel), (int)HttpStatusCode.OK)]
-        [ProducesResponseType(typeof(string), (int)HttpStatusCode.NotFound)]
-        [ProducesResponseType(typeof(string), (int)HttpStatusCode.InternalServerError)]
+        [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.NotFound)]
+        [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.InternalServerError)]
         public async Task<IActionResult> PatchEdgeAsync([FromBody] EdgeModel patch, [FromRoute] Guid id)
         {
 
@@ -120,14 +128,15 @@ namespace Middleware.RedisInterface.Controllers
                 EdgeModel model = await _edgeRepository.PatchEdgeAsync(id, patch);
                 if (model == null)
                 {
-                    return NotFound("Object to be updated was not found.");
+                    return NotFound(new ApiResponse((int)HttpStatusCode.NotFound, "Object to be updated was not found."));
                 }
                 return Ok(model);
             }
             catch (Exception ex)
             {
+                int statusCode = (int)HttpStatusCode.InternalServerError;
                 _logger.LogError(ex, "An error occurred:");
-                return Problem(ex.Message);
+                return StatusCode(statusCode, new ApiResponse(statusCode, $"An error has occurred: {ex.Message}"));
             }
         }
 
@@ -140,7 +149,7 @@ namespace Middleware.RedisInterface.Controllers
         [HttpDelete]
         [Route("{id}", Name = "EdgeDelete")]
         [ProducesResponseType(typeof(void), (int)HttpStatusCode.OK)]
-        [ProducesResponseType(typeof(string), (int)HttpStatusCode.InternalServerError)]
+        [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.InternalServerError)]
         public async Task<ActionResult> DeleteByIdAsync(Guid id)
         {
             try
@@ -149,8 +158,9 @@ namespace Middleware.RedisInterface.Controllers
             }
             catch (Exception ex)
             {
+                int statusCode = (int)HttpStatusCode.InternalServerError;
                 _logger.LogError(ex, "An error occurred:");
-                return Problem(ex.Message);
+                return StatusCode(statusCode, new ApiResponse(statusCode, $"An error has occurred: {ex.Message}"));
             }
             return Ok();
         }
@@ -159,26 +169,28 @@ namespace Middleware.RedisInterface.Controllers
         [HttpPost]
         [Route("AddRelation", Name = "EdgeAddRelation")]
         [ProducesResponseType(typeof(RelationModel), (int)HttpStatusCode.OK)]
-        [ProducesResponseType(typeof(string), (int)HttpStatusCode.BadRequest)]
-        [ProducesResponseType(typeof(string), (int)HttpStatusCode.InternalServerError)]
+        [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.BadRequest)]
+        [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.InternalServerError)]
         public async Task<ActionResult<RelationModel>> AddRelationAsync([FromBody] RelationModel model)
         {
             if (model == null)
             {
-                return BadRequest("Parameters were not specified.");
+                return BadRequest(new ApiResponse((int)HttpStatusCode.BadRequest, "Parameters were not specified."));
             }
             try
             {
                 bool isValid = await _edgeRepository.AddRelationAsync(model);
                 if (!isValid)
                 {
-                    return Problem("The relation was not created");
+                    return StatusCode((int) HttpStatusCode.InternalServerError,
+                        new ApiResponse((int) HttpStatusCode.InternalServerError, "The relation was not created"));
                 }
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex.Message);
-                return Problem("Something went wrong while calling the API");
+                int statusCode = (int)HttpStatusCode.InternalServerError;
+                _logger.LogError(ex, "An error occurred:");
+                return StatusCode(statusCode, new ApiResponse(statusCode, $"An error has occurred: {ex.Message}"));
             }
             return Ok(model);
         }
@@ -186,8 +198,8 @@ namespace Middleware.RedisInterface.Controllers
         [HttpGet]
         [Route("relation/{name}", Name = "EdgeGetRelationByName")]
         [ProducesResponseType(typeof(List<RelationModel>), (int)HttpStatusCode.OK)]
-        [ProducesResponseType(typeof(string), (int)HttpStatusCode.NotFound)]
-        [ProducesResponseType(typeof(string), (int)HttpStatusCode.InternalServerError)]
+        [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.NotFound)]
+        [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.InternalServerError)]
         public async Task<IActionResult> GetRelationAsync(Guid id, string name)
         {
             try
@@ -195,14 +207,15 @@ namespace Middleware.RedisInterface.Controllers
                 var relations = await _edgeRepository.GetRelation(id, name);
                 if (!relations.Any())
                 {
-                    return NotFound("Relations were not found.");
+                    return NotFound(new ApiResponse((int)HttpStatusCode.NotFound, "Relations were not found."));
                 }
                 return Ok(relations);
             }
             catch (Exception ex)
             {
+                int statusCode = (int)HttpStatusCode.InternalServerError;
                 _logger.LogError(ex, "An error occurred:");
-                return Problem(ex.Message);
+                return StatusCode(statusCode, new ApiResponse(statusCode, $"An error has occurred: {ex.Message}"));
             }
         }
 
@@ -210,8 +223,8 @@ namespace Middleware.RedisInterface.Controllers
         [HttpGet]
         [Route("relations/{firstName}/{secondName}", Name = "EdgeGetRelationsByName")]
         [ProducesResponseType(typeof(List<RelationModel>), (int)HttpStatusCode.OK)]
-        [ProducesResponseType(typeof(string), (int)HttpStatusCode.NotFound)]
-        [ProducesResponseType(typeof(string), (int)HttpStatusCode.InternalServerError)]
+        [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.NotFound)]
+        [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.InternalServerError)]
         public async Task<IActionResult> GetRelationsAsync(Guid id, string firstName, string secondName)
         {
             try
@@ -220,14 +233,15 @@ namespace Middleware.RedisInterface.Controllers
                 var relations = await _edgeRepository.GetRelations(id, relationNames);
                 if (!relations.Any())
                 {
-                    return NotFound("Relations were not found");
+                    return NotFound(new ApiResponse((int)HttpStatusCode.NotFound, "Relations were not found"));
                 }
                 return Ok(relations);
             }
             catch (Exception ex)
             {
+                int statusCode = (int)HttpStatusCode.InternalServerError;
                 _logger.LogError(ex, "An error occurred:");
-                return Problem(ex.Message);
+                return StatusCode(statusCode, new ApiResponse(statusCode, $"An error has occurred: {ex.Message}"));
             }
         }
     }
