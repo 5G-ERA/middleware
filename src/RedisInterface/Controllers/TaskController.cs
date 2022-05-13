@@ -1,11 +1,9 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using System.Net;
 using Microsoft.AspNetCore.Mvc;
 using Middleware.Common.Enums;
 using Middleware.Common.Models;
 using Middleware.Common.Repositories;
 using Middleware.Common.Repositories.Abstract;
-using System.Net;
-using System.Text.Json;
 
 namespace Middleware.RedisInterface.Controllers
 {
@@ -292,11 +290,7 @@ namespace Middleware.RedisInterface.Controllers
                         await _containerImageRepository.AddAsync(instanceModel.ContainerImage);
 
                         //RELATIONSHIP--NEEDS (INSTANCE-IMAGE)
-                        GraphEntityModel initatesFrom, pointsTo;
-                        string relationname = "NEEDS";
-                        initatesFrom = new GraphEntityModel(instanceModel.Id, instanceModel.Name, RedisDbIndexEnum.Instance);
-                        pointsTo = new GraphEntityModel(instanceModel.ContainerImage.Id, instanceModel.ContainerImage.Name, RedisDbIndexEnum.Container);
-                        RelationModel imageRelation = new RelationModel(initatesFrom, pointsTo, relationname);
+                        RelationModel imageRelation = CreateGraphRelation(instanceModel, RedisDbIndexEnum.Instance, instanceModel.ContainerImage, RedisDbIndexEnum.Container);
                         bool isImageValid = await _containerImageRepository.AddRelationAsync(imageRelation);
                         if (!isImageValid)
                         {
@@ -306,11 +300,7 @@ namespace Middleware.RedisInterface.Controllers
                     //RELATIONSHIP--NEEDS (ACTION-INSTANCE)
                     foreach (var instance in actionModel.Services)
                     {
-                        GraphEntityModel initiatesFrom, pointsTo;
-                        string relationname = "NEEDS";
-                        initiatesFrom = new GraphEntityModel(actionModel.Id, actionModel.Name, RedisDbIndexEnum.Action);
-                        pointsTo = new GraphEntityModel(instance.Id, instance.Name, RedisDbIndexEnum.Instance);
-                        RelationModel instanceRelation = new RelationModel(initiatesFrom, pointsTo, relationname);
+                        RelationModel instanceRelation = CreateGraphRelation(actionModel, RedisDbIndexEnum.Action, instance, RedisDbIndexEnum.Instance);
                         bool isInstanceValid = await _instanceRepository.AddRelationAsync(instanceRelation);
                         if (!isInstanceValid)
                         {
@@ -322,11 +312,7 @@ namespace Middleware.RedisInterface.Controllers
                 foreach (var action in model.ActionSequence)
                 {
                     //RELATIONSHIP--EXTENDS (TASK->ACTION)
-                    GraphEntityModel initiatesFrom, pointsTo;
-                    string relationName = "EXTENDS";
-                    initiatesFrom = new GraphEntityModel(importModel.Id, importModel.Name, RedisDbIndexEnum.Task);
-                    pointsTo = new GraphEntityModel(action.Id, action.Name, RedisDbIndexEnum.Action);
-                    RelationModel taskRelation = new RelationModel(initiatesFrom, pointsTo, relationName);
+                    RelationModel taskRelation = CreateGraphRelation(importModel, RedisDbIndexEnum.Task, action, RedisDbIndexEnum.Action);
                     bool isTaskValid = await _taskRepository.AddRelationAsync(taskRelation);
                     if (!isTaskValid)
                     {
@@ -342,7 +328,25 @@ namespace Middleware.RedisInterface.Controllers
                 return StatusCode(statusCode, new ApiResponse(statusCode, $"An error has occurred: {ex.Message}"));
             }
         }
+        /// <summary>
+        /// Creates the new Relation between 2 objects for the import of the task
+        /// </summary>
+        /// <param name="initiatesModel"></param>
+        /// <param name="initiatesType"></param>
+        /// <param name="pointsToModel"></param>
+        /// <param name="pointsToType"></param>
+        /// <returns></returns>
+        private RelationModel CreateGraphRelation(BaseModel initiatesModel,
+            RedisDbIndexEnum initiatesType,
+            BaseModel pointsToModel,
+            RedisDbIndexEnum pointsToType)
+        {
+            GraphEntityModel initiatesFrom = new GraphEntityModel(initiatesModel.Id, initiatesModel.Name, initiatesType);
+            GraphEntityModel pointsTo = new GraphEntityModel(pointsToModel.Id, pointsToModel.Name, pointsToType);
+            var relation = initiatesType == RedisDbIndexEnum.Task ? "EXTENDS" : "NEEDS";
 
+            return new RelationModel(initiatesFrom, pointsTo, relation);
+        }
 
 
     }
