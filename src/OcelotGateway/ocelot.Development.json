@@ -40,7 +40,7 @@
         "AllowedScopes": []
       },
       "UpstreamPathTemplate": "/Data/{all}",
-      "UpstreamHttpMethod": [ "GET", "POST", "PATCH", "DELETE" ]
+      "UpstreamHttpMethod": [ "GET", "POST", "PUT", "PATCH", "DELETE" ]
     },
     //TaskPlanner API
     {
@@ -57,6 +57,23 @@
         "AllowedScopes": []
       },
       "UpstreamPathTemplate": "/Task/{all}",
+      "UpstreamHttpMethod": [ "GET", "POST", "PATCH", "DELETE" ]
+    },
+    //ResourcePlanner API
+    {
+      "DownstreamPathTemplate": "/api/v1/{all}",
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "resourceplanner.api",
+          "Port": "80"
+        }
+      ],
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "Bearer",
+        "AllowedScopes": []
+      },
+      "UpstreamPathTemplate": "/Resource/{all}",
       "UpstreamHttpMethod": [ "GET", "POST", "PATCH", "DELETE" ]
     },
     //Orchestrator API

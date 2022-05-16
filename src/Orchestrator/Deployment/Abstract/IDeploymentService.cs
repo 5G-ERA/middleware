@@ -26,4 +26,10 @@ public interface IDeploymentService
     /// <param name="meta">Metadata for the service from the existing deployment</param>
     /// <returns>Service of the specified type. Service has not been deployed</returns>
     V1Service CreateService(string serviceImageName, K8SServiceKindEnum kind, V1ObjectMeta meta);
+    /// <summary>
+    /// Deletes the resources instantiated by the specified Action Plan
+    /// </summary>
+    /// <param name="actionPlan">Action Plan to be deleted</param>
+    /// <returns>Has the operation succeeded</returns>
+    Task<bool> DeletePlanAsync(ActionPlanModel actionPlan);
 }

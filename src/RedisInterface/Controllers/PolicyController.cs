@@ -1,8 +1,7 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using System.Net;
 using Microsoft.AspNetCore.Mvc;
 using Middleware.Common.Models;
 using Middleware.Common.Repositories;
-using System.Net;
 
 namespace Middleware.RedisInterface.Controllers
 {
@@ -27,8 +26,8 @@ namespace Middleware.RedisInterface.Controllers
         [HttpGet]
         [Route("{id}", Name = "PolicyGetById")]
         [ProducesResponseType(typeof(PolicyModel), (int)HttpStatusCode.OK)]
-        [ProducesResponseType(typeof(string), (int)HttpStatusCode.NotFound)]
-        [ProducesResponseType(typeof(string), (int)HttpStatusCode.InternalServerError)]
+        [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.NotFound)]
+        [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.InternalServerError)]
         public async Task<ActionResult<PolicyModel>> GetPolicyByIdAsync(Guid id)
         {
             try
@@ -36,14 +35,15 @@ namespace Middleware.RedisInterface.Controllers
                 PolicyModel model = await _policyRepository.GetByIdAsync(id);
                 if (model == null)
                 {
-                    return NotFound("Object was not found.");
+                    return NotFound(new ApiResponse((int)HttpStatusCode.NotFound, "Object was not found."));
                 }
                 return Ok(model);
             }
             catch (Exception ex) 
             {
+                int statusCode = (int)HttpStatusCode.InternalServerError;
                 _logger.LogError(ex, "An error occurred:");
-                return Problem(ex.Message);
+                return StatusCode(statusCode, new ApiResponse(statusCode, $"An error has occurred: {ex.Message}"));
             }
         }
 
@@ -53,8 +53,8 @@ namespace Middleware.RedisInterface.Controllers
         /// <returns> the list of PolicyModel entities </returns>
         [HttpGet(Name = "PolicyGetAll")]
         [ProducesResponseType(typeof(PolicyModel), (int)HttpStatusCode.OK)]
-        [ProducesResponseType(typeof(string), (int)HttpStatusCode.NotFound)]
-        [ProducesResponseType(typeof(string), (int)HttpStatusCode.InternalServerError)]
+        [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.NotFound)]
+        [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.InternalServerError)]
         public async Task<ActionResult<List<PolicyModel>>> GetAllPoliciesAsync()
         {
             try
@@ -62,15 +62,16 @@ namespace Middleware.RedisInterface.Controllers
                 List<PolicyModel> models = await _policyRepository.GetAllPoliciesAsync();
                 if (models.Any() == false)
                 {
-                    return NotFound("Objects were not found.");
+                    return NotFound(new ApiResponse((int)HttpStatusCode.NotFound, "Objects were not found."));
                 }
                 return Ok(models);
                 
             }
             catch (Exception ex) 
             {
+                int statusCode = (int)HttpStatusCode.InternalServerError;
                 _logger.LogError(ex, "An error occurred:");
-                return Problem(ex.Message);
+                return StatusCode(statusCode, new ApiResponse(statusCode, $"An error has occurred: {ex.Message}"));
             }
         }
 
@@ -85,8 +86,8 @@ namespace Middleware.RedisInterface.Controllers
         [HttpGet]
         [Route("current", Name = "PolicyGetActive")]
         [ProducesResponseType(typeof(ActivePolicy), (int)HttpStatusCode.OK)]
-        [ProducesResponseType(typeof(string), (int)HttpStatusCode.NotFound)]
-        [ProducesResponseType(typeof(string), (int)HttpStatusCode.InternalServerError)]
+        [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.NotFound)]
+        [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.InternalServerError)]
         public async Task<ActionResult<List<ActivePolicy>>> GetActivePolicies()
         {
             try
@@ -94,15 +95,16 @@ namespace Middleware.RedisInterface.Controllers
                 List<PolicyModel> activePolicies = await _policyRepository.GetActivePoliciesAsync();
                 if (activePolicies == null)
                 {
-                    return NotFound("Object was not found.");
+                    return NotFound(new ApiResponse((int)HttpStatusCode.NotFound, "Object was not found."));
                 }
-                List<ActivePolicy> activePoliciesRecords = activePolicies.Select(p => new ActivePolicy(p.Id, p.PolicyName, p.Description)).ToList();
+                List<ActivePolicy> activePoliciesRecords = activePolicies.Select(p => new ActivePolicy(p.Id, p.Name, p.Description)).ToList();
                 return Ok(activePoliciesRecords);     
             }
             catch (Exception ex) 
             {
+                int statusCode = (int)HttpStatusCode.InternalServerError;
                 _logger.LogError(ex, "An error occurred:");
-                return Problem(ex.Message);
+                return StatusCode(statusCode, new ApiResponse(statusCode, $"An error has occurred: {ex.Message}"));
             }
         }
 
@@ -116,8 +118,8 @@ namespace Middleware.RedisInterface.Controllers
         [HttpPatch]
         [Route("{id}", Name = "PolicyPatch")]
         [ProducesResponseType(typeof(PolicyModel), (int)HttpStatusCode.OK)]
-        [ProducesResponseType(typeof(string), (int)HttpStatusCode.NotFound)]
-        [ProducesResponseType(typeof(string), (int)HttpStatusCode.InternalServerError)]
+        [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.NotFound)]
+        [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.InternalServerError)]
         public async Task<IActionResult> PatchPolicyAsync([FromBody] PolicyModel patch, [FromRoute] Guid id)
         {
             try
@@ -125,14 +127,15 @@ namespace Middleware.RedisInterface.Controllers
                 PolicyModel model = await _policyRepository.PatchPolicyAsync(id, patch);
                 if (model == null)
                 {
-                    return NotFound("Object to be updated was not found.");
+                    return NotFound(new ApiResponse((int)HttpStatusCode.NotFound, "Object to be updated was not found."));
                 }
                 return Ok(model);
             }
             catch (Exception ex) 
             {
+                int statusCode = (int)HttpStatusCode.InternalServerError;
                 _logger.LogError(ex, "An error occurred:");
-                return Problem(ex.Message);
+                return StatusCode(statusCode, new ApiResponse(statusCode, $"An error has occurred: {ex.Message}"));
             }
         }
     }

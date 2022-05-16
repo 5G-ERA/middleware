@@ -40,7 +40,7 @@
         "AllowedScopes": []
       },
       "UpstreamPathTemplate": "/Data/{all}",
-      "UpstreamHttpMethod": [ "GET", "POST", "PATCH", "DELETE" ]
+      "UpstreamHttpMethod": [ "GET", "POST", "PUT", "PATCH", "DELETE" ]
     },
     //TaskPlanner API
     {

@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Text.Json.Serialization;
-using System.Threading.Tasks;
+﻿using System.Text.Json.Serialization;
 
 namespace Middleware.Common.Models
 {
@@ -12,6 +7,9 @@ namespace Middleware.Common.Models
         [JsonPropertyName("Id")]
         public override Guid Id { get; set; }
 
+        [JsonPropertyName("Name")]
+        public override string Name { get; set; }
+
         [JsonPropertyName("TaskPriority")]
         public int TaskPriority { get; set; }
 
@@ -19,6 +17,7 @@ namespace Middleware.Common.Models
         public Guid ActionPlanId { get; set; }
 
         [JsonPropertyName("ActionSequence")]
+        [JsonIgnore]
         public List<ActionModel> ActionSequence { get; set; }
 
         public TaskModel()

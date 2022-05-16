@@ -13,6 +13,7 @@
         Edge =8,
         Cloud =9,
         Action =10,
-        QoS =11  
+        QoS =11,
+        ActionSequence = 13
     }
 }

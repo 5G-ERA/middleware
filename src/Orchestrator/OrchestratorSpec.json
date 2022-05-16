@@ -93,6 +93,26 @@
                 }
               }
             }
+          },
+          "500": {
+            "description": "Server Error",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              }
+            }
           }
         }
       },
@@ -149,7 +169,7 @@
         "tags": [
           "Orchestrate"
         ],
-        "operationId": "GetActionsByPlanId",
+        "operationId": "GetActionPlanByPlanId",
         "parameters": [
           {
             "name": "id",
@@ -167,26 +187,17 @@
             "content": {
               "text/plain": {
                 "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/ActionModel"
-                  }
+                  "$ref": "#/components/schemas/ActionPlanModel"
                 }
               },
               "application/json": {
                 "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/ActionModel"
-                  }
+                  "$ref": "#/components/schemas/ActionPlanModel"
                 }
               },
               "text/json": {
                 "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/ActionModel"
-                  }
+                  "$ref": "#/components/schemas/ActionPlanModel"
                 }
               }
             }
@@ -196,17 +207,37 @@
             "content": {
               "text/plain": {
                 "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
+                  "$ref": "#/components/schemas/ApiResponse"
                 }
               },
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
+                  "$ref": "#/components/schemas/ApiResponse"
                 }
               },
               "text/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Server Error",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
                 }
               }
             }
@@ -232,6 +263,66 @@
         "responses": {
           "200": {
             "description": "Success"
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Server Error",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              }
+            }
           }
         }
       }
@@ -363,6 +454,10 @@
             "type": "string",
             "format": "uuid"
           },
+          "Name": {
+            "type": "string",
+            "nullable": true
+          },
           "ActionFamily": {
             "type": "string",
             "nullable": true
@@ -378,16 +473,47 @@
           "ActionPriority": {
             "type": "string",
             "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "ActionPlanModel": {
+        "type": "object",
+        "properties": {
+          "relations": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/RelationModel"
+            },
+            "nullable": true
           },
-          "ImageName": {
+          "Id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "Name": {
             "type": "string",
             "nullable": true
           },
-          "Services": {
+          "ActionSequence": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/InstanceModel"
+              "$ref": "#/components/schemas/ActionModel"
             },
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "ApiResponse": {
+        "type": "object",
+        "properties": {
+          "statusCode": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "message": {
+            "type": "string",
             "nullable": true
           }
         },
@@ -424,6 +550,10 @@
           "Id": {
             "type": "string",
             "format": "uuid"
+          },
+          "Name": {
+            "type": "string",
+            "nullable": true
           },
           "ImageName": {
             "type": "string",
@@ -534,6 +664,10 @@
             "type": "string",
             "format": "uuid"
           },
+          "Name": {
+            "type": "string",
+            "nullable": true
+          },
           "TaskPriority": {
             "type": "integer",
             "format": "int32"
@@ -541,13 +675,6 @@
           "ActionPlanId": {
             "type": "string",
             "format": "uuid"
-          },
-          "ActionSequence": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/ActionModel"
-            },
-            "nullable": true
           }
         },
         "additionalProperties": false

@@ -25,8 +25,8 @@ namespace Middleware.RedisInterface.Controllers
         /// <returns> the list of RobotModel entities </returns>
         [HttpGet(Name = "RobotGetAll")]
         [ProducesResponseType(typeof(RobotModel), (int)HttpStatusCode.OK)]
-        [ProducesResponseType(typeof(string), (int)HttpStatusCode.NotFound)]
-        [ProducesResponseType(typeof(string), (int)HttpStatusCode.InternalServerError)]
+        [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.NotFound)]
+        [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.InternalServerError)]
         public async Task<ActionResult<IEnumerable<RobotModel>>> GetAllAsync()
         {
             try
@@ -34,14 +34,15 @@ namespace Middleware.RedisInterface.Controllers
                 List<RobotModel> models = await _robotRepository.GetAllAsync();
                 if (models.Any() == false)
                 {
-                    return NotFound("Objects were not found.");
+                    return NotFound(new ApiResponse((int)HttpStatusCode.NotFound, "Objects were not found."));
                 }
                 return Ok(models);
             }
             catch (Exception ex)
             {
+                int statusCode = (int)HttpStatusCode.InternalServerError;
                 _logger.LogError(ex, "An error occurred:");
-                return Problem(ex.Message);
+                return StatusCode(statusCode, new ApiResponse(statusCode, $"An error has occurred: {ex.Message}"));
             }
         }
 
@@ -53,8 +54,8 @@ namespace Middleware.RedisInterface.Controllers
         [HttpGet]
         [Route("{id}", Name = "RobotGetById")]
         [ProducesResponseType(typeof(RobotModel), (int)HttpStatusCode.OK)]
-        [ProducesResponseType(typeof(string), (int)HttpStatusCode.NotFound)]
-        [ProducesResponseType(typeof(string), (int)HttpStatusCode.InternalServerError)]
+        [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.NotFound)]
+        [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.InternalServerError)]
         public async Task<IActionResult> GetByIdAsync(Guid id)
         {
             try
@@ -62,14 +63,15 @@ namespace Middleware.RedisInterface.Controllers
                 RobotModel model = await _robotRepository.GetByIdAsync(id);
                 if (model == null)
                 {
-                    return NotFound("Object was not found.");
+                    return NotFound(new ApiResponse((int)HttpStatusCode.NotFound, "Object was not found."));
                 }
                 return Ok(model);
             }
             catch (Exception ex)
             {
+                int statusCode = (int)HttpStatusCode.InternalServerError;
                 _logger.LogError(ex, "An error occurred:");
-                return Problem(ex.Message);
+                return StatusCode(statusCode, new ApiResponse(statusCode, $"An error has occurred: {ex.Message}"));
             }
         }
 
@@ -80,22 +82,29 @@ namespace Middleware.RedisInterface.Controllers
         /// <returns> the newly created RobotModel entity </returns>
         [HttpPost(Name = "RobotAdd")]
         [ProducesResponseType(typeof(RobotModel), (int)HttpStatusCode.OK)]
-        [ProducesResponseType(typeof(string), (int)HttpStatusCode.BadRequest)]
-        [ProducesResponseType(typeof(string), (int)HttpStatusCode.InternalServerError)]
+        [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.BadRequest)]
+        [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.InternalServerError)]
         public async Task<ActionResult<RobotModel>> AddAsync([FromBody] RobotModel model)
         {
             if (model == null)
             {
-                BadRequest("Parameters were not specified.");
+                return BadRequest(new ApiResponse((int)HttpStatusCode.BadRequest, "Parameters were not specified."));
             }
             try
             {
-                await _robotRepository.AddAsync(model);
+                RobotModel robot = await _robotRepository.AddAsync(model);
+                if (robot is null)
+                {
+                    return StatusCode((int) HttpStatusCode.InternalServerError,
+                        new ApiResponse((int) HttpStatusCode.InternalServerError,
+                            "Could not add the robot to the data store"));
+                }
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex.Message);
-                return Problem("Something went wrong while calling the API");
+                int statusCode = (int)HttpStatusCode.InternalServerError;
+                _logger.LogError(ex, "An error occurred:");
+                return StatusCode(statusCode, new ApiResponse(statusCode, $"An error has occurred: {ex.Message}"));
             }
             return Ok(model);
         }
@@ -109,8 +118,8 @@ namespace Middleware.RedisInterface.Controllers
         [HttpPatch]
         [Route("{id}", Name = "RobotPatch")]
         [ProducesResponseType(typeof(RobotModel), (int)HttpStatusCode.OK)]
-        [ProducesResponseType(typeof(string), (int)HttpStatusCode.NotFound)]
-        [ProducesResponseType(typeof(string), (int)HttpStatusCode.InternalServerError)]
+        [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.NotFound)]
+        [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.InternalServerError)]
         public async Task<IActionResult> PatchRobotAsync([FromBody] RobotModel patch, [FromRoute] Guid id)
         {
             try
@@ -118,14 +127,15 @@ namespace Middleware.RedisInterface.Controllers
                 RobotModel model = await _robotRepository.PatchRobotAsync(id, patch);
                 if (model == null)
                 {
-                    return NotFound("Object to be updated was not found.");
+                    return NotFound(new ApiResponse((int)HttpStatusCode.NotFound, "Object to be updated was not found."));
                 }
                 return Ok(model);
             }
             catch (Exception ex)
             {
+                int statusCode = (int)HttpStatusCode.InternalServerError;
                 _logger.LogError(ex, "An error occurred:");
-                return Problem(ex.Message);
+                return StatusCode(statusCode, new ApiResponse(statusCode, $"An error has occurred: {ex.Message}"));
             }
         }
 
@@ -137,7 +147,7 @@ namespace Middleware.RedisInterface.Controllers
         [HttpDelete]
         [Route("{id}", Name = "RobotDelete")]
         [ProducesResponseType(typeof(void), (int)HttpStatusCode.OK)]
-        [ProducesResponseType(typeof(string), (int)HttpStatusCode.InternalServerError)]
+        [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.InternalServerError)]
         public async Task<ActionResult> DeleteByIdAsync(Guid id)
         {
             try
@@ -146,8 +156,9 @@ namespace Middleware.RedisInterface.Controllers
             }
             catch (Exception ex)
             {
+                int statusCode = (int)HttpStatusCode.InternalServerError;
                 _logger.LogError(ex, "An error occurred:");
-                return Problem(ex.Message);
+                return StatusCode(statusCode, new ApiResponse(statusCode, $"An error has occurred: {ex.Message}"));
             }
             return Ok();
         }
@@ -160,11 +171,42 @@ namespace Middleware.RedisInterface.Controllers
         //    return Ok();
         //}
 
+
+        [HttpPost]
+        [Route("AddRelation", Name = "RobotAddRelation")]
+        [ProducesResponseType(typeof(RelationModel), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.BadRequest)]
+        [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.InternalServerError)]
+        public async Task<ActionResult<RelationModel>> AddRelationAsync([FromBody] RelationModel model)
+        {
+            if (model == null)
+            {
+                return BadRequest(new ApiResponse((int)HttpStatusCode.BadRequest, "Parameters were not specified."));
+            }
+            try
+            {
+                bool isValid = await _robotRepository.AddRelationAsync(model);
+                if (!isValid)
+                {
+                    return StatusCode((int) HttpStatusCode.InternalServerError,
+                        new ApiResponse((int) HttpStatusCode.InternalServerError, "The relation was not created"));
+                }
+
+            }
+            catch (Exception ex)
+            {
+                int statusCode = (int)HttpStatusCode.InternalServerError;
+                _logger.LogError(ex, "An error occurred:");
+                return StatusCode(statusCode, new ApiResponse(statusCode, $"An error has occurred: {ex.Message}"));
+            }
+            return Ok(model);
+        }
+
         [HttpGet]
         [Route("relation/{name}", Name ="RobotGetRelationByName")]
         [ProducesResponseType(typeof(List<RelationModel>), (int)HttpStatusCode.OK)]
-        [ProducesResponseType(typeof(string), (int)HttpStatusCode.NotFound)]
-        [ProducesResponseType(typeof(string), (int)HttpStatusCode.InternalServerError)]
+        [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.NotFound)]
+        [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.InternalServerError)]
         public async Task<IActionResult> GetRelationAsync(Guid id, string name)
         {
             try
@@ -172,14 +214,15 @@ namespace Middleware.RedisInterface.Controllers
                 var relations = await _robotRepository.GetRelation(id, name);
                 if (!relations.Any())
                 {
-                    return NotFound("Relations were not found.");
+                    return NotFound(new ApiResponse((int)HttpStatusCode.NotFound, "Relations were not found."));
                 }
                 return Ok(relations);
             }
             catch (Exception ex)
             {
+                int statusCode = (int)HttpStatusCode.InternalServerError;
                 _logger.LogError(ex, "An error occurred:");
-                return Problem(ex.Message);
+                return StatusCode(statusCode, new ApiResponse(statusCode, $"An error has occurred: {ex.Message}"));
             }
         }
 
@@ -187,8 +230,8 @@ namespace Middleware.RedisInterface.Controllers
         [HttpGet]
         [Route("relations/{firstName}/{secondName}", Name = "RobotGetRelationsByName")]
         [ProducesResponseType(typeof(List<RelationModel>), (int)HttpStatusCode.OK)]
-        [ProducesResponseType(typeof(string), (int)HttpStatusCode.NotFound)]
-        [ProducesResponseType(typeof(string), (int)HttpStatusCode.InternalServerError)]
+        [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.NotFound)]
+        [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.InternalServerError)]
         public async Task<IActionResult> GetRelationsAsync(Guid id, string firstName, string secondName)
         {
             try
@@ -197,14 +240,15 @@ namespace Middleware.RedisInterface.Controllers
                 var relations = await _robotRepository.GetRelations(id, relationNames);
                 if (!relations.Any())
                 {
-                    return NotFound("Relations were not found");
+                    return NotFound(new ApiResponse((int)HttpStatusCode.NotFound, "Relations were not found"));
                 }
                 return Ok(relations);
             }
             catch (Exception ex)
             {
+                int statusCode = (int)HttpStatusCode.InternalServerError;
                 _logger.LogError(ex, "An error occurred:");
-                return Problem(ex.Message);
+                return StatusCode(statusCode, new ApiResponse(statusCode, $"An error has occurred: {ex.Message}"));
             }
         }
     }

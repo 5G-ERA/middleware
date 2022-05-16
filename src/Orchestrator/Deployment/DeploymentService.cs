@@ -1,14 +1,14 @@
-﻿using k8s;
+﻿using AutoMapper;
+using k8s;
 using k8s.Models;
 using Middleware.Common;
 using Middleware.Common.Enums;
 using Middleware.Common.ExtensionMethods;
+using Middleware.Common.Models;
 using Middleware.Orchestrator.ApiReference;
 using Middleware.Orchestrator.Config;
 using Middleware.Orchestrator.Exceptions;
 using Middleware.Orchestrator.Models;
-using Middleware.Orchestrator.RedisInterface;
-using TaskModel = Middleware.Common.Models.TaskModel;
 
 namespace Middleware.Orchestrator.Deployment;
 
@@ -17,11 +17,15 @@ public class DeploymentService : IDeploymentService
     /// <summary>
     /// Kubernetes client connection builder
     /// </summary>
-    private readonly IKubernetes _k8SClient;
+    private readonly IKubernetesBuilder _kubernetesBuilder;
     /// <summary>
     /// Environments access to the configuration of a pod
     /// </summary>
     private readonly IEnvironment _env;
+    /// <summary>
+    /// Object mapper
+    /// </summary>
+    private readonly IMapper _mapper;
     /// <summary>
     /// Logger instance
     /// </summary>
@@ -29,16 +33,17 @@ public class DeploymentService : IDeploymentService
     /// <summary>
     /// Redis Interface client allowing to make calls to the Redis Cache
     /// </summary>
-    private readonly RedisApiClient _redisClient;
+    private readonly RedisInterface.RedisApiClient _redisClient;
     /// <summary>
     /// Name of the AWS registry used 
     /// </summary>
     private readonly string _awsRegistryName;
 
-    public DeploymentService(IKubernetesBuilder kubernetesBuilder, IApiClientBuilder apiClientBuilder, IEnvironment env, ILogger<DeploymentService> logger)
+    public DeploymentService(IKubernetesBuilder kubernetesBuilder, IApiClientBuilder apiClientBuilder, IEnvironment env, IMapper mapper, ILogger<DeploymentService> logger)
     {
-        _k8SClient = kubernetesBuilder.CreateKubernetesClient();
+        _kubernetesBuilder = kubernetesBuilder;
         _env = env;
+        _mapper = mapper;
         _logger = logger;
         _redisClient = apiClientBuilder.CreateRedisApiClient();
         _awsRegistryName = _env.GetEnvVariable("AWS_IMAGE_REGISTRY");
@@ -47,80 +52,127 @@ public class DeploymentService : IDeploymentService
     /// <inheritdoc/>
     public async Task<bool> DeployAsync(TaskModel task)
     {
-        _logger.LogDebug("Entered DeploymentService.DeployAsync");
-        var deployments = await _k8SClient.ListNamespacedDeploymentAsync(AppConfig.K8SNamespaceName);
-        var deploymentNames = deployments.Items.Select(d => d.Metadata.Name).OrderBy(d => d).ToArray();
-        _logger.LogDebug("Current deployments: {deployments}", string.Join(", ", deploymentNames));
         bool isSuccess = true;
-
-        foreach (var seq in task.ActionSequence)
+        try
         {
-            foreach (var service in seq.Services)
+            var k8SClient = _kubernetesBuilder.CreateKubernetesClient();
+            _logger.LogDebug("Entered DeploymentService.DeployAsync");
+            var deployments = await k8SClient.ListNamespacedDeploymentAsync(AppConfig.K8SNamespaceName);
+            var deploymentNames = deployments.Items.Select(d => d.Metadata.Name).OrderBy(d => d).ToArray();
+            _logger.LogDebug("Current deployments: {deployments}", string.Join(", ", deploymentNames));
+
+            foreach (var seq in task.ActionSequence)
             {
-                try
+                foreach (var service in seq.Services)
                 {
-                    _logger.LogDebug("Querying for redis for service {Id}", service.Id);
-                    var images = (await _redisClient.ContainerImageGetForInstanceAsync(service.Id))?.ToList();
-                    if (images is null || images.Any() == false)
+                    try
                     {
-                        throw new IncorrectDataException("Images not defined for the Instance deployment");
+                        await DeployService(k8SClient, service, deploymentNames);
                     }
-                    _logger.LogDebug("Retrieved service with Id: {Id}", service.Id);
-                    // should only be just one image
-                    foreach (var cim in images)
+                    catch (Exception ex)
                     {
-                        _logger.LogDebug("Deploying the image {ImageName}", service.ImageName);
-
-                        if (deploymentNames.Contains(cim.Name))
-                        {
-                            //TODO: handle the check if the deployment or a service already exists
-                            continue;
-                        }
-
-                        var deployedPair = await Deploy(cim);
-
-                        service.ServiceStatus = ServiceStatusEnum.Idle.GetStringValue();
-                        service.ServiceInstanceId = Guid.Parse(deployedPair.Deployment.GetLabel("serviceId"));
-                        _logger.LogDebug("Deployed the image {ImageName} with the Id {ServiceInstanceId}", service.ImageName, service.ServiceInstanceId);
-                        //if (deployedPair.Service is not null && deployedPair.Service.Spec.ExternalIPs.Any())
-                        //{
-                        //    service.ServiceUrl = new Uri(deployedPair.Service.Spec.ExternalIPs[0]);
-                        //}
-
-
-                        //TODO: save the specified actionPlan to the Redis
-
+                        _logger.LogError(ex, "There was an error while deploying the service");
+                        isSuccess = false;
                     }
                 }
-                catch (Exception ex)
-                {
-                    _logger.LogError(ex, "There was an error while deploying the service");
-                    isSuccess = false;
-                }
+            }
+
+            isSuccess &= await SaveActionSequence(task);
+        }
+        catch (RedisInterface.ApiException<ApiResponse> apiEx)
+        {
+            _logger.LogError(apiEx, "There was an error while retrieving the information from Redis");
+            isSuccess = false;
+        }
+        catch (NotInK8SEnvironmentException)
+        {
+            _logger.LogInformation("The instantiation of the kubernetes client has failed in {env} environment.", AppConfig.AppConfiguration);
+
+            isSuccess = AppConfig.AppConfiguration == AppVersionEnum.Dev.GetStringValue();
+
+            if (isSuccess)
+            {
+                _logger.LogWarning("Deployment of the services has been skipped in the Development environment");
             }
         }
 
         return isSuccess;
     }
+
+    /// <summary>
+    /// Saves the specified task to the redis as an action plan
+    /// </summary>
+    /// <param name="task"></param>
+    /// <returns></returns>
+    private async Task<bool> SaveActionSequence(TaskModel task)
+    {
+        var actionPlan = new ActionPlanModel(task.ActionPlanId, task.Name, task.ActionSequence);
+
+        var riActionPlan = _mapper.Map<RedisInterface.ActionPlanModel>(actionPlan);
+        var result = await _redisClient.ActionPlanAddAsync(riActionPlan);
+
+        return result != null;
+    }
+
+    private async Task DeployService(IKubernetes k8SClient, InstanceModel service, string[] deploymentNames)
+    {
+        _logger.LogDebug("Querying for redis for service {Id}", service.Id);
+        var images = (await _redisClient.ContainerImageGetForInstanceAsync(service.Id))?.ToList();
+
+        if (images is null || images.Any() == false)
+        {
+            throw new IncorrectDataException("Image is not defined for the Instance deployment");
+        }
+
+        var mappedImages = _mapper.Map<List<ContainerImageModel>>(images);
+
+        _logger.LogDebug("Retrieved service with Id: {Id}", service.Id);
+
+        // usually should only be just one image
+        foreach (var cim in mappedImages)
+        {
+            _logger.LogDebug("Deploying the image {ImageName}", service.ImageName);
+
+            if (deploymentNames.Contains(cim.Name))
+            {
+
+                //TODO: handle the check if the deployment or a service already exists
+                continue;
+            }
+
+            var deployedPair = await Deploy(k8SClient, cim);
+
+            service.ServiceStatus = ServiceStatusEnum.Idle.GetStringValue();
+            service.ServiceInstanceId = Guid.Parse(deployedPair.Deployment.GetLabel("serviceId"));
+            _logger.LogDebug("Deployed the image {ImageName} with the Id {ServiceInstanceId}", service.ImageName,
+                service.ServiceInstanceId);
+
+            //TODO: assign values to the instance data
+        }
+    }
+
     /// <summary>
     /// Deploy the service based on the container information
     /// </summary>
+    /// <param name="k8SClient"></param>
     /// <param name="cim"></param>
     /// <returns></returns>
-    public async Task<DeploymentPairModel> Deploy(ContainerImageModel cim)
+    public async Task<DeploymentPairModel> Deploy(IKubernetes k8SClient, ContainerImageModel cim)
     {
         var instanceId = Guid.NewGuid();
 
-        var service = await Deploy<V1Service>(cim.K8SService, cim.Name, instanceId, nameof(cim.K8SService));
+        var service = await Deploy<V1Service>(k8SClient, cim.K8SService, cim.Name, instanceId, nameof(cim.K8SService));
 
-        var deployment = await Deploy<V1Deployment>(cim.K8SDeployment, cim.Name, instanceId, nameof(cim.K8SDeployment));
+        var deployment = await Deploy<V1Deployment>(k8SClient, cim.K8SDeployment, cim.Name, instanceId, nameof(cim.K8SDeployment));
 
         return new DeploymentPairModel(deployment, service);
     }
+
     /// <summary>
     /// Deploy the Service of the specified type. Available types are <seealso cref="V1Service"/> and <seealso cref="V1Deployment"/>
     /// </summary>
     /// <typeparam name="T">Type of the service</typeparam>
+    /// <param name="k8SClient"></param>
     /// <param name="objectDefinition">string representation of the k8s yaml object</param>
     /// <param name="name">Name of the service to be deployed</param>
     /// <param name="instanceId"></param>
@@ -128,7 +180,8 @@ public class DeploymentService : IDeploymentService
     /// <returns></returns>
     /// <exception cref="IncorrectDataException"></exception>
     /// <exception cref="UnableToParseYamlConfigException"></exception>
-    private async Task<T> Deploy<T>(string objectDefinition, string name, Guid instanceId, string propName = null) where T : class
+    private async Task<T> Deploy<T>(IKubernetes k8SClient, string objectDefinition, string name, Guid instanceId,
+        string propName = null) where T : class
     {
         var type = typeof(T);
 
@@ -153,14 +206,14 @@ public class DeploymentService : IDeploymentService
         {
             srv.Metadata.SetServiceLabel(instanceId);
 
-            obj = await _k8SClient.CreateNamespacedServiceAsync(srv, AppConfig.K8SNamespaceName) as T;
+            obj = await k8SClient.CreateNamespacedServiceAsync(srv, AppConfig.K8SNamespaceName) as T;
             return obj;
         }
         if (obj is V1Deployment depl)
         {
             depl.Metadata.SetServiceLabel(instanceId);
 
-            obj = await _k8SClient.CreateNamespacedDeploymentAsync(depl, AppConfig.K8SNamespaceName) as T;
+            obj = await k8SClient.CreateNamespacedDeploymentAsync(depl, AppConfig.K8SNamespaceName) as T;
             return obj;
         }
 
@@ -199,6 +252,67 @@ public class DeploymentService : IDeploymentService
     }
 
     /// <inheritdoc/>
+    public async Task<bool> DeletePlanAsync(ActionPlanModel actionPlan)
+    {
+        bool retVal = true;
+        try
+        {
+            var k8sClient = _kubernetesBuilder.CreateKubernetesClient();
+            foreach (var action in actionPlan.ActionSequence)
+            {
+                foreach (var srv in action.Services)
+                {
+                    retVal &= await DeleteInstance(k8sClient, srv);
+                }
+            }
+        }
+        catch (NotInK8SEnvironmentException)
+        {
+            _logger.LogInformation("The instantiation of the kubernetes client has failed in {env} environment.", AppConfig.AppConfiguration);
+
+            retVal = AppConfig.AppConfiguration == AppVersionEnum.Dev.GetStringValue();
+            if (retVal)
+                _logger.LogWarning("Deployment of the services has been skipped in the Development environment");
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "The deletion of the Action Plan has failed!");
+            retVal = false;
+        }
+        return retVal;
+    }
+    /// <summary>
+    /// Deletes the instance specified. The deletion includes associated deployment and service
+    /// </summary>
+    /// <param name="k8sClient"></param>
+    /// <param name="instance"></param>
+    /// <returns></returns>
+    private async Task<bool> DeleteInstance(IKubernetes k8sClient, InstanceModel instance)
+    {
+        const string success = "Success";
+        var retVal = true;
+
+        var deployments = await k8sClient.ListNamespacedDeploymentAsync(AppConfig.K8SNamespaceName,
+            labelSelector: V1ObjectMetaExtensions.GetServiceLabelSelector(instance.ServiceInstanceId));
+        var services = await k8sClient.ListNamespacedServiceAsync(AppConfig.K8SNamespaceName,
+            labelSelector: V1ObjectMetaExtensions.GetServiceLabelSelector(instance.ServiceInstanceId));
+
+        foreach (var deployment in deployments.Items)
+        {
+            var status = await k8sClient.DeleteNamespacedDeploymentAsync(deployment.Name(), AppConfig.K8SNamespaceName);
+            retVal &= status.Status == success;
+        }
+
+        foreach (var service in services.Items)
+        {
+            var status = await k8sClient.DeleteNamespacedDeploymentAsync(service.Name(), AppConfig.K8SNamespaceName);
+            retVal &= status.Status == success;
+        }
+
+        return retVal;
+    }
+
+    /// <inheritdoc/>
     public V1Deployment CreateStartupDeployment(string name)
     {
         var selector = new V1LabelSelector
@@ -230,7 +344,7 @@ public class DeploymentService : IDeploymentService
         {
             Name = name,
             Image = K8SImageHelper.BuildImageName(_awsRegistryName, name, "latest"),
-            ImagePullPolicy = AppConfig.AppConfiguration == "Release" ? "Always" : "IfNotPresent",
+            ImagePullPolicy = AppConfig.AppConfiguration == AppVersionEnum.Prod.GetStringValue() ? "Always" : "IfNotPresent",
             Env = envList,
             Ports = new List<V1ContainerPort>() { new(80), new(433) }
         };

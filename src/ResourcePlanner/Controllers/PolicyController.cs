@@ -16,7 +16,7 @@ namespace Middleware.ResourcePlanner.Controllers
         public async Task<ActionResult<PolicyTrimmedRecord>> GetCurrentPolicy()
         {
             var policy = new PolicyModel();
-            var policyRecord = new PolicyTrimmedRecord(policy.Id, policy.PolicyName, policy.Description);
+            var policyRecord = new PolicyTrimmedRecord(policy.Id, policy.Name, policy.Description);
             return Ok(policyRecord);
         }
         [HttpGet]

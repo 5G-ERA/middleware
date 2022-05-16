@@ -7,6 +7,9 @@ public class InstanceModel : BaseModel
     [JsonPropertyName("Id")]
     public override Guid Id { get; set; }
 
+    [JsonPropertyName("Name")]
+    public override string Name { get; set; }
+
     [JsonPropertyName("ImageName")]
     public string ImageName { get; set; }
 
@@ -27,4 +30,8 @@ public class InstanceModel : BaseModel
 
     [JsonPropertyName("ServiceStatus")]
     public string ServiceStatus { get; set; }
+
+    [JsonPropertyName("ContainerImage")]
+    [JsonIgnore]
+    public ContainerImageModel ContainerImage { get; set; }
 }

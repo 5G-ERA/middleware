@@ -1,21 +1,32 @@
-﻿using Middleware.Common.Models;
+﻿using System.Text.Json;
+using Microsoft.Extensions.Logging;
 using Middleware.Common.Enums;
+using Middleware.Common.Models;
 using Middleware.Common.Repositories.Abstract;
 using NReJSON;
 using RedisGraphDotNet.Client;
 using StackExchange.Redis;
-using System.Text.Json;
-using Microsoft.Extensions.Logging;
 
 namespace Middleware.Common.Repositories
 {
     public class ActionRepository : BaseRepository<ActionModel>, IActionRepository
     {
-        public ActionRepository(IConnectionMultiplexer redisClient, IRedisGraphClient redisGraph, ILogger<ActionRepository> logger) : base(RedisDbIndexEnum.Action, redisClient, redisGraph, logger)
+        /// <summary>
+        /// Default constructor
+        /// </summary>
+        /// <param name="redisClient"></param>
+        /// <param name="redisGraph"></param>
+        /// <param name="logger"></param>
+        public ActionRepository(IConnectionMultiplexer redisClient, IRedisGraphClient redisGraph, ILogger<ActionRepository> logger) : base(RedisDbIndexEnum.Action, redisClient, redisGraph, logger, true)
         {
         }
 
-
+        /// <summary>
+        /// Patching properties for ActionModel
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="patch"></param>
+        /// <returns> Patched model </returns>
         public async Task<ActionModel> PatchActionAsync(Guid id, ActionModel patch)
         {
             string model = (string)await Db.JsonGetAsync(id.ToString());
@@ -23,6 +34,14 @@ namespace Middleware.Common.Repositories
             if (currentModel == null)
             {
                 return null;
+            }
+            if (!string.IsNullOrEmpty(patch.Name))
+            {
+                currentModel.Name = patch.Name;
+            }
+            if (!string.IsNullOrEmpty(patch.ActionFamily))
+            {
+                currentModel.ActionFamily = patch.ActionFamily;
             }
             if (!string.IsNullOrEmpty(patch.Order.ToString()))
             {
@@ -35,10 +54,6 @@ namespace Middleware.Common.Repositories
             if (!string.IsNullOrEmpty(patch.ActionPriority))
             {
                 currentModel.ActionPriority = patch.ActionPriority;
-            }
-            if (!string.IsNullOrEmpty(patch.Services.ToString()))
-            {
-                currentModel.Services = patch.Services;
             }
             await Db.JsonSetAsync(id.ToString(), JsonSerializer.Serialize(currentModel));
             return currentModel;

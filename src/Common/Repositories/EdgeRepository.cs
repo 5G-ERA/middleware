@@ -1,21 +1,32 @@
-﻿using Middleware.Common.Models;
+﻿using System.Text.Json;
+using Microsoft.Extensions.Logging;
 using Middleware.Common.Enums;
+using Middleware.Common.Models;
 using Middleware.Common.Repositories.Abstract;
 using NReJSON;
 using RedisGraphDotNet.Client;
 using StackExchange.Redis;
-using System.Text.Json;
-using Microsoft.Extensions.Logging;
 
 namespace Middleware.Common.Repositories
 {
     public class EdgeRepository : BaseRepository<EdgeModel>, IEdgeRepository
     {
-        public EdgeRepository(IConnectionMultiplexer redisClient, IRedisGraphClient redisGraph, ILogger<EdgeRepository> logger) : base(RedisDbIndexEnum.Edge, redisClient, redisGraph, logger)
+        /// <summary>
+        /// Default constructor
+        /// </summary>
+        /// <param name="redisClient"></param>
+        /// <param name="redisGraph"></param>
+        /// <param name="logger"></param>
+        public EdgeRepository(IConnectionMultiplexer redisClient, IRedisGraphClient redisGraph, ILogger<EdgeRepository> logger) : base(RedisDbIndexEnum.Edge, redisClient, redisGraph, logger, true)
         {
         }
 
-
+        /// <summary>
+        /// Patching properties for EdgeModel
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="patch"></param>
+        /// <returns> Patched model </returns>
         public async Task<EdgeModel> PatchEdgeAsync(Guid id, EdgeModel patch) 
         {
             string model = (string)await Db.JsonGetAsync(id.ToString());
@@ -23,6 +34,10 @@ namespace Middleware.Common.Repositories
             if (currentModel == null)
             {
                 return null;
+            }
+            if (!string.IsNullOrEmpty(patch.Name))
+            {
+                currentModel.Name = patch.Name;
             }
             if (!string.IsNullOrEmpty(patch.EdgeStatus))
             {

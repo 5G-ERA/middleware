@@ -11,10 +11,22 @@ namespace Middleware.Common.Repositories
 {
     public class RobotRepository : BaseRepository<RobotModel>, IRobotRepository
     {
-        public RobotRepository(IConnectionMultiplexer redisClient, IRedisGraphClient redisGraph, ILogger<RobotRepository> logger) : base(RedisDbIndexEnum.Robot, redisClient, redisGraph, logger)
+        /// <summary>
+        /// Default constructor
+        /// </summary>
+        /// <param name="redisClient"></param>
+        /// <param name="redisGraph"></param>
+        /// <param name="logger"></param>
+        public RobotRepository(IConnectionMultiplexer redisClient, IRedisGraphClient redisGraph, ILogger<RobotRepository> logger) : base(RedisDbIndexEnum.Robot, redisClient, redisGraph, logger, true)
         {
         }
 
+        /// <summary>
+        /// Patching properties for RobotModel
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="patch"></param>
+        /// <returns> Patched model </returns>
         public async Task<RobotModel> PatchRobotAsync(Guid id, RobotModel patch) 
         {
             string model = (string)await Db.JsonGetAsync(id.ToString());
@@ -23,9 +35,9 @@ namespace Middleware.Common.Repositories
             {
                 return null;
             }
-            if (!string.IsNullOrEmpty(patch.RobotName))
+            if (!string.IsNullOrEmpty(patch.Name))
             {
-                currentModel.RobotName = patch.RobotName;
+                currentModel.Name = patch.Name;
             }
             if (!string.IsNullOrEmpty(patch.Manufacturer))
             {
@@ -39,9 +51,9 @@ namespace Middleware.Common.Repositories
             {
                 currentModel.RobotStatus = patch.RobotStatus;
             }
-            if (!string.IsNullOrEmpty(patch.TaskList.ToString()))
+            if (patch.TaskList != null)
             {
-                currentModel.TaskList = patch.TaskList;
+                currentModel.TaskList = patch.TaskList; 
             }
             if (!string.IsNullOrEmpty(patch.BatteryStatus.ToString()))
             {
@@ -55,7 +67,7 @@ namespace Middleware.Common.Repositories
             {
                 currentModel.LocomotionSystem = patch.LocomotionSystem;
             }
-            if (!string.IsNullOrEmpty(patch.Sensors.ToString()))
+            if (patch.Sensors != null)
             {
                 currentModel.Sensors = patch.Sensors;
             }
@@ -79,7 +91,7 @@ namespace Middleware.Common.Repositories
             {
                 currentModel.NumberCores = patch.NumberCores;
             }
-            if (!string.IsNullOrEmpty(patch.Questions.ToString()))
+            if (patch.Questions != null)
             {
                 currentModel.Questions = patch.Questions;
             }

@@ -1,4 +1,5 @@
-﻿using System.Security.Cryptography;
+﻿using System.Net;
+using System.Security.Cryptography;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Cryptography.KeyDerivation;
 using Microsoft.AspNetCore.Mvc;
@@ -23,15 +24,22 @@ namespace Middleware.OcelotGateway.Controllers
         }
 
 
-
+        /// <summary>
+        /// Register a new user into the system
+        /// </summary>
+        /// <param name="register"></param>
+        /// <returns> HttpStatusCode Created </returns>
         [AllowAnonymous]
         [HttpPost]
         [Route("register", Name = "Register")]
+        [ProducesResponseType(typeof(UserModel), (int)HttpStatusCode.Created)]
+        [ProducesResponseType(typeof(string), (int)HttpStatusCode.BadRequest)]
+        [ProducesResponseType(typeof(string), (int)HttpStatusCode.InternalServerError)]
         public async Task<ActionResult<UserModel>> Register([FromBody] UserModel register)
         {
             if (register == null)
             {
-                BadRequest("Please enter valid credentials");
+                return BadRequest("Please enter valid credentials");
             }
             try
             {
@@ -40,46 +48,84 @@ namespace Middleware.OcelotGateway.Controllers
 
                 register.Password = ComputeHashPassword(register.Password, salt);
         
-                await _userRepository.AddAsync(register);
+                await _userRepository.AddAsync(register, () => register.Id);
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex.Message);
                 return Problem("Something went wrong while calling the API");
             }
-            return Ok(register);
+            return StatusCode((int)HttpStatusCode.Created);
         }
 
-
+        /// <summary>
+        /// Login the user into the system
+        /// </summary>
+        /// <param name="login"></param>
+        /// <returns> JWT Token with expiry date </returns>
         [AllowAnonymous]
         [HttpPost]
         [Route("login", Name = "Login")]
+        [ProducesResponseType(typeof(TokenService), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(string), (int)HttpStatusCode.BadRequest)]
+        [ProducesResponseType(typeof(string), (int)HttpStatusCode.Unauthorized)]
         public async Task<IActionResult> Login([FromBody] UserModel login) 
         {
-            IActionResult response = Unauthorized();
-            
-            bool authenticated = await AuthenticateUser(login);
-            if (authenticated)
+            if (login == null)
             {
-                TokenService token = new TokenService();
-                var newToken = token.GenerateToken(login.Id);
-                response = Ok(newToken);
+                return BadRequest("Credentials must be provided");
             }
-            return response;
+            try
+            {
+                IActionResult response = Unauthorized();
+
+                bool authenticated = await AuthenticateUser(login);
+                if (authenticated)
+                {
+                    TokenService token = new TokenService();
+                    var newToken = token.GenerateToken(login.Id);
+                    response = Ok(newToken);
+                }
+                return response;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex.Message);
+                return Unauthorized("User Unauthorized, username or password are incorect");
+            }
+            
         }
 
 
+        /// <summary>
+        /// Checks for user credentials
+        /// </summary>
+        /// <param name="login"></param>
+        /// <returns> True or False according to users' credentials </returns>
         private async Task<bool> AuthenticateUser(UserModel login) 
         {
-            UserModel storedCredentials = await _userRepository.GetByIdAsync(login.Id);
-            byte[] salt = Convert.FromBase64String(storedCredentials.Salt);
-            
-            string computedHashedPassword = ComputeHashPassword(login.Password, salt);
+            try
+            {
+                UserModel storedCredentials = await _userRepository.GetByIdAsync(login.Id);
+                byte[] salt = Convert.FromBase64String(storedCredentials.Salt);
 
-            return computedHashedPassword.Equals(storedCredentials.Password) ? true : false; 
+                string computedHashedPassword = ComputeHashPassword(login.Password, salt);
+
+                return computedHashedPassword.Equals(storedCredentials.Password) ? true : false;
+            }
+            catch (Exception ex) 
+            {
+                _logger.LogError(ex.Message);
+                return false;
+            }
         }
 
-
+        /// <summary>
+        /// Computes Hash + Salt for users'password
+        /// </summary>
+        /// <param name="clearTextPassword"></param>
+        /// <param name="salt"></param>
+        /// <returns> Hashed password </returns>
         private string ComputeHashPassword(string clearTextPassword, byte[] salt) 
         {
             string hashedPassword = Convert.ToBase64String(KeyDerivation.Pbkdf2(
