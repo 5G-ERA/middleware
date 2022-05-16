@@ -273,16 +273,20 @@ namespace Middleware.RedisInterface.Controllers
             {
                 foreach (ActionModel actionModel in model.ActionSequence)
                 {
+                    var tmpServices = actionModel.Services;
+                    actionModel.Services = null;
                     await _actionRepository.AddAsync(actionModel);
-
+                    actionModel.Services = tmpServices;
                     if (!actionModel.Services.Any())
                     {
                         return BadRequest(new ApiResponse((int)HttpStatusCode.BadRequest, "Parameters for Services were not specified."));
                     }
                     foreach (InstanceModel instanceModel in actionModel.Services)
                     {
+                        var tmpImage = instanceModel.ContainerImage;
+                        instanceModel.ContainerImage = null;
                         await _instanceRepository.AddAsync(instanceModel);
-
+                        instanceModel.ContainerImage = tmpImage;
                         if (instanceModel.ContainerImage == null)
                         {
                             return BadRequest(new ApiResponse((int)HttpStatusCode.BadRequest, "Parameters for ContainerImage were not specified."));
@@ -308,7 +312,11 @@ namespace Middleware.RedisInterface.Controllers
                         }
                     }
                 }
+
+                var tmpSequence = model.ActionSequence;
+                model.ActionSequence = null;
                 TaskModel importModel = await _taskRepository.AddAsync(model);
+                model.ActionSequence = tmpSequence;
                 foreach (var action in model.ActionSequence)
                 {
                     //RELATIONSHIP--EXTENDS (TASK->ACTION)
