@@ -473,6 +473,13 @@
           "ActionPriority": {
             "type": "string",
             "nullable": true
+          },
+          "Services": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/InstanceModel"
+            },
+            "nullable": true
           }
         },
         "additionalProperties": false
@@ -515,6 +522,11 @@
           "message": {
             "type": "string",
             "nullable": true
+          },
+          "timeStamp": {
+            "type": "string",
+            "format": "date-time",
+            "readOnly": true
           }
         },
         "additionalProperties": false
@@ -675,6 +687,13 @@
           "ActionPlanId": {
             "type": "string",
             "format": "uuid"
+          },
+          "ActionSequence": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ActionModel"
+            },
+            "nullable": true
           }
         },
         "additionalProperties": false

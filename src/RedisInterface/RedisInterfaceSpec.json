@@ -5809,6 +5809,13 @@
           "ActionPriority": {
             "type": "string",
             "nullable": true
+          },
+          "Services": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/InstanceModel"
+            },
+            "nullable": true
           }
         },
         "additionalProperties": false
@@ -6286,6 +6293,13 @@
           "ActionPlanId": {
             "type": "string",
             "format": "uuid"
+          },
+          "ActionSequence": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ActionModel"
+            },
+            "nullable": true
           }
         },
         "additionalProperties": false

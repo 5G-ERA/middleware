@@ -34,9 +34,13 @@ public static class AutoMapperConfig
             cfg.CreateMap<InstanceModel, Orchestrator.InstanceModel>().ReverseMap();
             cfg.CreateMap<TaskModel, Orchestrator.TaskModel>().ReverseMap();
             cfg.CreateMap<ApiResponse, Orchestrator.ApiResponse>().ReverseMap();
+            //cfg.CreateMap<ContainerImageModel, Orchestrator.ContainerImageModel>().ReverseMap();
             // Resource Planner
             cfg.CreateMap<TaskModel, ResourcePlanner.TaskModel>().ReverseMap();
             cfg.CreateMap<ApiResponse, ResourcePlanner.ApiResponse>().ReverseMap();
+            cfg.CreateMap<ActionModel, ResourcePlanner.ActionModel>().ReverseMap();
+            cfg.CreateMap<InstanceModel, ResourcePlanner.InstanceModel>().ReverseMap();
+            //cfg.CreateMap<ContainerImageModel, ResourcePlanner.ContainerImageModel>().ReverseMap();
 
         });
         return services;

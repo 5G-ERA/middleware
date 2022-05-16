@@ -35,6 +35,7 @@ public static class AutoMapperConfig
             cfg.CreateMap<InstanceModel, Orchestrator.InstanceModel>().ReverseMap();
             cfg.CreateMap<TaskModel, Orchestrator.TaskModel>().ReverseMap();
             cfg.CreateMap<ApiResponse, Orchestrator.ApiResponse>().ReverseMap();
+            //cfg.CreateMap<ContainerImageModel, Orchestrator.ContainerImageModel>().ReverseMap();
         });
         return services;
     }

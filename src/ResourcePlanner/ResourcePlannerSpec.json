@@ -375,6 +375,50 @@
   },
   "components": {
     "schemas": {
+      "ActionModel": {
+        "type": "object",
+        "properties": {
+          "relations": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/RelationModel"
+            },
+            "nullable": true
+          },
+          "Id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "Name": {
+            "type": "string",
+            "nullable": true
+          },
+          "ActionFamily": {
+            "type": "string",
+            "nullable": true
+          },
+          "Order": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "Placement": {
+            "type": "string",
+            "nullable": true
+          },
+          "ActionPriority": {
+            "type": "string",
+            "nullable": true
+          },
+          "Services": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/InstanceModel"
+            },
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
       "ApiResponse": {
         "type": "object",
         "properties": {
@@ -385,6 +429,11 @@
           "message": {
             "type": "string",
             "nullable": true
+          },
+          "timeStamp": {
+            "type": "string",
+            "format": "date-time",
+            "readOnly": true
           }
         },
         "additionalProperties": false
@@ -401,6 +450,56 @@
             "nullable": true
           },
           "name": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "InstanceModel": {
+        "type": "object",
+        "properties": {
+          "relations": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/RelationModel"
+            },
+            "nullable": true
+          },
+          "Id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "Name": {
+            "type": "string",
+            "nullable": true
+          },
+          "ImageName": {
+            "type": "string",
+            "nullable": true
+          },
+          "ServiceInstanceId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "ServiceType": {
+            "type": "string",
+            "nullable": true
+          },
+          "IsReusable": {
+            "type": "boolean",
+            "nullable": true
+          },
+          "DesiredStatus": {
+            "type": "string",
+            "nullable": true
+          },
+          "ServiceUrl": {
+            "type": "string",
+            "format": "uri",
+            "nullable": true
+          },
+          "ServiceStatus": {
             "type": "string",
             "nullable": true
           }
@@ -519,6 +618,13 @@
           "ActionPlanId": {
             "type": "string",
             "format": "uuid"
+          },
+          "ActionSequence": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ActionModel"
+            },
+            "nullable": true
           }
         },
         "additionalProperties": false
