@@ -1,11 +1,46 @@
+using Elasticsearch.Net;
+using Elasticsearch.Net.Aws;
 using Middleware.RedisInterface;
 using Middleware.Common.Repositories;
 using Middleware.Common.Repositories.Abstract;
 using RedisGraphDotNet.Client;
 using Serilog;
+using Serilog.Formatting.Json;
+using Serilog.Sinks.Elasticsearch;
 using StackExchange.Redis;
 
 var builder = WebApplication.CreateBuilder(args);
+
+
+Log.Logger = new LoggerConfiguration()
+    .Enrich.FromLogContext()
+    .Enrich.WithExceptionDetails()
+    .WriteTo.Elasticsearch(new ElasticsearchSinkOptions(new Uri(awsSettings.ElasticSearchUrl))
+    {
+        ModifyConnectionSettings = conn =>
+        {
+            var httpConnection = new AwsHttpConnection(awsSettings.Region
+                , new StaticCredentialsProvider(new AwsCredentials
+                {
+                    AccessKey = awsSettings.AccessKey,
+                    SecretKey = awsSettings.SecretKey,
+                }));
+            var pool = new SingleNodeConnectionPool(new Uri(awsSettings.ElasticSearchUrl));
+            var conf = new ConnectionConfiguration(pool, httpConnection);
+            return conf;
+        },
+        ConnectionTimeout = new TimeSpan(0, 10, 0),
+        IndexFormat = "xxxxx-{0:yyyy.MM}",
+        FailureCallback = e => Console.WriteLine("Unable to submit event " + e.MessageTemplate),
+        EmitEventFailure = EmitEventFailureHandling.WriteToSelfLog |
+                           EmitEventFailureHandling.WriteToFailureSink |
+                           EmitEventFailureHandling.RaiseCallback,
+        FailureSink = new LoggerConfiguration().WriteTo
+            .RollingFile(new JsonFormatter(), "XXXXX-{Date}.txt").CreateLogger()
+    })
+    .write
+    .CreateLogger();
+
 
 builder.Host.UseSerilog((ctx, lc) => lc
     .MinimumLevel.Debug()
