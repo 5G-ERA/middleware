@@ -92,6 +92,7 @@ public class DeploymentService : IDeploymentService
 
             if (isSuccess)
             {
+                isSuccess &= await SaveActionSequence(task);
                 _logger.LogWarning("Deployment of the services has been skipped in the Development environment");
             }
         }
