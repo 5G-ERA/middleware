@@ -6077,10 +6077,6 @@
             "type": "string",
             "nullable": true
           },
-          "ImageName": {
-            "type": "string",
-            "nullable": true
-          },
           "ServiceInstanceId": {
             "type": "string",
             "format": "uuid"

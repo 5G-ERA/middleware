@@ -38,10 +38,6 @@ namespace Middleware.Common.Repositories
             {
                 currentModel.Name = patch.Name;
             }
-            if (!string.IsNullOrEmpty(patch.ImageName))
-            {
-                currentModel.ImageName = patch.ImageName;
-            }
             if (!string.IsNullOrEmpty(patch.ServiceType))
             {
                 currentModel.ServiceType = patch.ServiceType;
