@@ -3,11 +3,11 @@ using Middleware.Common.Repositories;
 using Middleware.Common.Repositories.Abstract;
 using Middleware.RedisInterface;
 using RedisGraphDotNet.Client;
-using Serilog;
-using Serilog.Sinks.Elasticsearch;
 using StackExchange.Redis;
 
 var builder = WebApplication.CreateBuilder(args);
+
+builder.RegisterSecretsManager();
 
 builder.UseElasticSerilogLogger();
 

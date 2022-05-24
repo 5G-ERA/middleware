@@ -1,5 +1,7 @@
 ﻿using System.Net;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Options;
+using Middleware.Common.Config;
 using Middleware.Common.Models;
 using Middleware.Common.Repositories;
 using Middleware.Common.Repositories.Abstract;
@@ -14,12 +16,14 @@ namespace Middleware.RedisInterface.Controllers
         private readonly IActionPlanRepository _actionPlanRepository;
 
         private readonly ILogger _logger;
+        private readonly IOptions<ElasticConfig> _elasticOptions;
 
-        public ActionController(IActionRepository actionRepository, IActionPlanRepository actionPlanRepository, ILogger<ActionController> logger)
+        public ActionController(IActionRepository actionRepository, IActionPlanRepository actionPlanRepository, ILogger<ActionController> logger, IOptions<ElasticConfig> elasticOptions)
         {
             _actionRepository = actionRepository ?? throw new ArgumentNullException(nameof(actionRepository));
             _actionPlanRepository = actionPlanRepository ?? throw new ArgumentNullException(nameof(actionPlanRepository));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+            _elasticOptions = elasticOptions;
         }
 
         /// <summary>
@@ -34,6 +38,7 @@ namespace Middleware.RedisInterface.Controllers
         {
             try
             {
+
                 List<ActionModel> models = await _actionRepository.GetAllAsync();
                 if (models.Any() == false)
                 {
