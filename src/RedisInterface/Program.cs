@@ -1,53 +1,41 @@
-using Elasticsearch.Net;
-using Elasticsearch.Net.Aws;
-using Middleware.RedisInterface;
 using Middleware.Common.Repositories;
 using Middleware.Common.Repositories.Abstract;
+using Middleware.RedisInterface;
 using RedisGraphDotNet.Client;
 using Serilog;
-using Serilog.Formatting.Json;
 using Serilog.Sinks.Elasticsearch;
 using StackExchange.Redis;
 
 var builder = WebApplication.CreateBuilder(args);
 
+#if DEBUG
+Serilog.Debugging.SelfLog.Enable(msg => Console.WriteLine(msg));
+#endif
+
+
+Uri elasticsearchUri = new Uri("https://elastic.uri");
 
 Log.Logger = new LoggerConfiguration()
     .Enrich.FromLogContext()
-    .Enrich.WithExceptionDetails()
-    .WriteTo.Elasticsearch(new ElasticsearchSinkOptions(new Uri(awsSettings.ElasticSearchUrl))
+    .Enrich.WithMachineName()
+    .Enrich.WithEnvironmentUserName()
+    .WriteTo.Console()
+    .WriteTo.Elasticsearch(new ElasticsearchSinkOptions(elasticsearchUri)
     {
-        ModifyConnectionSettings = conn =>
-        {
-            var httpConnection = new AwsHttpConnection(awsSettings.Region
-                , new StaticCredentialsProvider(new AwsCredentials
-                {
-                    AccessKey = awsSettings.AccessKey,
-                    SecretKey = awsSettings.SecretKey,
-                }));
-            var pool = new SingleNodeConnectionPool(new Uri(awsSettings.ElasticSearchUrl));
-            var conf = new ConnectionConfiguration(pool, httpConnection);
-            return conf;
-        },
-        ConnectionTimeout = new TimeSpan(0, 10, 0),
-        IndexFormat = "xxxxx-{0:yyyy.MM}",
-        FailureCallback = e => Console.WriteLine("Unable to submit event " + e.MessageTemplate),
+        ModifyConnectionSettings = conn => conn.BasicAuthentication("user", "pass"),
+        ConnectionTimeout = new TimeSpan(0, 1, 0),
+        IndexFormat = $"{builder.Configuration["ApplicationName"]}-logs-{builder.Environment.EnvironmentName.ToLower().Replace('.', '-')}-{DateTime.UtcNow:yyyy.MM}",
+        AutoRegisterTemplate = true,
         EmitEventFailure = EmitEventFailureHandling.WriteToSelfLog |
-                           EmitEventFailureHandling.WriteToFailureSink |
-                           EmitEventFailureHandling.RaiseCallback,
-        FailureSink = new LoggerConfiguration().WriteTo
-            .RollingFile(new JsonFormatter(), "XXXXX-{Date}.txt").CreateLogger()
+                       EmitEventFailureHandling.WriteToFailureSink |
+                       EmitEventFailureHandling.RaiseCallback,
+        FailureSink = new LoggerConfiguration().WriteTo.Console().CreateLogger()
     })
-    .write
     .CreateLogger();
-
-
-builder.Host.UseSerilog((ctx, lc) => lc
-    .MinimumLevel.Debug()
-    .WriteTo.Console());
+builder.Host.UseSerilog(Log.Logger);
+builder.Services.AddSingleton<Serilog.ILogger>(Log.Logger);
 
 // Add services to the container.
-
 builder.Services.AddControllers(options =>
 {
     options.InputFormatters.Insert(0, JsonPatchInputFormatter.GetJsonPatchInputFormatter());
