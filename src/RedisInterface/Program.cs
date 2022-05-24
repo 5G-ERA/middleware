@@ -1,3 +1,4 @@
+using Middleware.Common.ExtensionMethods;
 using Middleware.Common.Repositories;
 using Middleware.Common.Repositories.Abstract;
 using Middleware.RedisInterface;
@@ -8,32 +9,7 @@ using StackExchange.Redis;
 
 var builder = WebApplication.CreateBuilder(args);
 
-#if DEBUG
-Serilog.Debugging.SelfLog.Enable(msg => Console.WriteLine(msg));
-#endif
-
-
-Uri elasticsearchUri = new Uri("https://elastic.uri");
-
-Log.Logger = new LoggerConfiguration()
-    .Enrich.FromLogContext()
-    .Enrich.WithMachineName()
-    .Enrich.WithEnvironmentUserName()
-    .WriteTo.Console()
-    .WriteTo.Elasticsearch(new ElasticsearchSinkOptions(elasticsearchUri)
-    {
-        ModifyConnectionSettings = conn => conn.BasicAuthentication("user", "pass"),
-        ConnectionTimeout = new TimeSpan(0, 1, 0),
-        IndexFormat = $"{builder.Configuration["ApplicationName"]}-logs-{builder.Environment.EnvironmentName.ToLower().Replace('.', '-')}-{DateTime.UtcNow:yyyy.MM}",
-        AutoRegisterTemplate = true,
-        EmitEventFailure = EmitEventFailureHandling.WriteToSelfLog |
-                       EmitEventFailureHandling.WriteToFailureSink |
-                       EmitEventFailureHandling.RaiseCallback,
-        FailureSink = new LoggerConfiguration().WriteTo.Console().CreateLogger()
-    })
-    .CreateLogger();
-builder.Host.UseSerilog(Log.Logger);
-builder.Services.AddSingleton<Serilog.ILogger>(Log.Logger);
+builder.UseElasticSerilogLogger();
 
 // Add services to the container.
 builder.Services.AddControllers(options =>
