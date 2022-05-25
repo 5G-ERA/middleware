@@ -20,6 +20,12 @@ public static class CommonExtensions
     /// <returns></returns>
     public static WebApplicationBuilder RegisterSecretsManager(this WebApplicationBuilder builder)
     {
+        var awsKey = Environment.GetEnvironmentVariable("AWS_ACCESS_KEY_ID");
+        var awsSecret = Environment.GetEnvironmentVariable("AWS_SECRET_ACCESS_KEY");
+
+        if (string.IsNullOrWhiteSpace(awsKey) || string.IsNullOrWhiteSpace(awsSecret))
+            return builder;
+
         builder.Configuration.AddSecretsManager(region: RegionEndpoint.EUWest1, configurator: opt =>
         {
             opt.SecretFilter = entry => entry.Name.StartsWith($"{AppConfig.SystemName}-");
