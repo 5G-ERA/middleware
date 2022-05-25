@@ -1,28 +1,21 @@
-using Ocelot.DependencyInjection;
-using Ocelot.Middleware;
-using Ocelot.Cache.CacheManager;
-using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Middleware.Common.Repositories.Abstract;
+using Microsoft.IdentityModel.Tokens;
+using Middleware.Common.ExtensionMethods;
 using Middleware.Common.Repositories;
-using StackExchange.Redis;
+using Middleware.Common.Repositories.Abstract;
+using Ocelot.Cache.CacheManager;
+using Ocelot.DependencyInjection;
+using Ocelot.Middleware;
 using RedisGraphDotNet.Client;
-using Serilog;
+using StackExchange.Redis;
 
 
 var builder = WebApplication.CreateBuilder(args);
 
-/*builder.Host.ConfigureLogging((hostingContext, loggingbuilder) =>
-{
-    loggingbuilder.AddConfiguration(hostingContext.Configuration.GetSection("Logging"));
-    loggingbuilder.AddConsole();
-    loggingbuilder.AddDebug();
-});*/
+builder.RegisterSecretsManager();
 
-builder.Host.UseSerilog((ctx, lc) => lc
-    .MinimumLevel.Debug()
-    .WriteTo.Console());
+builder.UseElasticSerilogLogger();
 
 builder.Host.ConfigureAppConfiguration((hostingContext, config) =>
 {

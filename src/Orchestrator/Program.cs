@@ -5,13 +5,12 @@ using Middleware.Orchestrator.Config;
 using Middleware.Orchestrator.Deployment;
 using Middleware.Orchestrator.Jobs;
 using Quartz;
-using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Host.UseSerilog((ctx, lc) => lc
-    .MinimumLevel.Debug()
-    .WriteTo.Console());
+builder.RegisterSecretsManager();
+
+builder.UseElasticSerilogLogger();
 
 builder.Host.ConfigureAppConfiguration((hostingContext, config) =>
 {
