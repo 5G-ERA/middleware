@@ -148,12 +148,18 @@ namespace Middleware.RedisInterface.Controllers
         [HttpDelete]
         [Route("{id}", Name = "ContainerImageDelete")]
         [ProducesResponseType(typeof(void), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.NotFound)]
         [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.InternalServerError)]
         public async Task<ActionResult> DeleteByIdAsync(Guid id)
         {
             try
             {
-                await _containerImageRepository.DeleteByIdAsync(id);
+                var deleted = await _containerImageRepository.DeleteByIdAsync(id);
+                if (deleted == false)
+                {
+                    return NotFound(new ApiResponse((int)HttpStatusCode.NotFound, "The specified ContainerImage has not been found."));
+                }
+                return Ok();
             }
             catch (Exception ex)
             {
@@ -161,7 +167,6 @@ namespace Middleware.RedisInterface.Controllers
                 _logger.LogError(ex, "An error occurred:");
                 return StatusCode(statusCode, new ApiResponse(statusCode, $"An error has occurred: {ex.Message}"));
             }
-            return Ok();
         }
 
         [HttpPost]
