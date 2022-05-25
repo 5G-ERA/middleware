@@ -2,6 +2,7 @@
 using k8s;
 using k8s.Models;
 using Middleware.Common;
+using Middleware.Common.Config;
 using Middleware.Common.Enums;
 using Middleware.Common.ExtensionMethods;
 using Middleware.Common.Models;
