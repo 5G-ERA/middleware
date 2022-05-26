@@ -14,6 +14,9 @@
         Cloud =9,
         Action =10,
         QoS =11,
-        ActionSequence = 13
+        //12 is not used
+        ActionSequence = 13,
+        NetAppStatus =14,
+        RobotStatus=15
     }
 }
