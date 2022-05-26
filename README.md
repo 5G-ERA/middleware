@@ -29,6 +29,15 @@ Add 2 new Environment Variables if not defined already:
 * **REDIS_PORT** - The port on which the Redis server is operating. The default is `6379`, for the AWS server it has different port
 * **AWS_IMAGE_REGISTRY** - the address of the AWS Container Image Registry that hosts the official images for the 5G-ERA middleware
 
+The Middleware has an option to log to centralized Elasticsearch. For this the AWS SecretManager is used. The 2 additional environment variables have to be set to authenticate the machine against AWS.
+
+* **AWS_ACCESS_KEY_ID** - Access Key Id of the IAM user for the AWS account
+* **AWS_SECRET_ACCESS_KEY** - Secret Access Key of the IAM user for the AWS account
+
+For the AWS Secret Manager the secrets are supposed to be stored as a plaintext and the names should have the following format: `Middleware-{SettingGroup}__{SettingValue}` for example `Middleware-Database__ConnectionString`.
+
+The SecretManager will automatically map the required `appsetting.json` configuration sections into the correct data.
+
 ### Visual Studio Configuration
 
 To properly run the solution from the Visual Studio specify the build configuration as in the image below:

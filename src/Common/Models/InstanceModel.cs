@@ -12,9 +12,6 @@ public class InstanceModel : BaseModel
     [JsonPropertyName("Name")]
     public override string Name { get; set; }
 
-    [JsonPropertyName("ImageName")]
-    public string ImageName { get; set; }
-
     [JsonPropertyName("ServiceInstanceId")]
     public Guid ServiceInstanceId { get; set; }
 

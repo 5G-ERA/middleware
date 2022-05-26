@@ -1,5 +1,7 @@
 ﻿using System.Net;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Options;
+using Middleware.Common.Config;
 using Middleware.Common.Models;
 using Middleware.Common.Repositories;
 using Middleware.Common.Repositories.Abstract;
@@ -14,12 +16,14 @@ namespace Middleware.RedisInterface.Controllers
         private readonly IActionPlanRepository _actionPlanRepository;
 
         private readonly ILogger _logger;
+        private readonly IOptions<ElasticConfig> _elasticOptions;
 
-        public ActionController(IActionRepository actionRepository, IActionPlanRepository actionPlanRepository, ILogger<ActionController> logger)
+        public ActionController(IActionRepository actionRepository, IActionPlanRepository actionPlanRepository, ILogger<ActionController> logger, IOptions<ElasticConfig> elasticOptions)
         {
             _actionRepository = actionRepository ?? throw new ArgumentNullException(nameof(actionRepository));
             _actionPlanRepository = actionPlanRepository ?? throw new ArgumentNullException(nameof(actionPlanRepository));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+            _elasticOptions = elasticOptions;
         }
 
         /// <summary>
@@ -34,6 +38,7 @@ namespace Middleware.RedisInterface.Controllers
         {
             try
             {
+
                 List<ActionModel> models = await _actionRepository.GetAllAsync();
                 if (models.Any() == false)
                 {
@@ -145,12 +150,18 @@ namespace Middleware.RedisInterface.Controllers
         [HttpDelete]
         [Route("{id}", Name = "ActionDelete")]
         [ProducesResponseType(typeof(void), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.NotFound)]
         [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.InternalServerError)]
         public async Task<ActionResult> DeleteByIdAsync(Guid id)
         {
             try
             {
-                await _actionRepository.DeleteByIdAsync(id);
+                var deleted = await _actionRepository.DeleteByIdAsync(id);
+                if (deleted == false)
+                {
+                    return NotFound(new ApiResponse((int)HttpStatusCode.NotFound, "The specified Action has not been found."));
+                }
+                return Ok();
             }
             catch (Exception ex)
             {
@@ -158,8 +169,6 @@ namespace Middleware.RedisInterface.Controllers
                 _logger.LogError(ex, "An error occurred:");
                 return StatusCode(statusCode, new ApiResponse(statusCode, $"An error has occurred: {ex.Message}"));
             }
-            return Ok();
-
         }
 
 

@@ -2,10 +2,14 @@
 using Middleware.Common.Enums;
 using Middleware.Common.ExtensionMethods;
 
-namespace Middleware.Orchestrator.Config;
+namespace Middleware.Common.Config;
 
 public static class AppConfig
 {
+    /// <summary>
+    /// Name of the system
+    /// </summary>
+    public const string SystemName = "Middleware";
     /// <summary>
     /// Name of the <see cref="HttpClient"/> used to connect to RedisInterface API
     /// </summary>

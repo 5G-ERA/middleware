@@ -1,18 +1,17 @@
-using Middleware.RedisInterface;
+using Middleware.Common.ExtensionMethods;
 using Middleware.Common.Repositories;
 using Middleware.Common.Repositories.Abstract;
+using Middleware.RedisInterface;
 using RedisGraphDotNet.Client;
-using Serilog;
 using StackExchange.Redis;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Host.UseSerilog((ctx, lc) => lc
-    .MinimumLevel.Debug()
-    .WriteTo.Console());
+builder.RegisterSecretsManager();
+
+builder.UseElasticSerilogLogger();
 
 // Add services to the container.
-
 builder.Services.AddControllers(options =>
 {
     options.InputFormatters.Insert(0, JsonPatchInputFormatter.GetJsonPatchInputFormatter());

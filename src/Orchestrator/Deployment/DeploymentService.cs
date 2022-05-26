@@ -2,6 +2,7 @@
 using k8s;
 using k8s.Models;
 using Middleware.Common;
+using Middleware.Common.Config;
 using Middleware.Common.Enums;
 using Middleware.Common.ExtensionMethods;
 using Middleware.Common.Models;
@@ -132,7 +133,7 @@ public class DeploymentService : IDeploymentService
         // usually should only be just one image
         foreach (var cim in mappedImages)
         {
-            _logger.LogDebug("Deploying the image {ImageName}", service.ImageName);
+            _logger.LogDebug("Deploying the image {ImageName}", service.Name);
 
             if (deploymentNames.Contains(cim.Name))
             {
@@ -145,7 +146,7 @@ public class DeploymentService : IDeploymentService
 
             service.ServiceStatus = ServiceStatusEnum.Idle.GetStringValue();
             service.ServiceInstanceId = Guid.Parse(deployedPair.Deployment.GetLabel("serviceId"));
-            _logger.LogDebug("Deployed the image {ImageName} with the Id {ServiceInstanceId}", service.ImageName,
+            _logger.LogDebug("Deployed the image {Name} with the Id {ServiceInstanceId}", service.Name,
                 service.ServiceInstanceId);
 
             //TODO: assign values to the instance data

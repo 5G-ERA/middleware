@@ -15,6 +15,10 @@ FROM build AS publish
 RUN dotnet publish "Orchestrator.csproj" -c Release -o /app/publish
 
 FROM base AS final
+ARG AWS_KEY_ID
+ARG AWS_SECRET_KEY
 WORKDIR /app
 COPY --from=publish /app/publish .
+ENV AWS_ACCESS_KEY_ID=$AWS_KEY_ID
+ENV AWS_SECRET_ACCESS_KEY=$AWS_SECRET_KEY
 ENTRYPOINT ["dotnet", "Orchestrator.dll"]

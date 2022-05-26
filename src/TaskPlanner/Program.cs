@@ -5,6 +5,9 @@ using Middleware.TaskPlanner.Config;
 
 var builder = WebApplication.CreateBuilder(args);
 
+builder.RegisterSecretsManager();
+
+builder.UseElasticSerilogLogger();
 // Add services to the container.
 
 builder.Services.AddControllers();

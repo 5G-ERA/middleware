@@ -7,8 +7,8 @@ namespace Middleware.ResourcePlanner
 
         public async Task<List<InstanceModel>> GetServicesForAction()
         {
-            return new List<InstanceModel>() { new InstanceModel() { ImageName = "SLAM", Id = Guid.NewGuid() },
-                                                new InstanceModel() { ImageName = "Object detection", Id = Guid.NewGuid()}};
+            return new List<InstanceModel>() { new InstanceModel() { Name = "SLAM", Id = Guid.NewGuid() },
+                                                new InstanceModel() { Name = "Object detection", Id = Guid.NewGuid()}};
         }
     }
 }

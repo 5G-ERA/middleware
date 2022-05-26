@@ -14,6 +14,8 @@ public static class AutoMapperConfig
     {
         services.AddAutoMapper(cfg =>
         {
+            cfg.CreateMap<DateTimeOffset, DateTime>().ConstructUsing(x => x.DateTime);
+
             cfg.CreateMap<ActionModel, RedisInterface.ActionModel>().ReverseMap();
             cfg.CreateMap<CloudModel, RedisInterface.CloudModel>().ReverseMap();
             cfg.CreateMap<ContainerImageModel, RedisInterface.ContainerImageModel>().ReverseMap();

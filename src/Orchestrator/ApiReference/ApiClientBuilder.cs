@@ -1,5 +1,5 @@
 ﻿using Middleware.Common;
-using Middleware.Orchestrator.Config;
+using Middleware.Common.Config;
 using Middleware.Orchestrator.Osm;
 using Middleware.Orchestrator.RedisInterface;
 
