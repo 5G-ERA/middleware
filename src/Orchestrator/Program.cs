@@ -13,7 +13,7 @@ builder.RegisterSecretsManager();
 
 builder.UseElasticSerilogLogger();
 
-builder.Host.ConfigureAppConfiguration((hostingContext, config) =>
+builder.Host.ConfigureAppConfiguration((hostingContext, _) =>
 {
     AppConfig.AppConfiguration = hostingContext.HostingEnvironment.EnvironmentName;
     ServicePointManager.DnsRefreshTimeout = 60000;
@@ -26,6 +26,8 @@ builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+
+builder.Services.AddRedisConnection();
 
 builder.Services.ConfigureAutoMapper();
 builder.Services.AddHttpClient(AppConfig.RedisApiClientName);

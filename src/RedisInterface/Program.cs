@@ -2,8 +2,6 @@ using Middleware.Common.ExtensionMethods;
 using Middleware.Common.Repositories;
 using Middleware.Common.Repositories.Abstract;
 using Middleware.RedisInterface;
-using RedisGraphDotNet.Client;
-using StackExchange.Redis;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -27,13 +25,7 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddHttpClient("healthCheckClient");
 
-var redisHostname = Environment.GetEnvironmentVariable("REDIS_HOSTNAME") ?? "127.0.0.1";
-var redisPort = Environment.GetEnvironmentVariable("REDIS_PORT") ?? "6379";
-
-ConnectionMultiplexer multiplexer = ConnectionMultiplexer.Connect($"{redisHostname}:{redisPort}");
-builder.Services.AddSingleton<IConnectionMultiplexer>(multiplexer);
-RedisGraphClient redisGraphClient = new RedisGraphClient(redisHostname, int.Parse(redisPort));
-builder.Services.AddSingleton<IRedisGraphClient>(redisGraphClient);
+builder.Services.AddRedisConnection();
 
 builder.Services.AddScoped<IActionRepository, ActionRepository>();
 builder.Services.AddScoped<IActionPlanRepository, ActionPlanRepository>();

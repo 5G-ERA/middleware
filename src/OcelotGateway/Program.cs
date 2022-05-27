@@ -7,8 +7,6 @@ using Middleware.Common.Repositories.Abstract;
 using Ocelot.Cache.CacheManager;
 using Ocelot.DependencyInjection;
 using Ocelot.Middleware;
-using RedisGraphDotNet.Client;
-using StackExchange.Redis;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -44,13 +42,7 @@ builder.Services.AddAuthentication(
         };
     });
 
-var redisHostname = Environment.GetEnvironmentVariable("REDIS_HOSTNAME") ?? "127.0.0.1";
-var redisPort = Environment.GetEnvironmentVariable("REDIS_PORT") ?? "6379";
-
-ConnectionMultiplexer multiplexer = ConnectionMultiplexer.Connect($"{redisHostname}:{redisPort}");
-builder.Services.AddSingleton<IConnectionMultiplexer>(multiplexer);
-RedisGraphClient redisGraphClient = new RedisGraphClient(redisHostname, int.Parse(redisPort));
-builder.Services.AddSingleton<IRedisGraphClient>(redisGraphClient);
+builder.Services.AddRedisConnection();
 
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 

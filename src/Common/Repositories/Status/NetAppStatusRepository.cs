@@ -8,7 +8,7 @@ namespace Middleware.Common.Repositories;
 
 public class NetAppStatusRepository : BaseRepository<NetAppStatusModel>, INetAppStatusRepository
 {
-    public NetAppStatusRepository(RedisDbIndexEnum redisDbIndex, IConnectionMultiplexer redisClient, IRedisGraphClient redisGraph, ILogger<NetAppStatusRepository> logger) : base(redisDbIndex, redisClient, redisGraph, logger, false)
+    public NetAppStatusRepository(IConnectionMultiplexer redisClient, IRedisGraphClient redisGraph, ILogger<NetAppStatusRepository> logger) : base(RedisDbIndexEnum.NetAppStatus, redisClient, redisGraph, logger, false)
     {
     }
 }

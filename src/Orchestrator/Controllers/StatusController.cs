@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Middleware.Common.Models;
 using Middleware.Common.Repositories;
 
-namespace Middleware.RedisInterface.Controllers
+namespace Middleware.Orchestrator.Controllers
 {
     [Route("api/v1/[controller]")]
     [ApiController]
