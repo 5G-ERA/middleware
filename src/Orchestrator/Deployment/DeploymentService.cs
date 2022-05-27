@@ -214,6 +214,16 @@ public class DeploymentService : IDeploymentService
         if (obj is V1Deployment depl)
         {
             depl.Metadata.SetServiceLabel(instanceId);
+            foreach (var container in depl.Spec.Template.Spec.Containers)
+            {
+                var env = new List<V1EnvVar>(container.Env)
+                {
+                    new ("NETAPP_ID", instanceId.ToString()),
+                    new ("MIDDLEWARE_ADDRESS", AppConfig.GetMiddlewareAddress()),
+                    new ("MIDDLEWARE_REPORT_INTERVAL", 5.ToString())
+                };
+                container.Env = env;
+            }
 
             obj = await k8SClient.CreateNamespacedDeploymentAsync(depl, AppConfig.K8SNamespaceName) as T;
             return obj;

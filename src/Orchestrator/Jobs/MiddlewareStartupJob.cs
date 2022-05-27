@@ -2,7 +2,6 @@
 using k8s.Models;
 using Middleware.Common.Config;
 using Middleware.Common.Enums;
-using Middleware.Orchestrator.Config;
 using Middleware.Orchestrator.Deployment;
 using Middleware.Orchestrator.Exceptions;
 using Quartz;
@@ -72,6 +71,13 @@ namespace Middleware.Orchestrator.Jobs
 
                     var lbService = _deploymentService.CreateService(service, kind, result.Metadata);
                     var createdService = await kubeClient.CreateNamespacedServiceAsync(lbService, AppConfig.K8SNamespaceName);
+
+                    if (service == "gateway")
+                    {
+                        AppConfig.MiddlewareAddress = createdService.Status.LoadBalancer.Ingress
+                            .Select(s => s.Hostname)
+                            .SingleOrDefault();
+                    }
 
                 }
             }

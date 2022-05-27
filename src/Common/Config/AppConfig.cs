@@ -1,4 +1,5 @@
-﻿using k8s.Models;
+﻿using System.Text;
+using k8s.Models;
 using Middleware.Common.Enums;
 using Middleware.Common.ExtensionMethods;
 
@@ -36,4 +37,15 @@ public static class AppConfig
     /// </summary>
     /// <returns></returns>
     public static bool IsDevEnvironment() => AppConfiguration == AppVersionEnum.Dev.GetStringValue();
+    /// <summary>
+    /// Represents the Address under which the Middleware is accessible
+    /// </summary>
+    public static string MiddlewareAddress = string.Empty;
+
+    public static string GetMiddlewareAddress()
+    {
+        var builder = new UriBuilder(MiddlewareAddress);
+        builder.Path = "/status/netapp";
+        return builder.ToString();
+    }
 }
