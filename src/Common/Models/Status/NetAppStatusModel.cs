@@ -1,4 +1,6 @@
-﻿namespace Middleware.Common.Models;
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace Middleware.Common.Models;
 
 public class NetAppStatusModel : BaseModel
 {
@@ -21,5 +23,16 @@ public class NetAppStatusModel : BaseModel
     /// <summary>
     /// Number of robots the NetApp currently works for
     /// </summary>
-    public int CurrentRobotsCount { get; set; }
+    [Required]
+    public int? CurrentRobotsCount { get; set; }
+    /// <summary>
+    /// Timestamp of the update
+    /// </summary>
+    public DateTimeOffset Timestamp { get; set; }
+
+    public bool IsValid()
+    {
+        return Id != Guid.Empty && HardLimit != default && OptimalLimit != default
+            && CurrentRobotsCount.HasValue;
+    }
 }

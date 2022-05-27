@@ -1,10 +1,13 @@
-﻿namespace Middleware.Common.Models;
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace Middleware.Common.Models;
 
 public class RobotStatusModel : BaseModel
 {
     /// <summary>
     /// Identifier of the Robot
     /// </summary>
+    [Required]
     public override Guid Id { get; set; }
     /// <summary>
     /// Name of the robot
@@ -13,13 +16,24 @@ public class RobotStatusModel : BaseModel
     /// <summary>
     /// Identifier of the currently executed action sequence
     /// </summary>
+    [Required]
     public Guid ActionSequenceId { get; set; }
     /// <summary>
     /// Index of the currently executed action
     /// </summary>
-    public int CurrentlyExecutedActionIndex { get; set; }
+    [Required]
+    public int? CurrentlyExecutedActionIndex { get; set; }
     /// <summary>
     /// Battery level in %
     /// </summary>
     public int BatteryLevel { get; set; }
+    /// <summary>
+    /// Timestamp of the update
+    /// </summary>
+    public DateTimeOffset Timestamp { get; set; }
+
+    public bool IsValid()
+    {
+         return Id != Guid.Empty && ActionSequenceId != Guid.Empty && CurrentlyExecutedActionIndex.HasValue;
+    }
 }

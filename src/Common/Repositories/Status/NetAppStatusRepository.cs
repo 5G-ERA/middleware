@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using System.Reflection.Metadata.Ecma335;
+using Microsoft.Extensions.Logging;
 using Middleware.Common.Enums;
 using Middleware.Common.Models;
 using RedisGraphDotNet.Client;
@@ -10,5 +11,12 @@ public class NetAppStatusRepository : BaseRepository<NetAppStatusModel>, INetApp
 {
     public NetAppStatusRepository(IConnectionMultiplexer redisClient, IRedisGraphClient redisGraph, ILogger<NetAppStatusRepository> logger) : base(RedisDbIndexEnum.NetAppStatus, redisClient, redisGraph, logger, false)
     {
+    }
+
+    ///<inheritdoc/>
+    public override async Task<NetAppStatusModel> AddAsync(NetAppStatusModel model, Func<Guid> guidProvider)
+    {
+        model.Timestamp = DateTimeOffset.Now;
+        return await base.AddAsync(model, guidProvider);
     }
 }

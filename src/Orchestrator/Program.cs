@@ -1,6 +1,7 @@
 using System.Net;
 using Middleware.Common.Config;
 using Middleware.Common.ExtensionMethods;
+using Middleware.Common.Repositories;
 using Middleware.Orchestrator.ApiReference;
 using Middleware.Orchestrator.Config;
 using Middleware.Orchestrator.Deployment;
@@ -36,6 +37,8 @@ builder.Services.RegisterCommonServices();
 builder.Services.AddScoped<IApiClientBuilder, ApiClientBuilder>();
 builder.Services.AddScoped<IKubernetesBuilder, KubernetesBuilder>();
 builder.Services.AddScoped<IDeploymentService, DeploymentService>();
+builder.Services.AddScoped<INetAppStatusRepository, NetAppStatusRepository>();
+builder.Services.AddScoped<IRobotStatusRepository, RobotStatusRepository>();
 
 builder.Services.AddHttpClient("healthCheckClient");
 
