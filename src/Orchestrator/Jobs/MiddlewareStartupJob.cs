@@ -31,7 +31,7 @@ namespace Middleware.Orchestrator.Jobs
             }
             catch (NotInK8SEnvironmentException ex)
             {
-                Logger.LogWarning("Could not instantiate the Kubernetes Client", ex);
+                Logger.LogError(ex, "Could not instantiate the Kubernetes Client");
                 throw;
             }
         }
@@ -54,7 +54,8 @@ namespace Middleware.Orchestrator.Jobs
             {
                 var deployments = await kubeClient.ListNamespacedDeploymentAsync(AppConfig.K8SNamespaceName);
                 var deploymentNames = deployments.Items.Select(d => d.Metadata.Name).ToArray();
-
+                var services = await kubeClient.ListNamespacedServiceAsync(AppConfig.K8SNamespaceName);
+                var serviceNames = services.Items.Select(d => d.Metadata.Name).ToArray();
                 var images = new List<string>
                     {"gateway", "redis-interface-api", "resource-planner-api", "task-planner-api"};
 
@@ -62,10 +63,13 @@ namespace Middleware.Orchestrator.Jobs
                 {
                     var v1Deployment = _deploymentService.CreateStartupDeployment(service);
 
-                    if (deploymentNames.Contains(v1Deployment.Metadata.Name))
+                    bool shouldDryRun = AppConfig.IsDevEnvironment();
+
+                    if (deploymentNames.Contains(v1Deployment.Metadata.Name) && shouldDryRun == false)
                         continue;
 
-                    var result = await kubeClient.CreateNamespacedDeploymentAsync(v1Deployment, AppConfig.K8SNamespaceName);
+                    var result = await kubeClient.CreateNamespacedDeploymentAsync(v1Deployment, AppConfig.K8SNamespaceName,
+                        dryRun: shouldDryRun ? "All" : null);
 
                     var kind = service != "gateway" ? K8SServiceKindEnum.ClusterIp : K8SServiceKindEnum.LoadBalancer;
 
@@ -74,11 +78,8 @@ namespace Middleware.Orchestrator.Jobs
 
                     if (service == "gateway")
                     {
-                        AppConfig.MiddlewareAddress = createdService.Status.LoadBalancer.Ingress
-                            .Select(s => s.Hostname)
-                            .SingleOrDefault();
+                        AppConfig.MiddlewareAddress = GetMiddlewareAddress(createdService);
                     }
-
                 }
             }
             catch (k8s.Autorest.HttpOperationException httpOperationException)
@@ -87,6 +88,23 @@ namespace Middleware.Orchestrator.Jobs
                 var content = httpOperationException.Response.Content;
                 Logger.LogError(httpOperationException, "Unable to deploy the resource to k8s:{phase}, {content}", phase, content);
             }
+        }
+
+        private string GetMiddlewareAddress(V1Service createdService)
+        {
+            var ingress = createdService.Status?.LoadBalancer?.Ingress.FirstOrDefault();
+
+            if (ingress is null)
+            {
+                Logger.LogError("Could not obtain the Gateway Address");
+                return string.Empty;
+            }
+
+            Logger.LogInformation("Available ExternalIP: {externalIp}, ExternalName: {externalName}, IngressIP: {ingressIP}, " +
+                                  "IngressName: {ingressName}",
+                createdService.Spec.ExternalIPs.FirstOrDefault(), createdService.Spec.ExternalName, ingress.Ip, ingress.Hostname);
+            
+            return ingress.Hostname ?? ingress.Ip;
         }
     }
 }
