@@ -2,6 +2,7 @@
 using k8s.Models;
 using Middleware.Common.Config;
 using Middleware.Common.Enums;
+using Middleware.Common.ExtensionMethods;
 using Middleware.Orchestrator.Deployment;
 using Middleware.Orchestrator.Exceptions;
 using Quartz;
@@ -48,7 +49,10 @@ namespace Middleware.Orchestrator.Jobs
             var exists = namespaces.Items.Any(n => n.Name() == AppConfig.K8SNamespaceName);
 
             if (exists == false)
+            {
+                Logger.LogError("Middleware has not been deployed in the correct namespace. Correct namespace is {namespace}", AppConfig.K8SNamespaceName);
                 return;
+            }                
 
             try
             {
@@ -78,7 +82,10 @@ namespace Middleware.Orchestrator.Jobs
 
                     if (service == "gateway")
                     {
-                        AppConfig.MiddlewareAddress = GetMiddlewareAddress(createdService);
+                        AppConfig.MiddlewareAddress = createdService.GetExternalAddress(Logger);
+
+                        if (string.IsNullOrEmpty(AppConfig.MiddlewareAddress))
+                            Logger.LogError("Could not obtain the Gateway Address");
                     }
                 }
             }
@@ -88,23 +95,6 @@ namespace Middleware.Orchestrator.Jobs
                 var content = httpOperationException.Response.Content;
                 Logger.LogError(httpOperationException, "Unable to deploy the resource to k8s:{phase}, {content}", phase, content);
             }
-        }
-
-        private string GetMiddlewareAddress(V1Service createdService)
-        {
-            var ingress = createdService.Status?.LoadBalancer?.Ingress.FirstOrDefault();
-
-            if (ingress is null)
-            {
-                Logger.LogError("Could not obtain the Gateway Address");
-                return string.Empty;
-            }
-
-            Logger.LogInformation("Available ExternalIP: {externalIp}, ExternalName: {externalName}, IngressIP: {ingressIP}, " +
-                                  "IngressName: {ingressName}",
-                createdService.Spec.ExternalIPs.FirstOrDefault(), createdService.Spec.ExternalName, ingress.Ip, ingress.Hostname);
-            
-            return ingress.Hostname ?? ingress.Ip;
         }
     }
 }

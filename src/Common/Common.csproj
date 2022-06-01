@@ -35,9 +35,4 @@
 	  <PackageReference Include="System.Collections" Version="4.3.0" />	
 	  <PackageReference Include="KubernetesClient" Version="7.1.9" />
 	</ItemGroup>
-
-	<ItemGroup>
-	  <Folder Include="ExtensionMethods\" />
-	  <Folder Include="Enums\" />
-	</ItemGroup>
 </Project>

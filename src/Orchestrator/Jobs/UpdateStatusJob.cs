@@ -1,6 +1,8 @@
 ﻿using AutoMapper;
 using k8s;
+using k8s.Models;
 using Middleware.Common.Config;
+using Middleware.Common.Enums;
 using Middleware.Common.ExtensionMethods;
 using Middleware.Common.Models;
 using Middleware.Orchestrator.ApiReference;
@@ -11,39 +13,48 @@ namespace Middleware.Orchestrator.Jobs;
 
 public class UpdateStatusJob : BaseJob<UpdateStatusJob>
 {
+    private readonly IKubernetesBuilder _kubeBuilder;
     private readonly IMapper _mapper;
     private readonly RedisInterface.RedisApiClient _redisApiClient;
-    private readonly IKubernetes _kubeClient;
 
     public UpdateStatusJob(IKubernetesBuilder kubeBuilder, IApiClientBuilder apiBuilder, IMapper mapper, ILogger<UpdateStatusJob> logger) : base(logger)
     {
+        _kubeBuilder = kubeBuilder;
         _mapper = mapper;
         _redisApiClient = apiBuilder.CreateRedisApiClient();
-        _kubeClient = kubeBuilder.CreateKubernetesClient();
+
     }
 
     protected override async Task ExecuteJobAsync(IJobExecutionContext context)
     {
         ICollection<RedisInterface.ActionPlanModel> riSequences = await _redisApiClient.ActionPlanGetAllAsync();
         var sequences = _mapper.Map<List<ActionPlanModel>>(riSequences);
-
-        foreach (var seq in sequences)
+        try
         {
-            try
+            var kubeClient = _kubeBuilder.CreateKubernetesClient();
+            foreach (var seq in sequences)
             {
-                var updatedSeq = await ValidateSequenceStatusAsync(seq);
+                try
+                {
+                    var updatedSeq = await ValidateSequenceStatusAsync(seq, kubeClient);
 
-                var riSeq = _mapper.Map<RedisInterface.ActionPlanModel>(updatedSeq);
-                await _redisApiClient.ActionPlanAddAsync(riSeq);
+                    var riSeq = _mapper.Map<RedisInterface.ActionPlanModel>(updatedSeq);
+                    await _redisApiClient.ActionPlanAddAsync(riSeq);
+                }
+                catch (Exception ex)
+                {
+                    Logger.LogError(ex, "There was en error while updating the status of the action-plan: {id}, actionPlan: {actionPlan}", seq.Id, seq);
+                }
             }
-            catch (Exception ex)
-            {
-                Logger.LogError(ex, "There was en error while updating the status of the action-plan: {id}, actionPlan: {actionPlan}", seq.Id, seq);
-            }
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex, "Where was a problem during the execution of {job}.", nameof(UpdateStatusJob));
+            throw;
         }
     }
 
-    private async Task<ActionPlanModel> ValidateSequenceStatusAsync(ActionPlanModel seq)
+    private async Task<ActionPlanModel> ValidateSequenceStatusAsync(ActionPlanModel seq, IKubernetes kubeClient)
     {
         foreach (var action in seq.ActionSequence)
         {
@@ -51,13 +62,73 @@ public class UpdateStatusJob : BaseJob<UpdateStatusJob>
             {
                 var instanceId = instance.ServiceInstanceId;
 
-                var deployments = await _kubeClient.ListNamespacedDeploymentAsync(AppConfig.K8SNamespaceName,
-                    labelSelector: V1ObjectMetaExtensions.GetServiceLabelSelector(instance.ServiceInstanceId));
-                var services = await _kubeClient.ListNamespacedServiceAsync(AppConfig.K8SNamespaceName,
-                    labelSelector: V1ObjectMetaExtensions.GetServiceLabelSelector(instance.ServiceInstanceId));
+                var deployments = await kubeClient.ListNamespacedDeploymentAsync(AppConfig.K8SNamespaceName,
+                    labelSelector: V1ObjectExtensions.GetServiceLabelSelector(instance.ServiceInstanceId));
+
+                ValidateDeploymentStatus(deployments, instance);
+
+                var services = await kubeClient.ListNamespacedServiceAsync(AppConfig.K8SNamespaceName,
+                    labelSelector: V1ObjectExtensions.GetServiceLabelSelector(instance.ServiceInstanceId));
+
+                ValidateServiceStatus(services, instance);
             }
         }
 
         return seq;
+    }
+
+    private void ValidateDeploymentStatus(V1DeploymentList deployments, InstanceModel instance)
+    {
+        ServiceStatus tmpStatus = ServiceStatus.Down;
+        var deployment = deployments.Items.FirstOrDefault();
+
+        if (deployment is null)
+        {
+            instance.ServiceStatus = tmpStatus.ToString();
+            return;
+        }
+        
+        var status = deployment.Status;
+
+        if (status.Replicas.HasValue == false)
+        {
+            instance.ServiceStatus = ServiceStatus.Down.ToString();
+            return;
+        }
+
+        if (status.Replicas.Value == default)
+        {
+            tmpStatus = ServiceStatus.Terminating;
+        }
+
+        if (status.Replicas == status.AvailableReplicas)
+        {
+            tmpStatus = ServiceStatus.Active;
+        }
+        else if (status.Replicas > status.AvailableReplicas)
+        {
+            tmpStatus = ServiceStatus.Instantiating;
+        }
+
+        instance.ServiceStatus = tmpStatus.GetStringValue();
+    }
+
+    private void ValidateServiceStatus(V1ServiceList services, InstanceModel instance)
+    {
+        var service = services.Items.FirstOrDefault();
+        if (service is null)
+        {
+            return;
+        }
+
+        var address = service.GetExternalAddress(Logger);
+        if (Uri.IsWellFormedUriString(address, UriKind.Absolute))
+        {
+            var builder = new UriBuilder();
+            var hasHttpsPort = service.Spec.Ports.Where(p => p.Port == 443).Any();
+
+            builder.Scheme = hasHttpsPort ? "https" : "http";
+            instance.ServiceUrl = builder.Uri;
+        }
     }
 }

@@ -144,7 +144,7 @@ public class DeploymentService : IDeploymentService
 
             var deployedPair = await Deploy(k8SClient, cim);
 
-            service.ServiceStatus = ServiceStatusEnum.Idle.GetStringValue();
+            service.ServiceStatus = ServiceStatus.Idle.GetStringValue();
             service.ServiceInstanceId = Guid.Parse(deployedPair.Deployment.GetLabel("serviceId"));
             _logger.LogDebug("Deployed the image {Name} with the Id {ServiceInstanceId}", service.Name,
                 service.ServiceInstanceId);
@@ -305,9 +305,9 @@ public class DeploymentService : IDeploymentService
         var retVal = true;
 
         var deployments = await k8sClient.ListNamespacedDeploymentAsync(AppConfig.K8SNamespaceName,
-            labelSelector: V1ObjectMetaExtensions.GetServiceLabelSelector(instance.ServiceInstanceId));
+            labelSelector: V1ObjectExtensions.GetServiceLabelSelector(instance.ServiceInstanceId));
         var services = await k8sClient.ListNamespacedServiceAsync(AppConfig.K8SNamespaceName,
-            labelSelector: V1ObjectMetaExtensions.GetServiceLabelSelector(instance.ServiceInstanceId));
+            labelSelector: V1ObjectExtensions.GetServiceLabelSelector(instance.ServiceInstanceId));
 
         foreach (var deployment in deployments.Items)
         {
