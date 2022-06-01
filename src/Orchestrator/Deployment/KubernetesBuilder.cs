@@ -11,10 +11,10 @@ namespace Middleware.Orchestrator.Deployment
             {
                 $"{Path.DirectorySeparatorChar}var", "run", "secrets", "kubernetes.io", "serviceaccount",
             });
-       internal static string KubeConfigPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), ".kube", "config");
-       internal const string ServiceAccountTokenKeyFileName = "token";
-       internal const string ServiceAccountRootCAKeyFileName = "ca.crt";
-       internal const string ServiceAccountNamespaceFileName = "namespace";
+        internal static string KubeConfigPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), ".kube", "config");
+        internal const string ServiceAccountTokenKeyFileName = "token";
+        internal const string ServiceAccountRootCAKeyFileName = "ca.crt";
+        internal const string ServiceAccountNamespaceFileName = "namespace";
 
         private const string KubernetesServiceHost = "KUBERNETES_SERVICE_HOST";
         private const string KubernetesServicePort = "KUBERNETES_SERVICE_PORT";

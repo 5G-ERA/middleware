@@ -32,7 +32,7 @@ namespace Middleware.Orchestrator.Jobs
             }
             catch (NotInK8SEnvironmentException ex)
             {
-                Logger.LogWarning("Could not instantiate the Kubernetes Client", ex);
+                Logger.LogWarning(ex, "Could not instantiate the Kubernetes Client");
                 throw;
             }
         }
@@ -50,7 +50,7 @@ namespace Middleware.Orchestrator.Jobs
 
             if (exists == false)
                 return;
-
+            var success = true;
             try
             {
                 var deployments = await kubeClient.ListNamespacedDeploymentAsync(AppConfig.K8SNamespaceName);
@@ -61,10 +61,14 @@ namespace Middleware.Orchestrator.Jobs
 
                 foreach (string service in images)
                 {
+                    Logger.LogDebug("Started deployment of {service}", service);
                     var v1Deployment = _deploymentService.CreateStartupDeployment(service);
 
                     if (deploymentNames.Contains(v1Deployment.Metadata.Name))
+                    {
+                        Logger.LogDebug("{service} is already deployed, moved to the next service", service);
                         continue;
+                    }
 
                     var result = await kubeClient.CreateNamespacedDeploymentAsync(v1Deployment, AppConfig.K8SNamespaceName);
 
@@ -72,7 +76,7 @@ namespace Middleware.Orchestrator.Jobs
 
                     var lbService = _deploymentService.CreateService(service, kind, result.Metadata);
                     var createdService = await kubeClient.CreateNamespacedServiceAsync(lbService, AppConfig.K8SNamespaceName);
-
+                    Logger.LogDebug("Successfully deployed {service}", service);
                 }
             }
             catch (k8s.Autorest.HttpOperationException httpOperationException)
@@ -80,6 +84,11 @@ namespace Middleware.Orchestrator.Jobs
                 var phase = httpOperationException.Response.ReasonPhrase;
                 var content = httpOperationException.Response.Content;
                 Logger.LogError(httpOperationException, "Unable to deploy the resource to k8s:{phase}, {content}", phase, content);
+                success = false;
+            }
+            if (success)
+            {
+                Logger.LogInformation("Successfully deployed the Middleware.");
             }
         }
     }
