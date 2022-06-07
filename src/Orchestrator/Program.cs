@@ -5,8 +5,7 @@ using Middleware.Common.Repositories;
 using Middleware.Orchestrator.ApiReference;
 using Middleware.Orchestrator.Config;
 using Middleware.Orchestrator.Deployment;
-using Middleware.Orchestrator.Jobs;
-using Quartz;
+using Middleware.Orchestrator.ExtensionMethods;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -42,23 +41,7 @@ builder.Services.AddScoped<IRobotStatusRepository, RobotStatusRepository>();
 
 builder.Services.AddHttpClient("healthCheckClient");
 
-// quartz 
-builder.Services.AddQuartz(q =>
-{
-    q.UseMicrosoftDependencyInjectionJobFactory();
-
-    q.ScheduleJob<MiddlewareStartupJob>(trg => trg
-        .WithIdentity("Middleware startup Job")
-        .WithDescription("Job that starts the whole Middleware system")
-        .StartNow()
-    );
-});
-builder.Services.AddQuartzHostedService(opt =>
-{
-    opt.WaitForJobsToComplete = true;
-});
-
-builder.Services.AddTransient<MiddlewareStartupJob>();
+builder.Services.RegisterQuartzJobs();
 
 var app = builder.Build();
 

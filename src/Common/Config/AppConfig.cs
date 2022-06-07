@@ -41,6 +41,10 @@ public static class AppConfig
     /// Represents the Address under which the Middleware is accessible
     /// </summary>
     public static string MiddlewareAddress = string.Empty;
+    /// <summary>
+    /// Interval in which the status check has to be performed. Expressed in seconds.
+    /// </summary>
+    public static int StatusCheckInterval = 10;
 
     public static string GetMiddlewareAddress()
     {

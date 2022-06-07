@@ -11,6 +11,7 @@ using Quartz;
 
 namespace Middleware.Orchestrator.Jobs;
 
+[DisallowConcurrentExecution]
 public class UpdateStatusJob : BaseJob<UpdateStatusJob>
 {
     private readonly IKubernetesBuilder _kubeBuilder;
@@ -88,24 +89,24 @@ public class UpdateStatusJob : BaseJob<UpdateStatusJob>
             return;
         }
         
-        var status = deployment.Status;
+        var deploymentStatus = deployment.Status;
 
-        if (status.Replicas.HasValue == false)
+        if (deploymentStatus.Replicas.HasValue == false)
         {
             instance.ServiceStatus = ServiceStatus.Down.ToString();
             return;
         }
 
-        if (status.Replicas.Value == default)
+        if (deploymentStatus.Replicas.Value == default)
         {
             tmpStatus = ServiceStatus.Terminating;
         }
 
-        if (status.Replicas == status.AvailableReplicas)
+        if (deploymentStatus.Replicas == deploymentStatus.AvailableReplicas)
         {
             tmpStatus = ServiceStatus.Active;
         }
-        else if (status.Replicas > status.AvailableReplicas)
+        else if (deploymentStatus.Replicas > deploymentStatus.AvailableReplicas)
         {
             tmpStatus = ServiceStatus.Instantiating;
         }
