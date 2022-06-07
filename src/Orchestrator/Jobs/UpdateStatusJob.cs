@@ -1,4 +1,5 @@
-﻿using AutoMapper;
+﻿using System.Net;
+using AutoMapper;
 using k8s;
 using k8s.Models;
 using Middleware.Common.Config;
@@ -28,10 +29,10 @@ public class UpdateStatusJob : BaseJob<UpdateStatusJob>
 
     protected override async Task ExecuteJobAsync(IJobExecutionContext context)
     {
-        ICollection<RedisInterface.ActionPlanModel> riSequences = await _redisApiClient.ActionPlanGetAllAsync();
-        var sequences = _mapper.Map<List<ActionPlanModel>>(riSequences);
         try
         {
+            ICollection<RedisInterface.ActionPlanModel> riSequences = await _redisApiClient.ActionPlanGetAllAsync();
+            var sequences = _mapper.Map<List<ActionPlanModel>>(riSequences);
             var kubeClient = _kubeBuilder.CreateKubernetesClient();
             foreach (var seq in sequences)
             {
@@ -44,9 +45,21 @@ public class UpdateStatusJob : BaseJob<UpdateStatusJob>
                 }
                 catch (Exception ex)
                 {
-                    Logger.LogError(ex, "There was en error while updating the status of the action-plan: {id}, actionPlan: {actionPlan}", seq.Id, seq);
+                    Logger.LogError(ex,
+                        "There was en error while updating the status of the action-plan: {id}, actionPlan: {actionPlan}",
+                        seq.Id, seq);
                 }
             }
+        }
+        catch (RedisInterface.ApiException<RedisInterface.ApiResponse> apiEx)
+        {
+            if (apiEx.StatusCode == (int)HttpStatusCode.NotFound)
+            {
+                Logger.LogInformation(apiEx, "No deployed plans have been found");
+                return;
+            }
+
+            Logger.LogError(apiEx, "There was a problem during the operation on the data.");
         }
         catch (Exception ex)
         {

@@ -30,8 +30,14 @@ public static class QuartzExtensions
                                  "Updates their status and reports any seen failures.")
                 .WithSimpleSchedule(x => 
                     x.WithInterval(TimeSpan.FromSeconds(AppConfig.StatusCheckInterval)).RepeatForever())
-                .StartAt(DateBuilder.EvenMinuteDate(DateTimeOffset.Now.AddMinutes(2))));
-            
+                .StartAt(DateBuilder.EvenMinuteDateBefore(DateTimeOffset.UtcNow.AddMinutes(2))));
+
+            q.ScheduleJob<RefreshMiddlewareAddressJob>(trg => trg
+                .WithIdentity("Update the Middleware address Job")
+                .WithDescription("Updates the current address under which the Middleware has to be contacted")
+                .WithSimpleSchedule(x => x.WithInterval(TimeSpan.FromMinutes(1)).RepeatForever())
+                .StartAt(DateBuilder.EvenMinuteDateBefore(DateTimeOffset.UtcNow.AddMinutes(1))));
+
         });
         services.AddQuartzHostedService(opt =>
         {
@@ -39,6 +45,7 @@ public static class QuartzExtensions
         });
         services.AddTransient<MiddlewareStartupJob>();
         services.AddTransient<UpdateStatusJob>();
+        services.AddTransient<RefreshMiddlewareAddressJob>();
 
         return services;
     }
