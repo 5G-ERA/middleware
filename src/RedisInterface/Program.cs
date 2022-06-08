@@ -1,3 +1,4 @@
+using Middleware.Common.Config;
 using Middleware.Common.ExtensionMethods;
 using Middleware.Common.Repositories;
 using Middleware.Common.Repositories.Abstract;
@@ -10,6 +11,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.RegisterSecretsManager();
 
 builder.UseElasticSerilogLogger();
+
 
 // Add services to the container.
 builder.Services.AddControllers(options =>
@@ -27,12 +29,18 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddHttpClient("healthCheckClient");
 
-var redisHostname = Environment.GetEnvironmentVariable("REDIS_HOSTNAME") ?? "127.0.0.1";
-var redisPort = Environment.GetEnvironmentVariable("REDIS_PORT") ?? "6379";
+var config = builder.Configuration.GetSection(RedisConfig.ConfigName).Get<RedisConfig>();
 
-ConnectionMultiplexer multiplexer = ConnectionMultiplexer.Connect($"{redisHostname}:{redisPort}");
+/*var redisHostname = Environment.GetEnvironmentVariable("REDIS_HOSTNAME") ?? "127.0.0.1";
+var redisPort = Environment.GetEnvironmentVariable("REDIS_PORT") ?? "6379";*/
+
+ConnectionMultiplexer multiplexer = ConnectionMultiplexer.Connect(config.HostName,  (c) => 
+{
+    //c.User = config.User;
+    c.Password = config.Password;
+});
 builder.Services.AddSingleton<IConnectionMultiplexer>(multiplexer);
-RedisGraphClient redisGraphClient = new RedisGraphClient(redisHostname, int.Parse(redisPort));
+RedisGraphClient redisGraphClient = new RedisGraphClient(multiplexer);
 builder.Services.AddSingleton<IRedisGraphClient>(redisGraphClient);
 
 builder.Services.AddScoped<IActionRepository, ActionRepository>();
