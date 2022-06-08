@@ -36,7 +36,6 @@ var redisPort = Environment.GetEnvironmentVariable("REDIS_PORT") ?? "6379";*/
 
 ConnectionMultiplexer multiplexer = ConnectionMultiplexer.Connect(config.HostName,  (c) => 
 {
-    //c.User = config.User;
     c.Password = config.Password;
 });
 builder.Services.AddSingleton<IConnectionMultiplexer>(multiplexer);
