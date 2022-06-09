@@ -16,7 +16,7 @@ public static class CommonExtensions
         return services;
     }
     /// <summary>
-    /// Register the AWS Secrets Manager to retrieve the data for the appsettings.json file
+    /// Register the AWS Secrets Manager to retrieve the data for the appsettings.json file.
     /// </summary>
     /// <param name="builder"></param>
     /// <returns></returns>
@@ -39,6 +39,12 @@ public static class CommonExtensions
         return builder;
     }
 
+    /// <summary>
+    /// Configures the Redis Connection for the Application. The connection includes standard redis client via <see cref="ConnectionMultiplexer"/>
+    /// and connection to Redis Graph using <seealso cref="RedisGraphClient"/>.
+    /// </summary>
+    /// <param name="services"></param>
+    /// <returns></returns>
     public static WebApplicationBuilder RegisterRedis(this WebApplicationBuilder builder) 
     {
         var config = builder.Configuration.GetSection(RedisConfig.ConfigName).Get<RedisConfig>();
@@ -52,5 +58,6 @@ public static class CommonExtensions
         builder.Services.AddSingleton<IRedisGraphClient>(redisGraphClient);
 
         return builder;
+
     }
 }

@@ -51,6 +51,7 @@
 
     <ItemGroup>
       <Folder Include="Models\" />
+      <Folder Include="ExtensionMethods\" />
     </ItemGroup>
 
 </Project>

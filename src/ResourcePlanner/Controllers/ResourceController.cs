@@ -11,11 +11,13 @@ namespace Middleware.ResourcePlanner.Controllers
     {
         private readonly IResourcePlanner _resourcePlanner;
         private readonly IMapper _mapper;
+        private readonly ILogger _logger;
 
-        public ResourceController(IResourcePlanner resourcePlanner, IMapper mapper)
+        public ResourceController(IResourcePlanner resourcePlanner, IMapper mapper, ILogger<ResourceController> logger)
         {
             _resourcePlanner = resourcePlanner;
             _mapper = mapper;
+            _logger = logger;
         }
 
         [HttpPost(Name = "GetResourcePlan")]
@@ -31,6 +33,10 @@ namespace Middleware.ResourcePlanner.Controllers
                 return Ok(updatedTask);
             }
             catch (Orchestrator.ApiException<RedisInterface.ApiResponse> apiEx)
+            {
+                return StatusCode(apiEx.StatusCode, _mapper.Map<ApiResponse>(apiEx.Result));
+            }
+            catch (Orchestrator.ApiException<Orchestrator.ApiResponse> apiEx)
             {
                 return StatusCode(apiEx.StatusCode,_mapper.Map<ApiResponse>(apiEx.Result));
             }

@@ -3,8 +3,6 @@ using Middleware.Common.ExtensionMethods;
 using Middleware.Common.Repositories;
 using Middleware.Common.Repositories.Abstract;
 using Middleware.RedisInterface;
-using RedisGraphDotNet.Client;
-using StackExchange.Redis;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -43,6 +41,7 @@ ConnectionMultiplexer multiplexer = ConnectionMultiplexer.Connect(config.HostNam
 builder.Services.AddSingleton<IConnectionMultiplexer>(multiplexer);
 RedisGraphClient redisGraphClient = new RedisGraphClient(multiplexer);
 builder.Services.AddSingleton<IRedisGraphClient>(redisGraphClient);*/
+
 
 builder.Services.AddScoped<IActionRepository, ActionRepository>();
 builder.Services.AddScoped<IActionPlanRepository, ActionPlanRepository>();

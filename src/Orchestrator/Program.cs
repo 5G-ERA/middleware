@@ -1,11 +1,11 @@
 using System.Net;
 using Middleware.Common.Config;
 using Middleware.Common.ExtensionMethods;
+using Middleware.Common.Repositories;
 using Middleware.Orchestrator.ApiReference;
 using Middleware.Orchestrator.Config;
 using Middleware.Orchestrator.Deployment;
-using Middleware.Orchestrator.Jobs;
-using Quartz;
+using Middleware.Orchestrator.ExtensionMethods;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -13,7 +13,7 @@ builder.RegisterSecretsManager();
 
 builder.UseElasticSerilogLogger();
 
-builder.Host.ConfigureAppConfiguration((hostingContext, config) =>
+builder.Host.ConfigureAppConfiguration((hostingContext, _) =>
 {
     AppConfig.AppConfiguration = hostingContext.HostingEnvironment.EnvironmentName;
     ServicePointManager.DnsRefreshTimeout = 60000;
@@ -27,6 +27,8 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+builder.RegisterRedis();
+
 builder.Services.ConfigureAutoMapper();
 builder.Services.AddHttpClient(AppConfig.RedisApiClientName);
 builder.Services.AddHttpClient(AppConfig.OsmApiClientName);
@@ -34,26 +36,12 @@ builder.Services.RegisterCommonServices();
 builder.Services.AddScoped<IApiClientBuilder, ApiClientBuilder>();
 builder.Services.AddScoped<IKubernetesBuilder, KubernetesBuilder>();
 builder.Services.AddScoped<IDeploymentService, DeploymentService>();
+builder.Services.AddScoped<INetAppStatusRepository, NetAppStatusRepository>();
+builder.Services.AddScoped<IRobotStatusRepository, RobotStatusRepository>();
 
 builder.Services.AddHttpClient("healthCheckClient");
 
-// quartz 
-builder.Services.AddQuartz(q =>
-{
-    q.UseMicrosoftDependencyInjectionJobFactory();
-
-    q.ScheduleJob<MiddlewareStartupJob>(trg => trg
-        .WithIdentity("Middleware startup Job")
-        .WithDescription("Job that starts the whole Middleware system")
-        .StartNow()
-    );
-});
-builder.Services.AddQuartzHostedService(opt =>
-{
-    opt.WaitForJobsToComplete = true;
-});
-
-builder.Services.AddTransient<MiddlewareStartupJob>();
+builder.Services.RegisterQuartzJobs();
 
 var app = builder.Build();
 

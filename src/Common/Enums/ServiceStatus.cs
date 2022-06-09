@@ -2,7 +2,7 @@
 
 namespace Middleware.Common.Enums;
 
-public enum ServiceStatusEnum
+public enum ServiceStatus
 {
     /// <summary>
     /// Service is running and under workload

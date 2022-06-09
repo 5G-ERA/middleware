@@ -59,12 +59,12 @@ namespace Middleware.Common.Repositories
 
 
         /// <inheritdoc/>
-        public async Task<T> AddAsync(T model)
+        public virtual async Task<T> AddAsync(T model)
         {
             return await AddAsync(model, () => Guid.NewGuid());
         }
         /// <inheritdoc/>
-        public async Task<T> AddAsync(T model, Func<Guid> guidProvider)
+        public virtual async Task<T> AddAsync(T model, Func<Guid> guidProvider)
         {
             if (guidProvider == null) throw new ArgumentNullException(nameof(guidProvider));
 
@@ -85,7 +85,7 @@ namespace Middleware.Common.Repositories
             return retVal ? model : null;
         }
         /// <inheritdoc/>
-        public async Task<T> GetByIdAsync(Guid id)
+        public virtual async Task<T> GetByIdAsync(Guid id)
         {
             string model = (string)await Db.JsonGetAsync(id.ToString());
             if (string.IsNullOrEmpty(model))
@@ -97,7 +97,7 @@ namespace Middleware.Common.Repositories
             return newModel;
         }
         /// <inheritdoc/>
-        public async Task<List<T>> GetAllAsync()
+        public virtual async Task<List<T>> GetAllAsync()
         {
             List<T> models = new List<T>();
             var keys = await GetKeysAsync("GetKeys");
@@ -111,7 +111,7 @@ namespace Middleware.Common.Repositories
             return models;
         }
         /// <inheritdoc/>
-        public async Task<bool> DeleteByIdAsync(Guid id)
+        public virtual async Task<bool> DeleteByIdAsync(Guid id)
         {
             int deleted = await Db.JsonDeleteAsync(id.ToString());
             bool success = deleted > 0;
@@ -157,7 +157,7 @@ namespace Middleware.Common.Repositories
             return models;
         }
 
-        public async Task<List<string>> GetKeysAsync(string queryName)
+        public virtual async Task<List<string>> GetKeysAsync(string queryName)
         {
             var script = await File.ReadAllTextAsync(GetScriptPath(queryName));
             var prepared = LuaScript.Prepare(script);
@@ -176,7 +176,7 @@ namespace Middleware.Common.Repositories
             return Path.Combine(Directory.GetCurrentDirectory(), "LuaQueries", $"{queryName}.lua");
         }
         /// <inheritdoc/>
-        public async Task<List<RelationModel>> GetRelation(Guid id, string relationName)
+        public virtual async Task<List<RelationModel>> GetRelation(Guid id, string relationName)
         {
             List<RelationModel> relationModels = new List<RelationModel>();
             relationName = relationName?.ToUpper();
@@ -223,7 +223,7 @@ namespace Middleware.Common.Repositories
         }
 
         /// <inheritdoc/>
-        public async Task<List<RelationModel>> GetRelations(Guid id, List<string> relationNames)
+        public virtual async Task<List<RelationModel>> GetRelations(Guid id, List<string> relationNames)
         {
             List<RelationModel> relations = new List<RelationModel>();
 
@@ -236,7 +236,7 @@ namespace Middleware.Common.Repositories
         }
 
 
-        public async Task<bool> AddGraphAsync(GraphEntityModel model)
+        public virtual async Task<bool> AddGraphAsync(GraphEntityModel model)
         {
             model.Type = _redisDbIndex.ToString().ToUpper();
 
@@ -247,7 +247,7 @@ namespace Middleware.Common.Repositories
         }
 
 
-        public async Task<bool> AddRelationAsync(RelationModel relation)
+        public virtual async Task<bool> AddRelationAsync(RelationModel relation)
         {
             string query = "MATCH (x: " + relation.InitiatesFrom.Type + " {ID: '" + relation.InitiatesFrom.Id + "'}), (c: " + relation.PointsTo.Type + " {ID: '" + relation.PointsTo.Id + "'}) CREATE (x)-[:" + relation.RelationName + "]->(c) ";
             ResultSet resultSet = await RedisGraph.Query(GraphName, query);
@@ -256,7 +256,7 @@ namespace Middleware.Common.Repositories
         }
 
 
-        public async Task<bool> DeleteGraphModelAsync(GraphEntityModel model)
+        public virtual async Task<bool> DeleteGraphModelAsync(GraphEntityModel model)
         {
             model.Type = _redisDbIndex.ToString().ToUpper();
 
@@ -267,7 +267,7 @@ namespace Middleware.Common.Repositories
         }
 
 
-        public async Task<bool> DeleteRelationAsync(RelationModel relation)
+        public virtual async Task<bool> DeleteRelationAsync(RelationModel relation)
         {
             string query = "MATCH (x: " + relation.InitiatesFrom.Type + " {ID: '" + relation.InitiatesFrom.Id + "'})-[e: " + relation.RelationName + " ]->(y: " + relation.PointsTo.Type + " {ID: '" + relation.PointsTo.Id + "'}) DELETE e";
             ResultSet resultSet = await RedisGraph.Query(GraphName, query);
