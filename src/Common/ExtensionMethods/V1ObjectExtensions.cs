@@ -23,7 +23,7 @@ public static class V1ObjectExtensions
 
     public static string GetExternalAddress(this V1Service service, ILogger logger = null)
     {
-        var ingress = service.Status?.LoadBalancer?.Ingress.FirstOrDefault();
+        var ingress = service.Status?.LoadBalancer?.Ingress?.FirstOrDefault();
 
         if (ingress is null)
         {
