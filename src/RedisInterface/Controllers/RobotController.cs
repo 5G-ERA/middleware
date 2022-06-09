@@ -173,7 +173,7 @@ namespace Middleware.RedisInterface.Controllers
         //[ProducesResponseType(typeof(List <TaskModel>), (int)HttpStatusCode.OK)]
         //public async Task<ActionResult<IEnumerable<TaskModel>>> GetTaskForRobotByIdAsync()
         //{
-        //  //  List<TaskModel> models = await _robotRepository.GetAllAsync();
+        //  //  List<TaskModel> models = await _robotRepository.GetRobotStatusByIdAsync();
         //    return Ok();
         //}
 

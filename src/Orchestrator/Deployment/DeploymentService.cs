@@ -68,6 +68,10 @@ public class DeploymentService : IDeploymentService
                 {
                     try
                     {
+                        // BB: service can be reused, to be decided by the resource planner
+                        if (service.ServiceInstanceId != Guid.Empty)
+                            continue;
+                        
                         await DeployService(k8SClient, service, deploymentNames);
                     }
                     catch (Exception ex)
@@ -144,7 +148,7 @@ public class DeploymentService : IDeploymentService
 
             var deployedPair = await Deploy(k8SClient, cim);
 
-            service.ServiceStatus = ServiceStatusEnum.Idle.GetStringValue();
+            service.ServiceStatus = ServiceStatus.Idle.GetStringValue();
             service.ServiceInstanceId = Guid.Parse(deployedPair.Deployment.GetLabel("serviceId"));
             _logger.LogDebug("Deployed the image {Name} with the Id {ServiceInstanceId}", service.Name,
                 service.ServiceInstanceId);
@@ -214,6 +218,16 @@ public class DeploymentService : IDeploymentService
         if (obj is V1Deployment depl)
         {
             depl.Metadata.SetServiceLabel(instanceId);
+            foreach (var container in depl.Spec.Template.Spec.Containers)
+            {
+                var env = new List<V1EnvVar>(container.Env)
+                {
+                    new ("NETAPP_ID", instanceId.ToString()),
+                    new ("MIDDLEWARE_ADDRESS", AppConfig.GetMiddlewareAddress()),
+                    new ("MIDDLEWARE_REPORT_INTERVAL", 5.ToString())
+                };
+                container.Env = env;
+            }
 
             obj = await k8SClient.CreateNamespacedDeploymentAsync(depl, AppConfig.K8SNamespaceName) as T;
             return obj;
@@ -295,9 +309,9 @@ public class DeploymentService : IDeploymentService
         var retVal = true;
 
         var deployments = await k8sClient.ListNamespacedDeploymentAsync(AppConfig.K8SNamespaceName,
-            labelSelector: V1ObjectMetaExtensions.GetServiceLabelSelector(instance.ServiceInstanceId));
+            labelSelector: V1ObjectExtensions.GetServiceLabelSelector(instance.ServiceInstanceId));
         var services = await k8sClient.ListNamespacedServiceAsync(AppConfig.K8SNamespaceName,
-            labelSelector: V1ObjectMetaExtensions.GetServiceLabelSelector(instance.ServiceInstanceId));
+            labelSelector: V1ObjectExtensions.GetServiceLabelSelector(instance.ServiceInstanceId));
 
         foreach (var deployment in deployments.Items)
         {

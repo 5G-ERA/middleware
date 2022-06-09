@@ -2,7 +2,7 @@
 using k8s.Models;
 using Middleware.Common.Config;
 using Middleware.Common.Enums;
-using Middleware.Orchestrator.Config;
+using Middleware.Common.ExtensionMethods;
 using Middleware.Orchestrator.Deployment;
 using Middleware.Orchestrator.Exceptions;
 using Quartz;
@@ -32,6 +32,7 @@ namespace Middleware.Orchestrator.Jobs
             }
             catch (NotInK8SEnvironmentException ex)
             {
+
                 Logger.LogWarning(ex, "Could not instantiate the Kubernetes Client");
                 throw;
             }
@@ -49,13 +50,19 @@ namespace Middleware.Orchestrator.Jobs
             var exists = namespaces.Items.Any(n => n.Name() == AppConfig.K8SNamespaceName);
 
             if (exists == false)
+            {
+                Logger.LogError("Middleware has not been deployed in the correct namespace. Correct namespace is {namespace}", AppConfig.K8SNamespaceName);
                 return;
+
+            }
             var success = true;
+            bool shouldDryRun = AppConfig.IsDevEnvironment();
             try
             {
                 var deployments = await kubeClient.ListNamespacedDeploymentAsync(AppConfig.K8SNamespaceName);
                 var deploymentNames = deployments.Items.Select(d => d.Metadata.Name).ToArray();
-
+                var services = await kubeClient.ListNamespacedServiceAsync(AppConfig.K8SNamespaceName);
+                var serviceNames = services.Items.Select(d => d.Metadata.Name).ToArray();
                 var images = new List<string>
                     {"gateway", "redis-interface-api", "resource-planner-api", "task-planner-api"};
 
@@ -70,13 +77,21 @@ namespace Middleware.Orchestrator.Jobs
                         continue;
                     }
 
-                    var result = await kubeClient.CreateNamespacedDeploymentAsync(v1Deployment, AppConfig.K8SNamespaceName);
+                    var result = await kubeClient.CreateNamespacedDeploymentAsync(v1Deployment, AppConfig.K8SNamespaceName,
+                        dryRun: shouldDryRun ? "All" : null);
 
                     var kind = service != "gateway" ? K8SServiceKindEnum.ClusterIp : K8SServiceKindEnum.LoadBalancer;
 
                     var lbService = _deploymentService.CreateService(service, kind, result.Metadata);
                     var createdService = await kubeClient.CreateNamespacedServiceAsync(lbService, AppConfig.K8SNamespaceName);
-                    Logger.LogDebug("Successfully deployed {service}", service);
+
+                    if (service == "gateway")
+                    {
+                        AppConfig.MiddlewareAddress = createdService.GetExternalAddress(Logger);
+
+                        if (string.IsNullOrEmpty(AppConfig.MiddlewareAddress))
+                            Logger.LogError("Could not obtain the Gateway Address");
+                    }
                 }
             }
             catch (k8s.Autorest.HttpOperationException httpOperationException)

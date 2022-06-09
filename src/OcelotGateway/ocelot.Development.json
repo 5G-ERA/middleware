@@ -92,6 +92,18 @@
       },
       "UpstreamPathTemplate": "/Orchestrate/{all}",
       "UpstreamHttpMethod": [ "GET", "POST", "PATCH", "DELETE" ]
+    },
+    {
+      "DownstreamPathTemplate": "/api/v1/status/{all}",
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "orchestrator.api",
+          "Port": "80"
+        }
+      ],
+      "UpstreamPathTemplate": "/status/{all}",
+      "UpstreamHttpMethod": [ "GET", "POST"]
     }
   ],
   "GlobalConfiguration": {
