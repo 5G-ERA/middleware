@@ -833,17 +833,26 @@
             "content": {
               "text/plain": {
                 "schema": {
-                  "$ref": "#/components/schemas/NetAppStatusModel"
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/NetAppStatusModel"
+                  }
                 }
               },
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/NetAppStatusModel"
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/NetAppStatusModel"
+                  }
                 }
               },
               "text/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/NetAppStatusModel"
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/NetAppStatusModel"
+                  }
                 }
               }
             }

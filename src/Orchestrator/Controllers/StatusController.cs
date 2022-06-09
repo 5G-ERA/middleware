@@ -153,7 +153,7 @@ public class StatusController : Controller
     /// <returns></returns>
     [HttpGet]
     [Route("netapp/instance", Name = "NetAppStatusGetByInstanceId")]
-    [ProducesResponseType(typeof(NetAppStatusModel), (int)HttpStatusCode.OK)]
+    [ProducesResponseType(typeof(List<NetAppStatusModel>), (int)HttpStatusCode.OK)]
     [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.BadRequest)]
     [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.NotFound)]
     [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.InternalServerError)]

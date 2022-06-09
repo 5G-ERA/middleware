@@ -1,6 +1,8 @@
-﻿using System.Net;
+﻿using System.Linq;
+using System.Net;
 using AutoMapper;
 using Middleware.Common;
+using Middleware.Common.Enums;
 using Middleware.Common.Models;
 using Middleware.ResourcePlanner.ApiReference;
 
@@ -25,10 +27,10 @@ public class ResourcePlanner : IResourcePlanner
         _env = env;
         _logger = logger;
     }
-        
+
     public async Task<TaskModel> Plan(TaskModel taskModel)
     {
-            
+
         var redisApiClient = _apiClientBuilder.CreateRedisApiClient();
         var orchestratorApiClient = _apiClientBuilder.CreateOrchestratorApiClient();
         // actionPlanner will give resource planner the actionSequence. 
@@ -75,11 +77,41 @@ public class ResourcePlanner : IResourcePlanner
     {
         try
         {
-            var statuses = await orchestratorApi.NetAppStatusGetByInstanceIdAsync(instance.Id);
+            var statuses = (await orchestratorApi.NetAppStatusGetByInstanceIdAsync(instance.Id))?.ToList();
+            if (statuses == null || statuses.Any() == false)
+                return null;
+            if (statuses.Count == 1)
+            {
+                var status = statuses.First();
+                instance.ServiceInstanceId = status.Id;
+                return instance;
+            }
+
+            var percentageUsage = statuses.Select(s =>
+                    new
+                    {
+                        s.Id,
+                        Percentage = s.CurrentRobotsCount / (decimal) s.HardLimit * 100,
+                        // TODO: this will have to be expanded based on the resource prediction
+                        // for example if the edge can accommodate another instance
+                        Recommendation = s.CurrentRobotsCount < s.OptimalLimit ? NetAppStatus.Green :
+                            s.CurrentRobotsCount >= s.HardLimit ? NetAppStatus.Red : NetAppStatus.Yellow
+                    }).Where(s => s.Recommendation != NetAppStatus.Red)
+                .OrderBy(s => s.Recommendation).ThenBy(s=>s.Percentage).ToList();
+
+            // need for the deployment of the new service no to overload one in the red zone
+            if (percentageUsage.Any() == false)
+            {
+                return null;
+            }
+
+            var instanceToReuse = percentageUsage.First();
+            instance.ServiceInstanceId = instanceToReuse.Id;
+            return instance;
         }
         catch (Orchestrator.ApiException<ApiResponse> apiEx)
         {
-            if (apiEx.StatusCode == (int) HttpStatusCode.NotFound)
+            if (apiEx.StatusCode == (int)HttpStatusCode.NotFound)
             {
                 _logger.LogDebug("No active instances for {name} with {id} were found", instance.Name, instance.Id);
                 return null;
