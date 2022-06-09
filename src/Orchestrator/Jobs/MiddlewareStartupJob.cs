@@ -32,7 +32,8 @@ namespace Middleware.Orchestrator.Jobs
             }
             catch (NotInK8SEnvironmentException ex)
             {
-                Logger.LogError(ex, "Could not instantiate the Kubernetes Client");
+
+                Logger.LogWarning(ex, "Could not instantiate the Kubernetes Client");
                 throw;
             }
         }
@@ -52,7 +53,9 @@ namespace Middleware.Orchestrator.Jobs
             {
                 Logger.LogError("Middleware has not been deployed in the correct namespace. Correct namespace is {namespace}", AppConfig.K8SNamespaceName);
                 return;
-            }                
+
+            }
+            var success = true;
 
             try
             {
@@ -65,12 +68,14 @@ namespace Middleware.Orchestrator.Jobs
 
                 foreach (string service in images)
                 {
+                    Logger.LogDebug("Started deployment of {service}", service);
                     var v1Deployment = _deploymentService.CreateStartupDeployment(service);
 
-                    bool shouldDryRun = AppConfig.IsDevEnvironment();
-
-                    if (deploymentNames.Contains(v1Deployment.Metadata.Name) && shouldDryRun == false)
+                    if (deploymentNames.Contains(v1Deployment.Metadata.Name))
+                    {
+                        Logger.LogDebug("{service} is already deployed, moved to the next service", service);
                         continue;
+                    }
 
                     var result = await kubeClient.CreateNamespacedDeploymentAsync(v1Deployment, AppConfig.K8SNamespaceName,
                         dryRun: shouldDryRun ? "All" : null);
@@ -94,6 +99,11 @@ namespace Middleware.Orchestrator.Jobs
                 var phase = httpOperationException.Response.ReasonPhrase;
                 var content = httpOperationException.Response.Content;
                 Logger.LogError(httpOperationException, "Unable to deploy the resource to k8s:{phase}, {content}", phase, content);
+                success = false;
+            }
+            if (success)
+            {
+                Logger.LogInformation("Successfully deployed the Middleware.");
             }
         }
     }
