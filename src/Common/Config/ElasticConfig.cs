@@ -3,7 +3,7 @@
 public class ElasticConfig
 {
     /// <summary>
-    /// Name of teh section in the appsettings.json file
+    /// Name of the section in the appsettings.json file
     /// </summary>
     public const string ConfigName = "Elasticsearch";
     /// <summary>

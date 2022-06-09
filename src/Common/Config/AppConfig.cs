@@ -20,6 +20,10 @@ public static class AppConfig
     /// </summary>
     public const string OsmApiClientName = "osmApiClient";
     /// <summary>
+    /// Name of the <see cref="HttpClient"/> used to connect to Orchestrator API
+    /// </summary>
+    public const string OrchestratorApiClientName = "orchestratorApiClient";
+    /// <summary>
     /// Namespace in which the middleware pods will be deployed
     /// </summary>
     public static string K8SNamespaceName { get; set; } = "middleware";
