@@ -27,7 +27,7 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-builder.Services.AddRedisConnection();
+builder.RegisterRedis();
 
 builder.Services.ConfigureAutoMapper();
 builder.Services.AddHttpClient(AppConfig.RedisApiClientName);

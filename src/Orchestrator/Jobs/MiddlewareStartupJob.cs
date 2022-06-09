@@ -56,7 +56,7 @@ namespace Middleware.Orchestrator.Jobs
 
             }
             var success = true;
-
+            bool shouldDryRun = AppConfig.IsDevEnvironment();
             try
             {
                 var deployments = await kubeClient.ListNamespacedDeploymentAsync(AppConfig.K8SNamespaceName);
