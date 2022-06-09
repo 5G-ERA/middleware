@@ -3,6 +3,8 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Middleware.Common.Config;
+using RedisGraphDotNet.Client;
+using StackExchange.Redis;
 
 namespace Middleware.Common.ExtensionMethods;
 
@@ -34,6 +36,21 @@ public static class CommonExtensions
                 .Replace("__", ":");
         });
         builder.Services.Configure<ElasticConfig>(builder.Configuration.GetSection(ElasticConfig.ConfigName));
+        return builder;
+    }
+
+    public static WebApplicationBuilder RegisterRedis(this WebApplicationBuilder builder) 
+    {
+        var config = builder.Configuration.GetSection(RedisConfig.ConfigName).Get<RedisConfig>();
+
+        ConnectionMultiplexer multiplexer = ConnectionMultiplexer.Connect(config.HostName, (c) =>
+        {
+            c.Password = config.Password;
+        });
+        builder.Services.AddSingleton<IConnectionMultiplexer>(multiplexer);
+        RedisGraphClient redisGraphClient = new RedisGraphClient(multiplexer);
+        builder.Services.AddSingleton<IRedisGraphClient>(redisGraphClient);
+
         return builder;
     }
 }
