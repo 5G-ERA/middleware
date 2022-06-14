@@ -3,6 +3,8 @@ using System.Security.Cryptography;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Cryptography.KeyDerivation;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Options;
+using Middleware.Common.Config;
 using Middleware.Common.Models;
 using Middleware.Common.Repositories.Abstract;
 using Middleware.OcelotGateway.Services;
@@ -14,12 +16,14 @@ namespace Middleware.OcelotGateway.Controllers
     public class LoginController : ControllerBase
     {
         private readonly IUserRepository _userRepository;
+        private readonly IOptions<JwtConfig> _jwtconfig;
         private readonly ILogger _logger;
         
 
-        public LoginController(IUserRepository userRepository, ILogger<LoginController> logger)
+        public LoginController(IUserRepository userRepository, IOptions<JwtConfig> jwtconfig, ILogger<LoginController> logger)
         {
             _userRepository = userRepository ?? throw new ArgumentNullException(nameof(userRepository));
+            _jwtconfig = jwtconfig ?? throw new ArgumentNullException(nameof(jwtconfig));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));   
         }
 
@@ -33,13 +37,13 @@ namespace Middleware.OcelotGateway.Controllers
         [HttpPost]
         [Route("register", Name = "Register")]
         [ProducesResponseType(typeof(UserModel), (int)HttpStatusCode.Created)]
-        [ProducesResponseType(typeof(string), (int)HttpStatusCode.BadRequest)]
-        [ProducesResponseType(typeof(string), (int)HttpStatusCode.InternalServerError)]
+        [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.BadRequest)]
+        [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.InternalServerError)]
         public async Task<ActionResult<UserModel>> Register([FromBody] UserModel register)
         {
             if (register == null)
             {
-                return BadRequest("Please enter valid credentials");
+                return BadRequest(new ApiResponse((int)HttpStatusCode.BadRequest, "Please enter valid credentials"));
             }
             try
             {
@@ -52,8 +56,9 @@ namespace Middleware.OcelotGateway.Controllers
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex.Message);
-                return Problem("Something went wrong while calling the API");
+                int statusCode = (int)HttpStatusCode.InternalServerError;
+                _logger.LogError(ex, "An error occurred:");
+                return StatusCode(statusCode, new ApiResponse(statusCode, $"An error has occurred: {ex.Message}"));
             }
             return StatusCode((int)HttpStatusCode.Created);
         }
@@ -67,13 +72,13 @@ namespace Middleware.OcelotGateway.Controllers
         [HttpPost]
         [Route("login", Name = "Login")]
         [ProducesResponseType(typeof(TokenService), (int)HttpStatusCode.OK)]
-        [ProducesResponseType(typeof(string), (int)HttpStatusCode.BadRequest)]
-        [ProducesResponseType(typeof(string), (int)HttpStatusCode.Unauthorized)]
+        [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.BadRequest)]
+        [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.Unauthorized)]
         public async Task<IActionResult> Login([FromBody] UserModel login) 
         {
             if (login == null)
             {
-                return BadRequest("Credentials must be provided");
+                return BadRequest(new ApiResponse((int)HttpStatusCode.BadRequest, "Credentials must be provided"));
             }
             try
             {
@@ -82,7 +87,7 @@ namespace Middleware.OcelotGateway.Controllers
                 bool authenticated = await AuthenticateUser(login);
                 if (authenticated)
                 {
-                    TokenService token = new TokenService();
+                    TokenService token = new TokenService(_jwtconfig.Value);
                     var newToken = token.GenerateToken(login.Id);
                     response = Ok(newToken);
                 }
@@ -90,8 +95,9 @@ namespace Middleware.OcelotGateway.Controllers
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex.Message);
-                return Unauthorized("User Unauthorized, username or password are incorect");
+                int statusCode = (int)HttpStatusCode.Unauthorized;
+                _logger.LogError(ex, "Unauthorized, username or password are incorect");
+                return StatusCode(statusCode, new ApiResponse(statusCode, $"Unauthorized, username or password are incorect: {ex.Message}"));
             }
             
         }
@@ -115,7 +121,7 @@ namespace Middleware.OcelotGateway.Controllers
             }
             catch (Exception ex) 
             {
-                _logger.LogError(ex.Message);
+                _logger.LogError(ex, "An error has occured during the authentication process");
                 return false;
             }
         }

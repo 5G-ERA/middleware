@@ -59,7 +59,7 @@ public class UpdateStatusJob : BaseJob<UpdateStatusJob>
                 return;
             }
 
-            Logger.LogError(apiEx, "There was a problem during the operation on the data.");
+            Logger.LogError(apiEx, "There was a problem during the operation on the data");
         }
         catch (Exception ex)
         {

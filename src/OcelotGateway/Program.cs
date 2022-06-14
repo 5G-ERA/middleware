@@ -1,6 +1,7 @@
 using System.Text;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
+using Middleware.Common.Config;
 using Middleware.Common.ExtensionMethods;
 using Middleware.Common.Repositories;
 using Middleware.Common.Repositories.Abstract;
@@ -23,6 +24,9 @@ builder.Host.ConfigureAppConfiguration((hostingContext, config) =>
 builder.Services.AddOcelot()
                 .AddCacheManager(settings => settings.WithDictionaryHandle());
 
+var config = builder.Configuration.GetSection(JwtConfig.ConfigName).Get<JwtConfig>();
+builder.Services.Configure<JwtConfig>(builder.Configuration.GetSection(JwtConfig.ConfigName));
+
 builder.Services.AddAuthentication(
     options =>
     {
@@ -33,7 +37,7 @@ builder.Services.AddAuthentication(
     {
         options.TokenValidationParameters = new TokenValidationParameters()
         {
-            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("my_secure_api_secret")),
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(config.Key)),
             ValidAudience = "redisinterfaceAudience",
             ValidIssuer = "redisinterfaceIssuer",
             ValidateIssuerSigningKey = true,
