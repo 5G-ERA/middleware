@@ -34,7 +34,7 @@ The Middleware has an option to log to centralized Elasticsearch. For this the A
 * **AWS_ACCESS_KEY_ID** - Access Key Id of the IAM user for the AWS account
 * **AWS_SECRET_ACCESS_KEY** - Secret Access Key of the IAM user for the AWS account
 
-For the AWS Secret Manager the secrets are supposed to be stored as a plaintext and the names should have the following format: `Middleware-{SettingGroup}__{SettingValue}` for example `Middleware-Database__ConnectionString`.
+For the AWS Secret Manager, the secrets are supposed to be stored as a plaintext and the names should have the following format: `Middleware-{SettingGroup}__{SettingValue}` for example `Middleware-Database__ConnectionString`.
 
 The SecretManager will automatically map the required `appsetting.json` configuration sections into the correct data.
 
