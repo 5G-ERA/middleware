@@ -1,0 +1,15 @@
+---
+version: '3.7'
+
+networks:
+    middleware-proxy:
+       external:
+          name: middleware_network
+
+
+services:
+     ros2:
+       image: ${DOCKER_REGISTRY-}actionserver:latest
+       #command: bash -c "cd /home/dev_ws & source /opt/ros/foxy/setup.bash & source install/setup.bash & "
+       networks:
+        - middleware-proxy
