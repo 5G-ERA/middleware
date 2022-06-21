@@ -76,7 +76,7 @@ public class DeploymentService : IDeploymentService
                     }
                     catch (Exception ex)
                     {
-                        _logger.LogError(ex, "There was an error while deploying the service");
+                        _logger.LogError(ex, "There was an error while deploying the service {service}", service.Name);
                         isSuccess = false;
                     }
                 }
@@ -220,13 +220,15 @@ public class DeploymentService : IDeploymentService
             depl.Metadata.SetServiceLabel(instanceId);
             foreach (var container in depl.Spec.Template.Spec.Containers)
             {
-                var env = new List<V1EnvVar>(container.Env)
-                {
-                    new ("NETAPP_ID", instanceId.ToString()),
-                    new ("MIDDLEWARE_ADDRESS", AppConfig.GetMiddlewareAddress()),
-                    new ("MIDDLEWARE_REPORT_INTERVAL", 5.ToString())
-                };
-                container.Env = env;
+                List<V1EnvVar> envVars = container.Env is not null
+                    ? new List<V1EnvVar>(container.Env)
+                    : new List<V1EnvVar>();
+
+                envVars.Add(new("NETAPP_ID", instanceId.ToString()));
+                envVars.Add(new("MIDDLEWARE_ADDRESS", AppConfig.GetMiddlewareAddress()));
+                envVars.Add(new("MIDDLEWARE_REPORT_INTERVAL", 5.ToString()));
+
+                container.Env = envVars;
             }
 
             obj = await k8SClient.CreateNamespacedDeploymentAsync(depl, AppConfig.K8SNamespaceName) as T;
