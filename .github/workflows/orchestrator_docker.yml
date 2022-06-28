@@ -6,6 +6,8 @@ on:
      -dummy:
   schedule:
     - cron: 0 3 * * 1-5
+  push:
+    tags:  [ v* ]
 
 jobs:
   build_and_deploy:
@@ -22,6 +24,12 @@ jobs:
         aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         aws-region: eu-west-1
 
+    - name: Extract metadata for the Docker image
+      id: meta
+      uses: docker/metadata-action@v4
+      with:
+        images: ${{ steps.login-ecr.outputs.registry }}/${{ secrets.ORCHESTRATOR_REPO_NAME }}
+
     - name: Login to Amazon ECR
       id: login-ecr
       uses: aws-actions/amazon-ecr-login@v1
@@ -33,7 +41,7 @@ jobs:
         ECR_REPOSITORY: ${{ secrets.ORCHESTRATOR_REPO_NAME }}
         AWS_KEY_ID: ${{ secrets.AWS_APP_KEY_ID }}
         AWS_SECRET_KEY: ${{ secrets.AWS_APP_SECRET_KEY }}
-        IMAGE_TAG: latest
+        IMAGE_TAG: ${{ steps.meta.outputs.tags }}
       run: |
         # Build a docker container and push it to ECR 
         docker build -f ./src/Orchestrator/Dockerfile -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG \
