@@ -1,7 +1,7 @@
 {
   "openapi": "3.0.1",
   "info": {
-    "title": "ResourcePlanner",
+    "title": "TaskPlanner",
     "version": "1.0"
   },
   "paths": {
@@ -48,27 +48,36 @@
         }
       }
     },
-    "/api/v1/Resource": {
+    "/api/v1/Plan": {
       "post": {
         "tags": [
-          "Resource"
+          "Plan"
         ],
-        "operationId": "GetResourcePlan",
+        "parameters": [
+          {
+            "name": "dryRun",
+            "in": "query",
+            "schema": {
+              "type": "boolean",
+              "default": false
+            }
+          }
+        ],
         "requestBody": {
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/TaskModel"
+                "$ref": "#/components/schemas/TaskPlannerInputModel"
               }
             },
             "text/json": {
               "schema": {
-                "$ref": "#/components/schemas/TaskModel"
+                "$ref": "#/components/schemas/TaskPlannerInputModel"
               }
             },
             "application/*+json": {
               "schema": {
-                "$ref": "#/components/schemas/TaskModel"
+                "$ref": "#/components/schemas/TaskPlannerInputModel"
               }
             }
           }
@@ -114,6 +123,26 @@
               }
             }
           },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              }
+            }
+          },
           "500": {
             "description": "Server Error",
             "content": {
@@ -130,6 +159,54 @@
               "text/json": {
                 "schema": {
                   "$ref": "#/components/schemas/ApiResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/RePlan": {
+      "post": {
+        "tags": [
+          "RePlan"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TaskReplanModel"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TaskReplanModel"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/TaskReplanModel"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/TaskModel"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TaskModel"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TaskModel"
                 }
               }
             }
@@ -199,6 +276,37 @@
             "type": "string",
             "format": "date-time",
             "readOnly": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "DialogueModel": {
+        "type": "object",
+        "properties": {
+          "relations": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/RelationModel"
+            },
+            "nullable": true
+          },
+          "Id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "Question": {
+            "type": "string",
+            "nullable": true
+          },
+          "IsSingleAnswer": {
+            "type": "boolean"
+          },
+          "Answer": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/KeyValuePair"
+            },
+            "nullable": true
           }
         },
         "additionalProperties": false
@@ -324,6 +432,59 @@
           "TaskPriority": {
             "type": "integer",
             "format": "int32"
+          },
+          "ActionPlanId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "ActionSequence": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ActionModel"
+            },
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "TaskPlannerInputModel": {
+        "type": "object",
+        "properties": {
+          "RobotId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "TaskId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "Questions": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/DialogueModel"
+            },
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "TaskReplanModel": {
+        "type": "object",
+        "properties": {
+          "relations": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/RelationModel"
+            },
+            "nullable": true
+          },
+          "Id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "Name": {
+            "type": "string",
+            "nullable": true
           },
           "ActionPlanId": {
             "type": "string",
