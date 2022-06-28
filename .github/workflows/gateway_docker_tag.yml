@@ -34,7 +34,7 @@ jobs:
         ECR_REPOSITORY: ${{ secrets.GATEWAY_REPO_NAME }}
         AWS_KEY_ID: ${{ secrets.AWS_APP_KEY_ID }}
         AWS_SECRET_KEY: ${{ secrets.AWS_APP_SECRET_KEY }}
-        IMAGE_TAG: ${{ steps.meta.outputs.tags }}
+        IMAGE_TAG: ${{ steps.get_version.outputs.VERSION }}
       run: |
         # Build a docker container and push it to ECR 
         docker build -f ./src/OcelotGateway/Dockerfile -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG \
