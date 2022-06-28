@@ -1,11 +1,8 @@
-name: Gateway docker build
+name: Redis Interface docker build on tag
 
 on:
-  workflow_dispatch:
-    inputs:
-     -dummy:
-  schedule:
-    - cron: 0 3 * * 1-5
+  push:
+    tags:  [ v* ]
 
 jobs:
   build_and_deploy:
@@ -20,7 +17,11 @@ jobs:
       with:
         aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
         aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-        aws-region: eu-west-1    
+        aws-region: eu-west-1
+
+    - name: Get the version
+      id: get_version
+      run: echo ::set-output name=VERSION::${GITHUB_REF/refs\/tags\//}
 
     - name: Login to Amazon ECR
       id: login-ecr
@@ -30,14 +31,14 @@ jobs:
       id: build-image
       env:
         ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-        ECR_REPOSITORY: ${{ secrets.GATEWAY_REPO_NAME }}
+        ECR_REPOSITORY: ${{ secrets.REDIS_INTERFACE_REPO_NAME }}
         AWS_KEY_ID: ${{ secrets.AWS_APP_KEY_ID }}
         AWS_SECRET_KEY: ${{ secrets.AWS_APP_SECRET_KEY }}
-        IMAGE_TAG: latest
+        IMAGE_TAG: ${{ steps.get_version.outputs.VERSION }}
       run: |
         # Build a docker container and push it to ECR 
-        docker build -f ./src/OcelotGateway/Dockerfile -t $IMAGE_TAG \
+        docker build -f ./src/RedisInterface/Dockerfile -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG \
          --build-arg AWS_KEY_ID=$AWS_KEY_ID --build-arg AWS_SECRET_KEY=$AWS_SECRET_KEY ./src
         echo "Pushing image to ECR..."
-        docker push $IMAGE_TAG
-        echo "::set-output name=image::$IMAGE_TAG"
+        docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+        echo "::set-output name=image::$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG"

@@ -1,4 +1,4 @@
-name: Orchestrator docker build
+name: Orchestrator docker build on tag
 
 on:
   push:
