@@ -1,0 +1,5 @@
+string Goal
+---
+int32[]  resource_final
+---
+int32[]  resource_feedback

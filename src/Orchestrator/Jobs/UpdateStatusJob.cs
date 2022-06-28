@@ -70,6 +70,7 @@ public class UpdateStatusJob : BaseJob<UpdateStatusJob>
 
     private async Task<ActionPlanModel> ValidateSequenceStatusAsync(ActionPlanModel seq, IKubernetes kubeClient)
     {
+        //check if all instances are down for at least half an hour, then terminate
         foreach (var action in seq.ActionSequence)
         {
             foreach (var instance in action.Services)

@@ -16,6 +16,7 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.ConfigureAutoMapper();
 
+builder.Services.AddHttpClient("healthCheckClient");
 builder.Services.AddHttpClient("redisApiClient");
 builder.Services.AddHttpClient("resourcePlannerApiClient");
 builder.Services.AddHttpClient("orchestratorApiClient");

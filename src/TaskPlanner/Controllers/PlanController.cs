@@ -28,7 +28,7 @@ namespace Middleware.TaskPlanner.Controllers
         [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.NotFound)]
         [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.BadRequest)]
         [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.InternalServerError)]
-        public async Task<ActionResult<TaskModel>> GetPlan([FromBody] TaskPlannerInputModel inputModel)
+        public async Task<ActionResult<TaskModel>> GetPlan([FromBody] TaskPlannerInputModel inputModel, bool dryRun = false)
         {
             Guid id = inputModel.Id;
 
@@ -45,6 +45,8 @@ namespace Middleware.TaskPlanner.Controllers
 
                 TaskModel resourcePlan = _mapper.Map<TaskModel>(tmpFinalTask);
 
+                if (dryRun)
+                    return Ok(resourcePlan);
                 // call orchestrator for deployment of the resources
                 Orchestrator.TaskModel tmpTaskOrchestratorSend = _mapper.Map<Orchestrator.TaskModel>(resourcePlan);
                 Orchestrator.TaskModel tmpFinalOrchestratorTask =
