@@ -45,8 +45,8 @@ jobs:
         IMAGE_TAG: ${{ steps.meta.outputs.tags }}
       run: |
         # Build a docker container and push it to ECR 
-        docker build -f ./src/OcelotGateway/Dockerfile -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG \
+        docker build -f ./src/OcelotGateway/Dockerfile -t $IMAGE_TAG \
          --build-arg AWS_KEY_ID=$AWS_KEY_ID --build-arg AWS_SECRET_KEY=$AWS_SECRET_KEY ./src
         echo "Pushing image to ECR..."
-        docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
-        echo "::set-output name=image::$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG"
+        docker push $IMAGE_TAG
+        echo "::set-output name=image::$IMAGE_TAG"
