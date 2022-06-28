@@ -1,5 +1,5 @@
-## Guidelines for development applications to support 5G-Era Middleware:
+# Guidelines for development applications to support 5G-Era Middleware:
 
-For a given pod, only use ROS in a single container.
+For the instruction on the possible solutions when developing the 5G-ERA NetApps, see the [NetApp Workshop](https://github.com/5G-ERA/NetApp-Workshop) and [Reference NetApp](https://github.com/5G-ERA/Reference-NetApp).
 
-References: https://ubuntu.com/blog/exploring-ros-2-with-kubernetes 
+
