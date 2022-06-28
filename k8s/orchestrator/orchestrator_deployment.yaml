@@ -23,9 +23,5 @@ spec:
         env:
         - name: AWS_IMAGE_REGISTRY
           value: $(AWS_IMAGE_REGISTRY) # to be replaced with real value
-        - name: REDIS_HOSTNAME
-          value: $(REDIS_HOSTNAME) # to be replaced with real value
-        - name: REDIS_PORT
-          value: $(REDIS_PORT) # to be replaced with real value
         - name: REDIS_INTERFACE_ADDRESS
           value: http://redis-interface-api # to be replaced with real value
