@@ -260,7 +260,11 @@ namespace Middleware.Common.Repositories
             return relations;
         }
 
-
+        /// <summary>
+        /// Adding new model into RedisGraph db
+        /// </summary>
+        /// <param name="model"></param>
+        /// <returns></returns>
         public virtual async Task<bool> AddGraphAsync(GraphEntityModel model)
         {
             model.Type = _redisDbIndex.ToString().ToUpper();
@@ -272,7 +276,11 @@ namespace Middleware.Common.Repositories
             return resultSet != null && resultSet.Metrics.NodesCreated == 1;
         }
 
-
+        /// <summary>
+        /// Creating a new relation between two models
+        /// </summary>
+        /// <param name="relation"></param>
+        /// <returns></returns>
         public virtual async Task<bool> AddRelationAsync(RelationModel relation)
         {
             string query = "MATCH (x: " + relation.InitiatesFrom.Type + " {ID: '" + relation.InitiatesFrom.Id +
@@ -283,7 +291,11 @@ namespace Middleware.Common.Repositories
             return resultSet != null && resultSet.Metrics.RelationshipsCreated == 1;
         }
 
-
+        /// <summary>
+        /// Removing a model from RedisGraph db
+        /// </summary>
+        /// <param name="model"></param>
+        /// <returns></returns>
         public virtual async Task<bool> DeleteGraphModelAsync(GraphEntityModel model)
         {
             model.Type = _redisDbIndex.ToString().ToUpper();
@@ -294,7 +306,11 @@ namespace Middleware.Common.Repositories
             return resultSet != null && resultSet.Metrics.NodesDeleted == 1;
         }
 
-
+        /// <summary>
+        /// Removing a relation from the RedisGraph db
+        /// </summary>
+        /// <param name="relation"></param>
+        /// <returns></returns>
         public virtual async Task<bool> DeleteRelationAsync(RelationModel relation)
         {
             string query = "MATCH (x: " + relation.InitiatesFrom.Type + " {ID: '" + relation.InitiatesFrom.Id +

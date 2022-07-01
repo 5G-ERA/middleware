@@ -170,6 +170,11 @@ namespace Middleware.RedisInterface.Controllers
             }
         }
 
+        /// <summary>
+        /// Creates a new relation between two models
+        /// </summary>
+        /// <param name="model"></param>
+        /// <returns></returns>
         [HttpPost]
         [Route("AddRelation", Name = "CloudAddRelation")]
         [ProducesResponseType(typeof(RelationModel), (int)HttpStatusCode.OK)]
@@ -198,7 +203,12 @@ namespace Middleware.RedisInterface.Controllers
             return Ok(model);
         }
 
-
+        /// <summary>
+        /// Retrieves a single relation by name
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="name"></param>
+        /// <returns></returns>
         [HttpGet]
         [Route("relation/{name}", Name = "CloudGetRelationByName")]
         [ProducesResponseType(typeof(List<RelationModel>), (int)HttpStatusCode.OK)]
@@ -223,7 +233,13 @@ namespace Middleware.RedisInterface.Controllers
             }
         }
 
-
+        /// <summary>
+        /// Retrieves two relations by their names
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="firstName"></param>
+        /// <param name="secondName"></param>
+        /// <returns></returns>
         [HttpGet]
         [Route("relations/{firstName}/{secondName}", Name = "CloudGetRelationsByName")]
         [ProducesResponseType(typeof(List<RelationModel>), (int)HttpStatusCode.OK)]

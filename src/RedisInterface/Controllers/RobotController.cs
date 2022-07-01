@@ -169,15 +169,11 @@ namespace Middleware.RedisInterface.Controllers
             }
         }
 
-        //[HttpGet]
-        //[ProducesResponseType(typeof(List <TaskModel>), (int)HttpStatusCode.OK)]
-        //public async Task<ActionResult<IEnumerable<TaskModel>>> GetTaskForRobotByIdAsync()
-        //{
-        //  //  List<TaskModel> models = await _robotRepository.GetRobotStatusByIdAsync();
-        //    return Ok();
-        //}
-
-
+        /// <summary>
+        /// Creates a new relation between two models
+        /// </summary>
+        /// <param name="model"></param>
+        /// <returns></returns>
         [HttpPost]
         [Route("AddRelation", Name = "RobotAddRelation")]
         [ProducesResponseType(typeof(RelationModel), (int)HttpStatusCode.OK)]
@@ -208,6 +204,12 @@ namespace Middleware.RedisInterface.Controllers
             return Ok(model);
         }
 
+        /// <summary>
+        /// Retrieves a single relation by name
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="name"></param>
+        /// <returns></returns>
         [HttpGet]
         [Route("relation/{name}", Name ="RobotGetRelationByName")]
         [ProducesResponseType(typeof(List<RelationModel>), (int)HttpStatusCode.OK)]
@@ -232,7 +234,13 @@ namespace Middleware.RedisInterface.Controllers
             }
         }
 
-
+        /// <summary>
+        /// Retrieves two relations by their names
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="firstName"></param>
+        /// <param name="secondName"></param>
+        /// <returns></returns>
         [HttpGet]
         [Route("relations/{firstName}/{secondName}", Name = "RobotGetRelationsByName")]
         [ProducesResponseType(typeof(List<RelationModel>), (int)HttpStatusCode.OK)]
