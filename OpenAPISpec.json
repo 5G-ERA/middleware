@@ -712,7 +712,7 @@
                 "tags": [
                     "Health"
                 ],
-                "operationId": "HealthCheck",
+                "operationId": "OrchestratorHealthCheck",
                 "responses": {
                     "200": {
                         "description": "Success"
@@ -725,7 +725,7 @@
                 "tags": [
                     "Health"
                 ],
-                "operationId": "GetSpec",
+                "operationId": "GetOrchestratorSpec",
                 "responses": {
                     "200": {
                         "description": "Success",
@@ -4962,7 +4962,7 @@
                 "tags": [
                     "Health"
                 ],
-                "operationId": "HealthCheck",
+                "operationId": "RedisInterfaceHealthCheck",
                 "responses": {
                     "200": {
                         "description": "Success"
@@ -4975,7 +4975,7 @@
                 "tags": [
                     "Health"
                 ],
-                "operationId": "GetSpec",
+                "operationId": "GetRedisInterfaceSpec",
                 "responses": {
                     "200": {
                         "description": "Success",
@@ -7535,7 +7535,7 @@
                 "tags": [
                     "Health"
                 ],
-                "operationId": "HealthCheck",
+                "operationId": "TaskPlannerHealthCheck",
                 "responses": {
                     "200": {
                         "description": "Success"
@@ -7548,7 +7548,7 @@
                 "tags": [
                     "Health"
                 ],
-                "operationId": "GetSpec",
+                "operationId": "GetTaskPlannerSpec",
                 "responses": {
                     "200": {
                         "description": "Success",

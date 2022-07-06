@@ -14,7 +14,7 @@ namespace Middleware.ResourcePlanner.Controllers
             _client = factory.CreateClient("healthCheckClient");
         }
 
-        [HttpGet(Name="HealthCheck")]
+        [HttpGet(Name= "ResourcePlannerHealthCheck")]
         [ProducesResponseType((int)HttpStatusCode.OK)]
         public IActionResult Get()
         {
@@ -22,7 +22,7 @@ namespace Middleware.ResourcePlanner.Controllers
         }
 
         [HttpGet]
-        [Route("spec", Name = "GetSpec")]
+        [Route("spec", Name = "GetResourcePlannerSpec")]
         [ProducesResponseType(typeof(string), (int)HttpStatusCode.OK)]
         public async Task<IActionResult> GetSpec()
         {

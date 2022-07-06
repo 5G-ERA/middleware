@@ -10,7 +10,7 @@
         "tags": [
           "Health"
         ],
-        "operationId": "HealthCheck",
+        "operationId": "ResourcePlannerHealthCheck",
         "responses": {
           "200": {
             "description": "Success"
@@ -23,7 +23,7 @@
         "tags": [
           "Health"
         ],
-        "operationId": "GetSpec",
+        "operationId": "GetResourcePlannerSpec",
         "responses": {
           "200": {
             "description": "Success",
