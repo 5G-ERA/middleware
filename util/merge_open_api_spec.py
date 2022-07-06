@@ -1,12 +1,16 @@
 from array import array
 import sys
 import json
+import os
+
+dirname = os.path.dirname(__file__)
 
 # ResourcePlanner is not here because it is not accessible through gateway
-files = ["./src/RedisInterface/RedisInterfaceSpec.json",
-         "./src/TaskPlanner/TaskPlannerSpec.json"]
-source_file = "./src/Orchestrator/OrchestratorSpec.json"
-output_file = "./OpenAPISpec.json"
+files = [os.path.join(dirname, "../src/RedisInterface/RedisInterfaceSpec.json"),
+         os.path.join(dirname, "../src/TaskPlanner/TaskPlannerSpec.json")]
+source_file = os.path.join(
+    dirname, "../src/Orchestrator/OrchestratorSpec.json")
+output_file = os.path.join(dirname, "../OpenAPISpec.json")
 
 prefixes = {"RedisInterface": "Data",
             "TaskPlanner": "Task",
@@ -53,7 +57,7 @@ def correct_route_name(route: str, api: str) -> str:
 
 
 def get_api_name(file_name: str) -> str:
-    return file_name.split("/")[2]
+    return file_name.split("/")[-2]
 
 
 def main() -> None:
