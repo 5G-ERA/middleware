@@ -166,7 +166,11 @@ namespace Middleware.RedisInterface.Controllers
             }
         }
 
-
+        /// <summary>
+        /// Creates a new relation between two models
+        /// </summary>
+        /// <param name="model"></param>
+        /// <returns></returns>
         [HttpPost]
         [Route("AddRelation", Name = "ActionAddRelation")]
         [ProducesResponseType(typeof(RelationModel), (int)HttpStatusCode.OK)]
@@ -195,7 +199,12 @@ namespace Middleware.RedisInterface.Controllers
             return Ok(model);
         }
 
-
+        /// <summary>
+        /// Retrieves a single relation by name
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="name"></param>
+        /// <returns></returns>
         [HttpGet]
         [Route("relation/{name}", Name = "ActionGetRelationByName")]
         [ProducesResponseType(typeof(List<RelationModel>), (int)HttpStatusCode.OK)]
@@ -229,7 +238,13 @@ namespace Middleware.RedisInterface.Controllers
             }
         }
 
-
+        /// <summary>
+        /// Retrieves two relations by their names
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="firstName"></param>
+        /// <param name="secondName"></param>
+        /// <returns></returns>
         [HttpGet]
         [Route("relations/{firstName}/{secondName}", Name = "ActionGetRelationsByName")]
         [ProducesResponseType(typeof(List<RelationModel>), (int)HttpStatusCode.OK)]
@@ -257,6 +272,10 @@ namespace Middleware.RedisInterface.Controllers
 
         #region ActionPlan
 
+        /// <summary>
+        /// Retrieves all ActionPlans
+        /// </summary>
+        /// <returns></returns>
         [HttpGet]
         [Route("plan", Name = "ActionPlanGetAll")]
         [ProducesResponseType(typeof(List<ActionPlanModel>), (int)HttpStatusCode.OK)]
@@ -281,6 +300,11 @@ namespace Middleware.RedisInterface.Controllers
             }
         }
 
+        /// <summary>
+        /// Retrieves an ActionPlan by id
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
         [HttpGet]
         [Route("plan/{id:guid}", Name = "ActionPlanGetById")]
         [ProducesResponseType(typeof(ActionPlanModel), (int)HttpStatusCode.OK)]
@@ -304,6 +328,12 @@ namespace Middleware.RedisInterface.Controllers
                 return StatusCode(statusCode, new ApiResponse(statusCode, ex.Message));
             }
         }
+
+        /// <summary>
+        /// Creates new ActionPlan
+        /// </summary>
+        /// <param name="actionPlan"></param>
+        /// <returns></returns>
         [HttpPost]
         [Route("plan", Name = "ActionPlanAdd")]
         [ProducesResponseType(typeof(ActionPlanModel), (int)HttpStatusCode.OK)]
@@ -331,6 +361,12 @@ namespace Middleware.RedisInterface.Controllers
                 return StatusCode(statusCode, new ApiResponse(statusCode, $"An error has occurred: {ex.Message}"));
             }
         }
+
+        /// <summary>
+        /// Delete ActionPlan by id
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
         [HttpDelete]
         [Route("plan/{id}", Name = "ActionPlanDelete")]
         [ProducesResponseType(typeof(void), (int)HttpStatusCode.OK)]
@@ -355,6 +391,12 @@ namespace Middleware.RedisInterface.Controllers
             }
         }
 
+        /// <summary>
+        /// Patches an existing ActionPlan by id
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="actionPlan"></param>
+        /// <returns></returns>
         [HttpPut]
         [Route("plan/{id:guid}", Name = "ActionPlanPatch")]
         [ProducesResponseType(typeof(void), (int)HttpStatusCode.OK)]

@@ -177,7 +177,11 @@ namespace Middleware.RedisInterface.Controllers
             }
         }
 
-
+        /// <summary>
+        /// Creates a new relation between two models
+        /// </summary>
+        /// <param name="model"></param>
+        /// <returns></returns>
         [HttpPost]
         [Route("AddRelation", Name = "TaskAddRelation")]
         [ProducesResponseType(typeof(RelationModel), (int)HttpStatusCode.OK)]
@@ -207,6 +211,12 @@ namespace Middleware.RedisInterface.Controllers
             return Ok(model);
         }
 
+        /// <summary>
+        /// Retrieves a single relation by name
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="name"></param>
+        /// <returns></returns>
         [HttpGet]
         [Route("relation/{name}", Name = "TaskGetRelationByName")]
         [ProducesResponseType(typeof(List<RelationModel>), (int)HttpStatusCode.OK)]
@@ -231,7 +241,13 @@ namespace Middleware.RedisInterface.Controllers
             }
         }
 
-
+        /// <summary>
+        /// Retrieves two relations by their names
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="firstName"></param>
+        /// <param name="secondName"></param>
+        /// <returns></returns>
         [HttpGet]
         [Route("relations/{firstName}/{secondName}", Name = "TaskGetRelationsByName")]
         [ProducesResponseType(typeof(List<RelationModel>), (int)HttpStatusCode.OK)]
@@ -257,7 +273,11 @@ namespace Middleware.RedisInterface.Controllers
             }
         }
 
-
+        /// <summary>
+        /// Imports the complete task definition for the user to incorporate services to be used in the middleware
+        /// </summary>
+        /// <param name="model"></param>
+        /// <returns></returns>
         [HttpPost]
         [Route("ImportTask", Name = "ImportTaskAsync")]
         [ProducesResponseType(typeof(ActionResult<TaskModel>), (int)HttpStatusCode.OK)]
