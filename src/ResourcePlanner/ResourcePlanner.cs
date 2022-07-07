@@ -32,6 +32,7 @@ public class ResourcePlanner : IResourcePlanner
     {
 
         var redisApiClient = _apiClientBuilder.CreateRedisApiClient();
+        List<Guid> ids = (await redisApiClient.RobotGetConnectedEdgesIdsAsync(Guid.Empty)).ToList();
         var orchestratorApiClient = _apiClientBuilder.CreateOrchestratorApiClient();
         // actionPlanner will give resource planner the actionSequence. 
 

@@ -265,5 +265,36 @@ namespace Middleware.RedisInterface.Controllers
                 return StatusCode(statusCode, new ApiResponse(statusCode, $"An error has occurred: {ex.Message}"));
             }
         }
+
+
+        [HttpGet]
+        [Route("{robotId}/edges", Name = "RobotGetConnectedEdgesIds")]
+        [ProducesResponseType(typeof(List<Guid>), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.NotFound)]
+        [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.BadRequest)]
+        [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.InternalServerError)]
+        public async Task<ActionResult<List<Guid>>> GetConnectedEdgesIdsAsync(Guid robotId) 
+        {
+            try 
+            {
+                if (robotId == Guid.Empty)
+                {
+                    return BadRequest(new ApiResponse((int)HttpStatusCode.BadRequest, "The Robot Id was not provided"));
+                }
+                List<Guid> edgeIds = await _robotRepository.GetConnectedEdgesIdsAsync(robotId);
+                if (!edgeIds.Any())
+                {
+                    return NotFound(new ApiResponse((int)HttpStatusCode.NotFound, "No connected Edges have been found."));
+                }
+                return Ok(edgeIds);
+            }
+            catch (Exception ex)
+            {
+                int statusCode = (int)HttpStatusCode.InternalServerError;
+                _logger.LogError(ex, "An error occurred:");
+                return StatusCode(statusCode, new ApiResponse(statusCode, $"An error has occurred: {ex.Message}"));
+            }
+
+        }
     }
 }

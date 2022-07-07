@@ -98,5 +98,19 @@ namespace Middleware.Common.Repositories
             await Db.JsonSetAsync(id.ToString(), JsonSerializer.Serialize(currentModel));
             return currentModel;
         }
+
+        public async Task<List<Guid>> GetConnectedEdgesIdsAsync(Guid robotId) 
+        {
+            List<Guid> edgeIds = new List<Guid>();
+            List<RelationModel> robotRelations = await GetRelation(robotId, "CAN_REACH");
+            foreach (RelationModel relationModel in robotRelations)
+            {
+                if (relationModel.PointsTo.Type == "EDGE") 
+                {
+                    edgeIds.Add(relationModel.PointsTo.Id);
+                }
+            }
+            return edgeIds;
+        } 
     }
 }
