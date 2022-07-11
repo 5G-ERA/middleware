@@ -42,7 +42,7 @@ public interface IBaseRepository<T> where T : class
     /// <param name="relationName">Name of the relation</param>
     /// <param name="direction">Direction of the relation, outgoing from the object or incoming to the object</param>
     /// <returns></returns>
-    Task<List<RelationModel>> GetRelation(Guid id, string relationName, RelationDirection direction);
+    Task<List<RelationModel>> GetRelation(Guid id, string relationName, RelationDirection direction = RelationDirection.Outgoing);
     /// <summary>
     /// Get relations for the specified object by the names of the relations
     /// </summary>
