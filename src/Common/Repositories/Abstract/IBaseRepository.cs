@@ -1,4 +1,5 @@
-﻿using Middleware.Common.Models;
+﻿using Middleware.Common.Enums;
+using Middleware.Common.Models;
 
 namespace Middleware.Common.Repositories;
 
@@ -39,8 +40,9 @@ public interface IBaseRepository<T> where T : class
     /// </summary>
     /// <param name="id">Identifier of the object</param>
     /// <param name="relationName">Name of the relation</param>
+    /// <param name="direction">Direction of the relation, outgoing from the object or incoming to the object</param>
     /// <returns></returns>
-    Task<List<RelationModel>> GetRelation(Guid id, string relationName);
+    Task<List<RelationModel>> GetRelation(Guid id, string relationName, RelationDirection direction);
     /// <summary>
     /// Get relations for the specified object by the names of the relations
     /// </summary>

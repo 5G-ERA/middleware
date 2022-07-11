@@ -197,7 +197,7 @@ namespace Middleware.Common.Repositories
         }
 
         /// <inheritdoc/>
-        public virtual async Task<List<RelationModel>> GetRelation(Guid id, string relationName)
+        public virtual async Task<List<RelationModel>> GetRelation(Guid id, string relationName, RelationDirection direction = RelationDirection.Outgoing)
         {
             List<RelationModel> relationModels = new List<RelationModel>();
             relationName = relationName?.ToUpper();

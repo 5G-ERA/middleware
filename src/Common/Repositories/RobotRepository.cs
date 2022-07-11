@@ -120,11 +120,11 @@ namespace Middleware.Common.Repositories
             List<Guid> freeEdges = new List<Guid>();
             foreach (Guid edges in listofEdgesConnectedtoRobot)
             {
-                // todo: BB: create the function that will allow to query for any object connected to a desired object
-                // as a context is the Edge for this function, move it to Edge controller and Edge repository
+                // BB 11.07.2022: update on this, let's not create the new function, it doesn't make any sense to do so
+                // I have added teh parameter to the GetRelation method mased on the parameter on which we will modify the query
+                // Example call of the GetRelation() method in line 128
                 // [Any] --[relation]--> [Edge with id]
-                // GetReferencingRelation()
-                List<RelationModel> robotRelations = await GetRelation(edges, "LOCATED_AT");
+                List<RelationModel> robotRelations = await GetRelation(edges, "LOCATED_AT", RelationDirection.Incoming);
                 foreach (RelationModel relationModel in robotRelations) 
                 {
                     if (relationModel.PointsTo != null)
