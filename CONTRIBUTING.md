@@ -2,6 +2,10 @@
 
 This document describes the functionality needed to run and contribute to the 5G-ERA Middleware repository. This document assumes the machine is configured with the instructions in the [ENVIRONMENT.md](ENVIRONMENT.md) file.
 
+## Features and Bugs
+
+If you stumble upon a bug or would like to propose a new feature or functionality, please create the new issue and describe it in detail. 
+
 ## Development Environment configuration
 
 The Middleware application is designed to be built around the Visual Studio 2022 installation utilizing the docker-compose support for the testing in the local development environment.
