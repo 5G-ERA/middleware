@@ -337,5 +337,11 @@ namespace Middleware.Common.Repositories
             graphEntity.Type = type.ToString();
             graphEntity.Name = name.ToString();
         }
+
+        public virtual async Task<List<RelationModel>> GetReferencingRelation(Guid id, string relationName)
+        {
+            //HERE
+            throw new NotImplementedException();
+        }
     }
 }

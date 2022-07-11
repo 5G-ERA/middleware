@@ -11,6 +11,8 @@ namespace Middleware.Common.Repositories
 {
     public class RobotRepository : BaseRepository<RobotModel>, IRobotRepository
     {
+        
+
         /// <summary>
         /// Default constructor
         /// </summary>
@@ -112,5 +114,29 @@ namespace Middleware.Common.Repositories
             }
             return edgeIds;
         } 
+
+        public async Task<List<Guid>> GetFreeEdgesIdsAsync (List<Guid> listofEdgesConnectedtoRobot)
+        {
+            List<Guid> freeEdges = new List<Guid>();
+            foreach (Guid edges in listofEdgesConnectedtoRobot)
+            {
+                // todo: BB: create the function that will allow to query for any object connected to a desired object
+                // as a context is the Edge for this function, move it to Edge controller and Edge repository
+                // [Any] --[relation]--> [Edge with id]
+                // GetReferencingRelation()
+                List<RelationModel> robotRelations = await GetRelation(edges, "LOCATED_AT");
+                foreach (RelationModel relationModel in robotRelations) 
+                {
+                    if (relationModel.PointsTo != null)
+                    {
+                        freeEdges.Add(relationModel.PointsTo.Id);
+                    }
+                }
+            }
+            return freeEdges;
+
+          
+
+        }
     }
 }
