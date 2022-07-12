@@ -3340,7 +3340,7 @@
         }
       }
     },
-    "/api/v1/Edge/edges": {
+    "/api/v1/Edge/free": {
       "post": {
         "tags": [
           "Edge"

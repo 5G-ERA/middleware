@@ -94,8 +94,8 @@ namespace Middleware.RedisInterface.Controllers
                 EdgeModel edge = await _edgeRepository.AddAsync(model);
                 if (edge is null)
                 {
-                    return StatusCode((int) HttpStatusCode.InternalServerError,
-                        new ApiResponse((int) HttpStatusCode.NotFound,
+                    return StatusCode((int)HttpStatusCode.InternalServerError,
+                        new ApiResponse((int)HttpStatusCode.NotFound,
                             "Problem while adding the Edge to the data store"));
                 }
             }
@@ -191,8 +191,8 @@ namespace Middleware.RedisInterface.Controllers
                 bool isValid = await _edgeRepository.AddRelationAsync(model);
                 if (!isValid)
                 {
-                    return StatusCode((int) HttpStatusCode.InternalServerError,
-                        new ApiResponse((int) HttpStatusCode.InternalServerError, "The relation was not created"));
+                    return StatusCode((int)HttpStatusCode.InternalServerError,
+                        new ApiResponse((int)HttpStatusCode.InternalServerError, "The relation was not created"));
                 }
             }
             catch (Exception ex)
@@ -266,32 +266,34 @@ namespace Middleware.RedisInterface.Controllers
             }
         }
 
-
-
         [HttpPost]
-        [Route("edges/free", Name = "GetFreeEdgesIdsAsync")]//edges
+        [Route("free", Name = "GetFreeEdgesIdsAsync")]//edges
         [ProducesResponseType(typeof(List<Guid>), (int)HttpStatusCode.OK)]
         [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.NotFound)]
         [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.BadRequest)]
         [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.InternalServerError)]
-        public async Task<ActionResult<List<Guid>>> GetFreeEdgesIdsAsync(List<Guid> listofEdgesConnectedtoRobot)
+        public async Task<ActionResult<List<Guid>>> GetFreeEdgesIdsAsync(List<Guid> edgesToCheck)
         {
             try
             {
-                if (!listofEdgesConnectedtoRobot.Any())
-                { return BadRequest(new ApiResponse((int)HttpStatusCode.BadRequest, "ERROR: There are no edges connected to the Robot")); }
+                if (!edgesToCheck.Any())
+                {
+                    return BadRequest(new ApiResponse((int)HttpStatusCode.BadRequest, "No Edge ids were provided"));
+                }
 
-                List<Guid> edgeFree = await _edgeRepository.GetFreeEdgesIdsAsync(listofEdgesConnectedtoRobot);
+                List<Guid> edgeFree = await _edgeRepository.GetFreeEdgesIdsAsync(edgesToCheck);
+                if (!edgeFree.Any())
+                {
+                    return NotFound(new ApiResponse((int)HttpStatusCode.BadRequest, "There are no edges connected to the Robot"));
+                }
                 return Ok(edgeFree);
             }
             catch (Exception ex)
             {
-                {
-                    int statusCode = (int)HttpStatusCode.InternalServerError;
-                    _logger.LogError(ex, "An error occurred:");
-                    return StatusCode(statusCode, new ApiResponse(statusCode, $"An error has occurred: {ex.Message}"));
 
-                }
+                int statusCode = (int)HttpStatusCode.InternalServerError;
+                _logger.LogError(ex, "An error occurred:");
+                return StatusCode(statusCode, new ApiResponse(statusCode, $"An error has occurred: {ex.Message}"));
             }
 
         }

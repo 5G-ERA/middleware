@@ -27,7 +27,7 @@ namespace Middleware.Common.Repositories
         /// <param name="id"></param>
         /// <param name="patch"></param>
         /// <returns> Patched model </returns>
-        public async Task<EdgeModel> PatchEdgeAsync(Guid id, EdgeModel patch) 
+        public async Task<EdgeModel> PatchEdgeAsync(Guid id, EdgeModel patch)
         {
             string model = (string)await Db.JsonGetAsync(id.ToString());
             EdgeModel currentModel = JsonSerializer.Deserialize<EdgeModel>(model);
@@ -74,16 +74,13 @@ namespace Middleware.Common.Repositories
             await Db.JsonSetAsync(id.ToString(), JsonSerializer.Serialize(currentModel));
             return currentModel;
         }
-        public async Task<List<Guid>> GetFreeEdgesIdsAsync(List<Guid> listofEdgesConnectedtoRobot)
+
+        public async Task<List<Guid>> GetFreeEdgesIdsAsync(List<Guid> edgesToCheck)
         {
             List<Guid> freeEdges = new List<Guid>();
-            foreach (Guid edges in listofEdgesConnectedtoRobot)
+            foreach (Guid edgeId in edgesToCheck)
             {
-                // BB 11.07.2022: update on this, let's not create the new function, it doesn't make any sense to do so
-                // I have added teh parameter to the GetRelation method mased on the parameter on which we will modify the query
-                // Example call of the GetRelation() method in line 128
-                // [Any] --[relation]--> [Edge with id]
-                List<RelationModel> robotRelations = await GetRelation(edges, "LOCATED_AT", RelationDirection.Incoming);
+                List<RelationModel> robotRelations = await GetRelation(edgeId, "LOCATED_AT", RelationDirection.Incoming);
                 foreach (RelationModel relationModel in robotRelations)
                 {
                     if (relationModel.PointsTo != null)
@@ -93,9 +90,6 @@ namespace Middleware.Common.Repositories
                 }
             }
             return freeEdges;
-
-
-
         }
-}
+    }
 }
