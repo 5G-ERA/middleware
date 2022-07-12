@@ -115,28 +115,6 @@ namespace Middleware.Common.Repositories
             return edgeIds;
         } 
 
-        public async Task<List<Guid>> GetFreeEdgesIdsAsync (List<Guid> listofEdgesConnectedtoRobot)
-        {
-            List<Guid> freeEdges = new List<Guid>();
-            foreach (Guid edges in listofEdgesConnectedtoRobot)
-            {
-                // BB 11.07.2022: update on this, let's not create the new function, it doesn't make any sense to do so
-                // I have added teh parameter to the GetRelation method mased on the parameter on which we will modify the query
-                // Example call of the GetRelation() method in line 128
-                // [Any] --[relation]--> [Edge with id]
-                List<RelationModel> robotRelations = await GetRelation(edges, "LOCATED_AT", RelationDirection.Incoming);
-                foreach (RelationModel relationModel in robotRelations) 
-                {
-                    if (relationModel.PointsTo != null)
-                    {
-                        freeEdges.Add(relationModel.PointsTo.Id);
-                    }
-                }
-            }
-            return freeEdges;
-
-          
-
-        }
+        
     }
 }

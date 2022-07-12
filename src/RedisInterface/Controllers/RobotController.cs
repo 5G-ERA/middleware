@@ -297,34 +297,6 @@ namespace Middleware.RedisInterface.Controllers
 
         }
 
-
-        [HttpPost]
-        [Route("edges", Name = "GetFreeEdgesIdsAsync")]
-        [ProducesResponseType(typeof(List<Guid>), (int)HttpStatusCode.OK)]
-        [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.NotFound)]
-        [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.BadRequest)]
-        [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.InternalServerError)]
-        public async Task<ActionResult<List<Guid>>> GetFreeEdgesIdsAsync(List<Guid> listofEdgesConnectedtoRobot)
-        {
-            try
-            {
-                if (!listofEdgesConnectedtoRobot.Any())
-                { return BadRequest(new ApiResponse((int)HttpStatusCode.BadRequest, "ERROR: There are no edges connected to the Robot")); }
-
-                List<Guid> edgeFree = await _robotRepository.GetFreeEdgesIdsAsync(listofEdgesConnectedtoRobot);
-                return Ok(edgeFree);
-            }
-            catch (Exception ex)
-            {
-                {
-                    int statusCode = (int)HttpStatusCode.InternalServerError;
-                    _logger.LogError(ex, "An error occurred:");
-                    return StatusCode(statusCode, new ApiResponse(statusCode, $"An error has occurred: {ex.Message}"));
-
-                }
-            }
-
-        }
     }
 }
 

@@ -5,5 +5,6 @@ namespace Middleware.Common.Repositories.Abstract
     public interface IEdgeRepository : IBaseRepository<EdgeModel>
     {
         Task<EdgeModel> PatchEdgeAsync(Guid id, EdgeModel patch);
+        Task<List<Guid>> GetFreeEdgesIdsAsync(List<Guid> listofEdgesConnectedtoRobot);
     }
 }
