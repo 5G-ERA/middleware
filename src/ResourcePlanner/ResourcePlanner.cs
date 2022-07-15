@@ -6,12 +6,15 @@ using Middleware.Common.Enums;
 using Middleware.Common.Models;
 using Middleware.ResourcePlanner.ApiReference;
 
+
 namespace Middleware.ResourcePlanner;
 
 public interface IResourcePlanner
 {
     Task<TaskModel> Plan(TaskModel taskModel);
 }
+
+
 
 public class ResourcePlanner : IResourcePlanner
 {
@@ -32,7 +35,8 @@ public class ResourcePlanner : IResourcePlanner
     {
 
         var redisApiClient = _apiClientBuilder.CreateRedisApiClient();
-        List<Guid> ids = (await redisApiClient.RobotGetConnectedEdgesIdsAsync(Guid.Empty)).ToList();
+        //List<Guid> ids = (await redisApiClient.RobotGetConnectedEdgesIdsAsync(Guid.Empty)).ToList();
+        List<Middleware.ResourcePlanner.RedisInterface.ActivePolicy> activePolicies = (await redisApiClient.PolicyGetActiveAsync()).ToList();
         var orchestratorApiClient = _apiClientBuilder.CreateOrchestratorApiClient();
         // actionPlanner will give resource planner the actionSequence. 
 

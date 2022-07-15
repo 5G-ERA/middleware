@@ -4587,17 +4587,26 @@
             "content": {
               "text/plain": {
                 "schema": {
-                  "$ref": "#/components/schemas/ActivePolicy"
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ActivePolicy"
+                  }
                 }
               },
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ActivePolicy"
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ActivePolicy"
+                  }
                 }
               },
               "text/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ActivePolicy"
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ActivePolicy"
+                  }
                 }
               }
             }

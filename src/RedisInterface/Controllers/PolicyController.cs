@@ -115,7 +115,7 @@ namespace Middleware.RedisInterface.Controllers
 
         [HttpGet]
         [Route("current", Name = "PolicyGetActive")]
-        [ProducesResponseType(typeof(ActivePolicy), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(List<ActivePolicy>), (int)HttpStatusCode.OK)]
         [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.NotFound)]
         [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.InternalServerError)]
         public async Task<ActionResult<List<ActivePolicy>>> GetActivePolicies()
