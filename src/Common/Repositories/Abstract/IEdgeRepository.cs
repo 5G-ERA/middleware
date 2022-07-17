@@ -6,5 +6,6 @@ namespace Middleware.Common.Repositories.Abstract
     {
         Task<EdgeModel> PatchEdgeAsync(Guid id, EdgeModel patch);
         Task<List<Guid>> GetFreeEdgesIdsAsync(List<Guid> listofEdgesConnectedtoRobot);
+        Task<List<Guid>> GetLessBusyEdgesAsync(List<Guid> busyEdgesTocheck);
     }
 }

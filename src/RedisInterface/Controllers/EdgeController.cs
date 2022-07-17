@@ -267,7 +267,7 @@ namespace Middleware.RedisInterface.Controllers
         }
 
         [HttpPost]
-        [Route("free", Name = "GetFreeEdgesIdsAsync")]//edges
+        [Route("free", Name = "GetFreeEdgesIds")]//edges
         [ProducesResponseType(typeof(List<Guid>), (int)HttpStatusCode.OK)]
         [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.NotFound)]
         [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.BadRequest)]
@@ -287,6 +287,38 @@ namespace Middleware.RedisInterface.Controllers
                     return NotFound(new ApiResponse((int)HttpStatusCode.BadRequest, "There are no edges connected to the Robot"));
                 }
                 return Ok(edgeFree);
+            }
+            catch (Exception ex)
+            {
+
+                int statusCode = (int)HttpStatusCode.InternalServerError;
+                _logger.LogError(ex, "An error occurred:");
+                return StatusCode(statusCode, new ApiResponse(statusCode, $"An error has occurred: {ex.Message}"));
+            }
+
+        }
+
+        [HttpPost]
+        [Route("lessBusy", Name = "GetLessBusyEdges")]
+        [ProducesResponseType(typeof(List<Guid>), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.NotFound)]
+        [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.BadRequest)]
+        [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.InternalServerError)]
+        public async Task<ActionResult<List<Guid>>> GetLessBusyEdgesAsync(List<Guid> edgesToCheck)
+        {
+            try
+            {
+                if (!edgesToCheck.Any())
+                {
+                    return BadRequest(new ApiResponse((int)HttpStatusCode.BadRequest, "No Edge ids were provided"));
+                }
+
+                List<Guid> lessBusyEdge = await _edgeRepository.GetLessBusyEdgesAsync(edgesToCheck);
+                if (!lessBusyEdge.Any())
+                {
+                    return NotFound(new ApiResponse((int)HttpStatusCode.BadRequest, "There are no busy edges"));
+                }
+                return Ok(lessBusyEdge);
             }
             catch (Exception ex)
             {
