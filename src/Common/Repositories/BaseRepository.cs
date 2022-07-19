@@ -197,12 +197,26 @@ namespace Middleware.Common.Repositories
         }
 
         /// <inheritdoc/>
-        public virtual async Task<List<RelationModel>> GetRelation(Guid id, string relationName)
+        public virtual async Task<List<RelationModel>> GetRelation(Guid id, string relationName, RelationDirection direction = RelationDirection.Outgoing)
         {
+            string query = "";
             List<RelationModel> relationModels = new List<RelationModel>();
-            relationName = relationName?.ToUpper();
-            string query = "MATCH (x: " + _redisDbIndex.ToString().ToUpper() + " {ID: '" + id +
-                           "' }) MATCH (y) WHERE (x)-[: " + relationName + "]->(y) RETURN x,y";
+
+            if (RelationDirection.Incoming == direction)
+            {
+                
+                relationName = relationName?.ToUpper();
+                query = "MATCH (x) MATCH (y) WHERE (x)-[: " + relationName + "]->(y: " + _redisDbIndex.ToString().ToUpper() + " {ID: '" + id +
+                "' }) RETURN x,y";
+            }     
+            else
+            {
+                relationName = relationName?.ToUpper();
+                query = "MATCH (x: " + _redisDbIndex.ToString().ToUpper() + " {ID: '" + id +
+                               "' }) MATCH (y) WHERE (x)-[: " + relationName + "]->(y) RETURN x,y";
+            }
+            
+
             ResultSet resultSet = await RedisGraph.Query(GraphName, query);
             // BB: 24.03.2022
             // We are using the loop with 2 nested loops to retrieve the values from the graph
@@ -336,6 +350,12 @@ namespace Middleware.Common.Repositories
             graphEntity.Id = Guid.Parse(id.ToString());
             graphEntity.Type = type.ToString();
             graphEntity.Name = name.ToString();
+        }
+
+        public virtual async Task<List<RelationModel>> GetReferencingRelation(Guid id, string relationName)
+        {
+            //HERE
+            throw new NotImplementedException();
         }
     }
 }

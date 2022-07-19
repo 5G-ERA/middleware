@@ -6,12 +6,15 @@ using Middleware.Common.Enums;
 using Middleware.Common.Models;
 using Middleware.ResourcePlanner.ApiReference;
 
+
 namespace Middleware.ResourcePlanner;
 
 public interface IResourcePlanner
 {
     Task<TaskModel> Plan(TaskModel taskModel);
 }
+
+
 
 public class ResourcePlanner : IResourcePlanner
 {
@@ -28,11 +31,41 @@ public class ResourcePlanner : IResourcePlanner
         _logger = logger;
     }
 
+    private async Task<ActionModel> InferResource (ActionModel actionParam)
+    {
+        var redisApiClient = _apiClientBuilder.CreateRedisApiClient();
+        List<Middleware.ResourcePlanner.RedisInterface.ActivePolicy> activePolicies = (await redisApiClient.PolicyGetActiveAsync()).ToList();
+        Dictionary<Guid, List<Guid>> tempDic = new Dictionary<Guid, List<Guid>>();//Diccionary of Key policy ID, values List of results after query
+
+        foreach (RedisInterface.ActivePolicy policy in activePolicies)
+        {
+            if (policy == null)
+            {
+                throw new Exception("Index policy is empty"); //This should never happend
+            }
+            if (policy.PolicyName == "AllContainersInClosestMachine")
+            {
+                List<Guid> connectedEdges = (await redisApiClient.RobotGetConnectedEdgesIdsAsync(Guid.Empty)).ToList();
+                List<Guid> freeEdges = (await redisApiClient.GetFreeEdgesIdsAsync(connectedEdges)).ToList();
+                if (freeEdges.Count()==0)
+                {
+                    //if all of them are busy, check which one is less busy
+                    List<Guid> lessBusyEdges = (await redisApiClient.GetLessBusyEdgesAsync(connectedEdges)).ToList();
+                    tempDic.Add(policy.Id, lessBusyEdges);
+                    
+                }
+                
+            }
+           
+          
+        }
+
+        return actionParam;
+    }
+
     public async Task<TaskModel> Plan(TaskModel taskModel)
     {
-
         var redisApiClient = _apiClientBuilder.CreateRedisApiClient();
-        //List<Guid> ids = (await redisApiClient.RobotGetConnectedEdgesIdsAsync(Guid.Empty)).ToList();
         var orchestratorApiClient = _apiClientBuilder.CreateOrchestratorApiClient();
         // actionPlanner will give resource planner the actionSequence. 
 
