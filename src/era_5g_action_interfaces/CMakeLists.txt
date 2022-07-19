@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.5)
-project(action_tutorials_interfaces)
+project(era_5g_action_interfaces)
 
 # Default to C99
 if(NOT CMAKE_C_STANDARD)
@@ -34,7 +34,7 @@ endif()
 find_package(rosidl_default_generators REQUIRED)
 
 rosidl_generate_interfaces(${PROJECT_NAME}
-	  "action/Fibonacci.action"
+	  "action/Goal5g.action"
 	  )
 
 ament_package()
