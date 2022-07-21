@@ -11,7 +11,7 @@ RUN apt-get update \
         && sudo apt-get update \
         && sudo apt-get install python3-pip -y \
         && mkdir -p home/dev_ws/src
-COPY action_tutorials_interfaces /home/dev_ws/src
+COPY action_interfaces_5g /home/dev_ws/src
 COPY middleware-actionserver-main /home/dev_ws/src
 COPY middleware-actionClient-main /home/dev_ws/src
 COPY Python_Interface_StandAlone /home/dev_ws/src
@@ -23,7 +23,7 @@ RUN source /opt/ros/foxy/setup.bash && colcon build --symlink-install
 
 #COPY middleware-actionserver-main /home/dev_ws/src
 
-#COPY action_tutorials_interfaces /home/dev_ws/src
+#COPY action_interfaces_5g /home/dev_ws/src
 RUN . /opt/ros/${ROS_DISTRO}/setup.sh
 #RUN colcon build
 

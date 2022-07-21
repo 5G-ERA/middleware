@@ -3,7 +3,7 @@ import rclpy
 from rclpy.node import Node
 # ActionServer library for ROS 2 Python
 from rclpy.action import ActionClient
-from action_tutorials_interfaces.action import Fibonacci
+from era_5g_action_interfaces.action import Goal5g
 import time
 
 taskId = "11071d4d-d1ae-4e55-8de2-e562c6078277" #Example of task that the robot wants to execute - make sure the taskid is in redis.
@@ -12,13 +12,13 @@ actionSequence = []
 global resourceStatus
 resourceStatus = ''
 
-class ActionClient5G(Node):
+class ActionClientNode(Node):
     def __init__(self):
-        super().__init__('actionClient')  # Defines class of type ActionServer5G and inherits from subclass Node
-        self._action_client  = ActionClient(self, Fibonacci, 'fibonacci')  # instantiate a new action server
+        super().__init__('actionClient')  # Defines class of type ActionClientNode and inherits from subclass Node
+        self._action_client  = ActionClient(self, Goal5g, 'goal_5g')  # instantiate a new action server
 
     def send_goal(self, order,ref): # send an action goal message 'canlelation request' / success remove resources
-        goal_msg = Fibonacci.Goal()
+        goal_msg = Goal5g.Goal()
         goal_msg.goal_taskid = order #task id
         goal_msg.action_reference = ref # Action reference
         self.get_logger().info("Waiting for action server")
@@ -68,7 +68,7 @@ def main(args=None):
     global resourceStatus #can be accesed fron here
 
 
-    actionClient = ActionClient5G()
+    actionClient = ActionClientNode()
 
     future = actionClient.send_goal(taskId,0) #send an action goal
 
