@@ -32,7 +32,7 @@ public class RefreshMiddlewareAddressJob : BaseJob<RefreshMiddlewareAddressJob>
 
     private async Task<V1Service> GetGateway(IKubernetes kubeClient)
     {
-        var services = await kubeClient.ListNamespacedServiceAsync(AppConfig.K8SNamespaceName, labelSelector: "app=gateway");
+        var services = await kubeClient.CoreV1.ListNamespacedServiceAsync(AppConfig.K8SNamespaceName, labelSelector: "app=gateway");
         return services.Items.SingleOrDefault();
     }
 }
