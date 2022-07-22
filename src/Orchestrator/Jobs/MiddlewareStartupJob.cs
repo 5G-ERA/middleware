@@ -45,16 +45,16 @@ namespace Middleware.Orchestrator.Jobs
         /// <returns></returns>
         private async Task InstantiateMiddleware(IKubernetes kubeClient)
         {
-            var namespaces = await kubeClient.CoreV1.ListNamespaceAsync();
+            //var namespaces = await kubeClient.CoreV1.ListNamespaceAsync();
 
-            var exists = namespaces.Items.Any(n => n.Name() == AppConfig.K8SNamespaceName);
+            //var exists = namespaces.Items.Any(n => n.Name() == AppConfig.K8SNamespaceName);
 
-            if (exists == false)
-            {
-                Logger.LogError("Middleware has not been deployed in the correct namespace. Correct namespace is {namespace}", AppConfig.K8SNamespaceName);
-                return;
+            //if (exists == false)
+            //{
+            //    Logger.LogError("Middleware has not been deployed in the correct namespace. Correct namespace is {namespace}", AppConfig.K8SNamespaceName);
+            //    return;
 
-            }
+            //}
             var success = true;
             bool shouldDryRun = AppConfig.IsDevEnvironment();
             try
