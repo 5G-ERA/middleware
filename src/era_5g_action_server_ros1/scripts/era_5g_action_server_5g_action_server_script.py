@@ -6,6 +6,10 @@ import actionlib
 from era_5g_action_client_ros1.msg import *
 from era_5g_action_client_ros1.msg import goal_5gActionGoal
 
+from actionlib_msgs.msg import *
+from actionlib import ActionServer
+from actionlib.server_goal_handle import ServerGoalHandle
+
 import requests
 from requests.exceptions import HTTPError
 import time
@@ -32,12 +36,20 @@ RESOURCE_STATUS_OCELOT = ''
 ID = '97f4059f-acfa-48f9-b22c-165ecbc51ed1'
 ACTION_PLAN_ID = ''
 PASSWORD = '5g-era'
-K8IP = '10.64.140.43'
+K8IP = '10.64.140.43' # Change to the middleware deployed IP
 
 class ActionServerNode():
     def __init__(self):
-        self.a_server = actionlib.SimpleActionServer("goal_5g", goal_5gAction, execute_cb=self.execute_cb, auto_start=False)
+        # Create an instance of simpleActionServer
+        self.a_server = actionlib.SimpleActionServer("goal_5g", goal_5gAction, execute_cb=self.execute_cb,auto_start=False)
+        # Set the callback to be executed when a goal is received
+        self.a_server.register_goal_callback(self.goal_callback)
+        # Set the callback that should be executed when a preempt request is received
+        self.action_server.register_preempt_callback(self.preempt_callback)
+        # Start the server
+        rospy.loginfo("Starting 5g-era-action-server...")
         self.a_server.start()
+
 
         global K8IP
         global LOGIN_OCELOT
@@ -46,7 +58,7 @@ class ActionServerNode():
 
         LOGIN_OCELOT = "http://"+str(K8IP)+"/Login"
         PLAN_OCELOT = "http://"+str(K8IP)+"/Task/Plan"
-        RESOURCE_STATUS_OCELOT = "http://" + \str(K8IP)+"/orchestrate/orchestrate/plan/"
+        RESOURCE_STATUS_OCELOT = "http://" + str(K8IP)+"/orchestrate/orchestrate/plan/"
 
 
     def destroy(self):
@@ -108,8 +120,8 @@ class ActionServerNode():
             for x in range(0, number_steps):  # Iterate over all the actions within the action sequence and get their ids.
                 Action_SequenceFullData = Action_Sequence_Data[x]
                 ActionSequenceIdsList.append(Action_SequenceFullData['Id'])
-                                                                                                         return ActionSequenceIdsList  # Return a list of the actions ids.
-                                                                                                        except HTTPError as e:
+            return ActionSequenceIdsList
+         except HTTPError as e:
             rospy.loginfo(e.response.status_code)
             return 'Error, could not get the number list of action ids, revisit the log files for more details.'
 
@@ -145,47 +157,46 @@ class ActionServerNode():
         pass
 
 # This function will decide if a goal is accepted or rejected.
-    def goal_callback(self, goal_handle):
+    def goal_callback(self):
 
-        self.get_logger().info("RECEIVED GOAL REQUEST - Trying to process request")
+        rospy.loginfo("RECEIVED GOAL REQUEST - Trying to process request")
         global TOKEN
         global ACTION_PLAN_ID
         global PLAN
         global ID
 
         index = goal_handle.action_reference
-        self.get_logger().info('Feedback: {0}'.format("index: "+str(index)))
+        rospy.loginfo('Feedback: {0}'.format("index: "+str(index)))
 
-        if (index != 0) and (len(PLAN) != 0):  # received update for the task
-            return GoalResponse.ACCEPT
+        if (index != 0) and (len(PLAN) != 0):
+            self.a_server.accept_new_goal()
 
         # Login to gateway function
         newToken = self.gateway_login(ID, PASSWORD)
         TOKEN = newToken
 
         if 'Error' in newToken:
-            self.get_logger().info('Feedback: {0}'.format(
+            rospy.loginfo('Feedback: {0}'.format(
                 "Error, could not login to gateway, revisit the log files for more details."))  # Update feedback disply in command line
-            return GoalResponse.REJECT
+            self.a_server.set_aborted()
         else:
-            self.get_logger().info('Feedback: {0}'.format(
+            rospy.loginfo('Feedback: {0}'.format(
                 "Login successful, token received"))
-            PLAN, ActionPlanId = self.gateway_get_plan(newToken, goal_handle.goal_taskid,
-                                                       PLAN_OCELOT)  # Get the plan by sending the token and TaskId
+            PLAN, ActionPlanId = self.gateway_get_plan(newToken, goal_handle.goal_taskid,PLAN_OCELOT)  # Get the plan by sending the token and TaskId
 
             ACTION_PLAN_ID = ActionPlanId  # Update the global variable actionPlanId
-            self.get_logger().info("ActionPlanId is: " + ACTION_PLAN_ID)
+            rospy.loginfo("ActionPlanId is: " + ACTION_PLAN_ID)
             if 'Error' in PLAN:
-                self.get_logger().info(
+                rospy.loginfo(
                     'Feedback: {0}'.format("Error, could not get the plan, revisit the log files for more details."))
-                return GoalResponse.REJECT
+                self.a_server.set_aborted()
             else:
-                self.get_logger().info('Feedback: {0}'.format(
+                rospy.loginfo('Feedback: {0}'.format(
                     "Got new plan successfully."))
-                return GoalResponse.ACCEPT
+                self.a_server.accept_new_goal()
 
     # Will execute the goal if it was accepted by the register_goal_callback function.
-    def execute_callback(self, goal_handle: ServerGoalHandle):
+    def execute_cb(self, goal):
         global FirstActionId
 
         global TOKEN
@@ -194,85 +205,82 @@ class ActionServerNode():
         global ID
         global PLAN
 
-        SubactionRef = goal_handle.request.action_reference
-        feedback_msg = Goal5g.Feedback()  # create action instance feedback
+        SubactionRef = goal.request.action_reference
+        feedback_msg = goal_5gFeedback.Feedback()  # create action instance feedback
 
-        self.get_logger().info('SubactionRef '+str(SubactionRef))
-        self.get_logger().info('SubactionRef '+str(type(SubactionRef)))
+        rospy.loginfo('SubactionRef '+str(SubactionRef))
+        rospy.loginfo('SubactionRef '+str(type(SubactionRef)))
         if SubactionRef == 0:  # This is a completely new action.
             FirstActionId = SubactionRef
-            self.get_logger().info('Executing New action goal... ')
+            rospy.loginfo('Executing New action goal... ')
 
             actionSequenceIds = self.gateway_get_actionSequenceIds(PLAN)
-            self.get_logger().info("ActionSequenceIds: " + str(actionSequenceIds))
+            rospy.loginfo("ActionSequenceIds: " + str(actionSequenceIds))
             feedback_msg.action_sequence = actionSequenceIds
             feedback_msg.feedback_resources_status = ''
-            goal_handle.publish_feedback(feedback_msg)  # Publish the feedback
-            self.get_logger().info("Publishing first feedback")
-            self.get_logger().info("goal handle: " + str(goal_handle))
+
+            self.a_server.publish_feedback(feedback_msg)  # Publish the feedback
+
+            rospy.loginfo("Publishing first feedback")
+            rospy.loginfo("goal handle: " + str(goal_handle))
 
             # goal_handle.succeed()
             # result.success = True
 
-            while goal_handle.is_active:
+            while self.a_server.is_active:
 
-                self.get_logger().info("Processing goal")
+                rospy.loginfo("Processing goal")
 
-                if not goal_handle.is_active:
+                if not self.a_server.is_active:
                     #  result = goal_5g.Result()
-                    self.get_logger().info('Goal aborted')
+                    rospy.loginfo('Goal aborted')
                     # result = 'Goal aborted'
                     # return goal_5g.Result
 
-                if goal_handle.is_cancel_requested:
-                    # result = goal_5g.Result()
-                    # result = 'Goal canceled'
-                    goal_handle.canceled()
-                    self.get_logger().info('Goal canceled')
-                #      goal_handle.canceled()
-                # return goal_5g.Result()
 
-                self.get_logger().info("Looping query reosurce update")
+                rospy.loginfo("Looping query reosurce update")
                 time.sleep(1)
-                feedback_msg.feedback_resources_status = self.getResourceStatus(ACTION_PLAN_ID,
-                                                                                TOKEN)  # Not sure this will work. May need another timer approach.
+                feedback_msg.feedback_resources_status = self.getResourceStatus(ACTION_PLAN_ID,TOKEN)  # Not sure this will work. May need another timer approach.
                 actionSequenceIds = self.gateway_get_actionSequenceIds(PLAN)
-                goal_handle.publish_feedback(
+                self.a_server.publish_feedback(
                     feedback_msg)  # Publish the feedback
                 time.sleep(1)
 
         elif SubactionRef == -1:  # if received -1 as second parameter to the action goal, goal was succesful
 
-            self.get_logger().info('Removing resources')
+            rospy.loginfo('Removing resources')
             self.deleteAllResources(TOKEN, ACTION_PLAN_ID)
             resultObject = Goal5g.Result()
             resultObject.result = "Finished"
-            goal_handle.succeed()
+            self.a_server.succeed()
 
         else:  # This is a subaction - check
-            self.get_logger().info("Subaction")
+            rospy.loginfo("Subaction")
 
             while goal_handle.is_active:
-                self.get_logger().info("Looping query reosurce update")
+                rospy.loginfo("Looping query reosurce update")
                 time.sleep(1)
-                feedback_msg.feedback_resources_status = self.getResourceStatus(ACTION_PLAN_ID,
-                                                                                TOKEN)  # Not sure this will work. May need another timer approach.
+                feedback_msg.feedback_resources_status = self.getResourceStatus(ACTION_PLAN_ID,TOKEN)  # Not sure this will work. May need another timer approach.
                 actionSequenceIds = self.gateway_get_actionSequenceIds(PLAN)
-                goal_handle.publish_feedback(
+                self.a_server.publish_feedback(
                     feedback_msg)  # Publish the feedback
                 time.sleep(1)
 
-    # function to be triggered once a goal is canceled by client side.
-    def cancel_callback(self, cancel_callback):
+
+    def preempt_callback(self):
+        """
+            Callback executed when a preempt request has been received. --> cancel the goal.
+        """
+        rospy.loginfo("Action preempted - canceling")
         global ACTION_PLAN_ID
         global TOKEN
         # It will delete all the resources.
         self.deleteAllResources(TOKEN, ACTION_PLAN_ID)
-        return CancelResponse.ACCEPT
+        self.action_server.set_preempted()
 
 def main(args=None):
     rospy.init_node("action_server")
-    actionServerObj = ActionServerNode():
+    actionServerObj = ActionServerNode()
     s = actionServerObj.ActionServer()
     rospy.spin()
 
