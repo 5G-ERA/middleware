@@ -1,0 +1,33 @@
+---
+version: '3.7'
+
+networks:
+    ros:
+        driver: bridge
+	middleware-proxy:
+       external:
+          name: middleware_network
+
+
+
+services:
+    ros-master:
+        image: ros:melodic-ros-core
+        command: stdbuf -o L roscore
+        ports:
+            - 11311:11311
+        networks:
+            - ros
+            - middleware-proxy
+    ros1:
+        build: ros1
+
+        command: "rosrun rospy_tutorials talker"
+
+        environment:
+            - "ROS_MASTER_URI=http://ros-master:11311"
+        networks:
+            - ros
+            - middleware-proxy
+        depends_on:
+            - ros-master
