@@ -197,6 +197,7 @@ class ActionServerNode():
 
     # Will execute the goal if it was accepted by the register_goal_callback function.
     def execute_cb(self, goal):
+        goal_callback()
         global FirstActionId
 
         global TOKEN
