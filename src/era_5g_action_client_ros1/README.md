@@ -30,5 +30,5 @@ goal_id:
     nsecs: 0
   id: ''
 goal:
-  goal_taskid: ''
+  goal_taskid: 'c2a99272-8e84-4ae6-8c3d-1951d0985cdf'
   action_reference: 0" 
