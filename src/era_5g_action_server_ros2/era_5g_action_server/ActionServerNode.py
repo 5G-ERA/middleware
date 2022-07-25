@@ -27,7 +27,7 @@ from rclpy.action import *
 
 from rclpy.action.server import ServerGoalHandle
 
-from era_5g_action_interfaces.action import Goal5g
+from era_5g_action_interfaces_ros2.action import Goal5g
 import threading
 from rclpy.callback_groups import ReentrantCallbackGroup
 from rclpy.executors import MultiThreadedExecutor
