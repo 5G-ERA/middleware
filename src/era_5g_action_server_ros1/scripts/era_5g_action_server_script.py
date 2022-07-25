@@ -99,7 +99,7 @@ class ActionServerNode():
             rospy.loginfo(e.response.status_code)
             return 'Error, could not get the plan, revisit the log files for more details.'
 
-    def gateway_get_number_steps_in_plan(self,newToken: str, taskid) -> int:
+    def gateway_get_number_steps_in_plan(self,newToken, taskid):
         try:
             hed = {'Authorization': 'Bearer ' + str(newToken)}
             data = {"TaskId": taskid}
@@ -111,7 +111,7 @@ class ActionServerNode():
             rospy.loginfo(e.response.status_code)
             return 'Error, could not get the number of steps, revisit the log files for more details.'
 
-    def gateway_get_actionSequenceIds(self, plan: dict) -> List:
+    def gateway_get_actionSequenceIds(self, plan):
          try:
             rospy.loginfo("type "+str(type(plan)))
             Action_Sequence_Data = plan['ActionSequence']
