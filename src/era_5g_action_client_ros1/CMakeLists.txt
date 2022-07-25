@@ -4,16 +4,10 @@ project(era_5g_action_client_ros1)
 find_package(catkin REQUIRED COMPONENTS
   actionlib_msgs
   std_msgs
-  message_generation
+  
 )
 
 
-## Generate actions in the 'action' folder
- add_action_files(
-   FILES
-   goal_5g.action
-#   Action2.action
- )
 
 ## Generate added messages and services with any dependencies listed here
 generate_messages(
@@ -26,7 +20,7 @@ generate_messages(
 catkin_package(
 #  INCLUDE_DIRS include
 #  LIBRARIES 5g-era-actionClient-ros1
-  CATKIN_DEPENDS actionlib_msgs std_msgs message_runtime
+  CATKIN_DEPENDS actionlib_msgs std_msgs 
 #  DEPENDS system_lib
 )
 
