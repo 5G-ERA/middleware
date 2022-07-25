@@ -278,9 +278,9 @@ class ActionServerNode():
         self.deleteAllResources(TOKEN, ACTION_PLAN_ID)
         self.action_server.set_preempted()
 
-def main(args=None):
+if __name__ = "__main__":
+    rospy.loginfo("Starting 5g-era-action-server")
     rospy.init_node("action_server")
     actionServerObj = ActionServerNode()
-    s = actionServerObj.ActionServer()
     rospy.spin()
 
