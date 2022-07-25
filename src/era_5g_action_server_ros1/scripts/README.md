@@ -1,4 +1,4 @@
-## Launch the action client:
+## Launch the action server:
 
 * From the ROS workspace /home/dev_ws source the directory.
 
