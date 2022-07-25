@@ -5,7 +5,7 @@ import rclpy
 from rclpy.node import Node
 # ActionServer library for ROS 2 Python
 from rclpy.action import ActionClient
-from era_5g_action_interfaces.action import Goal5g
+from era_5g_action_interfaces_ros2.action import Goal5g
 import time
 
 taskId = "11071d4d-d1ae-4e55-8de2-e562c6078277" #Example of task that the robot wants to execute - make sure the taskid is in redis.
