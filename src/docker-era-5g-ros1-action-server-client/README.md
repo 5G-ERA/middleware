@@ -2,9 +2,10 @@
 
 
 ## 
-This document assumes working with Summit XL, which is a robot which up to the current date
-only supports by default native ROS 1. To include the 5G ERA Action server, a container running
-ROS 2 Foxy with the Action Server will be used. Additionally, a container with ROS 1 Melodic
-will be launched  with a version of ROS 1 Action Client. 
-Therefore, by sending a action goal message via ROS 1 Action client, ROS2 action server in the
-other container, will recieve the action and act accordingly. 
+This document assumes working with Summit XL, a robot which up to the current day
+only supports by default native ROS 1. To include the 5G ERA Action server, client and ROS 2 NetApp,
+the inclusion of the ROS bridge and a complete ROS 1 implementation of 5g-era action server and client is available here.
+
+docker-compose -f docker-compose-action-client-ros1.yml up
+
+docker-compose -f docker-compose-action-server-ros1.yml up
