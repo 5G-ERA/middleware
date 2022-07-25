@@ -14,7 +14,7 @@ RUN apt-get update \
         && cp -r /middleware/src/era_5g_action_interfaces/ /home/dev_ws/src/ \
         && sudo apt update \
         && sudo apt install -y python3-pip \
-        && sudo pip install requests
+        && sudo pip3 install requests
 
 
         #&& . /opt/ros/melodic/setup.bash
