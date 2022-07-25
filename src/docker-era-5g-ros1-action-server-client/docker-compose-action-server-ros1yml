@@ -1,10 +1,10 @@
 ---
-version: '3.7'
+version: '3.3'
 
 networks:
     ros:
         driver: bridge
-	middleware-proxy:
+    middleware-proxy:
        external:
           name: middleware_network
 
