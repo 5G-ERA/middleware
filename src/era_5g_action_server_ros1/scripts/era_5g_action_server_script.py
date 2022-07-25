@@ -43,9 +43,9 @@ class ActionServerNode():
         # Create an instance of simpleActionServer
         self.a_server = actionlib.SimpleActionServer("goal_5g", goal_5gAction, execute_cb=self.execute_cb,auto_start=False)
         # Set the callback to be executed when a goal is received
-        self.a_server.register_goal_callback(self.goal_callback)
+        # self.a_server.register_goal_callback(self.goal_callback)
         # Set the callback that should be executed when a preempt request is received
-        self.action_server.register_preempt_callback(self.preempt_callback)
+        self.a_server.register_preempt_callback(self.preempt_callback)
         # Start the server
         rospy.loginfo("Starting 5g-era-action-server...")
         self.a_server.start()
