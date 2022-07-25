@@ -3,8 +3,9 @@
 import rospy
 import actionlib
 
-from era_5g_action_client_ros1.msg import *
-from era_5g_action_client_ros1.msg import goal_5gActionGoal
+from era_5g_action_interfaces_ros1.msg import *
+from era_5g_action_interfaces_ros1.msg import goal_5gActionGoal
+
 
 from actionlib_msgs.msg import *
 from actionlib import ActionServer
