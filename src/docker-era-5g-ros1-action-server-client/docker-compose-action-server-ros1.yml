@@ -22,7 +22,7 @@ services:
     ros1:
         build: ros1
 
-        command: "rosrun rospy_tutorials talker"
+        command: bash -c "chmod +777 /home/dev_ws/src/era_5g_action_client_ros1/scripts/era_5g_action_client_script.py && chmod +777 /home/dev_ws/src/era_5g_action_server_ros1/scripts/era_5g_action_server_script.py && source /opt/ros/melodic/setup.bash && cd /home/dev_ws/ && catkin_make && source devel/setup.bash &&  rosrun era_5g_action_server_ros1 era_5g_action_server_script.py"
 
         environment:
             - "ROS_MASTER_URI=http://ros-master:11311"
