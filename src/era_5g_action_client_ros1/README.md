@@ -12,11 +12,13 @@ source /devel/setup.bash
 chmod +x era_5g_action_client_script.py 
 ```
 
+```shell
+rosrun era_5g_action_server_ros1 era_5g_action_server_script.py 
+```
+
 ## Command line only action publisher:
 
 Run first the action server 
-
-rosrun era_5g_action_server_ros1 era_5g_action_server_script.py 
 
 In another terminal, run:
 
