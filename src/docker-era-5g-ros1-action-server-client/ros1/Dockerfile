@@ -13,10 +13,12 @@ RUN apt-get update \
         && cp -r /middleware/src/era_5g_action_server_ros1/ /home/dev_ws/src/ \
         && cp -r /middleware/src/era_5g_action_interfaces_ros1/ /home/dev_ws/src/ \
         && sudo apt update \
-        && sudo apt install -y python3-pip \
-        && sudo apt install python-pip \
-        && pip install requests \
-        && sudo pip3 install requests
+        #&& sudo apt install -y python3-pip \
+        && sudo apt install python-pip -y \
+        # sudo apt install -y python-pip 
+        && pip install requests
+        #&& sudo pip3 install requests --quiet
+
 
 
         #&& . /opt/ros/melodic/setup.bash
