@@ -5,7 +5,7 @@ import actionlib
 
 from era_5g_action_interfaces_ros1.msg import *
 from era_5g_action_interfaces_ros1.msg import goal_5gActionGoal
-
+from era_5g_action_interfaces_ros1.msg import goal_5gFeedback
 
 from actionlib_msgs.msg import *
 from actionlib import ActionServer
@@ -44,7 +44,7 @@ class ActionServerNode():
         # Create an instance of simpleActionServer
         self.a_server = actionlib.SimpleActionServer("goal_5g", goal_5gAction, execute_cb=self.execute_cb,auto_start=False)
         # Set the callback to be executed when a goal is received
-        # self.a_server.register_goal_callback(self.goal_callback)
+        #self.a_server.register_goal_callback(self.goal_callback)
         # Set the callback that should be executed when a preempt request is received
         self.a_server.register_preempt_callback(self.preempt_callback)
         # Start the server
@@ -81,7 +81,7 @@ class ActionServerNode():
             rospy.loginfo(e.response.status_code)
             return 'Error, could not login to gateway, revisit the log files for more details.'
 
-
+        
     def gateway_get_plan(self,newToken,taskid,PLAN_OCELOT):
         # Request plan
         try:
@@ -156,9 +156,9 @@ class ActionServerNode():
         rospy.loginfo('Middleware log out succesful ')
         #TODO
         pass
-
+    
 # This function will decide if a goal is accepted or rejected.
-    def goal_callback(self):
+    def goal_callback(self,goal_param):
 
         rospy.loginfo("RECEIVED GOAL REQUEST - Trying to process request")
         global TOKEN
@@ -166,11 +166,12 @@ class ActionServerNode():
         global PLAN
         global ID
 
-        index = goal_handle.action_reference
+        index = goal_param.action_reference
         rospy.loginfo('Feedback: {0}'.format("index: "+str(index)))
 
         if (index != 0) and (len(PLAN) != 0):
-            self.a_server.accept_new_goal()
+
+           pass
 
         # Login to gateway function
         newToken = self.gateway_login(ID, PASSWORD)
@@ -183,7 +184,7 @@ class ActionServerNode():
         else:
             rospy.loginfo('Feedback: {0}'.format(
                 "Login successful, token received"))
-            PLAN, ActionPlanId = self.gateway_get_plan(newToken, goal_handle.goal_taskid,PLAN_OCELOT)  # Get the plan by sending the token and TaskId
+            PLAN, ActionPlanId = self.gateway_get_plan(newToken, goal_param.goal_taskid,PLAN_OCELOT)  # Get the plan by sending the token and TaskId
 
             ACTION_PLAN_ID = ActionPlanId  # Update the global variable actionPlanId
             rospy.loginfo("ActionPlanId is: " + ACTION_PLAN_ID)
@@ -194,11 +195,11 @@ class ActionServerNode():
             else:
                 rospy.loginfo('Feedback: {0}'.format(
                     "Got new plan successfully."))
-                self.a_server.accept_new_goal()
+               # self.a_server.accept_new_goal()
 
     # Will execute the goal if it was accepted by the register_goal_callback function.
     def execute_cb(self, goal):
-        goal_callback()
+        self.goal_callback(goal)
         global FirstActionId
 
         global TOKEN
@@ -207,8 +208,8 @@ class ActionServerNode():
         global ID
         global PLAN
 
-        SubactionRef = goal.request.action_reference
-        feedback_msg = goal_5gFeedback.Feedback()  # create action instance feedback
+        SubactionRef = goal.action_reference
+        feedback_msg = goal_5gFeedback() # create action instance feedback
 
         rospy.loginfo('SubactionRef '+str(SubactionRef))
         rospy.loginfo('SubactionRef '+str(type(SubactionRef)))
@@ -224,11 +225,10 @@ class ActionServerNode():
             self.a_server.publish_feedback(feedback_msg)  # Publish the feedback
 
             rospy.loginfo("Publishing first feedback")
-            rospy.loginfo("goal handle: " + str(goal_handle))
+            #rospy.loginfo("goal handle: " + str(goal_handle))
 
             # goal_handle.succeed()
             # result.success = True
-
             while self.a_server.is_active:
 
                 rospy.loginfo("Processing goal")
@@ -267,8 +267,7 @@ class ActionServerNode():
                 self.a_server.publish_feedback(
                     feedback_msg)  # Publish the feedback
                 time.sleep(1)
-
-
+                
     def preempt_callback(self):
         """
             Callback executed when a preempt request has been received. --> cancel the goal.
@@ -280,9 +279,10 @@ class ActionServerNode():
         self.deleteAllResources(TOKEN, ACTION_PLAN_ID)
         self.action_server.set_preempted()
 
-if __name__ = "__main__":
-    rospy.loginfo("Starting 5g-era-action-server")
+if __name__ == '__main__':
+    rospy.loginfo('Running 5g-era-action-server...')
     rospy.init_node("action_server")
     actionServerObj = ActionServerNode()
+
     rospy.spin()
 
