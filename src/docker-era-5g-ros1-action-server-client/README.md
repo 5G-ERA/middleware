@@ -9,3 +9,10 @@ the inclusion of the ROS bridge and a complete ROS 1 implementation of 5g-era ac
 docker-compose -f docker-compose-action-client-ros1.yml up
 
 docker-compose -f docker-compose-action-server-ros1.yml up
+
+## rebuild the image from ROS1 directory:
+docker build -f Dockerfile .
+
+## Remove specific docker image
+
+docker image rm docker_image_name
