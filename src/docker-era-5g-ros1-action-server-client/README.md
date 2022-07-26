@@ -11,6 +11,7 @@ docker-compose -f docker-compose-action-client-ros1.yml up
 docker-compose -f docker-compose-action-server-ros1.yml up
 
 =====================================================================
+
 Stopping the containers from the directory where the compose.yml are located:
 
 docker-compose -f docker-compose-action-client-ros1.yml down
