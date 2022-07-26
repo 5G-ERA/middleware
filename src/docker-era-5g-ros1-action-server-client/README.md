@@ -6,7 +6,10 @@ This document assumes working with Summit XL, a robot which up to the current da
 only supports by default native ROS 1. To include the 5G ERA Action server, client and ROS 2 NetApp,
 the inclusion of the ROS bridge and a complete ROS 1 implementation of 5g-era action server and client is available here.
 
+```shell
 docker-compose -f docker-compose-action-client-ros1.yml up
+```
+
 
 docker-compose -f docker-compose-action-server-ros1.yml up
 
