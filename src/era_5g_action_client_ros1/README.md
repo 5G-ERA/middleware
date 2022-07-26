@@ -12,6 +12,8 @@ source /devel/setup.bash
 chmod +x era_5g_action_client_script.py 
 ```
 
+Run the python script ros node
+
 ```shell
 rosrun era_5g_action_server_ros1 era_5g_action_server_script.py 
 ```
