@@ -9,7 +9,9 @@ RUN apt-get update \
         && git clone --branch Development https://github.com/5G-ERA/middleware \
         && mkdir -p /home/dev_ws/src/ \
         && cd /home/dev_ws/src \
- 		  && cp -r /middleware/src/era_5g_action_client_ros1/ /home/dev_ws/src/ \
+        #&& source /opt/ros/melodic/setup.bash  \
+        #&& catkin_init_workspace  \
+        && cp -r /middleware/src/era_5g_action_client_ros1/ /home/dev_ws/src/ \
         && cp -r /middleware/src/era_5g_action_server_ros1/ /home/dev_ws/src/ \
         && cp -r /middleware/src/era_5g_action_interfaces_ros1/ /home/dev_ws/src/ \
         && sudo apt update \
@@ -17,14 +19,19 @@ RUN apt-get update \
         && sudo apt install python-pip -y \
         # sudo apt install -y python-pip 
         && pip install requests
+        #&& chmod +777 /home/dev_ws/src/era_5g_action_client_ros1/scripts/era_5g_action_client_script.py \
+        #&& chmod +777 /home/dev_ws/src/era_5g_action_server_ros1/scripts/era_5g_action_server_script.py 
+
         #&& sudo pip3 install requests --quiet
 
 
-
         #&& . /opt/ros/melodic/setup.bash
-        #&& cd /home/dev_ws/src \
-        #&& catkin_init_workspace
-RUN bash -c "cd /home/dev_ws/src && source /opt/ros/melodic/setup.bash && catkin_init_workspace"
+
+
+RUN bash -c "chmod +777 /home/dev_ws/src/era_5g_action_client_ros1/scripts/era_5g_action_client_script.py"
+RUN bash -c "chmod +777 /home/dev_ws/src/era_5g_action_server_ros1/scripts/era_5g_action_server_script.py"
+
+RUN bash -c "source /opt/ros/melodic/setup.bash && cd /home/dev_ws/ && catkin_make && source devel/setup.bash"
 
 #RUN bash -c "cp -r /middleware/src/middleware-actionClient-main /home/dev_ws/src/"
 
