@@ -114,13 +114,15 @@ class ActionServerNode():
 
     def gateway_get_actionSequenceIds(self, plan):
          try:
-            rospy.loginfo("type "+str("Getting action sequence..."))
+            rospy.loginfo("API: "+str("Getting action sequence..."))
             Action_Sequence_Data = plan['ActionSequence']
             number_steps = len(Action_Sequence_Data)
             ActionSequenceIdsList = []
             for x in range(0, number_steps):  # Iterate over all the actions within the action sequence and get their ids.
                 Action_SequenceFullData = Action_Sequence_Data[x]
                 ActionSequenceIdsList.append(Action_SequenceFullData['Id'])
+            
+            rospy.loginfo("API data returned: "+str(ActionSequenceIdsList))
             return ActionSequenceIdsList
          except HTTPError as e:
             rospy.loginfo(e.response.status_code)
