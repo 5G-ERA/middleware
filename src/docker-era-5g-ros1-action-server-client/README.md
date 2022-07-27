@@ -43,6 +43,8 @@ docker image rm docker_image_name
 
 ## Verification of process:
 Please check if middleware is correctly deployed:
+
+Expected output if fore all pods to be in Status Running and Ready 1/1.
 ```shell
 kubectl get all -n middleware  
 ```
