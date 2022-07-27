@@ -40,3 +40,10 @@ docker build -f Dockerfile .
 ```shell
 docker image rm docker_image_name
 ```
+
+## Common errors:
+
+```shell
+Creating network "dockerera5gros1actionserverclient_ros" with driver "bridge"
+ERROR: Network middleware_network declared as external, but could not be found. Please create the network manually using `docker network create middleware_network` and try again.
+```
