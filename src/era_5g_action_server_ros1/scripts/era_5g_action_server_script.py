@@ -114,7 +114,7 @@ class ActionServerNode():
 
     def gateway_get_actionSequenceIds(self, plan):
          try:
-            rospy.loginfo("type "+str(type(plan)))
+            rospy.loginfo("type "+str("Getting action sequence..."))
             Action_Sequence_Data = plan['ActionSequence']
             number_steps = len(Action_Sequence_Data)
             ActionSequenceIdsList = []
@@ -212,7 +212,7 @@ class ActionServerNode():
         feedback_msg = goal_5gFeedback() # create action instance feedback
 
         rospy.loginfo('SubactionRef '+str(SubactionRef))
-        rospy.loginfo('SubactionRef '+str(type(SubactionRef)))
+        #rospy.loginfo('SubactionRef '+str(type(SubactionRef)))
         if SubactionRef == 0:  # This is a completely new action.
             FirstActionId = SubactionRef
             rospy.loginfo('Executing New action goal... ')
@@ -242,8 +242,9 @@ class ActionServerNode():
 
                 rospy.loginfo("Looping query reosurce update")
                 time.sleep(1)
+                feedback_msg.action_sequence = self.gateway_get_actionSequenceIds(PLAN)
                 feedback_msg.feedback_resources_status = self.getResourceStatus(ACTION_PLAN_ID,TOKEN)  # Not sure this will work. May need another timer approach.
-                actionSequenceIds = self.gateway_get_actionSequenceIds(PLAN)
+                
                 self.a_server.publish_feedback(
                     feedback_msg)  # Publish the feedback
                 time.sleep(1)
