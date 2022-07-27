@@ -44,7 +44,7 @@ docker image rm docker_image_name
 ## Verification of process:
 Please check if middleware is correctly deployed:
 ```shell
-ubectl get all -n middleware  
+kubectl get all -n middleware  
 ```
 
 ```shell
