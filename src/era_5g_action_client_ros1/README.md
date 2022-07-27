@@ -25,6 +25,14 @@ Run first the action server
 In another terminal, run:
 
 ```shell
+cd /home/dev_ws
+```
+
+```shell
+source devel/setup.bash
+```
+
+```shell
 rostopic pub /goal_5g/goal era_5g_action_interfaces_ros1/goal_5gActionGoal "header:
   seq: 0
   stamp:
