@@ -45,23 +45,23 @@ namespace Middleware.Orchestrator.Jobs
         /// <returns></returns>
         private async Task InstantiateMiddleware(IKubernetes kubeClient)
         {
-            var namespaces = await kubeClient.ListNamespaceAsync();
+            //var namespaces = await kubeClient.CoreV1.ListNamespaceAsync();
 
-            var exists = namespaces.Items.Any(n => n.Name() == AppConfig.K8SNamespaceName);
+            //var exists = namespaces.Items.Any(n => n.Name() == AppConfig.K8SNamespaceName);
 
-            if (exists == false)
-            {
-                Logger.LogError("Middleware has not been deployed in the correct namespace. Correct namespace is {namespace}", AppConfig.K8SNamespaceName);
-                return;
+            //if (exists == false)
+            //{
+            //    Logger.LogError("Middleware has not been deployed in the correct namespace. Correct namespace is {namespace}", AppConfig.K8SNamespaceName);
+            //    return;
 
-            }
+            //}
             var success = true;
             bool shouldDryRun = AppConfig.IsDevEnvironment();
             try
             {
-                var deployments = await kubeClient.ListNamespacedDeploymentAsync(AppConfig.K8SNamespaceName);
+                var deployments = await kubeClient.AppsV1.ListNamespacedDeploymentAsync(AppConfig.K8SNamespaceName);
                 var deploymentNames = deployments.Items.Select(d => d.Metadata.Name).ToArray();
-                var services = await kubeClient.ListNamespacedServiceAsync(AppConfig.K8SNamespaceName);
+                var services = await kubeClient.CoreV1.ListNamespacedServiceAsync(AppConfig.K8SNamespaceName);
                 var serviceNames = services.Items.Select(d => d.Metadata.Name).ToArray();
                 var images = new List<string>
                     {"gateway", "redis-interface-api", "resource-planner-api", "task-planner-api"};
@@ -77,13 +77,14 @@ namespace Middleware.Orchestrator.Jobs
                         continue;
                     }
 
-                    var result = await kubeClient.CreateNamespacedDeploymentAsync(v1Deployment, AppConfig.K8SNamespaceName,
+                    var result = await kubeClient.AppsV1.CreateNamespacedDeploymentAsync(v1Deployment, AppConfig.K8SNamespaceName,
                         dryRun: shouldDryRun ? "All" : null);
+                    
 
                     var kind = service != "gateway" ? K8SServiceKindEnum.ClusterIp : K8SServiceKindEnum.LoadBalancer;
 
                     var lbService = _deploymentService.CreateService(service, kind, result.Metadata);
-                    var createdService = await kubeClient.CreateNamespacedServiceAsync(lbService, AppConfig.K8SNamespaceName);
+                    var createdService = await kubeClient.CoreV1.CreateNamespacedServiceAsync(lbService, AppConfig.K8SNamespaceName);
 
                     if (service == "gateway")
                     {
