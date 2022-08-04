@@ -1,19 +1,15 @@
-apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
+apiVersion: rbac.authorization.k8s.io/v1
 metadata:
-  name: orchestrator
+  name: orchestrator-role-binding
+  namespace: middleware
 subjects:
-  - kind: Group
-    name: Middleware
-    apiGroup: rbac.authorization.k8s.io
-  - kind: ServiceAccount
-    # Reference to ServiceAccount kind's `metadata.name`
-    name: orchestrator
-    # Reference to ServiceAccount kind's `metadata.namespace`
-    namespace: middleware
   - kind: User
     name: middleware-user
+  - kind: ServiceAccount
+    name: orchestrator
+    namespace: middleware
 roleRef:
   kind: ClusterRole
-  name: orchestrator
+  name: orchestrator-role
   apiGroup: rbac.authorization.k8s.io
