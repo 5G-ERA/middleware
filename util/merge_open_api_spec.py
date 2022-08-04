@@ -7,14 +7,16 @@ dirname = os.path.dirname(__file__)
 
 # ResourcePlanner is not here because it is not accessible through gateway
 files = [os.path.join(dirname, "../src/RedisInterface/RedisInterfaceSpec.json"),
-         os.path.join(dirname, "../src/TaskPlanner/TaskPlannerSpec.json")]
+         os.path.join(dirname, "../src/TaskPlanner/TaskPlannerSpec.json"),
+         os.path.join(dirname, "../src/OcelotGateway/OcelotGatewaySpec.json")]
 source_file = os.path.join(
     dirname, "../src/Orchestrator/OrchestratorSpec.json")
 output_file = os.path.join(dirname, "../OpenAPISpec.json")
 
 prefixes = {"RedisInterface": "Data",
             "TaskPlanner": "Task",
-            "Orchestrator": "Orchestrate"}
+            "Orchestrator": "Orchestrate",
+            "OcelotGateway": ""}
 
 
 def set_properties(template_info: dict) -> None:
@@ -25,31 +27,38 @@ def set_properties(template_info: dict) -> None:
 def add_routes(template: dict, routes: dict, api: str) -> None:
     for key in routes.keys():
         new_route_name = correct_route_name(key, api)
+        if not new_route_name:
+            continue
         template["paths"][new_route_name] = routes[key]
 
 
 def add_models(template: dict, models: dict) -> None:
     for key in models.keys():
-        if key not in template["components"]["schemas"]:
+        if key not in template["components"]["schemas"] and "File" not in key and "AggregateRouteConfig" not in key:
             template["components"]["schemas"][key] = models[key]
 
 
 def correct_route_name(route: str, api: str) -> str:
     """
     Corrects the route path to match the gateway configuration
-
+    If the route should be skipped, returns empty string.
     Args:
         route: path to the endpoint.
         api: name of the api to adjust to.
     """
+
+    if "/api/" not in route:
+        return ""
+
     prefix = prefixes[api]
 
     if "/api/v1/status/" in route and api == "Orchestrator":
         route = route.replace("/api/v1/status/", "/status/")
 
+    if "/api/v1/" in route and api == "OcelotGateway":
+        route = route.replace("/api/v1/", "/")
     if "/api/v1/" in route:
         route = route.replace("/api/v1/", "/" + prefix + "/")
-
     if "/api/" in route:
         route = route.replace("/api/", "/" + prefix + "/")
 
