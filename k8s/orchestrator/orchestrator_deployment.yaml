@@ -18,7 +18,7 @@ spec:
       containers:        
       - name: orchestrator-api
         image: 394603622351.dkr.ecr.eu-west-1.amazonaws.com/orchestrator-api:latest
-        imagePullPolicy: IfNotPresent
+        imagePullPolicy: Always
         resources: {}
         env:
         - name: AWS_IMAGE_REGISTRY
