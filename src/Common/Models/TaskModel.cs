@@ -10,9 +10,9 @@ namespace Middleware.Common.Models
         [JsonPropertyName("Name")]
         public override string Name { get; set; }
 
-        [JsonPropertyName("resourceLock")]
+        [JsonPropertyName("ResourceLock")]
 
-        public bool resourceLock { get; set; }
+        public bool ResourceLock { get; set; }
 
         [JsonPropertyName("TaskPriority")]
         public int TaskPriority { get; set; }

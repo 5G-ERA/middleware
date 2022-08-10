@@ -93,7 +93,7 @@ public class ResourcePlanner : IResourcePlanner
                 //map
                 InstanceModel instance = _mapper.Map<InstanceModel>(instanceTmp);
 
-                if (CanBeReused(instance) && taskModel.resourceLock==true)
+                if (CanBeReused(instance) && taskModel.ResourceLock==true)
                 {
                     var reusedInstance = await GetInstanceToReuse(instance, orchestratorApiClient);
                     if (reusedInstance is not null)

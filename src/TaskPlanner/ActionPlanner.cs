@@ -95,7 +95,7 @@ namespace Middleware.TaskPlanner
             }
 
             task.ActionSequence = ActionSequence;
-            task.resourceLock = resourceLock;
+            task.ResourceLock = resourceLock;
             return task;
             
             //    TaskModel tempActionSequence = _mapper.Map<TaskModel>(tempAction);
