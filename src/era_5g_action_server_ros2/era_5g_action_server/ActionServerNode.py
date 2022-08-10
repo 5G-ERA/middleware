@@ -104,13 +104,13 @@ class ActionServerNode(rclpy.node.Node):
             self.get_logger().ERROR(e.response.status_code)
             return 'Error, could not login to gateway, revisit the log files for more details.'
 
-    def gateway_get_plan(self, newToken, taskid, PLAN_OCELOT):
+    def gateway_get_plan(self, newToken, taskid, PLAN_OCELOT,resource_lock):
         # Request plan
         try:
             print("Goal task is: ", taskid)
             self.get_logger().info("Goal task is : " + taskid)
             hed = {'Authorization': 'Bearer ' + str(newToken)}
-            data = {"TaskId": str(taskid)}
+            data = {"TaskId": str(taskid),"LockResourceReUse": resource_lock}
 
             response = requests.post(PLAN_OCELOT, json=data, headers=hed)
             self.get_logger().info("PLAN: " + str(response.json()))
@@ -204,6 +204,7 @@ class ActionServerNode(rclpy.node.Node):
         global ID
 
         index = goal_handle.action_reference
+        resource_lock = goal_handle.resource_lock
         self.get_logger().info('Feedback: {0}'.format("index: "+str(index)))
 
         if (index != 0) and (len(PLAN) != 0):  # received update for the task
@@ -221,7 +222,7 @@ class ActionServerNode(rclpy.node.Node):
             self.get_logger().info('Feedback: {0}'.format(
                 "Login successful, token received"))
             PLAN, ActionPlanId = self.gateway_get_plan(newToken, goal_handle.goal_taskid,
-                                                       PLAN_OCELOT)  # Get the plan by sending the token and TaskId
+                                                       PLAN_OCELOT,resource_lock)  # Get the plan by sending the token and TaskId
 
             ACTION_PLAN_ID = ActionPlanId  # Update the global variable actionPlanId
             self.get_logger().info("ActionPlanId is: " + ACTION_PLAN_ID)

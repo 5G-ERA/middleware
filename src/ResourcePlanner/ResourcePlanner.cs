@@ -6,15 +6,12 @@ using Middleware.Common.Enums;
 using Middleware.Common.Models;
 using Middleware.ResourcePlanner.ApiReference;
 
-
 namespace Middleware.ResourcePlanner;
 
 public interface IResourcePlanner
 {
     Task<TaskModel> Plan(TaskModel taskModel);
 }
-
-
 
 public class ResourcePlanner : IResourcePlanner
 {
@@ -41,7 +38,7 @@ public class ResourcePlanner : IResourcePlanner
         {
             if (policy == null)
             {
-                throw new Exception("Index policy is empty"); //This should never happend
+                throw new ArgumentException("Index policy is empty"); //This should never happend
             }
             if (policy.PolicyName == "AllContainersInClosestMachine")
             {
@@ -55,13 +52,16 @@ public class ResourcePlanner : IResourcePlanner
                     
                 }
                 
-            }
+            }//historical data second policy. --> succesful goal, less time used to perform action, more efficient,
+             //which one did the task before? QoS & QoE. (Speed network, bandwidth, 5g or 4g, wifi, number of slices)
            
           
         }
 
         return actionParam;
     }
+
+
 
     public async Task<TaskModel> Plan(TaskModel taskModel)
     {
@@ -93,7 +93,7 @@ public class ResourcePlanner : IResourcePlanner
                 //map
                 InstanceModel instance = _mapper.Map<InstanceModel>(instanceTmp);
 
-                if (CanBeReused(instance))
+                if (CanBeReused(instance) && taskModel.resourceLock==true)
                 {
                     var reusedInstance = await GetInstanceToReuse(instance, orchestratorApiClient);
                     if (reusedInstance is not null)

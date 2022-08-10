@@ -7,6 +7,10 @@ namespace Middleware.Common.Models
         [JsonPropertyName("RobotId")]
         public Guid RobotId { get; set; }
 
+        [JsonPropertyName("LockResourceReUse")]
+
+        public bool LockResourceReUse { get; set; }
+
         [JsonPropertyName("TaskId")]
         public Guid Id { get; set; }
 

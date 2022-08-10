@@ -77,19 +77,22 @@ namespace Middleware.Common.Repositories
 
         public async Task<List<Guid>> GetFreeEdgesIdsAsync(List<Guid> edgesToCheck)
         {
-            
-            foreach (Guid edgeId in edgesToCheck)
+            List<Guid> TempFreeEdges = new List<Guid>();
+            edgesToCheck.AddRange(TempFreeEdges);
+            //TempFreeEdges = edgesToCheck;
+
+            foreach (Guid edgeId in TempFreeEdges)
             {
                 List<RelationModel> robotRelations = await GetRelation(edgeId, "LOCATED_AT", RelationDirection.Incoming);
                 foreach (RelationModel relationModel in robotRelations)
                 {
                     if (relationModel.PointsTo != null)
                     {
-                        edgesToCheck.Remove(relationModel.PointsTo.Id);                      
+                        TempFreeEdges.Remove(relationModel.PointsTo.Id);                      
                     }
                 }
             }
-            return edgesToCheck;
+            return TempFreeEdges;
         }
 
         public async Task<List<Guid>> GetLessBusyEdgesAsync(List<Guid> busyEdgesTocheck)
@@ -98,7 +101,7 @@ namespace Middleware.Common.Repositories
             //Dictionary<String, int> tempDic = new Dictionary<String, int>();
             List<Guid> lessBusyEdges = new List<Guid>();
             //List<String> lessBusyEdges = new List<String>();
-            int counter = 0;
+            //int counter = 0;
             string previousEdge = "";
 
             foreach (Guid busyEdgeId in busyEdgesTocheck)
@@ -109,14 +112,14 @@ namespace Middleware.Common.Repositories
                 {   
                     if (relationModel.PointsTo.Name == previousEdge)//Check how many times an edge have the relationship LOCATED_AT
                     {
-                        tempDic.Add(relationModel.PointsTo.Id, counter++);//tempDic.Add(relationModel.PointsTo.Id
+                        tempDic[relationModel.PointsTo.Id]++;//tempDic.Add(relationModel.PointsTo.Id
                     }
                     previousEdge = relationModel.PointsTo.Name;
 
                 }
             }
             var ordered = tempDic.OrderBy(x => x.Value).ToDictionary( x => x.Key, x => x.Value);  //Order the dictionary by value
-            foreach (var element in tempDic)
+            foreach (var element in ordered)
             {
                 lessBusyEdges.Add(element.Key);
             }
