@@ -58,7 +58,7 @@ public class DeploymentService : IDeploymentService
         {
             var k8SClient = _kubernetesBuilder.CreateKubernetesClient();
             _logger.LogDebug("Entered DeploymentService.DeployAsync");
-            var deployments = await k8SClient.ListNamespacedDeploymentAsync(AppConfig.K8SNamespaceName);
+            var deployments = await k8SClient.AppsV1.ListNamespacedDeploymentAsync(AppConfig.K8SNamespaceName);
             var deploymentNames = deployments.Items.Select(d => d.Metadata.Name).OrderBy(d => d).ToArray();
             _logger.LogDebug("Current deployments: {deployments}", string.Join(", ", deploymentNames));
 
@@ -201,7 +201,7 @@ public class DeploymentService : IDeploymentService
             return default;
         }
         var sanitized = objectDefinition.SanitizeAsK8SYaml();
-        T obj = Yaml.LoadFromString<T>(sanitized);
+        T obj = KubernetesYaml.Deserialize<T>(sanitized);
 
         if (obj == null)
         {
@@ -212,7 +212,7 @@ public class DeploymentService : IDeploymentService
         {
             srv.Metadata.SetServiceLabel(instanceId);
 
-            obj = await k8SClient.CreateNamespacedServiceAsync(srv, AppConfig.K8SNamespaceName) as T;
+            obj = await k8SClient.CoreV1.CreateNamespacedServiceAsync(srv, AppConfig.K8SNamespaceName) as T;
             return obj;
         }
         if (obj is V1Deployment depl)
@@ -231,7 +231,7 @@ public class DeploymentService : IDeploymentService
                 container.Env = envVars;
             }
 
-            obj = await k8SClient.CreateNamespacedDeploymentAsync(depl, AppConfig.K8SNamespaceName) as T;
+            obj = await k8SClient.AppsV1.CreateNamespacedDeploymentAsync(depl, AppConfig.K8SNamespaceName) as T;
             return obj;
         }
 
@@ -310,20 +310,20 @@ public class DeploymentService : IDeploymentService
         const string success = "Success";
         var retVal = true;
 
-        var deployments = await k8sClient.ListNamespacedDeploymentAsync(AppConfig.K8SNamespaceName,
+        var deployments = await k8sClient.AppsV1.ListNamespacedDeploymentAsync(AppConfig.K8SNamespaceName,
             labelSelector: V1ObjectExtensions.GetServiceLabelSelector(instance.ServiceInstanceId));
-        var services = await k8sClient.ListNamespacedServiceAsync(AppConfig.K8SNamespaceName,
+        var services = await k8sClient.CoreV1.ListNamespacedServiceAsync(AppConfig.K8SNamespaceName,
             labelSelector: V1ObjectExtensions.GetServiceLabelSelector(instance.ServiceInstanceId));
 
         foreach (var deployment in deployments.Items)
         {
-            var status = await k8sClient.DeleteNamespacedDeploymentAsync(deployment.Name(), AppConfig.K8SNamespaceName);
+            var status = await k8sClient.AppsV1.DeleteNamespacedDeploymentAsync(deployment.Name(), AppConfig.K8SNamespaceName);
             retVal &= status.Status == success;
         }
 
         foreach (var service in services.Items)
         {
-            var status = await k8sClient.DeleteNamespacedDeploymentAsync(service.Name(), AppConfig.K8SNamespaceName);
+            var status = await k8sClient.AppsV1.DeleteNamespacedDeploymentAsync(service.Name(), AppConfig.K8SNamespaceName);
             retVal &= status.Status == success;
         }
 

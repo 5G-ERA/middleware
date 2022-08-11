@@ -10,7 +10,7 @@
         "tags": [
           "Health"
         ],
-        "operationId": "HealthCheck",
+        "operationId": "OrchestratorHealthCheck",
         "responses": {
           "200": {
             "description": "Success"
@@ -23,7 +23,7 @@
         "tags": [
           "Health"
         ],
-        "operationId": "GetSpec",
+        "operationId": "GetOrchestratorSpec",
         "responses": {
           "200": {
             "description": "Success",

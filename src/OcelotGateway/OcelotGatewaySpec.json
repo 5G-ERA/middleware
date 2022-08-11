@@ -1,0 +1,894 @@
+{
+  "openapi": "3.0.1",
+  "info": {
+    "title": "OcelotGateway",
+    "version": "1.0"
+  },
+  "paths": {
+    "/configuration": {
+      "get": {
+        "tags": [
+          "FileConfiguration"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "FileConfiguration"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/FileConfiguration"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/FileConfiguration"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/FileConfiguration"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/api/v1/register": {
+      "post": {
+        "tags": [
+          "Login"
+        ],
+        "operationId": "Register",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UserModel"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UserModel"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/UserModel"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserModel"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserModel"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserModel"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Server Error",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/login": {
+      "post": {
+        "tags": [
+          "Login"
+        ],
+        "operationId": "Login",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UserModel"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UserModel"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/UserModel"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/TokenModel"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TokenModel"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TokenModel"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/outputcache/{region}": {
+      "delete": {
+        "tags": [
+          "OutputCache"
+        ],
+        "parameters": [
+          {
+            "name": "region",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "AggregateRouteConfig": {
+        "type": "object",
+        "properties": {
+          "routeKey": {
+            "type": "string",
+            "nullable": true
+          },
+          "parameter": {
+            "type": "string",
+            "nullable": true
+          },
+          "jsonPath": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "ApiResponse": {
+        "type": "object",
+        "properties": {
+          "statusCode": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "message": {
+            "type": "string",
+            "nullable": true
+          },
+          "timeStamp": {
+            "type": "string",
+            "format": "date-time",
+            "readOnly": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "FileAggregateRoute": {
+        "type": "object",
+        "properties": {
+          "routeKeys": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "nullable": true
+          },
+          "routeKeysConfig": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AggregateRouteConfig"
+            },
+            "nullable": true
+          },
+          "upstreamPathTemplate": {
+            "type": "string",
+            "nullable": true
+          },
+          "upstreamHost": {
+            "type": "string",
+            "nullable": true
+          },
+          "routeIsCaseSensitive": {
+            "type": "boolean"
+          },
+          "aggregator": {
+            "type": "string",
+            "nullable": true
+          },
+          "upstreamHttpMethod": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "nullable": true,
+            "readOnly": true
+          },
+          "priority": {
+            "type": "integer",
+            "format": "int32"
+          }
+        },
+        "additionalProperties": false
+      },
+      "FileAuthenticationOptions": {
+        "type": "object",
+        "properties": {
+          "authenticationProviderKey": {
+            "type": "string",
+            "nullable": true
+          },
+          "allowedScopes": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "FileCacheOptions": {
+        "type": "object",
+        "properties": {
+          "ttlSeconds": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "region": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "FileConfiguration": {
+        "type": "object",
+        "properties": {
+          "routes": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/FileRoute"
+            },
+            "nullable": true
+          },
+          "dynamicRoutes": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/FileDynamicRoute"
+            },
+            "nullable": true
+          },
+          "aggregates": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/FileAggregateRoute"
+            },
+            "nullable": true
+          },
+          "globalConfiguration": {
+            "$ref": "#/components/schemas/FileGlobalConfiguration"
+          }
+        },
+        "additionalProperties": false
+      },
+      "FileDynamicRoute": {
+        "type": "object",
+        "properties": {
+          "serviceName": {
+            "type": "string",
+            "nullable": true
+          },
+          "rateLimitRule": {
+            "$ref": "#/components/schemas/FileRateLimitRule"
+          },
+          "downstreamHttpVersion": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "FileGlobalConfiguration": {
+        "type": "object",
+        "properties": {
+          "requestIdKey": {
+            "type": "string",
+            "nullable": true
+          },
+          "serviceDiscoveryProvider": {
+            "$ref": "#/components/schemas/FileServiceDiscoveryProvider"
+          },
+          "rateLimitOptions": {
+            "$ref": "#/components/schemas/FileRateLimitOptions"
+          },
+          "qoSOptions": {
+            "$ref": "#/components/schemas/FileQoSOptions"
+          },
+          "baseUrl": {
+            "type": "string",
+            "nullable": true
+          },
+          "loadBalancerOptions": {
+            "$ref": "#/components/schemas/FileLoadBalancerOptions"
+          },
+          "downstreamScheme": {
+            "type": "string",
+            "nullable": true
+          },
+          "httpHandlerOptions": {
+            "$ref": "#/components/schemas/FileHttpHandlerOptions"
+          },
+          "downstreamHttpVersion": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "FileHostAndPort": {
+        "type": "object",
+        "properties": {
+          "host": {
+            "type": "string",
+            "nullable": true
+          },
+          "port": {
+            "type": "integer",
+            "format": "int32"
+          }
+        },
+        "additionalProperties": false
+      },
+      "FileHttpHandlerOptions": {
+        "type": "object",
+        "properties": {
+          "allowAutoRedirect": {
+            "type": "boolean"
+          },
+          "useCookieContainer": {
+            "type": "boolean"
+          },
+          "useTracing": {
+            "type": "boolean"
+          },
+          "useProxy": {
+            "type": "boolean"
+          },
+          "maxConnectionsPerServer": {
+            "type": "integer",
+            "format": "int32"
+          }
+        },
+        "additionalProperties": false
+      },
+      "FileLoadBalancerOptions": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string",
+            "nullable": true
+          },
+          "key": {
+            "type": "string",
+            "nullable": true
+          },
+          "expiry": {
+            "type": "integer",
+            "format": "int32"
+          }
+        },
+        "additionalProperties": false
+      },
+      "FileQoSOptions": {
+        "type": "object",
+        "properties": {
+          "exceptionsAllowedBeforeBreaking": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "durationOfBreak": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "timeoutValue": {
+            "type": "integer",
+            "format": "int32"
+          }
+        },
+        "additionalProperties": false
+      },
+      "FileRateLimitOptions": {
+        "type": "object",
+        "properties": {
+          "clientIdHeader": {
+            "type": "string",
+            "nullable": true
+          },
+          "quotaExceededMessage": {
+            "type": "string",
+            "nullable": true
+          },
+          "rateLimitCounterPrefix": {
+            "type": "string",
+            "nullable": true
+          },
+          "disableRateLimitHeaders": {
+            "type": "boolean"
+          },
+          "httpStatusCode": {
+            "type": "integer",
+            "format": "int32"
+          }
+        },
+        "additionalProperties": false
+      },
+      "FileRateLimitRule": {
+        "type": "object",
+        "properties": {
+          "clientWhitelist": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "nullable": true
+          },
+          "enableRateLimiting": {
+            "type": "boolean"
+          },
+          "period": {
+            "type": "string",
+            "nullable": true
+          },
+          "periodTimespan": {
+            "type": "number",
+            "format": "double"
+          },
+          "limit": {
+            "type": "integer",
+            "format": "int64"
+          }
+        },
+        "additionalProperties": false
+      },
+      "FileRoute": {
+        "type": "object",
+        "properties": {
+          "downstreamPathTemplate": {
+            "type": "string",
+            "nullable": true
+          },
+          "upstreamPathTemplate": {
+            "type": "string",
+            "nullable": true
+          },
+          "upstreamHttpMethod": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "nullable": true
+          },
+          "downstreamHttpMethod": {
+            "type": "string",
+            "nullable": true
+          },
+          "addHeadersToRequest": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string",
+              "nullable": true
+            },
+            "nullable": true
+          },
+          "upstreamHeaderTransform": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string",
+              "nullable": true
+            },
+            "nullable": true
+          },
+          "downstreamHeaderTransform": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string",
+              "nullable": true
+            },
+            "nullable": true
+          },
+          "addClaimsToRequest": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string",
+              "nullable": true
+            },
+            "nullable": true
+          },
+          "routeClaimsRequirement": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string",
+              "nullable": true
+            },
+            "nullable": true
+          },
+          "addQueriesToRequest": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string",
+              "nullable": true
+            },
+            "nullable": true
+          },
+          "changeDownstreamPathTemplate": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string",
+              "nullable": true
+            },
+            "nullable": true
+          },
+          "requestIdKey": {
+            "type": "string",
+            "nullable": true
+          },
+          "fileCacheOptions": {
+            "$ref": "#/components/schemas/FileCacheOptions"
+          },
+          "routeIsCaseSensitive": {
+            "type": "boolean"
+          },
+          "serviceName": {
+            "type": "string",
+            "nullable": true
+          },
+          "serviceNamespace": {
+            "type": "string",
+            "nullable": true
+          },
+          "downstreamScheme": {
+            "type": "string",
+            "nullable": true
+          },
+          "qoSOptions": {
+            "$ref": "#/components/schemas/FileQoSOptions"
+          },
+          "loadBalancerOptions": {
+            "$ref": "#/components/schemas/FileLoadBalancerOptions"
+          },
+          "rateLimitOptions": {
+            "$ref": "#/components/schemas/FileRateLimitRule"
+          },
+          "authenticationOptions": {
+            "$ref": "#/components/schemas/FileAuthenticationOptions"
+          },
+          "httpHandlerOptions": {
+            "$ref": "#/components/schemas/FileHttpHandlerOptions"
+          },
+          "downstreamHostAndPorts": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/FileHostAndPort"
+            },
+            "nullable": true
+          },
+          "upstreamHost": {
+            "type": "string",
+            "nullable": true
+          },
+          "key": {
+            "type": "string",
+            "nullable": true
+          },
+          "delegatingHandlers": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "nullable": true
+          },
+          "priority": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "timeout": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "dangerousAcceptAnyServerCertificateValidator": {
+            "type": "boolean"
+          },
+          "securityOptions": {
+            "$ref": "#/components/schemas/FileSecurityOptions"
+          },
+          "downstreamHttpVersion": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "FileSecurityOptions": {
+        "type": "object",
+        "properties": {
+          "ipAllowedList": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "nullable": true
+          },
+          "ipBlockedList": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "FileServiceDiscoveryProvider": {
+        "type": "object",
+        "properties": {
+          "scheme": {
+            "type": "string",
+            "nullable": true
+          },
+          "host": {
+            "type": "string",
+            "nullable": true
+          },
+          "port": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "type": {
+            "type": "string",
+            "nullable": true
+          },
+          "token": {
+            "type": "string",
+            "nullable": true
+          },
+          "configurationKey": {
+            "type": "string",
+            "nullable": true
+          },
+          "pollingInterval": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "namespace": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "GraphEntityModel": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "type": {
+            "type": "string",
+            "nullable": true
+          },
+          "name": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "KeyValuePair": {
+        "type": "object",
+        "properties": {
+          "key": {
+            "type": "string",
+            "nullable": true
+          },
+          "value": {
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "RelationModel": {
+        "type": "object",
+        "properties": {
+          "initiatesFrom": {
+            "$ref": "#/components/schemas/GraphEntityModel"
+          },
+          "relationName": {
+            "type": "string",
+            "nullable": true
+          },
+          "relationAttributes": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/KeyValuePair"
+            },
+            "nullable": true
+          },
+          "pointsTo": {
+            "$ref": "#/components/schemas/GraphEntityModel"
+          }
+        },
+        "additionalProperties": false
+      },
+      "TokenModel": {
+        "type": "object",
+        "properties": {
+          "token": {
+            "type": "string",
+            "nullable": true
+          },
+          "expirationDate": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "additionalProperties": false
+      },
+      "UserModel": {
+        "required": [
+          "id",
+          "password"
+        ],
+        "type": "object",
+        "properties": {
+          "relations": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/RelationModel"
+            },
+            "nullable": true
+          },
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "password": {
+            "type": "string"
+          },
+          "UserName": {
+            "type": "string",
+            "nullable": true
+          },
+          "salt": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      }
+    }
+  }
+}

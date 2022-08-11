@@ -1,0 +1,9 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: orchestrator-role
+  namespace: middleware
+rules:
+- apiGroups: ["", "apps", "batch"]  
+  resources: ["services", "nodes", "namespaces", "pods", "deployments",  "daemonsets",  "statefulsets",  "replicasets", "jobs"]  
+  verbs: ["get",  "list",  "watch",  "create"]
