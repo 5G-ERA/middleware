@@ -71,7 +71,7 @@ namespace Middleware.OcelotGateway.Controllers
         [AllowAnonymous]
         [HttpPost]
         [Route("login", Name = "Login")]
-        [ProducesResponseType(typeof(TokenService), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(TokenModel), (int)HttpStatusCode.OK)]
         [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.BadRequest)]
         [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.Unauthorized)]
         public async Task<IActionResult> Login([FromBody] UserModel login) 

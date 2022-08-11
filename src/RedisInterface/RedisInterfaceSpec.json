@@ -3345,7 +3345,7 @@
         "tags": [
           "Health"
         ],
-        "operationId": "HealthCheck",
+        "operationId": "RedisInterfaceHealthCheck",
         "responses": {
           "200": {
             "description": "Success"
@@ -3358,7 +3358,7 @@
         "tags": [
           "Health"
         ],
-        "operationId": "GetSpec",
+        "operationId": "GetRedisInterfaceSpec",
         "responses": {
           "200": {
             "description": "Success",

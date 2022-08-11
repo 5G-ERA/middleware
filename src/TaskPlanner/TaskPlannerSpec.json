@@ -10,7 +10,7 @@
         "tags": [
           "Health"
         ],
-        "operationId": "HealthCheck",
+        "operationId": "TaskPlannerHealthCheck",
         "responses": {
           "200": {
             "description": "Success"
@@ -23,7 +23,7 @@
         "tags": [
           "Health"
         ],
-        "operationId": "GetSpec",
+        "operationId": "GetTaskPlannerSpec",
         "responses": {
           "200": {
             "description": "Success",
