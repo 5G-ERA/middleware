@@ -28,11 +28,44 @@ public class ResourcePlanner : IResourcePlanner
         _logger = logger;
     }
 
+    private async Task<ActionModel> InferResource (ActionModel actionParam)
+    {
+        var redisApiClient = _apiClientBuilder.CreateRedisApiClient();
+        List<Middleware.ResourcePlanner.RedisInterface.ActivePolicy> activePolicies = (await redisApiClient.PolicyGetActiveAsync()).ToList();
+        Dictionary<Guid, List<Guid>> tempDic = new Dictionary<Guid, List<Guid>>();//Diccionary of Key policy ID, values List of results after query
+
+        foreach (RedisInterface.ActivePolicy policy in activePolicies)
+        {
+            if (policy == null)
+            {
+                throw new ArgumentException("Index policy is empty"); //This should never happend
+            }
+            if (policy.PolicyName == "AllContainersInClosestMachine")
+            {
+                List<Guid> connectedEdges = (await redisApiClient.RobotGetConnectedEdgesIdsAsync(Guid.Empty)).ToList();
+                List<Guid> freeEdges = (await redisApiClient.GetFreeEdgesIdsAsync(connectedEdges)).ToList();
+                if (freeEdges.Count()==0)
+                {
+                    //if all of them are busy, check which one is less busy
+                    List<Guid> lessBusyEdges = (await redisApiClient.GetLessBusyEdgesAsync(connectedEdges)).ToList();
+                    tempDic.Add(policy.Id, lessBusyEdges);
+                    
+                }
+                
+            }//historical data second policy. --> succesful goal, less time used to perform action, more efficient,
+             //which one did the task before? QoS & QoE. (Speed network, bandwidth, 5g or 4g, wifi, number of slices)
+           
+          
+        }
+
+        return actionParam;
+    }
+
+
+
     public async Task<TaskModel> Plan(TaskModel taskModel)
     {
-
         var redisApiClient = _apiClientBuilder.CreateRedisApiClient();
-        //List<Guid> ids = (await redisApiClient.RobotGetConnectedEdgesIdsAsync(Guid.Empty)).ToList();
         var orchestratorApiClient = _apiClientBuilder.CreateOrchestratorApiClient();
         // actionPlanner will give resource planner the actionSequence. 
 
@@ -60,7 +93,7 @@ public class ResourcePlanner : IResourcePlanner
                 //map
                 InstanceModel instance = _mapper.Map<InstanceModel>(instanceTmp);
 
-                if (CanBeReused(instance))
+                if (CanBeReused(instance) && taskModel.ResourceLock==true)
                 {
                     var reusedInstance = await GetInstanceToReuse(instance, orchestratorApiClient);
                     if (reusedInstance is not null)

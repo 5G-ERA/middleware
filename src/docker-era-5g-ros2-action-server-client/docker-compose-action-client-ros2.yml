@@ -1,0 +1,32 @@
+---
+version: '3.7'
+
+networks:
+    ros:
+        driver: bridge
+    middleware-proxy:
+        external:
+           name: middleware_network
+
+
+services:
+    ros2bridge:
+        build: ros2
+
+        command: "ros2 run ros1_bridge static_bridge"
+        environment:
+            - "ROS_MASTER_URI=http://ros-master:11311" #poner la ip del ros-master (ROS1)
+        networks:
+            - ros
+            - middleware-proxy
+
+
+    ros2:
+        build: ros2
+
+        command: "ros2 run demo_nodes_cpp listener"
+        environment:
+            - "ROS_MASTER_URI=http://ros-master:11311" #poner la ip del ros-master (ROS1)
+        networks:
+            - ros
+            - middleware-proxy

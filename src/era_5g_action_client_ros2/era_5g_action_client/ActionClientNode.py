@@ -1,9 +1,11 @@
+#!/usr/bin/env python
+
 # ROS Client
 import rclpy
 from rclpy.node import Node
 # ActionServer library for ROS 2 Python
 from rclpy.action import ActionClient
-from era_5g_action_interfaces.action import Goal5g
+from era_5g_action_interfaces_ros2.action import Goal5g
 import time
 
 taskId = "11071d4d-d1ae-4e55-8de2-e562c6078277" #Example of task that the robot wants to execute - make sure the taskid is in redis.
@@ -21,6 +23,7 @@ class ActionClientNode(Node):
         goal_msg = Goal5g.Goal()
         goal_msg.goal_taskid = order #task id
         goal_msg.action_reference = ref # Action reference
+        goal_msg.resource_lock = False
         self.get_logger().info("Waiting for action server")
         self._action_client.wait_for_server()
         self.get_logger().info("Sending goal request")

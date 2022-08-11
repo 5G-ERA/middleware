@@ -11,6 +11,8 @@ namespace Middleware.Common.Repositories
 {
     public class RobotRepository : BaseRepository<RobotModel>, IRobotRepository
     {
+        
+
         /// <summary>
         /// Default constructor
         /// </summary>
@@ -112,5 +114,7 @@ namespace Middleware.Common.Repositories
             }
             return edgeIds;
         } 
+
+        
     }
 }

@@ -45,7 +45,7 @@ namespace Middleware.Orchestrator.Jobs
         /// <returns></returns>
         private async Task InstantiateMiddleware(IKubernetes kubeClient)
         {
-            //var namespaces = await kubeClient.CoreV1.ListNamespaceAsync();
+            //var namespaces = await kubeClient.ListNamespaceAsync();
 
             //var exists = namespaces.Items.Any(n => n.Name() == AppConfig.K8SNamespaceName);
 

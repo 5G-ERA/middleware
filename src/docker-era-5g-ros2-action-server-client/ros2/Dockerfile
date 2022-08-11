@@ -6,12 +6,12 @@ RUN apt-get update \
         && apt-get clean -q -y \
         && apt-get autoremove -q -y \
         && rm -rf /var/lib/apt/lists/* \
-        && git clone https://github.com/5G-ERA/middleware \
+        && git clone --branch Development https://github.com/5G-ERA/middleware \
         && mkdir -p /home/dev_ws/src/ \
         && cd /home/dev_ws/ \
-        && cp -r /middleware/src/era_5g_action_client/ /home/dev_ws/src/ \
-        && cp -r /middleware/src/era_5g_action_server/ /home/dev_ws/src/ \
-        && cp -r /middleware/src/era_5g_action_interfaces/ /home/dev_ws/src/ \
+        && cp -r /middleware/src/era_5g_action_client_ros2/ /home/dev_ws/src/ \
+        && cp -r /middleware/src/era_5g_action_server_ros2/ /home/dev_ws/src/ \
+        && cp -r /middleware/src/era_5g_action_interfaces_ros2/ /home/dev_ws/src/ \
         && sudo apt update \
         && sudo apt install -y python3-pip \
         && sudo pip install requests
