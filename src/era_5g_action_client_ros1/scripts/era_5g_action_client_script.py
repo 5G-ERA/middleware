@@ -22,6 +22,7 @@ def goal():
         goal = goal_5gGoal
         goal.goal_taskid =taskId
         goal.action_reference =0
+        goal.resource_lock = False
         #goal = era_5g_action_client_ros1.msg.5gGoal((taskId,0))
         rospy.loginfo('Waiting for 5g-era-server...')
         client.wait_for_server()

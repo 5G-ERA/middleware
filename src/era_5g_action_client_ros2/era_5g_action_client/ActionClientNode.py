@@ -23,6 +23,7 @@ class ActionClientNode(Node):
         goal_msg = Goal5g.Goal()
         goal_msg.goal_taskid = order #task id
         goal_msg.action_reference = ref # Action reference
+        goal_msg.resource_lock = False
         self.get_logger().info("Waiting for action server")
         self._action_client.wait_for_server()
         self.get_logger().info("Sending goal request")

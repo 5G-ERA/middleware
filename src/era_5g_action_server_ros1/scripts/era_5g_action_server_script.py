@@ -82,12 +82,12 @@ class ActionServerNode():
             return 'Error, could not login to gateway, revisit the log files for more details.'
 
         
-    def gateway_get_plan(self,newToken,taskid,PLAN_OCELOT):
+    def gateway_get_plan(self,newToken,taskid,PLAN_OCELOT,resource_lock):
         # Request plan
         try:
             rospy.loginfo("Goal task is: "+str(taskid))
             hed = {'Authorization': 'Bearer ' + str(newToken)}
-            data = {"TaskId": str(taskid)}
+            data = {"TaskId": str(taskid), "LockResourceReUse": resource_lock}
 
             response = requests.post(PLAN_OCELOT, json=data, headers=hed)
             rospy.loginfo("PLAN: " + str(response.json()))
@@ -169,6 +169,7 @@ class ActionServerNode():
         global ID
 
         index = goal_param.action_reference
+        resource_lock = goal_param.resource_lock
         rospy.loginfo('Feedback: {0}'.format("index: "+str(index)))
 
         if (index != 0) and (len(PLAN) != 0):
@@ -186,7 +187,7 @@ class ActionServerNode():
         else:
             rospy.loginfo('Feedback: {0}'.format(
                 "Login successful, token received"))
-            PLAN, ActionPlanId = self.gateway_get_plan(newToken, goal_param.goal_taskid,PLAN_OCELOT)  # Get the plan by sending the token and TaskId
+            PLAN, ActionPlanId = self.gateway_get_plan(newToken, goal_param.goal_taskid,PLAN_OCELOT,resource_lock)  # Get the plan by sending the token and TaskId
 
             ACTION_PLAN_ID = ActionPlanId  # Update the global variable actionPlanId
             rospy.loginfo("ActionPlanId is: " + ACTION_PLAN_ID)

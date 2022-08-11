@@ -1,5 +1,6 @@
 string goal_taskid
 int32 action_reference
+bool resource_lock
 ---
 string result
 ---

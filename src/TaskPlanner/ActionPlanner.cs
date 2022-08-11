@@ -11,7 +11,7 @@ namespace Middleware.TaskPlanner
     public interface IActionPlanner
     {
         void Initialize(List<ActionModel> actionSequence, DateTime currentTime);
-        Task<TaskModel> InferActionSequence(Guid currentTaskId);
+        Task<TaskModel> InferActionSequence(Guid currentTaskId, bool resourceLock);
     }
 
     public class ActionPlanner : IActionPlanner
@@ -57,7 +57,7 @@ namespace Middleware.TaskPlanner
             CurrentTime = currentTime;
         }
 
-        public async Task<TaskModel> InferActionSequence(Guid currentTaskId)
+        public async Task<TaskModel> InferActionSequence(Guid currentTaskId, bool resourceLock)
         {
             // TasksIDs = GetAllTasksID.lua
             RedisInterface.TaskModel tmpTask = await _apiClient.TaskGetByIdAsync(currentTaskId);
@@ -95,6 +95,7 @@ namespace Middleware.TaskPlanner
             }
 
             task.ActionSequence = ActionSequence;
+            task.ResourceLock = resourceLock;
             return task;
             
             //    TaskModel tempActionSequence = _mapper.Map<TaskModel>(tempAction);
