@@ -16,8 +16,9 @@ public interface IDeploymentService
     /// Creates startup deployment needed to instantiate the middleware.
     /// </summary>
     /// <param name="name">Name of the Middleware component to be deployed</param>
+    /// <param name="tag">Tag of the image to be used</param>
     /// <returns>Deployment for the middleware component. Created deployment is not instantiated</returns>
-    V1Deployment CreateStartupDeployment(string name);
+    V1Deployment CreateStartupDeployment(string name, string tag);
     /// <summary>
     /// Creates the service of the specified type with the metadata
     /// </summary>

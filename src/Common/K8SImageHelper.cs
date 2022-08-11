@@ -1,4 +1,6 @@
-﻿namespace Middleware.Common;
+﻿using Middleware.Common.Structs;
+
+namespace Middleware.Common;
 
 public class K8SImageHelper
 {
@@ -12,5 +14,15 @@ public class K8SImageHelper
     public static string BuildImageName(string registry, string repositoryName, string tag)
     {
         return $"{registry}/{repositoryName}:{tag}";
+    }
+
+    public static string GetTag(string image)
+    {
+        var splitted = image.Split(':');
+
+        if (splitted.Length == 1)
+            return "latest";
+
+        return splitted[1];
     }
 }
