@@ -32,13 +32,14 @@ namespace Middleware.TaskPlanner.Controllers
         {
             Guid id = inputModel.Id;
             bool lockResource = inputModel.LockResourceReUse;
+            List<Common.Models.DialogueModel> DialogueTemp = inputModel.Questions;
 
             try
             {
 
                 _actionPlanner.Initialize(new List<ActionModel>(), DateTime.Now);
 
-                TaskModel plan = await _actionPlanner.InferActionSequence(id, lockResource);
+                TaskModel plan = await _actionPlanner.InferActionSequence(id, lockResource, DialogueTemp);
 
                 // call resource planner for resources
                 ResourcePlanner.TaskModel tmpTaskSend = _mapper.Map<ResourcePlanner.TaskModel>(plan);

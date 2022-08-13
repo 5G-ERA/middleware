@@ -11,7 +11,8 @@ namespace Middleware.TaskPlanner
     public interface IActionPlanner
     {
         void Initialize(List<ActionModel> actionSequence, DateTime currentTime);
-        Task<TaskModel> InferActionSequence(Guid currentTaskId, bool resourceLock);
+       
+        Task<TaskModel> InferActionSequence(Guid id, bool lockResource, List<Common.Models.DialogueModel> dialogueTemp);
     }
 
     public class ActionPlanner : IActionPlanner
@@ -28,8 +29,6 @@ namespace Middleware.TaskPlanner
         private ActionModel _actionModel;
 
         public List<Guid> TasksIDs { get; set; } //List with all tasks ids registered in Redis
-
-
         public Guid ActionPlanId { get; set; } //Pregenerated Id for task planner request
         public List<ActionModel> ActionSequence { get; set; }
         public DateTime CurrentTime { get; set; }
@@ -40,6 +39,11 @@ namespace Middleware.TaskPlanner
         public string InferingProcess { get; set; }
         public Guid RobotId { get; set; }
         public string RobotName { get; set; }
+        public Guid QuestionId { get; set; }
+        public string QuestionName { get; set; }
+        public bool IsSingleAnswer { get; set; }
+        public RobotModel robot { get; set; }
+        public List<Common.Models.KeyValuePair> Answer { get; set; }
 
         public ActionPlanner(IApiClientBuilder apiBuilder, IMapper mapper)
         {
@@ -57,15 +61,17 @@ namespace Middleware.TaskPlanner
             CurrentTime = currentTime;
         }
 
-        public async Task<TaskModel> InferActionSequence(Guid currentTaskId, bool resourceLock)
+        public async Task<TaskModel> InferActionSequence(Guid currentTaskId, bool resourceLock, List<Common.Models.DialogueModel> DialogueTemp)
         {
-            // TasksIDs = GetAllTasksID.lua
+
+            //TasksIDs = GetAllTasksID.lua
             RedisInterface.TaskModel tmpTask = await _apiClient.TaskGetByIdAsync(currentTaskId);
             TaskModel task = _mapper.Map<TaskModel>(tmpTask);
 
             bool alreadyExist = task != null; //Check if CurrentTask is inside Redis model
 
             task.ActionPlanId = Guid.NewGuid();
+    
             // Use . after task to access the properties of the task
             //task.TaskPriority
             if (alreadyExist == true)
@@ -92,10 +98,76 @@ namespace Middleware.TaskPlanner
                     //ActionSequence.Add(actionItem.Id(actionId));
                 }
 
+            
+
+            //For standard data of the robot, maybe query redis/db after robot registered first time.
+            //Iterate over the answers of the robot to make a action plan accordingly.
+            foreach (Common.Models.DialogueModel entryDialog in DialogueTemp)
+            {
+                QuestionId = entryDialog.Id;
+                QuestionName = entryDialog.Name;
+                IsSingleAnswer = entryDialog.IsSingleAnswer;
+                Answer = entryDialog.Answer;
+
+                if (QuestionName == "Whats the priority of this task?")
+                {
+                    Common.Models.KeyValuePair answer = Answer.First();
+                    task.TaskPriority = (int)answer.Value;
+                }
+
+
+                if (QuestionName == "Whats your battery status?")
+                {
+                    Common.Models.KeyValuePair answer = Answer.First();
+                    robot.BatteryStatus = (long)answer.Value;
+                }
+                 
+
+                    if (QuestionName == "Do you have a map of the current enviroment?")
+                {
+                    Common.Models.KeyValuePair answer = Answer.First();
+                    if ((bool)answer.Value == false)
+                    {
+                        //Query if task.id needs SLAM module.
+                        bool nav_avaialable = false;
+                        bool laser_available = false;
+                        foreach (ActionModel actionSequenceTemp in ActionSequence)
+                            {
+                                if  (actionSequenceTemp.ActionFamily == "Mapping")
+                                {
+                                    nav_avaialable = true;
+                                }
+                            }
+
+                        
+                        foreach (string sensor in robot.Sensors)
+                            {
+                                if (sensor == "Laser"){
+                                    laser_available = true;
+                                }
+                            }
+
+                        if (nav_avaialable ==false && laser_available == true)
+                            //Add the SLAM package to the plan if robot is equiped with laser.
+                            {
+
+                                //Need to complete this mapping object
+
+                                //ActionModel mapping = new ActionModel();
+                                //mapping.Name = "GMapping";
+                                //ActionSequence.Add(mapping);
+                            }
+                    }
+                }
+
+
             }
+            }
+
 
             task.ActionSequence = ActionSequence;
             task.ResourceLock = resourceLock;
+            robot.CurrentTaskId = task.Id; //Add the task to the robot internally in the middleware
             return task;
             
             //    TaskModel tempActionSequence = _mapper.Map<TaskModel>(tempAction);
