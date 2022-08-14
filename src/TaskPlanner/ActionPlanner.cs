@@ -42,8 +42,10 @@ namespace Middleware.TaskPlanner
         public Guid QuestionId { get; set; }
         public string QuestionName { get; set; }
         public bool IsSingleAnswer { get; set; }
-        public RobotModel robot { get; set; }
+        //public RobotModel robot { get; set; }
         public List<Common.Models.KeyValuePair> Answer { get; set; }
+
+        public List<Common.Models.DialogueModel> RobotDialogueData { get; set; }
 
         public ActionPlanner(IApiClientBuilder apiBuilder, IMapper mapper)
         {
@@ -63,6 +65,11 @@ namespace Middleware.TaskPlanner
 
         public async Task<TaskModel> InferActionSequence(Guid currentTaskId, bool resourceLock, List<Common.Models.DialogueModel> DialogueTemp)
         {
+            //List<Common.Models.DialogueModel> RobotDialogueData = new List<Common.Models.DialogueModel>();
+            RobotDialogueData = DialogueTemp;
+
+            RobotModel robot = new RobotModel();//Create a new robot
+            robot.Questions = DialogueTemp; //Add the questions-answers to the robot
 
             //TasksIDs = GetAllTasksID.lua
             RedisInterface.TaskModel tmpTask = await _apiClient.TaskGetByIdAsync(currentTaskId);
@@ -102,7 +109,7 @@ namespace Middleware.TaskPlanner
 
             //For standard data of the robot, maybe query redis/db after robot registered first time.
             //Iterate over the answers of the robot to make a action plan accordingly.
-            foreach (Common.Models.DialogueModel entryDialog in DialogueTemp)
+            foreach (Common.Models.DialogueModel entryDialog in robot.Questions)
             {
                 QuestionId = entryDialog.Id;
                 QuestionName = entryDialog.Name;
@@ -167,7 +174,7 @@ namespace Middleware.TaskPlanner
 
             task.ActionSequence = ActionSequence;
             task.ResourceLock = resourceLock;
-            robot.CurrentTaskId = task.Id; //Add the task to the robot internally in the middleware
+            //robot.CurrentTaskId = task.Id; //Add the task to the robot internally in the middleware <-- not done like this.
             return task;
             
             //    TaskModel tempActionSequence = _mapper.Map<TaskModel>(tempAction);

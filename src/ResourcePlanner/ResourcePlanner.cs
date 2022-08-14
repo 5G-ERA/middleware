@@ -5,8 +5,11 @@ using Middleware.Common;
 using Middleware.Common.Enums;
 using Middleware.Common.Models;
 using Middleware.ResourcePlanner.ApiReference;
+using Middleware.TaskPlanner;
+
 
 namespace Middleware.ResourcePlanner;
+
 
 public interface IResourcePlanner
 {
@@ -20,15 +23,65 @@ public class ResourcePlanner : IResourcePlanner
     private readonly IEnvironment _env;
     private readonly ILogger _logger;
 
+    public string Slice5gType { get; private set; } //eMBB, URLL, mMTC, MIoT, V2X
+    public bool StandAlone5GParam { get; private set; } // Standalone 5G or none-standalone.
+    public int NumSlicesTestBed { get; private set; } //number of slices available in testbed.
+
     public ResourcePlanner(IApiClientBuilder apiClientBuilder, IMapper mapper, IEnvironment env, ILogger<ResourcePlanner> logger)
     {
         _apiClientBuilder = apiClientBuilder;
         _mapper = mapper;
         _env = env;
         _logger = logger;
+
     }
 
-    private async Task<ActionModel> InferResource (ActionModel actionParam)
+    private async Task NetworkPlan(RobotModel robot)
+    {
+        var redisApiClient = _apiClientBuilder.CreateRedisApiClient();
+        List<Middleware.ResourcePlanner.RedisInterface.ActivePolicy> activePolicies = (await redisApiClient.PolicyGetActiveAsync()).ToList();
+        foreach (RedisInterface.ActivePolicy policy in activePolicies)
+        { 
+                if (policy.PolicyName == "Use5G")
+                {
+                        //TODO: Query testbed for number of slices and types.
+
+                        foreach (DialogueModel question in robot.Questions)
+                        {
+                            if (question.Name == "StandAlone5G or NoneStandAlone5G")
+                            {
+                                Common.Models.KeyValuePair answer = question.Answer.First();
+                                bool StandAlone5GParam = (bool)answer.Value;
+                            }
+                        }
+
+                        foreach (DialogueModel question in robot.Questions)
+                        {
+                            if (question.Name == "What type of 5G slice")
+                            {
+                                Common.Models.KeyValuePair answer = question.Answer.First();
+                                string Slice5gType = (string)answer.Value; // there is an upper limit of eight network slices that be used by a device
+                            }//Nest template
+                        }
+
+                //TODO: Attach robot to slice in Redis graph
+
+
+            }
+                if (policy.PolicyName == "Use4G")
+                {
+
+                }
+                if (policy.PolicyName == "UseWifi")
+                {
+
+                }
+
+        }
+
+    }
+
+    private async Task<ActionModel> InferResource (ActionModel actionParam) //Allocate correct placement based upon policies and priority
     {
         var redisApiClient = _apiClientBuilder.CreateRedisApiClient();
         List<Middleware.ResourcePlanner.RedisInterface.ActivePolicy> activePolicies = (await redisApiClient.PolicyGetActiveAsync()).ToList();
@@ -40,7 +93,7 @@ public class ResourcePlanner : IResourcePlanner
             {
                 throw new ArgumentException("Index policy is empty"); //This should never happend
             }
-            if (policy.PolicyName == "AllContainersInClosestMachine")
+            if (policy.PolicyName == "AllContainersInClosestMachine") // Resource allocation policies
             {
                 List<Guid> connectedEdges = (await redisApiClient.RobotGetConnectedEdgesIdsAsync(Guid.Empty)).ToList();
                 List<Guid> freeEdges = (await redisApiClient.GetFreeEdgesIdsAsync(connectedEdges)).ToList();
@@ -49,13 +102,15 @@ public class ResourcePlanner : IResourcePlanner
                     //if all of them are busy, check which one is less busy
                     List<Guid> lessBusyEdges = (await redisApiClient.GetLessBusyEdgesAsync(connectedEdges)).ToList();
                     tempDic.Add(policy.Id, lessBusyEdges);
-                    
+                    actionParam.Placement = lessBusyEdges.First();
                 }
-                
-            }//historical data second policy. --> succesful goal, less time used to perform action, more efficient,
-             //which one did the task before? QoS & QoE. (Speed network, bandwidth, 5g or 4g, wifi, number of slices)
-           
-          
+                else
+                {
+                    tempDic.Add(policy.Id, freeEdges);
+                    actionParam.Placement = freeEdges.First();
+                }
+            }
+
         }
 
         return actionParam;
