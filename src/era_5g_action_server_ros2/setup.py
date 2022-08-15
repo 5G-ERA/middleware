@@ -1,6 +1,6 @@
 from setuptools import setup
 
-package_name = 'era_5g_action_server'
+package_name = 'era_5g_action_server_ros2'
 
 setup(
     name=package_name,
@@ -14,13 +14,13 @@ setup(
     install_requires=['setuptools'],
     zip_safe=True,
     maintainer='ros',
-    maintainer_email='ros@todo.todo',
-    description='TODO: Package description',
+    maintainer_email='adrian.lendinez@outlook.com',
+    description='ROS 2 Action server interface for 5g-era middleware',
     license='TODO: License declaration',
     tests_require=['pytest'],
     entry_points={
         'console_scripts': [
-            'ActionServerNode = era_5g_action_server.ActionServerNode:main'
+            'ActionServerNode = era_5g_action_server_ros2.ActionServerNode:main'
         ],
     },
 )
