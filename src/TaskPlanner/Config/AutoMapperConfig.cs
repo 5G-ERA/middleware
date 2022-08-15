@@ -41,6 +41,7 @@ public static class AutoMapperConfig
             cfg.CreateMap<ApiResponse, ResourcePlanner.ApiResponse>().ReverseMap();
             cfg.CreateMap<ActionModel, ResourcePlanner.ActionModel>().ReverseMap();
             cfg.CreateMap<InstanceModel, ResourcePlanner.InstanceModel>().ReverseMap();
+            cfg.CreateMap<RobotModel, ResourcePlanner.RobotModel>().ReverseMap();
             //cfg.CreateMap<ContainerImageModel, ResourcePlanner.ContainerImageModel>().ReverseMap();
 
         });

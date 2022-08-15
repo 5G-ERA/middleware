@@ -16,7 +16,7 @@ public class ActionModel : BaseModel
     public int Order { get; set; }
 
     [JsonPropertyName("Placement")]
-    public Guid Placement { get; set; }
+    public string Placement { get; set; }
 
     [JsonPropertyName("ActionPriority")]
     public string ActionPriority { get; set; }

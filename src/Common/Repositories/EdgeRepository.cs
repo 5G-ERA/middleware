@@ -75,20 +75,22 @@ namespace Middleware.Common.Repositories
             return currentModel;
         }
 
-        public async Task<List<Guid>> GetFreeEdgesIdsAsync(List<Guid> edgesToCheck)
+        public async Task<List<String>> GetFreeEdgesIdsAsync(List<Guid> edgesToCheck)
         {
-            List<Guid> TempFreeEdges = new List<Guid>();
-            edgesToCheck.AddRange(TempFreeEdges);
+            //List<Guid> TempFreeEdges = new List<Guid>();
+            List<String> TempFreeEdges = new List<String>();
+            //edgesToCheck.AddRange(TempFreeEdges);
             //TempFreeEdges = edgesToCheck;
 
-            foreach (Guid edgeId in TempFreeEdges)
+            foreach (Guid edgeId in edgesToCheck)
             {
                 List<RelationModel> robotRelations = await GetRelation(edgeId, "LOCATED_AT", RelationDirection.Incoming);
                 foreach (RelationModel relationModel in robotRelations)
                 {
                     if (relationModel.PointsTo != null)
                     {
-                        TempFreeEdges.Remove(relationModel.PointsTo.Id);                      
+                        //TempFreeEdges.Remove(relationModel.PointsTo.Id);
+                        TempFreeEdges.Add(relationModel.PointsTo.Name);
                     }
                 }
             }

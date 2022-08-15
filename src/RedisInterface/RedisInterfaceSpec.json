@@ -6920,6 +6920,9 @@
             "type": "string",
             "nullable": true
           },
+          "ResourceLock": {
+            "type": "boolean"
+          },
           "TaskPriority": {
             "type": "integer",
             "format": "int32"

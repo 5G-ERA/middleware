@@ -5,15 +5,13 @@ using Middleware.Common;
 using Middleware.Common.Enums;
 using Middleware.Common.Models;
 using Middleware.ResourcePlanner.ApiReference;
-using Middleware.TaskPlanner;
 
 
 namespace Middleware.ResourcePlanner;
 
-
 public interface IResourcePlanner
 {
-    Task<TaskModel> Plan(TaskModel taskModel);
+    Task<TaskModel> Plan(TaskModel taskModel, RobotModel robot);
 }
 
 public class ResourcePlanner : IResourcePlanner
@@ -81,11 +79,11 @@ public class ResourcePlanner : IResourcePlanner
 
     }
 
-    private async Task<ActionModel> InferResource (ActionModel actionParam) //Allocate correct placement based upon policies and priority
+    private async Task<ActionModel> InferResource (ActionModel actionParam, RobotModel robot) //Allocate correct placement based upon policies and priority
     {
         var redisApiClient = _apiClientBuilder.CreateRedisApiClient();
         List<Middleware.ResourcePlanner.RedisInterface.ActivePolicy> activePolicies = (await redisApiClient.PolicyGetActiveAsync()).ToList();
-        Dictionary<Guid, List<Guid>> tempDic = new Dictionary<Guid, List<Guid>>();//Diccionary of Key policy ID, values List of results after query
+        Dictionary<Guid, List<String>> tempDic = new Dictionary<Guid, List<String>>();//Diccionary of Key policy ID, values List of results after query
 
         foreach (RedisInterface.ActivePolicy policy in activePolicies)
         {
@@ -97,19 +95,27 @@ public class ResourcePlanner : IResourcePlanner
             {
                 List<Guid> connectedEdges = (await redisApiClient.RobotGetConnectedEdgesIdsAsync(Guid.Empty)).ToList();
                 List<Guid> freeEdges = (await redisApiClient.GetFreeEdgesIdsAsync(connectedEdges)).ToList();
-                if (freeEdges.Count()==0)
-                {
-                    //if all of them are busy, check which one is less busy
-                    List<Guid> lessBusyEdges = (await redisApiClient.GetLessBusyEdgesAsync(connectedEdges)).ToList();
-                    tempDic.Add(policy.Id, lessBusyEdges);
-                    actionParam.Placement = lessBusyEdges.First();
-                }
-                else
-                {
-                    tempDic.Add(policy.Id, freeEdges);
-                    actionParam.Placement = freeEdges.First();
-                }
+                //if (freeEdges.Count()==0)
+                //{
+                //    //if all of them are busy, check which one is less busy
+                //    List<String> lessBusyEdges = (await redisApiClient.GetLessBusyEdgesAsync(connectedEdges)).ToList();
+                //    tempDic.Add(policy.Id, lessBusyEdges);
+                //    actionParam.Placement = lessBusyEdges.First();
+                //}
+                //else
+                //{
+                //    //tempDic.Add(policy.Id, freeEdges);
+                //    //actionParam.Placement = freeEdges.First();
+                //}
             }
+            if (policy.PolicyName == "StoreAllInRobot")
+            {
+                // Put all neccesary containers inside robot
+                actionParam.Placement = robot.Name;//guid
+            }
+            //All stored in the robot.
+
+                //QoS & QoE
 
         }
 
@@ -118,7 +124,7 @@ public class ResourcePlanner : IResourcePlanner
 
 
 
-    public async Task<TaskModel> Plan(TaskModel taskModel)
+    public async Task<TaskModel> Plan(TaskModel taskModel, RobotModel robot)
     {
         var redisApiClient = _apiClientBuilder.CreateRedisApiClient();
         var orchestratorApiClient = _apiClientBuilder.CreateOrchestratorApiClient();

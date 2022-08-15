@@ -272,7 +272,7 @@ namespace Middleware.RedisInterface.Controllers
         [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.NotFound)]
         [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.BadRequest)]
         [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.InternalServerError)]
-        public async Task<ActionResult<List<Guid>>> GetFreeEdgesIdsAsync(List<Guid> edgesToCheck)
+        public async Task<ActionResult<List<String>>> GetFreeEdgesIdsAsync(List<Guid> edgesToCheck)
         {
             try
             {
@@ -281,7 +281,7 @@ namespace Middleware.RedisInterface.Controllers
                     return BadRequest(new ApiResponse((int)HttpStatusCode.BadRequest, "No Edge ids were provided"));
                 }
 
-                List<Guid> edgeFree = await _edgeRepository.GetFreeEdgesIdsAsync(edgesToCheck);
+                List<string> edgeFree = await _edgeRepository.GetFreeEdgesIdsAsync(edgesToCheck);
                 if (!edgeFree.Any())
                 {
                     return NotFound(new ApiResponse((int)HttpStatusCode.BadRequest, "There are no edges connected to the Robot"));

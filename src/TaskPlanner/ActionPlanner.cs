@@ -12,7 +12,7 @@ namespace Middleware.TaskPlanner
     {
         void Initialize(List<ActionModel> actionSequence, DateTime currentTime);
        
-        Task<TaskModel> InferActionSequence(Guid id, bool lockResource, List<Common.Models.DialogueModel> dialogueTemp);
+        Task<Tuple<TaskModel, RobotModel>> InferActionSequence(Guid id, bool lockResource, List<Common.Models.DialogueModel> dialogueTemp);
     }
 
     public class ActionPlanner : IActionPlanner
@@ -63,7 +63,7 @@ namespace Middleware.TaskPlanner
             CurrentTime = currentTime;
         }
 
-        public async Task<TaskModel> InferActionSequence(Guid currentTaskId, bool resourceLock, List<Common.Models.DialogueModel> DialogueTemp)
+        public async Task<Tuple<TaskModel,RobotModel>> InferActionSequence(Guid currentTaskId, bool resourceLock, List<Common.Models.DialogueModel> DialogueTemp)
         {
             //List<Common.Models.DialogueModel> RobotDialogueData = new List<Common.Models.DialogueModel>();
             RobotDialogueData = DialogueTemp;
@@ -171,11 +171,10 @@ namespace Middleware.TaskPlanner
             }
             }
 
-
             task.ActionSequence = ActionSequence;
             task.ResourceLock = resourceLock;
             //robot.CurrentTaskId = task.Id; //Add the task to the robot internally in the middleware <-- not done like this.
-            return task;
+            return new Tuple<TaskModel, RobotModel>(task,robot);
             
             //    TaskModel tempActionSequence = _mapper.Map<TaskModel>(tempAction);
             //    object p = tempActionSequence.ActionSequence;

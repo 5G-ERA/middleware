@@ -40,7 +40,6 @@
 
 	<ItemGroup>
 		<ProjectReference Include="..\Common\Common.csproj" />
-		<ProjectReference Include="..\TaskPlanner\TaskPlanner.csproj" />
 	</ItemGroup>
 
 </Project>

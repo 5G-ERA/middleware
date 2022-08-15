@@ -38,12 +38,18 @@ namespace Middleware.TaskPlanner.Controllers
             {
 
                 _actionPlanner.Initialize(new List<ActionModel>(), DateTime.Now);
-
-                TaskModel plan = await _actionPlanner.InferActionSequence(id, lockResource, DialogueTemp);
+                   
+                var (plan, robot) = await _actionPlanner.InferActionSequence(id, lockResource, DialogueTemp);
 
                 // call resource planner for resources
                 ResourcePlanner.TaskModel tmpTaskSend = _mapper.Map<ResourcePlanner.TaskModel>(plan);
-                ResourcePlanner.TaskModel tmpFinalTask = await _resourcePlannerClient.GetResourcePlanAsync(tmpTaskSend);
+                ResourcePlanner.RobotModel tmpRobotSend = _mapper.Map<ResourcePlanner.RobotModel>(robot);
+                ResourcePlanner.ResourceInput resourceInput = new ResourcePlanner.ResourceInput
+                {
+                    Robot = tmpRobotSend,
+                    Task = tmpTaskSend
+                };
+                ResourcePlanner.TaskModel tmpFinalTask = await _resourcePlannerClient.GetResourcePlanAsync(resourceInput);//API call to resource planner
 
                 TaskModel resourcePlan = _mapper.Map<TaskModel>(tmpFinalTask);
 

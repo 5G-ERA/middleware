@@ -20,16 +20,20 @@ namespace Middleware.ResourcePlanner.Controllers
             _logger = logger;
         }
 
+        public record ResourceInput(TaskModel Task, RobotModel Robot);
+
         [HttpPost(Name = "GetResourcePlan")]
         [ProducesResponseType(typeof(TaskModel), (int)HttpStatusCode.OK)]
         [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.NotFound)]
         [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.InternalServerError)]
         
-        public async Task<ActionResult<TaskModel>> GetResource([FromBody] TaskModel inputModel)
+        public async Task<ActionResult<TaskModel>> GetResource([FromBody] ResourceInput resource)
         {
             try
             {
-                TaskModel updatedTask = await _resourcePlanner.Plan(inputModel);
+              
+                TaskModel updatedTask = await _resourcePlanner.Plan(resource.Task, resource.Robot);
+                
                 return Ok(updatedTask);
             }
             catch (Orchestrator.ApiException<RedisInterface.ApiResponse> apiEx)
