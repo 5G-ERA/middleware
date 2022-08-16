@@ -45,6 +45,7 @@ goal_id:
     nsecs: 0
   id: ''
 goal:
-  goal_taskid: 'c2a99272-8e84-4ae6-8c3d-1951d0985cdf'
-  action_reference: 0" 
+  goal_taskid: 'a9fdafe6-9b90-48bc-a286-3f08ed0a78aa'
+  action_reference: 0
+  resource_lock: false"
 ```
