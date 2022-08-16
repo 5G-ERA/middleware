@@ -32,6 +32,7 @@ cd /home/dev_ws
 source devel/setup.bash
 ```
 
+Distributed example task:
 ```shell
 rostopic pub /goal_5g/goal era_5g_action_interfaces_ros1/goal_5gActionGoal "header:
   seq: 0
@@ -51,4 +52,21 @@ goal:
 ```
 
 StandAlone example taskid: 
-72d9e9ee-e261-41f8-8135-1e5cc0db13f4
+```shell
+rostopic pub /goal_5g/goal era_5g_action_interfaces_ros1/goal_5gActionGoal "header:
+  seq: 0
+  stamp:
+    secs: 0
+    nsecs: 0
+  frame_id: ''
+goal_id:
+  stamp:
+    secs: 0
+    nsecs: 0
+  id: ''
+goal:
+  goal_taskid: '72d9e9ee-e261-41f8-8135-1e5cc0db13f4'
+  action_reference: 0
+  resource_lock: false"
+```
+
