@@ -4,6 +4,19 @@ metadata:
   name: orchestrator-role
   namespace: middleware
 rules:
-- apiGroups: ["", "apps", "batch"]  
-  resources: ["services", "nodes", "namespaces", "pods", "deployments",  "daemonsets",  "statefulsets",  "replicasets", "jobs"]  
-  verbs: ["get",  "list",  "watch",  "create", "delete"]
+  - apiGroups: ["", "apps", "batch"]
+    resources:
+      [
+        "services",
+        "nodes",
+        "namespaces",
+        "pods",
+        "deployments",
+        "daemonsets",
+        "statefulsets",
+        "replicasets",
+        "jobs",
+        "pods/log",
+        "pods/exec",
+      ]
+    verbs: ["get", "list", "watch", "create", "delete"]
