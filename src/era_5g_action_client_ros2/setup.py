@@ -1,6 +1,6 @@
 from setuptools import setup
 
-package_name = 'era_5g_action_client_ros2'
+package_name = 'era_5g_action_client'
 
 setup(
     name=package_name,
@@ -20,7 +20,7 @@ setup(
     tests_require=['pytest'],
     entry_points={
         'console_scripts': [
-            'ActionClientNode = era_5g_action_client_ros2.ActionClientNode:main'
+            'ActionClientNode = era_5g_action_client.ActionClientNode:main'
         ],
     },
 )
