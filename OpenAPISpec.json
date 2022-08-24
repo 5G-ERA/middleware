@@ -753,7 +753,7 @@
         }
     },
     "paths": {
-        "/Orchestrate/Health": {
+        "/Orchestrate/health": {
             "get": {
                 "tags": [
                     "Health"
@@ -766,7 +766,7 @@
                 }
             }
         },
-        "/Orchestrate/Health/spec": {
+        "/Orchestrate/health/spec": {
             "get": {
                 "tags": [
                     "Health"
@@ -796,7 +796,7 @@
                 }
             }
         },
-        "/Orchestrate/Orchestrate/plan": {
+        "/Orchestrate/orchestrate/plan": {
             "post": {
                 "tags": [
                     "Orchestrate"
@@ -912,7 +912,7 @@
                 }
             }
         },
-        "/Orchestrate/Orchestrate/plan/{id}": {
+        "/Orchestrate/orchestrate/plan/{id}": {
             "get": {
                 "tags": [
                     "Orchestrate"
@@ -1075,7 +1075,7 @@
                 }
             }
         },
-        "/Orchestrate/Orchestrate/action/{id}": {
+        "/Orchestrate/orchestrate/action/{id}": {
             "delete": {
                 "tags": [
                     "Orchestrate"
@@ -1119,7 +1119,7 @@
                 }
             }
         },
-        "/Orchestrate/Orchestrate/execute": {
+        "/Orchestrate/orchestrate/execute": {
             "post": {
                 "tags": [
                     "Orchestrate"
@@ -1185,7 +1185,7 @@
                 }
             }
         },
-        "/Orchestrate/Status/robot": {
+        "/status/robot": {
             "get": {
                 "tags": [
                     "Status"
@@ -1372,7 +1372,7 @@
                 }
             }
         },
-        "/Orchestrate/Status/netapp": {
+        "/status/netapp": {
             "get": {
                 "tags": [
                     "Status"
@@ -1559,7 +1559,7 @@
                 }
             }
         },
-        "/Orchestrate/Status/netapp/instance": {
+        "/status/netapp/instance": {
             "get": {
                 "tags": [
                     "Status"
@@ -1668,7 +1668,7 @@
                 }
             }
         },
-        "/Data/Action": {
+        "/Data/action": {
             "get": {
                 "tags": [
                     "Action"
@@ -1839,7 +1839,7 @@
                 }
             }
         },
-        "/Data/Action/{id}": {
+        "/Data/action/{id}": {
             "get": {
                 "tags": [
                     "Action"
@@ -2085,7 +2085,7 @@
                 }
             }
         },
-        "/Data/Action/AddRelation": {
+        "/Data/action/addrelation": {
             "post": {
                 "tags": [
                     "Action"
@@ -2179,7 +2179,7 @@
                 }
             }
         },
-        "/Data/Action/relation/{name}": {
+        "/Data/action/relation/{name}": {
             "get": {
                 "tags": [
                     "Action"
@@ -2276,7 +2276,7 @@
                 }
             }
         },
-        "/Data/Action/relations/{firstName}/{secondName}": {
+        "/Data/action/relations/{firstname}/{secondname}": {
             "get": {
                 "tags": [
                     "Action"
@@ -2381,7 +2381,7 @@
                 }
             }
         },
-        "/Data/Action/plan": {
+        "/Data/action/plan": {
             "get": {
                 "tags": [
                     "Action"
@@ -2552,7 +2552,7 @@
                 }
             }
         },
-        "/Data/Action/plan/{id}": {
+        "/Data/action/plan/{id}": {
             "get": {
                 "tags": [
                     "Action"
@@ -2801,7 +2801,7 @@
                 }
             }
         },
-        "/Data/Cloud": {
+        "/Data/cloud": {
             "get": {
                 "tags": [
                     "Cloud"
@@ -2963,7 +2963,7 @@
                 }
             }
         },
-        "/Data/Cloud/{id}": {
+        "/Data/cloud/{id}": {
             "get": {
                 "tags": [
                     "Cloud"
@@ -3209,7 +3209,7 @@
                 }
             }
         },
-        "/Data/Cloud/AddRelation": {
+        "/Data/cloud/addrelation": {
             "post": {
                 "tags": [
                     "Cloud"
@@ -3303,7 +3303,7 @@
                 }
             }
         },
-        "/Data/Cloud/relation/{name}": {
+        "/Data/cloud/relation/{name}": {
             "get": {
                 "tags": [
                     "Cloud"
@@ -3400,7 +3400,7 @@
                 }
             }
         },
-        "/Data/Cloud/relations/{firstName}/{secondName}": {
+        "/Data/cloud/relations/{firstname}/{secondname}": {
             "get": {
                 "tags": [
                     "Cloud"
@@ -3505,7 +3505,7 @@
                 }
             }
         },
-        "/Data/ContainerImage": {
+        "/Data/containerimage": {
             "get": {
                 "tags": [
                     "ContainerImage"
@@ -3667,7 +3667,7 @@
                 }
             }
         },
-        "/Data/ContainerImage/{id}": {
+        "/Data/containerimage/{id}": {
             "get": {
                 "tags": [
                     "ContainerImage"
@@ -3913,7 +3913,7 @@
                 }
             }
         },
-        "/Data/ContainerImage/AddRelation": {
+        "/Data/containerimage/addrelation": {
             "post": {
                 "tags": [
                     "ContainerImage"
@@ -4007,7 +4007,7 @@
                 }
             }
         },
-        "/Data/ContainerImage/relation/{name}": {
+        "/Data/containerimage/relation/{name}": {
             "get": {
                 "tags": [
                     "ContainerImage"
@@ -4104,7 +4104,7 @@
                 }
             }
         },
-        "/Data/ContainerImage/relations/{firstName}/{secondName}": {
+        "/Data/containerimage/relations/{firstname}/{secondname}": {
             "get": {
                 "tags": [
                     "ContainerImage"
@@ -4209,7 +4209,7 @@
                 }
             }
         },
-        "/Data/ContainerImage/instance/{id}": {
+        "/Data/containerimage/instance/{id}": {
             "get": {
                 "tags": [
                     "ContainerImage"
@@ -4299,7 +4299,7 @@
                 }
             }
         },
-        "/Data/Edge": {
+        "/Data/edge": {
             "get": {
                 "tags": [
                     "Edge"
@@ -4461,7 +4461,7 @@
                 }
             }
         },
-        "/Data/Edge/{id}": {
+        "/Data/edge/{id}": {
             "get": {
                 "tags": [
                     "Edge"
@@ -4707,7 +4707,7 @@
                 }
             }
         },
-        "/Data/Edge/AddRelation": {
+        "/Data/edge/addrelation": {
             "post": {
                 "tags": [
                     "Edge"
@@ -4801,7 +4801,7 @@
                 }
             }
         },
-        "/Data/Edge/relation/{name}": {
+        "/Data/edge/relation/{name}": {
             "get": {
                 "tags": [
                     "Edge"
@@ -4898,7 +4898,7 @@
                 }
             }
         },
-        "/Data/Edge/relations/{firstName}/{secondName}": {
+        "/Data/edge/relations/{firstname}/{secondname}": {
             "get": {
                 "tags": [
                     "Edge"
@@ -5003,7 +5003,291 @@
                 }
             }
         },
-        "/Data/Health": {
+        "/Data/edge/free": {
+            "post": {
+                "tags": [
+                    "Edge"
+                ],
+                "operationId": "GetFreeEdgesIds",
+                "requestBody": {
+                    "content": {
+                        "application/json-patch+json": {
+                            "schema": {
+                                "type": "array",
+                                "items": {
+                                    "type": "string",
+                                    "format": "uuid"
+                                }
+                            }
+                        },
+                        "application/json": {
+                            "schema": {
+                                "type": "array",
+                                "items": {
+                                    "type": "string",
+                                    "format": "uuid"
+                                }
+                            }
+                        },
+                        "text/json": {
+                            "schema": {
+                                "type": "array",
+                                "items": {
+                                    "type": "string",
+                                    "format": "uuid"
+                                }
+                            }
+                        },
+                        "application/*+json": {
+                            "schema": {
+                                "type": "array",
+                                "items": {
+                                    "type": "string",
+                                    "format": "uuid"
+                                }
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Success",
+                        "content": {
+                            "text/plain": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "type": "string",
+                                        "format": "uuid"
+                                    }
+                                }
+                            },
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "type": "string",
+                                        "format": "uuid"
+                                    }
+                                }
+                            },
+                            "text/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "type": "string",
+                                        "format": "uuid"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "content": {
+                            "text/plain": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                }
+                            },
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                }
+                            },
+                            "text/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "content": {
+                            "text/plain": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                }
+                            },
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                }
+                            },
+                            "text/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Server Error",
+                        "content": {
+                            "text/plain": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                }
+                            },
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                }
+                            },
+                            "text/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/Data/edge/lessbusy": {
+            "post": {
+                "tags": [
+                    "Edge"
+                ],
+                "operationId": "GetLessBusyEdges",
+                "requestBody": {
+                    "content": {
+                        "application/json-patch+json": {
+                            "schema": {
+                                "type": "array",
+                                "items": {
+                                    "type": "string",
+                                    "format": "uuid"
+                                }
+                            }
+                        },
+                        "application/json": {
+                            "schema": {
+                                "type": "array",
+                                "items": {
+                                    "type": "string",
+                                    "format": "uuid"
+                                }
+                            }
+                        },
+                        "text/json": {
+                            "schema": {
+                                "type": "array",
+                                "items": {
+                                    "type": "string",
+                                    "format": "uuid"
+                                }
+                            }
+                        },
+                        "application/*+json": {
+                            "schema": {
+                                "type": "array",
+                                "items": {
+                                    "type": "string",
+                                    "format": "uuid"
+                                }
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Success",
+                        "content": {
+                            "text/plain": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "type": "string",
+                                        "format": "uuid"
+                                    }
+                                }
+                            },
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "type": "string",
+                                        "format": "uuid"
+                                    }
+                                }
+                            },
+                            "text/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "type": "string",
+                                        "format": "uuid"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "content": {
+                            "text/plain": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                }
+                            },
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                }
+                            },
+                            "text/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "content": {
+                            "text/plain": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                }
+                            },
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                }
+                            },
+                            "text/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Server Error",
+                        "content": {
+                            "text/plain": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                }
+                            },
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                }
+                            },
+                            "text/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/Data/health": {
             "get": {
                 "tags": [
                     "Health"
@@ -5016,7 +5300,7 @@
                 }
             }
         },
-        "/Data/Health/spec": {
+        "/Data/health/spec": {
             "get": {
                 "tags": [
                     "Health"
@@ -5046,7 +5330,7 @@
                 }
             }
         },
-        "/Data/Instance": {
+        "/Data/instance": {
             "get": {
                 "tags": [
                     "Instance"
@@ -5208,7 +5492,7 @@
                 }
             }
         },
-        "/Data/Instance/{id}": {
+        "/Data/instance/{id}": {
             "get": {
                 "tags": [
                     "Instance"
@@ -5454,7 +5738,7 @@
                 }
             }
         },
-        "/Data/Instance/AddRelation": {
+        "/Data/instance/addrelation": {
             "post": {
                 "tags": [
                     "Instance"
@@ -5548,7 +5832,7 @@
                 }
             }
         },
-        "/Data/Instance/relation/{name}": {
+        "/Data/instance/relation/{name}": {
             "get": {
                 "tags": [
                     "Instance"
@@ -5645,7 +5929,7 @@
                 }
             }
         },
-        "/Data/Instance/relations/{firstName}/{secondName}": {
+        "/Data/instance/relations/{firstname}/{secondname}": {
             "get": {
                 "tags": [
                     "Instance"
@@ -5750,7 +6034,169 @@
                 }
             }
         },
-        "/Data/Policy/{id}": {
+        "/Data/policy": {
+            "post": {
+                "tags": [
+                    "Policy"
+                ],
+                "operationId": "PolicyAdd",
+                "requestBody": {
+                    "content": {
+                        "application/json-patch+json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/PolicyModel"
+                            }
+                        },
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/PolicyModel"
+                            }
+                        },
+                        "text/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/PolicyModel"
+                            }
+                        },
+                        "application/*+json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/PolicyModel"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Success",
+                        "content": {
+                            "text/plain": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/PolicyModel"
+                                }
+                            },
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/PolicyModel"
+                                }
+                            },
+                            "text/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/PolicyModel"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "content": {
+                            "text/plain": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                }
+                            },
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                }
+                            },
+                            "text/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Server Error",
+                        "content": {
+                            "text/plain": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                }
+                            },
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                }
+                            },
+                            "text/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "get": {
+                "tags": [
+                    "Policy"
+                ],
+                "operationId": "PolicyGetAll",
+                "responses": {
+                    "200": {
+                        "description": "Success",
+                        "content": {
+                            "text/plain": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/PolicyModel"
+                                }
+                            },
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/PolicyModel"
+                                }
+                            },
+                            "text/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/PolicyModel"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "content": {
+                            "text/plain": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                }
+                            },
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                }
+                            },
+                            "text/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Server Error",
+                        "content": {
+                            "text/plain": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                }
+                            },
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                }
+                            },
+                            "text/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/Data/policy/{id}": {
             "get": {
                 "tags": [
                     "Policy"
@@ -5934,77 +6380,7 @@
                 }
             }
         },
-        "/Data/Policy": {
-            "get": {
-                "tags": [
-                    "Policy"
-                ],
-                "operationId": "PolicyGetAll",
-                "responses": {
-                    "200": {
-                        "description": "Success",
-                        "content": {
-                            "text/plain": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/PolicyModel"
-                                }
-                            },
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/PolicyModel"
-                                }
-                            },
-                            "text/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/PolicyModel"
-                                }
-                            }
-                        }
-                    },
-                    "404": {
-                        "description": "Not Found",
-                        "content": {
-                            "text/plain": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/ApiResponse"
-                                }
-                            },
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/ApiResponse"
-                                }
-                            },
-                            "text/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/ApiResponse"
-                                }
-                            }
-                        }
-                    },
-                    "500": {
-                        "description": "Server Error",
-                        "content": {
-                            "text/plain": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/ApiResponse"
-                                }
-                            },
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/ApiResponse"
-                                }
-                            },
-                            "text/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/ApiResponse"
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        },
-        "/Data/Policy/current": {
+        "/Data/policy/current": {
             "get": {
                 "tags": [
                     "Policy"
@@ -6016,17 +6392,26 @@
                         "content": {
                             "text/plain": {
                                 "schema": {
-                                    "$ref": "#/components/schemas/ActivePolicy"
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/ActivePolicy"
+                                    }
                                 }
                             },
                             "application/json": {
                                 "schema": {
-                                    "$ref": "#/components/schemas/ActivePolicy"
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/ActivePolicy"
+                                    }
                                 }
                             },
                             "text/json": {
                                 "schema": {
-                                    "$ref": "#/components/schemas/ActivePolicy"
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/ActivePolicy"
+                                    }
                                 }
                             }
                         }
@@ -6074,7 +6459,7 @@
                 }
             }
         },
-        "/Data/Robot": {
+        "/Data/robot": {
             "get": {
                 "tags": [
                     "Robot"
@@ -6236,7 +6621,7 @@
                 }
             }
         },
-        "/Data/Robot/{id}": {
+        "/Data/robot/{id}": {
             "get": {
                 "tags": [
                     "Robot"
@@ -6482,7 +6867,7 @@
                 }
             }
         },
-        "/Data/Robot/AddRelation": {
+        "/Data/robot/addrelation": {
             "post": {
                 "tags": [
                     "Robot"
@@ -6576,7 +6961,7 @@
                 }
             }
         },
-        "/Data/Robot/relation/{name}": {
+        "/Data/robot/relation/{name}": {
             "get": {
                 "tags": [
                     "Robot"
@@ -6673,7 +7058,7 @@
                 }
             }
         },
-        "/Data/Robot/relations/{firstName}/{secondName}": {
+        "/Data/robot/relations/{firstname}/{secondname}": {
             "get": {
                 "tags": [
                     "Robot"
@@ -6778,7 +7163,120 @@
                 }
             }
         },
-        "/Data/Task": {
+        "/Data/robot/{robotid}/edges": {
+            "get": {
+                "tags": [
+                    "Robot"
+                ],
+                "operationId": "RobotGetConnectedEdgesIds",
+                "parameters": [
+                    {
+                        "name": "robotId",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Success",
+                        "content": {
+                            "text/plain": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "type": "string",
+                                        "format": "uuid"
+                                    }
+                                }
+                            },
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "type": "string",
+                                        "format": "uuid"
+                                    }
+                                }
+                            },
+                            "text/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "type": "string",
+                                        "format": "uuid"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "content": {
+                            "text/plain": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                }
+                            },
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                }
+                            },
+                            "text/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "content": {
+                            "text/plain": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                }
+                            },
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                }
+                            },
+                            "text/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Server Error",
+                        "content": {
+                            "text/plain": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                }
+                            },
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                }
+                            },
+                            "text/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/Data/task": {
             "get": {
                 "tags": [
                     "Task"
@@ -6940,7 +7438,7 @@
                 }
             }
         },
-        "/Data/Task/{id}": {
+        "/Data/task/{id}": {
             "get": {
                 "tags": [
                     "Task"
@@ -7186,7 +7684,7 @@
                 }
             }
         },
-        "/Data/Task/AddRelation": {
+        "/Data/task/addrelation": {
             "post": {
                 "tags": [
                     "Task"
@@ -7280,7 +7778,7 @@
                 }
             }
         },
-        "/Data/Task/relation/{name}": {
+        "/Data/task/relation/{name}": {
             "get": {
                 "tags": [
                     "Task"
@@ -7377,7 +7875,7 @@
                 }
             }
         },
-        "/Data/Task/relations/{firstName}/{secondName}": {
+        "/Data/task/relations/{firstname}/{secondname}": {
             "get": {
                 "tags": [
                     "Task"
@@ -7482,7 +7980,7 @@
                 }
             }
         },
-        "/Data/Task/ImportTask": {
+        "/Data/task/importtask": {
             "post": {
                 "tags": [
                     "Task"
@@ -7576,7 +8074,7 @@
                 }
             }
         },
-        "/Task/Health": {
+        "/Task/health": {
             "get": {
                 "tags": [
                     "Health"
@@ -7589,7 +8087,7 @@
                 }
             }
         },
-        "/Task/Health/spec": {
+        "/Task/health/spec": {
             "get": {
                 "tags": [
                     "Health"
@@ -7619,7 +8117,7 @@
                 }
             }
         },
-        "/Task/Plan": {
+        "/Task/plan": {
             "post": {
                 "tags": [
                     "Plan"
@@ -7737,7 +8235,7 @@
                 }
             }
         },
-        "/Task/RePlan": {
+        "/Task/replan": {
             "post": {
                 "tags": [
                     "RePlan"
