@@ -6,6 +6,7 @@ import os
 #GLOBAL VARIABLES 
 global username
 username='97f4059f-acfa-48f9-b22c-165ecbc51ed1'
+#username='a9fdafe6-9b90-48bc-a286-3f08ed0a78aa'
 global password
 password='5g-era'
 global Token
@@ -15,7 +16,11 @@ plan=''
 global ActionPlanId
 ActionPlanId = ''
 
-task_id='204edfa7-ca2b-43d2-9298-f5b3883aaf27'
+#task_id='204edfa7-ca2b-43d2-9298-f5b3883aaf27'
+#distributed
+#task_id='a9fdafe6-9b90-48bc-a286-3f08ed0a78aa'
+#standalone
+task_id='72d9e9ee-e261-41f8-8135-1e5cc0db13f4'
 
 #Last update: 16-05-2022
 
@@ -28,7 +33,8 @@ class ActionClient_5g():
     def login(self): # Login function to middleware
         try:
             global Token
-            r = requests.post('http://10.64.140.43/Login', json={"Id": username, "Password": password})
+            #r = requests.post('http://10.64.140.43/Login', json={"Id": username, "Password": password})
+            r = requests.post('http://192.168.20.220/Login', json={"Id": username, "Password": password})
             print(f"Status Code: {r.status_code}, Response: {r.json()}")
             Token = jsondata = r.json()
             newToken=(Token['token'])
@@ -42,7 +48,8 @@ class ActionClient_5g():
             global Token
             hed = {'Authorization': 'Bearer ' + str(Token)}
             data = {"TaskId": taskId}
-            url = "http://10.64.140.43/Task/Plan"
+            #url = "http://10.64.140.43/Task/Plan"
+            url = "http://192.168.20.220/Task/Plan"
             response = requests.post(url, json=data, headers=hed)
             print(response.json())
 
@@ -58,7 +65,8 @@ class ActionClient_5g():
         try:
             global Token
             hed = {'Authorization': 'Bearer ' + str(Token)}
-            url = "http://10.64.140.43/orchestrate/orchestrate/plan/"+str(ActionPlanId)
+            #url = "http://10.64.140.43/orchestrate/orchestrate/plan/"+str(ActionPlanId)
+            url = "http://192.168.20.220/orchestrate/orchestrate/plan/"+str(ActionPlanId)
             response = requests.get(url, headers=hed)
             print(response.json())
         except HTTPError as e:
@@ -68,7 +76,8 @@ class ActionClient_5g():
         try:
             global Token
             hed = {'Authorization': 'Bearer ' + str(Token)}
-            url = "http://10.64.140.43/orchestrate/orchestrate/plan/"+str(ActionPlanId)
+            #url = "http://10.64.140.43/orchestrate/orchestrate/plan/"+str(ActionPlanId)
+            url = "http://192.168.20.220/orchestrate/orchestrate/plan/"+str(ActionPlanId)
             response = requests.delete(url, headers=hed)
             if '200' in str(response):
                 print("Deleted succesfully")
@@ -88,7 +97,7 @@ def main():
     print("==========GET RESOURCE STATUS=======")
     actionClient.getResourceStatus(ActionPlanId) # Get resource update
     print("===========DELETE RESOURCES=========")
-    actionClient.DeleteResources(ActionPlanId) # Delete resources
+    #actionClient.DeleteResources(ActionPlanId) # Delete resources
     print("====================================")
     
 

@@ -1,0 +1,8 @@
+string goal_taskid
+int32 action_reference
+bool resource_lock
+---
+string result
+---
+string feedback_resources_status
+string[] action_sequence                       

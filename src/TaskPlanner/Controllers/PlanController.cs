@@ -23,7 +23,7 @@ namespace Middleware.TaskPlanner.Controllers
             _orchestratorClient = builder.CreateOrchestratorApiClient();
         }
 
-        [HttpPost] //http get request
+        [HttpPost] 
         [ProducesResponseType(typeof(TaskModel), (int)HttpStatusCode.OK)]
         [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.NotFound)]
         [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.BadRequest)]
@@ -31,13 +31,14 @@ namespace Middleware.TaskPlanner.Controllers
         public async Task<ActionResult<TaskModel>> GetPlan([FromBody] TaskPlannerInputModel inputModel, bool dryRun = false)
         {
             Guid id = inputModel.Id;
+            bool lockResource = inputModel.LockResourceReUse;
 
             try
             {
 
                 _actionPlanner.Initialize(new List<ActionModel>(), DateTime.Now);
 
-                TaskModel plan = await _actionPlanner.InferActionSequence(id);
+                TaskModel plan = await _actionPlanner.InferActionSequence(id, lockResource);
 
                 // call resource planner for resources
                 ResourcePlanner.TaskModel tmpTaskSend = _mapper.Map<ResourcePlanner.TaskModel>(plan);

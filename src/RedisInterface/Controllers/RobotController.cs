@@ -95,8 +95,8 @@ namespace Middleware.RedisInterface.Controllers
                 RobotModel robot = await _robotRepository.AddAsync(model);
                 if (robot is null)
                 {
-                    return StatusCode((int) HttpStatusCode.InternalServerError,
-                        new ApiResponse((int) HttpStatusCode.InternalServerError,
+                    return StatusCode((int)HttpStatusCode.InternalServerError,
+                        new ApiResponse((int)HttpStatusCode.InternalServerError,
                             "Could not add the robot to the data store"));
                 }
             }
@@ -153,12 +153,12 @@ namespace Middleware.RedisInterface.Controllers
         {
             try
             {
-               var deleted = await _robotRepository.DeleteByIdAsync(id);
-               if (deleted == false)
-               {
-                   return NotFound(new ApiResponse((int)HttpStatusCode.NotFound, "The specified Robot has not been found."));
-               }
-               return Ok();
+                var deleted = await _robotRepository.DeleteByIdAsync(id);
+                if (deleted == false)
+                {
+                    return NotFound(new ApiResponse((int)HttpStatusCode.NotFound, "The specified Robot has not been found."));
+                }
+                return Ok();
 
             }
             catch (Exception ex)
@@ -190,8 +190,8 @@ namespace Middleware.RedisInterface.Controllers
                 bool isValid = await _robotRepository.AddRelationAsync(model);
                 if (!isValid)
                 {
-                    return StatusCode((int) HttpStatusCode.InternalServerError,
-                        new ApiResponse((int) HttpStatusCode.InternalServerError, "The relation was not created"));
+                    return StatusCode((int)HttpStatusCode.InternalServerError,
+                        new ApiResponse((int)HttpStatusCode.InternalServerError, "The relation was not created"));
                 }
 
             }
@@ -211,7 +211,7 @@ namespace Middleware.RedisInterface.Controllers
         /// <param name="name"></param>
         /// <returns></returns>
         [HttpGet]
-        [Route("relation/{name}", Name ="RobotGetRelationByName")]
+        [Route("relation/{name}", Name = "RobotGetRelationByName")]
         [ProducesResponseType(typeof(List<RelationModel>), (int)HttpStatusCode.OK)]
         [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.NotFound)]
         [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.InternalServerError)]
@@ -273,9 +273,9 @@ namespace Middleware.RedisInterface.Controllers
         [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.NotFound)]
         [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.BadRequest)]
         [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.InternalServerError)]
-        public async Task<ActionResult<List<Guid>>> GetConnectedEdgesIdsAsync(Guid robotId) 
+        public async Task<ActionResult<List<Guid>>> GetConnectedEdgesIdsAsync(Guid robotId)
         {
-            try 
+            try
             {
                 if (robotId == Guid.Empty)
                 {
@@ -296,5 +296,7 @@ namespace Middleware.RedisInterface.Controllers
             }
 
         }
+
     }
 }
+
