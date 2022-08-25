@@ -218,6 +218,7 @@ public class DeploymentService : IDeploymentService
         if (obj is V1Deployment depl)
         {
             depl.Metadata.SetServiceLabel(instanceId);
+            depl.Metadata.AddNetAppMultusAnnotations(AppConfig.MultusNetworkName);
             foreach (var container in depl.Spec.Template.Spec.Containers)
             {
                 List<V1EnvVar> envVars = container.Env is not null
@@ -238,7 +239,6 @@ public class DeploymentService : IDeploymentService
         return default;
 
     }
-
 
     /// <inheritdoc/>
     public V1Service CreateService(string serviceImageName, K8SServiceKindEnum kind, V1ObjectMeta meta)

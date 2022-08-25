@@ -21,6 +21,17 @@ public static class V1ObjectExtensions
         meta.Labels.Add(ServiceIdSelector, serviceId.ToString());
     }
 
+    public static void AddNetAppMultusAnnotations(this V1ObjectMeta meta, string networkName)
+    {
+        const string annotationKey = "k8s.v1.cni.cncf.io/networks";
+        if (meta.Annotations is null)
+        {
+            meta.Annotations = new Dictionary<string, string>();
+        }
+
+        meta.Annotations[annotationKey] = networkName;
+    }
+
     public static string GetExternalAddress(this V1Service service, ILogger logger = null)
     {
         var ingress = service.Status?.LoadBalancer?.Ingress?.FirstOrDefault();
