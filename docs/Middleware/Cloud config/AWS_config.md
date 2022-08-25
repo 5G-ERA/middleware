@@ -31,7 +31,7 @@ To configure your identity pool
 
 8. Enter the App Client ID. This must be the same client app ID that you received when you created the app in the Your User Pools section of the AWS Management Console for Amazon Cognito.
 
-9. If you have additional apps or user pools, choose Add Another Provider and enter the User Pool ID and App Client ID for each app in each user pool.
+9. If you have additional apps or user pools, choose "Add Another Provider" and enter the User Pool ID and App Client ID for each app in each user pool.
 
 10. When you have no more apps or user pools to add, choose Save Changes. If successful, you will see a Changes saved successfully message on the Dashboard page.
 
@@ -67,7 +67,7 @@ The IAM Role will be used for giving the pod the necessary permissions to deploy
 Create the Service Account and the Role, as described in the definition of preparing the testing environment. 
 
 On top of this, the service account has to be annotated with the `arn` of the IAM Role. 
-Do this with the following command replacing `service-account-name` with the name of the service account that will be annotated and the `arn:aws:iam::111122223333:role/iam-role-name` with the correct arn of teh role you gave the necessary permissions:
+Do this with the following command replacing `service-account-name` with the name of the service account that will be annotated and the `arn:aws:iam::111122223333:role/iam-role-name` with the correct `arn` of the role you gave the necessary permissions:
 
 ```bash
 kubectl annotate serviceaccount -n service-account-namespace service-account-name \
