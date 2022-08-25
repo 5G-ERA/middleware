@@ -23,7 +23,7 @@ public class KubernetesBuilderTests
     }
 
     [Fact]
-    public void IsValidInClusterConfig_ShoudReturnTrue_WhenEnvVarsExistAndFilesArePresent()
+    public void IsValidInClusterConfig_ShouldReturnTrue_WhenEnvVarsExistAndFilesArePresent()
     {
         // arrange
         _env.GetEnvVariable("KUBERNETES_SERVICE_HOST").Returns("192.168.0.1");
@@ -43,7 +43,7 @@ public class KubernetesBuilderTests
     }
 
     [Fact]
-    public void IsValidInClusterConfig_ShoudReturnFalse_WhenServiceAccountNotSet()
+    public void IsValidInClusterConfig_ShouldReturnFalse_WhenServiceAccountNotSet()
     {
         // arrange
         _env.GetEnvVariable("KUBERNETES_SERVICE_HOST").Returns("192.168.0.1");

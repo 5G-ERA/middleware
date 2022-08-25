@@ -331,7 +331,8 @@ public class DeploymentService : IDeploymentService
     }
 
     /// <inheritdoc/>
-    public V1Deployment CreateStartupDeployment(string name)
+    /// <param name="tag1"></param>
+    public V1Deployment CreateStartupDeployment(string name, string tag)
     {
         var selector = new V1LabelSelector
         {
@@ -361,7 +362,7 @@ public class DeploymentService : IDeploymentService
         var container = new V1Container()
         {
             Name = name,
-            Image = K8SImageHelper.BuildImageName(_awsRegistryName, name, "latest"),
+            Image = K8SImageHelper.BuildImageName(_awsRegistryName, name, tag),
             ImagePullPolicy = AppConfig.AppConfiguration == AppVersionEnum.Prod.GetStringValue() ? "Always" : "IfNotPresent",
             Env = envList,
             Ports = new List<V1ContainerPort>() { new(80), new(433) }
