@@ -12,6 +12,10 @@ public class ActionModel : BaseModel
 
     [JsonPropertyName("ActionFamily")]
     public string ActionFamily { get; set; }
+
+    [JsonPropertyName("Tags")]
+    public List<string> Tags { get; set; }
+
     [JsonPropertyName("Order")]
     public int Order { get; set; }
 

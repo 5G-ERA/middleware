@@ -11,7 +11,6 @@ namespace Middleware.Common.Models
         public override string Name { get; set; }
 
         [JsonPropertyName("ResourceLock")]
-
         public bool ResourceLock { get; set; }
 
         [JsonPropertyName("TaskPriority")]
@@ -23,6 +22,11 @@ namespace Middleware.Common.Models
         [JsonPropertyName("ActionSequence")]
         //[JsonIgnore]
         public List<ActionModel> ActionSequence { get; set; }
+
+        [JsonPropertyName("Tags")]
+        //[JsonIgnore]
+        public List<string> Tags { get; set; }
+
 
         public TaskModel()
         {

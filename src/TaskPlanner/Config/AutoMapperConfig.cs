@@ -26,6 +26,7 @@ public static class AutoMapperConfig
             cfg.CreateMap<PolicyModel, RedisInterface.PolicyModel>().ReverseMap();
             cfg.CreateMap<RobotModel, RedisInterface.RobotModel>().ReverseMap();
             cfg.CreateMap<TaskModel, RedisInterface.TaskModel>().ReverseMap();
+            //cfg.CreateMap<RosTopicModel, RedisInterface.>().ReverseMap();
             cfg.CreateMap<PolicyModel, RedisInterface.PolicyModel>().ReverseMap();
             cfg.CreateMap<RelationModel, RedisInterface.RelationModel>().ReverseMap();
             cfg.CreateMap<GraphEntityModel, RedisInterface.GraphEntityModel>().ReverseMap();

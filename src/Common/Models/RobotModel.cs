@@ -35,7 +35,7 @@ public class RobotModel : BaseModel
     public string LocomotionSystem { get; set; }
 
     [JsonPropertyName("Sensors")]
-    public List<string> Sensors { get; set; }
+    public List<SensorModel> Sensors { get; set; }
 
     [JsonPropertyName("CPU")]
     public long Cpu { get; set; }

@@ -27,6 +27,15 @@ public class InstanceModel : BaseModel
     [JsonPropertyName("ServiceUrl")]
     public Uri ServiceUrl { get; set; }
 
+    [JsonPropertyName("RosTopicsPub")]
+    public List<RosTopicModel> RosTopicsPub { get; set; }
+
+    [JsonPropertyName("RosTopicsSub")]
+    public List<RosTopicModel> RosTopicsSub { get; set; }
+
+    [JsonPropertyName("Tags")]
+    public List<string> Tags { get; set; }
+
     [JsonPropertyName("ServiceStatus")]
     public string ServiceStatus { get; set; }
 
