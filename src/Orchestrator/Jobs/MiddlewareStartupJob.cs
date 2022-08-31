@@ -29,7 +29,6 @@ namespace Middleware.Orchestrator.Jobs
                 var client = _kubeBuilder.CreateKubernetesClient();
 
                 await InstantiateMiddleware(client);
-
             }
             catch (NotInK8SEnvironmentException ex)
             {
@@ -57,7 +56,7 @@ namespace Middleware.Orchestrator.Jobs
                 var images = new List<string>
                     {"gateway", "redis-interface-api", "resource-planner-api", "task-planner-api"};
                 string orchestratorImage = deployments.Items
-                    .First(d => d.Metadata.Name == "orchestraotr-api").Spec.Template.Spec.Containers.FirstOrDefault().Image;
+                    .First(d => d.Metadata.Name == "orchestrator-api").Spec.Template.Spec.Containers.FirstOrDefault().Image;
                 string tag = K8SImageHelper.GetTag(orchestratorImage);
 
                 foreach (string service in images)

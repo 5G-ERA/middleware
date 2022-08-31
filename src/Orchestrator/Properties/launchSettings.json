@@ -1,13 +1,4 @@
 {
-  "$schema": "https://json.schemastore.org/launchsettings.json",
-  "iisSettings": {
-    "windowsAuthentication": false,
-    "anonymousAuthentication": true,
-    "iisExpress": {
-      "applicationUrl": "http://localhost:6766",
-      "sslPort": 44308
-    }
-  },
   "profiles": {
     "Orchestrator": {
       "commandName": "Project",
@@ -37,6 +28,15 @@
     "Bridge to Kubernetes": {
       "commandName": "AzureDevSpacesLocal",
       "launchBrowser": true
+    }
+  },
+  "$schema": "https://json.schemastore.org/launchsettings.json",
+  "iisSettings": {
+    "windowsAuthentication": false,
+    "anonymousAuthentication": true,
+    "iisExpress": {
+      "applicationUrl": "http://localhost:6766",
+      "sslPort": 44308
     }
   }
 }
