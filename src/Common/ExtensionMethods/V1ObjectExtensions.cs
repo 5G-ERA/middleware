@@ -43,7 +43,7 @@ public static class V1ObjectExtensions
 
         logger?.LogInformation("Available ExternalIP: {externalIp}, ExternalName: {externalName}, IngressIP: {ingressIP}, " +
                               "IngressName: {ingressName}",
-            service.Spec.ExternalIPs.FirstOrDefault(), service.Spec.ExternalName, ingress.Ip, ingress.Hostname);
+            service.Spec.ExternalIPs?.FirstOrDefault(), service.Spec?.ExternalName, ingress.Ip, ingress.Hostname);
 
         return ingress.Hostname ?? ingress.Ip;
     }

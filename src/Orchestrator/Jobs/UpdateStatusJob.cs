@@ -109,7 +109,7 @@ public class UpdateStatusJob : BaseJob<UpdateStatusJob>
             instance.ServiceStatus = tmpStatus.ToString();
             return;
         }
-        
+
         var deploymentStatus = deployment.Status;
 
         if (deploymentStatus.Replicas.HasValue == false)
@@ -144,9 +144,7 @@ public class UpdateStatusJob : BaseJob<UpdateStatusJob>
         }
 
         var address = service.GetExternalAddress(Logger);
-        if (Uri.IsWellFormedUriString(address, UriKind.Absolute))
-        {
-            instance.ServiceUrl = new Uri(address);
-        }
+        if (string.IsNullOrEmpty(address) == false)
+            instance.ServiceUrl = address;
     }
 }
