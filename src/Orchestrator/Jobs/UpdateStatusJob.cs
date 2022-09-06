@@ -39,6 +39,13 @@ public class UpdateStatusJob : BaseJob<UpdateStatusJob>
                 try
                 {
                     var updatedSeq = await ValidateSequenceStatusAsync(seq, kubeClient);
+                    // List<string> statuses = updatedSeq.ActionSequence
+                    //     .SelectMany(a => a.Services.Select(s => s.ServiceStatus)).ToList();
+                    // if (statuses.Any(s => s != ServiceStatus.Down.GetStringValue()) == false)
+                    // {
+                    //     await _redisApiClient.ActionPlanDeleteAsync(updatedSeq.Id);
+                    //     continue;
+                    // }
 
                     var riSeq = _mapper.Map<RedisInterface.ActionPlanModel>(updatedSeq);
                     await _redisApiClient.ActionPlanAddAsync(riSeq);
@@ -46,7 +53,7 @@ public class UpdateStatusJob : BaseJob<UpdateStatusJob>
                 catch (Exception ex)
                 {
                     Logger.LogError(ex,
-                        "There was en error while updating the status of the action-plan: {id}, actionPlan: {actionPlan}",
+                        "There was en error while updating the status of the action-plan: {Id}, actionPlan: {ActionPlan}",
                         seq.Id, seq);
                 }
             }
@@ -63,7 +70,7 @@ public class UpdateStatusJob : BaseJob<UpdateStatusJob>
         }
         catch (Exception ex)
         {
-            Logger.LogError(ex, "Where was a problem during the execution of {job}.", nameof(UpdateStatusJob));
+            Logger.LogError(ex, "Where was a problem during the execution of {Job}", nameof(UpdateStatusJob));
             throw;
         }
     }
@@ -78,14 +85,14 @@ public class UpdateStatusJob : BaseJob<UpdateStatusJob>
                 var instanceId = instance.ServiceInstanceId;
 
                 var deployments = await kubeClient.AppsV1.ListNamespacedDeploymentAsync(AppConfig.K8SNamespaceName,
-                    labelSelector: V1ObjectExtensions.GetServiceLabelSelector(instance.ServiceInstanceId));
+                    labelSelector: V1ObjectExtensions.GetNetAppLabelSelector(instance.ServiceInstanceId));
 
                 ValidateDeploymentStatus(deployments, instance);
 
                 var services = await kubeClient.CoreV1.ListNamespacedServiceAsync(AppConfig.K8SNamespaceName,
-                    labelSelector: V1ObjectExtensions.GetServiceLabelSelector(instance.ServiceInstanceId));
+                    labelSelector: V1ObjectExtensions.GetNetAppLabelSelector(instance.ServiceInstanceId));
 
-                ValidateServiceStatus(services, instance);
+                UpdateServiceStatus(services, instance);
             }
         }
 
@@ -128,7 +135,7 @@ public class UpdateStatusJob : BaseJob<UpdateStatusJob>
         instance.ServiceStatus = tmpStatus.GetStringValue();
     }
 
-    private void ValidateServiceStatus(V1ServiceList services, InstanceModel instance)
+    private void UpdateServiceStatus(V1ServiceList services, InstanceModel instance)
     {
         var service = services.Items.FirstOrDefault();
         if (service is null)
@@ -139,11 +146,7 @@ public class UpdateStatusJob : BaseJob<UpdateStatusJob>
         var address = service.GetExternalAddress(Logger);
         if (Uri.IsWellFormedUriString(address, UriKind.Absolute))
         {
-            var builder = new UriBuilder();
-            var hasHttpsPort = service.Spec.Ports.Where(p => p.Port == 443).Any();
-
-            builder.Scheme = hasHttpsPort ? "https" : "http";
-            instance.ServiceUrl = builder.Uri;
+            instance.ServiceUrl = new Uri(address);
         }
     }
 }
