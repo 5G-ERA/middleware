@@ -1,14 +1,7 @@
 ﻿using System.Linq;
 using AutoMapper;
+using Middleware.Common.Models;
 using Middleware.TaskPlanner.ApiReference;
-using Middleware.TaskPlanner.RedisInterface;
-using ActionModel = Middleware.Common.Models.ActionModel;
-using RobotModel = Middleware.Common.Models.RobotModel;
-using TaskModel = Middleware.Common.Models.TaskModel;
-using InstanceModel = Middleware.Common.Models.InstanceModel;
-using RosTopicModel = Middleware.Common.Models.RosTopicModel;
-using SensorModel = Middleware.Common.Models.SensorModel;
-
 namespace Middleware.TaskPlanner
 {
     public interface IActionPlanner
@@ -20,10 +13,11 @@ namespace Middleware.TaskPlanner
 
     public class ActionPlanner : IActionPlanner
     {
+
         /// <summary>
         /// Client to access Redis Interface API
         /// </summary>
-        private readonly RedisApiClient _apiClient;
+        private readonly RedisInterface.RedisApiClient _apiClient;
 
         private readonly IMapper _mapper;
 
@@ -66,7 +60,7 @@ namespace Middleware.TaskPlanner
             CurrentTime = currentTime;
         }
 
-        public void mapRobotTopicsToNetApp(ActionModel action, RobotModel tempRobot)
+        public void mapRobotTopicsToNetApp(ActionModel action, RobotModel tempRobot) //TOBECOMPLETED
         { // The robot topics and the netApps topics are different. Here they get mapped automatically.
            
             List<InstanceModel> tempInstance = _mapper.Map<List<InstanceModel>>(action.Services);
@@ -89,7 +83,6 @@ namespace Middleware.TaskPlanner
             }          
         }
 
-        //create new action mapper container to redis
 
         public async Task<Tuple<TaskModel,RobotModel>> InferActionSequence(Guid currentTaskId, bool resourceLock, List<Common.Models.DialogueModel> DialogueTemp)
         {
@@ -102,7 +95,8 @@ namespace Middleware.TaskPlanner
             TaskModel task = _mapper.Map<TaskModel>(tmpTask);
             bool alreadyExist = task != null; //Check if CurrentTask is inside Redis model
             task.ActionPlanId = Guid.NewGuid();//Generate automatic new Guid for plan ID.
-    
+            task.Replan = false;
+
             if (alreadyExist == true)
             {
                 // For now query graph to get action sequence. It will be modified in later iterations.
@@ -154,14 +148,117 @@ namespace Middleware.TaskPlanner
             //robot.CurrentTaskId = task.Id; //Add the task to the robot internally in the middleware <-- not done like this.
             return new Tuple<TaskModel, RobotModel>(task,robot);
         }
-        private static void ReInferActionSequence(Guid CurrentTaskId)
+        private async Task<Tuple<TaskModel, RobotModel>> ReInferActionSequence(Guid currentTaskId, Guid currentPlanId, int CompleteReplan, bool MarkovianProcess, List<Common.Models.DialogueModel> DialogueTemp, bool resourceLock)
         {
+            // Prepare basic information of new plan
+            TaskModel task = new TaskModel();
+            task.Id = currentTaskId;
+            task.ActionPlanId = Guid.NewGuid();
+            task.Replan = true;
 
-            //Replan
+            // Load robot
+            RedisInterface.RobotModel robotRedis = (await _apiClient.RobotGetByIdAsync(currentTaskId)); //TODO: change currentTaskId to robot actual Guid from Api call.
+            RobotModel robot = _mapper.Map<RobotModel>(robotRedis);
+            robot.Questions = DialogueTemp; //Add the questions-answers to the robot
 
+            // Define some local method variables
+            List<ActionModel> FailedActions = new List<ActionModel>();
+            List<Guid> dependantActions = new List<Guid>();
+            Dictionary<Guid, string> actionStatus = new Dictionary<Guid, string>();
+            RelationModel dependency = new RelationModel();
+            bool InstanceError = false;
+
+            //Query Redis given curerntPLanId and obtain action seq.
+            RedisInterface.ActionPlanModel riActionPLan = (await _apiClient.ActionPlanGetByIdAsync(currentPlanId));
+            var actionPlan = _mapper.Map<ActionPlanModel>(riActionPLan);
+
+            //Check if there was any issues with the deployments or instances. --> if so it is a replan on the resource planner level and action plan stays the same.
+            foreach (ActionModel action in actionPlan.ActionSequence)
+            {
+                actionStatus.Add(action.Id, action.ActionStatus);
+                if (action.ActionStatus == "Failed")
+                {
+                    FailedActions.Add(action);
+                }
+                foreach (InstanceModel instance in action.Services)
+                {
+                    if (instance.ServiceStatus == "Problem")
+                    {
+                        InstanceError = true;
+                    }
+                }
+            }
+            // How many actions in actionSeq
+            int numActions = actionStatus.Count;
+
+            // All the actions have the same status?
+            var lists = actionStatus.Select(kv => kv.Value.OrderBy(x => x)).ToList();
+            var first = lists.First();
+            var areEqual = lists.Skip(1).All(hs => hs.SequenceEqual(first));
+
+            // A review of the action seq is neccesary
+            if (InstanceError == false)
+            {
+                //Prepare a complete replan asked explicitely by the robot
+                if (CompleteReplan == 1)
+                {
+                    //TODO
+                }
+                //Prepare a partial replan asked explicitely by the robot
+                if (CompleteReplan == 2)
+                {
+                    // Modify only the actions that have failed
+                    if (MarkovianProcess == false)
+                    {
+                        foreach (ActionModel failedAction in FailedActions)
+                        {
+                            string family = failedAction.ActionFamily;
+                            List<string> tags = failedAction.Tags;
+                            // Query Redis for another action with the same family and tags --> Run LUA query
+                            //TODO
+                        }
+                    }
+                    // Check if the actions that failed have a depends_on relationship to other actions. Check if there is any failed Markovian action.
+                    else // TODO: REDIS GRAPH create depends_on relationships.
+                    {
+                        foreach (ActionModel failedAction in FailedActions)
+                        {
+                                List<RedisInterface.RelationModel> dependsOnRelationship = (await _apiClient.ActionGetRelationByNameAsync(failedAction.Id, "DEPENDS_ON"))?.ToList();
+                                RelationModel dependsOnAction = _mapper.Map<RelationModel>(dependsOnRelationship);
+                                dependantActions.Add(dependsOnAction.PointsTo.Id);
+                        }  
+                        //TODO
+                    }
+                }
+
+                //ActionPlanner decides if partial or complete replan is neccesary as the robot did not select either explicitely.
+                if (CompleteReplan == 0)
+                {
+                    // The robot executed the complete action sequence and failed all of them => Task failed.               
+                     if ((areEqual==true) && actionStatus.ContainsValue("Failed")){
+                        //TODO
+                        }
+
+                     // The robot decided to call for replan before finishing the whole task.
+                     if (actionStatus.ContainsValue("Waiting"))
+                        {
+                            //TODO
+                        }
+                }
+            }
+
+            // Provide same action seq and let resource planner modify the placement.
+            else
+            {
+                task.ActionSequence = actionPlan.ActionSequence;
+            }
+            
+
+            return new Tuple<TaskModel, RobotModel>(task, robot);
         }
-
     }
 
 }
+
+
 

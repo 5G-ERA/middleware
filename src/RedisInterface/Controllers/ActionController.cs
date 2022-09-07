@@ -49,6 +49,8 @@ namespace Middleware.RedisInterface.Controllers
             }
         }
 
+        //New end points for depends_on property for actions.
+
         /// <summary>
         /// Get an ActionModel entity by id
         /// </summary>
@@ -210,7 +212,7 @@ namespace Middleware.RedisInterface.Controllers
         [ProducesResponseType(typeof(List<RelationModel>), (int)HttpStatusCode.OK)]
         [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.NotFound)]
         [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.InternalServerError)]
-        public async Task<IActionResult> GetRelationAsync(Guid id, string name)
+        public async Task<IActionResult> GetRelationAsync(Guid id, string name) //Guid of node and name of relationship
         {
             if (string.IsNullOrWhiteSpace(name))
             {

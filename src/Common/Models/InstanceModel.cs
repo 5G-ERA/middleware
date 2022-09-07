@@ -37,7 +37,7 @@ public class InstanceModel : BaseModel
     public List<string> Tags { get; set; }
 
     [JsonPropertyName("ServiceStatus")]
-    public string ServiceStatus { get; set; }
+    public string ServiceStatus { get; set; } //updated every 10 sec
 
     [JsonPropertyName("ContainerImage")]
     [JsonIgnore]

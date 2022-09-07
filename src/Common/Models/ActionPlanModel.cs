@@ -10,6 +10,12 @@ public sealed class ActionPlanModel : BaseModel
     [JsonPropertyName("Name")]
     public override string Name { get; set; }
 
+    [JsonPropertyName("Status")] //Status of whole plan
+    public string Status { get; set; }
+
+    [JsonPropertyName("LastStatusChange")]
+    public DateTime LastStatusChange { get; set; }
+
     [JsonPropertyName("ActionSequence")]
     public List<ActionModel> ActionSequence { get; set; }
 
