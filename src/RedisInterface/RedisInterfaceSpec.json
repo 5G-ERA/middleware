@@ -6733,7 +6733,6 @@
           },
           "ServiceUrl": {
             "type": "string",
-            "format": "uri",
             "nullable": true
           },
           "ServiceStatus": {
@@ -6919,6 +6918,9 @@
           "Name": {
             "type": "string",
             "nullable": true
+          },
+          "ResourceLock": {
+            "type": "boolean"
           },
           "TaskPriority": {
             "type": "integer",
