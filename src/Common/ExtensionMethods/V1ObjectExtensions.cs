@@ -5,7 +5,7 @@ namespace Middleware.Common.ExtensionMethods;
 
 public static class V1ObjectExtensions
 {
-    private const string ServiceIdSelector = "serviceId";
+    private const string NetAppIdSelector = "serviceId";
 
     /// <summary>
     /// Sets the label for the object metadata with the specified serviceId
@@ -18,7 +18,7 @@ public static class V1ObjectExtensions
         {
             meta.Labels = new Dictionary<string, string>();
         }
-        meta.Labels.Add(ServiceIdSelector, serviceId.ToString());
+        meta.Labels.Add(NetAppIdSelector, serviceId.ToString());
     }
 
     public static void AddNetAppMultusAnnotations(this V1ObjectMeta meta, string networkName)
@@ -43,13 +43,18 @@ public static class V1ObjectExtensions
 
         logger?.LogInformation("Available ExternalIP: {externalIp}, ExternalName: {externalName}, IngressIP: {ingressIP}, " +
                               "IngressName: {ingressName}",
-            service.Spec.ExternalIPs.FirstOrDefault(), service.Spec.ExternalName, ingress.Ip, ingress.Hostname);
+            service.Spec.ExternalIPs?.FirstOrDefault(), service.Spec?.ExternalName, ingress.Ip, ingress.Hostname);
 
         return ingress.Hostname ?? ingress.Ip;
     }
 
-    public static string GetServiceLabelSelector(Guid serviceId)
+    /// <summary>
+    /// Returns the selector definition for the NetApp
+    /// </summary>
+    /// <param name="serviceId"></param>
+    /// <returns></returns>
+    public static string GetNetAppLabelSelector(Guid serviceId)
     {
-        return $"{ServiceIdSelector}={serviceId}";
+        return $"{NetAppIdSelector}={serviceId}";
     }
 }

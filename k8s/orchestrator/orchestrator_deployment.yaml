@@ -17,7 +17,7 @@ spec:
         kubernetes.io/os: linux
       containers:        
       - name: orchestrator-api
-        image: 394603622351.dkr.ecr.eu-west-1.amazonaws.com/orchestrator-api:latest
+        image: 394603622351.dkr.ecr.eu-west-1.amazonaws.com/orchestrator-api:v0.1.4
         imagePullPolicy: Always
         resources: {}
         env:

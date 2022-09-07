@@ -25,7 +25,7 @@ public class InstanceModel : BaseModel
     public string DesiredStatus { get; set; }
 
     [JsonPropertyName("ServiceUrl")]
-    public Uri ServiceUrl { get; set; }
+    public string ServiceUrl { get; set; }
 
     [JsonPropertyName("ServiceStatus")]
     public string ServiceStatus { get; set; }
