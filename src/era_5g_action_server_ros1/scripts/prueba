@@ -1,0 +1,43 @@
+-- This LUA script will query for all actions that are of the same family to the provided one and have the same action tags.
+-- This script is used for the replaning functions of the middleware.
+
+-- launch script from ubuntu terminal: redis-cli --eval GetSameFamilyAction.lua , Navigation ROS2 FOXY
+
+-- Select index 10 of DB.
+redis.call('select', '10')
+
+-- Define method to check if variable is null
+local function isempty(s)
+  return s == nil or s == ''
+end
+
+local TagsParam = {};
+local ActionCandidates = {};
+local matches = redis.call('KEYS', '*')
+local index = 0
+
+-- Get all params
+for i = 1,1000
+do
+   if not isempty(ARGV[i]) then
+        table.insert(tostring(ARGV[i]),TagsParam)
+    else
+        break
+    end
+end
+
+for value,key in ipairs(matches) do
+
+    local ActionId = redis.call('json.get', key, 'Id')
+    local ActionFamily = redis.call('json.get', key, 'ActionFamily')
+    local Tags = redis.call('json.get', key, 'Tags')
+    local ActionAllObject = redis.call('json.get',key)
+
+    --arg[i]
+
+    if (arg[1] == ActionFamily) and () then table.insert(ActionCandidates,ActionId) end
+        index = index +1
+end
+
+return ActionCandidates
+

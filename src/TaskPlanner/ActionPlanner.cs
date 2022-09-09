@@ -191,7 +191,7 @@ namespace Middleware.TaskPlanner
             // How many actions in actionSeq
             int numActions = actionStatus.Count;
 
-            // All the actions have the same status?
+            // Check if all the actions have the same status?
             var lists = actionStatus.Select(kv => kv.Value.OrderBy(x => x)).ToList();
             var first = lists.First();
             var areEqual = lists.Skip(1).All(hs => hs.SequenceEqual(first));
@@ -207,8 +207,8 @@ namespace Middleware.TaskPlanner
                 //Prepare a partial replan asked explicitely by the robot
                 if (CompleteReplan == 2)
                 {
-                    // Modify only the actions that have failed
-                    if (MarkovianProcess == false)
+                    // If the task is single action then by nature it is none-Markovian.
+                    if (numActions == 1)
                     {
                         foreach (ActionModel failedAction in FailedActions)
                         {
@@ -218,17 +218,33 @@ namespace Middleware.TaskPlanner
                             //TODO
                         }
                     }
-                    // Check if the actions that failed have a depends_on relationship to other actions. Check if there is any failed Markovian action.
-                    else // TODO: REDIS GRAPH create depends_on relationships.
+                    // If task is not single action
+                    else
                     {
-                        foreach (ActionModel failedAction in FailedActions)
+                        // Modify only the actions that have failed
+                        if (MarkovianProcess == false)
                         {
+                            foreach (ActionModel failedAction in FailedActions)
+                            {
+                                string family = failedAction.ActionFamily;
+                                List<string> tags = failedAction.Tags;
+                                // Query Redis for another action with the same family and tags --> Run LUA query
+                                //TODO
+                            }
+                        }
+                        // Check if the actions that failed have a depends_on relationship to other actions. Check if there is any failed Markovian action.
+                        else // TODO: REDIS GRAPH create depends_on relationships.
+                        {
+                            foreach (ActionModel failedAction in FailedActions)
+                            {
                                 List<RedisInterface.RelationModel> dependsOnRelationship = (await _apiClient.ActionGetRelationByNameAsync(failedAction.Id, "DEPENDS_ON"))?.ToList();
                                 RelationModel dependsOnAction = _mapper.Map<RelationModel>(dependsOnRelationship);
                                 dependantActions.Add(dependsOnAction.PointsTo.Id);
-                        }  
-                        //TODO
+                            }
+                            //TODO
+                        }
                     }
+                    
                 }
 
                 //ActionPlanner decides if partial or complete replan is neccesary as the robot did not select either explicitely.
