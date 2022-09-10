@@ -268,12 +268,12 @@ namespace Middleware.RedisInterface.Controllers
 
 
         [HttpGet]
-        [Route("{robotId}/edges", Name = "RobotGetConnectedEdgesIds")]
-        [ProducesResponseType(typeof(List<Guid>), (int)HttpStatusCode.OK)]
+        [Route("{robotId}/edges/connected", Name = "RobotGetConnectedEdgesIds")]
+        [ProducesResponseType(typeof(List<EdgeModel>), (int)HttpStatusCode.OK)]
         [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.NotFound)]
         [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.BadRequest)]
         [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.InternalServerError)]
-        public async Task<ActionResult<List<Guid>>> GetConnectedEdgesIdsAsync(Guid robotId)
+        public async Task<ActionResult<List<EdgeModel>>> GetConnectedEdgesIdsAsync(Guid robotId)
         {
             try
             {
@@ -281,7 +281,7 @@ namespace Middleware.RedisInterface.Controllers
                 {
                     return BadRequest(new ApiResponse((int)HttpStatusCode.BadRequest, "The Robot Id was not provided"));
                 }
-                List<Guid> edgeIds = await _robotRepository.GetConnectedEdgesIdsAsync(robotId);
+                List<EdgeModel> edgeIds = await _robotRepository.GetConnectedEdgesIdsAsync(robotId);
                 if (!edgeIds.Any())
                 {
                     return NotFound(new ApiResponse((int)HttpStatusCode.NotFound, "No connected Edges have been found."));

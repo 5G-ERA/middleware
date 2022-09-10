@@ -148,12 +148,19 @@ namespace Middleware.TaskPlanner
             //robot.CurrentTaskId = task.Id; //Add the task to the robot internally in the middleware <-- not done like this.
             return new Tuple<TaskModel, RobotModel>(task,robot);
         }
-        private async Task<Tuple<TaskModel, RobotModel>> ReInferActionSequence(Guid currentTaskId, Guid currentPlanId, int CompleteReplan, bool MarkovianProcess, List<Common.Models.DialogueModel> DialogueTemp, bool resourceLock)
+        private async Task<Tuple<TaskModel,TaskModel, RobotModel>> ReInferActionSequence(TaskModel oldTask, int CompleteReplan, List<Common.Models.DialogueModel> DialogueTemp)
         {
+            bool MarkovianProcess = oldTask.MarkovianProcess;
+            Guid currentTaskId = oldTask.Id;
+            Guid currentPlanId = oldTask.ActionPlanId;
+            bool resourceLock = oldTask.ResourceLock;
+            bool ActionReplanLocked = oldTask.ReplanActionPlannerLocked;
+
             // Prepare basic information of new plan
             TaskModel task = new TaskModel();
             task.Id = currentTaskId;
             task.ActionPlanId = Guid.NewGuid();
+            // Set the plan to be a replan.
             task.Replan = true;
 
             // Load robot
@@ -161,68 +168,56 @@ namespace Middleware.TaskPlanner
             RobotModel robot = _mapper.Map<RobotModel>(robotRedis);
             robot.Questions = DialogueTemp; //Add the questions-answers to the robot
 
-            // Define some local method variables
-            List<ActionModel> FailedActions = new List<ActionModel>();
-            List<Guid> dependantActions = new List<Guid>();
-            Dictionary<Guid, string> actionStatus = new Dictionary<Guid, string>();
-            RelationModel dependency = new RelationModel();
-            bool InstanceError = false;
-
             //Query Redis given curerntPLanId and obtain action seq.
             RedisInterface.ActionPlanModel riActionPLan = (await _apiClient.ActionPlanGetByIdAsync(currentPlanId));
             var actionPlan = _mapper.Map<ActionPlanModel>(riActionPLan);
 
-            //Check if there was any issues with the deployments or instances. --> if so it is a replan on the resource planner level and action plan stays the same.
-            foreach (ActionModel action in actionPlan.ActionSequence)
+            if (ActionReplanLocked == true)
             {
-                actionStatus.Add(action.Id, action.ActionStatus);
-                if (action.ActionStatus == "Failed")
+                // Define some local method variables
+                List<ActionModel> FailedActions = new List<ActionModel>();
+                List<Guid> dependantActions = new List<Guid>();
+                Dictionary<Guid, string> actionStatus = new Dictionary<Guid, string>();
+                RelationModel dependency = new RelationModel();
+                bool InstanceError = false;              
+
+                //Check if there was any issues with the deployments or instances. --> if so it is a replan on the resource planner level and action plan stays the same.
+                foreach (ActionModel action in actionPlan.ActionSequence)
                 {
-                    FailedActions.Add(action);
-                }
-                foreach (InstanceModel instance in action.Services)
-                {
-                    if (instance.ServiceStatus == "Problem")
+                    actionStatus.Add(action.Id, action.ActionStatus);
+                    if (action.ActionStatus == "Failed")
                     {
-                        InstanceError = true;
+                        FailedActions.Add(action); 
                     }
-                }
-            }
-            // How many actions in actionSeq
-            int numActions = actionStatus.Count;
-
-            // Check if all the actions have the same status?
-            var lists = actionStatus.Select(kv => kv.Value.OrderBy(x => x)).ToList();
-            var first = lists.First();
-            var areEqual = lists.Skip(1).All(hs => hs.SequenceEqual(first));
-
-            // A review of the action seq is neccesary
-            if (InstanceError == false)
-            {
-                //Prepare a complete replan asked explicitely by the robot
-                if (CompleteReplan == 1)
-                {
-                    //TODO
-                }
-                //Prepare a partial replan asked explicitely by the robot
-                if (CompleteReplan == 2)
-                {
-                    // If the task is single action then by nature it is none-Markovian.
-                    if (numActions == 1)
+                    foreach (InstanceModel instance in action.Services)
                     {
-                        foreach (ActionModel failedAction in FailedActions)
+                        if (instance.ServiceStatus == "Problem")
                         {
-                            string family = failedAction.ActionFamily;
-                            List<string> tags = failedAction.Tags;
-                            // Query Redis for another action with the same family and tags --> Run LUA query
-                            //TODO
+                            InstanceError = true;
                         }
                     }
-                    // If task is not single action
-                    else
+                }
+                // How many actions in actionSeq
+                int numActions = actionStatus.Count;
+
+                // Check if all the actions have the same status?
+                var lists = actionStatus.Select(kv => kv.Value.OrderBy(x => x)).ToList();
+                var first = lists.First();
+                var areEqual = lists.Skip(1).All(hs => hs.SequenceEqual(first));
+
+                // A review of the action seq is neccesary
+                if (InstanceError == false)
+                {
+                    //Prepare a complete replan asked explicitely by the robot
+                    if (CompleteReplan == 1)
                     {
-                        // Modify only the actions that have failed
-                        if (MarkovianProcess == false)
+                        //TODO
+                    }
+                    //Prepare a partial replan asked explicitely by the robot
+                    if (CompleteReplan == 2)
+                    {
+                        // If the task is single action then by nature it is none-Markovian.
+                        if (numActions == 1)
                         {
                             foreach (ActionModel failedAction in FailedActions)
                             {
@@ -232,46 +227,70 @@ namespace Middleware.TaskPlanner
                                 //TODO
                             }
                         }
-                        // Check if the actions that failed have a depends_on relationship to other actions. Check if there is any failed Markovian action.
-                        else // TODO: REDIS GRAPH create depends_on relationships.
+                        // If task is not single action
+                        else
                         {
-                            foreach (ActionModel failedAction in FailedActions)
+                            // Modify only the actions that have failed
+                            if (MarkovianProcess == false)
                             {
-                                List<RedisInterface.RelationModel> dependsOnRelationship = (await _apiClient.ActionGetRelationByNameAsync(failedAction.Id, "DEPENDS_ON"))?.ToList();
-                                RelationModel dependsOnAction = _mapper.Map<RelationModel>(dependsOnRelationship);
-                                dependantActions.Add(dependsOnAction.PointsTo.Id);
+                                foreach (ActionModel failedAction in FailedActions)
+                                {
+                                    string family = failedAction.ActionFamily;
+                                    List<string> tags = failedAction.Tags;
+                                    // Query Redis for another action with the same family and tags --> Run LUA query
+                                    //TODO
+                                }
                             }
+                            // Check if the actions that failed have a depends_on relationship to other actions. Check if there is any failed Markovian action.
+                            else // TODO: REDIS GRAPH create depends_on relationships.
+                            {
+                                foreach (ActionModel failedAction in FailedActions)
+                                {
+                                    List<RedisInterface.RelationModel> dependsOnRelationship = (await _apiClient.ActionGetRelationByNameAsync(failedAction.Id, "DEPENDS_ON"))?.ToList();
+                                    RelationModel dependsOnAction = _mapper.Map<RelationModel>(dependsOnRelationship);
+                                    dependantActions.Add(dependsOnAction.PointsTo.Id);
+                                }
+                                //TODO
+                            }
+                        }
+
+                    }
+
+                    //ActionPlanner decides if partial or complete replan is neccesary as the robot did not select either explicitely.
+                    if (CompleteReplan == 0)
+                    {
+                        // The robot executed the complete action sequence and failed all of them => Task failed.               
+                        if ((areEqual == true) && actionStatus.ContainsValue("Failed"))
+                        {
+                            //TODO
+                        }
+
+                        // The robot decided to call for replan before finishing the whole task.
+                        if (actionStatus.ContainsValue("Waiting"))
+                        {
                             //TODO
                         }
                     }
-                    
                 }
 
-                //ActionPlanner decides if partial or complete replan is neccesary as the robot did not select either explicitely.
-                if (CompleteReplan == 0)
+                // Provide same action seq and let resource planner modify the placement.
+                else
                 {
-                    // The robot executed the complete action sequence and failed all of them => Task failed.               
-                     if ((areEqual==true) && actionStatus.ContainsValue("Failed")){
-                        //TODO
-                        }
-
-                     // The robot decided to call for replan before finishing the whole task.
-                     if (actionStatus.ContainsValue("Waiting"))
-                        {
-                            //TODO
-                        }
+                    task.ActionSequence = actionPlan.ActionSequence;
                 }
-            }
 
-            // Provide same action seq and let resource planner modify the placement.
+
+                return new Tuple<TaskModel, TaskModel, RobotModel>(task, oldTask,  robot);
+            }
             else
             {
+                // return same action sequence but with new plan id.
                 task.ActionSequence = actionPlan.ActionSequence;
+                return new Tuple<TaskModel, TaskModel, RobotModel>(task, oldTask, robot);
             }
-            
-
-            return new Tuple<TaskModel, RobotModel>(task, robot);
         }
+
+            
     }
 
 }

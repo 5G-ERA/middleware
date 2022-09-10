@@ -101,18 +101,21 @@ namespace Middleware.Common.Repositories
             return currentModel;
         }
 
-        public async Task<List<Guid>> GetConnectedEdgesIdsAsync(Guid robotId) 
+        public async Task<List<EdgeModel>> GetConnectedEdgesIdsAsync(Guid robotId) 
         {
-            List<Guid> edgeIds = new List<Guid>();
+            List<EdgeModel> edges = new List<EdgeModel>();
             List<RelationModel> robotRelations = await GetRelation(robotId, "CAN_REACH");
             foreach (RelationModel relationModel in robotRelations)
             {
                 if (relationModel.PointsTo.Type == "EDGE") 
                 {
-                    edgeIds.Add(relationModel.PointsTo.Id);
+                    EdgeModel edgeObject = new EdgeModel();
+                    edgeObject.Id = relationModel.PointsTo.Id;
+                    edgeObject.Name = relationModel.PointsTo.Name;
+                    edges.Add(edgeObject);
                 }
             }
-            return edgeIds;
+            return edges;
         } 
 
 

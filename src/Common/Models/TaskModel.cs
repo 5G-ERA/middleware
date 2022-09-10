@@ -10,6 +10,9 @@ namespace Middleware.Common.Models
         [JsonPropertyName("Name")]
         public override string Name { get; set; }
 
+        [JsonPropertyName("ReplanActionPlannerLocked")]
+        public bool ReplanActionPlannerLocked { get; set; } //Dont change actions in action sequence replan
+
         [JsonPropertyName("ResourceLock")]
         public bool ResourceLock { get; set; } //Avoid reusage of resources always.
 

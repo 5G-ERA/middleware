@@ -3352,8 +3352,7 @@
               "schema": {
                 "type": "array",
                 "items": {
-                  "type": "string",
-                  "format": "uuid"
+                  "$ref": "#/components/schemas/EdgeModel"
                 }
               }
             },
@@ -3361,8 +3360,7 @@
               "schema": {
                 "type": "array",
                 "items": {
-                  "type": "string",
-                  "format": "uuid"
+                  "$ref": "#/components/schemas/EdgeModel"
                 }
               }
             },
@@ -3370,8 +3368,7 @@
               "schema": {
                 "type": "array",
                 "items": {
-                  "type": "string",
-                  "format": "uuid"
+                  "$ref": "#/components/schemas/EdgeModel"
                 }
               }
             },
@@ -3379,8 +3376,7 @@
               "schema": {
                 "type": "array",
                 "items": {
-                  "type": "string",
-                  "format": "uuid"
+                  "$ref": "#/components/schemas/EdgeModel"
                 }
               }
             }
@@ -3494,8 +3490,7 @@
               "schema": {
                 "type": "array",
                 "items": {
-                  "type": "string",
-                  "format": "uuid"
+                  "$ref": "#/components/schemas/EdgeModel"
                 }
               }
             },
@@ -3503,8 +3498,7 @@
               "schema": {
                 "type": "array",
                 "items": {
-                  "type": "string",
-                  "format": "uuid"
+                  "$ref": "#/components/schemas/EdgeModel"
                 }
               }
             },
@@ -3512,8 +3506,7 @@
               "schema": {
                 "type": "array",
                 "items": {
-                  "type": "string",
-                  "format": "uuid"
+                  "$ref": "#/components/schemas/EdgeModel"
                 }
               }
             },
@@ -3521,8 +3514,7 @@
               "schema": {
                 "type": "array",
                 "items": {
-                  "type": "string",
-                  "format": "uuid"
+                  "$ref": "#/components/schemas/EdgeModel"
                 }
               }
             }
@@ -5500,7 +5492,7 @@
         }
       }
     },
-    "/api/v1/Robot/{robotId}/edges": {
+    "/api/v1/Robot/{robotId}/edges/connected": {
       "get": {
         "tags": [
           "Robot"
@@ -5525,8 +5517,7 @@
                 "schema": {
                   "type": "array",
                   "items": {
-                    "type": "string",
-                    "format": "uuid"
+                    "$ref": "#/components/schemas/EdgeModel"
                   }
                 }
               },
@@ -5534,8 +5525,7 @@
                 "schema": {
                   "type": "array",
                   "items": {
-                    "type": "string",
-                    "format": "uuid"
+                    "$ref": "#/components/schemas/EdgeModel"
                   }
                 }
               },
@@ -5543,8 +5533,7 @@
                 "schema": {
                   "type": "array",
                   "items": {
-                    "type": "string",
-                    "format": "uuid"
+                    "$ref": "#/components/schemas/EdgeModel"
                   }
                 }
               }
@@ -6436,6 +6425,13 @@
             "type": "string",
             "nullable": true
           },
+          "Tags": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "nullable": true
+          },
           "Order": {
             "type": "integer",
             "format": "int32"
@@ -6445,6 +6441,10 @@
             "nullable": true
           },
           "ActionPriority": {
+            "type": "string",
+            "nullable": true
+          },
+          "ActionStatus": {
             "type": "string",
             "nullable": true
           },
@@ -6475,6 +6475,14 @@
           "Name": {
             "type": "string",
             "nullable": true
+          },
+          "Status": {
+            "type": "string",
+            "nullable": true
+          },
+          "LastStatusChange": {
+            "type": "string",
+            "format": "date-time"
           },
           "ActionSequence": {
             "type": "array",
@@ -6736,6 +6744,27 @@
             "format": "uri",
             "nullable": true
           },
+          "RosTopicsPub": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/RosTopicModel"
+            },
+            "nullable": true
+          },
+          "RosTopicsSub": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/RosTopicModel"
+            },
+            "nullable": true
+          },
+          "Tags": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "nullable": true
+          },
           "ServiceStatus": {
             "type": "string",
             "nullable": true
@@ -6868,7 +6897,7 @@
           "Sensors": {
             "type": "array",
             "items": {
-              "type": "string"
+              "$ref": "#/components/schemas/SensorModel"
             },
             "nullable": true
           },
@@ -6902,6 +6931,57 @@
         },
         "additionalProperties": false
       },
+      "RosTopicModel": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "nullable": true
+          },
+          "type": {
+            "type": "string",
+            "nullable": true
+          },
+          "family": {
+            "type": "string",
+            "nullable": true
+          },
+          "description": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "SensorModel": {
+        "type": "object",
+        "properties": {
+          "sensorName": {
+            "type": "string",
+            "nullable": true
+          },
+          "sensorType": {
+            "type": "string",
+            "nullable": true
+          },
+          "sensorLocation": {
+            "type": "string",
+            "nullable": true
+          },
+          "sensorDescription": {
+            "type": "string",
+            "nullable": true
+          },
+          "rosTopicPub": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/RosTopicModel"
+            },
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
       "TaskModel": {
         "type": "object",
         "properties": {
@@ -6920,6 +7000,9 @@
             "type": "string",
             "nullable": true
           },
+          "ReplanActionPlannerLocked": {
+            "type": "boolean"
+          },
           "ResourceLock": {
             "type": "boolean"
           },
@@ -6931,10 +7014,26 @@
             "type": "string",
             "format": "uuid"
           },
+          "Replan": {
+            "type": "boolean"
+          },
+          "DeterministicTask": {
+            "type": "boolean"
+          },
+          "MarkovianProcess": {
+            "type": "boolean"
+          },
           "ActionSequence": {
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/ActionModel"
+            },
+            "nullable": true
+          },
+          "Tags": {
+            "type": "array",
+            "items": {
+              "type": "string"
             },
             "nullable": true
           }

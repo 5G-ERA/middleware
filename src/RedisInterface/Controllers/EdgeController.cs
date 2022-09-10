@@ -268,11 +268,11 @@ namespace Middleware.RedisInterface.Controllers
 
         [HttpPost]
         [Route("free", Name = "GetFreeEdgesIds")]//edges
-        [ProducesResponseType(typeof(List<Guid>), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(List<EdgeModel>), (int)HttpStatusCode.OK)]
         [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.NotFound)]
         [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.BadRequest)]
         [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.InternalServerError)]
-        public async Task<ActionResult<List<String>>> GetFreeEdgesIdsAsync(List<Guid> edgesToCheck)
+        public async Task<ActionResult<List<EdgeModel>>> GetFreeEdgesIdsAsync(List<EdgeModel> edgesToCheck)
         {
             try
             {
@@ -281,7 +281,7 @@ namespace Middleware.RedisInterface.Controllers
                     return BadRequest(new ApiResponse((int)HttpStatusCode.BadRequest, "No Edge ids were provided"));
                 }
 
-                List<string> edgeFree = await _edgeRepository.GetFreeEdgesIdsAsync(edgesToCheck);
+                List<EdgeModel> edgeFree = await _edgeRepository.GetFreeEdgesIdsAsync(edgesToCheck);
                 if (!edgeFree.Any())
                 {
                     return NotFound(new ApiResponse((int)HttpStatusCode.BadRequest, "There are no edges connected to the Robot"));
@@ -300,11 +300,11 @@ namespace Middleware.RedisInterface.Controllers
 
         [HttpPost]
         [Route("lessBusy", Name = "GetLessBusyEdges")]
-        [ProducesResponseType(typeof(List<Guid>), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(List<EdgeModel>), (int)HttpStatusCode.OK)]
         [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.NotFound)]
         [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.BadRequest)]
         [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.InternalServerError)]
-        public async Task<ActionResult<List<Guid>>> GetLessBusyEdgesAsync(List<Guid> edgesToCheck)
+        public async Task<ActionResult<List<EdgeModel>>> GetLessBusyEdgesAsync(List<EdgeModel> edgesToCheck)
         {
             try
             {
@@ -313,7 +313,7 @@ namespace Middleware.RedisInterface.Controllers
                     return BadRequest(new ApiResponse((int)HttpStatusCode.BadRequest, "No Edge ids were provided"));
                 }
 
-                List<Guid> lessBusyEdge = await _edgeRepository.GetLessBusyEdgesAsync(edgesToCheck);
+                List<EdgeModel> lessBusyEdge = await _edgeRepository.GetLessBusyEdgesAsync(edgesToCheck);
                 if (!lessBusyEdge.Any())
                 {
                     return NotFound(new ApiResponse((int)HttpStatusCode.BadRequest, "There are no busy edges"));

@@ -91,14 +91,19 @@ public class ResourcePlanner : IResourcePlanner
             {
                 throw new ArgumentException("Index policy is empty"); //This should never happend
             }
-            if (policy.PolicyName == "AllContainersInClosestMachine") // Resource allocation policies
+            if (policy.PolicyName == "AllContainersInClosestMachine") // Resource allocation policies RobotGetConnectedEdgesIdsAsync(robot.Id)).ToList();
             {
-                List<Guid> connectedEdges = (await redisApiClient.RobotGetConnectedEdgesIdsAsync(Guid.Empty)).ToList();
-                List<Guid> freeEdges = (await redisApiClient.GetFreeEdgesIdsAsync(connectedEdges)).ToList();
+
+                //List<EdgeModel> connectedEdges = (await redisApiClient.RobotGetConnectedEdgesIdsAsync(robot.Id)).ToList();
+
+
+               // List<EdgeModel> freeEdges = (await redisApiClient.GetFreeEdgesIdsAsync(connectedEdges)).ToList();
+
+
                 //if (freeEdges.Count()==0)
                 //{
                 //    //if all of them are busy, check which one is less busy
-                //    List<String> lessBusyEdges = (await redisApiClient.GetLessBusyEdgesAsync(connectedEdges)).ToList();
+                //    List<EdgeModel> lessBusyEdges = (await redisApiClient.GetLessBusyEdgesAsync(connectedEdges)).ToList();
                 //    tempDic.Add(policy.Id, lessBusyEdges);
                 //    actionParam.Placement = lessBusyEdges.First();
                 //}
@@ -106,7 +111,7 @@ public class ResourcePlanner : IResourcePlanner
                 //{
                 //    //tempDic.Add(policy.Id, freeEdges);
                 //    //actionParam.Placement = freeEdges.First();
-                //}
+                // }
             }
             if (policy.PolicyName == "StoreAllInRobot")
             {
@@ -166,6 +171,57 @@ public class ResourcePlanner : IResourcePlanner
         }
         return taskModel;
 
+    }
+
+
+    public async Task<TaskModel> RePlan(TaskModel taskModel, TaskModel oldTaskmMdel, RobotModel robot)
+    {
+
+        List<ActionModel> FailedActions = new List<ActionModel>();
+        List<ActionModel> ActionsModifiedCandidates = new List<ActionModel>();
+
+        // Get old action sequence 
+        List<ActionModel> oldActionSequence = oldTaskmMdel.ActionSequence;
+        if (oldActionSequence == null || oldActionSequence.Count == 0)
+            throw new ArgumentException("Action sequence cannot be empty");
+
+        // Get new action sequence 
+        List<ActionModel> actionSequence = taskModel.ActionSequence;
+        if (actionSequence == null || actionSequence.Count == 0)
+            throw new ArgumentException("Action sequence cannot be empty");
+
+        // iterate throught old actions in actionSequence and complete failed actions list.
+        foreach (ActionModel oldAction in oldActionSequence)
+        {
+            if (oldAction.ActionStatus == "Failed")
+            {
+                FailedActions.Add(oldAction);
+            }
+        }
+
+        // Check in which of the failed actions action planner has done some modifications.
+        foreach (ActionModel failedAction in FailedActions)
+        {
+            foreach(ActionModel newAction in actionSequence)
+            {
+                if (failedAction.Order == newAction.Order) //Compare old action with new one
+                {
+                    if (failedAction.Id == newAction.Id)
+                    {
+                        // Action planner did no change to the failed action.
+                        ActionsModifiedCandidates.Add(failedAction);
+                    }
+                    
+                }
+            }
+        }
+
+        // Get resource stadistic of failed action locations.
+
+
+
+
+            return taskModel;
     }
 
     private async Task<InstanceModel> GetInstanceToReuse(InstanceModel instance, Orchestrator.OrchestratorApiClient orchestratorApi)
