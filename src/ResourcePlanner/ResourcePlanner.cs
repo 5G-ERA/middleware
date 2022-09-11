@@ -193,6 +193,8 @@ public class ResourcePlanner : IResourcePlanner
         // iterate throught old actions in actionSequence and complete failed actions list.
         foreach (ActionModel oldAction in oldActionSequence)
         {
+            string resourceName = oldAction.Placement;
+
             if (oldAction.ActionStatus == "Failed")
             {
                 FailedActions.Add(oldAction);
@@ -216,7 +218,9 @@ public class ResourcePlanner : IResourcePlanner
             }
         }
 
-        // Get resource stadistic of failed action locations.
+        // Get resource stadistic of All action locations.
+
+        // Given action location, return resource Id.
 
 
 
