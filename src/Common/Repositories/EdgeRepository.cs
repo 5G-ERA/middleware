@@ -86,6 +86,7 @@ namespace Middleware.Common.Repositories
             {
                 //Get edge id from name
                 List<RelationModel> robotRelations = await GetRelation(edgeId.Id, "LOCATED_AT", RelationDirection.Incoming);
+                
                 foreach (RelationModel relationModel in robotRelations)
                 {
                     if (relationModel.PointsTo != null)

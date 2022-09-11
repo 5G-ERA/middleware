@@ -94,10 +94,10 @@ public class ResourcePlanner : IResourcePlanner
             if (policy.PolicyName == "AllContainersInClosestMachine") // Resource allocation policies RobotGetConnectedEdgesIdsAsync(robot.Id)).ToList();
             {
 
-                //List<EdgeModel> connectedEdges = (await redisApiClient.RobotGetConnectedEdgesIdsAsync(robot.Id)).ToList();
+                List<Middleware.ResourcePlanner.RedisInterface.EdgeModel> connectedEdges = (await redisApiClient.RobotGetConnectedEdgesIdsAsync(robot.Id)).ToList();
+               // List<Middleware.Common.Models.EdgeModel> connectedEdgesMaped = _mapper.Map<List<EdgeModel>>(connectedEdges);
 
-
-               // List<EdgeModel> freeEdges = (await redisApiClient.GetFreeEdgesIdsAsync(connectedEdges)).ToList();
+               // List< Middleware.ResourcePlanner.RedisInterface.EdgeModel > freeEdges = (await redisApiClient.GetFreeEdgesIdsAsync(connectedEdges)).ToList();
 
 
                 //if (freeEdges.Count()==0)
