@@ -5,3 +5,5 @@ sudo apt install ros-foxy-rmw-cyclonedds-cpp
 export RMW_IMPLEMENTATION=rmw_cyclonedds_cpp
 
 image: 394603622351.dkr.ecr.eu-west-1.amazonaws.com/robotnik-dds:dds-devel
+
+fastdds discovery -i 0 -l 10.0.2.64 -p 11811
