@@ -228,6 +228,12 @@ public class DeploymentService : IDeploymentService
                 envVars.Add(new("NETAPP_ID", instanceId.ToString()));
                 envVars.Add(new("MIDDLEWARE_ADDRESS", AppConfig.GetMiddlewareAddress()));
                 envVars.Add(new("MIDDLEWARE_REPORT_INTERVAL", 5.ToString()));
+                envVars.Add(new("ROS_DOMAIN_ID", 0.ToString()));
+                // BB 14.09.22: for the purposes of the September integration meeting
+                // to be replaced with the actual dynamically obtained address of the DDS Server
+                // that will be deployed alongside the Middleware during the startup.
+                // The address has to be updated with the address of the whole middleware.
+                envVars.Add(new("ROS_DISCOVERY_SERVER", "10.0.2.142:11811"));
 
                 container.Env = envVars;
             }
