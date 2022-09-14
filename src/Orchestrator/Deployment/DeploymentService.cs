@@ -323,8 +323,18 @@ public class DeploymentService : IDeploymentService
 
         foreach (var service in services.Items)
         {
-            var status = await k8sClient.CoreV1.DeleteNamespacedServiceAsync(service.Name(), AppConfig.K8SNamespaceName);
+            //var version = await k8sClient.Version.GetCodeWithHttpMessagesAsync();
+            try
+            {
+
+                await k8sClient.CoreV1.DeleteNamespacedServiceAsync(service.Name(), AppConfig.K8SNamespaceName);
+            }
+            catch
+            {
+                // ignored
+            }
         }
+
 
         return retVal;
     }
