@@ -329,5 +329,34 @@ namespace Middleware.RedisInterface.Controllers
             }
 
         }
+
+        public record EdgeDataByName(string name);
+
+        [HttpGet]
+        [Route("EdgeData/{name}", Name = "EdgeGetDataByName")]
+        [ProducesResponseType(typeof(List<EdgeModel>), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.NotFound)]
+        [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.InternalServerError)]
+        public async Task<ActionResult<EdgeModel>> GetEdgeResourceDetailsbyNameAsync(string name)
+        {
+            try
+            {
+                List<EdgeModel> edgeResource = await _edgeRepository.GetEdgeResourceDetailsbyNameAsync(name);
+                if (edgeResource == null)
+                {
+                    return NotFound(new ApiResponse((int)HttpStatusCode.NotFound, "Object was not found."));
+                }
+                return Ok(edgeResource);
+            }
+            catch (Exception ex)
+            {
+                int statusCode = (int)HttpStatusCode.InternalServerError;
+                _logger.LogError(ex, "An error occurred:");
+                return StatusCode(statusCode, new ApiResponse(statusCode, $"An error has occurred: {ex.Message}"));
+            }
+        }
+
+
+        
     }
 }

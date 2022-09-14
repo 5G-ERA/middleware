@@ -137,5 +137,16 @@ namespace Middleware.Common.Repositories
             
             return lessBusyEdges;
         }
+        public async Task<List<EdgeModel>> GetEdgeResourceDetailsbyNameAsync(string name)
+
+        {
+            List<EdgeModel> edgeData = await ExecuteLuaQueryAsync("GetResourceEdgeData "+name);
+            return edgeData;
+        }
+        /// <summary>
+        /// Retrieves active policies
+        /// </summary>
+        /// <returns> Active policies </returns>
+       
     }
 }

@@ -176,6 +176,30 @@ namespace Middleware.Common.Repositories
             return models;
         }
 
+        protected async Task<List<T>> ExecuteLuaQueryWithParamsAsync(string queryName,List<string> parameters)
+        {
+            //TODO: implement launching lua query with parameters
+            var script = await File.ReadAllTextAsync(GetScriptPath(queryName));
+
+            var prepared = LuaScript.Prepare(script);
+            var redisResult = await Db.ScriptEvaluateAsync(prepared);
+
+            var models = new List<T>();
+            var results = new List<string>();
+            if (redisResult.Type == ResultType.MultiBulk)
+            {
+                results.AddRange(((RedisValue[])redisResult).Select(x => x.ToString()));
+            }
+
+            foreach (var result in results)
+            {
+                T model = JsonSerializer.Deserialize<T>(result);
+                models.Add(model);
+            }
+
+            return models;
+        }
+
         public virtual async Task<List<string>> GetKeysAsync(string queryName)
         {
             var script = await File.ReadAllTextAsync(GetScriptPath(queryName));
@@ -357,5 +381,7 @@ namespace Middleware.Common.Repositories
             //HERE
             throw new NotImplementedException();
         }
+
+        
     }
 }

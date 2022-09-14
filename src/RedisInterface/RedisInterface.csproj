@@ -40,6 +40,7 @@
 
   <ItemGroup>
     <None Remove="LuaQueries\GetKeys.lua" />
+    <None Remove="LuaQueries\GetResourceCloudData.lua" />
     <None Remove="LuaQueries\GetResourceEdgeData.lua" />
     <None Remove="LuaQueries\GetSameFamilyAction.lua" />
   </ItemGroup>

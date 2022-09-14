@@ -10,6 +10,9 @@ public class EdgeModel : BaseModel
     [JsonPropertyName("Name")]
     public override string Name { get; set; }
 
+    [JsonPropertyName("Type")]
+    public string Type { get; set; }
+
     [JsonPropertyName("EdgeStatus")]
     public string EdgeStatus { get; set; }
 

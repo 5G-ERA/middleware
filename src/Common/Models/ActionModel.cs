@@ -22,6 +22,9 @@ public class ActionModel : BaseModel
     [JsonPropertyName("Placement")]
     public string Placement { get; set; }
 
+    [JsonPropertyName("PlacementType")]
+    public string PlacementType { get; set; } // Either edge or cloud. 
+
     [JsonPropertyName("ActionPriority")]
     public string ActionPriority { get; set; }
 

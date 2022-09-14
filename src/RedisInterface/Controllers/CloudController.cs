@@ -264,5 +264,29 @@ namespace Middleware.RedisInterface.Controllers
                 return StatusCode(statusCode, new ApiResponse(statusCode, $"An error has occurred: {ex.Message}"));
             }
         }
+
+        [HttpGet]
+        [Route("CloudData/{name}", Name = "CloudGetDataByName")]
+        [ProducesResponseType(typeof(List<CloudModel>), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.NotFound)]
+        [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.InternalServerError)]
+        public async Task<ActionResult<CloudModel>> GetCloudResourceDetailsbyNameAsync(string name)
+        {
+            try
+            {
+                List<CloudModel> edgeResource = await _cloudRepository.GetCloudResourceDetailsbyNameAsync(name);
+                if (edgeResource == null)
+                {
+                    return NotFound(new ApiResponse((int)HttpStatusCode.NotFound, "Object was not found."));
+                }
+                return Ok(edgeResource);
+            }
+            catch (Exception ex)
+            {
+                int statusCode = (int)HttpStatusCode.InternalServerError;
+                _logger.LogError(ex, "An error occurred:");
+                return StatusCode(statusCode, new ApiResponse(statusCode, $"An error has occurred: {ex.Message}"));
+            }
+        }
     }
 }

@@ -50,5 +50,16 @@ namespace Middleware.Common.Repositories
             await Db.JsonSetAsync(id.ToString(), JsonSerializer.Serialize(currentModel));
             return currentModel;
         }
+
+        public async Task<List<CloudModel>> GetCloudResourceDetailsbyNameAsync(string name)
+
+        {
+            List<CloudModel> cloudData = await ExecuteLuaQueryAsync("GetResourceCloudData " + name);
+            return cloudData;
+        }
+        /// <summary>
+        /// Retrieves active policies
+        /// </summary>
+        /// <returns> Active policies </returns>
     }
 }

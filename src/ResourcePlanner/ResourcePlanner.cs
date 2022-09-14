@@ -4,6 +4,7 @@ using AutoMapper;
 using Middleware.Common;
 using Middleware.Common.Enums;
 using Middleware.Common.Models;
+using Middleware.Common.Repositories;
 using Middleware.ResourcePlanner.ApiReference;
 
 
@@ -14,12 +15,13 @@ public interface IResourcePlanner
     Task<TaskModel> Plan(TaskModel taskModel, RobotModel robot);
 }
 
-public class ResourcePlanner : IResourcePlanner
+public class ResourcePlanner : IResourcePlanner 
 {
     private readonly IApiClientBuilder _apiClientBuilder;
     private readonly IMapper _mapper;
     private readonly IEnvironment _env;
     private readonly ILogger _logger;
+
 
     public string Slice5gType { get; private set; } //eMBB, URLL, mMTC, MIoT, V2X
     public bool StandAlone5GParam { get; private set; } // Standalone 5G or none-standalone.
@@ -79,11 +81,29 @@ public class ResourcePlanner : IResourcePlanner
 
     }
 
-    private async Task<ActionModel> InferResource (ActionModel actionParam, RobotModel robot) //Allocate correct placement based upon policies and priority
+    private async Task<ActionModel> InferResource (ActionModel actionParam, RobotModel robot, bool rePlan) //Allocate correct placement based upon policies and priority
     {
         var redisApiClient = _apiClientBuilder.CreateRedisApiClient();
         List<Middleware.ResourcePlanner.RedisInterface.ActivePolicy> activePolicies = (await redisApiClient.PolicyGetActiveAsync()).ToList();
-        Dictionary<Guid, List<String>> tempDic = new Dictionary<Guid, List<String>>();//Diccionary of Key policy ID, values List of results after query
+        Dictionary<Guid, List<EdgeModel>> tempDic = new Dictionary<Guid, List<EdgeModel>>();//Diccionary of Key policy ID, values List of results after query
+
+        if (rePlan == true)
+        {
+            string resourceName = actionParam.Placement;
+            // Get resource stadistics of all action locations.
+            // Check with BB
+
+
+            // string cloudData = await ExecuteLuaQueryWithParamsAsync("GetResourceCloudData", resourceName);
+            // CloudModel cloudResourceData = FromJsonRedisToEdgeModel(cloudData);
+            // CloudActionResource.Add(oldAction, cloudResourceData);
+
+            List<Middleware.ResourcePlanner.RedisInterface.EdgeModel> riEdgeData = (await redisApiClient.EdgeGetDataByNameAsync(actionParam.Name)).ToList();
+            List<Middleware.Common.Models.EdgeModel> edgeData = _mapper.Map<List<EdgeModel>>(riEdgeData);
+            EdgeModel edgeDataFull = edgeData.First();
+           
+        }
+        
 
         foreach (RedisInterface.ActivePolicy policy in activePolicies)
         {
@@ -93,25 +113,42 @@ public class ResourcePlanner : IResourcePlanner
             }
             if (policy.PolicyName == "AllContainersInClosestMachine") // Resource allocation policies RobotGetConnectedEdgesIdsAsync(robot.Id)).ToList();
             {
+                if (rePlan == false)
+                {
+                    List<Middleware.ResourcePlanner.RedisInterface.EdgeModel> connectedEdges = (await redisApiClient.RobotGetConnectedEdgesIdsAsync(robot.Id)).ToList();
+                    List<Middleware.ResourcePlanner.RedisInterface.EdgeModel > rifreeEdges = (await redisApiClient.GetFreeEdgesIdsAsync(connectedEdges)).ToList();
+                    List<Middleware.Common.Models.EdgeModel> freeEdges = _mapper.Map<List<EdgeModel>>(rifreeEdges);
 
-                List<Middleware.ResourcePlanner.RedisInterface.EdgeModel> connectedEdges = (await redisApiClient.RobotGetConnectedEdgesIdsAsync(robot.Id)).ToList();
-               // List<Middleware.Common.Models.EdgeModel> connectedEdgesMaped = _mapper.Map<List<EdgeModel>>(connectedEdges);
+                    if (freeEdges.Count()==0)
+                    {
+                        //if all of them are busy, check which one is less busy
+                        List<Middleware.ResourcePlanner.RedisInterface.EdgeModel> rilessBusyEdges = (await redisApiClient.GetLessBusyEdgesAsync(connectedEdges)).ToList();
+                        List<EdgeModel> lessBusyEdges = _mapper.Map<List<EdgeModel>>(rilessBusyEdges);
+                        tempDic.Add(policy.Id, lessBusyEdges);
+                        EdgeModel LessBusyEdge = lessBusyEdges.First();
+                        actionParam.Placement = LessBusyEdge.Name;
 
-               // List< Middleware.ResourcePlanner.RedisInterface.EdgeModel > freeEdges = (await redisApiClient.GetFreeEdgesIdsAsync(connectedEdges)).ToList();
+                        }
+                        else
+                        {
+                           tempDic.Add(policy.Id, freeEdges);
+                            EdgeModel freeEdgesObj = freeEdges.First();
+                            actionParam.Placement = freeEdgesObj.Name;
+                        }
+                }
+                else // Replan is true
+                {
+                    //Check if the placement is edge or cloud.
+                    if (actionParam.PlacementType == "edge")
+                    {
+                        //TODO
 
-
-                //if (freeEdges.Count()==0)
-                //{
-                //    //if all of them are busy, check which one is less busy
-                //    List<EdgeModel> lessBusyEdges = (await redisApiClient.GetLessBusyEdgesAsync(connectedEdges)).ToList();
-                //    tempDic.Add(policy.Id, lessBusyEdges);
-                //    actionParam.Placement = lessBusyEdges.First();
-                //}
-                //else
-                //{
-                //    //tempDic.Add(policy.Id, freeEdges);
-                //    //actionParam.Placement = freeEdges.First();
-                // }
+                    }
+                    if (actionParam.PlacementType == "cloud")
+                    {
+                        //TODO
+                    }
+                }
             }
             if (policy.PolicyName == "StoreAllInRobot")
             {
@@ -173,9 +210,10 @@ public class ResourcePlanner : IResourcePlanner
 
     }
 
-
+   
     public async Task<TaskModel> RePlan(TaskModel taskModel, TaskModel oldTaskmMdel, RobotModel robot)
     {
+        
 
         List<ActionModel> FailedActions = new List<ActionModel>();
         List<ActionModel> ActionsModifiedCandidates = new List<ActionModel>();
@@ -193,7 +231,7 @@ public class ResourcePlanner : IResourcePlanner
         // iterate throught old actions in actionSequence and complete failed actions list.
         foreach (ActionModel oldAction in oldActionSequence)
         {
-            string resourceName = oldAction.Placement;
+            
 
             if (oldAction.ActionStatus == "Failed")
             {
@@ -217,10 +255,17 @@ public class ResourcePlanner : IResourcePlanner
                 }
             }
         }
+        // If Full replan
+        // TODO
 
-        // Get resource stadistic of All action locations.
 
-        // Given action location, return resource Id.
+        // If partial replan is requested:
+        foreach (ActionModel actionFail in ActionsModifiedCandidates)
+        {
+            //ActionModel actionModel = InferResource();
+        }
+
+
 
 
 

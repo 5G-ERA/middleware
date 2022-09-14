@@ -1842,6 +1842,95 @@
         }
       }
     },
+    "/api/v1/Cloud/CloudData/{name}": {
+      "get": {
+        "tags": [
+          "Cloud"
+        ],
+        "operationId": "CloudGetDataByName",
+        "parameters": [
+          {
+            "name": "name",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/CloudModel"
+                  }
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/CloudModel"
+                  }
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/CloudModel"
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Server Error",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/v1/ContainerImage": {
       "get": {
         "tags": [
@@ -3390,8 +3479,7 @@
                 "schema": {
                   "type": "array",
                   "items": {
-                    "type": "string",
-                    "format": "uuid"
+                    "$ref": "#/components/schemas/EdgeModel"
                   }
                 }
               },
@@ -3399,8 +3487,7 @@
                 "schema": {
                   "type": "array",
                   "items": {
-                    "type": "string",
-                    "format": "uuid"
+                    "$ref": "#/components/schemas/EdgeModel"
                   }
                 }
               },
@@ -3408,8 +3495,7 @@
                 "schema": {
                   "type": "array",
                   "items": {
-                    "type": "string",
-                    "format": "uuid"
+                    "$ref": "#/components/schemas/EdgeModel"
                   }
                 }
               }
@@ -3528,8 +3614,7 @@
                 "schema": {
                   "type": "array",
                   "items": {
-                    "type": "string",
-                    "format": "uuid"
+                    "$ref": "#/components/schemas/EdgeModel"
                   }
                 }
               },
@@ -3537,8 +3622,7 @@
                 "schema": {
                   "type": "array",
                   "items": {
-                    "type": "string",
-                    "format": "uuid"
+                    "$ref": "#/components/schemas/EdgeModel"
                   }
                 }
               },
@@ -3546,8 +3630,7 @@
                 "schema": {
                   "type": "array",
                   "items": {
-                    "type": "string",
-                    "format": "uuid"
+                    "$ref": "#/components/schemas/EdgeModel"
                   }
                 }
               }
@@ -3575,6 +3658,95 @@
           },
           "400": {
             "description": "Bad Request",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Server Error",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/Edge/EdgeData/{name}": {
+      "get": {
+        "tags": [
+          "Edge"
+        ],
+        "operationId": "EdgeGetDataByName",
+        "parameters": [
+          {
+            "name": "name",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/EdgeModel"
+                  }
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/EdgeModel"
+                  }
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/EdgeModel"
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
             "content": {
               "text/plain": {
                 "schema": {
@@ -6440,6 +6612,10 @@
             "type": "string",
             "nullable": true
           },
+          "PlacementType": {
+            "type": "string",
+            "nullable": true
+          },
           "ActionPriority": {
             "type": "string",
             "nullable": true
@@ -6553,6 +6729,10 @@
             "type": "string",
             "nullable": true
           },
+          "Type": {
+            "type": "string",
+            "nullable": true
+          },
           "CloudStatus": {
             "type": "string",
             "nullable": true
@@ -6648,6 +6828,10 @@
             "format": "uuid"
           },
           "Name": {
+            "type": "string",
+            "nullable": true
+          },
+          "Type": {
             "type": "string",
             "nullable": true
           },
