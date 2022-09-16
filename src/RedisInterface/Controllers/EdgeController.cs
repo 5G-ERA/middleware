@@ -341,7 +341,7 @@ namespace Middleware.RedisInterface.Controllers
         {
             try
             {
-                List<EdgeModel> edgeResource = await _edgeRepository.GetEdgeResourceDetailsbyNameAsync(name);
+                List<EdgeModel> edgeResource = await _edgeRepository.GetEdgeResourceDetailsByNameAsync(name);
                 if (edgeResource == null)
                 {
                     return NotFound(new ApiResponse((int)HttpStatusCode.NotFound, "Object was not found."));

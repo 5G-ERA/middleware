@@ -151,14 +151,15 @@ namespace Middleware.Common.Repositories
         /// <summary>
         /// Execute the given Lua query against the redis data store
         /// </summary>
-        /// <param name="queryName"></param>
-        /// <returns></returns>
-        protected async Task<List<T>> ExecuteLuaQueryAsync(string queryName)
+        /// <param name="queryName">name of the query to be executed</param>
+        /// <param name="parameters">Parameters to be passed to the script</param>
+        /// <returns>List of the objects of hte specified type T</returns>
+        protected async Task<List<T>> ExecuteLuaQueryAsync(string queryName, object parameters = null)
         {
             var script = await File.ReadAllTextAsync(GetScriptPath(queryName));
 
             var prepared = LuaScript.Prepare(script);
-            var redisResult = await Db.ScriptEvaluateAsync(prepared);
+            var redisResult = await Db.ScriptEvaluateAsync(prepared, parameters);
 
             var models = new List<T>();
             var results = new List<string>();
