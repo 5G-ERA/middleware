@@ -3,5 +3,5 @@
 ## Launching from command line a lua script:
 
 ```
-redis-cli -a password --eval GetEdges.lua , demo_edge
+redis-cli -a password --eval GetEdges.lua , "[\"demo_edge\"]"
 ```
