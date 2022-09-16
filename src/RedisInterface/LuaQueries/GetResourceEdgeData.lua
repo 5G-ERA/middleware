@@ -3,6 +3,7 @@
 redis.call('select', '8')
 
 local resourceName = ARGV[1]
+local modResourceName = "[" .. '"' .. resourceName .. '"' .. "]"
 local matches = redis.call('KEYS', '*')
 
 for value,key in ipairs(matches) do
@@ -10,7 +11,7 @@ for value,key in ipairs(matches) do
     local resource = redis.call('json.get', key)
 	 local resourceMatchName = redis.call('json.get', key, "$.Name")
 
-	 if resourceMatchName == resourceName then
+	 if resourceMatchName == modResourceName then
 		return resource
 	 end
 end
