@@ -22,7 +22,6 @@ public class ResourcePlanner : IResourcePlanner
     private readonly IEnvironment _env;
     private readonly ILogger _logger;
 
-
     public string Slice5gType { get; private set; } //eMBB, URLL, mMTC, MIoT, V2X
     public bool StandAlone5GParam { get; private set; } // Standalone 5G or none-standalone.
     public int NumSlicesTestBed { get; private set; } //number of slices available in testbed.
@@ -84,24 +83,19 @@ public class ResourcePlanner : IResourcePlanner
     private async Task<ActionModel> InferResource (ActionModel actionParam, RobotModel robot, bool rePlan) //Allocate correct placement based upon policies and priority
     {
         var redisApiClient = _apiClientBuilder.CreateRedisApiClient();
-        List<Middleware.ResourcePlanner.RedisInterface.ActivePolicy> activePolicies = (await redisApiClient.PolicyGetActiveAsync()).ToList();
+        List<RedisInterface.ActivePolicy> activePolicies = (await redisApiClient.PolicyGetActiveAsync()).ToList();
         Dictionary<Guid, List<EdgeModel>> tempDic = new Dictionary<Guid, List<EdgeModel>>();//Diccionary of Key policy ID, values List of results after query
 
         if (rePlan == true)
         {
             string resourceName = actionParam.Placement;
             // Get resource stadistics of all action locations.
-            // Check with BB
-
-            // string cloudData = await ExecuteLuaQueryWithParamsAsync("GetResourceCloudData", resourceName);
-            // CloudModel cloudResourceData = FromJsonRedisToEdgeModel(cloudData);
-            // CloudActionResource.Add(oldAction, cloudResourceData);
-
+            
             RedisInterface.CloudModel riCloudData = await redisApiClient.CloudGetDataByNameAsync(actionParam.Name);
-            Middleware.Common.Models.CloudModel cloudData = _mapper.Map<CloudModel>(riCloudData);
+            CloudModel cloudData = _mapper.Map<CloudModel>(riCloudData);
 
             RedisInterface.EdgeModel riEdgeData = await redisApiClient.EdgeGetDataByNameAsync(actionParam.Name);
-            Middleware.Common.Models.EdgeModel edgeData = _mapper.Map<EdgeModel>(riEdgeData);
+            EdgeModel edgeData = _mapper.Map<EdgeModel>(riEdgeData);
            
            
         }
