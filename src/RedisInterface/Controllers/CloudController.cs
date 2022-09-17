@@ -267,19 +267,19 @@ namespace Middleware.RedisInterface.Controllers
 
         [HttpGet]
         [Route("CloudData/{name}", Name = "CloudGetDataByName")]
-        [ProducesResponseType(typeof(List<CloudModel>), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(CloudModel), (int)HttpStatusCode.OK)]
         [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.NotFound)]
         [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.InternalServerError)]
         public async Task<ActionResult<CloudModel>> GetCloudResourceDetailsbyNameAsync(string name)
         {
             try
             {
-                List<CloudModel> edgeResource = await _cloudRepository.GetCloudResourceDetailsbyNameAsync(name);
-                if (edgeResource == null)
+                CloudModel cloudResource = await _cloudRepository.GetCloudResourceDetailsByNameAsync(name);
+                if (cloudResource == null)
                 {
                     return NotFound(new ApiResponse((int)HttpStatusCode.NotFound, "Object was not found."));
                 }
-                return Ok(edgeResource);
+                return Ok(cloudResource);
             }
             catch (Exception ex)
             {

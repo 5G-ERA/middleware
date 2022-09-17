@@ -8,6 +8,6 @@ namespace Middleware.Common.Repositories.Abstract
         Task<List<EdgeModel>> GetFreeEdgesIdsAsync(List<EdgeModel> listofEdgesConnectedtoRobot);
         Task<List<EdgeModel>> GetLessBusyEdgesAsync(List<EdgeModel> busyEdgesTocheck);
 
-        Task<List<EdgeModel>> GetEdgeResourceDetailsByNameAsync(string name);
+        Task<EdgeModel> GetEdgeResourceDetailsByNameAsync(string name);
     }
 }

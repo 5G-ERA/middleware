@@ -6,6 +6,6 @@ namespace Middleware.Common.Repositories.Abstract
     {
         Task<CloudModel> PatchCloudAsync(Guid id, CloudModel patch);
 
-        Task<List<CloudModel>> GetCloudResourceDetailsbyNameAsync(string name);
+        Task<CloudModel> GetCloudResourceDetailsByNameAsync(string name);
     }
 }

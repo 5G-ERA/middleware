@@ -93,14 +93,16 @@ public class ResourcePlanner : IResourcePlanner
             // Get resource stadistics of all action locations.
             // Check with BB
 
-
             // string cloudData = await ExecuteLuaQueryWithParamsAsync("GetResourceCloudData", resourceName);
             // CloudModel cloudResourceData = FromJsonRedisToEdgeModel(cloudData);
             // CloudActionResource.Add(oldAction, cloudResourceData);
 
-            List<Middleware.ResourcePlanner.RedisInterface.EdgeModel> riEdgeData = (await redisApiClient.EdgeGetDataByNameAsync(actionParam.Name)).ToList();
-            List<Middleware.Common.Models.EdgeModel> edgeData = _mapper.Map<List<EdgeModel>>(riEdgeData);
-            EdgeModel edgeDataFull = edgeData.First();
+            RedisInterface.CloudModel riCloudData = await redisApiClient.CloudGetDataByNameAsync(actionParam.Name);
+            Middleware.Common.Models.CloudModel cloudData = _mapper.Map<CloudModel>(riCloudData);
+
+            RedisInterface.EdgeModel riEdgeData = await redisApiClient.EdgeGetDataByNameAsync(actionParam.Name);
+            Middleware.Common.Models.EdgeModel edgeData = _mapper.Map<EdgeModel>(riEdgeData);
+           
            
         }
         

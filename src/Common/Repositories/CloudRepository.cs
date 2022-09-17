@@ -61,5 +61,17 @@ namespace Middleware.Common.Repositories
         /// Retrieves active policies
         /// </summary>
         /// <returns> Active policies </returns>
+        /// 
+        public async Task<CloudModel> GetCloudResourceDetailsByNameAsync(string name)
+        {
+            //RedisValue[] testValues = new RedisValue[] { name };
+
+
+            //object parameters = name;
+            //List<EdgeModel> edgeData = await ExecuteLuaQueryAsync("GetResourceEdgeData", testValues);
+            CloudModel cloud = (await GetAllAsync()).Where(x => x.Name == name).FirstOrDefault();
+            return cloud;
+            // return edgeData;
+        }
     }
 }

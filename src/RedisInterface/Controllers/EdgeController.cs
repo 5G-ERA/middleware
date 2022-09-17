@@ -334,14 +334,14 @@ namespace Middleware.RedisInterface.Controllers
 
         [HttpGet]
         [Route("EdgeData/{name}", Name = "EdgeGetDataByName")]
-        [ProducesResponseType(typeof(List<EdgeModel>), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(EdgeModel), (int)HttpStatusCode.OK)]
         [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.NotFound)]
         [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.InternalServerError)]
         public async Task<ActionResult<EdgeModel>> GetEdgeResourceDetailsbyNameAsync(string name)
         {
             try
             {
-                List<EdgeModel> edgeResource = await _edgeRepository.GetEdgeResourceDetailsByNameAsync(name);
+                EdgeModel edgeResource = await _edgeRepository.GetEdgeResourceDetailsByNameAsync(name);
                 if (edgeResource == null)
                 {
                     return NotFound(new ApiResponse((int)HttpStatusCode.NotFound, "Object was not found."));

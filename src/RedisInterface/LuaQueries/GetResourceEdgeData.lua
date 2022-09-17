@@ -9,7 +9,7 @@ local matches = redis.call('KEYS', '*')
 for value,key in ipairs(matches) do
 
     local resource = redis.call('json.get', key)
-	 local resourceMatchName = redis.call('json.get', key, "$.Name")
+	local resourceMatchName = redis.call('json.get', key, "$.Name")
 
 	 if resourceMatchName == modResourceName then
 		return resource

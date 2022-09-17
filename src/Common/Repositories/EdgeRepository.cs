@@ -137,11 +137,17 @@ namespace Middleware.Common.Repositories
             
             return lessBusyEdges;
         }
-        public async Task<List<EdgeModel>> GetEdgeResourceDetailsByNameAsync(string name)
+        
+        public async Task<EdgeModel> GetEdgeResourceDetailsByNameAsync(string name)
         {
-            object parameters = name;
-            List<EdgeModel> edgeData = await ExecuteLuaQueryAsync("GetResourceEdgeData", parameters);
-            return edgeData;
+            //RedisValue[] testValues = new RedisValue[] { name };
+
+
+            //object parameters = name;
+            //List<EdgeModel> edgeData = await ExecuteLuaQueryAsync("GetResourceEdgeData", testValues);
+            EdgeModel edge = (await GetAllAsync()).Where(x => x.Name == name).FirstOrDefault();
+            return edge;
+           // return edgeData;
         }
         /// <summary>
         /// Retrieves active policies
