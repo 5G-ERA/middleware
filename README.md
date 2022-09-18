@@ -19,7 +19,7 @@ The Middleware mainly operates on the Kubernetes network layer, designed as a cl
 The image below presents the conceptual architecture of the 5G-ERA Middleware and the connection between the associated services. The 5G-ERA Middleware has been designed to run in the Cloud and the Edge devices. Therefore, it can be always accessible and provide the best quality of service to the Robot by placement in the closest possible location.
  
 <p align="center">
-  <img src="docs/img/Middleware_Architecture..png" alt="Middleware architecture"/>
+  <img src="docs/img/Middleware_Architecture.png" alt="Middleware architecture"/>
 </p>
 
 The 5G-ERA Middleware connects to the Redis Cluster, which allows sharing of semantic knowledge between all the instances of the 5G-ERA Middleware running in every Cloud and Edge device.
