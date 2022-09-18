@@ -1,7 +1,7 @@
 # 5G-ERA Middleware
 
 The repository contains the middleware system applications of the 5G-ERA project.
-Visit the 5G ERA project websize for more information.
+Visit the 5G ERA project website for more information.
 https://5g-era.eu 
 
 ## What is 5G-ERA Middleware
