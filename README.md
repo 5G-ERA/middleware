@@ -41,7 +41,7 @@ The 5G-ERA Middleware has an OpenAPI specification that can be checked under thi
 To see how to deploy the 5G-ERA Middleware see the instructions in [ENVIRONMENT.md](ENVIRONMENT.md).
 
 ## Developing the 5G-ERA Middleware
-To see how to deploy the 5G-ERA Middleware see the instructions in [ENVIRONMENT.md](ENVIRONMENT.md).
+To see how to deploy the 5G-ERA Middleware development enviroment, see the instructions in [ENVIRONMENT.md](ENVIRONMENT.md).
 
 ## License 
 For the licensing information see [LICENSE](LICENSE).
