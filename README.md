@@ -4,6 +4,9 @@ The repository contains the middleware system applications of the 5G-ERA project
 Visit the 5G ERA project website for more information.
 https://5g-era.eu 
 
+For workshops demostrations and tutorials visit our Youtube Channel:
+https://www.youtube.com/channel/UCFn5FI9OYLA9_jTwl2cwdFA/videos 
+
 ## What is 5G-ERA Middleware
 
 5G-ERA Middleware is the Orchestration software responsible for linking vertical applications managed by ROS (Robot Operating System), a 5G infrastructure managed by Open Source MANO (OSM) and the cloud-native network applications ([NetApps](https://github.com/5G-ERA/Reference-NetApp)). It realizes the 5G intent-based networking by utilizing the cloud-native design. The core principles and functionality of the Middleware cover the lifecycle management, recovery and error handling of the applications, and integration of the semantic planning into the orchestration process.
