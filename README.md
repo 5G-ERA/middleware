@@ -7,7 +7,7 @@ https://5g-era.eu
 For workshops demostrations and tutorials visit our Youtube Channel:
 https://www.youtube.com/channel/UCFn5FI9OYLA9_jTwl2cwdFA/videos 
 
-<p align="right">
+<p align="left">
   <img src="docs/img/logo.png" alt="Middleware architecture"/>
 </p>
 
