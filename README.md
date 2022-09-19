@@ -34,7 +34,7 @@ The 5G-ERA Middleware connects to the Redis Cluster, which allows sharing of sem
 
 ## Action Server
 
-The communication between the 5G-ERA Middleware and the robot is conducted using the Action Client, Action Server as well as Service Calls.
+The communication between the 5G-ERA Middleware and the robot is conducted using a ROS Action Client, Action Server as well as Service Calls. Both ROS 1 and ROS2 versions are available for the Action-Server/client.
 
 The action client and the robot itself are responsible for letting the middleware know via action server and microservices of the latest status of the action and NetApp. Two types of information are defined here: heartbeat and action status. The first one will be a request from the middleware with a specific frequency to measure the health of the deployed application/s that the currently executed action is using. The second one defines a high-level conceptualization of the status of the action. 
 
