@@ -44,6 +44,8 @@ For a more in-detail description of the Action Server see [ACTION_SERVER_README.
 
 The 5G-ERA Middleware has an OpenAPI specification that can be checked under this [link](https://app.swaggerhub.com/apis/BARTOSZBRTATUS/5-g_era_middleware/0.1).
 
+Try the API with the custom python [library] (https://github.com/5G-ERA/middleware/blob/main/src/Python_Interface_StandAlone/README.md).
+
 ## Using the 5G-ERA Middleware
 
 To see how to deploy the 5G-ERA Middleware see the instructions in [ENVIRONMENT.md](ENVIRONMENT.md).
