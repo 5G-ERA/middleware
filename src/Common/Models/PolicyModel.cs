@@ -18,4 +18,7 @@ public class PolicyModel : BaseModel
 
     [JsonPropertyName("Description")]
     public string Description { get; set; }
+
+    [JsonPropertyName("CannotCoexistFamily")]
+    public int CannotCoexistFamily { get; set; }
 }

@@ -38,7 +38,7 @@ public class ResourcePlanner : IResourcePlanner
     private async Task NetworkPlan(RobotModel robot)
     {
         var redisApiClient = _apiClientBuilder.CreateRedisApiClient();
-        List<Middleware.ResourcePlanner.RedisInterface.ActivePolicy> activePolicies = (await redisApiClient.PolicyGetActiveAsync()).ToList();
+        List<RedisInterface.ActivePolicy> activePolicies = (await redisApiClient.PolicyGetActiveAsync()).ToList();
         foreach (RedisInterface.ActivePolicy policy in activePolicies)
         { 
                 if (policy.PolicyName == "Use5G")
@@ -85,21 +85,18 @@ public class ResourcePlanner : IResourcePlanner
         var redisApiClient = _apiClientBuilder.CreateRedisApiClient();
         List<RedisInterface.ActivePolicy> activePolicies = (await redisApiClient.PolicyGetActiveAsync()).ToList();
         Dictionary<Guid, List<EdgeModel>> tempDic = new Dictionary<Guid, List<EdgeModel>>();//Diccionary of Key policy ID, values List of results after query
-
+        string resourceName = actionParam.Placement;
+        
         if (rePlan == true)
         {
-            string resourceName = actionParam.Placement;
             // Get resource stadistics of all action locations.
             
-            RedisInterface.CloudModel riCloudData = await redisApiClient.CloudGetDataByNameAsync(actionParam.Name);
-            CloudModel cloudData = _mapper.Map<CloudModel>(riCloudData);
+            RedisInterface.CloudModel riCloudData = await redisApiClient.CloudGetDataByNameAsync(resourceName);
+            CloudModel cloudCurrentData = _mapper.Map<CloudModel>(riCloudData);
 
-            RedisInterface.EdgeModel riEdgeData = await redisApiClient.EdgeGetDataByNameAsync(actionParam.Name);
-            EdgeModel edgeData = _mapper.Map<EdgeModel>(riEdgeData);
-           
-           
+
+ 
         }
-        
 
         foreach (RedisInterface.ActivePolicy policy in activePolicies)
         {
@@ -107,52 +104,98 @@ public class ResourcePlanner : IResourcePlanner
             {
                 throw new ArgumentException("Index policy is empty"); //This should never happend
             }
-            if (policy.PolicyName == "AllContainersInClosestMachine") // Resource allocation policies RobotGetConnectedEdgesIdsAsync(robot.Id)).ToList();
+            if (policy.PolicyName == "AllContainersInClosestMachine") 
             {
-                if (rePlan == false)
-                {
-                    List<Middleware.ResourcePlanner.RedisInterface.EdgeModel> connectedEdges = (await redisApiClient.RobotGetConnectedEdgesIdsAsync(robot.Id)).ToList();
-                    List<Middleware.ResourcePlanner.RedisInterface.EdgeModel > rifreeEdges = (await redisApiClient.GetFreeEdgesIdsAsync(connectedEdges)).ToList();
-                    List<Middleware.Common.Models.EdgeModel> freeEdges = _mapper.Map<List<EdgeModel>>(rifreeEdges);
+                // Get free edges
+                List<RedisInterface.EdgeModel> riconnectedEdges = (await redisApiClient.RobotGetConnectedEdgesIdsAsync(robot.Id)).ToList();
+                List<RedisInterface.EdgeModel> rifreeEdges = (await redisApiClient.GetFreeEdgesIdsAsync(riconnectedEdges)).ToList();
+                List<EdgeModel> freeEdges = _mapper.Map<List<EdgeModel>>(rifreeEdges);
 
+                //If all of them are busy, check which one is less busy
+                List<RedisInterface.EdgeModel> rilessBusyEdges = (await redisApiClient.GetLessBusyEdgesAsync(riconnectedEdges)).ToList();
+                List<EdgeModel> lessBusyEdges = _mapper.Map<List<EdgeModel>>(rilessBusyEdges);
+
+                if (rePlan == false)
+                {       
                     if (freeEdges.Count()==0)
                     {
-                        //if all of them are busy, check which one is less busy
-                        List<Middleware.ResourcePlanner.RedisInterface.EdgeModel> rilessBusyEdges = (await redisApiClient.GetLessBusyEdgesAsync(connectedEdges)).ToList();
-                        List<EdgeModel> lessBusyEdges = _mapper.Map<List<EdgeModel>>(rilessBusyEdges);
-                        tempDic.Add(policy.Id, lessBusyEdges);
+                        //Remove edges that do not have minimunm NetApps HW requirements
+                        foreach (EdgeModel edgeCandidate in lessBusyEdges)
+                        {
+                            if ((edgeCandidate.NumberOfCores < actionParam.MinimumNumCores) && (edgeCandidate.Ram < actionParam.MinimumRam))
+                            {
+                                lessBusyEdges.Remove(edgeCandidate);
+                            }
+                        }
+                        //tempDic.Add(policy.Id, lessBusyEdges);
                         EdgeModel LessBusyEdge = lessBusyEdges.First();
                         actionParam.Placement = LessBusyEdge.Name;
+                        //Query to get minimunm resources of NetApp. actionParam.Id
+                        }
 
-                        }
-                        else
+                    //There are free edges
+                    else
+                    {
+                        ////Remove edges that do not have minimunm NetApps HW requirements
+                        foreach (EdgeModel edgeCandidate in freeEdges)
                         {
-                           tempDic.Add(policy.Id, freeEdges);
-                            EdgeModel freeEdgesObj = freeEdges.First();
-                            actionParam.Placement = freeEdgesObj.Name;
+                            if ((edgeCandidate.NumberOfCores < actionParam.MinimumNumCores) && (edgeCandidate.Ram < actionParam.MinimumRam))
+                            {
+                                freeEdges.Remove(edgeCandidate);
+                            }
                         }
+                        //tempDic.Add(policy.Id, freeEdges);
+                        EdgeModel freeEdgesObj = freeEdges.First();
+                        actionParam.Placement = freeEdgesObj.Name;
+                    }
+                 
                 }
                 else // Replan is true
                 {
-                    //Check if the placement is edge or cloud.
-                    if (actionParam.PlacementType == "edge")
-                    {
-                        //TODO
+                    // Get current HW resources of previosly selected edge
+                    RedisInterface.EdgeModel riEdgeData = await redisApiClient.EdgeGetDataByNameAsync(resourceName);
+                    EdgeModel edgeCurrentData = _mapper.Map<EdgeModel>(riEdgeData);
 
-                    }
-                    if (actionParam.PlacementType == "cloud")
+                    if (freeEdges.Count() != 0)
                     {
-                        //TODO
+                        //If there are free edges, get a better edge from the HW perspective for the netApp
+                        foreach (EdgeModel freeCandidateEdge in freeEdges)
+                        {
+                            if ((freeCandidateEdge.NumberOfCores > edgeCurrentData.NumberOfCores) && (freeCandidateEdge.Ram > edgeCurrentData.Ram))
+                            {
+                                actionParam.Placement = freeCandidateEdge.Name;
+                            }
+                        }
+                     }
+                    else //There are no edge free
+                    {
+                        // Get a better edge from the HW perspective for the netApp
+                        foreach (EdgeModel lessBusyCandidatesEdges in lessBusyEdges)
+                        {
+                            if ((lessBusyCandidatesEdges.NumberOfCores > edgeCurrentData.NumberOfCores) && (lessBusyCandidatesEdges.Ram > edgeCurrentData.Ram))
+                            {
+                                actionParam.Placement = lessBusyCandidatesEdges.Name;
+                            }
+                        }
                     }
+                    
                 }
             }
-            if (policy.PolicyName == "StoreAllInRobot")
-            {
-                // Put all neccesary containers inside robot
-                actionParam.Placement = robot.Name;//guid
-            }
             //All stored in the robot.
-
+            if (policy.PolicyName == "StoreAllInRobot") // Put all neccesary containers inside robot
+            {
+                //Check if the robot can handle the HW requirements of NetApp
+                if ((robot.NumberCores < actionParam.MinimumNumCores) && (robot.Ram < actionParam.MinimumRam))
+                {
+                    throw new Exception("The robot with ID "+robot.Id+"doesnt have the HW requirements to run the netApp with ID: "+actionParam.Id);
+                }
+                else
+                {
+                    // Select the placement to te the robot
+                    actionParam.Placement = robot.Name;//guid
+                }
+                
+            }
                 //QoS & QoE
 
         }

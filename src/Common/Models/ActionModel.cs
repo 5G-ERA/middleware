@@ -35,5 +35,9 @@ public class ActionModel : BaseModel
     //[JsonIgnore]
     public List<InstanceModel> Services { get; set; }
 
+    [JsonPropertyName("MinimumRam")]
+    public int MinimumRam { get; set; }
 
+    [JsonPropertyName("MinimumNumCores")]
+    public int MinimumNumCores { get; set; }
 }

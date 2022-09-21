@@ -5,6 +5,7 @@ using NReJSON;
 using RedisGraphDotNet.Client;
 using StackExchange.Redis;
 using Microsoft.Extensions.Logging;
+using System.Collections.Generic;
 
 namespace Middleware.Common.Repositories
 {
@@ -18,6 +19,24 @@ namespace Middleware.Common.Repositories
         /// <param name="logger"></param>
         public PolicyRepository(IConnectionMultiplexer redisClient, IRedisGraphClient redisGraph, ILogger<PolicyRepository> logger) : base(RedisDbIndexEnum.Policy, redisClient, redisGraph, logger, false)
         {
+        }
+
+        /// <summary>
+        /// Check if a policy can coexist with already active policies
+        /// </summary>
+        /// <param name="newActivePolicy"></param>
+        /// <param name="ActivePolicies"></param>
+        /// <returns>boolean</returns>
+        public bool CheckPolicyCanCoexist(PolicyModel newActivePolicy, List<PolicyModel> ActivePolicies)
+        {
+            foreach (PolicyModel policy in ActivePolicies)
+            {
+                if (policy.CannotCoexistFamily == newActivePolicy.CannotCoexistFamily)
+                {
+                    return false;
+                }
+            }
+            return true;
         }
 
         /// <summary>
@@ -71,9 +90,20 @@ namespace Middleware.Common.Repositories
             {
                 currentModel.Timestamp = patch.Timestamp;
             }
+            if (!string.IsNullOrEmpty(patch.CannotCoexistFamily.ToString()))
+            {
+                currentModel.CannotCoexistFamily = patch.CannotCoexistFamily;
+            }
             if (patch.IsActive != null)
             {
-                currentModel.IsActive = patch.IsActive;
+                // Some policies cannot be active at the same time. Automatic check TODO.
+                if (patch.IsActive == true)
+                {
+                    List<PolicyModel> activePolicies = await GetActivePoliciesAsync();
+                    bool coexistanceCheck = CheckPolicyCanCoexist(patch, activePolicies);
+                    if (coexistanceCheck == true) { currentModel.IsActive = patch.IsActive; }
+                    else { throw new Exception("The proposed policy cannot coexists with the already active policies."); }
+                }  
             }
             if (!string.IsNullOrEmpty(patch.Description))
             {
