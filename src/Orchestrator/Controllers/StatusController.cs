@@ -41,7 +41,7 @@ public class StatusController : Controller
         }
         try
         {
-
+            //TODO: put behind service
             var status = await _robotStatusRepository.GetByIdAsync(id);
             if (status is null)
             {
@@ -74,6 +74,7 @@ public class StatusController : Controller
         }
         try
         {
+            //TODO: put behind service
             await _robotStatusRepository.AddAsync(model, () => model.Id);
         }
         catch (Exception ex)
@@ -104,6 +105,7 @@ public class StatusController : Controller
         }
         try
         {
+            //TODO: put behind service
             var status = await _netAppStatusRepository.GetByIdAsync(id);
             if (status is null)
             {
@@ -136,6 +138,7 @@ public class StatusController : Controller
         }
         try
         {
+            //TODO: put behind service
             await _netAppStatusRepository.AddAsync(model, () => model.Id);
         }
         catch (Exception ex)
@@ -167,6 +170,7 @@ public class StatusController : Controller
 
         try
         {
+            //TODO: put behind service
             var redisClient = _clientBuilder.CreateRedisApiClient();
             var riDeployedActionPlans = await redisClient.ActionPlanGetAllAsync();
             var instanceIds = riDeployedActionPlans
