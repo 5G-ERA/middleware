@@ -8,7 +8,7 @@ namespace Middleware.TaskPlanner
     {
         void Initialize(List<ActionModel> actionSequence, DateTime currentTime);
        
-        Task<Tuple<TaskModel, RobotModel>> InferActionSequence(Guid id, bool lockResource, List<Common.Models.DialogueModel> dialogueTemp);
+        Task<Tuple<TaskModel, RobotModel>> InferActionSequence(Guid id, bool lockResource, List<Common.Models.DialogueModel> dialogueTemp, Guid robotId);
     }
 
     public class ActionPlanner : IActionPlanner
@@ -60,6 +60,7 @@ namespace Middleware.TaskPlanner
             CurrentTime = currentTime;
         }
 
+        [Obsolete("mapRobotTopicsToNetApp is deprecated, please do not use.")]
         public void mapRobotTopicsToNetApp(ActionModel action, RobotModel tempRobot) //TOBECOMPLETED
         { // The robot topics and the netApps topics are different. Here they get mapped automatically.
            
@@ -84,10 +85,10 @@ namespace Middleware.TaskPlanner
         }
 
 
-        public async Task<Tuple<TaskModel,RobotModel>> InferActionSequence(Guid currentTaskId, bool resourceLock, List<Common.Models.DialogueModel> DialogueTemp)
+        public async Task<Tuple<TaskModel,RobotModel>> InferActionSequence(Guid currentTaskId, bool resourceLock, List<Common.Models.DialogueModel> DialogueTemp, Guid robotId)
         {
-            //Load the robot asking from a plan from redis to middleware for infering action sequence.
-            RedisInterface.RobotModel robotRedis = (await _apiClient.RobotGetByIdAsync(currentTaskId)); //TODO: change currentTaskId to robot actual Guid from Api call.
+            //Load the robot asking for a plan from redis to middleware for infering action sequence.
+            RedisInterface.RobotModel robotRedis = (await _apiClient.RobotGetByIdAsync(robotId)); //TODO: change currentTaskId to robot actual Guid from Api call.
             RobotModel robot = _mapper.Map<RobotModel>(robotRedis);
 
             robot.Questions = DialogueTemp; //Add the questions-answers to the robot
@@ -95,7 +96,8 @@ namespace Middleware.TaskPlanner
             TaskModel task = _mapper.Map<TaskModel>(tmpTask);
             bool alreadyExist = task != null; //Check if CurrentTask is inside Redis model
             task.ActionPlanId = Guid.NewGuid();//Generate automatic new Guid for plan ID.
-            task.Replan = false;
+            task.PartialRePlan = false;
+            task.FullReplan = false;
 
             if (alreadyExist == true)
             {
@@ -161,7 +163,8 @@ namespace Middleware.TaskPlanner
             task.Id = currentTaskId;
             task.ActionPlanId = Guid.NewGuid();
             // Set the plan to be a replan.
-            task.Replan = true;
+            task.PartialRePlan = false;
+            task.FullReplan = true;
 
             // Load robot
             RedisInterface.RobotModel robotRedis = (await _apiClient.RobotGetByIdAsync(currentTaskId)); //TODO: change currentTaskId to robot actual Guid from Api call.

@@ -297,6 +297,41 @@ namespace Middleware.RedisInterface.Controllers
 
         }
 
+        /// <summary>
+        ///  Return the connected clouds to the robot
+        /// </summary>
+        /// <param name="robotId"></param>
+        /// <returns>returns a list of cloudModels that have conectivity to the robot</returns>
+        [HttpGet]
+        [Route("{robotId}/clouds/connected", Name = "RobotGetConnectedCloudsIds")]
+        [ProducesResponseType(typeof(List<CloudModel>), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.NotFound)]
+        [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.BadRequest)]
+        [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.InternalServerError)]
+        public async Task<ActionResult<List<CloudModel>>> GetConnectedCloudsIdsAsync(Guid robotId)
+        {
+            try
+            {
+                if (robotId == Guid.Empty)
+                {
+                    return BadRequest(new ApiResponse((int)HttpStatusCode.BadRequest, "The Robot Id was not provided"));
+                }
+                List<CloudModel> cloudsIds = await _robotRepository.GetConnectedCloudsIdsAsync(robotId);
+                if (!cloudsIds.Any())
+                {
+                    return NotFound(new ApiResponse((int)HttpStatusCode.NotFound, "No connected clouds have been found."));
+                }
+                return Ok(cloudsIds);
+            }
+            catch (Exception ex)
+            {
+                int statusCode = (int)HttpStatusCode.InternalServerError;
+                _logger.LogError(ex, "An error occurred:");
+                return StatusCode(statusCode, new ApiResponse(statusCode, $"An error has occurred: {ex.Message}"));
+            }
+
+        }
+
     }
 }
 

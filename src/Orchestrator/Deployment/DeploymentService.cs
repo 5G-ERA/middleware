@@ -52,7 +52,7 @@ public class DeploymentService : IDeploymentService
     }
 
     /// <inheritdoc/>
-    public async Task<bool> DeployAsync(TaskModel task)
+    public async Task<bool> DeployAsync(TaskModel task, Guid robotId)
     {
         bool isSuccess = true;
         try
@@ -83,7 +83,7 @@ public class DeploymentService : IDeploymentService
                 }
             }
 
-            isSuccess &= await SaveActionSequence(task);
+            isSuccess &= await SaveActionSequence(task, robotId); //Here saved in index 13
         }
         catch (RedisInterface.ApiException<ApiResponse> apiEx)
         {
@@ -98,7 +98,7 @@ public class DeploymentService : IDeploymentService
 
             if (isSuccess)
             {
-                isSuccess &= await SaveActionSequence(task);
+                isSuccess &= await SaveActionSequence(task, robotId);
                 _logger.LogWarning("Deployment of the services has been skipped in the Development environment");
             }
         }
@@ -111,9 +111,10 @@ public class DeploymentService : IDeploymentService
     /// </summary>
     /// <param name="task"></param>
     /// <returns></returns>
-    private async Task<bool> SaveActionSequence(TaskModel task)
+    private async Task<bool> SaveActionSequence(TaskModel task, Guid robotId)
     {
-        var actionPlan = new ActionPlanModel(task.ActionPlanId, task.Name, task.ActionSequence);
+        var actionPlan = new ActionPlanModel(task.ActionPlanId, task.Name, task.ActionSequence, robotId);
+        actionPlan.SetStatus("active");
 
         var riActionPlan = _mapper.Map<RedisInterface.ActionPlanModel>(actionPlan);
         var result = await _redisClient.ActionPlanAddAsync(riActionPlan);

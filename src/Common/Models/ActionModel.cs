@@ -19,6 +19,9 @@ public class ActionModel : BaseModel
     [JsonPropertyName("Order")]
     public int Order { get; set; }
 
+    [JsonPropertyName("SuccessRate")] 
+    public int SuccessRate { get; set; }
+
     [JsonPropertyName("Placement")]
     public string Placement { get; set; }
 

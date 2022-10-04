@@ -30,16 +30,18 @@ namespace Middleware.TaskPlanner.Controllers
         [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.InternalServerError)]
         public async Task<ActionResult<TaskModel>> GetPlan([FromBody] TaskPlannerInputModel inputModel, bool dryRun = false)
         {
-            Guid id = inputModel.Id;
+            Guid id = inputModel.Id;//task id
             bool lockResource = inputModel.LockResourceReUse;
+            Guid robotId = inputModel.RobotId; //robot id
             List<Common.Models.DialogueModel> DialogueTemp = inputModel.Questions;
 
             try
             {
 
                 _actionPlanner.Initialize(new List<ActionModel>(), DateTime.Now);
+
                    
-                var (plan, robot) = await _actionPlanner.InferActionSequence(id, lockResource, DialogueTemp);
+                var (plan, robot) = await _actionPlanner.InferActionSequence(id, lockResource, DialogueTemp, robotId);
 
                 // call resource planner for resources
                 ResourcePlanner.TaskModel tmpTaskSend = _mapper.Map<ResourcePlanner.TaskModel>(plan);

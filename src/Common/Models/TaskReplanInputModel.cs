@@ -2,7 +2,7 @@
 
 namespace Middleware.Common.Models
 {
-    public class TaskPlannerInputModel
+    public class TaskReplanInputModel 
     {
         [JsonPropertyName("RobotId")]
         public Guid RobotId { get; set; }
@@ -10,10 +10,11 @@ namespace Middleware.Common.Models
         [JsonPropertyName("LockResourceReUse")]
         public bool LockResourceReUse { get; set; }
 
-        [JsonPropertyName("TaskId")]
-        public Guid Id { get; set; }
+        [JsonPropertyName("TaskID")]
+        public Guid TaskID { get; set; }
 
         [JsonPropertyName("Questions")]
         public List<DialogueModel> Questions { get; set; }
+
     }
 }

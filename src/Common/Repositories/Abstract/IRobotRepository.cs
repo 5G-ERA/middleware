@@ -8,6 +8,6 @@ namespace Middleware.Common.Repositories.Abstract
 
         Task<List<EdgeModel>> GetConnectedEdgesIdsAsync(Guid robotId);
 
-       // Task<List<Guid>> GetFreeEdgesIdsAsync(List<Guid> listofEdgesConnectedtoRobot);
+        Task<List<CloudModel>> GetConnectedCloudsIdsAsync(Guid robotID);
     }
 }

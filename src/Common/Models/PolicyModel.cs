@@ -11,7 +11,7 @@ public class PolicyModel : BaseModel
     public override string Name { get; set; }
 
     [JsonPropertyName("Timestamp")]
-    public DateTime Timestamp { get; set; }
+    public DateTime? Timestamp { get; set; }
 
     [JsonPropertyName("IsActive")]
     public bool? IsActive { get; set; }
@@ -21,4 +21,7 @@ public class PolicyModel : BaseModel
 
     [JsonPropertyName("CannotCoexistFamily")]
     public int CannotCoexistFamily { get; set; }
+
+    [JsonPropertyName("Type")]
+    public string Type { get; set; }
 }

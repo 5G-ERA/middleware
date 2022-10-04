@@ -96,7 +96,7 @@ namespace Middleware.Common.Repositories
             }
             if (patch.IsActive != null)
             {
-                // Some policies cannot be active at the same time. Automatic check TODO.
+                // Some policies cannot be active at the same time. Automatic check.
                 if (patch.IsActive == true)
                 {
                     List<PolicyModel> activePolicies = await GetActivePoliciesAsync();

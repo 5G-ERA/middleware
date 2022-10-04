@@ -101,6 +101,11 @@ namespace Middleware.Common.Repositories
             return currentModel;
         }
 
+        /// <summary>
+        /// Get all the edges models that have conection to the robot. TODO - it should be bi-directional.
+        /// </summary>
+        /// <param name="robotId"></param>
+        /// <returns></returns>
         public async Task<List<EdgeModel>> GetConnectedEdgesIdsAsync(Guid robotId) 
         {
             List<EdgeModel> edges = new List<EdgeModel>();
@@ -116,10 +121,32 @@ namespace Middleware.Common.Repositories
                 }
             }
             return edges;
-        } 
+        }
+
+        /// <summary>
+        /// Get all the clouds models that have conection to the robot. TODO - it should be bi-directional.
+        /// </summary>
+        /// <param name="robotId"></param>
+        /// <returns>list of cloudsModels</returns>
+        public async Task<List<CloudModel>> GetConnectedCloudsIdsAsync(Guid robotId)
+        {
+            List<CloudModel> clouds = new List<CloudModel>();
+            List<RelationModel> robotRelations = await GetRelation(robotId, "CAN_REACH");
+            foreach (RelationModel relationModel in robotRelations)
+            {
+                if (relationModel.PointsTo.Type == "CLOUD")
+                {
+                    CloudModel cloudObject = new CloudModel();
+                    cloudObject.Id = relationModel.PointsTo.Id;
+                    cloudObject.Name = relationModel.PointsTo.Name;
+                    clouds.Add(cloudObject);
+                }
+            }
+            return clouds;
+        }
 
 
 
 
-}
+    }
 }

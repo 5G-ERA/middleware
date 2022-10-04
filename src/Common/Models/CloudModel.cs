@@ -19,5 +19,22 @@ public class CloudModel : BaseModel
     [JsonPropertyName("CloudIp")]
     public Uri CloudIp { get; set; }
 
-    
+    [JsonPropertyName("NumberOfCores")]
+    public int NumberOfCores { get; set; }
+
+    [JsonPropertyName("DiskStorage")]
+    public long DiskStorage { get; set; }
+
+    [JsonPropertyName("VirtualRam")]
+    public int VirtualRam { get; set; }
+
+    [JsonPropertyName("CPU")]
+    public int Cpu { get; set; }
+
+    [JsonPropertyName("RAM")]
+    public int Ram { get; set; }
+
+    [JsonPropertyName("MacAddress")]
+    public string MacAddress { get; set; }
+
 }

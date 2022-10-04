@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Middleware.Common.Models;
+using Middleware.Common.Repositories;
 using Middleware.Common.Repositories.Abstract;
 using System.Net;
 
@@ -288,5 +289,77 @@ namespace Middleware.RedisInterface.Controllers
                 return StatusCode(statusCode, new ApiResponse(statusCode, $"An error has occurred: {ex.Message}"));
             }
         }
+
+        /// <summary>
+        ///  Get the free clouds that have connectivity to the robot
+        /// </summary>
+        /// <param name="edgesToCheck"></param>
+        /// <returns>list of cloudModel</returns>
+        [HttpPost]
+        [Route("free", Name = "GetFreeCloudIds")]
+        [ProducesResponseType(typeof(List<CloudModel>), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.NotFound)]
+        [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.BadRequest)]
+        [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.InternalServerError)]
+        public async Task<ActionResult<List<CloudModel>>> GetFreeCloudsIdsAsync(List<CloudModel> edgesToCheck)
+        {
+            try
+            {
+                if (!edgesToCheck.Any())
+                {
+                    return BadRequest(new ApiResponse((int)HttpStatusCode.BadRequest, "No Edge ids were provided"));
+                }
+
+                List<CloudModel> edgeFree = await _cloudRepository.GetFreeCloudsIdsAsync(edgesToCheck);
+                if (!edgeFree.Any())
+                {
+                    return NotFound(new ApiResponse((int)HttpStatusCode.BadRequest, "There are no busy edges"));
+                }
+                return Ok(edgeFree);
+            }
+            catch (Exception ex)
+            {
+
+                int statusCode = (int)HttpStatusCode.InternalServerError;
+                _logger.LogError(ex, "An error occurred:");
+                return StatusCode(statusCode, new ApiResponse(statusCode, $"An error has occurred: {ex.Message}"));
+            }
+
+        }
+
+        [HttpPost]
+        [Route("lessBusy", Name = "GetLessBusyClouds")]
+        [ProducesResponseType(typeof(List<CloudModel>), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.NotFound)]
+        [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.BadRequest)]
+        [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.InternalServerError)]
+        public async Task<ActionResult<List<CloudModel>>> GetLessBusyCloudsAsync(List<CloudModel> cloudsToCheck)
+        {
+            try
+            {
+                if (!cloudsToCheck.Any())
+                {
+                    return BadRequest(new ApiResponse((int)HttpStatusCode.BadRequest, "No Edge ids were provided"));
+                }
+
+                List<CloudModel> lessBusyCloud = await _cloudRepository.GetLessBusyCloudsAsync(cloudsToCheck);
+                if (!lessBusyCloud.Any())
+                {
+                    return NotFound(new ApiResponse((int)HttpStatusCode.BadRequest, "There are no busy edges"));
+                }
+                return Ok(lessBusyCloud);
+            }
+            catch (Exception ex)
+            {
+
+                int statusCode = (int)HttpStatusCode.InternalServerError;
+                _logger.LogError(ex, "An error occurred:");
+                return StatusCode(statusCode, new ApiResponse(statusCode, $"An error has occurred: {ex.Message}"));
+            }
+
+        }
+
+
+        
     }
 }
