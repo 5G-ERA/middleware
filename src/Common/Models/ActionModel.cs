@@ -10,17 +10,11 @@ public class ActionModel : BaseModel
     [JsonPropertyName("Name")]
     public override string Name { get; set; }
 
-    [JsonPropertyName("ActionFamily")]
-    public string ActionFamily { get; set; }
-
     [JsonPropertyName("Tags")]
     public List<string> Tags { get; set; }
 
     [JsonPropertyName("Order")]
     public int Order { get; set; }
-
-    [JsonPropertyName("SuccessRate")] 
-    public int SuccessRate { get; set; }
 
     [JsonPropertyName("Placement")]
     public string Placement { get; set; }

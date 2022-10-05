@@ -102,6 +102,8 @@ public class ResourcePlanner : IResourcePlanner
         List<RedisInterface.CloudModel> rilessBusyClouds = (await redisApiClient.GetLessBusyCloudsAsync(riconnectedClouds)).ToList();
         List<CloudModel> lessBusyClouds = _mapper.Map<List<CloudModel>>(rilessBusyClouds);
 
+        List<CloudModel> cloudsThatMeetNetAppRequirementsTotal = new List<CloudModel>();
+
         // If replan flag is false
         if (replan == false)
         { 
@@ -125,14 +127,21 @@ public class ResourcePlanner : IResourcePlanner
             }
 
             //There are free clouds
+            
             else
             {
-                // Remove edges that do not have minimunm NetApps HW requirements
-                var cloudsThatMeetNetAppRequirements = freeClouds
-                    .Where(cloud => cloud.NumberOfCores <= actionParam.MinimumNumCores &&
+                // Remove edges that do not have minimunm instance (NetApps) HW requirements
+
+                foreach(InstanceModel instance in actionParam.Services)
+                {
+                    // Check with BB
+                     cloudsThatMeetNetAppRequirementsTotal.AddRange( freeClouds
+                    .Where(cloud => cloud.NumberOfCores <= instance.MinimumNumCores &&
                             cloud.Ram <= actionParam.MinimumRam)
-                    .ToList();
-                CloudModel freeCloudNodes = cloudsThatMeetNetAppRequirements.FirstOrDefault();
+                    .ToList());
+                }
+                
+                CloudModel freeCloudNodes = cloudsThatMeetNetAppRequirementsTotal.FirstOrDefault();
                 if (freeCloudNodes is not null)
                     return freeCloudNodes.Name;
             }
@@ -184,17 +193,17 @@ public class ResourcePlanner : IResourcePlanner
     /// <exception cref="Exception"></exception>
     private Task<string> ResourcesInRequestedTaskRobot(RobotModel robot, ActionModel actionParam)
     {
-        //Check if the robot can handle the HW requirements of NetApp
-        if ((robot.NumberCores < actionParam.MinimumNumCores) && (robot.Ram < actionParam.MinimumRam))
+        //Check if the robot can handle the HW requirements of instance (NetApp's)
+        foreach(InstanceModel instance in actionParam.Services)
         {
-            //TODO: handle this other way.
-            throw new Exception("The robot with ID " + robot.Id + "doesnt have the HW requirements to run the netApp with ID: " + actionParam.Id);
+            if ((robot.NumberCores < actionParam.MinimumNumCores) && (robot.Ram < actionParam.MinimumRam))
+            {
+                //TODO: handle this other way.
+                throw new Exception("The robot with ID " + robot.Id + "doesnt have the HW requirements to run the netApp with ID: " + actionParam.Id);
+            }
         }
-        else
-        {
             // Select the placement to te the robot
             return Task.FromResult(robot.Name);//guid
-        }
     }
 
     /// <summary>
@@ -217,6 +226,8 @@ public class ResourcePlanner : IResourcePlanner
         // If all of them are busy, check which one is less busy
         List<RedisInterface.EdgeModel> rilessBusyEdges = (await redisApiClient.GetLessBusyEdgesAsync(riconnectedEdges)).ToList();
         List<EdgeModel> lessBusyEdges = _mapper.Map<List<EdgeModel>>(rilessBusyEdges);
+
+        List<EdgeModel> edgesThatMeetNetAppRequirementsTotal = new List<EdgeModel>();
 
         // If replan flag is false
         if (replan == false)
@@ -242,12 +253,16 @@ public class ResourcePlanner : IResourcePlanner
             //There are free edges
             else
             {
-                // Remove edges that do not have minimunm NetApps HW requirements
-                var edgesThatMeetNetAppRequirements = freeEdges
+                // Remove edges that do not have minimunm instance (NetApps) HW requirements
+                foreach(InstanceModel instance in actionParam.Services)
+                {
+                    edgesThatMeetNetAppRequirementsTotal.AddRange(freeEdges
                     .Where(edge => edge.NumberOfCores <= actionParam.MinimumNumCores &&
                             edge.Ram <= actionParam.MinimumRam)
-                    .ToList();
-                EdgeModel freeEdgesNodes = edgesThatMeetNetAppRequirements.FirstOrDefault();
+                    .ToList());
+                }
+                
+                EdgeModel freeEdgesNodes = edgesThatMeetNetAppRequirementsTotal.FirstOrDefault();
                 if (freeEdgesNodes is not null)
                     return freeEdgesNodes.Name;
             }

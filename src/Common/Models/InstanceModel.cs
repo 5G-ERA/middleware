@@ -36,10 +36,22 @@ public class InstanceModel : BaseModel
     [JsonPropertyName("Tags")]
     public List<string> Tags { get; set; }
 
+    [JsonPropertyName("InstanceFamily")]
+    public string InstanceFamily { get; set; }
+
+    [JsonPropertyName("SuccessRate")]
+    public int SuccessRate { get; set; }
+
     [JsonPropertyName("ServiceStatus")]
     public string ServiceStatus { get; set; } //updated every 10 sec
 
     [JsonPropertyName("ContainerImage")]
     [JsonIgnore]
     public ContainerImageModel ContainerImage { get; set; }
+
+    [JsonPropertyName("MinimumRam")]
+    public int MinimumRam { get; set; }
+
+    [JsonPropertyName("MinimumNumCores")]
+    public int MinimumNumCores { get; set; }
 }

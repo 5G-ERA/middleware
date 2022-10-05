@@ -13,35 +13,12 @@ namespace Middleware.TaskPlanner
 
     public class ActionPlanner : IActionPlanner
     {
-
-        /// <summary>
-        /// Client to access Redis Interface API
-        /// </summary>
         private readonly RedisInterface.RedisApiClient _apiClient;
-
         private readonly IMapper _mapper;
-
-        private TaskModel _taskModel;
-        private RobotModel _robotModel;
-        private ActionModel _actionModel;
-        private InstanceModel _instanceModel;
-
-        public Dictionary<string, string> rosMapper = new Dictionary<string, string>();
-        public List<Guid> TasksIDs { get; set; } //List with all tasks ids registered in Redis
-        public Guid ActionPlanId { get; set; } //Pregenerated Id for task planner request
         public List<ActionModel> ActionSequence { get; set; }
         public DateTime CurrentTime { get; set; }
-        public string LocomotionSystem { get; set; }
-        public List<string> Sensors { get; set; }
-        public Guid Id { get; set; }
-        public int TaskPriority { get; set; }
         public string InferingProcess { get; set; }
-        public Guid RobotId { get; set; }
-        public string RobotName { get; set; }
-        public Guid QuestionId { get; set; }
-        public string QuestionName { get; set; }
-        public bool IsSingleAnswer { get; set; }
-        //public RobotModel robot { get; set; }
+
         public List<Common.Models.KeyValuePair> Answer { get; set; }
 
         public ActionPlanner(IApiClientBuilder apiBuilder, IMapper mapper)
@@ -50,8 +27,6 @@ namespace Middleware.TaskPlanner
             _mapper = mapper;
             
             InferingProcess = ""; //Predefined actionsequence by id or IA infering based on new task.
-            //string robotName = _robotModel.RobotName;
-            //Guid RobotId = _robotModel.Id;
         }
 
         public void Initialize(List<ActionModel> actionSequence, DateTime currentTime)
@@ -60,30 +35,37 @@ namespace Middleware.TaskPlanner
             CurrentTime = currentTime;
         }
 
-        [Obsolete("mapRobotTopicsToNetApp is deprecated, please do not use.")]
-        public void mapRobotTopicsToNetApp(ActionModel action, RobotModel tempRobot) //TOBECOMPLETED
-        { // The robot topics and the netApps topics are different. Here they get mapped automatically.
-           
-            List<InstanceModel> tempInstance = _mapper.Map<List<InstanceModel>>(action.Services);
-
-            foreach (InstanceModel Instance in tempInstance)
+        protected void CheckInstanceByRobotHw(RobotModel robot, ActionModel actionItem)
+        {
+            //Check if the instances (netApps) support the robot attributes, sensors and specifications.
+            int numSensors = robot.Sensors.Count;
+            int countTemp = 0;
+            foreach (InstanceModel instance in actionItem.Services)
             {
-                foreach (RosTopicModel InstaceTopics in Instance.RosTopicsSub)
+                if (instance.InstanceFamily == "ComputerVision")
                 {
-                    foreach (SensorModel sensor in tempRobot.Sensors)
+                    foreach (SensorModel sensor in robot.Sensors)
                     {
-                        foreach (RosTopicModel sensorTopic in sensor.RosTopicPub)
+                        if ((sensor.SensorType != "camera") | (sensor.SensorType != "depthCamera") | (sensor.SensorType != "rgdbCamera"))
                         {
-                            if (sensorTopic.Type == InstaceTopics.Type)
-                            {
-                                rosMapper.Add(sensorTopic.Name, InstaceTopics.Name); //Add a mapper
-                            }
+                            countTemp++;
                         }
                     }
                 }
-            }          
-        }
+                if (instance.InstanceFamily == "Manipulation")
+                {
+                    if (robot.Actuator.Count == 0)
+                    {
+                        throw new InvalidOperationException("The robot does not have any proper actuators to accomodate the neccesary one of the netApp's.");
+                    }
+                }
+            }
 
+            if (numSensors == countTemp)
+            {
+                throw new InvalidOperationException("The robot does not have any proper sensors to feed the neccesary data to the netApp.");
+            }
+        }
 
         public async Task<Tuple<TaskModel,RobotModel>> InferActionSequence(Guid currentTaskId, bool resourceLock, List<Common.Models.DialogueModel> DialogueTemp, Guid robotId)
         {
@@ -116,41 +98,31 @@ namespace Middleware.TaskPlanner
                     RedisInterface.ActionModel tempAction = await _apiClient.ActionGetByIdAsync(actionId);
                     ActionModel actionItem = _mapper.Map<ActionModel>(tempAction);
 
+                    // Check if the robot have the neccesary sensors and actuators for the netapp to correctly function.
+                    CheckInstanceByRobotHw(robot,actionItem);
+
                     //Add action to the action sequence in TaskModel
                     ActionSequence.Add(actionItem);
+                }            
 
-                    //Map the topics of the robot to the topics of the NetApp;
-                    mapRobotTopicsToNetApp(actionItem, robot);
-                }
-              
-            //Iterate over the answers of the robot to make an action plan accordingly.
-            foreach (Common.Models.DialogueModel entryDialog in robot.Questions)
-            {
-                QuestionId = entryDialog.Id;
-                QuestionName = entryDialog.Name;
-                IsSingleAnswer = entryDialog.IsSingleAnswer;
-                Answer = entryDialog.Answer;
 
-                if (QuestionName == "Whats the priority of this task?")
+                // Iterate over the answers of the robot to make an action plan accordingly.
+                foreach (DialogueModel entryDialog in robot.Questions)
                 {
-                    Common.Models.KeyValuePair answer = Answer.First();
-                    task.TaskPriority = (int)answer.Value;
-                }
 
+                    if (entryDialog.Name == "TaskPriority")
+                    {
+                        Common.Models.KeyValuePair answer = Answer.First();
+                        task.TaskPriority = (int)answer.Value;
+                    }
 
-                if (QuestionName == "Whats your battery status?")
-                {
-                    Common.Models.KeyValuePair answer = Answer.First();
-                    robot.BatteryStatus = (long)answer.Value;
                 }
-            }
             }
             task.ActionSequence = ActionSequence;
             task.ResourceLock = resourceLock;
-            //robot.CurrentTaskId = task.Id; //Add the task to the robot internally in the middleware <-- not done like this.
             return new Tuple<TaskModel, RobotModel>(task,robot);
         }
-        private async Task<Tuple<TaskModel,TaskModel, RobotModel>> ReInferActionSequence(TaskModel oldTask, int CompleteReplan, List<Common.Models.DialogueModel> DialogueTemp)
+        private async Task<Tuple<TaskModel,TaskModel, RobotModel>> ReInferActionSequence(TaskModel oldTask, bool CompleteReplan, List<Common.Models.DialogueModel> DialogueTemp)
         {
             bool MarkovianProcess = oldTask.MarkovianProcess;
             Guid currentTaskId = oldTask.Id;
@@ -171,11 +143,12 @@ namespace Middleware.TaskPlanner
             RobotModel robot = _mapper.Map<RobotModel>(robotRedis);
             robot.Questions = DialogueTemp; //Add the questions-answers to the robot
 
-            //Query Redis given curerntPLanId and obtain action seq.
+            //Query Redis given old plan and obtain action seq.
             RedisInterface.ActionPlanModel riActionPLan = (await _apiClient.ActionPlanGetByIdAsync(currentPlanId));
             var actionPlan = _mapper.Map<ActionPlanModel>(riActionPLan);
 
-            if (ActionReplanLocked == true)
+            // The robot requests to not change anything from action sequence but placement.
+            if (ActionReplanLocked == false)
             {
                 // Define some local method variables
                 List<ActionModel> FailedActions = new List<ActionModel>();
@@ -184,7 +157,7 @@ namespace Middleware.TaskPlanner
                 RelationModel dependency = new RelationModel();
                 bool InstanceError = false;              
 
-                //Check if there was any issues with the deployments or instances. --> if so it is a replan on the resource planner level and action plan stays the same.
+                //Check if there were any issues with the deployments or instances. --> if so it is a replan on the resource planner level and action plan stays the same.
                 foreach (ActionModel action in actionPlan.ActionSequence)
                 {
                     actionStatus.Add(action.Id, action.ActionStatus);
@@ -208,23 +181,23 @@ namespace Middleware.TaskPlanner
                 var first = lists.First();
                 var areEqual = lists.Skip(1).All(hs => hs.SequenceEqual(first));
 
-                // A review of the action seq is neccesary
+                // A review of the action seq is neccesary --> there were no errors from the resource perspective.
                 if (InstanceError == false)
                 {
                     //Prepare a complete replan asked explicitely by the robot
-                    if (CompleteReplan == 1)
+                    if (CompleteReplan == true)
                     {
                         //TODO
                     }
                     //Prepare a partial replan asked explicitely by the robot
-                    if (CompleteReplan == 2)
+                    else
                     {
                         // If the task is single action then by nature it is none-Markovian.
                         if (numActions == 1)
                         {
                             foreach (ActionModel failedAction in FailedActions)
                             {
-                                string family = failedAction.ActionFamily;
+                               // string family = failedAction.ActionFamily;
                                 List<string> tags = failedAction.Tags;
                                 // Query Redis for another action with the same family and tags --> Run LUA query
                                 //TODO
@@ -238,7 +211,7 @@ namespace Middleware.TaskPlanner
                             {
                                 foreach (ActionModel failedAction in FailedActions)
                                 {
-                                    string family = failedAction.ActionFamily;
+                                    //string family = failedAction.ActionFamily;
                                     List<string> tags = failedAction.Tags;
                                     // Query Redis for another action with the same family and tags --> Run LUA query
                                     //TODO
@@ -258,22 +231,7 @@ namespace Middleware.TaskPlanner
                         }
 
                     }
-
-                    //ActionPlanner decides if partial or complete replan is neccesary as the robot did not select either explicitely.
-                    if (CompleteReplan == 0)
-                    {
-                        // The robot executed the complete action sequence and failed all of them => Task failed.               
-                        if ((areEqual == true) && actionStatus.ContainsValue("Failed"))
-                        {
-                            //TODO
-                        }
-
-                        // The robot decided to call for replan before finishing the whole task.
-                        if (actionStatus.ContainsValue("Waiting"))
-                        {
-                            //TODO
-                        }
-                    }
+ 
                 }
 
                 // Provide same action seq and let resource planner modify the placement.
