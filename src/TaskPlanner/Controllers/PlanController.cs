@@ -3,7 +3,7 @@ using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 using Middleware.Common.Models;
 using Middleware.TaskPlanner.ApiReference;
-using Middleware.TaskPlanner.Services.Abstract;
+using Middleware.TaskPlanner.Services;
 
 namespace Middleware.TaskPlanner.Controllers
 {

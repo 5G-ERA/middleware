@@ -2,7 +2,7 @@
 
 namespace Middleware.TaskPlanner.Services
 {
-    public interface IActionPlanner
+    public interface IActionPlanner 
     {
         void Initialize(List<ActionModel> actionSequence, DateTime currentTime);
 
