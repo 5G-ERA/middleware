@@ -85,15 +85,7 @@ Roadmap for continuos enhancement of the middleware.
                 <table style="width: 98%; margin-right: calc(2%);">
                     <tbody>
                         <tr>
-                            <td style="width: 20.0000%;">
-                                <table style="width: 98%; margin-right: calc(2%);">
-                                    <tbody>
-                                        <tr>
-                                            <td style="width: 18.9953%;">v0.16</td>
-                                        </tr>
-                                    </tbody>
-                                </table>
-                            </td>
+                            <td style="width: 18.9953%;">v0.16</td>
                         </tr>
                     </tbody>
                 </table><br>
