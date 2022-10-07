@@ -55,6 +55,9 @@ To see how to deploy the 5G-ERA Middleware see the instructions in [ENVIRONMENT.
 ## Developing the 5G-ERA Middleware
 To see how to deploy the 5G-ERA Middleware development enviroment, see the instructions in [ENVIRONMENT.md](ENVIRONMENT.md).
 
+## License 
+For the licensing information see [LICENSE](LICENSE).
+
 ## Middleware features & Bugfixing Roadmap:
 
 Roadmap for continuos enhancement of the middleware.
@@ -165,5 +168,4 @@ Roadmap for continuos enhancement of the middleware.
         </tr>
     </tbody>
 </table>
-## License 
-For the licensing information see [LICENSE](LICENSE).
+
