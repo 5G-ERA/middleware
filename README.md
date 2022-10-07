@@ -75,8 +75,8 @@ Roadmap for continuos enhancement of the middleware.
                 <table style="width: 100%;">
                     <tbody>
                         <tr>
-                            <td style="width: 11.9309%;">October 2022</td>
-                            <td style="width: 7.3784%;">No Delay</td>
+                            <td style="width: 57.2585%;">October 2022</td>
+                            <td style="width: 41.935%;"><span style="color: rgb(97, 189, 109);">No Delay</span></td>
                         </tr>
                     </tbody>
                 </table><br>
@@ -100,7 +100,7 @@ Roadmap for continuos enhancement of the middleware.
                     <tbody>
                         <tr>
                             <td style="width: 10.675%;">October 2022</td>
-                            <td style="width: 8.6343%;">No Delay</td>
+                            <td style="width: 8.6343%;"><span style="color: rgb(97, 189, 109);">No Delay</span></td>
                         </tr>
                     </tbody>
                 </table><br>
@@ -123,8 +123,8 @@ Roadmap for continuos enhancement of the middleware.
                 <table style="width: 100%;">
                     <tbody>
                         <tr>
-                            <td style="width: 11.9309%;">October 2022</td>
-                            <td style="width: 7.3784%;">No Delay</td>
+                            <td style="width: 74.9996%;">October 2022</td>
+                            <td style="width: 24.1939%;"><span style="color: rgb(97, 189, 109);">No Delay</span></td>
                         </tr>
                     </tbody>
                 </table><br>
@@ -148,7 +148,7 @@ Roadmap for continuos enhancement of the middleware.
                     <tbody>
                         <tr>
                             <td style="width: 13.1868%;">November 2022</td>
-                            <td style="width: 6.1225%;">No Delay</td>
+                            <td style="width: 6.1225%;"><span style="color: rgb(97, 189, 109);">No Delay</span></td>
                         </tr>
                     </tbody>
                 </table><br>
@@ -165,6 +165,5 @@ Roadmap for continuos enhancement of the middleware.
         </tr>
     </tbody>
 </table>
-
 ## License 
 For the licensing information see [LICENSE](LICENSE).
