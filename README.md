@@ -57,6 +57,8 @@ To see how to deploy the 5G-ERA Middleware development enviroment, see the instr
 
 ## Middleware features & Bugfixing Roadmap:
 
+Roadmap for continuos enhancement of the middleware.
+
 <table style="width: 100%;">
     <tbody>
         <tr>
