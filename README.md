@@ -58,66 +58,98 @@ To see how to deploy the 5G-ERA Middleware development enviroment, see the instr
 ## Middleware features & Bugfixing Roadmap:
 
 Roadmap for continuos enhancement of the middleware.
-
-<table style="width: 100%;">
+<table style="width: 98%; margin-right: calc(2%);">
     <tbody>
         <tr>
-            <td style="width: 25.0000%;"><br></td>
-            <td style="width: 25.0000%;">Feature</td>
-            <td style="width: 24.9231%;">Bug Fix</td>
-            <td style="width: 24.9231%;">Date</td>
+            <td style="width: 19.9372%;"><br></td>
+            <td style="width: 19.9372%;">Feature</td>
+            <td style="width: 19.9686%;">Bug Fix</td>
+            <td style="width: 19.9686%;">Date</td>
+            <td style="width: 20.0000%;">Release</td>
         </tr>
         <tr>
-            <td style="width: 25.0000%;">Robot/Cloud/Edge Data onboarding automatic middleware validation.</td>
-            <td style="width: 25.0000%;">X</td>
-            <td style="width: 24.9231%;"><br></td>
-            <td style="width: 24.9231%;"><br>
+            <td style="width: 19.9372%;">Robot/Cloud/Edge Data onboarding automatic middleware validation.</td>
+            <td style="width: 19.9372%;">X</td>
+            <td style="width: 19.9686%;"><br></td>
+            <td style="width: 19.9686%;"><br>
                 <table style="width: 100%;">
                     <tbody>
                         <tr>
-                            <td style="width: 25.0000%;">October 2022</td>
+                            <td style="width: 11.9309%;">October 2022</td>
+                            <td style="width: 7.3784%;">No Delay</td>
+                        </tr>
+                    </tbody>
+                </table><br>
+            </td>
+            <td style="width: 20.0000%;">v0.16</td>
+        </tr>
+        <tr>
+            <td style="width: 19.9372%;">Replanning Endpoint for robot tasks.&nbsp;</td>
+            <td style="width: 19.9372%;">X</td>
+            <td style="width: 19.9686%;"><br></td>
+            <td style="width: 19.9686%;">
+                <table style="width: 100%;">
+                    <tbody>
+                        <tr>
+                            <td style="width: 10.675%;">October 2022</td>
+                            <td style="width: 8.6343%;">No Delay</td>
+                        </tr>
+                    </tbody>
+                </table><br>
+            </td>
+            <td style="width: 20.0000%;">
+                <table style="width: 98%; margin-right: calc(2%);">
+                    <tbody>
+                        <tr>
+                            <td style="width: 18.9953%;">v0.16</td>
                         </tr>
                     </tbody>
                 </table><br>
             </td>
         </tr>
         <tr>
-            <td style="width: 25.0000%;">Replanning Endpoint for robot tasks.&nbsp;</td>
-            <td style="width: 25.0000%;">X</td>
-            <td style="width: 24.9231%;"><br></td>
-            <td style="width: 24.9231%;">
+            <td style="width: 19.9372%;">Reference Robot Onboarding template</td>
+            <td style="width: 19.9372%;">X</td>
+            <td style="width: 19.9686%;"><br></td>
+            <td style="width: 19.9686%;"><br>
                 <table style="width: 100%;">
                     <tbody>
                         <tr>
-                            <td style="width: 25.0000%;">October 2022</td>
+                            <td style="width: 11.9309%;">October 2022</td>
+                            <td style="width: 7.3784%;">No Delay</td>
+                        </tr>
+                    </tbody>
+                </table><br>
+            </td>
+            <td style="width: 20.0000%;">
+                <table style="width: 98%; margin-right: calc(2%);">
+                    <tbody>
+                        <tr>
+                            <td style="width: 18.9953%;">v0.16</td>
                         </tr>
                     </tbody>
                 </table><br>
             </td>
         </tr>
         <tr>
-            <td style="width: 25.0000%;">Reference Robot Onboarding template</td>
-            <td style="width: 25.0000%;">X</td>
-            <td style="width: 24.9231%;"><br></td>
-            <td style="width: 24.9231%;"><br>
+            <td style="width: 19.9372%;">Bash script for automatic generation of onboarding files</td>
+            <td style="width: 19.9372%;">X</td>
+            <td style="width: 19.9686%;"><br></td>
+            <td style="width: 19.9686%;"><br><br>
                 <table style="width: 100%;">
                     <tbody>
                         <tr>
-                            <td style="width: 25.0000%;">October 2022</td>
+                            <td style="width: 13.1868%;">November 2022</td>
+                            <td style="width: 6.1225%;">No Delay</td>
                         </tr>
                     </tbody>
                 </table><br>
             </td>
-        </tr>
-        <tr>
-            <td style="width: 25.0000%;">Bash script for automatic generation of onboarding files</td>
-            <td style="width: 25.0000%;">X</td>
-            <td style="width: 24.9231%;"><br></td>
-            <td style="width: 24.9231%;"><br><br>
-                <table style="width: 100%;">
+            <td style="width: 20.0000%;">
+                <table style="width: 98%; margin-right: calc(2%);">
                     <tbody>
                         <tr>
-                            <td style="width: 25.0000%;">November 2022</td>
+                            <td style="width: 18.9953%;">v0.17</td>
                         </tr>
                     </tbody>
                 </table><br>
