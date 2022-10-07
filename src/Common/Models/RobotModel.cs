@@ -120,10 +120,22 @@ public class RobotModel : BaseModel
                 if (string.IsNullOrEmpty(actuator.ActuatorName.ToString())) return false;
                 if (string.IsNullOrEmpty(actuator.ActuatorName.ToString())) return false;
                 if (!valActuatorTypesEnum.Contains(actuator.ActuatorType)) return false;
-                if (actuator.dof <= 0) return false;
                 if (actuator.number <= 0) return false;
             }
         }
-            return true;
+
+        //Check Manipulators validity
+        if (Manipulators.Any() == true)
+        {
+            var valActuatorTypesEnum = Enum.GetNames(typeof(RobotActuatorTypesEnum)).ToList();
+            foreach (RobotManipulatorModel manipulator in Manipulators)
+            {
+                if (string.IsNullOrEmpty(manipulator.ActuatorName.ToString())) return false;
+                if (string.IsNullOrEmpty(manipulator.dof.ToString())) return false;
+                if (manipulator.dof <= 0) return false;
+                if (manipulator.number <= 0) return false;
+            }
+        }
+        return true;
     }
 }
