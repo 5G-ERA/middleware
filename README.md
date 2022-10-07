@@ -81,7 +81,23 @@ Roadmap for continuos enhancement of the middleware.
                     </tbody>
                 </table><br>
             </td>
-            <td style="width: 20.0000%;">v0.16</td>
+            <td style="width: 20.0000%;">
+                <table style="width: 98%; margin-right: calc(2%);">
+                    <tbody>
+                        <tr>
+                            <td style="width: 20.0000%;">
+                                <table style="width: 98%; margin-right: calc(2%);">
+                                    <tbody>
+                                        <tr>
+                                            <td style="width: 18.9953%;">v0.16</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table><br>
+            </td>
         </tr>
         <tr>
             <td style="width: 19.9372%;">Replanning Endpoint for robot tasks.&nbsp;</td>
