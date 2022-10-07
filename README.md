@@ -61,15 +61,49 @@ To see how to deploy the 5G-ERA Middleware development enviroment, see the instr
     <tbody>
         <tr>
             <td style="width: 25.0000%;"><br></td>
-            <td style="width: 25.0000%;"><br></td>
-            <td style="width: 25.0000%;"><br></td>
-            <td style="width: 25.0000%;"><br></td>
+            <td style="width: 25.0000%;">Feature</td>
+            <td style="width: 25.0000%;">Bug Fix</td>
+            <td style="width: 25.0000%;">Date</td>
         </tr>
         <tr>
+            <td style="width: 25.0000%;">Robot/Cloud/Edge Data onboarding automatic middleware validation.</td>
+            <td style="width: 25.0000%;">X</td>
             <td style="width: 25.0000%;"><br></td>
+            <td style="width: 25.0000%;">October 2022</td>
+        </tr>
+        <tr>
+            <td style="width: 25.0000%;">Replanning Endpoint for robot tasks.&nbsp;</td>
+            <td style="width: 25.0000%;">X</td>
             <td style="width: 25.0000%;"><br></td>
+            <td style="width: 25.0000%;">
+                <table style="width: 100%;">
+                    <tbody>
+                        <tr>
+                            <td style="width: 25.0000%;">October 2022</td>
+                        </tr>
+                    </tbody>
+                </table><br>
+            </td>
+        </tr>
+        <tr>
+            <td style="width: 25.0000%;">Reference Robot Onboarding template</td>
+            <td style="width: 25.0000%;">X</td>
             <td style="width: 25.0000%;"><br></td>
+            <td style="width: 25.0000%;"><br>
+                <table style="width: 100%;">
+                    <tbody>
+                        <tr>
+                            <td style="width: 25.0000%;">October 2022</td>
+                        </tr>
+                    </tbody>
+                </table><br>
+            </td>
+        </tr>
+        <tr>
+            <td style="width: 25.0000%;">Bash script for automatic generation of onboarding files</td>
+            <td style="width: 25.0000%;">X</td>
             <td style="width: 25.0000%;"><br></td>
+            <td style="width: 25.0000%;">November 2022</td>
         </tr>
     </tbody>
 </table>
