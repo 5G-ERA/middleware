@@ -64,14 +64,15 @@ Roadmap for continuos enhancement of the middleware.
         <tr>
             <td style="width: 25.0000%;"><br></td>
             <td style="width: 25.0000%;">Feature</td>
-            <td style="width: 25.0000%;">Bug Fix</td>
-            <td style="width: 25.0000%;">Date</td>
+            <td style="width: 24.9231%;">Bug Fix</td>
+            <td style="width: 24.9231%;">Date</td>
         </tr>
         <tr>
             <td style="width: 25.0000%;">Robot/Cloud/Edge Data onboarding automatic middleware validation.</td>
             <td style="width: 25.0000%;">X</td>
-            <td style="width: 25.0000%;"><br></td>
-            <table style="width: 100%;">
+            <td style="width: 24.9231%;"><br></td>
+            <td style="width: 24.9231%;"><br>
+                <table style="width: 100%;">
                     <tbody>
                         <tr>
                             <td style="width: 25.0000%;">October 2022</td>
@@ -83,8 +84,8 @@ Roadmap for continuos enhancement of the middleware.
         <tr>
             <td style="width: 25.0000%;">Replanning Endpoint for robot tasks.&nbsp;</td>
             <td style="width: 25.0000%;">X</td>
-            <td style="width: 25.0000%;"><br></td>
-            <td style="width: 25.0000%;">
+            <td style="width: 24.9231%;"><br></td>
+            <td style="width: 24.9231%;">
                 <table style="width: 100%;">
                     <tbody>
                         <tr>
@@ -97,8 +98,8 @@ Roadmap for continuos enhancement of the middleware.
         <tr>
             <td style="width: 25.0000%;">Reference Robot Onboarding template</td>
             <td style="width: 25.0000%;">X</td>
-            <td style="width: 25.0000%;"><br></td>
-            <td style="width: 25.0000%;"><br>
+            <td style="width: 24.9231%;"><br></td>
+            <td style="width: 24.9231%;"><br>
                 <table style="width: 100%;">
                     <tbody>
                         <tr>
@@ -111,8 +112,16 @@ Roadmap for continuos enhancement of the middleware.
         <tr>
             <td style="width: 25.0000%;">Bash script for automatic generation of onboarding files</td>
             <td style="width: 25.0000%;">X</td>
-            <td style="width: 25.0000%;"><br></td>
-            <td style="width: 25.0000%;">November 2022</td>
+            <td style="width: 24.9231%;"><br></td>
+            <td style="width: 24.9231%;"><br><br>
+                <table style="width: 100%;">
+                    <tbody>
+                        <tr>
+                            <td style="width: 25.0000%;">November 2022</td>
+                        </tr>
+                    </tbody>
+                </table><br>
+            </td>
         </tr>
     </tbody>
 </table>
