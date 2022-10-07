@@ -55,6 +55,5 @@ namespace Middleware.Common.Repositories
             await Db.JsonSetAsync(id.ToString(), JsonSerializer.Serialize(currentModel));
             return currentModel;
         }
-
-    }
+     }
 }

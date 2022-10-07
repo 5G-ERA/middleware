@@ -1,4 +1,5 @@
-﻿using System.Net;
+﻿using System;
+using System.Net;
 using Microsoft.AspNetCore.Mvc;
 using Middleware.Common.Models;
 using Middleware.Common.Repositories;
@@ -89,6 +90,10 @@ namespace Middleware.RedisInterface.Controllers
             {
                 return BadRequest("Parameters were not specified.");
             }
+            if (model.IsValid() == false)
+            {
+                return BadRequest(new ApiResponse((int)HttpStatusCode.BadRequest, "Parameters were not specified or wrongly specified."));
+            }
             try 
             { 
                 InstanceModel instance = await _instanceRepository.AddAsync(model);
@@ -121,6 +126,10 @@ namespace Middleware.RedisInterface.Controllers
         [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.InternalServerError)]
         public async Task<IActionResult> PatchInstanceAsync([FromBody] InstanceModel patch, [FromRoute] Guid id)
         {
+            if (patch.IsValid() == false)
+            {
+                return BadRequest(new ApiResponse((int)HttpStatusCode.BadRequest, "Parameters were not specified or wrongly specified."));
+            }
             try
             {
                 InstanceModel model = await _instanceRepository.PatchInstanceAsync(id, patch);
@@ -261,5 +270,35 @@ namespace Middleware.RedisInterface.Controllers
                 return StatusCode(statusCode, new ApiResponse(statusCode, $"An error has occurred: {ex.Message}"));
             }
         }
+
+        /// <summary>
+        /// Return alternative instance of the same instance family of the provided Instance Id.
+        /// </summary>
+        /// <param name="instanceId"></param>
+        /// <returns>InstanceModel</returns>
+        [HttpGet]
+        [Route("alternative/{id}", Name = "InstanceGetAlternative")]
+        [ProducesResponseType(typeof(InstanceModel), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.NotFound)]
+        [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.InternalServerError)]
+        public async Task<IActionResult> FindAlternativeInstance(Guid id)
+        {
+            try
+            {
+                var alternativeInstance = await _instanceRepository.FindAlternativeInstance(id);
+                if (alternativeInstance == null)
+                {
+                    return NotFound(new ApiResponse((int)HttpStatusCode.NotFound, "Object to be updated was not found."));
+                }
+                return Ok(alternativeInstance);
+            }
+            catch (Exception ex)
+            {
+                int statusCode = (int)HttpStatusCode.InternalServerError;
+                _logger.LogError(ex, "An error occurred:");
+                return StatusCode(statusCode, new ApiResponse(statusCode, $"An error has occurred: {ex.Message}"));
+            }
+        }
+
     }
 }

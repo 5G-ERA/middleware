@@ -1138,15 +1138,15 @@
         }
       }
     },
-    "/api/v1/actionPlanModel/{id}": {
-      "post": {
+    "/api/v1/Action/plan/robot/{robotId}": {
+      "get": {
         "tags": [
-          "actionPlanModel"
+          "Action"
         ],
-        "operationId": "ActionPlanModelById",
+        "operationId": "GetActionPlanByRobotIdAsync",
         "parameters": [
           {
-            "name": "id",
+            "name": "robotId",
             "in": "path",
             "required": true,
             "schema": {
@@ -4877,6 +4877,87 @@
         }
       }
     },
+    "/api/v1/Instance/alternative/{id}": {
+      "get": {
+        "tags": [
+          "Instance"
+        ],
+        "operationId": "InstanceGetAlternative",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/InstanceModel"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InstanceModel"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InstanceModel"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Server Error",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/v1/Policy": {
       "post": {
         "tags": [
@@ -7045,10 +7126,6 @@
             "type": "string",
             "nullable": true
           },
-          "ActionFamily": {
-            "type": "string",
-            "nullable": true
-          },
           "Tags": {
             "type": "array",
             "items": {
@@ -7057,10 +7134,6 @@
             "nullable": true
           },
           "Order": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "SuccessRate": {
             "type": "integer",
             "format": "int32"
           },
@@ -7114,7 +7187,7 @@
           },
           "TaskId": {
             "type": "string",
-            "nullable": true
+            "format": "uuid"
           },
           "Name": {
             "type": "string",
@@ -7161,6 +7234,24 @@
             "nullable": true
           },
           "policyDescription": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "ActuatorModel": {
+        "type": "object",
+        "properties": {
+          "actuatorName": {
+            "type": "string",
+            "nullable": true
+          },
+          "actuatorType": {
+            "type": "string",
+            "nullable": true
+          },
+          "dof": {
             "type": "string",
             "nullable": true
           }
@@ -7441,6 +7532,14 @@
             },
             "nullable": true
           },
+          "ROSVersion": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "ROSDistro": {
+            "type": "string",
+            "nullable": true
+          },
           "Tags": {
             "type": "array",
             "items": {
@@ -7448,9 +7547,25 @@
             },
             "nullable": true
           },
+          "InstanceFamily": {
+            "type": "string",
+            "nullable": true
+          },
+          "SuccessRate": {
+            "type": "integer",
+            "format": "int32"
+          },
           "ServiceStatus": {
             "type": "string",
             "nullable": true
+          },
+          "MinimumRam": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "MinimumNumCores": {
+            "type": "integer",
+            "format": "int32"
           }
         },
         "additionalProperties": false
@@ -7590,6 +7705,13 @@
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/SensorModel"
+            },
+            "nullable": true
+          },
+          "Actuator": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ActuatorModel"
             },
             "nullable": true
           },

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Middleware.Common.Enums;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -11,7 +12,8 @@ namespace Middleware.Common.Models
     {
         public string ActuatorName { get; set; }
         public string ActuatorType { get; set; }
-        public string dof { get; set; } //degree's of freedomn
+        public int number { get; set; }
+        public List<ROSNodeModel> Nodes { get; set; }
 
     }
 }

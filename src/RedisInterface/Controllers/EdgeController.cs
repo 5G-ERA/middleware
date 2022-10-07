@@ -89,6 +89,10 @@ namespace Middleware.RedisInterface.Controllers
             {
                 return BadRequest(new ApiResponse((int)HttpStatusCode.BadRequest, "Parameters were not specified."));
             }
+            if (model.IsValid() == false)
+            {
+                return BadRequest(new ApiResponse((int)HttpStatusCode.BadRequest, "Parameters were not specified or wrongly specified."));
+            }
             try
             {
                 EdgeModel edge = await _edgeRepository.AddAsync(model);
@@ -122,6 +126,10 @@ namespace Middleware.RedisInterface.Controllers
         [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.InternalServerError)]
         public async Task<IActionResult> PatchEdgeAsync([FromBody] EdgeModel patch, [FromRoute] Guid id)
         {
+            if (patch.IsValid() == false)
+            {
+                return BadRequest(new ApiResponse((int)HttpStatusCode.BadRequest, "Parameters were not specified or wrongly specified."));
+            }
 
             try
             {

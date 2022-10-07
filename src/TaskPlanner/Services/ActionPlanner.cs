@@ -43,8 +43,20 @@ namespace Middleware.TaskPlanner.Services
         /// 
         protected async Task<ActionModel> FindAlternativeAction(ActionModel action)
         {
-            //List<EdgeModel> edgeData = await ExecuteLuaQueryAsync("GetResourceEdgeData", testValues)
-            //ActionModel edge = (await GetAllAsync()).Where(x => x.Name == name).FirstOrDefault();
+            //A new action entity will be created with most of the attributes from the previous one but the services.
+            ActionModel newAction = new ActionModel();
+            newAction.Id = action.Id;
+            newAction.Name = action.Name;
+            newAction.Order = action.Order;
+            newAction.ActionPriority = action.ActionPriority;
+            newAction.Relations = action.Relations;
+
+            foreach(InstanceModel instance in action.Services)
+            {
+               RedisInterface.InstanceModel riCandidate = await _apiClient.InstanceGetAlternativeAsync(instance.Id);
+               InstanceModel candidate = _mapper.Map<InstanceModel>(riCandidate);
+                newAction.Services.Add(candidate);
+            }
             return null;
         }
 
@@ -61,7 +73,7 @@ namespace Middleware.TaskPlanner.Services
         }
 
         /// <summary>
-        /// Check if an action is Markovian or not
+        /// Check if an action is Markovian (depends on other actions) or not.
         /// </summary>
         /// <param name="actionId"></param>
         /// <returns></returns>
@@ -79,11 +91,38 @@ namespace Middleware.TaskPlanner.Services
             }
         }
 
+        /// <summary>
+        /// Sort action sequence by descending order of the action attribute order.
+        /// </summary>
+        /// <param name="unsortedActionSequence"></param>
+        /// <returns>List<ActionModel></returns>
         protected List<ActionModel> SortActionSequence(List<ActionModel> unsortedActionSequence)
         {
-            return null;
+            List<ActionModel> SortedList = new List<ActionModel>();
+            Dictionary<ActionModel, int> myDict = new Dictionary<ActionModel, int>();
+
+            foreach (ActionModel action in unsortedActionSequence)
+            {
+                myDict.Add(action, action.Order);
+            }
+            //sort diccionary by decending order of action attribute order.
+            var sortedDict = from entry in myDict orderby entry.Value descending select entry;
+
+            foreach (KeyValuePair<ActionModel, int> entry in sortedDict)
+            {
+                SortedList.Add(entry.Key);
+            }
+
+            return SortedList;
+
         }
 
+        /// <summary>
+        /// Get the markovian (dependant) actions Guid's of a single action.
+        /// </summary>
+        /// <param name="failedActions"></param>
+        /// <param name="completeActionSeq"></param>
+        /// <returns>List<Guid></returns>
         protected async Task<List<Guid>> getMarkovianCandidates(List<ActionModel> failedActions, List<ActionModel> completeActionSeq)
         {
             List<Guid> FinalCandidates = new List<Guid>();
@@ -104,7 +143,6 @@ namespace Middleware.TaskPlanner.Services
                             sharedFailedCandidates.Add(failedAction.Id);
                         }
                     }
-
                 }
                 //Which of dependsOnAction is not in sharedFailedCandidates? --> succeded actions required
                 foreach (RelationModel dependsOnActionData in dependsOnAction)
@@ -113,9 +151,7 @@ namespace Middleware.TaskPlanner.Services
                     //Add the succesful actions that are required by the failed actions.
                     if (found == false) FinalCandidates.Add(dependsOnActionData.PointsTo.Id);
                 }
-
             }
-
             return FinalCandidates;
         }
 
@@ -144,9 +180,9 @@ namespace Middleware.TaskPlanner.Services
                 }
                 if (instance.InstanceFamily == "Manipulation")
                 {
-                    if (robot.Actuator.Count == 0)
+                    if (robot.Manipulators.Count == 0)
                     {
-                        throw new InvalidOperationException("The robot does not have any proper actuators to accomodate the neccesary one of the netApp's.");
+                        throw new InvalidOperationException("The robot does not have any proper manipulators to accomodate the neccesary one of the netApp's.");
                     }
                 }
             }
@@ -158,7 +194,7 @@ namespace Middleware.TaskPlanner.Services
         }
 
         /// <summary>
-        /// Get predefined action sequence from knowledge graph given TaskId
+        /// Get predefined action sequence from knowledge graph given TaskId or provide partial or full replan.
         /// </summary>
         /// <param name="currentTaskId"></param>
         /// <param name="resourceLock"></param>
@@ -174,8 +210,7 @@ namespace Middleware.TaskPlanner.Services
             return await InferActionSequence(currentTaskId, resourceLock, DialogueTemp, robotId, tempTask, tempReplanedCompleteActionSeq);
         }
         /// <summary>
-        /// Get predefined action sequence from knowledge graph given TaskId.
-        /// Or get replaned action sequence given partial or full replan.
+        /// Get predefined action sequence from knowledge graph given TaskId or provide partial or full replan.
         /// </summary>
         /// <param name="currentTaskId"></param>
         /// <param name="resourceLock"></param>
@@ -308,6 +343,14 @@ namespace Middleware.TaskPlanner.Services
             task.ResourceLock = resourceLock;
             return new Tuple<TaskModel, RobotModel>(task, robot);
         }
+
+        /// <summary>
+        ///  Reason for the new action plan based upon information provided by robot.
+        /// </summary>
+        /// <param name="oldTask"></param>
+        /// <param name="CompleteReplan"></param>
+        /// <param name="DialogueTemp"></param>
+        /// <returns>Tuple<TaskModel, TaskModel, RobotModel</returns>
         private async Task<Tuple<TaskModel, TaskModel, RobotModel>> ReInferActionSequence(TaskModel oldTask, bool CompleteReplan, List<DialogueModel> DialogueTemp)
         {
             bool MarkovianProcess = oldTask.MarkovianProcess;

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Middleware.Common.Enums;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -10,8 +11,10 @@ namespace Middleware.Common.Models
     {
         public string SensorName { get; set; }
         public string SensorType { get; set; }
-        public string SensorLocation  { get; set; }
+       // public string SensorLocation  { get; set; }
         public string SensorDescription { get; set; }
-        public List<RosTopicModel> RosTopicPub { get; set; } //A sensor can publish multiple topics
+        public List<string> Nodes { get; set; } //A sensor can publish multiple topics
+
+        public int number { get; set; }
     }
 }

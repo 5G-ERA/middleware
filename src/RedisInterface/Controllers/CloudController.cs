@@ -92,6 +92,10 @@ namespace Middleware.RedisInterface.Controllers
             {
                 return BadRequest("Parameters were not specified.");
             }
+            if (model.IsValid() == false)
+            {
+                return BadRequest(new ApiResponse((int)HttpStatusCode.BadRequest, "Parameters were not specified or wrongly specified."));
+            }
             try
             {
                 CloudModel cloud =  await _cloudRepository.AddAsync(model);
@@ -125,6 +129,11 @@ namespace Middleware.RedisInterface.Controllers
         [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.InternalServerError)]
         public async Task<IActionResult> PatchCloudAsync([FromBody] CloudModel patch, [FromRoute] Guid id)
         {
+            if (patch.IsValid() == false)
+            {
+                return BadRequest(new ApiResponse((int)HttpStatusCode.BadRequest, "Parameters were not specified or wrongly specified."));
+            }
+
             try
             {
                 CloudModel model = await _cloudRepository.PatchCloudAsync(id, patch);

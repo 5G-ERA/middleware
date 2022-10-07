@@ -6,11 +6,9 @@ using System.Threading.Tasks;
 
 namespace Middleware.Common.Models
 {
-    public class RosTopicModel
+    public class ROSServiceModel
     {
         public string Name { get; set; }
-        public string Type { get; set; }
         public string Description { get; set; }
-
     }
 }
