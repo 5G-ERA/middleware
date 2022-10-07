@@ -55,5 +55,24 @@ To see how to deploy the 5G-ERA Middleware see the instructions in [ENVIRONMENT.
 ## Developing the 5G-ERA Middleware
 To see how to deploy the 5G-ERA Middleware development enviroment, see the instructions in [ENVIRONMENT.md](ENVIRONMENT.md).
 
+## Middleware features & Bugfixing Roadmap:
+
+<table style="width: 100%;">
+    <tbody>
+        <tr>
+            <td style="width: 25.0000%;"><br></td>
+            <td style="width: 25.0000%;"><br></td>
+            <td style="width: 25.0000%;"><br></td>
+            <td style="width: 25.0000%;"><br></td>
+        </tr>
+        <tr>
+            <td style="width: 25.0000%;"><br></td>
+            <td style="width: 25.0000%;"><br></td>
+            <td style="width: 25.0000%;"><br></td>
+            <td style="width: 25.0000%;"><br></td>
+        </tr>
+    </tbody>
+</table>
+
 ## License 
 For the licensing information see [LICENSE](LICENSE).
