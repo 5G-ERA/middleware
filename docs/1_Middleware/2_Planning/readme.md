@@ -61,15 +61,17 @@ The basic idea, however, is explained in the figure below. Action 2 depends on a
      height="250">
 </p>
 
+To allow the middleware to do partial replan, when calling the **GET replan endpoint** the parameter **CompleteReplan** must be set to false as in the example below.
+##### 1.2.1) Partial replanning 
 
 #### GET /replan/{param}
 
 ```json
 {
-  "RobotId" : "Guid",
-  "LockResourceReUse": "false",
-  "ContextKnown" : "true",
-  "CompleteReplan" : true
+  "RobotId" : Guid,
+  "LockResourceReUse": false,
+  "ContextKnown" : true,
+  "CompleteReplan" : false
   "TaskId" : "task_id",
   "Questions": []
 }
