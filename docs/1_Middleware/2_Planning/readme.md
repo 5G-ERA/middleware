@@ -46,7 +46,9 @@ The parameters from the API call are fetch into the system and the actionPlanner
 
 7. The Task with all the neccesary data will be given to the orchestrator to save the new plan in redis along side with a timestamp and the robotId that requested the task. 
 
-8. The orchestrator will deploy the containers in dedicated locations. The 200 OK respond is given back to the robot with the plan information, plan id and placement chosen as well as other useful data.
+8. The orchestrator will deploy the containers in dedicated locations. 
+9. The orchestrator will update redis graph knowledge model with new relationships between robot and consumed resoruces.
+10. The 200 OK respond is given back to the robot with the plan information, plan id and placement chosen as well as other useful data.
 
 
 ```mermaid
