@@ -14,6 +14,7 @@ Calling the API planning endpoint for a known context plan will require providin
 {
   "RobotId" : "Guid",
   "LockResourceReUse": "false",
+  "ReplanActionPlannerLocked": "false"
   "TaskId" : "task_id",
   "TaskDescription": "string",
   "ContextKnown" : "true",
@@ -23,6 +24,7 @@ Calling the API planning endpoint for a known context plan will require providin
 
 * The RobotId is a unique identifier generated after the [registration](https://github.com/5G-ERA/middleware/blob/main/docs/1_Middleware/3_Architecture/Gateway/ProposedInterface.md)
 * LockResourceReUse parameter avoids the middleware from trying to reuse some of the containers from other past deployments with same instances. Recommed to be false by default.
+* ReplanActionPlannerLocked: Do not modify action sequence if replan is neccesary, only placement
 * TaskId parameter is automatically generated when performed a new [onboarding_task](https://github.com/5G-ERA/middleware/blob/main/docs/1_Middleware/3_Architecture/RedisInterface/ProposedInterface.md). Let's recall that it will contain a predefined action sequence with the **Known Context** perspective.
 * Questions: list of questions template including task criticality, priority, danger etc. This will mainly be applied to the resource planner to choose a much power powerful machine to avoid failure.
 
@@ -77,6 +79,22 @@ To allow the middleware to do partial replan, when calling the **GET replan endp
 }
 ```
 
+___
+The parameters from the API call are fetch into the system and the actionPlanner Module starts.
+
+1. The taskId is checked to be registered in the redis graph. (If not present, the task will be rejected as **ContextKnown** is set to true.)
+
+2. A new plan Id is automatically generated for this request along side a task object. **the replan tag of the task is now active** to know that this plan is indeed a replan f type full or partial.
+
+3. Query Redis for old plan and obtain the old action seq.
+
+4.  Check if the flaf **ReplanActionPlannerLocked** is only task planed is set to true. If so, the robot requested to not change anything from action sequence but placement, send new task with old action seq and new action plan id to the resoure planner. Else:
+
+5. If partial or complete replan, find alternative candidate instances (other algorithms of same family and ros specifications) and add them to the actions seq. If partial replan, try to only add the actions failed but also consider their Markovian properties.
+
+6. In resource planner now: Check in which of the failed actions action planner has not done some modifications.
+7. Find a better placement to the old action for those actions according to established policies.
+8. Send new task back to the robot with the updated replan.
 
 ## 2) Unknown Context Planning:
 
