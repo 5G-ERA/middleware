@@ -21,6 +21,8 @@ Calling the API planning endpoint will require providing the following data:
 }
 ```
 
+The RobotId is a unique identifier generated after the [registration](https://github.com/5G-ERA/middleware/blob/main/docs/1_Middleware/3_Architecture/Gateway/ProposedInterface.md)
+
 For more information about this API endpoint, check [API](https://github.com/5G-ERA/middleware/)
 
 ### 1.1) Planning endpoint
