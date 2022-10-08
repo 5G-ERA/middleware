@@ -30,9 +30,16 @@ For more information about this API endpoint, check [API](https://github.com/5G-
 
 ### 1.1) Planning endpoint
 The parameters from the API call are fetch into the system and the actionPlanner Module starts. 
+
 -The taskId is checked to be registered in the redis graph. (If not present, the task will be rejected as **ContextKnown** is set to true.)
 
+-A new plan Id is automatically generated for this request along side a task object.
+
 -For each action in the action sequence retreived from redis, the middleware will check the robot has the sensors and actuators neccesary for the vertical netApps(instance algorithms).
+
+-The actions will be added to new task object as part of the action sequence.
+
+
 
 ```mermaid
 graph TD
