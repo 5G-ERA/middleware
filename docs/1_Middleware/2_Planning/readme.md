@@ -40,6 +40,13 @@ The parameters from the API call are fetch into the system and the actionPlanner
 
 4. The actions will be added to new task object as part of the action sequence.
 
+5. The object will be given to the resource planner. This one will associate the neccesary instances (algorithms) with each action.
+
+6. For each action, a best placement will be found by considering the active resource type policies of the system. The placement attribute of each action will be updated.
+
+7. The Task with all the neccesary data will be given to the orchestrator to save the new plan in redis along side with a timestamp and the robotId that requested the task. 
+
+8. The orchestrator will deploy the containers in dedicated locations. The 200 OK respond is given back to the robot with the plan information, plan id and placement chosen as well as other useful data.
 
 
 ```mermaid
