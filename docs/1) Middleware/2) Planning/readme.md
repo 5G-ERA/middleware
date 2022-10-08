@@ -4,7 +4,14 @@ The 5G-ERA middleware has a planning module for action and resource planning. Th
 
 ## 1) Known Context Planning:
 
-lorem ipsum
+```mermaid
+graph TD;
+  GIVEN-->ROBOT_ID
+  GIVEN-->TASK_ID
+  GIVEN-->TASK_DESCRIPTION
+  GIVEN-->BOOL_CONTEXT_KNOWN
+  GIVEN-->QUESTIONS
+```
 
 
 ## 2) Unknown Context Planning:
