@@ -37,7 +37,7 @@ graph TD
     HH[fa:fa-book TASK_DESCRIPTION] -->|string| B(fa:fa-puzzle-piece INFER_ACTIONSEQUENCE)
     HHH[fa:fa-info CONTEXT_KNOWN] -->|bool| B(fa:fa-puzzle-piece INFER_ACTIONSEQUENCE)
     HHHH[fa:fa-search QUESTIONS] -->|list| B(fa:fa-puzzle-piece INFER_ACTIONSEQUENCE)
-    B --> |Redis Query for TaskId|C[fa:fa-robot HAS SENSORS REQUIRED?]
+    B --> |Redis Query for TaskId|C[fa:fa-robot HAS SENSORS & MANIPULATORS REQUIRED?]
     C -->|False| D[fa:fa-times Task Rejected]
     C -->|True| E[fa:fa-desktop RESOURCE_PLAN]
 E[fa:fa-desktop RESOURCE_PLAN]-->|list _actionSeq_|Q[ADD INSTANCE TO ACTION SEQ]
