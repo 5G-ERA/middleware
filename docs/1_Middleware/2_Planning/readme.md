@@ -56,7 +56,10 @@ If the robot fails to execute an action from the action sequence or it wants to 
 
 The basic idea, however, is explained in the figure below.
 
-[](https://github.com/5G-ERA/middleware/blob/main/docs/img/imagen_2022-10-08_183127880.png?raw=true)
+<p align="center">
+  <img src="docs/img/imagen_2022-10-08_183127880.png" alt="Middleware architecture"/>
+</p>
+
 
 #### GET /replan/{param}
 
