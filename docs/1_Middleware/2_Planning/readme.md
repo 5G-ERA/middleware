@@ -84,13 +84,13 @@ The parameters from the API call are fetch into the system and the actionPlanner
 
 1. The taskId is checked to be registered in the redis graph. (If not present, the task will be rejected as **ContextKnown** is set to true.)
 
-2. A new plan Id is automatically generated for this request along side a task object. **the replan tag of the task is now active** to know that this plan is indeed a replan f type full or partial.
+2. A new plan Id is automatically generated for this request along side a task object. **The replan tag of the task is now active** to know that this plan is indeed a replan f type full or partial.
 
 3. Query Redis for old plan and obtain the old action seq.
 
 4.  Check if the flaf **ReplanActionPlannerLocked** is only task planed is set to true. If so, the robot requested to not change anything from action sequence but placement, send new task with old action seq and new action plan id to the resoure planner. Else:
 
-5. If partial or complete replan, find alternative candidate instances (*other algorithms of same family and ros specifications*) and add them to the actions seq. If partial replan, try to only add the actions failed but also consider their Markovian properties.
+5. If partial or complete replan, find alternative candidate instances (**other algorithms of same family and ros specifications**) and add them to the actions seq. If partial replan, try to only add the actions failed but also consider their Markovian properties.
 
 6. In resource planner now: Check in which of the failed actions action planner has not done some modifications.
 7. Find a better placement to the old action for those actions according to established policies.
