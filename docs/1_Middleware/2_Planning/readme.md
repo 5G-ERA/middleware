@@ -42,9 +42,10 @@ graph TD;
   TASK_DESCRIPTION-->InferActionSequence
   BOOL_CONTEXT_KNOWN-->InferActionSequence
   QUESTIONS-->InferActionSequence
+  InferActionSequence-->GET_PREDEFINED_ACTION_SEQ
+  GET_PREDEFINED_ACTION_SEQ-->CheckInstanceByRobotHw
   
- 
-  
+
 ```
 
 ### 1.2) Replanning endpoint
