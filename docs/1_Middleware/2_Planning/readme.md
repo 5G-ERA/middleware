@@ -52,6 +52,8 @@ The parameters from the API call are fetch into the system and the actionPlanner
 ___
 ### 1.2) Replanning endpoint
 
+If the robot fails to execute an action from the action sequence or it wants to get another plan, the replan endpoint will be called. In this case, the robot may ask for a **complete replan** or a **partial replan**. The main difference here is that for partial replan, the middleware will create a new action sequence that may not include the previous succesful actions unless they are quiried again becasuse of the nature of the task. This information, named the Markovian property of an action is established during the [onboarding of task](https://github.com/5G-ERA/middleware/blob/main/docs/1_Middleware/1_Onboarding/Task.md) and a new pre-establehed action sequence.
+
 #### GET /replan/{param}
 
 ```json
