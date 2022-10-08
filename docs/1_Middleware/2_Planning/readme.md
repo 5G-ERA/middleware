@@ -29,15 +29,16 @@ Calling the API planning endpoint for a known context plan will require providin
 For more information about this API endpoint, check [API](https://github.com/5G-ERA/middleware/)
 
 ### 1.1) Planning endpoint
+___
 The parameters from the API call are fetch into the system and the actionPlanner Module starts. 
 
-1.The taskId is checked to be registered in the redis graph. (If not present, the task will be rejected as **ContextKnown** is set to true.)
+1. The taskId is checked to be registered in the redis graph. (If not present, the task will be rejected as **ContextKnown** is set to true.)
 
-2.A new plan Id is automatically generated for this request along side a task object.
+2. A new plan Id is automatically generated for this request along side a task object.
 
-3.For each action in the action sequence retreived from redis, the middleware will check the robot has the sensors and actuators neccesary for the vertical netApps(instance algorithms).
+3. For each action in the action sequence retreived from redis, the middleware will check the robot has the sensors and actuators neccesary for the vertical netApps(instance algorithms).
 
-4.The actions will be added to new task object as part of the action sequence.
+4. The actions will be added to new task object as part of the action sequence.
 
 
 
