@@ -37,6 +37,14 @@ graph TD;
   GIVEN-->TASK_DESCRIPTION
   GIVEN-->BOOL_CONTEXT_KNOWN
   GIVEN-->QUESTIONS
+  ROBOT_ID-->InferActionSequence
+  TASK_ID-->InferActionSequence
+  TASK_DESCRIPTION-->InferActionSequence
+  BOOL_CONTEXT_KNOWN-->InferActionSequence
+  QUESTIONS-->InferActionSequence
+  
+ 
+  
 ```
 
 ### 1.2) Replanning endpoint
