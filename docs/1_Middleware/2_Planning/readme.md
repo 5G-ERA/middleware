@@ -58,7 +58,7 @@ The basic idea, however, is explained in the figure below.
 
 <p align="center">
   <img src="https://github.com/5G-ERA/middleware/blob/main/docs/img/imagen_2022-10-08_183127880.png?raw=true" alt="Middleware architecture"/ width="400" 
-     height="300">
+     height="250">
 </p>
 
 
