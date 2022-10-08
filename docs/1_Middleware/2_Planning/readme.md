@@ -52,6 +52,20 @@ The parameters from the API call are fetch into the system and the actionPlanner
 ___
 ### 1.2) Replanning endpoint
 
+#### GET /replan/{param}
+
+```json
+{
+  "RobotId" : "Guid",
+  "LockResourceReUse": "false",
+  "ContextKnown" : "true",
+  "CompleteReplan" : true
+  "TaskId" : "task_id",
+  "Questions": []
+}
+```
+
+
 ## 2) Unknown Context Planning:
 
 lorem ipsum
