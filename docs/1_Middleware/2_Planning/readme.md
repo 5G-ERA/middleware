@@ -57,7 +57,8 @@ If the robot fails to execute an action from the action sequence or it wants to 
 The basic idea, however, is explained in the figure below.
 
 <p align="center">
-  <img src="https://github.com/5G-ERA/middleware/blob/main/docs/img/imagen_2022-10-08_183127880.png?raw=true" alt="Middleware architecture"/>
+  <img src="https://github.com/5G-ERA/middleware/blob/main/docs/img/imagen_2022-10-08_183127880.png?raw=true" alt="Middleware architecture"/ width="100" 
+     height="100">
 </p>
 
 
