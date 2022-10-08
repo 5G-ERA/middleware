@@ -19,6 +19,7 @@ Calling the API planning endpoint will require providing the following data:
   "Questions": []
 }
 ```
+The RobotId is the unique identifier for the robot given back by the middleware gateway after registration.
 
 For more information about this API endpoint, check [API](https://github.com/5G-ERA/middleware/)
 
