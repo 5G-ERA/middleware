@@ -54,6 +54,10 @@ ___
 
 If the robot fails to execute an action from the action sequence or it wants to get another plan, the replan endpoint will be called. In this case, the robot may ask for a **complete replan** or a **partial replan**. The main difference here is that for partial replan, the middleware will create a new action sequence that may not include the previous succesful actions unless they are quiried again becasuse of the nature of the task. This information, named the Markovian property of an action is established during the [onboarding of task](https://github.com/5G-ERA/middleware/blob/main/docs/1_Middleware/1_Onboarding/Task.md) and a new pre-establehed action sequence.
 
+The basic idea, however, is explained in the figure below.
+
+[](https://github.com/5G-ERA/middleware/blob/main/docs/img/imagen_2022-10-08_183127880.png?raw=true)
+
 #### GET /replan/{param}
 
 ```json
