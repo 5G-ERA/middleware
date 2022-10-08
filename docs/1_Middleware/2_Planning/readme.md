@@ -29,6 +29,10 @@ Calling the API planning endpoint for a known context plan will require providin
 For more information about this API endpoint, check [API](https://github.com/5G-ERA/middleware/)
 
 ### 1.1) Planning endpoint
+The parameters from the API call are fetch into the system and the actionPlanner Module starts. 
+```
+CheckInstanceByRobotHw(robot, actionItem);
+```
 
 ```mermaid
 graph TD
