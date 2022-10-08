@@ -20,7 +20,7 @@ Calling the API planning endpoint will require providing the following data:
 }
 ```
 
-For more information about this API endpoint, check [API]("https://github.com/5G-ERA/middleware/tree/main/docs/1)%20Middleware/3)%20Architecture")
+For more information about this API endpoint, check [API](https://github.com/5G-ERA/middleware/)
 
 ### 1.1) Planning endpoint
 
