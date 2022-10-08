@@ -10,16 +10,13 @@ Asking: ROBOT ANSWER: 5G-ERA.
 
 ```json
 {
-  "Id": "guid",
+  "RobotId" : "Guid",
+  "LockResourceReUse": "bool",
   "TaskId" : "task_id",
-  "Questions": [
-    {
-    "Id": "guid",
-    "Question": "Do you have a map?",
-    "Answer": "True/false"
-    }
-  ]
-  
+  "TaskDescription": "string",
+  "ContextKnown" : "bool",
+  "Questions": []
+}
 ```
 
 Return:
