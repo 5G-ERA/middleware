@@ -3,8 +3,7 @@
 # *********************************
 # DESCRIPTION: Query ROS and converts all the information to a json file for onboarding into the 5G-ERA Middleware DB.
 # DATE: 18/10/2022
-# VERSION: 1
-# TODO: cargarse Subcriber and Publisher first item in lists arrVar y subList
+# VERSION: 1 
 # *********************************
 
 # Allow bash script to use ROS commands. Change the distro to your robot one!
