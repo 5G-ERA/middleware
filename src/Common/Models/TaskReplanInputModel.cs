@@ -10,6 +10,12 @@ namespace Middleware.Common.Models
         [JsonPropertyName("LockResourceReUse")]
         public bool LockResourceReUse { get; set; }
 
+        [JsonPropertyName("ContextKnown")]
+        public bool ContextKnown { get; set; }
+
+        [JsonPropertyName("CompleteReplan")]
+        public bool CompleteReplan { get; set; }
+
         [JsonPropertyName("TaskID")]
         public Guid TaskID { get; set; }
 

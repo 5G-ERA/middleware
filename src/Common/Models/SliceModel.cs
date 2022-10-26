@@ -8,9 +8,9 @@ namespace Middleware.Common.Models
 {
     internal class SliceModel
     {
-        public Guid SliceId { get; set; }
-        public string SliceName { get; set; }
-        public bool DynamimcSlcie { get; set; }
-        public  string TypeSlice { get; set; }
+        public Guid Id { get; set; }
+        public string Name { get; set; }
+        public bool IsDynamic { get; set; }
+        public  string Type { get; set; }
     }
 }

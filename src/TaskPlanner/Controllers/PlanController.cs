@@ -34,6 +34,7 @@ namespace Middleware.TaskPlanner.Controllers
             Guid id = inputModel.Id;//task id
             bool lockResource = inputModel.LockResourceReUse;
             Guid robotId = inputModel.RobotId; //robot id
+            bool contextKnown = inputModel.ContextKnown;
             List<Common.Models.DialogueModel> DialogueTemp = inputModel.Questions;
 
             try
@@ -42,7 +43,7 @@ namespace Middleware.TaskPlanner.Controllers
                 _actionPlanner.Initialize(new List<ActionModel>(), DateTime.Now);
 
                    
-                var (plan, robot) = await _actionPlanner.InferActionSequence(id, lockResource, DialogueTemp, robotId);
+                var (plan, robot) = await _actionPlanner.InferActionSequence(id, contextKnown,lockResource, DialogueTemp, robotId);
 
                 // call resource planner for resources
                 ResourcePlanner.TaskModel tmpTaskSend = _mapper.Map<ResourcePlanner.TaskModel>(plan);

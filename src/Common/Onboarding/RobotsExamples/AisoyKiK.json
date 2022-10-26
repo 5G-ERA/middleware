@@ -638,6 +638,7 @@
   "VirtualRam": null,
   "StorageDisk": 8,
   "NumberCores": 4,
+  "ThreadsPerCore": 1,
   "Questions": null,
   "Relations": []
 }

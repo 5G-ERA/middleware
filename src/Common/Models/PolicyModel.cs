@@ -24,8 +24,8 @@ public class PolicyModel : BaseModel
     [JsonPropertyName("Description")]
     public string Description { get; set; }
 
-    [JsonPropertyName("CannotCoexistFamily")]
-    public int CannotCoexistFamily { get; set; }
+    [JsonPropertyName("IsExclusiveWithinType")]
+    public int IsExclusiveWithinType { get; set; }
 
 
     /// <summary>
@@ -39,7 +39,7 @@ public class PolicyModel : BaseModel
         if (string.IsNullOrEmpty(Name.ToString())) return false;
         if (string.IsNullOrEmpty(IsActive.ToString())) return false;
         if (string.IsNullOrEmpty(Description.ToString())) return false;
-        if (string.IsNullOrEmpty(CannotCoexistFamily.ToString())) return false;
+        if (string.IsNullOrEmpty(IsExclusiveWithinType.ToString())) return false;
         if (!policyTypesEnum.Contains(Type)) return false;
 
 

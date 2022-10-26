@@ -10,9 +10,9 @@ namespace Middleware.Common.Models
 {
     public class ActuatorModel 
     {
-        public string ActuatorName { get; set; }
-        public string ActuatorType { get; set; }
-        public int number { get; set; }
+        public string Name { get; set; }
+        public string Type { get; set; }
+        public int Dof { get; set; }
         public List<ROSNodeModel> Nodes { get; set; }
 
     }

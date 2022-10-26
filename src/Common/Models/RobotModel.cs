@@ -102,11 +102,11 @@ public class RobotModel : BaseModel
             var valSensorTypeEnum = Enum.GetNames(typeof(SensorTypeEnum)).ToList();
             foreach (SensorModel sensor in Sensors)
             {
-                if (string.IsNullOrEmpty(sensor.SensorDescription.ToString())) return false;
-                if (string.IsNullOrEmpty(sensor.SensorName.ToString())) return false;
+                if (string.IsNullOrEmpty(sensor.Description.ToString())) return false;
+                if (string.IsNullOrEmpty(sensor.Name.ToString())) return false;
                // if (string.IsNullOrEmpty(sensor.SensorLocation.ToString())) return false;
-                if (string.IsNullOrEmpty(sensor.SensorType.ToString())) return false;
-                if (!valSensorTypeEnum.Contains(sensor.SensorType)) return false;
+                if (string.IsNullOrEmpty(sensor.Type.ToString())) return false;
+                if (!valSensorTypeEnum.Contains(sensor.Type)) return false;
                 if (sensor.number <= 0) return false;
 
             }
@@ -117,10 +117,10 @@ public class RobotModel : BaseModel
             var valActuatorTypesEnum = Enum.GetNames(typeof(RobotActuatorTypesEnum)).ToList();
             foreach (ActuatorModel actuator in Actuator)
             {
-                if (string.IsNullOrEmpty(actuator.ActuatorName.ToString())) return false;
-                if (string.IsNullOrEmpty(actuator.ActuatorName.ToString())) return false;
-                if (!valActuatorTypesEnum.Contains(actuator.ActuatorType)) return false;
-                if (actuator.number <= 0) return false;
+                if (string.IsNullOrEmpty(actuator.Name.ToString())) return false;
+                if (string.IsNullOrEmpty(actuator.Name.ToString())) return false;
+                if (!valActuatorTypesEnum.Contains(actuator.Type)) return false;
+                if (actuator.Dof <= 0) return false;
             }
         }
 

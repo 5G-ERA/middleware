@@ -6,7 +6,7 @@ namespace Middleware.TaskPlanner.Services
     {
         void Initialize(List<ActionModel> actionSequence, DateTime currentTime);
 
-        Task<Tuple<TaskModel, RobotModel>> InferActionSequence(Guid id, bool lockResource, List<DialogueModel> dialogueTemp, Guid robotId);
+        Task<Tuple<TaskModel, RobotModel>> InferActionSequence(Guid id, bool ContextKnown,  bool lockResource, List<DialogueModel> dialogueTemp, Guid robotId);
     }
 
 }

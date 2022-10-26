@@ -31,7 +31,7 @@ namespace Middleware.Common.Repositories
         {
             foreach (PolicyModel policy in ActivePolicies)
             {
-                if (policy.CannotCoexistFamily == newActivePolicy.CannotCoexistFamily)
+                if (policy.IsExclusiveWithinType == newActivePolicy.IsExclusiveWithinType)
                 {
                     return false;
                 }
@@ -90,9 +90,9 @@ namespace Middleware.Common.Repositories
             {
                 currentModel.Timestamp = patch.Timestamp;
             }
-            if (!string.IsNullOrEmpty(patch.CannotCoexistFamily.ToString()))
+            if (!string.IsNullOrEmpty(patch.IsExclusiveWithinType.ToString()))
             {
-                currentModel.CannotCoexistFamily = patch.CannotCoexistFamily;
+                currentModel.IsExclusiveWithinType = patch.IsExclusiveWithinType;
             }
             if (patch.IsActive != null)
             {
