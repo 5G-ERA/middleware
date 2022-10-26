@@ -90,6 +90,10 @@ namespace Middleware.RedisInterface.Controllers
             {
                 return BadRequest(new ApiResponse((int)HttpStatusCode.BadRequest, "Parameters were not specified."));
             }
+            if (model.IsValid() == false)
+            {
+                return BadRequest(new ApiResponse((int)HttpStatusCode.BadRequest, "Parameters were not specified or wrongly specified."));
+            }
             try
             {
                 RobotModel robot = await _robotRepository.AddAsync(model);
@@ -122,6 +126,10 @@ namespace Middleware.RedisInterface.Controllers
         [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.InternalServerError)]
         public async Task<IActionResult> PatchRobotAsync([FromBody] RobotModel patch, [FromRoute] Guid id)
         {
+            if (patch.IsValid() == false)
+            {
+                return BadRequest(new ApiResponse((int)HttpStatusCode.BadRequest, "Parameters were not specified or wrongly specified."));
+            }
             try
             {
                 RobotModel model = await _robotRepository.PatchRobotAsync(id, patch);
@@ -268,12 +276,12 @@ namespace Middleware.RedisInterface.Controllers
 
 
         [HttpGet]
-        [Route("{robotId}/edges", Name = "RobotGetConnectedEdgesIds")]
-        [ProducesResponseType(typeof(List<Guid>), (int)HttpStatusCode.OK)]
+        [Route("{robotId}/edges/connected", Name = "RobotGetConnectedEdgesIds")]
+        [ProducesResponseType(typeof(List<EdgeModel>), (int)HttpStatusCode.OK)]
         [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.NotFound)]
         [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.BadRequest)]
         [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.InternalServerError)]
-        public async Task<ActionResult<List<Guid>>> GetConnectedEdgesIdsAsync(Guid robotId)
+        public async Task<ActionResult<List<EdgeModel>>> GetConnectedEdgesIdsAsync(Guid robotId)
         {
             try
             {
@@ -281,12 +289,47 @@ namespace Middleware.RedisInterface.Controllers
                 {
                     return BadRequest(new ApiResponse((int)HttpStatusCode.BadRequest, "The Robot Id was not provided"));
                 }
-                List<Guid> edgeIds = await _robotRepository.GetConnectedEdgesIdsAsync(robotId);
+                List<EdgeModel> edgeIds = await _robotRepository.GetConnectedEdgesIdsAsync(robotId);
                 if (!edgeIds.Any())
                 {
                     return NotFound(new ApiResponse((int)HttpStatusCode.NotFound, "No connected Edges have been found."));
                 }
                 return Ok(edgeIds);
+            }
+            catch (Exception ex)
+            {
+                int statusCode = (int)HttpStatusCode.InternalServerError;
+                _logger.LogError(ex, "An error occurred:");
+                return StatusCode(statusCode, new ApiResponse(statusCode, $"An error has occurred: {ex.Message}"));
+            }
+
+        }
+
+        /// <summary>
+        ///  Return the connected clouds to the robot
+        /// </summary>
+        /// <param name="robotId"></param>
+        /// <returns>returns a list of cloudModels that have conectivity to the robot</returns>
+        [HttpGet]
+        [Route("{robotId}/clouds/connected", Name = "RobotGetConnectedCloudsIds")]
+        [ProducesResponseType(typeof(List<CloudModel>), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.NotFound)]
+        [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.BadRequest)]
+        [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.InternalServerError)]
+        public async Task<ActionResult<List<CloudModel>>> GetConnectedCloudsIdsAsync(Guid robotId)
+        {
+            try
+            {
+                if (robotId == Guid.Empty)
+                {
+                    return BadRequest(new ApiResponse((int)HttpStatusCode.BadRequest, "The Robot Id was not provided"));
+                }
+                List<CloudModel> cloudsIds = await _robotRepository.GetConnectedCloudsIdsAsync(robotId);
+                if (!cloudsIds.Any())
+                {
+                    return NotFound(new ApiResponse((int)HttpStatusCode.NotFound, "No connected clouds have been found."));
+                }
+                return Ok(cloudsIds);
             }
             catch (Exception ex)
             {

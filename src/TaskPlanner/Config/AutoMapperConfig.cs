@@ -26,6 +26,7 @@ public static class AutoMapperConfig
             cfg.CreateMap<PolicyModel, RedisInterface.PolicyModel>().ReverseMap();
             cfg.CreateMap<RobotModel, RedisInterface.RobotModel>().ReverseMap();
             cfg.CreateMap<TaskModel, RedisInterface.TaskModel>().ReverseMap();
+            //cfg.CreateMap<RosTopicModel, RedisInterface.>().ReverseMap();
             cfg.CreateMap<PolicyModel, RedisInterface.PolicyModel>().ReverseMap();
             cfg.CreateMap<RelationModel, RedisInterface.RelationModel>().ReverseMap();
             cfg.CreateMap<GraphEntityModel, RedisInterface.GraphEntityModel>().ReverseMap();
@@ -41,6 +42,7 @@ public static class AutoMapperConfig
             cfg.CreateMap<ApiResponse, ResourcePlanner.ApiResponse>().ReverseMap();
             cfg.CreateMap<ActionModel, ResourcePlanner.ActionModel>().ReverseMap();
             cfg.CreateMap<InstanceModel, ResourcePlanner.InstanceModel>().ReverseMap();
+            cfg.CreateMap<RobotModel, ResourcePlanner.RobotModel>().ReverseMap();
             //cfg.CreateMap<ContainerImageModel, ResourcePlanner.ContainerImageModel>().ReverseMap();
 
         });

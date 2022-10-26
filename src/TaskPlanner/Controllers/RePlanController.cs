@@ -11,9 +11,9 @@ namespace Middleware.TaskPlanner.Controllers
     {
         [HttpPost] //http get replan 
         [ProducesResponseType(typeof(TaskModel), (int)HttpStatusCode.OK)]
-        public async Task<ActionResult<TaskModel>> GetReplan([FromBody] TaskReplanModel inputModel)
+        public async Task<ActionResult<TaskModel>> GetReplan([FromBody] TaskReplanInputModel inputModel)
         {
-            var taskModel = new TaskModel(inputModel.Id, 1)
+            var taskModel = new TaskModel(inputModel.TaskID, 1)
             {
                 ActionPlanId = Guid.NewGuid(),
                 ActionSequence = new List<ActionModel>() { new ActionModel( ) { } },

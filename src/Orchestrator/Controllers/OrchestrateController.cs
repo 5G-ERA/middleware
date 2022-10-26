@@ -24,6 +24,8 @@ public class OrchestrateController : Controller
         _redisClient = clientBuilder.CreateRedisApiClient();
     }
 
+    public record OrchestratorResourceInput(TaskModel Task, RobotModel Robot);
+
     /// <summary>
     /// Request orchestration of the resources defied in the plan
     /// </summary>
@@ -33,7 +35,7 @@ public class OrchestrateController : Controller
     [Route("plan", Name = "InstantiateNewPlan")]
     [ProducesResponseType(typeof(TaskModel), (int)HttpStatusCode.OK)]
     [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.InternalServerError)]
-    public async Task<IActionResult> InstantiateNewPlan([FromBody] TaskModel task)
+    public async Task<IActionResult> InstantiateNewPlan([FromBody] OrchestratorResourceInput task)
     {
         int statusCode = (int)HttpStatusCode.BadRequest;
         if (task is null)
@@ -43,7 +45,7 @@ public class OrchestrateController : Controller
         try
         {
             statusCode = (int)HttpStatusCode.OK;
-            var result = await _deploymentService.DeployAsync(task);
+            var result = await _deploymentService.DeployAsync(task.Task, task.Robot.Id);
             if (result == false)
             {
                 statusCode = (int)HttpStatusCode.InternalServerError;

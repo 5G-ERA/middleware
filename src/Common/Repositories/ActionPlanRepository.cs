@@ -17,4 +17,15 @@ public class ActionPlanRepository : BaseRepository<ActionPlanModel>, IActionPlan
     public ActionPlanRepository(IConnectionMultiplexer redisClient, IRedisGraphClient redisGraph, ILogger<ActionPlanRepository> logger) : base(RedisDbIndexEnum.ActionSequence, redisClient, redisGraph, logger, false)
     {
     }
+
+    /// <summary>
+    /// Retrieves actionPlanModels 
+    /// </summary>
+    /// <returns> List<ActionPlanModel> </returns>
+    public async Task<List<ActionPlanModel>> GetActionPlanModelsAsync(Guid robotId)
+    {
+        List<ActionPlanModel> planModels = await ExecuteLuaQueryAsync("GetPlanByRobotId");
+
+        return planModels;
+    }
 }

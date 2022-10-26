@@ -49,6 +49,8 @@ namespace Middleware.RedisInterface.Controllers
             }
         }
 
+        //New end points for depends_on property for actions.
+
         /// <summary>
         /// Get an ActionModel entity by id
         /// </summary>
@@ -210,7 +212,7 @@ namespace Middleware.RedisInterface.Controllers
         [ProducesResponseType(typeof(List<RelationModel>), (int)HttpStatusCode.OK)]
         [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.NotFound)]
         [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.InternalServerError)]
-        public async Task<IActionResult> GetRelationAsync(Guid id, string name)
+        public async Task<IActionResult> GetRelationAsync(Guid id, string name) //Guid of node and name of relationship
         {
             if (string.IsNullOrWhiteSpace(name))
             {
@@ -427,7 +429,39 @@ namespace Middleware.RedisInterface.Controllers
                 return StatusCode(statusCode, new ApiResponse(statusCode, $"An error has occurred: {ex.Message}"));
             }
         }
-
+        /// <summary>
+        /// Get action plan given robot Id.
+        /// </summary>
+        /// <returns>List<ActionPlanModel></returns>
+        [HttpGet]
+        [Route("plan/robot/{robotId}", Name = "GetActionPlanByRobotIdAsync")]
+        [ProducesResponseType(typeof(List<ActionPlanModel>), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.NotFound)]
+        [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.InternalServerError)]
+        public async Task<IActionResult> GetActionPlanByRobotIdAsync(Guid robotId)
+        {
+            try
+            {
+                if (robotId == Guid.Empty)
+                {
+                    return BadRequest(new ApiResponse((int)HttpStatusCode.BadRequest, "Robot id has not been specified"));
+                }
+                // Get list of actionPlans from specific robotId.
+                List<ActionPlanModel> actionPlans = await _actionPlanRepository.GetActionPlanModelsAsync(robotId);
+                if (actionPlans == null)
+                {
+                    return NotFound(new ApiResponse((int)HttpStatusCode.NotFound, "Object was not found."));
+                }
+                //List<ActionPlanModel> activePoliciesRecords = actionPlans.Select(p => new ActionPlanModel(p.Id, p.Name, p.Description)).ToList();
+                return Ok(actionPlans);
+            }
+            catch (Exception ex)
+            {
+                int statusCode = (int)HttpStatusCode.InternalServerError;
+                _logger.LogError(ex, "An error occurred:");
+                return StatusCode(statusCode, new ApiResponse(statusCode, $"An error has occurred: {ex.Message}"));
+            }
+        }
         #endregion
 
     }

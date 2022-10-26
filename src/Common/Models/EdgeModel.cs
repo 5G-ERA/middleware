@@ -10,6 +10,9 @@ public class EdgeModel : BaseModel
     [JsonPropertyName("Name")]
     public override string Name { get; set; }
 
+    [JsonPropertyName("Type")]
+    public string Type { get; set; }
+
     [JsonPropertyName("EdgeStatus")]
     public string EdgeStatus { get; set; }
 
@@ -33,4 +36,19 @@ public class EdgeModel : BaseModel
 
     [JsonPropertyName("NumberOfCores")]
     public int NumberOfCores { get; set; }
+
+    /// <summary>
+    /// Onboarding validation of the edge data object.
+    /// </summary>
+    /// <returns></returns>
+    public bool IsValid()
+    {
+        if (string.IsNullOrEmpty(Name.ToString())) return false;
+        if (string.IsNullOrEmpty(EdgeIp.ToString())) return false;
+        if (string.IsNullOrEmpty(NumberOfCores.ToString())) return false;
+        if (string.IsNullOrEmpty(DiskStorage.ToString())) return false;
+       // if (string.IsNullOrEmpty(MacAddress.ToString())) return false;
+        if (string.IsNullOrEmpty(Ram.ToString())) return false;
+        return true;
+    }
 }

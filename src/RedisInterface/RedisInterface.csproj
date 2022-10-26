@@ -9,6 +9,11 @@
 	<RootNamespace>Middleware.RedisInterface</RootNamespace>
     <DockerfileContext>..\..</DockerfileContext>
     <DockerComposeProjectPath>..\..\docker-compose.dcproj</DockerComposeProjectPath>
+    <DebugType>full</DebugType>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <Optimize>False</Optimize>
   </PropertyGroup>
 
   <ItemGroup>
@@ -35,6 +40,10 @@
 
   <ItemGroup>
     <None Remove="LuaQueries\GetKeys.lua" />
+    <None Remove="LuaQueries\GetPlanByRobotId.lua" />
+    <None Remove="LuaQueries\GetResourceCloudData.lua" />
+    <None Remove="LuaQueries\GetResourceEdgeData.lua" />
+    <None Remove="LuaQueries\GetSameFamilyAction.lua" />
   </ItemGroup>
 
 </Project>

@@ -58,17 +58,17 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/TaskModel"
+                "$ref": "#/components/schemas/ResourceInput"
               }
             },
             "text/json": {
               "schema": {
-                "$ref": "#/components/schemas/TaskModel"
+                "$ref": "#/components/schemas/ResourceInput"
               }
             },
             "application/*+json": {
               "schema": {
-                "$ref": "#/components/schemas/TaskModel"
+                "$ref": "#/components/schemas/ResourceInput"
               }
             }
           }
@@ -203,6 +203,37 @@
         },
         "additionalProperties": false
       },
+      "DialogueModel": {
+        "type": "object",
+        "properties": {
+          "relations": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/RelationModel"
+            },
+            "nullable": true
+          },
+          "Id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "Question": {
+            "type": "string",
+            "nullable": true
+          },
+          "IsSingleAnswer": {
+            "type": "boolean"
+          },
+          "Answer": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/KeyValuePair"
+            },
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
       "GraphEntityModel": {
         "type": "object",
         "properties": {
@@ -298,6 +329,108 @@
           },
           "pointsTo": {
             "$ref": "#/components/schemas/GraphEntityModel"
+          }
+        },
+        "additionalProperties": false
+      },
+      "ResourceInput": {
+        "type": "object",
+        "properties": {
+          "task": {
+            "$ref": "#/components/schemas/TaskModel"
+          },
+          "robot": {
+            "$ref": "#/components/schemas/RobotModel"
+          }
+        },
+        "additionalProperties": false
+      },
+      "RobotModel": {
+        "type": "object",
+        "properties": {
+          "relations": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/RelationModel"
+            },
+            "nullable": true
+          },
+          "Id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "Name": {
+            "type": "string",
+            "nullable": true
+          },
+          "Manufacturer": {
+            "type": "string",
+            "nullable": true
+          },
+          "RobotModel": {
+            "type": "string",
+            "nullable": true
+          },
+          "RobotStatus": {
+            "type": "string",
+            "nullable": true
+          },
+          "CurrentTaskID": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "TaskList": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "nullable": true
+          },
+          "BatteryStatus": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "MacAddress": {
+            "type": "string",
+            "nullable": true
+          },
+          "LocomotionSystem": {
+            "type": "string",
+            "nullable": true
+          },
+          "Sensors": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "nullable": true
+          },
+          "CPU": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "RAM": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "VirtualRam": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "StorageDisk": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "NumberCores": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "Questions": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/DialogueModel"
+            },
+            "nullable": true
           }
         },
         "additionalProperties": false

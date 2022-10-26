@@ -3,6 +3,7 @@ using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 using Middleware.Common.Models;
 using Middleware.TaskPlanner.ApiReference;
+using Middleware.TaskPlanner.Services;
 
 namespace Middleware.TaskPlanner.Controllers
 {
@@ -30,19 +31,29 @@ namespace Middleware.TaskPlanner.Controllers
         [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.InternalServerError)]
         public async Task<ActionResult<TaskModel>> GetPlan([FromBody] TaskPlannerInputModel inputModel, bool dryRun = false)
         {
-            Guid id = inputModel.Id;
+            Guid id = inputModel.Id;//task id
             bool lockResource = inputModel.LockResourceReUse;
+            Guid robotId = inputModel.RobotId; //robot id
+            bool contextKnown = inputModel.ContextKnown;
+            List<Common.Models.DialogueModel> DialogueTemp = inputModel.Questions;
 
             try
             {
 
                 _actionPlanner.Initialize(new List<ActionModel>(), DateTime.Now);
 
-                TaskModel plan = await _actionPlanner.InferActionSequence(id, lockResource);
+                   
+                var (plan, robot) = await _actionPlanner.InferActionSequence(id, contextKnown,lockResource, DialogueTemp, robotId);
 
                 // call resource planner for resources
                 ResourcePlanner.TaskModel tmpTaskSend = _mapper.Map<ResourcePlanner.TaskModel>(plan);
-                ResourcePlanner.TaskModel tmpFinalTask = await _resourcePlannerClient.GetResourcePlanAsync(tmpTaskSend);
+                ResourcePlanner.RobotModel tmpRobotSend = _mapper.Map<ResourcePlanner.RobotModel>(robot);
+                ResourcePlanner.ResourceInput resourceInput = new ResourcePlanner.ResourceInput
+                {
+                    Robot = tmpRobotSend,
+                    Task = tmpTaskSend
+                };
+                ResourcePlanner.TaskModel tmpFinalTask = await _resourcePlannerClient.GetResourcePlanAsync(resourceInput);//API call to resource planner
 
                 TaskModel resourcePlan = _mapper.Map<TaskModel>(tmpFinalTask);
 

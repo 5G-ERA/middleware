@@ -1,7 +1,8 @@
 using Middleware.Common.ExtensionMethods;
-using Middleware.TaskPlanner;
 using Middleware.TaskPlanner.ApiReference;
 using Middleware.TaskPlanner.Config;
+using Middleware.TaskPlanner.Services;
+
 
 var builder = WebApplication.CreateBuilder(args);
 

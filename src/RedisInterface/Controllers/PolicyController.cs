@@ -34,6 +34,10 @@ namespace Middleware.RedisInterface.Controllers
             {
                 return BadRequest(new ApiResponse((int)HttpStatusCode.BadRequest, "Parameters were not specified."));
             }
+            if (model.IsValid() == false)
+            {
+                return BadRequest(new ApiResponse((int)HttpStatusCode.BadRequest, "Parameters were not specified or wrongly specified."));
+            }
             try
             {
                 await _policyRepository.AddAsync(model);
@@ -152,6 +156,10 @@ namespace Middleware.RedisInterface.Controllers
         [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.InternalServerError)]
         public async Task<IActionResult> PatchPolicyAsync([FromBody] PolicyModel patch, [FromRoute] Guid id)
         {
+            if (patch.IsValid() == false)
+            {
+                return BadRequest(new ApiResponse((int)HttpStatusCode.BadRequest, "Parameters were not specified or wrongly specified."));
+            }
             try
             {
                 PolicyModel model = await _policyRepository.PatchPolicyAsync(id, patch);

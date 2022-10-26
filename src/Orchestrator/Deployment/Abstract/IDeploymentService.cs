@@ -11,7 +11,7 @@ public interface IDeploymentService
     /// </summary>
     /// <param name="task">Task plan with the defined action sequence and needed resources</param>
     /// <returns></returns>
-    Task<bool> DeployAsync(TaskModel task);
+    Task<bool> DeployAsync(TaskModel task, Guid robotId);
     /// <summary>
     /// Creates startup deployment needed to instantiate the middleware.
     /// </summary>

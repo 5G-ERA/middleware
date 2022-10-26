@@ -151,10 +151,34 @@ namespace Middleware.Common.Repositories
         /// <summary>
         /// Execute the given Lua query against the redis data store
         /// </summary>
-        /// <param name="queryName"></param>
-        /// <returns></returns>
+        /// <param name="queryName">name of the query to be executed</param>
+        /// <returns>List of the objects of hte specified type T</returns>
         protected async Task<List<T>> ExecuteLuaQueryAsync(string queryName)
         {
+            var script = await File.ReadAllTextAsync(GetScriptPath(queryName));
+
+            var prepared = LuaScript.Prepare(script);
+            var redisResult = await Db.ScriptEvaluateAsync(prepared);
+
+            var models = new List<T>();
+            var results = new List<string>();
+            if (redisResult.Type == ResultType.MultiBulk)
+            {
+                results.AddRange(((RedisValue[])redisResult).Select(x => x.ToString()));
+            }
+
+            foreach (var result in results)
+            {
+                T model = JsonSerializer.Deserialize<T>(result);
+                models.Add(model);
+            }
+
+            return models;
+        }
+
+        protected async Task<List<T>> ExecuteLuaQueryWithParamsAsync(string queryName,List<string> parameters)
+        {
+            //TODO: implement launching lua query with parameters
             var script = await File.ReadAllTextAsync(GetScriptPath(queryName));
 
             var prepared = LuaScript.Prepare(script);
@@ -357,5 +381,7 @@ namespace Middleware.Common.Repositories
             //HERE
             throw new NotImplementedException();
         }
+
+        
     }
 }

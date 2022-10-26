@@ -75,44 +75,55 @@ namespace Middleware.Common.Repositories
             return currentModel;
         }
 
-        public async Task<List<Guid>> GetFreeEdgesIdsAsync(List<Guid> edgesToCheck)
+        public async Task<List<EdgeModel>> GetFreeEdgesIdsAsync(List<EdgeModel> edgesToCheck)
         {
-            List<Guid> TempFreeEdges = new List<Guid>();
-            edgesToCheck.AddRange(TempFreeEdges);
+            //List<Guid> TempFreeEdges = new List<Guid>();
+            List<EdgeModel> TempFreeEdges = new List<EdgeModel>();
+            //edgesToCheck.AddRange(TempFreeEdges);
             //TempFreeEdges = edgesToCheck;
 
-            foreach (Guid edgeId in TempFreeEdges)
+            foreach (EdgeModel edgeId in edgesToCheck)
             {
-                List<RelationModel> robotRelations = await GetRelation(edgeId, "LOCATED_AT", RelationDirection.Incoming);
+                //Get edge id from name
+                List<RelationModel> robotRelations = await GetRelation(edgeId.Id, "LOCATED_AT", RelationDirection.Incoming);
+                
                 foreach (RelationModel relationModel in robotRelations)
                 {
                     if (relationModel.PointsTo != null)
                     {
-                        TempFreeEdges.Remove(relationModel.PointsTo.Id);                      
+                        EdgeModel edge = new EdgeModel();
+                        edge.Id = relationModel.PointsTo.Id;
+                        edge.Name = relationModel.PointsTo.Name;
+                        //TempFreeEdges.Remove(relationModel.PointsTo.Id);
+                        TempFreeEdges.Add(edge);
                     }
                 }
             }
             return TempFreeEdges;
         }
 
-        public async Task<List<Guid>> GetLessBusyEdgesAsync(List<Guid> busyEdgesTocheck)
+        public async Task<List<EdgeModel>> GetLessBusyEdgesAsync(List<EdgeModel> busyEdgesTocheck)
         {
-            Dictionary<Guid, int> tempDic = new Dictionary<Guid,int>();
-            //Dictionary<String, int> tempDic = new Dictionary<String, int>();
-            List<Guid> lessBusyEdges = new List<Guid>();
-            //List<String> lessBusyEdges = new List<String>();
+            //Dictionary<Guid, int> tempDic = new Dictionary<Guid,int>();
+            Dictionary<EdgeModel, int> tempDic = new Dictionary<EdgeModel, int>();
+            //List<Guid> lessBusyEdges = new List<Guid>();
+            List<EdgeModel> lessBusyEdges = new List<EdgeModel>();
             //int counter = 0;
             string previousEdge = "";
 
-            foreach (Guid busyEdgeId in busyEdgesTocheck)
+            foreach (EdgeModel busyEdge in busyEdgesTocheck)
             {
-                List<RelationModel> robotRelations = await GetRelation(busyEdgeId, "LOCATED_AT", RelationDirection.Incoming);
+                List<RelationModel> robotRelations = await GetRelation(busyEdge.Id, "LOCATED_AT", RelationDirection.Incoming);
 
                 foreach(RelationModel relationModel in robotRelations)
                 {   
                     if (relationModel.PointsTo.Name == previousEdge)//Check how many times an edge have the relationship LOCATED_AT
                     {
-                        tempDic[relationModel.PointsTo.Id]++;//tempDic.Add(relationModel.PointsTo.Id
+                        EdgeModel edge = new EdgeModel();
+                        edge.Id = relationModel.PointsTo.Id;
+                        edge.Name = relationModel.PointsTo.Name;
+
+                        tempDic[edge]++;//tempDic.Add(relationModel.PointsTo.Id
                     }
                     previousEdge = relationModel.PointsTo.Name;
 
@@ -126,5 +137,22 @@ namespace Middleware.Common.Repositories
             
             return lessBusyEdges;
         }
+        
+        public async Task<EdgeModel> GetEdgeResourceDetailsByNameAsync(string name)
+        {
+            //RedisValue[] testValues = new RedisValue[] { name };
+
+
+            //object parameters = name;
+            //List<EdgeModel> edgeData = await ExecuteLuaQueryAsync("GetResourceEdgeData", testValues);
+            EdgeModel edge = (await GetAllAsync()).Where(x => x.Name == name).FirstOrDefault();
+            return edge;
+           // return edgeData;
+        }
+        /// <summary>
+        /// Retrieves active policies
+        /// </summary>
+        /// <returns> Active policies </returns>
+       
     }
 }

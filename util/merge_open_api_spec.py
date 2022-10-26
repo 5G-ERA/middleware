@@ -13,9 +13,9 @@ source_file = os.path.join(
     dirname, "../src/Orchestrator/OrchestratorSpec.json")
 output_file = os.path.join(dirname, "../OpenAPISpec.json")
 
-prefixes = {"RedisInterface": "Data",
-            "TaskPlanner": "Task",
-            "Orchestrator": "Orchestrate",
+prefixes = {"RedisInterface": "data",
+            "TaskPlanner": "task",
+            "Orchestrator": "orchestrate",
             "OcelotGateway": ""}
 
 
@@ -47,6 +47,7 @@ def correct_route_name(route: str, api: str) -> str:
         api: name of the api to adjust to.
     """
 
+    route = route.lower()
     if "/api/" not in route:
         return ""
 

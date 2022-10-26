@@ -62,5 +62,29 @@ namespace Middleware.Common.Repositories
             return currentModel;
         }
 
+        /// <summary>
+        /// Return alternative instance to the provided instance.
+        /// It will be of the same family and comply with previous ROS versions.
+        /// </summary>
+        /// <param name="instance"></param>
+        /// <returns>InstanceModel</returns>
+        public async Task<InstanceModel> FindAlternativeInstance(Guid instanceId)
+        {
+            InstanceModel instance = await GetByIdAsync(instanceId);
+
+            List<InstanceModel> instanceCandidatesFinal = new List<InstanceModel>();
+            List <InstanceModel> PotentialInstanceCandidates = await GetAllAsync();
+            foreach (InstanceModel instanceCandidate in PotentialInstanceCandidates)
+            {
+                if(instanceCandidate.Id != instance.Id)
+                {
+                    if((instanceCandidate.InstanceFamily == instance.InstanceFamily) && (instanceCandidate.ROSDistro== instance.ROSDistro) && (instanceCandidate.RosVersion == instance.RosVersion))
+                    {
+                        instanceCandidatesFinal.Add(instanceCandidate);
+                    }
+                }
+            }
+            return instanceCandidatesFinal.FirstOrDefault();
+        }
     }
 }
