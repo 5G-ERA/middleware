@@ -177,7 +177,7 @@ public class DeploymentService : IDeploymentService
     }
 
     /// <summary>
-    /// Deploy the Service of the specified type. Available types are <seealso cref="V1Service"/> and <seealso cref="V1Deployment"/>
+    /// Deploy the Service of the specified type. Available types are <see cref="V1Service"/> and <see cref="V1Deployment"/>
     /// </summary>
     /// <typeparam name="T">Type of the service</typeparam>
     /// <param name="k8SClient"></param>
@@ -220,6 +220,7 @@ public class DeploymentService : IDeploymentService
         if (obj is V1Deployment depl)
         {
             depl.Metadata.SetServiceLabel(instanceId);
+            depl.Metadata.AddNetAppMultusAnnotations(AppConfig.MultusNetworkName);
             foreach (var container in depl.Spec.Template.Spec.Containers)
             {
                 List<V1EnvVar> envVars = container.Env is not null
@@ -240,7 +241,6 @@ public class DeploymentService : IDeploymentService
         return default;
 
     }
-
 
     /// <inheritdoc/>
     public V1Service CreateService(string serviceImageName, K8SServiceKindEnum kind, V1ObjectMeta meta)
@@ -313,9 +313,9 @@ public class DeploymentService : IDeploymentService
         var retVal = true;
 
         var deployments = await k8sClient.AppsV1.ListNamespacedDeploymentAsync(AppConfig.K8SNamespaceName,
-            labelSelector: V1ObjectExtensions.GetServiceLabelSelector(instance.ServiceInstanceId));
+            labelSelector: V1ObjectExtensions.GetNetAppLabelSelector(instance.ServiceInstanceId));
         var services = await k8sClient.CoreV1.ListNamespacedServiceAsync(AppConfig.K8SNamespaceName,
-            labelSelector: V1ObjectExtensions.GetServiceLabelSelector(instance.ServiceInstanceId));
+            labelSelector: V1ObjectExtensions.GetNetAppLabelSelector(instance.ServiceInstanceId));
 
         foreach (var deployment in deployments.Items)
         {
@@ -325,15 +325,25 @@ public class DeploymentService : IDeploymentService
 
         foreach (var service in services.Items)
         {
-            var status = await k8sClient.AppsV1.DeleteNamespacedDeploymentAsync(service.Name(), AppConfig.K8SNamespaceName);
-            retVal &= status.Status == success;
+            //var version = await k8sClient.Version.GetCodeWithHttpMessagesAsync();
+            try
+            {
+
+                await k8sClient.CoreV1.DeleteNamespacedServiceAsync(service.Name(), AppConfig.K8SNamespaceName);
+            }
+            catch
+            {
+                // ignored
+            }
         }
+
 
         return retVal;
     }
 
     /// <inheritdoc/>
-    public V1Deployment CreateStartupDeployment(string name)
+    /// <param name="tag1"></param>
+    public V1Deployment CreateStartupDeployment(string name, string tag)
     {
         var selector = new V1LabelSelector
         {
@@ -363,7 +373,7 @@ public class DeploymentService : IDeploymentService
         var container = new V1Container()
         {
             Name = name,
-            Image = K8SImageHelper.BuildImageName(_awsRegistryName, name, "latest"),
+            Image = K8SImageHelper.BuildImageName(_awsRegistryName, name, tag),
             ImagePullPolicy = AppConfig.AppConfiguration == AppVersionEnum.Prod.GetStringValue() ? "Always" : "IfNotPresent",
             Env = envList,
             Ports = new List<V1ContainerPort>() { new(80), new(433) }

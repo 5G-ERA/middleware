@@ -43,7 +43,7 @@ public static class CommonExtensions
     /// Configures the Redis Connection for the Application. The connection includes standard redis client via <see cref="ConnectionMultiplexer"/>
     /// and connection to Redis Graph using <seealso cref="RedisGraphClient"/>.
     /// </summary>
-    /// <param name="services"></param>
+    /// <param name="builder"></param>
     /// <returns></returns>
     public static WebApplicationBuilder RegisterRedis(this WebApplicationBuilder builder) 
     {

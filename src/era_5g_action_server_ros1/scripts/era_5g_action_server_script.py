@@ -21,6 +21,8 @@ import json
 import collections
 import threading
 
+import signal
+
 global PASSWORD
 global TOKEN
 global PLAN
@@ -48,9 +50,11 @@ class ActionServerNode():
         # Set the callback that should be executed when a preempt request is received
         self.a_server.register_preempt_callback(self.preempt_callback)
         # Start the server
-        rospy.loginfo("Starting 5g-era-action-server...")
-        self.a_server.start()
-
+        
+        
+        self.Num_Steps = 0
+        self.ActionSeqIds = []
+        self.rate = rospy.Rate(1)
 
         global K8IP
         global LOGIN_OCELOT
@@ -60,6 +64,9 @@ class ActionServerNode():
         LOGIN_OCELOT = "http://"+str(K8IP)+"/Login"
         PLAN_OCELOT = "http://"+str(K8IP)+"/Task/Plan"
         RESOURCE_STATUS_OCELOT = "http://" + str(K8IP)+"/orchestrate/orchestrate/plan/"
+
+        rospy.loginfo("Starting 5g-era-action-server...")
+        self.a_server.start()
 
 
     def destroy(self):
@@ -74,6 +81,7 @@ class ActionServerNode():
             r = requests.post(LOGIN_OCELOT, json={"Id": ID, "Password": PASSWORD})
             Token = jsondata = r.json()
             newToken = (Token['token'])  # Token is stored here
+            time.sleep(10)
             return newToken
 
         except HTTPError as e:
@@ -95,38 +103,23 @@ class ActionServerNode():
             actionseq = Action_Sequence['ActionSequence']
             ACTION_PLAN_ID = Action_Sequence['ActionPlanId']
             rospy.loginfo("ActionPlanId ** is: " + str(actionseq))
+
+
+            self.Num_Steps = len(actionseq)
+
+            for x in range(0, self.Num_Steps):  # Iterate over all the actions within the action sequence and get their ids.
+                Action_SequenceFullData = actionseq[x]
+                rospy.loginfo('Subaction task id: '+Action_SequenceFullData['Id'])
+                self.ActionSeqIds.append(Action_SequenceFullData['Id'])
+
+
+            time.sleep(10)
             return response.json(), ACTION_PLAN_ID
-        except HTTPError as e:
-            rospy.loginfo(e.response.status_code)
+        except KeyError as e:
+            rospy.loginfo('There was an error while getting a plan.')
+            rospy.loginfo(e)
             return 'Error, could not get the plan, revisit the log files for more details.'
 
-    def gateway_get_number_steps_in_plan(self,newToken, taskid):
-        try:
-            hed = {'Authorization': 'Bearer ' + str(newToken)}
-            data = {"TaskId": taskid}
-            response = requests.post(PLAN_OCELOT, json=data, headers=hed)
-            Action_Sequence = jsondata = response.json()
-            actionseq = (Action_Sequence['ActionSequence'])
-            return (len(actionseq))
-        except HTTPError as e:
-            rospy.loginfo(e.response.status_code)
-            return 'Error, could not get the number of steps, revisit the log files for more details.'
-
-    def gateway_get_actionSequenceIds(self, plan):
-         try:
-            rospy.loginfo("API: "+str("Getting action sequence..."))
-            Action_Sequence_Data = plan['ActionSequence']
-            number_steps = len(Action_Sequence_Data)
-            ActionSequenceIdsList = []
-            for x in range(0, number_steps):  # Iterate over all the actions within the action sequence and get their ids.
-                Action_SequenceFullData = Action_Sequence_Data[x]
-                ActionSequenceIdsList.append(Action_SequenceFullData['Id'])
-            
-            rospy.loginfo("API data returned: "+str(ActionSequenceIdsList))
-            return ActionSequenceIdsList
-         except HTTPError as e:
-            rospy.loginfo(e.response.status_code)
-            return 'Error, could not get the number list of action ids, revisit the log files for more details.'
 
     def deleteAllResources(self, newToken, ACTION_PLAN_ID):
         try:
@@ -145,6 +138,7 @@ class ActionServerNode():
         pass #TODO
 
     def getResourceStatus(self, ACTION_PLAN_ID, newToken):
+        rospy.loginfo('--> Quering middleware for resource status')
         try:  # query orchestrator for latest information regarding the status of resources.
             hed = {'Authorization': 'Bearer ' + str(newToken)}
             url = RESOURCE_STATUS_OCELOT + str(ACTION_PLAN_ID)
@@ -158,11 +152,15 @@ class ActionServerNode():
         rospy.loginfo('Middleware log out succesful ')
         #TODO
         pass
+
+    def handler(signum, frame):
+        exit(1)
     
 # This function will decide if a goal is accepted or rejected.
     def goal_callback(self,goal_param):
 
         rospy.loginfo("RECEIVED GOAL REQUEST - Trying to process request")
+        
         global TOKEN
         global ACTION_PLAN_ID
         global PLAN
@@ -172,29 +170,43 @@ class ActionServerNode():
         resource_lock = goal_param.resource_lock
         rospy.loginfo('Feedback: {0}'.format("index: "+str(index)))
 
-        if (index != 0) and (len(PLAN) != 0):
+        if (index == 0):
 
-           pass
 
-        # Login to gateway function
-        newToken = self.gateway_login(ID, PASSWORD)
-        TOKEN = newToken
+            # Login to gateway function
+            newToken = self.gateway_login(ID, PASSWORD)
+            TOKEN = newToken
 
-        if 'Error' in newToken:
-            rospy.loginfo('Feedback: {0}'.format(
-                "Error, could not login to gateway, revisit the log files for more details."))  # Update feedback disply in command line
-            self.a_server.set_aborted()
-        else:
-            rospy.loginfo('Feedback: {0}'.format(
-                "Login successful, token received"))
-            PLAN, ActionPlanId = self.gateway_get_plan(newToken, goal_param.goal_taskid,PLAN_OCELOT,resource_lock)  # Get the plan by sending the token and TaskId
+            if 'Error' in newToken:
+                rospy.loginfo('Feedback: {0}'.format(
+                    "Error, could not login to gateway, revisit the log files for more details."))  # Update feedback disply in command line
+                
+            else:
+                rospy.loginfo('Feedback: {0}'.format(
+                    "Login successful, token received"))
+                #rospy.loginfo('Is the goal active: ',self.a_server.is_active())
+            
+                try:
+                    PLAN, ActionPlanId = self.gateway_get_plan(newToken, goal_param.goal_taskid,PLAN_OCELOT,resource_lock)  # Get the plan by sending the token and TaskId
+                except:
+                    rospy.loginfo('Error getting a new plan, there is probably a deployment already done of this container. The goal will be canceled...')
+                    exit(1)
 
-            ACTION_PLAN_ID = ActionPlanId  # Update the global variable actionPlanId
-            rospy.loginfo("ActionPlanId is: " + ACTION_PLAN_ID)
+            try:
+                ACTION_PLAN_ID = ActionPlanId  # Update the global variable actionPlanId
+                rospy.loginfo("Generated ActionPlanId is: " + ACTION_PLAN_ID)
+            except:
+                rospy.loginfo(
+                    'Feedback: {0}'.format("Error, could not get the plan, revisit the log files for more details."))
+                #self.a_server.set_preempted()
+                exit(1)
+
+
             if 'Error' in PLAN:
                 rospy.loginfo(
                     'Feedback: {0}'.format("Error, could not get the plan, revisit the log files for more details."))
-                self.a_server.set_aborted()
+                exit(1)
+                #self.a_server.set_aborted()
             else:
                 rospy.loginfo('Feedback: {0}'.format(
                     "Got new plan successfully."))
@@ -203,6 +215,7 @@ class ActionServerNode():
     # Will execute the goal if it was accepted by the register_goal_callback function.
     def execute_cb(self, goal):
         self.goal_callback(goal)
+        rospy.loginfo('Running execute_cb')
         global FirstActionId
 
         global TOKEN
@@ -214,20 +227,22 @@ class ActionServerNode():
         SubactionRef = goal.action_reference
         feedback_msg = goal_5gFeedback() # create action instance feedback
 
-        rospy.loginfo('SubactionRef '+str(SubactionRef))
+        rospy.loginfo('Step number: '+str(SubactionRef))
         #rospy.loginfo('SubactionRef '+str(type(SubactionRef)))
-        if SubactionRef == 0:  # This is a completely new action.
+        if SubactionRef != -1:  # This is a completely new action.
             FirstActionId = SubactionRef
-            rospy.loginfo('Executing New action goal... ')
-
-            actionSequenceIds = self.gateway_get_actionSequenceIds(PLAN)
+        
+            self.Num_Steps = 0
+            
+            actionSequenceIds = self.ActionSeqIds
             rospy.loginfo("ActionSequenceIds: " + str(actionSequenceIds))
             feedback_msg.action_sequence = actionSequenceIds
             feedback_msg.feedback_resources_status = ''
 
             self.a_server.publish_feedback(feedback_msg)  # Publish the feedback
 
-            rospy.loginfo("Publishing first feedback")
+            rospy.loginfo("Publishing feedback")
+            self.rate.sleep()
             #rospy.loginfo("goal handle: " + str(goal_handle))
 
             # goal_handle.succeed()
@@ -236,21 +251,18 @@ class ActionServerNode():
 
                 rospy.loginfo("Processing goal")
 
-                if not self.a_server.is_active:
-                    #  result = goal_5g.Result()
-                    rospy.loginfo('Goal aborted')
-                    # result = 'Goal aborted'
-                    # return goal_5g.Result
-
-
                 rospy.loginfo("Looping query reosurce update")
-                time.sleep(1)
-                feedback_msg.action_sequence = self.gateway_get_actionSequenceIds(PLAN)
-                feedback_msg.feedback_resources_status = self.getResourceStatus(ACTION_PLAN_ID,TOKEN)  # Not sure this will work. May need another timer approach.
+                self.rate.sleep()
+                feedback_msg.action_sequence = self.ActionSeqIds
+                update_resource = self.getResourceStatus(ACTION_PLAN_ID,TOKEN) 
+                rospy.loginfo(update_resource)
+                feedback_msg.feedback_resources_status = str(update_resource)  # Not sure this will work. May need another timer approach.
                 
                 self.a_server.publish_feedback(
                     feedback_msg)  # Publish the feedback
-                time.sleep(1)
+                self.rate.sleep()
+
+
 
         elif SubactionRef == -1:  # if received -1 as second parameter to the action goal, goal was succesful
 
@@ -260,17 +272,6 @@ class ActionServerNode():
             resultObject.result = "Finished"
             self.a_server.succeed()
 
-        else:  # This is a subaction - check
-            rospy.loginfo("Subaction")
-
-            while goal_handle.is_active:
-                rospy.loginfo("Looping query reosurce update")
-                time.sleep(1)
-                feedback_msg.feedback_resources_status = self.getResourceStatus(ACTION_PLAN_ID,TOKEN)  # Not sure this will work. May need another timer approach.
-                actionSequenceIds = self.gateway_get_actionSequenceIds(PLAN)
-                self.a_server.publish_feedback(
-                    feedback_msg)  # Publish the feedback
-                time.sleep(1)
                 
     def preempt_callback(self):
         """
@@ -281,7 +282,8 @@ class ActionServerNode():
         global TOKEN
         # It will delete all the resources.
         self.deleteAllResources(TOKEN, ACTION_PLAN_ID)
-        self.action_server.set_preempted()
+        self.a_server.set_preempted()
+        self.a_server.set_aborted()
 
 if __name__ == '__main__':
     rospy.loginfo('Running 5g-era-action-server...')
@@ -289,4 +291,3 @@ if __name__ == '__main__':
     actionServerObj = ActionServerNode()
 
     rospy.spin()
-

@@ -72,6 +72,11 @@ The 5G era Redis uses indexes to simulate different tables of data models. In th
                <td>IMAGE</td>
                <td>Stores all the records about images.</td>
             </tr>
+          <tr>
+               <td>INDEX 16 </td>
+               <td>List of questions</td>
+               <td>List of questions of middleare to robot</td>
+            </tr>
       </table>
    </body>
 </html>

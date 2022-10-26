@@ -1,9 +1,8 @@
-# Integrating 5G ERA ROS 1 Action Server with Summit XL & NetApp
+# Integrating 5G ERA ROS 1 Action Server with a robot & NetApp
 
 
-This document assumes working with Summit XL, a robot which up to the current day
-only supports by default native ROS 1. To include the 5G ERA Action server, client and ROS 2 NetApp,
-the inclusion of the ROS bridge and a complete ROS 1 implementation of 5g-era action server and client is available here.
+This document assumes working with a ROS 1 robot. The 5G Era ROS interface includes both ROS 1 & ROS 2 versions of the action-client and server.
+To run netApps with native support for ROS 2, a  ROS bridge is neccesary. 
 
 ### Running ROS 1 5G-ERA Action Client
 

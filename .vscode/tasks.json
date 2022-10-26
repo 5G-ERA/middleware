@@ -1,0 +1,25 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"label": "bridge-to-kubernetes.resource",
+			"type": "bridge-to-kubernetes.resource",
+			"resource": "orchestrator-api",
+			"resourceType": "service",
+			"ports": [
+				3001
+			],
+			"targetCluster": "microk8s-cluster",
+			"targetNamespace": "middleware",
+			"useKubernetesServiceEnvironmentVariables": false
+		},
+		{
+			"label": "bridge-to-kubernetes.compound",
+			"dependsOn": [
+				"bridge-to-kubernetes.resource",
+				"build"
+			],
+			"dependsOrder": "sequence"
+		}
+	]
+}

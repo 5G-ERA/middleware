@@ -23,11 +23,14 @@ public class ResourcePlanner : IResourcePlanner
     private readonly IEnvironment _env;
     private readonly ILogger _logger;
 
+
     public string Slice5gType { get; private set; } //eMBB, URLL, mMTC, MIoT, V2X
     public bool StandAlone5GParam { get; private set; } // Standalone 5G or none-standalone.
     public int NumSlicesTestBed { get; private set; } //number of slices available in testbed.
 
-    public ResourcePlanner(IApiClientBuilder apiClientBuilder, IMapper mapper, IEnvironment env, ILogger<ResourcePlanner> logger)
+    public ResourcePlanner(IApiClientBuilder apiClientBuilder, IMapper mapper, IEnvironment env,
+        ILogger<ResourcePlanner> logger)
+
     {
         _apiClientBuilder = apiClientBuilder;
         _mapper = mapper;
@@ -36,10 +39,12 @@ public class ResourcePlanner : IResourcePlanner
 
     }
 
+
     private async Task NetworkPlan(RobotModel robot)
     {
         var redisApiClient = _apiClientBuilder.CreateRedisApiClient();
         List<RedisInterface.ActivePolicy> activePolicies = (await redisApiClient.PolicyGetActiveAsync()).ToList();
+
         foreach (RedisInterface.ActivePolicy policy in activePolicies)
         { 
                 if (policy.PolicyName == "Use5G")
@@ -165,6 +170,7 @@ public class ResourcePlanner : IResourcePlanner
                     }
                 }
             }
+
             else //There are no clouds free
             {
                 // Get a better less busy cloud from the HW perspective for the netApp
@@ -266,6 +272,21 @@ public class ResourcePlanner : IResourcePlanner
                 if (freeEdgesNodes is not null)
                     return freeEdgesNodes.Name;
             }
+
+
+            if (policy.PolicyName == "AllContainersInClosestMachine")
+            {
+                List<Guid> connectedEdges = (await redisApiClient.RobotGetConnectedEdgesIdsAsync(Guid.Empty)).ToList();
+                List<Guid> freeEdges = (await redisApiClient.GetFreeEdgesIdsAsync(connectedEdges)).ToList();
+                if (freeEdges.Count == 0)
+                {
+                    //if all of them are busy, check which one is less busy
+                    List<Guid> lessBusyEdges = (await redisApiClient.GetLessBusyEdgesAsync(connectedEdges)).ToList();
+                    tempDic.Add(policy.Id, lessBusyEdges);
+                }
+            } //historical data second policy. --> succesful goal, less time used to perform action, more efficient,
+            //which one did the task before? QoS & QoE. (Speed network, bandwidth, 5g or 4g, wifi, number of slices)
+
         }
         // Replan flag is true
         else 
@@ -380,6 +401,7 @@ public class ResourcePlanner : IResourcePlanner
     /// <returns></returns>
     /// <exception cref="ArgumentException"></exception>
     protected async Task<TaskModel> Plan(TaskModel taskModel, RobotModel robot, List<ActionModel> actionCandidates)
+
     {
         var redisApiClient = _apiClientBuilder.CreateRedisApiClient();
         var orchestratorApiClient = _apiClientBuilder.CreateOrchestratorApiClient();
@@ -394,7 +416,9 @@ public class ResourcePlanner : IResourcePlanner
         // iterate throught actions in actionSequence
         foreach (ActionModel action in actionSequence)
         {
-            List<RedisInterface.RelationModel> imagesTmp = (await redisApiClient.ActionGetRelationByNameAsync(action.Id, "NEEDS")).ToList(); //Get instances relationships
+
+            List<RedisInterface.RelationModel> imagesTmp =
+                (await redisApiClient.ActionGetRelationByNameAsync(action.Id, "NEEDS")).ToList();
             List<RelationModel> images = new List<RelationModel>();
             foreach (RedisInterface.RelationModel imgTmp in imagesTmp)
             {
@@ -406,23 +430,24 @@ public class ResourcePlanner : IResourcePlanner
             foreach (RelationModel relation in images)
             {
                 RedisInterface.InstanceModel instanceTmp = await redisApiClient.InstanceGetByIdAsync(relation.PointsTo.Id); //Get instance values
-                
+
                 InstanceModel instance = _mapper.Map<InstanceModel>(instanceTmp);
 
-                if (CanBeReused(instance) && taskModel.ResourceLock==true)
+                if (CanBeReused(instance) && taskModel.ResourceLock == true)
                 {
                     var reusedInstance = await GetInstanceToReuse(instance, orchestratorApiClient);
                     if (reusedInstance is not null)
                         instance = reusedInstance;
                 }
-                // add instance to actions 
+
+                // add instance to actions
                 action.Services.Add(instance);
             }
             // Choose placement based on policy
             action.Placement = await InferResource(action, robot,false, actionCandidates);
         }
-        return taskModel;
 
+        return taskModel;
     }
 
     /// <summary>
@@ -498,6 +523,7 @@ public class ResourcePlanner : IResourcePlanner
     }
 
     private async Task<InstanceModel> GetInstanceToReuse(InstanceModel instance, Orchestrator.OrchestratorApiClient orchestratorApi)
+
     {
         try
         {
@@ -515,13 +541,13 @@ public class ResourcePlanner : IResourcePlanner
                     new
                     {
                         s.Id,
-                        Percentage = s.CurrentRobotsCount / (decimal) s.HardLimit * 100,
+                        Percentage = s.CurrentRobotsCount / (decimal)s.HardLimit * 100,
                         // TODO: this will have to be expanded based on the resource prediction
                         // for example if the edge can accommodate another instance
                         Recommendation = s.CurrentRobotsCount < s.OptimalLimit ? NetAppStatus.Green :
                             s.CurrentRobotsCount >= s.HardLimit ? NetAppStatus.Red : NetAppStatus.Yellow
                     }).Where(s => s.Recommendation != NetAppStatus.Red)
-                .OrderBy(s => s.Recommendation).ThenBy(s=>s.Percentage).ToList();
+                .OrderBy(s => s.Recommendation).ThenBy(s => s.Percentage).ToList();
 
             // need for the deployment of the new service no to overload one in the red zone
             if (percentageUsage.Any() == false)
@@ -540,12 +566,14 @@ public class ResourcePlanner : IResourcePlanner
                 _logger.LogDebug("No active instances for {name} with {id} were found", instance.Name, instance.Id);
                 return null;
             }
+
             _logger.LogError(apiEx, "There was a problem while calling the Orchestrator");
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "Unable to retrieve the status of the specified NetApps from the orchestrator");
         }
+
         return null;
     }
 

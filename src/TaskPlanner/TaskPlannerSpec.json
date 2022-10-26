@@ -365,7 +365,6 @@
           },
           "ServiceUrl": {
             "type": "string",
-            "format": "uri",
             "nullable": true
           },
           "ServiceStatus": {
@@ -429,6 +428,9 @@
             "type": "string",
             "nullable": true
           },
+          "ResourceLock": {
+            "type": "boolean"
+          },
           "TaskPriority": {
             "type": "integer",
             "format": "int32"
@@ -453,6 +455,9 @@
           "RobotId": {
             "type": "string",
             "format": "uuid"
+          },
+          "LockResourceReUse": {
+            "type": "boolean"
           },
           "TaskId": {
             "type": "string",

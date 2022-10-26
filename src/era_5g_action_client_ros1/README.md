@@ -51,6 +51,7 @@ goal:
   resource_lock: false"
 ```
 
+
 StandAlone example taskid: 
 ```shell
 rostopic pub /goal_5g/goal era_5g_action_interfaces_ros1/goal_5gActionGoal "header:
@@ -70,3 +71,9 @@ goal:
   resource_lock: false"
 ```
 
+
+## Removing k8 deployed containers manually:
+
+```shell
+kubectl -n middleware delete deployment ros-css-deployment
+```

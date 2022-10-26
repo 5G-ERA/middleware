@@ -48,7 +48,11 @@ public static class AppConfig
     /// <summary>
     /// Interval in which the status check has to be performed. Expressed in seconds.
     /// </summary>
-    public static int StatusCheckInterval = 10;
+    public static readonly int StatusCheckInterval = 10;
+    /// <summary>
+    /// Name of the network created by MultusCNI
+    /// </summary>
+    public static string MultusNetworkName = "ros-network-1";
 
     public static string GetMiddlewareAddress()
     {

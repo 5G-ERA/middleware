@@ -23,13 +23,10 @@ import threading
 
 import signal
 
-global PASSWORD
-global TOKEN
-global PLAN
-global LOGIN_OCELOT
-global PLAN_OCELOT
-global RESOURCE_STATUS_OCELOT
-global K8IP
+
+def goal():
+        client = actionlib.SimpleActionClient('goal_5g', goal_5gAction)
+        taskId = "72d9e9ee-e261-41f8-8135-1e5cc0db13f4"  # Example of task that the robot wants to execute - make sure the taskid is in redis.
 
 TOKEN = ''
 PLAN = ''
@@ -40,6 +37,7 @@ ID = '97f4059f-acfa-48f9-b22c-165ecbc51ed1'
 ACTION_PLAN_ID = ''
 PASSWORD = '5g-era'
 K8IP = '10.64.140.43' # Change to the middleware deployed IP
+
 
 class ActionServerNode():
     def __init__(self):
@@ -55,6 +53,10 @@ class ActionServerNode():
         self.Num_Steps = 0
         self.ActionSeqIds = []
         self.rate = rospy.Rate(1)
+
+        client.send_goal(goal,feedback_cb=feedback_cb)
+        client.wait_for_result()
+
 
         global K8IP
         global LOGIN_OCELOT

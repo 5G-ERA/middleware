@@ -1,6 +1,9 @@
-﻿namespace Middleware.Common;
+﻿using System.Text;
+using IdentityModel;
 
-public class K8SImageHelper
+namespace Middleware.Common;
+
+public static class K8SImageHelper
 {
     /// <summary>
     /// Combines the information about the image registry, repository and tag to form the full image name
@@ -11,6 +14,31 @@ public class K8SImageHelper
     /// <returns></returns>
     public static string BuildImageName(string registry, string repositoryName, string tag)
     {
-        return $"{registry}/{repositoryName}:{tag}";
+        if (string.IsNullOrWhiteSpace(repositoryName))
+            throw new ArgumentException("Repository name not provided.", nameof(repositoryName));
+
+        StringBuilder builder =new StringBuilder();
+        builder.Append(repositoryName);
+
+        if (string.IsNullOrWhiteSpace(registry) == false)
+        {
+            builder.Insert(0, registry + "/");
+        }
+
+        if (string.IsNullOrWhiteSpace(tag) == false)
+        {
+            builder.Append($":{tag}");
+        }
+        return builder.ToString();
+    }
+
+    public static string GetTag(string image)
+    {
+        var splitted = image.Split(':');
+
+        if (splitted.Length == 1)
+            return "latest";
+
+        return splitted[1];
     }
 }

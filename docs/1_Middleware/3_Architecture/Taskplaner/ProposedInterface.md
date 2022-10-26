@@ -63,6 +63,7 @@ Param:
     {
       "Id": 2,
       "Status": "Done/In progress/Failed/Unable to execute",
+      "CompleteReplan": "true/false"
       "Timestamp": "dd/MM/yyyy HH24:ss.mmm"
     }
   ],

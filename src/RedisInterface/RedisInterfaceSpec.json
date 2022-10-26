@@ -7515,7 +7515,6 @@
           },
           "ServiceUrl": {
             "type": "string",
-            "format": "uri",
             "nullable": true
           },
           "RosTopicsPub": {
@@ -7814,6 +7813,7 @@
             "type": "string",
             "nullable": true
           },
+
           "ReplanActionPlannerLocked": {
             "type": "boolean"
           },

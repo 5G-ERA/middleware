@@ -1,5 +1,6 @@
 ﻿using k8s;
 using k8s.Models;
+using Middleware.Common;
 using Middleware.Common.Config;
 using Middleware.Common.Enums;
 using Middleware.Common.ExtensionMethods;
@@ -28,7 +29,6 @@ namespace Middleware.Orchestrator.Jobs
                 var client = _kubeBuilder.CreateKubernetesClient();
 
                 await InstantiateMiddleware(client);
-
             }
             catch (NotInK8SEnvironmentException ex)
             {
@@ -45,16 +45,6 @@ namespace Middleware.Orchestrator.Jobs
         /// <returns></returns>
         private async Task InstantiateMiddleware(IKubernetes kubeClient)
         {
-            //var namespaces = await kubeClient.ListNamespaceAsync();
-
-            //var exists = namespaces.Items.Any(n => n.Name() == AppConfig.K8SNamespaceName);
-
-            //if (exists == false)
-            //{
-            //    Logger.LogError("Middleware has not been deployed in the correct namespace. Correct namespace is {namespace}", AppConfig.K8SNamespaceName);
-            //    return;
-
-            //}
             var success = true;
             bool shouldDryRun = AppConfig.IsDevEnvironment();
             try
@@ -65,11 +55,14 @@ namespace Middleware.Orchestrator.Jobs
                 var serviceNames = services.Items.Select(d => d.Metadata.Name).ToArray();
                 var images = new List<string>
                     {"gateway", "redis-interface-api", "resource-planner-api", "task-planner-api"};
+                string orchestratorImage = deployments.Items
+                    .First(d => d.Metadata.Name == "orchestrator-api").Spec.Template.Spec.Containers.FirstOrDefault().Image;
+                string tag = K8SImageHelper.GetTag(orchestratorImage);
 
                 foreach (string service in images)
                 {
                     Logger.LogDebug("Started deployment of {service}", service);
-                    var v1Deployment = _deploymentService.CreateStartupDeployment(service);
+                    var v1Deployment = _deploymentService.CreateStartupDeployment(service, tag);
 
                     if (deploymentNames.Contains(v1Deployment.Metadata.Name))
                     {
