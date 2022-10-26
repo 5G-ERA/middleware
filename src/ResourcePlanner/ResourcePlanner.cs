@@ -274,19 +274,6 @@ public class ResourcePlanner : IResourcePlanner
             }
 
 
-            if (policy.PolicyName == "AllContainersInClosestMachine")
-            {
-                List<Guid> connectedEdges = (await redisApiClient.RobotGetConnectedEdgesIdsAsync(Guid.Empty)).ToList();
-                List<Guid> freeEdges = (await redisApiClient.GetFreeEdgesIdsAsync(connectedEdges)).ToList();
-                if (freeEdges.Count == 0)
-                {
-                    //if all of them are busy, check which one is less busy
-                    List<Guid> lessBusyEdges = (await redisApiClient.GetLessBusyEdgesAsync(connectedEdges)).ToList();
-                    tempDic.Add(policy.Id, lessBusyEdges);
-                }
-            } //historical data second policy. --> succesful goal, less time used to perform action, more efficient,
-            //which one did the task before? QoS & QoE. (Speed network, bandwidth, 5g or 4g, wifi, number of slices)
-
         }
         // Replan flag is true
         else 
