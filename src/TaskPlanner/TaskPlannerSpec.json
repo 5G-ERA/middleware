@@ -175,17 +175,17 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/TaskReplanModel"
+                "$ref": "#/components/schemas/TaskReplanInputModel"
               }
             },
             "text/json": {
               "schema": {
-                "$ref": "#/components/schemas/TaskReplanModel"
+                "$ref": "#/components/schemas/TaskReplanInputModel"
               }
             },
             "application/*+json": {
               "schema": {
-                "$ref": "#/components/schemas/TaskReplanModel"
+                "$ref": "#/components/schemas/TaskReplanInputModel"
               }
             }
           }
@@ -235,8 +235,11 @@
             "type": "string",
             "nullable": true
           },
-          "ActionFamily": {
-            "type": "string",
+          "Tags": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
             "nullable": true
           },
           "Order": {
@@ -247,7 +250,15 @@
             "type": "string",
             "nullable": true
           },
+          "PlacementType": {
+            "type": "string",
+            "nullable": true
+          },
           "ActionPriority": {
+            "type": "string",
+            "nullable": true
+          },
+          "ActionStatus": {
             "type": "string",
             "nullable": true
           },
@@ -257,6 +268,14 @@
               "$ref": "#/components/schemas/InstanceModel"
             },
             "nullable": true
+          },
+          "MinimumRam": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "MinimumNumCores": {
+            "type": "integer",
+            "format": "int32"
           }
         },
         "additionalProperties": false
@@ -367,9 +386,54 @@
             "type": "string",
             "nullable": true
           },
+          "RosTopicsPub": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/RosTopicModel"
+            },
+            "nullable": true
+          },
+          "RosTopicsSub": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/RosTopicModel"
+            },
+            "nullable": true
+          },
+          "ROSVersion": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "ROSDistro": {
+            "type": "string",
+            "nullable": true
+          },
+          "Tags": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "nullable": true
+          },
+          "InstanceFamily": {
+            "type": "string",
+            "nullable": true
+          },
+          "SuccessRate": {
+            "type": "integer",
+            "format": "int32"
+          },
           "ServiceStatus": {
             "type": "string",
             "nullable": true
+          },
+          "MinimumRam": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "MinimumNumCores": {
+            "type": "integer",
+            "format": "int32"
           }
         },
         "additionalProperties": false
@@ -410,6 +474,24 @@
         },
         "additionalProperties": false
       },
+      "RosTopicModel": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "nullable": true
+          },
+          "type": {
+            "type": "string",
+            "nullable": true
+          },
+          "description": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
       "TaskModel": {
         "type": "object",
         "properties": {
@@ -428,6 +510,9 @@
             "type": "string",
             "nullable": true
           },
+          "ReplanActionPlannerLocked": {
+            "type": "boolean"
+          },
           "ResourceLock": {
             "type": "boolean"
           },
@@ -439,10 +524,29 @@
             "type": "string",
             "format": "uuid"
           },
+          "FullReplan": {
+            "type": "boolean"
+          },
+          "PartialRePlan": {
+            "type": "boolean"
+          },
+          "DeterministicTask": {
+            "type": "boolean"
+          },
+          "MarkovianProcess": {
+            "type": "boolean"
+          },
           "ActionSequence": {
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/ActionModel"
+            },
+            "nullable": true
+          },
+          "Tags": {
+            "type": "array",
+            "items": {
+              "type": "string"
             },
             "nullable": true
           }
@@ -459,9 +563,19 @@
           "LockResourceReUse": {
             "type": "boolean"
           },
+          "ReplanActionPlannerLocked": {
+            "type": "boolean"
+          },
           "TaskId": {
             "type": "string",
             "format": "uuid"
+          },
+          "TaskDescription": {
+            "type": "string",
+            "nullable": true
+          },
+          "ContextKnown": {
+            "type": "boolean"
           },
           "Questions": {
             "type": "array",
@@ -473,32 +587,30 @@
         },
         "additionalProperties": false
       },
-      "TaskReplanModel": {
+      "TaskReplanInputModel": {
         "type": "object",
         "properties": {
-          "relations": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/RelationModel"
-            },
-            "nullable": true
-          },
-          "Id": {
+          "RobotId": {
             "type": "string",
             "format": "uuid"
           },
-          "Name": {
-            "type": "string",
-            "nullable": true
+          "LockResourceReUse": {
+            "type": "boolean"
           },
-          "ActionPlanId": {
+          "ContextKnown": {
+            "type": "boolean"
+          },
+          "CompleteReplan": {
+            "type": "boolean"
+          },
+          "TaskID": {
             "type": "string",
             "format": "uuid"
           },
-          "ActionSequence": {
+          "Questions": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/ActionModel"
+              "$ref": "#/components/schemas/DialogueModel"
             },
             "nullable": true
           }

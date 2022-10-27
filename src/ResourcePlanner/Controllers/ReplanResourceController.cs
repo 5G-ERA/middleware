@@ -4,6 +4,8 @@ using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 using Middleware.Common.Models;
 using Middleware.Common.Repositories;
+using Middleware.ResourcePlanner.ApiReference;
+using Middleware.ResourcePlanner.Models;
 
 namespace Middleware.ResourcePlanner.Controllers
 {
@@ -15,6 +17,7 @@ namespace Middleware.ResourcePlanner.Controllers
         private readonly IActionPlanRepository _actionPlanRepository;
         private readonly IMapper _mapper;
         private readonly ILogger _logger;
+        private readonly IApiClientBuilder _apiClientBuilder;
 
 
         /// <summary>
@@ -23,13 +26,14 @@ namespace Middleware.ResourcePlanner.Controllers
         /// <param name="resourcePlanner"></param>
         /// <param name="mapper"></param>
         /// <param name="logger"></param>
-        public ReplanResourceController(IResourcePlanner resourcePlanner, IMapper mapper, ILogger<ResourceController> logger)
+        public ReplanResourceController(IApiClientBuilder apiClientBuilder, IResourcePlanner resourcePlanner, IMapper mapper, ILogger<ResourceController> logger)
         {
             _resourcePlanner = resourcePlanner;
             _mapper = mapper;
             _logger = logger;
+            _apiClientBuilder = apiClientBuilder;
+
         }
-        public record ResourceInput(TaskModel Task, RobotModel Robot, bool FullReplan);
 
         [HttpPost(Name = "GetResourceRePlan")]
         [ProducesResponseType(typeof(TaskModel), (int)HttpStatusCode.OK)]
@@ -38,10 +42,12 @@ namespace Middleware.ResourcePlanner.Controllers
 
         public async Task<ActionResult<TaskModel>> GetResourceRePlan([FromBody] ResourceInput resource)
         {
+            var redisApiClient = _apiClientBuilder.CreateRedisApiClient();
             try
             {
                 //Lua query to get plan by robot and lastest timestamped.
-                List<ActionPlanModel> actionPlans = await _actionPlanRepository.GetActionPlanModelsAsync(resource.Robot.Id);
+                List<RedisInterface.ActionPlanModel> reActionPlans = (await redisApiClient.GetActionPlanByRobotIdAsync(resource.Robot.Id)).ToList();
+                List<ActionPlanModel> actionPlans = _mapper.Map<List<ActionPlanModel>>(reActionPlans);
 
                 //Get the newest task of robot.
                 Dictionary<ActionPlanModel, DateTime> tempDic = new Dictionary<ActionPlanModel, DateTime>();
@@ -62,7 +68,7 @@ namespace Middleware.ResourcePlanner.Controllers
                 }
 
                 // Get last item which is the latest plan.
-                ActionPlanModel last = OrderedTempDic.Keys.Last();
+                ActionPlanModel last = OrderedTempDic.Keys.First();
 
                 // Create a TaskModel entity with the values from the ActionPlanModel.
                 TaskModel tempTask = new TaskModel();

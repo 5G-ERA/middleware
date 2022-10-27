@@ -2,6 +2,7 @@
 using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 using Middleware.Common.Models;
+using Middleware.ResourcePlanner.Models;
 
 namespace Middleware.ResourcePlanner.Controllers
 {
@@ -20,7 +21,7 @@ namespace Middleware.ResourcePlanner.Controllers
             _logger = logger;
         }
 
-        public record ResourceInput(TaskModel Task, RobotModel Robot);
+       
 
         [HttpPost(Name = "GetResourcePlan")]
         [ProducesResponseType(typeof(TaskModel), (int)HttpStatusCode.OK)]
