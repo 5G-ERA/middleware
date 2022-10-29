@@ -12,8 +12,10 @@ namespace Middleware.Common.Models
     {
         public string Name { get; set; }
         public string Type { get; set; }
-        public int Dof { get; set; }
-        public List<ROSNodeModel> Nodes { get; set; }
+
+        public int Number { get; set; }
+
+        public List<string> Nodes { get; set; }
 
     }
 }

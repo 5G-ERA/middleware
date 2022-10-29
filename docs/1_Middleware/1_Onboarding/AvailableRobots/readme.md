@@ -1,4 +1,4 @@
 
 ## List of available robots already onboarded into the 5G-ERA Middleware:
 
-* Aisoy KiK
+* [Aisoy KiK](https://github.com/5G-ERA/middleware/blob/main/src/Common/Onboarding/RobotsExamples/AisoyKiK.json)

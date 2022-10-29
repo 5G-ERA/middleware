@@ -1,6 +1,33 @@
 ﻿{
-  "Id": null,
+  "relations": [
+    {
+      "initiatesFrom": {
+        "id": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
+        "type": "string",
+        "name": "string"
+      },
+      "relationName": "string",
+      "relationAttributes": [
+        {
+          "key": "string",
+          "value": "string"
+        }
+      ],
+      "pointsTo": {
+        "id": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
+        "type": "string",
+        "name": "string"
+      }
+    }
+  ],
+  "Id": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
   "Name": "AisoyKiK",
+  "RosVersion": 1,
+  "RosDistro": "indigo",
+  "MaximumPayload": 0,
+  "MaximumTranslationalVelocity": 0,
+  "MaximumRotationalVelocity": 0,
+  "RobotWeight": 1,
   "ROSRepo": "https://www.ros.org/news/2012/09/new-repository-aisoy-ros-pkg.html",
   "ROSNodes": [
     {
@@ -552,93 +579,119 @@
   "ManufacturerUrl": "https://aisoy.com/es/pages/kik-2-an-affordable-robot-for-learning-to-code",
   "RobotModel": "KiK",
   "RobotStatus": "Unkown",
-  "CurrentTaskID": null,
-  "TaskList": null,
+  "TaskList": "",
   "BatteryStatus": 100,
-  "MacAddress": null,
+  "MacAddress": "00:00:5e:00:53:af",
   "LocomotionSystem": "None",
   "LocomotionTypes": "None",
   "Sensors": [
     {
-      "SensorName": "cameraSensor",
-      "SensorType": "Camera",
-      "SensorDescription": "RGDB camera sensor",
+      "Name": "cameraSensor",
+      "Type": "Camera",
+      "Description": "RGDB camera sensor",
       "Nodes": [ "/airos/camera/camera_node" ],
       "number": 1
     },
     {
-      "SensorName": "touchSensor",
-      "SensorType": "Touch",
-      "SensorDescription": " touch sensors for the belly of the robot",
-      "Nodes": ["/airos/touch/touch_node"],
+      "Name": "touchSensor",
+      "Type": "Touch",
+      "Description": " touch sensors for the belly of the robot",
+      "Nodes": [ "/airos/touch/touch_node" ],
       "number": 3
     },
     {
-      "SensorName": "microphoneSensor",
-      "SensorType": "Microphone",
-      "SensorDescription": "one microphone sensor to listen to the world",
-      "Nodes": ["/airos/asr/asrnode"],
+      "Name": "microphoneSensor",
+      "Type": "Microphone",
+      "Description": "one microphone sensor to listen to the world",
+      "Nodes": [ "/airos/asr/asrnode" ],
       "number": 1
     },
     {
-      "SensorName": "speakerSensor",
-      "SensorType": "Speaker",
-      "SensorDescription": "one speaker sensor inside the robot",
-      "Nodes": ["/airos/audio/audio_node"],
+      "Name": "speakerSensor",
+      "Type": "Speaker",
+      "Description": "one speaker sensor inside the robot",
+      "Nodes": [ "/airos/audio/audio_node" ],
       "number": 1
     },
     {
-      "SensorName": "displaySensor",
-      "SensorType": "Display",
-      "SensorDescription": "little display in the mouth of the robot",
-      "Nodes": ["/airos/display/display_node"],
+      "Name": "displaySensor",
+      "Type": "Display",
+      "Description": "little display in the mouth of the robot",
+      "Nodes": [ "/airos/display/display_node" ],
       "number": 1
     },
     {
-      "SensorName": "light",
-      "SensorType": "Light",
-      "SensorDescription": "light in the belly of the robot to signal emotional state",
-      "Nodes": ["/airos/color/color_node"],
+      "Name": "light",
+      "Type": "Light",
+      "Description": "light in the belly of the robot to signal emotional state",
+      "Nodes": [ "/airos/color/color_node" ],
       "number": 1
     }
 
-      ],
-  "ActuatorModel": [
+  ],
+  "Actuator": [
     {
-      "ActuatorName": "RightEyebrow",
-      "ActuatorType": "Rotatory",
-      "number": 1,
-      "Nodes": ["/kik/actions/actions_node"]
+      "Name": "RightEyebrow",
+      "Type": "Rotatory",
+      "Number": 1,
+      "Nodes": [ "/kik/actions/actions_node" ]
     },
     {
-      "ActuatorName": "LeftEyebrow",
-      "ActuatorType": "Rotatory",
-      "dof": 1,
-      "number": 1,
-      "Nodes": ["/kik/actions/actions_node"]
+      "Name": "LeftEyebrow",
+      "Type": "Rotatory",
+      "Number": 1,
+      "Nodes": [ "/kik/actions/actions_node" ]
     },
     {
-      "ActuatorName": "NeckPitch",
-      "ActuatorType": "Rotatory",
-      "dof": 1,
-      "number": 1,
-      "Nodes": ["/kik/actions/actions_node"]
+      "Name": "NeckPitch",
+      "Type": "Rotatory",
+      "v": 1,
+      "Nodes": [ "/kik/actions/actions_node" ]
     },
     {
-      "ActuatorName": "NeckYaw",
-      "ActuatorType": "Rotatory",
-      "dof": 1,
-      "number": 1,
-      "Nodes": ["/kik/actions/actions_node"]
+      "Name": "NeckYaw",
+      "Type": "Rotatory",
+      "Number": 1,
+      "Nodes": [ "/kik/actions/actions_node" ]
     }
   ],
   "Manipulators": [],
   "CPU": 1,
   "RAM": 1,
-  "VirtualRam": null,
   "StorageDisk": 8,
-  "NumberCores": 4,
-  "ThreadsPerCore": 1,
-  "Questions": null,
-  "Relations": []
+  "NumberCores": 1,
+  "Questions": [
+    {
+      "relations": [
+        {
+          "initiatesFrom": {
+            "id": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
+            "type": "string",
+            "name": "string"
+          },
+          "relationName": "string",
+          "relationAttributes": [
+            {
+              "key": "string",
+              "value": "string"
+            }
+          ],
+          "pointsTo": {
+            "id": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
+            "type": "string",
+            "name": "streing"
+          }
+        }
+      ],
+      "Id": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
+      "Question": "string",
+      "IsSingleAnswer": true,
+      "Answer": [
+        {
+          "key": "string",
+          "value": "string"
+        }
+      ]
+    }
+  ]
 }
