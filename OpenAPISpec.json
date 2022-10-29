@@ -151,7 +151,6 @@
                     },
                     "ServiceUrl": {
                         "type": "string",
-                        "format": "uri",
                         "nullable": true
                     },
                     "ServiceStatus": {
@@ -324,6 +323,9 @@
                         "type": "string",
                         "nullable": true
                     },
+                    "ResourceLock": {
+                        "type": "boolean"
+                    },
                     "TaskPriority": {
                         "type": "integer",
                         "format": "int32"
@@ -364,6 +366,24 @@
                 },
                 "additionalProperties": false
             },
+            "ActuatorModel": {
+                "type": "object",
+                "properties": {
+                    "actuatorName": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "actuatorType": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "dof": {
+                        "type": "string",
+                        "nullable": true
+                    }
+                },
+                "additionalProperties": false
+            },
             "CloudModel": {
                 "type": "object",
                 "properties": {
@@ -382,6 +402,10 @@
                         "type": "string",
                         "nullable": true
                     },
+                    "Type": {
+                        "type": "string",
+                        "nullable": true
+                    },
                     "CloudStatus": {
                         "type": "string",
                         "nullable": true
@@ -389,6 +413,30 @@
                     "CloudIp": {
                         "type": "string",
                         "format": "uri",
+                        "nullable": true
+                    },
+                    "NumberOfCores": {
+                        "type": "integer",
+                        "format": "int32"
+                    },
+                    "DiskStorage": {
+                        "type": "integer",
+                        "format": "int64"
+                    },
+                    "VirtualRam": {
+                        "type": "integer",
+                        "format": "int32"
+                    },
+                    "CPU": {
+                        "type": "integer",
+                        "format": "int32"
+                    },
+                    "RAM": {
+                        "type": "integer",
+                        "format": "int32"
+                    },
+                    "MacAddress": {
+                        "type": "string",
                         "nullable": true
                     }
                 },
@@ -480,6 +528,10 @@
                         "type": "string",
                         "nullable": true
                     },
+                    "Type": {
+                        "type": "string",
+                        "nullable": true
+                    },
                     "EdgeStatus": {
                         "type": "string",
                         "nullable": true
@@ -536,13 +588,22 @@
                     },
                     "Timestamp": {
                         "type": "string",
-                        "format": "date-time"
+                        "format": "date-time",
+                        "nullable": true
                     },
                     "IsActive": {
                         "type": "boolean",
                         "nullable": true
                     },
                     "Description": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "CannotCoexistFamily": {
+                        "type": "integer",
+                        "format": "int32"
+                    },
+                    "Type": {
                         "type": "string",
                         "nullable": true
                     }
@@ -605,7 +666,14 @@
                     "Sensors": {
                         "type": "array",
                         "items": {
-                            "type": "string"
+                            "$ref": "#/components/schemas/SensorModel"
+                        },
+                        "nullable": true
+                    },
+                    "Actuator": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/ActuatorModel"
                         },
                         "nullable": true
                     },
@@ -639,6 +707,57 @@
                 },
                 "additionalProperties": false
             },
+            "RosTopicModel": {
+                "type": "object",
+                "properties": {
+                    "name": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "type": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "family": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "description": {
+                        "type": "string",
+                        "nullable": true
+                    }
+                },
+                "additionalProperties": false
+            },
+            "SensorModel": {
+                "type": "object",
+                "properties": {
+                    "sensorName": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "sensorType": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "sensorLocation": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "sensorDescription": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "rosTopicPub": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/RosTopicModel"
+                        },
+                        "nullable": true
+                    }
+                },
+                "additionalProperties": false
+            },
             "TaskModelActionResult": {
                 "type": "object",
                 "properties": {
@@ -658,9 +777,22 @@
                         "type": "string",
                         "format": "uuid"
                     },
+                    "LockResourceReUse": {
+                        "type": "boolean"
+                    },
+                    "ReplanActionPlannerLocked": {
+                        "type": "boolean"
+                    },
                     "TaskId": {
                         "type": "string",
                         "format": "uuid"
+                    },
+                    "TaskDescription": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "ContextKnown": {
+                        "type": "boolean"
                     },
                     "Questions": {
                         "type": "array",
@@ -672,32 +804,30 @@
                 },
                 "additionalProperties": false
             },
-            "TaskReplanModel": {
+            "TaskReplanInputModel": {
                 "type": "object",
                 "properties": {
-                    "relations": {
-                        "type": "array",
-                        "items": {
-                            "$ref": "#/components/schemas/RelationModel"
-                        },
-                        "nullable": true
-                    },
-                    "Id": {
+                    "RobotId": {
                         "type": "string",
                         "format": "uuid"
                     },
-                    "Name": {
-                        "type": "string",
-                        "nullable": true
+                    "LockResourceReUse": {
+                        "type": "boolean"
                     },
-                    "ActionPlanId": {
+                    "ContextKnown": {
+                        "type": "boolean"
+                    },
+                    "CompleteReplan": {
+                        "type": "boolean"
+                    },
+                    "TaskID": {
                         "type": "string",
                         "format": "uuid"
                     },
-                    "ActionSequence": {
+                    "Questions": {
                         "type": "array",
                         "items": {
-                            "$ref": "#/components/schemas/ActionModel"
+                            "$ref": "#/components/schemas/DialogueModel"
                         },
                         "nullable": true
                     }
@@ -753,7 +883,7 @@
         }
     },
     "paths": {
-        "/Orchestrate/health": {
+        "/orchestrate/health": {
             "get": {
                 "tags": [
                     "Health"
@@ -766,7 +896,7 @@
                 }
             }
         },
-        "/Orchestrate/health/spec": {
+        "/orchestrate/health/spec": {
             "get": {
                 "tags": [
                     "Health"
@@ -796,7 +926,7 @@
                 }
             }
         },
-        "/Orchestrate/orchestrate/plan": {
+        "/orchestrate/orchestrate/plan": {
             "post": {
                 "tags": [
                     "Orchestrate"
@@ -912,7 +1042,7 @@
                 }
             }
         },
-        "/Orchestrate/orchestrate/plan/{id}": {
+        "/orchestrate/orchestrate/plan/{id}": {
             "get": {
                 "tags": [
                     "Orchestrate"
@@ -1075,7 +1205,7 @@
                 }
             }
         },
-        "/Orchestrate/orchestrate/action/{id}": {
+        "/orchestrate/orchestrate/action/{id}": {
             "delete": {
                 "tags": [
                     "Orchestrate"
@@ -1119,7 +1249,7 @@
                 }
             }
         },
-        "/Orchestrate/orchestrate/execute": {
+        "/orchestrate/orchestrate/execute": {
             "post": {
                 "tags": [
                     "Orchestrate"
@@ -1668,7 +1798,7 @@
                 }
             }
         },
-        "/Data/action": {
+        "/data/action": {
             "get": {
                 "tags": [
                     "Action"
@@ -1839,7 +1969,7 @@
                 }
             }
         },
-        "/Data/action/{id}": {
+        "/data/action/{id}": {
             "get": {
                 "tags": [
                     "Action"
@@ -2085,7 +2215,7 @@
                 }
             }
         },
-        "/Data/action/addrelation": {
+        "/data/action/addrelation": {
             "post": {
                 "tags": [
                     "Action"
@@ -2179,7 +2309,7 @@
                 }
             }
         },
-        "/Data/action/relation/{name}": {
+        "/data/action/relation/{name}": {
             "get": {
                 "tags": [
                     "Action"
@@ -2276,7 +2406,7 @@
                 }
             }
         },
-        "/Data/action/relations/{firstname}/{secondname}": {
+        "/data/action/relations/{firstname}/{secondname}": {
             "get": {
                 "tags": [
                     "Action"
@@ -2381,7 +2511,7 @@
                 }
             }
         },
-        "/Data/action/plan": {
+        "/data/action/plan": {
             "get": {
                 "tags": [
                     "Action"
@@ -2552,7 +2682,7 @@
                 }
             }
         },
-        "/Data/action/plan/{id}": {
+        "/data/action/plan/{id}": {
             "get": {
                 "tags": [
                     "Action"
@@ -2801,7 +2931,97 @@
                 }
             }
         },
-        "/Data/cloud": {
+        "/data/action/plan/robot/{robotid}": {
+            "get": {
+                "tags": [
+                    "Action"
+                ],
+                "operationId": "GetActionPlanByRobotIdAsync",
+                "parameters": [
+                    {
+                        "name": "robotId",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Success",
+                        "content": {
+                            "text/plain": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/ActionPlanModel"
+                                    }
+                                }
+                            },
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/ActionPlanModel"
+                                    }
+                                }
+                            },
+                            "text/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/ActionPlanModel"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "content": {
+                            "text/plain": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                }
+                            },
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                }
+                            },
+                            "text/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Server Error",
+                        "content": {
+                            "text/plain": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                }
+                            },
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                }
+                            },
+                            "text/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/data/cloud": {
             "get": {
                 "tags": [
                     "Cloud"
@@ -2963,7 +3183,7 @@
                 }
             }
         },
-        "/Data/cloud/{id}": {
+        "/data/cloud/{id}": {
             "get": {
                 "tags": [
                     "Cloud"
@@ -3209,7 +3429,7 @@
                 }
             }
         },
-        "/Data/cloud/addrelation": {
+        "/data/cloud/addrelation": {
             "post": {
                 "tags": [
                     "Cloud"
@@ -3303,7 +3523,7 @@
                 }
             }
         },
-        "/Data/cloud/relation/{name}": {
+        "/data/cloud/relation/{name}": {
             "get": {
                 "tags": [
                     "Cloud"
@@ -3400,7 +3620,7 @@
                 }
             }
         },
-        "/Data/cloud/relations/{firstname}/{secondname}": {
+        "/data/cloud/relations/{firstname}/{secondname}": {
             "get": {
                 "tags": [
                     "Cloud"
@@ -3505,7 +3725,357 @@
                 }
             }
         },
-        "/Data/containerimage": {
+        "/data/cloud/clouddata/{name}": {
+            "get": {
+                "tags": [
+                    "Cloud"
+                ],
+                "operationId": "CloudGetDataByName",
+                "parameters": [
+                    {
+                        "name": "name",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Success",
+                        "content": {
+                            "text/plain": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/CloudModel"
+                                }
+                            },
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/CloudModel"
+                                }
+                            },
+                            "text/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/CloudModel"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "content": {
+                            "text/plain": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                }
+                            },
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                }
+                            },
+                            "text/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Server Error",
+                        "content": {
+                            "text/plain": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                }
+                            },
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                }
+                            },
+                            "text/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/data/cloud/free": {
+            "post": {
+                "tags": [
+                    "Cloud"
+                ],
+                "operationId": "GetFreeCloudIds",
+                "requestBody": {
+                    "content": {
+                        "application/json-patch+json": {
+                            "schema": {
+                                "type": "array",
+                                "items": {
+                                    "$ref": "#/components/schemas/CloudModel"
+                                }
+                            }
+                        },
+                        "application/json": {
+                            "schema": {
+                                "type": "array",
+                                "items": {
+                                    "$ref": "#/components/schemas/CloudModel"
+                                }
+                            }
+                        },
+                        "text/json": {
+                            "schema": {
+                                "type": "array",
+                                "items": {
+                                    "$ref": "#/components/schemas/CloudModel"
+                                }
+                            }
+                        },
+                        "application/*+json": {
+                            "schema": {
+                                "type": "array",
+                                "items": {
+                                    "$ref": "#/components/schemas/CloudModel"
+                                }
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Success",
+                        "content": {
+                            "text/plain": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/CloudModel"
+                                    }
+                                }
+                            },
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/CloudModel"
+                                    }
+                                }
+                            },
+                            "text/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/CloudModel"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "content": {
+                            "text/plain": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                }
+                            },
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                }
+                            },
+                            "text/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "content": {
+                            "text/plain": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                }
+                            },
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                }
+                            },
+                            "text/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Server Error",
+                        "content": {
+                            "text/plain": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                }
+                            },
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                }
+                            },
+                            "text/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/data/cloud/lessbusy": {
+            "post": {
+                "tags": [
+                    "Cloud"
+                ],
+                "operationId": "GetLessBusyClouds",
+                "requestBody": {
+                    "content": {
+                        "application/json-patch+json": {
+                            "schema": {
+                                "type": "array",
+                                "items": {
+                                    "$ref": "#/components/schemas/CloudModel"
+                                }
+                            }
+                        },
+                        "application/json": {
+                            "schema": {
+                                "type": "array",
+                                "items": {
+                                    "$ref": "#/components/schemas/CloudModel"
+                                }
+                            }
+                        },
+                        "text/json": {
+                            "schema": {
+                                "type": "array",
+                                "items": {
+                                    "$ref": "#/components/schemas/CloudModel"
+                                }
+                            }
+                        },
+                        "application/*+json": {
+                            "schema": {
+                                "type": "array",
+                                "items": {
+                                    "$ref": "#/components/schemas/CloudModel"
+                                }
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Success",
+                        "content": {
+                            "text/plain": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/CloudModel"
+                                    }
+                                }
+                            },
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/CloudModel"
+                                    }
+                                }
+                            },
+                            "text/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/CloudModel"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "content": {
+                            "text/plain": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                }
+                            },
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                }
+                            },
+                            "text/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "content": {
+                            "text/plain": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                }
+                            },
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                }
+                            },
+                            "text/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Server Error",
+                        "content": {
+                            "text/plain": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                }
+                            },
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                }
+                            },
+                            "text/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/data/containerimage": {
             "get": {
                 "tags": [
                     "ContainerImage"
@@ -3667,7 +4237,7 @@
                 }
             }
         },
-        "/Data/containerimage/{id}": {
+        "/data/containerimage/{id}": {
             "get": {
                 "tags": [
                     "ContainerImage"
@@ -3913,7 +4483,7 @@
                 }
             }
         },
-        "/Data/containerimage/addrelation": {
+        "/data/containerimage/addrelation": {
             "post": {
                 "tags": [
                     "ContainerImage"
@@ -4007,7 +4577,7 @@
                 }
             }
         },
-        "/Data/containerimage/relation/{name}": {
+        "/data/containerimage/relation/{name}": {
             "get": {
                 "tags": [
                     "ContainerImage"
@@ -4104,7 +4674,7 @@
                 }
             }
         },
-        "/Data/containerimage/relations/{firstname}/{secondname}": {
+        "/data/containerimage/relations/{firstname}/{secondname}": {
             "get": {
                 "tags": [
                     "ContainerImage"
@@ -4209,7 +4779,7 @@
                 }
             }
         },
-        "/Data/containerimage/instance/{id}": {
+        "/data/containerimage/instance/{id}": {
             "get": {
                 "tags": [
                     "ContainerImage"
@@ -4299,7 +4869,7 @@
                 }
             }
         },
-        "/Data/edge": {
+        "/data/edge": {
             "get": {
                 "tags": [
                     "Edge"
@@ -4461,7 +5031,7 @@
                 }
             }
         },
-        "/Data/edge/{id}": {
+        "/data/edge/{id}": {
             "get": {
                 "tags": [
                     "Edge"
@@ -4707,7 +5277,7 @@
                 }
             }
         },
-        "/Data/edge/addrelation": {
+        "/data/edge/addrelation": {
             "post": {
                 "tags": [
                     "Edge"
@@ -4801,7 +5371,7 @@
                 }
             }
         },
-        "/Data/edge/relation/{name}": {
+        "/data/edge/relation/{name}": {
             "get": {
                 "tags": [
                     "Edge"
@@ -4898,7 +5468,7 @@
                 }
             }
         },
-        "/Data/edge/relations/{firstname}/{secondname}": {
+        "/data/edge/relations/{firstname}/{secondname}": {
             "get": {
                 "tags": [
                     "Edge"
@@ -5003,7 +5573,7 @@
                 }
             }
         },
-        "/Data/edge/free": {
+        "/data/edge/free": {
             "post": {
                 "tags": [
                     "Edge"
@@ -5015,8 +5585,7 @@
                             "schema": {
                                 "type": "array",
                                 "items": {
-                                    "type": "string",
-                                    "format": "uuid"
+                                    "$ref": "#/components/schemas/EdgeModel"
                                 }
                             }
                         },
@@ -5024,8 +5593,7 @@
                             "schema": {
                                 "type": "array",
                                 "items": {
-                                    "type": "string",
-                                    "format": "uuid"
+                                    "$ref": "#/components/schemas/EdgeModel"
                                 }
                             }
                         },
@@ -5033,8 +5601,7 @@
                             "schema": {
                                 "type": "array",
                                 "items": {
-                                    "type": "string",
-                                    "format": "uuid"
+                                    "$ref": "#/components/schemas/EdgeModel"
                                 }
                             }
                         },
@@ -5042,8 +5609,7 @@
                             "schema": {
                                 "type": "array",
                                 "items": {
-                                    "type": "string",
-                                    "format": "uuid"
+                                    "$ref": "#/components/schemas/EdgeModel"
                                 }
                             }
                         }
@@ -5057,8 +5623,7 @@
                                 "schema": {
                                     "type": "array",
                                     "items": {
-                                        "type": "string",
-                                        "format": "uuid"
+                                        "$ref": "#/components/schemas/EdgeModel"
                                     }
                                 }
                             },
@@ -5066,8 +5631,7 @@
                                 "schema": {
                                     "type": "array",
                                     "items": {
-                                        "type": "string",
-                                        "format": "uuid"
+                                        "$ref": "#/components/schemas/EdgeModel"
                                     }
                                 }
                             },
@@ -5075,8 +5639,7 @@
                                 "schema": {
                                     "type": "array",
                                     "items": {
-                                        "type": "string",
-                                        "format": "uuid"
+                                        "$ref": "#/components/schemas/EdgeModel"
                                     }
                                 }
                             }
@@ -5145,7 +5708,7 @@
                 }
             }
         },
-        "/Data/edge/lessbusy": {
+        "/data/edge/lessbusy": {
             "post": {
                 "tags": [
                     "Edge"
@@ -5157,8 +5720,7 @@
                             "schema": {
                                 "type": "array",
                                 "items": {
-                                    "type": "string",
-                                    "format": "uuid"
+                                    "$ref": "#/components/schemas/EdgeModel"
                                 }
                             }
                         },
@@ -5166,8 +5728,7 @@
                             "schema": {
                                 "type": "array",
                                 "items": {
-                                    "type": "string",
-                                    "format": "uuid"
+                                    "$ref": "#/components/schemas/EdgeModel"
                                 }
                             }
                         },
@@ -5175,8 +5736,7 @@
                             "schema": {
                                 "type": "array",
                                 "items": {
-                                    "type": "string",
-                                    "format": "uuid"
+                                    "$ref": "#/components/schemas/EdgeModel"
                                 }
                             }
                         },
@@ -5184,8 +5744,7 @@
                             "schema": {
                                 "type": "array",
                                 "items": {
-                                    "type": "string",
-                                    "format": "uuid"
+                                    "$ref": "#/components/schemas/EdgeModel"
                                 }
                             }
                         }
@@ -5199,8 +5758,7 @@
                                 "schema": {
                                     "type": "array",
                                     "items": {
-                                        "type": "string",
-                                        "format": "uuid"
+                                        "$ref": "#/components/schemas/EdgeModel"
                                     }
                                 }
                             },
@@ -5208,8 +5766,7 @@
                                 "schema": {
                                     "type": "array",
                                     "items": {
-                                        "type": "string",
-                                        "format": "uuid"
+                                        "$ref": "#/components/schemas/EdgeModel"
                                     }
                                 }
                             },
@@ -5217,8 +5774,7 @@
                                 "schema": {
                                     "type": "array",
                                     "items": {
-                                        "type": "string",
-                                        "format": "uuid"
+                                        "$ref": "#/components/schemas/EdgeModel"
                                     }
                                 }
                             }
@@ -5287,7 +5843,87 @@
                 }
             }
         },
-        "/Data/health": {
+        "/data/edge/edgedata/{name}": {
+            "get": {
+                "tags": [
+                    "Edge"
+                ],
+                "operationId": "EdgeGetDataByName",
+                "parameters": [
+                    {
+                        "name": "name",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Success",
+                        "content": {
+                            "text/plain": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/EdgeModel"
+                                }
+                            },
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/EdgeModel"
+                                }
+                            },
+                            "text/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/EdgeModel"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "content": {
+                            "text/plain": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                }
+                            },
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                }
+                            },
+                            "text/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Server Error",
+                        "content": {
+                            "text/plain": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                }
+                            },
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                }
+                            },
+                            "text/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/data/health": {
             "get": {
                 "tags": [
                     "Health"
@@ -5300,7 +5936,7 @@
                 }
             }
         },
-        "/Data/health/spec": {
+        "/data/health/spec": {
             "get": {
                 "tags": [
                     "Health"
@@ -5330,7 +5966,7 @@
                 }
             }
         },
-        "/Data/instance": {
+        "/data/instance": {
             "get": {
                 "tags": [
                     "Instance"
@@ -5492,7 +6128,7 @@
                 }
             }
         },
-        "/Data/instance/{id}": {
+        "/data/instance/{id}": {
             "get": {
                 "tags": [
                     "Instance"
@@ -5738,7 +6374,7 @@
                 }
             }
         },
-        "/Data/instance/addrelation": {
+        "/data/instance/addrelation": {
             "post": {
                 "tags": [
                     "Instance"
@@ -5832,7 +6468,7 @@
                 }
             }
         },
-        "/Data/instance/relation/{name}": {
+        "/data/instance/relation/{name}": {
             "get": {
                 "tags": [
                     "Instance"
@@ -5929,7 +6565,7 @@
                 }
             }
         },
-        "/Data/instance/relations/{firstname}/{secondname}": {
+        "/data/instance/relations/{firstname}/{secondname}": {
             "get": {
                 "tags": [
                     "Instance"
@@ -6034,7 +6670,88 @@
                 }
             }
         },
-        "/Data/policy": {
+        "/data/instance/alternative/{id}": {
+            "get": {
+                "tags": [
+                    "Instance"
+                ],
+                "operationId": "InstanceGetAlternative",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Success",
+                        "content": {
+                            "text/plain": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/InstanceModel"
+                                }
+                            },
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/InstanceModel"
+                                }
+                            },
+                            "text/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/InstanceModel"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "content": {
+                            "text/plain": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                }
+                            },
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                }
+                            },
+                            "text/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Server Error",
+                        "content": {
+                            "text/plain": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                }
+                            },
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                }
+                            },
+                            "text/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/data/policy": {
             "post": {
                 "tags": [
                     "Policy"
@@ -6196,7 +6913,7 @@
                 }
             }
         },
-        "/Data/policy/{id}": {
+        "/data/policy/{id}": {
             "get": {
                 "tags": [
                     "Policy"
@@ -6380,7 +7097,7 @@
                 }
             }
         },
-        "/Data/policy/current": {
+        "/data/policy/current": {
             "get": {
                 "tags": [
                     "Policy"
@@ -6459,7 +7176,7 @@
                 }
             }
         },
-        "/Data/robot": {
+        "/data/robot": {
             "get": {
                 "tags": [
                     "Robot"
@@ -6621,7 +7338,7 @@
                 }
             }
         },
-        "/Data/robot/{id}": {
+        "/data/robot/{id}": {
             "get": {
                 "tags": [
                     "Robot"
@@ -6867,7 +7584,7 @@
                 }
             }
         },
-        "/Data/robot/addrelation": {
+        "/data/robot/addrelation": {
             "post": {
                 "tags": [
                     "Robot"
@@ -6961,7 +7678,7 @@
                 }
             }
         },
-        "/Data/robot/relation/{name}": {
+        "/data/robot/relation/{name}": {
             "get": {
                 "tags": [
                     "Robot"
@@ -7058,7 +7775,7 @@
                 }
             }
         },
-        "/Data/robot/relations/{firstname}/{secondname}": {
+        "/data/robot/relations/{firstname}/{secondname}": {
             "get": {
                 "tags": [
                     "Robot"
@@ -7163,7 +7880,7 @@
                 }
             }
         },
-        "/Data/robot/{robotid}/edges": {
+        "/data/robot/{robotid}/edges/connected": {
             "get": {
                 "tags": [
                     "Robot"
@@ -7188,8 +7905,7 @@
                                 "schema": {
                                     "type": "array",
                                     "items": {
-                                        "type": "string",
-                                        "format": "uuid"
+                                        "$ref": "#/components/schemas/EdgeModel"
                                     }
                                 }
                             },
@@ -7197,8 +7913,7 @@
                                 "schema": {
                                     "type": "array",
                                     "items": {
-                                        "type": "string",
-                                        "format": "uuid"
+                                        "$ref": "#/components/schemas/EdgeModel"
                                     }
                                 }
                             },
@@ -7206,8 +7921,7 @@
                                 "schema": {
                                     "type": "array",
                                     "items": {
-                                        "type": "string",
-                                        "format": "uuid"
+                                        "$ref": "#/components/schemas/EdgeModel"
                                     }
                                 }
                             }
@@ -7276,7 +7990,117 @@
                 }
             }
         },
-        "/Data/task": {
+        "/data/robot/{robotid}/clouds/connected": {
+            "get": {
+                "tags": [
+                    "Robot"
+                ],
+                "operationId": "RobotGetConnectedCloudsIds",
+                "parameters": [
+                    {
+                        "name": "robotId",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Success",
+                        "content": {
+                            "text/plain": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/CloudModel"
+                                    }
+                                }
+                            },
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/CloudModel"
+                                    }
+                                }
+                            },
+                            "text/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/CloudModel"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "content": {
+                            "text/plain": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                }
+                            },
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                }
+                            },
+                            "text/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "content": {
+                            "text/plain": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                }
+                            },
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                }
+                            },
+                            "text/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Server Error",
+                        "content": {
+                            "text/plain": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                }
+                            },
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                }
+                            },
+                            "text/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/data/task": {
             "get": {
                 "tags": [
                     "Task"
@@ -7438,7 +8262,7 @@
                 }
             }
         },
-        "/Data/task/{id}": {
+        "/data/task/{id}": {
             "get": {
                 "tags": [
                     "Task"
@@ -7684,7 +8508,7 @@
                 }
             }
         },
-        "/Data/task/addrelation": {
+        "/data/task/addrelation": {
             "post": {
                 "tags": [
                     "Task"
@@ -7778,7 +8602,7 @@
                 }
             }
         },
-        "/Data/task/relation/{name}": {
+        "/data/task/relation/{name}": {
             "get": {
                 "tags": [
                     "Task"
@@ -7875,7 +8699,7 @@
                 }
             }
         },
-        "/Data/task/relations/{firstname}/{secondname}": {
+        "/data/task/relations/{firstname}/{secondname}": {
             "get": {
                 "tags": [
                     "Task"
@@ -7980,7 +8804,7 @@
                 }
             }
         },
-        "/Data/task/importtask": {
+        "/data/task/importtask": {
             "post": {
                 "tags": [
                     "Task"
@@ -8074,7 +8898,7 @@
                 }
             }
         },
-        "/Task/health": {
+        "/task/health": {
             "get": {
                 "tags": [
                     "Health"
@@ -8087,7 +8911,7 @@
                 }
             }
         },
-        "/Task/health/spec": {
+        "/task/health/spec": {
             "get": {
                 "tags": [
                     "Health"
@@ -8117,7 +8941,7 @@
                 }
             }
         },
-        "/Task/plan": {
+        "/task/plan": {
             "post": {
                 "tags": [
                     "Plan"
@@ -8235,7 +9059,7 @@
                 }
             }
         },
-        "/Task/replan": {
+        "/task/replan": {
             "post": {
                 "tags": [
                     "RePlan"
@@ -8244,17 +9068,17 @@
                     "content": {
                         "application/json": {
                             "schema": {
-                                "$ref": "#/components/schemas/TaskReplanModel"
+                                "$ref": "#/components/schemas/TaskReplanInputModel"
                             }
                         },
                         "text/json": {
                             "schema": {
-                                "$ref": "#/components/schemas/TaskReplanModel"
+                                "$ref": "#/components/schemas/TaskReplanInputModel"
                             }
                         },
                         "application/*+json": {
                             "schema": {
-                                "$ref": "#/components/schemas/TaskReplanModel"
+                                "$ref": "#/components/schemas/TaskReplanInputModel"
                             }
                         }
                     }
