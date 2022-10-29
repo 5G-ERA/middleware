@@ -11,7 +11,9 @@ http://localhost:5047/Data/Robot
 </p>
 
 ___
+The headers required for this request should be the ones indicated in the image below.
 
-
-
+<p align="left">
+  <img src="img/OnboardingRobotHeaders.png" alt="Middleware architecture"/>
+</p>
 
