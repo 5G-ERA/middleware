@@ -58,17 +58,17 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/TaskModel"
+                "$ref": "#/components/schemas/OrchestratorResourceInput"
               }
             },
             "text/json": {
               "schema": {
-                "$ref": "#/components/schemas/TaskModel"
+                "$ref": "#/components/schemas/OrchestratorResourceInput"
               }
             },
             "application/*+json": {
               "schema": {
-                "$ref": "#/components/schemas/TaskModel"
+                "$ref": "#/components/schemas/OrchestratorResourceInput"
               }
             }
           }
@@ -941,8 +941,11 @@
             "type": "string",
             "nullable": true
           },
-          "ActionFamily": {
-            "type": "string",
+          "Tags": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
             "nullable": true
           },
           "Order": {
@@ -953,7 +956,15 @@
             "type": "string",
             "nullable": true
           },
+          "PlacementType": {
+            "type": "string",
+            "nullable": true
+          },
           "ActionPriority": {
+            "type": "string",
+            "nullable": true
+          },
+          "ActionStatus": {
             "type": "string",
             "nullable": true
           },
@@ -963,6 +974,14 @@
               "$ref": "#/components/schemas/InstanceModel"
             },
             "nullable": true
+          },
+          "MinimumRam": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "MinimumNumCores": {
+            "type": "integer",
+            "format": "int32"
           }
         },
         "additionalProperties": false
@@ -981,14 +1000,58 @@
             "type": "string",
             "format": "uuid"
           },
+          "TaskId": {
+            "type": "string",
+            "format": "uuid"
+          },
           "Name": {
             "type": "string",
             "nullable": true
+          },
+          "Status": {
+            "type": "string",
+            "nullable": true
+          },
+          "IsReplan": {
+            "type": "boolean"
+          },
+          "LastStatusChange": {
+            "type": "string",
+            "format": "date-time"
           },
           "ActionSequence": {
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/ActionModel"
+            },
+            "nullable": true
+          },
+          "RobotId": {
+            "type": "string",
+            "format": "uuid"
+          }
+        },
+        "additionalProperties": false
+      },
+      "ActuatorModel": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "nullable": true
+          },
+          "type": {
+            "type": "string",
+            "nullable": true
+          },
+          "dof": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "nodes": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ROSNodeModel"
             },
             "nullable": true
           }
@@ -1010,6 +1073,37 @@
             "type": "string",
             "format": "date-time",
             "readOnly": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "DialogueModel": {
+        "type": "object",
+        "properties": {
+          "relations": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/RelationModel"
+            },
+            "nullable": true
+          },
+          "Id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "Question": {
+            "type": "string",
+            "nullable": true
+          },
+          "IsSingleAnswer": {
+            "type": "boolean"
+          },
+          "Answer": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/KeyValuePair"
+            },
+            "nullable": true
           }
         },
         "additionalProperties": false
@@ -1070,9 +1164,54 @@
             "type": "string",
             "nullable": true
           },
+          "RosTopicsPub": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/RosTopicModel"
+            },
+            "nullable": true
+          },
+          "RosTopicsSub": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/RosTopicModel"
+            },
+            "nullable": true
+          },
+          "ROSVersion": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "ROSDistro": {
+            "type": "string",
+            "nullable": true
+          },
+          "Tags": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "nullable": true
+          },
+          "InstanceFamily": {
+            "type": "string",
+            "nullable": true
+          },
+          "SuccessRate": {
+            "type": "integer",
+            "format": "int32"
+          },
           "ServiceStatus": {
             "type": "string",
             "nullable": true
+          },
+          "MinimumRam": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "MinimumNumCores": {
+            "type": "integer",
+            "format": "int32"
           }
         },
         "additionalProperties": false
@@ -1130,6 +1269,18 @@
         },
         "additionalProperties": false
       },
+      "OrchestratorResourceInput": {
+        "type": "object",
+        "properties": {
+          "task": {
+            "$ref": "#/components/schemas/TaskModel"
+          },
+          "robot": {
+            "$ref": "#/components/schemas/RobotModel"
+          }
+        },
+        "additionalProperties": false
+      },
       "ProblemDetails": {
         "type": "object",
         "properties": {
@@ -1180,6 +1331,149 @@
         },
         "additionalProperties": false
       },
+      "RobotManipulatorModel": {
+        "type": "object",
+        "properties": {
+          "actuatorName": {
+            "type": "string",
+            "nullable": true
+          },
+          "dof": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "number": {
+            "type": "integer",
+            "format": "int32"
+          }
+        },
+        "additionalProperties": false
+      },
+      "RobotModel": {
+        "type": "object",
+        "properties": {
+          "relations": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/RelationModel"
+            },
+            "nullable": true
+          },
+          "Id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "Name": {
+            "type": "string",
+            "nullable": true
+          },
+          "ROSRepo": {
+            "type": "string",
+            "format": "uri",
+            "nullable": true
+          },
+          "ROSNodes": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ROSNodeModel"
+            },
+            "nullable": true
+          },
+          "Manufacturer": {
+            "type": "string",
+            "nullable": true
+          },
+          "ManufacturerUrl": {
+            "type": "string",
+            "format": "uri",
+            "nullable": true
+          },
+          "RobotModel": {
+            "type": "string",
+            "nullable": true
+          },
+          "RobotStatus": {
+            "type": "string",
+            "nullable": true
+          },
+          "CurrentTaskID": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "TaskList": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "nullable": true
+          },
+          "BatteryStatus": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "MacAddress": {
+            "type": "string",
+            "nullable": true
+          },
+          "LocomotionSystem": {
+            "type": "string",
+            "nullable": true
+          },
+          "LocomotionTypes": {
+            "type": "string",
+            "nullable": true
+          },
+          "Sensors": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SensorModel"
+            },
+            "nullable": true
+          },
+          "Actuator": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ActuatorModel"
+            },
+            "nullable": true
+          },
+          "Manipulators": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/RobotManipulatorModel"
+            },
+            "nullable": true
+          },
+          "CPU": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "RAM": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "VirtualRam": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "StorageDisk": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "NumberCores": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "Questions": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/DialogueModel"
+            },
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
       "RobotStatusModel": {
         "required": [
           "actionSequenceId",
@@ -1222,6 +1516,98 @@
         },
         "additionalProperties": false
       },
+      "ROSNodeModel": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "nullable": true
+          },
+          "publications": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/RosTopicModel"
+            },
+            "nullable": true
+          },
+          "subscriptions": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/RosTopicModel"
+            },
+            "nullable": true
+          },
+          "services": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ROSServiceModel"
+            },
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "ROSServiceModel": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "nullable": true
+          },
+          "description": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "RosTopicModel": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "nullable": true
+          },
+          "type": {
+            "type": "string",
+            "nullable": true
+          },
+          "description": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "SensorModel": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "nullable": true
+          },
+          "type": {
+            "type": "string",
+            "nullable": true
+          },
+          "description": {
+            "type": "string",
+            "nullable": true
+          },
+          "nodes": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "nullable": true
+          },
+          "number": {
+            "type": "integer",
+            "format": "int32"
+          }
+        },
+        "additionalProperties": false
+      },
       "TaskModel": {
         "type": "object",
         "properties": {
@@ -1240,6 +1626,9 @@
             "type": "string",
             "nullable": true
           },
+          "ReplanActionPlannerLocked": {
+            "type": "boolean"
+          },
           "ResourceLock": {
             "type": "boolean"
           },
@@ -1251,10 +1640,29 @@
             "type": "string",
             "format": "uuid"
           },
+          "FullReplan": {
+            "type": "boolean"
+          },
+          "PartialRePlan": {
+            "type": "boolean"
+          },
+          "DeterministicTask": {
+            "type": "boolean"
+          },
+          "MarkovianProcess": {
+            "type": "boolean"
+          },
           "ActionSequence": {
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/ActionModel"
+            },
+            "nullable": true
+          },
+          "Tags": {
+            "type": "array",
+            "items": {
+              "type": "string"
             },
             "nullable": true
           }

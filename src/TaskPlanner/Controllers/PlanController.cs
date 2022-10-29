@@ -60,7 +60,9 @@ namespace Middleware.TaskPlanner.Controllers
                 if (dryRun)
                     return Ok(resourcePlan);
                 // call orchestrator for deployment of the resources
-                Orchestrator.TaskModel tmpTaskOrchestratorSend = _mapper.Map<Orchestrator.TaskModel>(resourcePlan);
+                // Orchestrator.TaskModel tmpTaskOrchestratorSend = _mapper.Map<Orchestrator.TaskModel>(resourcePlan);
+                Orchestrator.OrchestratorResourceInput tmpTaskOrchestratorSend = _mapper.Map<Orchestrator.OrchestratorResourceInput>(resourcePlan);
+            
                 Orchestrator.TaskModel tmpFinalOrchestratorTask =
                     await _orchestratorClient.InstantiateNewPlanAsync(tmpTaskOrchestratorSend);
                 TaskModel finalPlan = _mapper.Map<TaskModel>(tmpFinalOrchestratorTask);

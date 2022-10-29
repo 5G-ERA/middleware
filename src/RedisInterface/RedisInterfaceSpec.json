@@ -7243,16 +7243,23 @@
       "ActuatorModel": {
         "type": "object",
         "properties": {
-          "actuatorName": {
+          "name": {
             "type": "string",
             "nullable": true
           },
-          "actuatorType": {
+          "type": {
             "type": "string",
             "nullable": true
           },
           "dof": {
-            "type": "string",
+            "type": "integer",
+            "format": "int32"
+          },
+          "nodes": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ROSNodeModel"
+            },
             "nullable": true
           }
         },
@@ -7600,6 +7607,10 @@
             "type": "string",
             "nullable": true
           },
+          "Type": {
+            "type": "string",
+            "nullable": true
+          },
           "Timestamp": {
             "type": "string",
             "format": "date-time",
@@ -7613,11 +7624,52 @@
             "type": "string",
             "nullable": true
           },
-          "CannotCoexistFamily": {
+          "IsExclusiveWithinType": {
             "type": "integer",
             "format": "int32"
+          }
+        },
+        "additionalProperties": false
+      },
+      "ROSNodeModel": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "nullable": true
           },
-          "Type": {
+          "publications": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/RosTopicModel"
+            },
+            "nullable": true
+          },
+          "subscriptions": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/RosTopicModel"
+            },
+            "nullable": true
+          },
+          "services": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ROSServiceModel"
+            },
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "ROSServiceModel": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "nullable": true
+          },
+          "description": {
             "type": "string",
             "nullable": true
           }
@@ -7647,6 +7699,24 @@
         },
         "additionalProperties": false
       },
+      "RobotManipulatorModel": {
+        "type": "object",
+        "properties": {
+          "actuatorName": {
+            "type": "string",
+            "nullable": true
+          },
+          "dof": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "number": {
+            "type": "integer",
+            "format": "int32"
+          }
+        },
+        "additionalProperties": false
+      },
       "RobotModel": {
         "type": "object",
         "properties": {
@@ -7665,8 +7735,25 @@
             "type": "string",
             "nullable": true
           },
+          "ROSRepo": {
+            "type": "string",
+            "format": "uri",
+            "nullable": true
+          },
+          "ROSNodes": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ROSNodeModel"
+            },
+            "nullable": true
+          },
           "Manufacturer": {
             "type": "string",
+            "nullable": true
+          },
+          "ManufacturerUrl": {
+            "type": "string",
+            "format": "uri",
             "nullable": true
           },
           "RobotModel": {
@@ -7700,6 +7787,10 @@
             "type": "string",
             "nullable": true
           },
+          "LocomotionTypes": {
+            "type": "string",
+            "nullable": true
+          },
           "Sensors": {
             "type": "array",
             "items": {
@@ -7711,6 +7802,13 @@
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/ActuatorModel"
+            },
+            "nullable": true
+          },
+          "Manipulators": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/RobotManipulatorModel"
             },
             "nullable": true
           },
@@ -7755,10 +7853,6 @@
             "type": "string",
             "nullable": true
           },
-          "family": {
-            "type": "string",
-            "nullable": true
-          },
           "description": {
             "type": "string",
             "nullable": true
@@ -7769,28 +7863,28 @@
       "SensorModel": {
         "type": "object",
         "properties": {
-          "sensorName": {
+          "name": {
             "type": "string",
             "nullable": true
           },
-          "sensorType": {
+          "type": {
             "type": "string",
             "nullable": true
           },
-          "sensorLocation": {
+          "description": {
             "type": "string",
             "nullable": true
           },
-          "sensorDescription": {
-            "type": "string",
-            "nullable": true
-          },
-          "rosTopicPub": {
+          "nodes": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/RosTopicModel"
+              "type": "string"
             },
             "nullable": true
+          },
+          "number": {
+            "type": "integer",
+            "format": "int32"
           }
         },
         "additionalProperties": false
@@ -7813,7 +7907,6 @@
             "type": "string",
             "nullable": true
           },
-
           "ReplanActionPlannerLocked": {
             "type": "boolean"
           },
