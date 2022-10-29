@@ -3,7 +3,8 @@
 # *********************************
 # DESCRIPTION: Query ROS and converts all the information to a json file for onboarding into the 5G-ERA Middleware DB.
 # DATE: 18/10/2022
-# VERSION: 1 
+# VERSION: 1
+# TODO: cargarse Subcriber and Publisher first item in lists arrVar y subList
 # *********************************
 
 # Allow bash script to use ROS commands. Change the distro to your robot one!
@@ -36,11 +37,13 @@ do
   for item  in ${ROSINFOTOPICS};do
 	 
           variable=`echo "${item}" | sed 's/rosNodes.json//g'`
-          variable=`echo "${variable}" | sed 's/onboardingRobotFunciona.sh//g'`
+          variable=`echo "${variable}" | sed 's/onboardingRobotB.sh//g'`
           variable=`echo "${variable}" | sed 's/output.txt//g'`
           
           arrVar+=("${variable}") #  List of all ros nodes.
   done
+
+  echo $arrVar
 
   # Remove some items not neccesary
   unset -v 'arrVar[0]'
@@ -214,65 +217,47 @@ done
 fi   
 echo "==========SAVE TEMP SUBSCRIBERS========"
 #Save the Subcriber topics of the node inside a temporal file.
-NEWTOTALSUB=${#subList[@]}
+NEWTOTALSUB=${#subList[@]} # lenght of array
 TOTALDIVIDEDSUB=$(($NEWTOTALSUB / 2))
-COUNTSUB=0
+
 
 if [[ $NEWTOTALSUB == 0 ]];then
     echo "" >> subTopics.txt
 fi
    
-  if [[ $NEWTOTALSUB > 1 ]];then
+if [[ $NEWTOTALSUB > 1 ]];then
 
-   for sub  in ${subList[@]};do
+   for (( a=0; a <= $NEWTOTALSUB; a=$a+2 ))
+   do
 
-        if [ $((COUNTSUB)) != $NEWTOTALSUB ] && ! [ $((COUNTSUB%2)) -eq 0 ];then # must be odd to add an entry.
-          if  [[ $sub != "None" ]];then
-             if [[ ${subList[$COUNTSUB+1]} == "type]" ]];then
-                echo " 
+        if [[ $subList[$a+1] == "[unknown" ]];then
+            echo " 
                   { 
-                    "\"""Name""\"": "\""${subList[$COUNTSUB]}"\"",
-                    "\"""Type""\"": "\""[unknown type]"\"",
-                    "\"""Description""\"": null
-                  }," >> subTopics.txt
-              fi
-              if [[ ${subList[$COUNTSUB+1]} != "type]" ]];then
-                  echo " 
-                      { 
-                        "\"""Name""\"": "\""${subList[$COUNTSUB+1]}"\"",
-                        "\"""Type""\"": "\""${subList[$COUNTSUB]}"\"",
-                        "\"""Description""\"": null
-                      }," >> subTopics.txt
-                  fi
-            fi
-        fi
-
-        echo $TOTALDIVIDEDSUB
-        if [ $((COUNTSUB)) == $NEWTOTALSUB ] && ! [ $((COUNTSUB%2)) -eq 0 ];then # must be odd to add an entry.
-          if  [[ $sub != "None" ]];then
-             if [[ ${subList[$COUNTSUB+1]} == "type]" ]];then
-                echo " 
-                  { 
-                    "\"""Name""\"": "\""${subList[$COUNTSUB]}"\"",
+                    "\"""Name""\"": "\""${subList[$a]}"\"",
                     "\"""Type""\"": "\""[unknown type]"\"",
                     "\"""Description""\"": null
                   }" >> subTopics.txt
-              fi
-              if [[ ${subList[$COUNTSUB+1]} != "type]" ]];then
-                  echo " 
-                      { 
-                        "\"""Name""\"": "\""${subList[$COUNTSUB+1]}"\"",
-                        "\"""Type""\"": "\""${subList[$COUNTSUB]}"\"",
-                        "\"""Description""\"": null
-                      }" >> subTopics.txt
-                  fi
-            fi
+        else
+        #if [[ $NEWTOTALSUB[$a+1] != "[unknown" ]];then
+            echo " 
+                  { 
+                    "\"""Name""\"": "\""${subList[$a]}"\"",
+                    "\"""Type""\"": "\""${subList[$a+1]}"\"",
+                    "\"""Description""\"": null
+                  }" >> subTopics.txt
+        fi
+
+        if [[ $a != $NEWTOTALSUB ]];then
+            echo "," >> subTopics.txt
         fi
         
+        #a=$((a+1)) 
+        if [[ $subList[$a+1] == "[unknown" ]];then
+            a=$((a+1))
+        fi
 
-        COUNTSUB=$((COUNTSUB+1))    
-      done  
-  fi
+   done 
+ fi
 
 
 echo "================SAVE TEMP PUBLISHERS================="
