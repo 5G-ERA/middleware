@@ -31,7 +31,7 @@ public class RobotModel : BaseModel
     [JsonPropertyName("RobotStatus")]
     public string RobotStatus { get; set; }
 
-    [JsonPropertyName("CurrentTaskID")]
+    //[JsonPropertyName("CurrentTaskID")]
     public Guid CurrentTaskId { get; set; }
 
     [JsonPropertyName("TaskList")]
@@ -64,8 +64,8 @@ public class RobotModel : BaseModel
     [JsonPropertyName("RAM")] // Compulsory field
     public long Ram { get; set; }
 
-    [JsonPropertyName("VirtualRam")]
-    public long VirtualRam { get; set; }
+  //  [JsonPropertyName("VirtualRam")]
+  //  public long VirtualRam { get; set; }
 
     [JsonPropertyName("StorageDisk")] // Compulsory field
     public long StorageDisk { get; set; } 
@@ -120,7 +120,6 @@ public class RobotModel : BaseModel
                 if (string.IsNullOrEmpty(actuator.Name.ToString())) return false;
                 if (string.IsNullOrEmpty(actuator.Name.ToString())) return false;
                 if (!valActuatorTypesEnum.Contains(actuator.Type)) return false;
-                if (actuator.Dof <= 0) return false;
             }
         }
 
@@ -131,8 +130,8 @@ public class RobotModel : BaseModel
             foreach (RobotManipulatorModel manipulator in Manipulators)
             {
                 if (string.IsNullOrEmpty(manipulator.ActuatorName.ToString())) return false;
-                if (string.IsNullOrEmpty(manipulator.dof.ToString())) return false;
-                if (manipulator.dof <= 0) return false;
+                if (string.IsNullOrEmpty(manipulator.Dof.ToString())) return false;
+                if (manipulator.Dof <= 0) return false;
                 if (manipulator.number <= 0) return false;
             }
         }

@@ -81,10 +81,6 @@ namespace Middleware.Common.Repositories
             {
                 currentModel.Ram = patch.Ram;
             }
-            if (!string.IsNullOrEmpty(patch.VirtualRam.ToString()))
-            {
-                currentModel.VirtualRam = patch.VirtualRam;
-            }
             if (!string.IsNullOrEmpty(patch.StorageDisk.ToString()))
             {
                 currentModel.StorageDisk = patch.StorageDisk;
