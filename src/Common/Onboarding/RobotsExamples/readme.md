@@ -4,6 +4,6 @@ At the moment, these are the available pre-defined onboarding files for robots t
 
 1) Aisoy Kik - From Aisoy Robotics 
 <p align="left">
-  <img src="img/Aisoy.png" height="200rm" align="right" alt="Middleware architecture"/>
+  <img src="img/Aisoy.png" height="100rm" align="right" alt="Middleware architecture"/>
 </p>
 
