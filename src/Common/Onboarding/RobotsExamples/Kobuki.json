@@ -22,6 +22,12 @@
   ],
   "Id": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
   "Name": "Kobuki",
+  "RosVersion": 1,
+  "RosDistro": "kinetic",
+  "MaximumPayload": 5,
+  "MaximumTranslationalVelocity": 65,
+  "MaximumRotationalVelocity": 3.13,
+  "RobotWeight": 6.3,
   "ROSRepo": "https://github.com/yujinrobot/kobuki",
   "ROSNodes": [
     {
