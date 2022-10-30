@@ -1,4 +1,4 @@
-﻿{
+{
   "relations": [
     {
       "initiatesFrom": {
@@ -106,8 +106,8 @@
   "TaskList": "",
   "BatteryStatus": 100,
   "MacAddress": "00:00:5e:00:53:af",
-  "LocomotionSystem": "Rolling",
-  "LocomotionTypes": "Differential",
+  "LocomotionSystem": "Differential",
+  "LocomotionTypes": "Rolling",
   "Sensors": [
     {
       "Name": "Gyroscope",
