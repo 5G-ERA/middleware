@@ -18,3 +18,4 @@ At the moment, these are the available pre-defined onboarding files for robots t
 
 
 2) Kobuki Base - Yujin Robot
+  <img src="img/kobuki.png" height="100rm" align="center" />
