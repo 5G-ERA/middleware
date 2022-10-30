@@ -22,6 +22,12 @@
   ],
   "Id": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
   "Name": "AisoyKiK",
+  "RosVersion": 1,
+  "RosDistro": "indigo",
+  "MaximumPayload": 0,
+  "MaximumTranslationalVelocity": 0,
+  "MaximumRotationalVelocity": 0,
+  "RobotWeight": 1,
   "ROSRepo": "https://www.ros.org/news/2012/09/new-repository-aisoy-ros-pkg.html",
   "ROSNodes": [
     {
