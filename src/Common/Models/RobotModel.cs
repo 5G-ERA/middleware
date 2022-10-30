@@ -12,6 +12,24 @@ public class RobotModel : BaseModel
     [JsonPropertyName("Name")]
     public override string Name { get; set; } // Compulsory field
 
+    [JsonPropertyName("RosVersion")]
+    public int RosVersion { get; set; } // Compulsory field
+
+    [JsonPropertyName("RosDistro")]
+    public string RosDistro { get; set; } 
+
+    [JsonPropertyName("MaximumPayload")]
+    public long MaximumPayload { get; set; } 
+
+    [JsonPropertyName("MaximumTranslationalVelocity")]
+    public long MaximumTranslationalVelocity { get; set; } 
+
+    [JsonPropertyName("MaximumRotationalVelocity")]
+    public long MaximumRotationalVelocity { get; set; }
+
+    [JsonPropertyName("RobotWeight")]
+    public long RobotWeight { get; set; }
+
     [JsonPropertyName("ROSRepo")]
     public Uri ROSRepo { get; set; }
 
