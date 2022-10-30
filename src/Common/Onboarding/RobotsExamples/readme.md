@@ -4,7 +4,7 @@ At the moment, these are the available pre-defined onboarding files for robots t
 
 1) Aisoy Kik - From Aisoy Robotics  
 
-  <img src="img/Aisoy.png" height="150rm" align="center" />
+  <img src="img/Aisoy.png" height="100rm" align="left" />
 
 
 2) Kobuki Base - Yujin Robot
