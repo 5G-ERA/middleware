@@ -7,7 +7,7 @@ http://localhost:5047/Data/Robot
 ````
 
 <p align="left">
-  <img src="img/OnboardRobot.png" alt="Middleware architecture"/>
+  <img src="img/OnboardRobot.png" height="200rm" align="right" alt="Middleware architecture"/>
 </p>
 
 ___
