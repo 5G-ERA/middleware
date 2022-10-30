@@ -10,9 +10,11 @@ namespace Middleware.Common.Enums
     {
         Laser,
         Ultrasonic,
+        Infrared,
         Touch,
         Color,
         Temperature,
+        Gyro,
         Imu,
         Camera,
         DepthCamera,
