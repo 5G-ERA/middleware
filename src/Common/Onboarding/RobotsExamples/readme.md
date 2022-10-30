@@ -7,4 +7,10 @@ At the moment, these are the available pre-defined onboarding files for robots t
   <img src="img/Aisoy.png" height="100rm" align="left" />
 
 
+
+
+
+
+
+
 2) Kobuki Base - Yujin Robot
