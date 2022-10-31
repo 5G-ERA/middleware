@@ -315,7 +315,7 @@ public class ResourcePlanner : IResourcePlanner
     private async Task<string> InferResource (ActionModel actionParam, RobotModel robot, bool rePlan, List<ActionModel> candidates) //Allocate correct placement based upon policies and priority
     {
         bool ActionToConsider = false;
-        // Check if this action requires infering anew placement
+        // Check if this action requires infering a new placement
         foreach (ActionModel action in candidates)
         {
             if ((actionParam.Name == action.Name) && (rePlan==true))

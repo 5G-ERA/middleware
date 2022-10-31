@@ -57,7 +57,7 @@ namespace Middleware.TaskPlanner.Controllers
 
                 TaskModel resourcePlan = _mapper.Map<TaskModel>(tmpFinalTask);
 
-                if (dryRun)
+                if (dryRun) // Will skip the orchestrator if true (will not deploy the actual plan.)
                     return Ok(resourcePlan);
                 // call orchestrator for deployment of the resources
                 // Orchestrator.TaskModel tmpTaskOrchestratorSend = _mapper.Map<Orchestrator.TaskModel>(resourcePlan);

@@ -1,4 +1,5 @@
 ﻿using System.Text.Json;
+using Amazon.Runtime.Internal.Transform;
 using Microsoft.Extensions.Logging;
 using Middleware.Common.Enums;
 using Middleware.Common.Models;
@@ -115,7 +116,12 @@ namespace Middleware.Common.Repositories
             {
                 List<RelationModel> robotRelations = await GetRelation(busyEdge.Id, "LOCATED_AT", RelationDirection.Incoming);
 
-                foreach(RelationModel relationModel in robotRelations)
+                EdgeModel edge = new EdgeModel();
+                edge.Id = busyEdge.Id;
+                edge.Name = busyEdge.Name;
+                tempDic.Add(edge, robotRelations.Count);
+                /*
+                foreach (RelationModel relationModel in robotRelations)
                 {   
                     if (relationModel.PointsTo.Name == previousEdge)//Check how many times an edge have the relationship LOCATED_AT
                     {
@@ -127,7 +133,7 @@ namespace Middleware.Common.Repositories
                     }
                     previousEdge = relationModel.PointsTo.Name;
 
-                }
+                }*/
             }
             var ordered = tempDic.OrderBy(x => x.Value).ToDictionary( x => x.Key, x => x.Value);  //Order the dictionary by value
             foreach (var element in ordered)
