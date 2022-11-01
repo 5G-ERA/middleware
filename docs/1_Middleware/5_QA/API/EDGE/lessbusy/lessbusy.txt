@@ -1,0 +1,70 @@
+[
+    {
+    "relations": [
+      {
+        "initiatesFrom": {
+          "id": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
+          "type": "string",
+          "name": "string"
+        },
+        "relationName": "string",
+        "relationAttributes": [
+          {
+            "key": "string",
+            "value": "string"
+          }
+        ],
+        "pointsTo": {
+          "id": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
+          "type": "string",
+          "name": "string"
+        }
+      }
+    ],
+    "Id": "c99304d5-c438-45e1-b57b-d66a2a8df478",
+    "Name": "EDGE_1",
+    "Type": "string",
+    "EdgeStatus": "string",
+    "EdgeIp": "string",
+    "MacAddress": "string",
+    "CPU": 0,
+    "RAM": 0,
+    "VirtualRam": 0,
+    "DiskStorage": 0,
+    "NumberOfCores": 0
+  },
+{
+    "relations": [
+      {
+        "initiatesFrom": {
+          "id": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
+          "type": "string",
+          "name": "string"
+        },
+        "relationName": "string",
+        "relationAttributes": [
+          {
+            "key": "string",
+            "value": "string"
+          }
+        ],
+        "pointsTo": {
+          "id": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
+          "type": "string",
+          "name": "string"
+        }
+      }
+    ],
+    "Id": "14ac55c9-a7c5-402f-9fa5-bddd8aa3f3df",
+    "Name": "demo_edge",
+    "Type": "string",
+    "EdgeStatus": "string",
+    "EdgeIp": "string",
+    "MacAddress": "string",
+    "CPU": 0,
+    "RAM": 0,
+    "VirtualRam": 0,
+    "DiskStorage": 0,
+    "NumberOfCores": 0
+  }
+]
