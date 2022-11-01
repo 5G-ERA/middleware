@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Middleware.Common.Enums
 {
-    public enum SensorTypeEnum
+    public enum SensorType
     {
         Laser,
         Ultrasonic,

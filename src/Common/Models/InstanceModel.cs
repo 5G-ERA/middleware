@@ -68,7 +68,7 @@ public class InstanceModel : BaseModel
     /// <returns>bool</returns>
     public bool IsValid()
     {
-        var rosDistrosEnum = Enum.GetNames(typeof(ROSDistroEnum)).ToList();
+        var rosDistrosEnum = Enum.GetNames(typeof(RosDistro)).ToList();
 
         //if (string.IsNullOrWhiteSpace(Name)) return false;
         if ((RosVersion != 1) | (RosVersion != 2))  return false;
