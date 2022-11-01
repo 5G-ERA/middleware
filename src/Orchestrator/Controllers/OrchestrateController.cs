@@ -195,31 +195,4 @@ public class OrchestrateController : Controller
         return Ok(new List<InstanceModel>());
     }
 
-    /// <summary>
-    /// Creates the LOCATED_AT relationship from instance to resource after orchestrator has deployed it.
-    /// </summary>
-    /// <param name="task"></param>
-    /// <returns></returns>
-    [HttpPost]
-    [Route("plan", Name = "createGraphRelationships")]
-    [ProducesResponseType(typeof(TaskModel), (int)HttpStatusCode.OK)]
-    [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.InternalServerError)]
-    public async Task<IActionResult> createGraphRelationships([FromBody] OrchestratorResourceInput task)
-    {
-        return Ok();
-    }
-
-    /// <summary>
-    /// Deletes the LOCATED_AT relationship between instance and resource after robot has finished using them.
-    /// </summary>
-    /// <param name="task"></param>
-    /// <returns></returns>
-    [HttpPost]
-    [Route("plan", Name = "deleteGraphRelationships")]
-    [ProducesResponseType(typeof(TaskModel), (int)HttpStatusCode.OK)]
-    [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.InternalServerError)]
-    public async Task<IActionResult> deleteGraphRelationships([FromBody] OrchestratorResourceInput task)
-    {
-        return Ok();
-    }
 }
