@@ -52,5 +52,6 @@ namespace Middleware.ResourcePlanner.Controllers
                     new ApiResponse(statusCode, $"There was an error while collecting the resources: {ex.Message}"));
             }
         }
+
     }
 }

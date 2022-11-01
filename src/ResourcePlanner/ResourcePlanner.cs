@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using System.Net;
 using AutoMapper;
 using Middleware.Common;
@@ -38,7 +39,6 @@ public class ResourcePlanner : IResourcePlanner
         _logger = logger;
 
     }
-
 
     private async Task NetworkPlan(RobotModel robot)
     {
@@ -358,8 +358,9 @@ public class ResourcePlanner : IResourcePlanner
                 //Store all in the cloud.
                 if (policy.PolicyName == "AllContainersInCloud")
                 {
-                    actionParam.Placement = await ResourcesInCloud(rePlan, robot, actionParam, resourceName);
+                    actionParam.Placement = await ResourcesInCloud(rePlan, robot, actionParam, resourceName);     
                 }
+               
             }
             // Return to the old placement - TODO: check if the placement is not fully busy.
             return actionParam.Placement;
