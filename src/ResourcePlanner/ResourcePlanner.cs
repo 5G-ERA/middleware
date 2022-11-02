@@ -379,7 +379,6 @@ public class ResourcePlanner : IResourcePlanner
     /// <returns></returns>
     /// <exception cref="ArgumentException"></exception>
     protected async Task<TaskModel> Plan(TaskModel taskModel, RobotModel robot, List<ActionModel> actionCandidates)
-
     {
         var redisApiClient = _apiClientBuilder.CreateRedisApiClient();
         var orchestratorApiClient = _apiClientBuilder.CreateOrchestratorApiClient();
@@ -394,7 +393,6 @@ public class ResourcePlanner : IResourcePlanner
         // iterate throught actions in actionSequence
         foreach (ActionModel action in actionSequence)
         {
-
             List<RedisInterface.RelationModel> imagesTmp =
                 (await redisApiClient.ActionGetRelationByNameAsync(action.Id, "NEEDS")).ToList();
             List<RelationModel> images = new List<RelationModel>();
@@ -424,7 +422,6 @@ public class ResourcePlanner : IResourcePlanner
             // Choose placement based on policy
             action.Placement = await InferResource(action, robot, false, actionCandidates);
         }
-
         return taskModel;
     }
 
@@ -440,49 +437,24 @@ public class ResourcePlanner : IResourcePlanner
     {
         // BB 01.01.2022: I have simplified the function, the funtionality remains the same
         if (ListHelpers.IsNullOrEmpty(oldTask.ActionSequence))
-            throw new ArgumentException("Old action sequence cannot be empty");
-                
+            throw new ArgumentException("Action sequence for old Task cannot be empty");
+
         if (ListHelpers.IsNullOrEmpty(currentTask.ActionSequence))
-            throw new ArgumentException("Action sequence cannot be empty");
+            throw new ArgumentException("Action sequence for current Task cannot be empty");
 
         // Iterate throught old actions in actionSequence and check with have failed and add them to failed actions list.
-        
         List<ActionModel> failedActions = oldTask.ActionSequence
             .Where(a => a.ActionStatus == ActionStatus.Failed.GetStringValue())
-            .ToList();
-        //foreach (ActionModel oldAction in oldActionSequence)
-        //{
-        //    if (oldAction.ActionStatus == "Failed")
-        //    {
-        //        failedActions.Add(oldAction);
-        //    }
-        //}
+            .ToList();        
 
         // Check in which of the failed actions action planner has not done some modifications.
         List<ActionModel> actionsCandidates = failedActions
             .UnionBy(currentTask.ActionSequence, action => new { action.Id, action.Order })
             .ToList();
-        //foreach (ActionModel failedAction in failedActions)
-        //{
-        //    foreach (ActionModel newAction in currentTask.ActionSequence)
-        //    {
-        //        if (failedAction.Order == newAction.Order) //Compare old action with new one
-        //        {
-        //            if (failedAction.Id == newAction.Id)
-        //            {
-        //                // Action planner did no change to the failed action.
-        //                actionsCandidates.Add(failedAction);
-        //            }
-
-        //        }
-        //    }
-        //}
-
+        
         bool isfullReplan = fullReplan || failedActions.Count == oldTask.ActionSequence.Count;
         currentTask.FullReplan = isfullReplan;
         currentTask.PartialRePlan = !isfullReplan;
-
-        // If partial replan is requested by robot.
 
         // Make a new plan but considering only the actionCandidates and leaving the same the other actions.
         currentTask = await Plan(currentTask, robot, actionsCandidates);
@@ -490,7 +462,6 @@ public class ResourcePlanner : IResourcePlanner
     }
 
     private async Task<InstanceModel> GetInstanceToReuse(InstanceModel instance, Orchestrator.OrchestratorApiClient orchestratorApi)
-
     {
         try
         {
@@ -548,6 +519,4 @@ public class ResourcePlanner : IResourcePlanner
     {
         return instance.IsReusable != null && instance.IsReusable.Value;
     }
-
-
 }

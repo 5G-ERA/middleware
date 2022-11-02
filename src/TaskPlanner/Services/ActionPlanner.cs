@@ -418,7 +418,7 @@ namespace Middleware.TaskPlanner.Services
                 foreach (ActionModel action in actionPlan.ActionSequence)
                 {
                     actionStatus.Add(action.Id, action.ActionStatus);
-                    if (action.ActionStatus == ActionStatus.FaiSled.GetStringValue())
+                    if (action.ActionStatus == ActionStatus.Failed.GetStringValue())
                     {
                         FailedActions.Add(action);
                     }
