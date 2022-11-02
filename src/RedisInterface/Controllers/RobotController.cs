@@ -148,7 +148,7 @@ namespace Middleware.RedisInterface.Controllers
         }
 
         /// <summary>
-        /// Delete an RobotModel entity for the given id
+        /// Delete a RobotModel entity for the given id
         /// </summary>
         /// <param name="id"></param>
         /// <returns> no return </returns>
@@ -211,6 +211,7 @@ namespace Middleware.RedisInterface.Controllers
             }
             return Ok(model);
         }
+
 
         /// <summary>
         /// Retrieves a single relation by name
