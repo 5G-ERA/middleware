@@ -68,7 +68,7 @@ namespace Middleware.TaskPlanner.Controllers
                 robotOwnsTaskRelation.InitiatesFrom = tempRobotGraph;
                 robotOwnsTaskRelation.PointsTo = tempTaskGraph;
 
-                RedisInterface.RelationModel newRelation = await _redisApiClient.RobotAddRelationAsync(robotOwnsTaskRelation);
+                RedisInterface.RelationModel newRobotOwnsTaskRelation = await _redisApiClient.RobotAddRelationAsync(robotOwnsTaskRelation);
 
                 // INFER ACTION SEQUENCE PROCESS
                 var (plan, robot) = await _actionPlanner.InferActionSequence(id, contextKnown,lockResource, DialogueTemp, robotId);
