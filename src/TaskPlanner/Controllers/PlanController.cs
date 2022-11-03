@@ -46,7 +46,31 @@ namespace Middleware.TaskPlanner.Controllers
 
                 _actionPlanner.Initialize(new List<ActionModel>(), DateTime.Now);
 
-                   
+                var _redisApiClient = _apiClientBuilder.CreateRedisApiClient();
+                // Create a relationship of types OWNS between a robot and a task objects.
+
+                RedisInterface.RobotModel tempRobotObject = await _redisApiClient.RobotGetByIdAsync(robotId);
+                CloudModel tempRobotModel = _mapper.Map<CloudModel>(tempRobotObject);
+
+                RedisInterface.TaskModel tempTaskObject = await _redisApiClient.TaskGetByIdAsync(id);
+                TaskModel tempTaskModel = _mapper.Map<TaskModel>(tempTaskObject);
+
+                RedisInterface.GraphEntityModel tempRobotGraph = new RedisInterface.GraphEntityModel();
+                tempRobotGraph.Id = robotId;
+                tempRobotGraph.Name = tempRobotModel.Name;
+
+                RedisInterface.GraphEntityModel tempTaskGraph = new RedisInterface.GraphEntityModel();
+                tempTaskGraph.Id = id;
+                tempTaskGraph.Name = tempTaskModel.Name;
+
+                RedisInterface.RelationModel robotOwnsTaskRelation = new RedisInterface.RelationModel();
+                robotOwnsTaskRelation.RelationName = "OWNS";
+                robotOwnsTaskRelation.InitiatesFrom = tempRobotGraph;
+                robotOwnsTaskRelation.PointsTo = tempTaskGraph;
+
+                RedisInterface.RelationModel newRelation = await _redisApiClient.RobotAddRelationAsync(robotOwnsTaskRelation);
+
+                // INFER ACTION SEQUENCE PROCESS
                 var (plan, robot) = await _actionPlanner.InferActionSequence(id, contextKnown,lockResource, DialogueTemp, robotId);
 
                 // call resource planner for resources
@@ -73,7 +97,7 @@ namespace Middleware.TaskPlanner.Controllers
                 TaskModel finalPlan = _mapper.Map<TaskModel>(tmpFinalOrchestratorTask);
 
                 //Create LOCATED_AT relationship in redis from instance to edge/cloud resource.
-                var _redisApiClient = _apiClientBuilder.CreateRedisApiClient();
+                //var _redisApiClient = _apiClientBuilder.CreateRedisApiClient();
 
                 List<ActionModel> actionSequence = resourcePlan.ActionSequence;
                 foreach (ActionModel action in actionSequence)
