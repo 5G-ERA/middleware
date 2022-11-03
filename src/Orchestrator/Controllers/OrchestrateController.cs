@@ -202,7 +202,29 @@ public class OrchestrateController : Controller
                 }
 
             }
-            
+
+            //Delete the relationship OWNS between the robot and the task that has been completed.
+            RedisInterface.RelationModel deleteRelationRobotOwnsTask = new RedisInterface.RelationModel();
+            deleteRelationRobotOwnsTask.RelationName = "OWNS";
+
+            RedisInterface.RobotModel tempRobotObject = await _redisClient.RobotGetByIdAsync(actionPlan.RobotId);
+            CloudModel tempRobotModel = _mapper.Map<CloudModel>(tempRobotObject);
+
+            RedisInterface.GraphEntityModel tempRobotGraph = new RedisInterface.GraphEntityModel();
+            tempRobotGraph.Id = tempRobotObject.Id;
+            tempRobotGraph.Name = tempRobotObject.Name;
+
+            RedisInterface.TaskModel tempTaskObject = await _redisClient.TaskGetByIdAsync(actionPlan.TaskId);
+            TaskModel tempTaskModel = _mapper.Map<TaskModel>(tempTaskObject);
+
+            RedisInterface.GraphEntityModel tempTaskGraph = new RedisInterface.GraphEntityModel();
+            tempTaskGraph.Id = id;
+            tempTaskGraph.Name = tempTaskModel.Name;
+
+            deleteRelationRobotOwnsTask.InitiatesFrom = tempRobotGraph;
+            deleteRelationRobotOwnsTask.PointsTo = tempTaskGraph;
+
+            RedisInterface.RelationModel deleteRobotOwnsTaskRelation = await _redisClient.InstanceDeleteRelationAsync(deleteRelationRobotOwnsTask);
 
             if (isSuccess == false)
             {
