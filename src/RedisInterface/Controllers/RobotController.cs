@@ -375,7 +375,6 @@ namespace Middleware.RedisInterface.Controllers
             }
 
         }
-
     }
 }
 

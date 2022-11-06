@@ -22,7 +22,11 @@ namespace Middleware.ResourcePlanner.Controllers
         }
 
        
-
+        /// <summary>
+        /// Return an updated taskModel with the resource specs.
+        /// </summary>
+        /// <param name="resource"></param>
+        /// <returns></returns>
         [HttpPost(Name = "GetResourcePlan")]
         [ProducesResponseType(typeof(TaskModel), (int)HttpStatusCode.OK)]
         [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.NotFound)]

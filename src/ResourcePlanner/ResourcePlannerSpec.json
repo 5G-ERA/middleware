@@ -58,17 +58,17 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/ResourceInput"
+                "$ref": "#/components/schemas/ResourceReplanInputModel"
               }
             },
             "text/json": {
               "schema": {
-                "$ref": "#/components/schemas/ResourceInput"
+                "$ref": "#/components/schemas/ResourceReplanInputModel"
               }
             },
             "application/*+json": {
               "schema": {
-                "$ref": "#/components/schemas/ResourceInput"
+                "$ref": "#/components/schemas/ResourceReplanInputModel"
               }
             }
           }
@@ -303,14 +303,14 @@
             "type": "string",
             "nullable": true
           },
-          "dof": {
+          "number": {
             "type": "integer",
             "format": "int32"
           },
           "nodes": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/ROSNodeModel"
+              "type": "string"
             },
             "nullable": true
           }
@@ -526,6 +526,24 @@
         },
         "additionalProperties": false
       },
+      "ResourceReplanInputModel": {
+        "type": "object",
+        "properties": {
+          "task": {
+            "$ref": "#/components/schemas/TaskModel"
+          },
+          "oldTask": {
+            "$ref": "#/components/schemas/TaskModel"
+          },
+          "robot": {
+            "$ref": "#/components/schemas/RobotModel"
+          },
+          "fullReplan": {
+            "type": "boolean"
+          }
+        },
+        "additionalProperties": false
+      },
       "RobotManipulatorModel": {
         "type": "object",
         "properties": {
@@ -562,6 +580,30 @@
             "type": "string",
             "nullable": true
           },
+          "RosVersion": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "RosDistro": {
+            "type": "string",
+            "nullable": true
+          },
+          "MaximumPayload": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "MaximumTranslationalVelocity": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "MaximumRotationalVelocity": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "RobotWeight": {
+            "type": "integer",
+            "format": "int64"
+          },
           "ROSRepo": {
             "type": "string",
             "format": "uri",
@@ -591,7 +633,7 @@
             "type": "string",
             "nullable": true
           },
-          "CurrentTaskID": {
+          "currentTaskId": {
             "type": "string",
             "format": "uuid"
           },
@@ -644,10 +686,6 @@
             "format": "int64"
           },
           "RAM": {
-            "type": "integer",
-            "format": "int64"
-          },
-          "VirtualRam": {
             "type": "integer",
             "format": "int64"
           },

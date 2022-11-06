@@ -371,7 +371,7 @@ namespace Middleware.TaskPlanner.Services
         /// <param name="CompleteReplan"></param>
         /// <param name="DialogueTemp"></param>
         /// <returns>Tuple<TaskModel, TaskModel, RobotModel</returns>
-        private async Task<Tuple<TaskModel, TaskModel, RobotModel>> ReInferActionSequence(TaskModel oldTask,  Guid RobotId, bool ContextKnown, bool CompleteReplan, List<DialogueModel> DialogueTemp)
+        public async Task<Tuple<TaskModel, TaskModel, RobotModel>> ReInferActionSequence(TaskModel oldTask,  Guid RobotId, bool ContextKnown, bool CompleteReplan, List<DialogueModel> DialogueTemp)
         {
             bool MarkovianProcess = oldTask.MarkovianProcess;
             Guid currentTaskId = oldTask.Id;
