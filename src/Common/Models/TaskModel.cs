@@ -10,8 +10,8 @@ namespace Middleware.Common.Models
         [JsonPropertyName("Name")]
         public override string Name { get; set; }
 
-        [JsonPropertyName("ReplanActionPlannerLocked")]
-        public bool ReplanActionPlannerLocked { get; set; } //Dont change actions in action sequence replan
+        [JsonPropertyName("ReplanActionPlannerLocked")] // True: The robot requests to not change anything from action sequence but placement.
+        public bool ReplanActionPlannerLocked { get; set; } //True: Dont change actions in action sequence replan
 
         [JsonPropertyName("ResourceLock")]
         public bool ResourceLock { get; set; } //Avoid reusage of resources always.
@@ -38,7 +38,7 @@ namespace Middleware.Common.Models
         //[JsonIgnore]
         public List<ActionModel> ActionSequence { get; set; }
 
-        [JsonPropertyName("Tags")]
+        [JsonPropertyName("Tags")] //TODO: define allows tags
         //[JsonIgnore]
         public List<string> Tags { get; set; }
 

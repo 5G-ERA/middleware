@@ -7,6 +7,7 @@ using AutoMapper;
 using Middleware.Common.Models;
 using Middleware.TaskPlanner.ApiReference;
 using Middleware.Common.Repositories.Abstract;
+using Middleware.TaskPlanner.Exceptions;
 
 namespace Middleware.TaskPlanner.Services
 {
@@ -161,12 +162,12 @@ namespace Middleware.TaskPlanner.Services
             {
                 if (instance.RosVersion != robot.RosVersion)
                 {
-                    throw new InvalidOperationException("The robot and the desired netApp to use do not have the same ROS Version.");
+                    throw new IncorrectROSDistroException(); 
                 }
 
                 if (instance.ROSDistro != robot.RosDistro)
                 {
-                    throw new InvalidOperationException("The robot and the desired netApp to use do not have the same ROS Distro.");
+                    throw new IncorrectROSVersionException();
                 }
             }
         }
