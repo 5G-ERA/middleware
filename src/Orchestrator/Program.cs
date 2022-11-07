@@ -1,4 +1,5 @@
 using System.Net;
+using System.Net.Http.Headers;
 using Middleware.Common.Config;
 using Middleware.Common.ExtensionMethods;
 using Middleware.Common.Repositories;
@@ -30,7 +31,14 @@ builder.Services.AddSwaggerGen();
 builder.RegisterRedis();
 
 builder.Services.ConfigureAutoMapper();
-builder.Services.AddHttpClient(AppConfig.RedisApiClientName);
+builder.Services.AddHttpClient(AppConfig.RedisApiClientName, (a) =>
+{
+    a.BaseAddress = new Uri(Environment.GetEnvironmentVariable("REDIS_INTERFACE_ADDRESS"));
+    a.DefaultRequestHeaders.Accept.Add(
+            new MediaTypeWithQualityHeaderValue("application/json"));
+
+
+});
 builder.Services.AddHttpClient(AppConfig.OsmApiClientName);
 builder.Services.RegisterCommonServices();
 builder.Services.AddScoped<IApiClientBuilder, ApiClientBuilder>();
