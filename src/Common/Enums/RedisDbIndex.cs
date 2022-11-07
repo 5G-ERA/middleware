@@ -1,6 +1,6 @@
 ﻿namespace Middleware.Common.Enums
 {
-    public enum RedisDbIndexEnum
+    public enum RedisDbIndex
     {
         Graph = 0,
         User = 1,

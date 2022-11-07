@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Middleware.Common.Enums
 {
-    public enum ROSDistroEnum
+    public enum RosDistro
     {
         Foxy=2, //ROS 2
         Galactic=2,

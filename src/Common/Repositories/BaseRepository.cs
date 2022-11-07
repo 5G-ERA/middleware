@@ -18,7 +18,7 @@ namespace Middleware.Common.Repositories
         /// <summary>
         /// Index of the database in the Redis to be used
         /// </summary>
-        private readonly RedisDbIndexEnum _redisDbIndex;
+        private readonly RedisDbIndex _redisDbIndex;
 
         /// <summary>
         /// Redis Client
@@ -54,7 +54,7 @@ namespace Middleware.Common.Repositories
         /// <param name="logger">Logger instance</param>
         /// <param name="isWritableToGraph">Should the object be saved on the graph</param>
         /// <exception cref="ArgumentNullException"></exception>
-        public BaseRepository(RedisDbIndexEnum redisDbIndex, IConnectionMultiplexer redisClient,
+        public BaseRepository(RedisDbIndex redisDbIndex, IConnectionMultiplexer redisClient,
             IRedisGraphClient redisGraph, ILogger logger, bool isWritableToGraph)
         {
             RedisClient = redisClient ?? throw new ArgumentNullException(nameof(redisClient));

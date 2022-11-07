@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Middleware.Common.Enums
 {
-    internal enum Slices5GEnums
+    internal enum SlicesType5G
     {
         eMBB, URLL, mMTC, MIoT, V2X
     }

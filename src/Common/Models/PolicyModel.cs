@@ -34,7 +34,7 @@ public class PolicyModel : BaseModel
     /// <returns>bool</returns>
     public bool IsValid()
     {
-        var policyTypesEnum = Enum.GetNames(typeof(PolicyTypesEnum)).ToList();
+        var policyTypesEnum = Enum.GetNames(typeof(PolicyType)).ToList();
 
         if (string.IsNullOrEmpty(Name.ToString())) return false;
         if (string.IsNullOrEmpty(IsActive.ToString())) return false;

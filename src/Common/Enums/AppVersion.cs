@@ -2,7 +2,7 @@
 
 namespace Middleware.Common.Enums;
 
-public enum AppVersionEnum
+public enum AppVersion
 {
     [StringValue("Development")]
     Dev,
