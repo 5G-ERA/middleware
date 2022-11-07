@@ -74,7 +74,7 @@ namespace Middleware.Orchestrator.Jobs
                         dryRun: shouldDryRun ? "All" : null);
                     
 
-                    var kind = service != "gateway" ? K8SServiceKind.ClusterIp : K8SServiceKind.LoadBalancer;
+                    var kind = service != "gateway" ? K8SServiceKindEnum.ClusterIp : K8SServiceKindEnum.LoadBalancer;
 
                     var lbService = _deploymentService.CreateService(service, kind, result.Metadata);
                     var createdService = await kubeClient.CoreV1.CreateNamespacedServiceAsync(lbService, AppConfig.K8SNamespaceName);

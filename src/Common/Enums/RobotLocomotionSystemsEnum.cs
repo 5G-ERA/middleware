@@ -6,11 +6,14 @@ using System.Threading.Tasks;
 
 namespace Middleware.Common.Enums
 {
-    public enum RobotStatus
+    public enum RobotLocomotionSystemsEnum
     {
-        Unknown,
-        Active,
-        Idle,
-        Off
+        Bipedal,
+        Hexapodal,
+        Quadripod,
+        Tracked,
+        Ackermann,
+        Differential,
+        None
     }
 }

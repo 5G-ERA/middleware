@@ -15,14 +15,14 @@ namespace Middleware.Common.Models
             
         }
 
-        public GraphEntityModel(Guid id, string name, RedisDbIndex dbIndex)
+        public GraphEntityModel(Guid id, string name, RedisDbIndexEnum dbIndex)
         {
             Id = id;
             Name = name;
             Type = dbIndex.ToString().ToUpper();
         }
 
-        public GraphEntityModel(Guid id, RedisDbIndex dbIndex)
+        public GraphEntityModel(Guid id, RedisDbIndexEnum dbIndex)
         {
             Id = id;
             Type = dbIndex.ToString().ToUpper();

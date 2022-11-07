@@ -18,7 +18,7 @@ namespace Middleware.Common.Repositories
         /// <param name="redisClient"></param>
         /// <param name="redisGraph"></param>
         /// <param name="logger"></param>
-        public EdgeRepository(IConnectionMultiplexer redisClient, IRedisGraphClient redisGraph, ILogger<EdgeRepository> logger) : base(RedisDbIndex.Edge, redisClient, redisGraph, logger, true)
+        public EdgeRepository(IConnectionMultiplexer redisClient, IRedisGraphClient redisGraph, ILogger<EdgeRepository> logger) : base(RedisDbIndexEnum.Edge, redisClient, redisGraph, logger, true)
         {
         }
 

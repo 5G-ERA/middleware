@@ -319,7 +319,7 @@ namespace Middleware.RedisInterface.Controllers
                         await _containerImageRepository.AddAsync(instanceModel.ContainerImage);
 
                         //RELATIONSHIP--NEEDS (INSTANCE-IMAGE)
-                        RelationModel imageRelation = CreateGraphRelation(instanceModel, RedisDbIndex.Instance, instanceModel.ContainerImage, RedisDbIndex.Container);
+                        RelationModel imageRelation = CreateGraphRelation(instanceModel, RedisDbIndexEnum.Instance, instanceModel.ContainerImage, RedisDbIndexEnum.Container);
                         bool isImageValid = await _containerImageRepository.AddRelationAsync(imageRelation);
                         if (!isImageValid)
                         {
@@ -329,7 +329,7 @@ namespace Middleware.RedisInterface.Controllers
                     //RELATIONSHIP--NEEDS (ACTION-INSTANCE)
                     foreach (var instance in actionModel.Services)
                     {
-                        RelationModel instanceRelation = CreateGraphRelation(actionModel, RedisDbIndex.Action, instance, RedisDbIndex.Instance);
+                        RelationModel instanceRelation = CreateGraphRelation(actionModel, RedisDbIndexEnum.Action, instance, RedisDbIndexEnum.Instance);
                         bool isInstanceValid = await _instanceRepository.AddRelationAsync(instanceRelation);
                         if (!isInstanceValid)
                         {
@@ -345,7 +345,7 @@ namespace Middleware.RedisInterface.Controllers
                 foreach (var action in model.ActionSequence)
                 {
                     //RELATIONSHIP--EXTENDS (TASK->ACTION)
-                    RelationModel taskRelation = CreateGraphRelation(importModel, RedisDbIndex.Task, action, RedisDbIndex.Action);
+                    RelationModel taskRelation = CreateGraphRelation(importModel, RedisDbIndexEnum.Task, action, RedisDbIndexEnum.Action);
                     bool isTaskValid = await _taskRepository.AddRelationAsync(taskRelation);
                     if (!isTaskValid)
                     {
@@ -370,13 +370,13 @@ namespace Middleware.RedisInterface.Controllers
         /// <param name="pointsToType"></param>
         /// <returns></returns>
         private RelationModel CreateGraphRelation(BaseModel initiatesModel,
-            RedisDbIndex initiatesType,
+            RedisDbIndexEnum initiatesType,
             BaseModel pointsToModel,
-            RedisDbIndex pointsToType)
+            RedisDbIndexEnum pointsToType)
         {
             GraphEntityModel initiatesFrom = new GraphEntityModel(initiatesModel.Id, initiatesModel.Name, initiatesType);
             GraphEntityModel pointsTo = new GraphEntityModel(pointsToModel.Id, pointsToModel.Name, pointsToType);
-            var relation = initiatesType == RedisDbIndex.Task ? "EXTENDS" : "NEEDS";
+            var relation = initiatesType == RedisDbIndexEnum.Task ? "EXTENDS" : "NEEDS";
 
             return new RelationModel(initiatesFrom, pointsTo, relation);
         }

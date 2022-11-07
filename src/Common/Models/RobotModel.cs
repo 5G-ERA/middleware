@@ -100,8 +100,8 @@ public class RobotModel : BaseModel
     /// <returns></returns>
     public bool IsValid()
     {
-        var valLocomotionSystemsEnum = Enum.GetNames(typeof(RobotLocomotionSystem)).ToList();
-        var valLocomotionTypes = Enum.GetNames(typeof(RobotLocomotionType)).ToList();
+        var valLocomotionSystemsEnum = Enum.GetNames(typeof(RobotLocomotionSystemsEnum)).ToList();
+        var valLocomotionTypes = Enum.GetNames(typeof(RobotLocomotionTypes)).ToList();
 
         if (string.IsNullOrEmpty(NumberCores.ToString())) return false;
         if (string.IsNullOrEmpty(StorageDisk.ToString())) return false;
@@ -117,7 +117,7 @@ public class RobotModel : BaseModel
         //Check sensors validity
         if (Sensors.Any() == true)
         {
-            var valSensorTypeEnum = Enum.GetNames(typeof(SensorType)).ToList();
+            var valSensorTypeEnum = Enum.GetNames(typeof(SensorTypeEnum)).ToList();
             foreach (SensorModel sensor in Sensors)
             {
                 if (string.IsNullOrEmpty(sensor.Description.ToString())) return false;
@@ -132,7 +132,7 @@ public class RobotModel : BaseModel
         //Check actuators validity
         if (Actuator.Any() == true)
         {
-            var valActuatorTypesEnum = Enum.GetNames(typeof(RobotActuatorType)).ToList();
+            var valActuatorTypesEnum = Enum.GetNames(typeof(RobotActuatorTypesEnum)).ToList();
             foreach (ActuatorModel actuator in Actuator)
             {
                 if (string.IsNullOrEmpty(actuator.Name.ToString())) return false;
@@ -144,7 +144,7 @@ public class RobotModel : BaseModel
         //Check Manipulators validity
         if (Manipulators.Any() == true)
         {
-            var valActuatorTypesEnum = Enum.GetNames(typeof(RobotActuatorType)).ToList();
+            var valActuatorTypesEnum = Enum.GetNames(typeof(RobotActuatorTypesEnum)).ToList();
             foreach (RobotManipulatorModel manipulator in Manipulators)
             {
                 if (string.IsNullOrEmpty(manipulator.ActuatorName.ToString())) return false;

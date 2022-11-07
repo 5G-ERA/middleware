@@ -2,7 +2,7 @@
 
 namespace Middleware.Common.Enums;
 
-public enum K8SServiceKind
+public enum K8SServiceKindEnum
 {
     [StringValue("ClusterIP")]
     ClusterIp,

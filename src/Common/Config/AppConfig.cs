@@ -40,7 +40,7 @@ public static class AppConfig
     /// Is the application running in the Development environment
     /// </summary>
     /// <returns></returns>
-    public static bool IsDevEnvironment() => AppConfiguration == AppVersion.Dev.GetStringValue();
+    public static bool IsDevEnvironment() => AppConfiguration == AppVersionEnum.Dev.GetStringValue();
     /// <summary>
     /// Represents the Address under which the Middleware is accessible
     /// </summary>

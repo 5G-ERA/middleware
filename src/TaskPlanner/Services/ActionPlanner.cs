@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,9 +8,6 @@ using Middleware.Common.Models;
 using Middleware.TaskPlanner.ApiReference;
 using Middleware.Common.Repositories.Abstract;
 using Middleware.TaskPlanner.Exceptions;
-using Middleware.Common.Enums;
-using Middleware.Common.ExtensionMethods;
-
 
 namespace Middleware.TaskPlanner.Services
 {
@@ -55,10 +52,10 @@ namespace Middleware.TaskPlanner.Services
             newAction.ActionPriority = action.ActionPriority;
             newAction.Relations = action.Relations;
 
-            foreach (InstanceModel instance in action.Services)
+            foreach(InstanceModel instance in action.Services)
             {
-                RedisInterface.InstanceModel riCandidate = await _apiClient.InstanceGetAlternativeAsync(instance.Id);
-                InstanceModel candidate = _mapper.Map<InstanceModel>(riCandidate);
+               RedisInterface.InstanceModel riCandidate = await _apiClient.InstanceGetAlternativeAsync(instance.Id);
+               InstanceModel candidate = _mapper.Map<InstanceModel>(riCandidate);
                 newAction.Services.Add(candidate);
             }
             return null;
@@ -375,13 +372,9 @@ namespace Middleware.TaskPlanner.Services
         /// <param name="CompleteReplan"></param>
         /// <param name="DialogueTemp"></param>
         /// <returns>Tuple<TaskModel, TaskModel, RobotModel</returns>
-        private async Task<Tuple<TaskModel, TaskModel, RobotModel>> ReInferActionSequence(TaskModel oldTask,
-            Guid RobotId,
-            bool ContextKnown,
-            bool CompleteReplan,
-            List<DialogueModel> DialogueTemp)
+        public async Task<Tuple<TaskModel, TaskModel, RobotModel>> ReInferActionSequence(TaskModel oldTask,  Guid RobotId, bool ContextKnown, bool CompleteReplan, List<DialogueModel> DialogueTemp)
         {
-            bool markovianProcess = oldTask.MarkovianProcess;
+            bool MarkovianProcess = oldTask.MarkovianProcess;
             Guid currentTaskId = oldTask.Id;
             Guid currentPlanId = oldTask.ActionPlanId;
             bool resourceLock = oldTask.ResourceLock;
@@ -390,10 +383,13 @@ namespace Middleware.TaskPlanner.Services
             List<ActionModel> FinalCandidatesActions = new List<ActionModel>();
             //DialogueModel dialogues = oldTask.
 
+            // Define some local method variables
+
+            List<ActionModel> candidatesActions = new List<ActionModel>();
             List<ActionModel> FailedActions = new List<ActionModel>();
-
+            List<RelationModel> dependantActions = new List<RelationModel>();
             Dictionary<Guid, string> actionStatus = new Dictionary<Guid, string>();
-
+            RelationModel dependency = new RelationModel();
             bool InstanceError = false;
 
             // Prepare basic information of new plan
@@ -405,7 +401,7 @@ namespace Middleware.TaskPlanner.Services
             task.FullReplan = true;
 
             // Load robot
-            RedisInterface.RobotModel robotRedis = await _apiClient.RobotGetByIdAsync(RobotId);
+            RedisInterface.RobotModel robotRedis = await _apiClient.RobotGetByIdAsync(RobotId); 
             RobotModel robot = _mapper.Map<RobotModel>(robotRedis);
             robot.Questions = DialogueTemp; //Add the questions-answers to the robot
 
@@ -420,13 +416,13 @@ namespace Middleware.TaskPlanner.Services
                 foreach (ActionModel action in actionPlan.ActionSequence)
                 {
                     actionStatus.Add(action.Id, action.ActionStatus);
-                    if (action.ActionStatus == ActionStatus.Failed.GetStringValue())
+                    if (action.ActionStatus == "Failed")
                     {
                         FailedActions.Add(action);
                     }
                     foreach (InstanceModel instance in action.Services)
                     {
-                        if (instance.ServiceStatus == ServiceStatus.Problem.GetStringValue()) //maybe another one more specific? Not sure about this one.
+                        if (instance.ServiceStatus == "Problem") //maybe another one more specific? Not sure about this one.
                         {
                             InstanceError = true;
                         }
@@ -441,7 +437,7 @@ namespace Middleware.TaskPlanner.Services
                 var areEqual = lists.Skip(1).All(hs => hs.SequenceEqual(first));
 
                 // A review of the action seq is neccesary --> there were no errors from the resource perspective.
-                if (InstanceError == false)
+                if (InstanceError == false) 
                 {
                     //Prepare a complete replan asked explicitely by the robot
                     if (CompleteReplan == true)
@@ -465,7 +461,7 @@ namespace Middleware.TaskPlanner.Services
                         else
                         {
                             // Modify only the actions that have failed
-                            if (markovianProcess == false)
+                            if (MarkovianProcess == false)
                             {
                                 foreach (ActionModel failedAction in FailedActions)
                                 {

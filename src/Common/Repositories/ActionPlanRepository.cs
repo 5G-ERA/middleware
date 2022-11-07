@@ -14,7 +14,7 @@ public class ActionPlanRepository : BaseRepository<ActionPlanModel>, IActionPlan
     /// <param name="redisClient"></param>
     /// <param name="redisGraph"></param>
     /// <param name="logger"></param>
-    public ActionPlanRepository(IConnectionMultiplexer redisClient, IRedisGraphClient redisGraph, ILogger<ActionPlanRepository> logger) : base(RedisDbIndex.ActionSequence, redisClient, redisGraph, logger, false)
+    public ActionPlanRepository(IConnectionMultiplexer redisClient, IRedisGraphClient redisGraph, ILogger<ActionPlanRepository> logger) : base(RedisDbIndexEnum.ActionSequence, redisClient, redisGraph, logger, false)
     {
     }
 

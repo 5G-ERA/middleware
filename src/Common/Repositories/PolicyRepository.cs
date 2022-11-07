@@ -17,7 +17,7 @@ namespace Middleware.Common.Repositories
         /// <param name="redisClient"></param>
         /// <param name="redisGraph"></param>
         /// <param name="logger"></param>
-        public PolicyRepository(IConnectionMultiplexer redisClient, IRedisGraphClient redisGraph, ILogger<PolicyRepository> logger) : base(RedisDbIndex.Policy, redisClient, redisGraph, logger, false)
+        public PolicyRepository(IConnectionMultiplexer redisClient, IRedisGraphClient redisGraph, ILogger<PolicyRepository> logger) : base(RedisDbIndexEnum.Policy, redisClient, redisGraph, logger, false)
         {
         }
 

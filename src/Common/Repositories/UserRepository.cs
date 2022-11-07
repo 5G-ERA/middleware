@@ -15,7 +15,7 @@ namespace Middleware.Common.Repositories
         /// <param name="redisClient"></param>
         /// <param name="redisGraph"></param>
         /// <param name="logger"></param>
-        public UserRepository(IConnectionMultiplexer redisClient, IRedisGraphClient redisGraph, ILogger<UserRepository> logger) : base(RedisDbIndex.User, redisClient, redisGraph, logger, false)
+        public UserRepository(IConnectionMultiplexer redisClient, IRedisGraphClient redisGraph, ILogger<UserRepository> logger) : base(RedisDbIndexEnum.User, redisClient, redisGraph, logger, false)
         {
         }
     }

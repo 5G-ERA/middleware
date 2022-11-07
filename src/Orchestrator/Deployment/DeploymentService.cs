@@ -94,7 +94,7 @@ public class DeploymentService : IDeploymentService
         {
             _logger.LogInformation("The instantiation of the kubernetes client has failed in {env} environment.", AppConfig.AppConfiguration);
 
-            isSuccess = AppConfig.AppConfiguration == AppVersion.Dev.GetStringValue();
+            isSuccess = AppConfig.AppConfiguration == AppVersionEnum.Dev.GetStringValue();
 
             if (isSuccess)
             {
@@ -243,7 +243,7 @@ public class DeploymentService : IDeploymentService
     }
 
     /// <inheritdoc/>
-    public V1Service CreateService(string serviceImageName, K8SServiceKind kind, V1ObjectMeta meta)
+    public V1Service CreateService(string serviceImageName, K8SServiceKindEnum kind, V1ObjectMeta meta)
     {
         var spec = new V1ServiceSpec()
         {
@@ -290,7 +290,7 @@ public class DeploymentService : IDeploymentService
         {
             _logger.LogInformation("The instantiation of the kubernetes client has failed in {env} environment.", AppConfig.AppConfiguration);
 
-            retVal = AppConfig.AppConfiguration == AppVersion.Dev.GetStringValue();
+            retVal = AppConfig.AppConfiguration == AppVersionEnum.Dev.GetStringValue();
             if (retVal)
                 _logger.LogWarning("Deployment of the services has been skipped in the Development environment");
         }
@@ -374,7 +374,7 @@ public class DeploymentService : IDeploymentService
         {
             Name = name,
             Image = K8SImageHelper.BuildImageName(_awsRegistryName, name, tag),
-            ImagePullPolicy = AppConfig.AppConfiguration == AppVersion.Prod.GetStringValue() ? "Always" : "IfNotPresent",
+            ImagePullPolicy = AppConfig.AppConfiguration == AppVersionEnum.Prod.GetStringValue() ? "Always" : "IfNotPresent",
             Env = envList,
             Ports = new List<V1ContainerPort>() { new(80), new(433) }
         };
