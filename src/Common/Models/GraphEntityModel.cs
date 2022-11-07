@@ -27,5 +27,14 @@ namespace Middleware.Common.Models
             Id = id;
             Type = dbIndex.ToString().ToUpper();
         }
+
+        public GraphEntityModel(Guid id, string name, Type type)
+        {
+            Id = id;
+            Name = name;
+            Type = type.Name.EndsWith("Model")
+                ? Type = type.Name.Remove(type.Name.LastIndexOf("M", StringComparison.Ordinal))
+                : type.Name;
+        }
     }
 }
