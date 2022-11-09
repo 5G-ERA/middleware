@@ -8,3 +8,7 @@ http://localhost:5047/Register
 
 ![image](https://user-images.githubusercontent.com/26432703/198844646-fcd1a5a0-172a-46d9-be30-a9795a7df35a.png)
 
+{
+    "Id":"99d16511-b9d5-4d3c-bafa-c1caf0869eb7",
+    "Password":"*********"
+}
