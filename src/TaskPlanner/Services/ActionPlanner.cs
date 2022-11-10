@@ -7,6 +7,7 @@ using AutoMapper;
 using Middleware.Common.Models;
 using Middleware.TaskPlanner.ApiReference;
 using Middleware.Common.Repositories.Abstract;
+using Middleware.TaskPlanner.Exceptions;
 
 namespace Middleware.TaskPlanner.Services
 {
@@ -155,6 +156,22 @@ namespace Middleware.TaskPlanner.Services
             return FinalCandidates;
         }
 
+        protected void CheckInstanceByRobotRosDistro(RobotModel robot, ActionModel actionItem)
+        {
+            foreach (InstanceModel instance in actionItem.Services)
+            {
+                if (instance.RosVersion != robot.RosVersion)
+                {
+                    throw new IncorrectROSDistroException(); 
+                }
+
+                if (instance.ROSDistro != robot.RosDistro)
+                {
+                    throw new IncorrectROSVersionException();
+                }
+            }
+        }
+
         /// <summary>
         /// Check that the robot can run the netApp from HW, sensor & actuators perspective 
         /// </summary>
@@ -228,7 +245,8 @@ namespace Middleware.TaskPlanner.Services
             List<ActionModel> replanedCompleteActionSeqBK = new List<ActionModel>();
             replanedCompleteActionSeqBK.AddRange(replanedCompleteActionSeq);
 
-            robot.Questions = DialogueTemp; //Add the questions-answers to the robot
+            robot.Questions.AddRange(DialogueTemp); //Append the questions-answers to the robot
+
             RedisInterface.TaskModel tmpTask = await _apiClient.TaskGetByIdAsync(currentTaskId); //Get action plan from Redis
             TaskModel task = _mapper.Map<TaskModel>(tmpTask);
             bool alreadyExist = task != null; //Check if CurrentTask is inside Redis model
@@ -270,6 +288,9 @@ namespace Middleware.TaskPlanner.Services
                     //Call to retrieve specific action
                     RedisInterface.ActionModel tempAction = await _apiClient.ActionGetByIdAsync(actionId);
                     ActionModel actionItem = _mapper.Map<ActionModel>(tempAction);
+
+                    // Check if the robot have the proper ROS distro and version.
+                    CheckInstanceByRobotRosDistro(robot, actionItem);
 
                     // Check if the robot have the neccesary sensors and actuators for the netapp to correctly function.
                     CheckInstanceByRobotHw(robot, actionItem);
@@ -351,7 +372,7 @@ namespace Middleware.TaskPlanner.Services
         /// <param name="CompleteReplan"></param>
         /// <param name="DialogueTemp"></param>
         /// <returns>Tuple<TaskModel, TaskModel, RobotModel</returns>
-        private async Task<Tuple<TaskModel, TaskModel, RobotModel>> ReInferActionSequence(TaskModel oldTask,  Guid RobotId, bool ContextKnown, bool CompleteReplan, List<DialogueModel> DialogueTemp)
+        public async Task<Tuple<TaskModel, TaskModel, RobotModel>> ReInferActionSequence(TaskModel oldTask,  Guid RobotId, bool ContextKnown, bool CompleteReplan, List<DialogueModel> DialogueTemp)
         {
             bool MarkovianProcess = oldTask.MarkovianProcess;
             Guid currentTaskId = oldTask.Id;

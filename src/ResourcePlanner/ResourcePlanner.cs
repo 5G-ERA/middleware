@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using System.Net;
 using AutoMapper;
 using Middleware.Common;
@@ -38,7 +39,6 @@ public class ResourcePlanner : IResourcePlanner
         _logger = logger;
 
     }
-
 
     private async Task NetworkPlan(RobotModel robot)
     {
@@ -315,7 +315,7 @@ public class ResourcePlanner : IResourcePlanner
     private async Task<string> InferResource (ActionModel actionParam, RobotModel robot, bool rePlan, List<ActionModel> candidates) //Allocate correct placement based upon policies and priority
     {
         bool ActionToConsider = false;
-        // Check if this action requires infering anew placement
+        // Check if this action requires infering a new placement
         foreach (ActionModel action in candidates)
         {
             if ((actionParam.Name == action.Name) && (rePlan==true))
@@ -358,8 +358,9 @@ public class ResourcePlanner : IResourcePlanner
                 //Store all in the cloud.
                 if (policy.PolicyName == "AllContainersInCloud")
                 {
-                    actionParam.Placement = await ResourcesInCloud(rePlan, robot, actionParam, resourceName);
+                    actionParam.Placement = await ResourcesInCloud(rePlan, robot, actionParam, resourceName);     
                 }
+               
             }
             // Return to the old placement - TODO: check if the placement is not fully busy.
             return actionParam.Placement;

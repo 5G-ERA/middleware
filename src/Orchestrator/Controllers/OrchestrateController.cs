@@ -161,6 +161,71 @@ public class OrchestrateController : Controller
 
             var isSuccess = await _deploymentService.DeletePlanAsync(actionPlan);
 
+            //Delete the LOCATED_AT relationships between instance and edge/cloud.
+            List<ActionModel> actionTempList = actionPlan.ActionSequence;
+            foreach (ActionModel action in actionTempList)
+            {
+                
+                RedisInterface.RelationModel tempRelationModel = new RedisInterface.RelationModel();
+                tempRelationModel.RelationName = "LOCATED_AT";
+
+                if (action.Placement.Contains("CLOUD"))
+                {
+                    RedisInterface.CloudModel tempRedisCloud = await _redisClient.CloudGetDataByNameAsync(action.Placement);
+                    CloudModel tempCloud = _mapper.Map<CloudModel>(tempRedisCloud);
+                    RedisInterface.GraphEntityModel tempGraph = new RedisInterface.GraphEntityModel();
+                    tempGraph.Name = tempCloud.Name;
+                    tempGraph.Type = "CLOUD";
+                    tempGraph.Id = tempCloud.Id;
+                    tempRelationModel.PointsTo = tempGraph;
+                }
+                else
+                {
+                    RedisInterface.EdgeModel tempRedisEdge = await _redisClient.EdgeGetDataByNameAsync(action.Placement);
+                    EdgeModel tempEdge = _mapper.Map<EdgeModel>(tempRedisEdge);
+                    RedisInterface.GraphEntityModel tempGraph = new RedisInterface.GraphEntityModel();
+                    tempGraph.Name = tempGraph.Name;
+                    tempGraph.Type = "EDGE";
+                    tempGraph.Id = tempGraph.Id;
+                    tempRelationModel.PointsTo = tempGraph;
+                }
+
+                foreach (InstanceModel instance in action.Services)
+                {
+                    GraphEntityModel tempInstanceGraph = new GraphEntityModel(); //The instances that the action need.
+                    tempInstanceGraph.Name = instance.Name;
+                    tempInstanceGraph.Id = instance.Id;
+                    tempInstanceGraph.Type = "INSTANCE";
+
+                    //delete all the located_at relationships between all instances of 1 action and the resources been edge/cloud
+                    RedisInterface.RelationModel newRelation = await _redisClient.InstanceDeleteRelationAsync(tempRelationModel);
+                }
+
+            }
+
+            //Delete the relationship OWNS between the robot and the task that has been completed.
+            RedisInterface.RelationModel deleteRelationRobotOwnsTask = new RedisInterface.RelationModel();
+            deleteRelationRobotOwnsTask.RelationName = "OWNS";
+
+            RedisInterface.RobotModel tempRobotObject = await _redisClient.RobotGetByIdAsync(actionPlan.RobotId);
+            CloudModel tempRobotModel = _mapper.Map<CloudModel>(tempRobotObject);
+
+            RedisInterface.GraphEntityModel tempRobotGraph = new RedisInterface.GraphEntityModel();
+            tempRobotGraph.Id = tempRobotObject.Id;
+            tempRobotGraph.Name = tempRobotObject.Name;
+
+            RedisInterface.TaskModel tempTaskObject = await _redisClient.TaskGetByIdAsync(actionPlan.TaskId);
+            TaskModel tempTaskModel = _mapper.Map<TaskModel>(tempTaskObject);
+
+            RedisInterface.GraphEntityModel tempTaskGraph = new RedisInterface.GraphEntityModel();
+            tempTaskGraph.Id = id;
+            tempTaskGraph.Name = tempTaskModel.Name;
+
+            deleteRelationRobotOwnsTask.InitiatesFrom = tempRobotGraph;
+            deleteRelationRobotOwnsTask.PointsTo = tempTaskGraph;
+
+            RedisInterface.RelationModel deleteRobotOwnsTaskRelation = await _redisClient.InstanceDeleteRelationAsync(deleteRelationRobotOwnsTask);
+
             if (isSuccess == false)
             {
                 int statusCode = (int)HttpStatusCode.InternalServerError;

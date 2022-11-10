@@ -148,7 +148,7 @@ namespace Middleware.RedisInterface.Controllers
         }
 
         /// <summary>
-        /// Delete an RobotModel entity for the given id
+        /// Delete a RobotModel entity for the given id
         /// </summary>
         /// <param name="id"></param>
         /// <returns> no return </returns>
@@ -211,6 +211,42 @@ namespace Middleware.RedisInterface.Controllers
             }
             return Ok(model);
         }
+
+        /// <summary>
+        /// Deletes a new relation between two models
+        /// </summary>
+        /// <param name="model"></param>
+        /// <returns></returns>
+        [HttpDelete]
+        [Route("DeleteRelation", Name = "RobotDeleteRelation")]
+        [ProducesResponseType(typeof(RelationModel), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.BadRequest)]
+        [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.InternalServerError)]
+        public async Task<ActionResult<RelationModel>> DeleteRelationAsync([FromBody] RelationModel model)
+        {
+            if (model == null)
+            {
+                return BadRequest(new ApiResponse((int)HttpStatusCode.BadRequest, "Parameters were not specified."));
+            }
+            try
+            {
+                bool isValid = await _robotRepository.DeleteRelationAsync(model);
+                if (!isValid)
+                {
+                    return StatusCode((int)HttpStatusCode.InternalServerError,
+                        new ApiResponse((int)HttpStatusCode.InternalServerError, "The relation was not created"));
+                }
+
+            }
+            catch (Exception ex)
+            {
+                int statusCode = (int)HttpStatusCode.InternalServerError;
+                _logger.LogError(ex, "An error occurred:");
+                return StatusCode(statusCode, new ApiResponse(statusCode, $"An error has occurred: {ex.Message}"));
+            }
+            return Ok(model);
+        }
+
 
         /// <summary>
         /// Retrieves a single relation by name
@@ -339,7 +375,6 @@ namespace Middleware.RedisInterface.Controllers
             }
 
         }
-
     }
 }
 

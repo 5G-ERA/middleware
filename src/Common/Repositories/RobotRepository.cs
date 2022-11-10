@@ -7,11 +7,12 @@ using StackExchange.Redis;
 using System.Text.Json;
 using Microsoft.Extensions.Logging;
 
+
 namespace Middleware.Common.Repositories
 {
     public class RobotRepository : BaseRepository<RobotModel>, IRobotRepository
     {
-        
+ 
 
         /// <summary>
         /// Default constructor
@@ -19,8 +20,9 @@ namespace Middleware.Common.Repositories
         /// <param name="redisClient"></param>
         /// <param name="redisGraph"></param>
         /// <param name="logger"></param>
-        public RobotRepository(IConnectionMultiplexer redisClient, IRedisGraphClient redisGraph, ILogger<RobotRepository> logger) : base(RedisDbIndexEnum.Robot, redisClient, redisGraph, logger, true)
+        public RobotRepository(IConnectionMultiplexer redisClient,IRedisGraphClient redisGraph, ILogger<RobotRepository> logger) : base(RedisDbIndexEnum.Robot, redisClient, redisGraph, logger, true)
         {
+         
         }
 
         /// <summary>
@@ -81,10 +83,6 @@ namespace Middleware.Common.Repositories
             {
                 currentModel.Ram = patch.Ram;
             }
-            if (!string.IsNullOrEmpty(patch.VirtualRam.ToString()))
-            {
-                currentModel.VirtualRam = patch.VirtualRam;
-            }
             if (!string.IsNullOrEmpty(patch.StorageDisk.ToString()))
             {
                 currentModel.StorageDisk = patch.StorageDisk;
@@ -144,9 +142,6 @@ namespace Middleware.Common.Repositories
             }
             return clouds;
         }
-
-
-
 
     }
 }

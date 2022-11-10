@@ -13,15 +13,13 @@ public sealed class ActionPlanModel : BaseModel
     [JsonPropertyName("Name")] // Name of task
     public override string Name { get; set; }
 
-    [JsonPropertyName("Status")] //Status of whole plan
-    public string Status
-    {
-        get { return Status; }
-        set
-        {
-            Status = value;           
-        }
-    }
+
+    /// <summary>
+    /// Status of the whole plan
+    /// </summary>
+    [JsonPropertyName("Status")]
+    public string Status { get; set; }
+
 
     [JsonPropertyName("IsReplan")] //Status of whole plan
     public bool IsReplan { get; set; }
@@ -37,7 +35,6 @@ public sealed class ActionPlanModel : BaseModel
 
     public ActionPlanModel()
     {
-
     }
 
     public ActionPlanModel(Guid id, string name, List<ActionModel> actionSequence, Guid robotId)
@@ -47,6 +44,7 @@ public sealed class ActionPlanModel : BaseModel
         ActionSequence = actionSequence;
         RobotId = robotId;
     }
+
     public void SetStatus(string status)
     {
         Status = status;

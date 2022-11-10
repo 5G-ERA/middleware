@@ -48,6 +48,95 @@
         }
       }
     },
+    "/api/v1/ReplanResource": {
+      "post": {
+        "tags": [
+          "ReplanResource"
+        ],
+        "operationId": "GetResourceRePlan",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ResourceReplanInputModel"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ResourceReplanInputModel"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/ResourceReplanInputModel"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/TaskModel"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TaskModel"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TaskModel"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Server Error",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/v1/Resource": {
       "post": {
         "tags": [
@@ -158,8 +247,11 @@
             "type": "string",
             "nullable": true
           },
-          "ActionFamily": {
-            "type": "string",
+          "Tags": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
             "nullable": true
           },
           "Order": {
@@ -170,7 +262,15 @@
             "type": "string",
             "nullable": true
           },
+          "PlacementType": {
+            "type": "string",
+            "nullable": true
+          },
           "ActionPriority": {
+            "type": "string",
+            "nullable": true
+          },
+          "ActionStatus": {
             "type": "string",
             "nullable": true
           },
@@ -178,6 +278,39 @@
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/InstanceModel"
+            },
+            "nullable": true
+          },
+          "MinimumRam": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "MinimumNumCores": {
+            "type": "integer",
+            "format": "int32"
+          }
+        },
+        "additionalProperties": false
+      },
+      "ActuatorModel": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "nullable": true
+          },
+          "type": {
+            "type": "string",
+            "nullable": true
+          },
+          "number": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "nodes": {
+            "type": "array",
+            "items": {
+              "type": "string"
             },
             "nullable": true
           }
@@ -290,9 +423,54 @@
             "type": "string",
             "nullable": true
           },
+          "RosTopicsPub": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/RosTopicModel"
+            },
+            "nullable": true
+          },
+          "RosTopicsSub": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/RosTopicModel"
+            },
+            "nullable": true
+          },
+          "ROSVersion": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "ROSDistro": {
+            "type": "string",
+            "nullable": true
+          },
+          "Tags": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "nullable": true
+          },
+          "InstanceFamily": {
+            "type": "string",
+            "nullable": true
+          },
+          "SuccessRate": {
+            "type": "integer",
+            "format": "int32"
+          },
           "ServiceStatus": {
             "type": "string",
             "nullable": true
+          },
+          "MinimumRam": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "MinimumNumCores": {
+            "type": "integer",
+            "format": "int32"
           }
         },
         "additionalProperties": false
@@ -341,6 +519,45 @@
           },
           "robot": {
             "$ref": "#/components/schemas/RobotModel"
+          },
+          "fullReplan": {
+            "type": "boolean"
+          }
+        },
+        "additionalProperties": false
+      },
+      "ResourceReplanInputModel": {
+        "type": "object",
+        "properties": {
+          "task": {
+            "$ref": "#/components/schemas/TaskModel"
+          },
+          "oldTask": {
+            "$ref": "#/components/schemas/TaskModel"
+          },
+          "robot": {
+            "$ref": "#/components/schemas/RobotModel"
+          },
+          "fullReplan": {
+            "type": "boolean"
+          }
+        },
+        "additionalProperties": false
+      },
+      "RobotManipulatorModel": {
+        "type": "object",
+        "properties": {
+          "actuatorName": {
+            "type": "string",
+            "nullable": true
+          },
+          "dof": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "number": {
+            "type": "integer",
+            "format": "int32"
           }
         },
         "additionalProperties": false
@@ -363,8 +580,49 @@
             "type": "string",
             "nullable": true
           },
+          "RosVersion": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "RosDistro": {
+            "type": "string",
+            "nullable": true
+          },
+          "MaximumPayload": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "MaximumTranslationalVelocity": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "MaximumRotationalVelocity": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "RobotWeight": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "ROSRepo": {
+            "type": "string",
+            "format": "uri",
+            "nullable": true
+          },
+          "ROSNodes": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ROSNodeModel"
+            },
+            "nullable": true
+          },
           "Manufacturer": {
             "type": "string",
+            "nullable": true
+          },
+          "ManufacturerUrl": {
+            "type": "string",
+            "format": "uri",
             "nullable": true
           },
           "RobotModel": {
@@ -375,7 +633,7 @@
             "type": "string",
             "nullable": true
           },
-          "CurrentTaskID": {
+          "currentTaskId": {
             "type": "string",
             "format": "uuid"
           },
@@ -398,10 +656,28 @@
             "type": "string",
             "nullable": true
           },
+          "LocomotionTypes": {
+            "type": "string",
+            "nullable": true
+          },
           "Sensors": {
             "type": "array",
             "items": {
-              "type": "string"
+              "$ref": "#/components/schemas/SensorModel"
+            },
+            "nullable": true
+          },
+          "Actuator": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ActuatorModel"
+            },
+            "nullable": true
+          },
+          "Manipulators": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/RobotManipulatorModel"
             },
             "nullable": true
           },
@@ -410,10 +686,6 @@
             "format": "int64"
           },
           "RAM": {
-            "type": "integer",
-            "format": "int64"
-          },
-          "VirtualRam": {
             "type": "integer",
             "format": "int64"
           },
@@ -431,6 +703,98 @@
               "$ref": "#/components/schemas/DialogueModel"
             },
             "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "ROSNodeModel": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "nullable": true
+          },
+          "publications": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/RosTopicModel"
+            },
+            "nullable": true
+          },
+          "subscriptions": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/RosTopicModel"
+            },
+            "nullable": true
+          },
+          "services": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ROSServiceModel"
+            },
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "ROSServiceModel": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "nullable": true
+          },
+          "description": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "RosTopicModel": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "nullable": true
+          },
+          "type": {
+            "type": "string",
+            "nullable": true
+          },
+          "description": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "SensorModel": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "nullable": true
+          },
+          "type": {
+            "type": "string",
+            "nullable": true
+          },
+          "description": {
+            "type": "string",
+            "nullable": true
+          },
+          "nodes": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "nullable": true
+          },
+          "number": {
+            "type": "integer",
+            "format": "int32"
           }
         },
         "additionalProperties": false
@@ -453,6 +817,9 @@
             "type": "string",
             "nullable": true
           },
+          "ReplanActionPlannerLocked": {
+            "type": "boolean"
+          },
           "ResourceLock": {
             "type": "boolean"
           },
@@ -464,10 +831,29 @@
             "type": "string",
             "format": "uuid"
           },
+          "FullReplan": {
+            "type": "boolean"
+          },
+          "PartialRePlan": {
+            "type": "boolean"
+          },
+          "DeterministicTask": {
+            "type": "boolean"
+          },
+          "MarkovianProcess": {
+            "type": "boolean"
+          },
           "ActionSequence": {
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/ActionModel"
+            },
+            "nullable": true
+          },
+          "Tags": {
+            "type": "array",
+            "items": {
+              "type": "string"
             },
             "nullable": true
           }

@@ -464,5 +464,61 @@ namespace Middleware.RedisInterface.Controllers
         }
         #endregion
 
+        /// <summary>
+        /// Get lastest action plan given robot Id.
+        /// </summary>
+        /// <returns>List<ActionPlanModel></returns>
+        [HttpGet]
+        [Route("LastestPlan/robot/{robotId}", Name = "GetLatestActionPlanByRobotIdAsync")]
+        [ProducesResponseType(typeof(ActionPlanModel), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.NotFound)]
+        [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.InternalServerError)]
+        public async Task<IActionResult> GetLatestActionPlanByRobotIdAsync(Guid robotId)
+        {
+            try
+            {
+                if (robotId == Guid.Empty)
+                {
+                    return BadRequest(new ApiResponse((int)HttpStatusCode.BadRequest, "Robot id has not been specified"));
+                }
+                // Get list of actionPlans from specific robotId.
+                List<ActionPlanModel> actionPlans = await _actionPlanRepository.GetActionPlanModelsAsync(robotId);
+
+                //Get the newest task of robot.
+                Dictionary<ActionPlanModel, DateTime> tempDic = new Dictionary<ActionPlanModel, DateTime>();
+                Dictionary<ActionPlanModel, DateTime> OrderedTempDic = new Dictionary<ActionPlanModel, DateTime>();
+
+                // Complete tempDic
+                foreach (ActionPlanModel plan in actionPlans)
+                {
+                    DateTime d;
+                    DateTime.TryParseExact(plan.Status, "ggyyyy$dd-MMM (dddd)", System.Globalization.CultureInfo.InvariantCulture, System.Globalization.DateTimeStyles.None, out d);
+                    tempDic.Add(plan, d);
+                }
+
+                // Order a new dictionary
+                foreach (KeyValuePair<ActionPlanModel, DateTime> pair in tempDic.OrderByDescending(p => p.Value))
+                {
+                    OrderedTempDic.Add(pair.Key, pair.Value);
+                }
+
+                // Get last item which is the latest plan.
+                ActionPlanModel last = OrderedTempDic.Keys.First();
+
+                if (actionPlans == null)
+                {
+                    return NotFound(new ApiResponse((int)HttpStatusCode.NotFound, "Object was not found."));
+                }
+                //List<ActionPlanModel> activePoliciesRecords = actionPlans.Select(p => new ActionPlanModel(p.Id, p.Name, p.Description)).ToList();
+                return Ok(last);
+            }
+            catch (Exception ex)
+            {
+                int statusCode = (int)HttpStatusCode.InternalServerError;
+                _logger.LogError(ex, "An error occurred:");
+                return StatusCode(statusCode, new ApiResponse(statusCode, $"An error has occurred: {ex.Message}"));
+            }
+        }
+
     }
 }

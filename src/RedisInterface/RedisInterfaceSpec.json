@@ -1228,6 +1228,87 @@
         }
       }
     },
+    "/api/v1/Action/LastestPlan/robot/{robotId}": {
+      "get": {
+        "tags": [
+          "Action"
+        ],
+        "operationId": "GetLatestActionPlanByRobotIdAsync",
+        "parameters": [
+          {
+            "name": "robotId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ActionPlanModel"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ActionPlanModel"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ActionPlanModel"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Server Error",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/v1/Cloud": {
       "get": {
         "tags": [
@@ -4675,6 +4756,100 @@
         }
       }
     },
+    "/api/v1/Instance/DeleteRelation": {
+      "delete": {
+        "tags": [
+          "Instance"
+        ],
+        "operationId": "InstanceDeleteRelation",
+        "requestBody": {
+          "content": {
+            "application/json-patch+json": {
+              "schema": {
+                "$ref": "#/components/schemas/RelationModel"
+              }
+            },
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RelationModel"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RelationModel"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/RelationModel"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/RelationModel"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RelationModel"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RelationModel"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Server Error",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/v1/Instance/relation/{name}": {
       "get": {
         "tags": [
@@ -5797,6 +5972,100 @@
           "Robot"
         ],
         "operationId": "RobotAddRelation",
+        "requestBody": {
+          "content": {
+            "application/json-patch+json": {
+              "schema": {
+                "$ref": "#/components/schemas/RelationModel"
+              }
+            },
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RelationModel"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RelationModel"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/RelationModel"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/RelationModel"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RelationModel"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RelationModel"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Server Error",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/Robot/DeleteRelation": {
+      "delete": {
+        "tags": [
+          "Robot"
+        ],
+        "operationId": "RobotDeleteRelation",
         "requestBody": {
           "content": {
             "application/json-patch+json": {
@@ -7243,16 +7512,23 @@
       "ActuatorModel": {
         "type": "object",
         "properties": {
-          "actuatorName": {
+          "name": {
             "type": "string",
             "nullable": true
           },
-          "actuatorType": {
+          "type": {
             "type": "string",
             "nullable": true
           },
-          "dof": {
-            "type": "string",
+          "number": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "nodes": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
             "nullable": true
           }
         },
@@ -7600,6 +7876,10 @@
             "type": "string",
             "nullable": true
           },
+          "Type": {
+            "type": "string",
+            "nullable": true
+          },
           "Timestamp": {
             "type": "string",
             "format": "date-time",
@@ -7613,11 +7893,52 @@
             "type": "string",
             "nullable": true
           },
-          "CannotCoexistFamily": {
+          "IsExclusiveWithinType": {
             "type": "integer",
             "format": "int32"
+          }
+        },
+        "additionalProperties": false
+      },
+      "ROSNodeModel": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "nullable": true
           },
-          "Type": {
+          "publications": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/RosTopicModel"
+            },
+            "nullable": true
+          },
+          "subscriptions": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/RosTopicModel"
+            },
+            "nullable": true
+          },
+          "services": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ROSServiceModel"
+            },
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "ROSServiceModel": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "nullable": true
+          },
+          "description": {
             "type": "string",
             "nullable": true
           }
@@ -7647,6 +7968,24 @@
         },
         "additionalProperties": false
       },
+      "RobotManipulatorModel": {
+        "type": "object",
+        "properties": {
+          "actuatorName": {
+            "type": "string",
+            "nullable": true
+          },
+          "dof": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "number": {
+            "type": "integer",
+            "format": "int32"
+          }
+        },
+        "additionalProperties": false
+      },
       "RobotModel": {
         "type": "object",
         "properties": {
@@ -7665,8 +8004,49 @@
             "type": "string",
             "nullable": true
           },
+          "RosVersion": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "RosDistro": {
+            "type": "string",
+            "nullable": true
+          },
+          "MaximumPayload": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "MaximumTranslationalVelocity": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "MaximumRotationalVelocity": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "RobotWeight": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "ROSRepo": {
+            "type": "string",
+            "format": "uri",
+            "nullable": true
+          },
+          "ROSNodes": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ROSNodeModel"
+            },
+            "nullable": true
+          },
           "Manufacturer": {
             "type": "string",
+            "nullable": true
+          },
+          "ManufacturerUrl": {
+            "type": "string",
+            "format": "uri",
             "nullable": true
           },
           "RobotModel": {
@@ -7677,7 +8057,7 @@
             "type": "string",
             "nullable": true
           },
-          "CurrentTaskID": {
+          "currentTaskId": {
             "type": "string",
             "format": "uuid"
           },
@@ -7700,6 +8080,10 @@
             "type": "string",
             "nullable": true
           },
+          "LocomotionTypes": {
+            "type": "string",
+            "nullable": true
+          },
           "Sensors": {
             "type": "array",
             "items": {
@@ -7714,15 +8098,18 @@
             },
             "nullable": true
           },
+          "Manipulators": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/RobotManipulatorModel"
+            },
+            "nullable": true
+          },
           "CPU": {
             "type": "integer",
             "format": "int64"
           },
           "RAM": {
-            "type": "integer",
-            "format": "int64"
-          },
-          "VirtualRam": {
             "type": "integer",
             "format": "int64"
           },
@@ -7755,10 +8142,6 @@
             "type": "string",
             "nullable": true
           },
-          "family": {
-            "type": "string",
-            "nullable": true
-          },
           "description": {
             "type": "string",
             "nullable": true
@@ -7769,28 +8152,28 @@
       "SensorModel": {
         "type": "object",
         "properties": {
-          "sensorName": {
+          "name": {
             "type": "string",
             "nullable": true
           },
-          "sensorType": {
+          "type": {
             "type": "string",
             "nullable": true
           },
-          "sensorLocation": {
+          "description": {
             "type": "string",
             "nullable": true
           },
-          "sensorDescription": {
-            "type": "string",
-            "nullable": true
-          },
-          "rosTopicPub": {
+          "nodes": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/RosTopicModel"
+              "type": "string"
             },
             "nullable": true
+          },
+          "number": {
+            "type": "integer",
+            "format": "int32"
           }
         },
         "additionalProperties": false
@@ -7813,7 +8196,6 @@
             "type": "string",
             "nullable": true
           },
-
           "ReplanActionPlannerLocked": {
             "type": "boolean"
           },

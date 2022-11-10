@@ -71,14 +71,15 @@ public class InstanceModel : BaseModel
         var rosDistrosEnum = Enum.GetNames(typeof(ROSDistroEnum)).ToList();
 
         //if (string.IsNullOrWhiteSpace(Name)) return false;
-        if ((RosVersion != 1) | (RosVersion != 2))  return false;
+        if (RosVersion > 2) return false;
+        if (RosVersion == 0) return false;
         if (string.IsNullOrEmpty(MinimumRam.ToString())) return false;
         if (string.IsNullOrEmpty(MinimumNumCores.ToString())) return false;
         if (string.IsNullOrEmpty(ROSDistro.ToString())) return false;
         if (string.IsNullOrEmpty(InstanceFamily.ToString())) return false;
         if (!rosDistrosEnum.Contains(ROSDistro)) return false;
-        if (string.IsNullOrEmpty(RosTopicsPub.ToString())) return false;
-        if (string.IsNullOrEmpty(RosTopicsSub.ToString())) return false;
+     //   if (string.IsNullOrEmpty(RosTopicsPub.ToString())) return false;
+     //   if (string.IsNullOrEmpty(RosTopicsSub.ToString())) return false;
 
         return true;
     }
