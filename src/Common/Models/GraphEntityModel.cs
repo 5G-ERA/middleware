@@ -1,4 +1,5 @@
 ﻿using Middleware.Common.Enums;
+using Middleware.Common.ExtensionMethods;
 
 namespace Middleware.Common.Models
 {
@@ -32,9 +33,7 @@ namespace Middleware.Common.Models
         {
             Id = id;
             Name = name;
-            Type = type.Name.EndsWith("Model")
-                ? Type = type.Name.Remove(type.Name.LastIndexOf("M", StringComparison.Ordinal))
-                : type.Name;
+            Type = type.GetModelName();
         }
     }
 }

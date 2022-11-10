@@ -1,10 +1,12 @@
 ﻿using System.Text.Json;
 using Middleware.Common.Config;
+using Middleware.Common.ExtensionMethods;
 using Middleware.Common.Models;
+using Middleware.Common.Structs;
 
 namespace Middleware.TaskPlanner.Services
 {
-    public class RedisInterfaceClientService
+    public class RedisInterfaceClientService : IRedisInterfaceClientService
     {
         private readonly HttpClient _httpClient;
         private readonly ILogger<RedisInterfaceClientService> _logger;
@@ -14,12 +16,12 @@ namespace Middleware.TaskPlanner.Services
             _httpClient = httpClientFactory.CreateClient(AppConfig.RedisApiClientName);
         }
 
-        public Task<ActionPlanModel> ActionPlanGetByIdAsync(Guid id)
+        public Task<Either<ActionPlanModel, InvalidOperationException>> ActionPlanGetByIdAsync(Guid id)
         {
             return ActionPlanGetByIdAsync(id, CancellationToken.None);
         }
 
-        public async Task<bool> AddRelation<TSource, TDirection>(TSource source, TDirection direction, string name)
+        public async Task<Either<bool, Exception>> AddRelation<TSource, TDirection>(TSource source, TDirection direction, string name)
             where TSource : BaseModel where TDirection : BaseModel
         {
             if (source is null) throw new ArgumentNullException(nameof(source));
@@ -30,17 +32,17 @@ namespace Middleware.TaskPlanner.Services
             {
                 var relation = CreateRelation(source, direction, name);
 
-                string url = "api";
+                string url = $"/api/v1/{source.GetType().GetModelName()}/AddRelation";
                     
-                var result = await _httpClient.PostAsync(url, JsonSerializer.Serialize(relation));
+                var result = await _httpClient.PostAsJsonAsync(url, JsonSerializer.Serialize(relation));
+
+                return result.IsSuccessStatusCode;
             }
             catch (Exception ex)
             {
-                
+                _logger.LogError(ex, "There was an error while creating a relation");
                 throw;
-            } 
-            
-            throw new NotImplementedException();
+            }
         }
 
         private RelationModel CreateRelation<TSource, TDirection>(TSource source, TDirection direction, string name) 
@@ -52,7 +54,7 @@ namespace Middleware.TaskPlanner.Services
             return new RelationModel(initiatesFrom, pointsTo, name);
         }
 
-        public async Task<ActionPlanModel> ActionPlanGetByIdAsync(Guid id, CancellationToken token)
+        public async Task<Either<ActionPlanModel, InvalidOperationException>> ActionPlanGetByIdAsync(Guid id, CancellationToken token)
         {
             if (id == default)
                 throw new ArgumentNullException(nameof(id));
