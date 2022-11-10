@@ -32,6 +32,7 @@ builder.Services.AddHttpClient(AppConfig.RedisApiClientName, (a) =>
 builder.Services.RegisterCommonServices();
 builder.Services.AddScoped<IApiClientBuilder, ApiClientBuilder>();
 builder.Services.AddScoped<IActionPlanner, ActionPlanner>();
+builder.Services.AddScoped<IRedisInterfaceClientService, RedisInterfaceClientService>();
 
 var app = builder.Build();
 
