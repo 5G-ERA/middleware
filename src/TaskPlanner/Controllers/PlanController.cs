@@ -40,6 +40,8 @@ namespace Middleware.TaskPlanner.Controllers
             Guid robotId = inputModel.RobotId; //robot id
             bool contextKnown = inputModel.ContextKnown;
             List<Common.Models.DialogueModel> DialogueTemp = inputModel.Questions;
+            List<RosTopicModel> InputTopics = inputModel.InputTopics;
+            List<RosTopicModel> OutputTopics = inputModel.OutputTopics;
 
             try
             {
@@ -71,7 +73,7 @@ namespace Middleware.TaskPlanner.Controllers
                 RedisInterface.RelationModel newRobotOwnsTaskRelation = await _redisApiClient.RobotAddRelationAsync(robotOwnsTaskRelation);
 
                 // INFER ACTION SEQUENCE PROCESS
-                var (plan, robot) = await _actionPlanner.InferActionSequence(id, contextKnown,lockResource, DialogueTemp, robotId);
+                var (plan, robot) = await _actionPlanner.InferActionSequence(InputTopics, OutputTopics, id, contextKnown,lockResource, DialogueTemp, robotId);
 
                 // call resource planner for resources
                 ResourcePlanner.TaskModel tmpTaskSend = _mapper.Map<ResourcePlanner.TaskModel>(plan);

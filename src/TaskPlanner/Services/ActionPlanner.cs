@@ -8,6 +8,7 @@ using Middleware.Common.Models;
 using Middleware.TaskPlanner.ApiReference;
 using Middleware.Common.Repositories.Abstract;
 using Middleware.TaskPlanner.Exceptions;
+using Middleware.Common.Enums;
 
 namespace Middleware.TaskPlanner.Services
 {
@@ -172,6 +173,24 @@ namespace Middleware.TaskPlanner.Services
             }
         }
 
+        protected void CheckIfInputTopicInRobot(RobotModel robot, List<RosTopicModel> topicsParam)
+        {
+            List<RosTopicModel> tempListTopics = new List<RosTopicModel>();
+            foreach (ROSNodeModel node in robot.ROSNodes)
+            {
+                tempListTopics.AddRange(node.Publications);
+                tempListTopics.AddRange(node.Subscriptions);
+            }
+            foreach (RosTopicModel topic in topicsParam)
+            {
+                if (!(tempListTopics.Contains(topic)))
+                {
+                    throw new NotARobotTopicException(topic.Name);
+                };
+            }
+            tempListTopics.Clear();
+        }
+
         /// <summary>
         /// Check that the robot can run the netApp from HW, sensor & actuators perspective 
         /// </summary>
@@ -218,13 +237,13 @@ namespace Middleware.TaskPlanner.Services
         /// <param name="DialogueTemp"></param>
         /// <param name="robotId"></param>
         /// <returns>TaskModel</returns>
-        public async Task<Tuple<TaskModel, RobotModel>> InferActionSequence(Guid currentTaskId, bool ContextKnown, bool resourceLock, List<DialogueModel> DialogueTemp, Guid robotId)
+        public async Task<Tuple<TaskModel, RobotModel>> InferActionSequence(List<RosTopicModel> InputTopics, List<RosTopicModel> OutputTopics , Guid currentTaskId, bool ContextKnown, bool resourceLock, List<DialogueModel> DialogueTemp, Guid robotId)
         {
 
             List<ActionModel> tempTask = new List<ActionModel>();
             List<ActionModel> tempReplanedCompleteActionSeq = new List<ActionModel>();
             // modify the existing plan with the candidates
-            return await InferActionSequence(currentTaskId, ContextKnown, resourceLock, DialogueTemp, robotId, tempTask, tempReplanedCompleteActionSeq);
+            return await InferActionSequence(InputTopics, OutputTopics, currentTaskId, ContextKnown, resourceLock, DialogueTemp, robotId, tempTask, tempReplanedCompleteActionSeq);
         }
         /// <summary>
         /// Get predefined action sequence from knowledge graph given TaskId or provide partial or full replan.
@@ -235,11 +254,14 @@ namespace Middleware.TaskPlanner.Services
         /// <param name="robotId"></param>
         /// <param name="candidates"></param>
         /// <returns>TaskModel</returns>
-        public async Task<Tuple<TaskModel, RobotModel>> InferActionSequence(Guid currentTaskId, bool ContextKnown, bool resourceLock, List<DialogueModel> DialogueTemp, Guid robotId, List<ActionModel> candidatesToRePlan, List<ActionModel> replanedCompleteActionSeq)
+        public async Task<Tuple<TaskModel, RobotModel>> InferActionSequence(List<RosTopicModel> InputTopics, List<RosTopicModel> OutputTopics, Guid currentTaskId, bool ContextKnown, bool resourceLock, List<DialogueModel> DialogueTemp, Guid robotId, List<ActionModel> candidatesToRePlan, List<ActionModel> replanedCompleteActionSeq)
         {
             //Load the robot asking for a plan from redis to middleware for infering action sequence.
             RedisInterface.RobotModel robotRedis = await _apiClient.RobotGetByIdAsync(robotId);
             RobotModel robot = _mapper.Map<RobotModel>(robotRedis);
+
+            //Validate InputTopics from robot onboarding information.
+            CheckIfInputTopicInRobot(robot, InputTopics);
 
             // Backup list of replanedCompleteActionSeq for removing items when processed inside this function.
             List<ActionModel> replanedCompleteActionSeqBK = new List<ActionModel>();
