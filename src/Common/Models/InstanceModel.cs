@@ -36,6 +36,17 @@ public class InstanceModel : BaseModel
 
     [JsonPropertyName("ROSVersion")]
     public int RosVersion { get; set; }  // compulsory field
+    /// <summary>
+    /// List of the data types that the Instance listens for
+    /// </summary>
+    [JsonPropertyName("InputTypes")]
+    public List<string> InputTypes { get; set; }
+    
+    /// <summary>
+    /// List of the data types that the Instance will output the data to
+    /// </summary>
+    [JsonPropertyName("OutputTypes")]
+    public List<string> OutputTypes { get; set; } 
 
     [JsonPropertyName("ROSDistro")]
     public string ROSDistro { get; set; }  // compulsory field
