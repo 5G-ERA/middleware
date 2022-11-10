@@ -19,6 +19,12 @@ namespace Middleware.Common.Models
         [JsonPropertyName("TaskID")]
         public Guid TaskID { get; set; }
 
+        public List<RosTopicModel> InputTopics { get; set; } // =  new() { "RGB Camera", "Point Cloud", "voice" };
+        /// <summary>
+        /// The topics that  robot will subscribe the output to 
+        /// </summary>
+        public List<RosTopicModel> OutputTopics { get; set; }
+
         [JsonPropertyName("Questions")]
         public List<DialogueModel> Questions { get; set; }
 

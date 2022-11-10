@@ -394,7 +394,7 @@ namespace Middleware.TaskPlanner.Services
         /// <param name="CompleteReplan"></param>
         /// <param name="DialogueTemp"></param>
         /// <returns>Tuple<TaskModel, TaskModel, RobotModel</returns>
-        public async Task<Tuple<TaskModel, TaskModel, RobotModel>> ReInferActionSequence(TaskModel oldTask,  Guid RobotId, bool ContextKnown, bool CompleteReplan, List<DialogueModel> DialogueTemp)
+        public async Task<Tuple<TaskModel, TaskModel, RobotModel>> ReInferActionSequence(List<RosTopicModel> InputTopics, List<RosTopicModel> OutputTopics, TaskModel oldTask,  Guid RobotId, bool ContextKnown, bool CompleteReplan, List<DialogueModel> DialogueTemp)
         {
             bool MarkovianProcess = oldTask.MarkovianProcess;
             Guid currentTaskId = oldTask.Id;
@@ -464,7 +464,7 @@ namespace Middleware.TaskPlanner.Services
                     //Prepare a complete replan asked explicitely by the robot
                     if (CompleteReplan == true)
                     {
-                        Tuple<TaskModel, RobotModel> replanedTask = await InferActionSequence(currentTaskId, ContextKnown, resourceLock, DialogueTemp, robot.Id, oldTask.ActionSequence, new List<ActionModel>());
+                        Tuple<TaskModel, RobotModel> replanedTask = await InferActionSequence(InputTopics, OutputTopics, currentTaskId, ContextKnown, resourceLock, DialogueTemp, robot.Id, oldTask.ActionSequence, new List<ActionModel>());
                         return new Tuple<TaskModel, TaskModel, RobotModel>(replanedTask.Item1, oldTask, robot);
                     }
                     //Prepare a partial replan asked explicitely by the robot
@@ -475,7 +475,7 @@ namespace Middleware.TaskPlanner.Services
                         {
                             foreach (ActionModel failedAction in FailedActions)
                             {
-                                Tuple<TaskModel, RobotModel> replanedTask = await InferActionSequence(currentTaskId, ContextKnown, resourceLock, DialogueTemp, robot.Id, oldTask.ActionSequence, new List<ActionModel>());
+                                Tuple<TaskModel, RobotModel> replanedTask = await InferActionSequence(InputTopics, OutputTopics, currentTaskId, ContextKnown, resourceLock, DialogueTemp, robot.Id, oldTask.ActionSequence, new List<ActionModel>());
                                 return new Tuple<TaskModel, TaskModel, RobotModel>(replanedTask.Item1, oldTask, robot);
                             }
                         }
@@ -487,7 +487,7 @@ namespace Middleware.TaskPlanner.Services
                             {
                                 foreach (ActionModel failedAction in FailedActions)
                                 {
-                                    Tuple<TaskModel, RobotModel> replanedTask = await InferActionSequence(currentTaskId, ContextKnown, resourceLock, DialogueTemp, robot.Id, oldTask.ActionSequence, new List<ActionModel>());
+                                    Tuple<TaskModel, RobotModel> replanedTask = await InferActionSequence(InputTopics, OutputTopics, currentTaskId, ContextKnown, resourceLock, DialogueTemp, robot.Id, oldTask.ActionSequence, new List<ActionModel>());
                                     return new Tuple<TaskModel, TaskModel, RobotModel>(replanedTask.Item1, oldTask, robot);
                                 }
                             }
@@ -507,7 +507,7 @@ namespace Middleware.TaskPlanner.Services
                                 }
 
                                 //Ask for a new plan
-                                Tuple<TaskModel, RobotModel> replanedTask = await InferActionSequence(currentTaskId, ContextKnown, resourceLock, DialogueTemp, robot.Id, oldTask.ActionSequence, FinalCandidatesActions);
+                                Tuple<TaskModel, RobotModel> replanedTask = await InferActionSequence(InputTopics, OutputTopics, currentTaskId, ContextKnown, resourceLock, DialogueTemp, robot.Id, oldTask.ActionSequence, FinalCandidatesActions);
                                 return new Tuple<TaskModel, TaskModel, RobotModel>(replanedTask.Item1, oldTask, robot);
                             }
                         }

@@ -59,7 +59,7 @@ namespace Middleware.TaskPlanner.Controllers
 
                 tempOldTaskModel.ActionPlanId = oldPlanModel.Id;
 
-                var (plan, oldPlan, robot) = await _actionPlanner.ReInferActionSequence(tempOldTaskModel, robotId, contextKnown, CompleteReplan, tempDialog);
+                var (plan, oldPlan, robot) = await _actionPlanner.ReInferActionSequence(inputModel.InputTopics, inputModel.OutputTopics,tempOldTaskModel, robotId, contextKnown, CompleteReplan, tempDialog);
 
                 ResourcePlanner.TaskModel tmpTaskSend = _mapper.Map<ResourcePlanner.TaskModel>(plan);
                 ResourcePlanner.TaskModel tmpOldPlanSend = _mapper.Map<ResourcePlanner.TaskModel>(oldPlan);
