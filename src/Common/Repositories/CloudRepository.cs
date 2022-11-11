@@ -202,5 +202,17 @@ namespace Middleware.Common.Repositories
             if (robotRelations.Count() > 0) { return false; }
             else { return true; }
         }
+
+        /// <summary>
+        /// Return bool if cloud is busy by cloud Id.
+        /// </summary>
+        /// <param name="cloudName"></param>
+        /// <returns></returns>
+        public async Task<bool> IsBusyCloudByIdAsync(Guid cloudId)
+        {
+            List<RelationModel> robotRelations = await GetRelation(cloudId, "LOCATED_AT", RelationDirection.Incoming);
+            if (robotRelations.Count() > 0) { return false; }
+            else { return true; }
+        }
     }
 }

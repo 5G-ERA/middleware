@@ -457,6 +457,35 @@ namespace Middleware.RedisInterface.Controllers
         }
 
 
+        /// <summary>
+        ///  Returns bool for status of BusyCloud by Id
+        /// </summary>
+        /// <param name="cloudsToCheck"></param>
+        /// <returns></returns>
+        [HttpPost]
+        [Route("busyCloud", Name = "isBusyCloudById")]
+        [ProducesResponseType(typeof(int), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.NotFound)]
+        [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.BadRequest)]
+        [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.InternalServerError)]
+        public async Task<ActionResult<bool>> isBusyCloudById(Guid cloudId)
+        {
+            try
+            {
+
+                bool busy = await _cloudRepository.IsBusyCloudByIdAsync(cloudId);
+                return Ok(busy);
+            }
+            catch (Exception ex)
+            {
+
+                int statusCode = (int)HttpStatusCode.InternalServerError;
+                _logger.LogError(ex, "An error occurred:");
+                return StatusCode(statusCode, new ApiResponse(statusCode, $"An error has occurred: {ex.Message}"));
+            }
+
+        }
+
 
 
 
