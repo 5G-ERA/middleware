@@ -2,13 +2,21 @@
 
     <PropertyGroup>
         <TargetFramework>net6.0</TargetFramework>
-        <Nullable>disable</Nullable>
+        <Nullable>warnings</Nullable>
         <ImplicitUsings>enable</ImplicitUsings>
         <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
         <RootNamespace>Middleware.Orchestrator</RootNamespace>
         <DockerComposeProjectPath>..\..\docker-compose.dcproj</DockerComposeProjectPath>
         <UserSecretsId>bb04139d-8d8c-4b04-bbfb-45d40544004e</UserSecretsId>
         <DockerfileContext>..\..</DockerfileContext>
+    </PropertyGroup>
+
+    <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
+      <OutputPath>bin\Debug\net6.0\</OutputPath>
+    </PropertyGroup>
+
+    <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
+      <OutputPath>bin\Release\net6.0\</OutputPath>
     </PropertyGroup>
 
 	<ItemGroup>
