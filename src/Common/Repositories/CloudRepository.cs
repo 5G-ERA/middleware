@@ -168,15 +168,26 @@ namespace Middleware.Common.Repositories
         }
 
         /// <summary>
-        /// Return number of containers alocated in cloud with specific id
+        /// Return number of containers alocated in cloud with specific name
         /// </summary>
         /// <param name="cloudName"></param>
         /// <returns></returns>
-        public async Task<int> GetNumContainersAsync(string cloudName)
+        public async Task<int> GetNumContainersByNameAsync(string cloudName)
         {
             CloudModel cloud = (await GetAllAsync()).Where(x => x.Name == cloudName).FirstOrDefault();
             List<RelationModel> robotRelations = await GetRelation(cloud.Id, "LOCATED_AT", RelationDirection.Incoming);
                 return robotRelations.Count();
+        }
+
+        /// <summary>
+        /// Return number of containers alocated in cloud with specific id
+        /// </summary>
+        /// <param name="cloudName"></param>
+        /// <returns></returns>
+        public async Task<int> GetNumContainersByIdAsync(Guid cloudId)
+        {
+            List<RelationModel> robotRelations = await GetRelation(cloudId, "LOCATED_AT", RelationDirection.Incoming);
+            return robotRelations.Count();
         }
     }
 }

@@ -370,12 +370,12 @@ namespace Middleware.RedisInterface.Controllers
         }
 
         /// <summary>
-        ///  Returns the number of containers that are deployed in a cloud entity. 
+        ///  Returns the number of containers that are deployed in a cloud entity base on cloud Name. 
         /// </summary>
         /// <param name="cloudsToCheck"></param>
         /// <returns></returns>
         [HttpPost]
-        [Route("numContainers/{name}", Name = "GetNumContainersInClouds")]
+        [Route("numContainers/{name}", Name = "GetNumContainersByName")]
         [ProducesResponseType(typeof(int), (int)HttpStatusCode.OK)]
         [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.NotFound)]
         [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.BadRequest)]
@@ -385,7 +385,7 @@ namespace Middleware.RedisInterface.Controllers
             try
             {
                 
-                int countContainers = await _cloudRepository.GetNumContainersAsync(cloudName);
+                int countContainers = await _cloudRepository.GetNumContainersByNameAsync(cloudName);
                 return Ok(countContainers);
             }
             catch (Exception ex)
@@ -398,6 +398,34 @@ namespace Middleware.RedisInterface.Controllers
 
         }
 
+        /// <summary>
+        ///  Returns the number of containers that are deployed in a cloud entity base on cloud Id. 
+        /// </summary>
+        /// <param name="cloudsToCheck"></param>
+        /// <returns></returns>
+        [HttpPost]
+        [Route("numContainers/{name}", Name = "GetNumContainersById")]
+        [ProducesResponseType(typeof(int), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.NotFound)]
+        [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.BadRequest)]
+        [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.InternalServerError)]
+        public async Task<ActionResult<int>> GetNumContainersById(Guid cloudId)
+        {
+            try
+            {
+
+                int countContainers = await _cloudRepository.GetNumContainersByIdAsync(cloudId);
+                return Ok(countContainers);
+            }
+            catch (Exception ex)
+            {
+
+                int statusCode = (int)HttpStatusCode.InternalServerError;
+                _logger.LogError(ex, "An error occurred:");
+                return StatusCode(statusCode, new ApiResponse(statusCode, $"An error has occurred: {ex.Message}"));
+            }
+
+        }
 
 
 
