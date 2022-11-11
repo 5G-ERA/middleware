@@ -18,6 +18,7 @@ namespace Middleware.RedisInterface.Controllers
         {
             _cloudRepository = cloudRepository ?? throw new ArgumentNullException(nameof(cloudRepository));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+
         }
 
         /// <summary>
@@ -348,7 +349,7 @@ namespace Middleware.RedisInterface.Controllers
             {
                 if (!cloudsToCheck.Any())
                 {
-                    return BadRequest(new ApiResponse((int)HttpStatusCode.BadRequest, "No Edge ids were provided"));
+                    return BadRequest(new ApiResponse((int)HttpStatusCode.BadRequest, "No Cloud ids were provided"));
                 }
 
                 List<CloudModel> lessBusyCloud = await _cloudRepository.GetLessBusyCloudsAsync(cloudsToCheck);
@@ -357,6 +358,35 @@ namespace Middleware.RedisInterface.Controllers
                     return NotFound(new ApiResponse((int)HttpStatusCode.BadRequest, "There are no busy edges"));
                 }
                 return Ok(lessBusyCloud);
+            }
+            catch (Exception ex)
+            {
+
+                int statusCode = (int)HttpStatusCode.InternalServerError;
+                _logger.LogError(ex, "An error occurred:");
+                return StatusCode(statusCode, new ApiResponse(statusCode, $"An error has occurred: {ex.Message}"));
+            }
+
+        }
+
+        /// <summary>
+        ///  Returns the number of containers that are deployed in a cloud entity. 
+        /// </summary>
+        /// <param name="cloudsToCheck"></param>
+        /// <returns></returns>
+        [HttpPost]
+        [Route("numContainers/{name}", Name = "GetNumContainersInClouds")]
+        [ProducesResponseType(typeof(int), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.NotFound)]
+        [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.BadRequest)]
+        [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.InternalServerError)]
+        public async Task<ActionResult<List<CloudModel>>> GetNumContainersInClouds(CloudModel cloud)
+        {
+            try
+            {
+               
+                int countContainers = await _cloudRepository.GetNumContainersAsync(cloud);
+                return Ok(countContainers);
             }
             catch (Exception ex)
             {

@@ -93,7 +93,7 @@ namespace Middleware.Common.Repositories
             return TempFreeClouds;
         }
 
-        public async Task<List<EdgeModel>> GetLessBusyEdgesAsync(List<EdgeModel> busyEdgesTocheck)
+        public async Task<List<EdgeModel>> GetLessBusyEdgesAsync(List<EdgeModel> busyEdgesTocheck) //TODO: AL 11/11/2022 What is this doing here??
         {
             //Dictionary<Guid, int> tempDic = new Dictionary<Guid,int>();
             Dictionary<EdgeModel, int> tempDic = new Dictionary<EdgeModel, int>();
@@ -166,5 +166,15 @@ namespace Middleware.Common.Repositories
             return lessBusyClouds;
         }
 
+        /// <summary>
+        /// Return number of containers alocated in cloud with specific id
+        /// </summary>
+        /// <param name="cloudName"></param>
+        /// <returns></returns>
+        public async Task<int> GetNumContainersAsync(CloudModel cloudName)
+        {
+                List<RelationModel> robotRelations = await GetRelation(cloudName.Id, "LOCATED_AT", RelationDirection.Incoming);
+                return robotRelations.Count();
+        }
     }
 }
