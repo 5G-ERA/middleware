@@ -364,7 +364,32 @@ namespace Middleware.RedisInterface.Controllers
             }
         }
 
+        /// <summary>
+        /// Check if a edge is busy by Id.
+        /// </summary>
+        /// <param name="edgeId"></param>
+        /// <returns></returns>
+        [HttpGet]
+        [Route("busyEdge", Name = "isBusyEdgeById")]
+        [ProducesResponseType(typeof(EdgeModel), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.NotFound)]
+        [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.InternalServerError)]
+        public async Task<ActionResult<bool>> isBusyEdgeById(Guid edgeId)
+        {
+            try
+            {
+                bool busy = await _edgeRepository.IsBusyEdgeByIdAsync(edgeId);
+                return Ok(busy);
+            }
+            catch (Exception ex)
+            {
+                int statusCode = (int)HttpStatusCode.InternalServerError;
+                _logger.LogError(ex, "An error occurred:");
+                return StatusCode(statusCode, new ApiResponse(statusCode, $"An error has occurred: {ex.Message}"));
+            }
+        }
 
-        
+
+
     }
 }

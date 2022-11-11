@@ -155,10 +155,19 @@ namespace Middleware.Common.Repositories
             return edge;
            // return edgeData;
         }
+
         /// <summary>
-        /// Retrieves active policies
+        /// Return bool if edge is busy by edge Id.
         /// </summary>
-        /// <returns> Active policies </returns>
-       
+        /// <param name="cloudName"></param>
+        /// <returns></returns>
+        public async Task<bool> IsBusyEdgeByIdAsync(Guid edgeId)
+        {
+            List<RelationModel> edgeRelations = await GetRelation(edgeId, "LOCATED_AT", RelationDirection.Incoming);
+            if (edgeRelations.Count() > 0) { return false; }
+            else { return true; }
+        }
+
+
     }
 }

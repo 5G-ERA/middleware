@@ -305,7 +305,7 @@ namespace Middleware.RedisInterface.Controllers
         /// </summary>
         /// <param name="edgesToCheck"></param>
         /// <returns>list of cloudModel</returns>
-        [HttpPost]
+        [HttpGet]
         [Route("free", Name = "GetFreeCloudIds")]
         [ProducesResponseType(typeof(List<CloudModel>), (int)HttpStatusCode.OK)]
         [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.NotFound)]
@@ -337,7 +337,7 @@ namespace Middleware.RedisInterface.Controllers
 
         }
 
-        [HttpPost]
+        [HttpGet]
         [Route("lessBusy", Name = "GetLessBusyClouds")]
         [ProducesResponseType(typeof(List<CloudModel>), (int)HttpStatusCode.OK)]
         [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.NotFound)]
@@ -374,7 +374,7 @@ namespace Middleware.RedisInterface.Controllers
         /// </summary>
         /// <param name="cloudsToCheck"></param>
         /// <returns></returns>
-        [HttpPost]
+        [HttpGet]
         [Route("numContainers/{name}", Name = "GetNumContainersByName")]
         [ProducesResponseType(typeof(int), (int)HttpStatusCode.OK)]
         [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.NotFound)]
@@ -403,7 +403,7 @@ namespace Middleware.RedisInterface.Controllers
         /// </summary>
         /// <param name="cloudsToCheck"></param>
         /// <returns></returns>
-        [HttpPost]
+        [HttpGet]
         [Route("numContainers", Name = "GetNumContainersById")]
         [ProducesResponseType(typeof(int), (int)HttpStatusCode.OK)]
         [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.NotFound)]
@@ -432,7 +432,7 @@ namespace Middleware.RedisInterface.Controllers
         /// </summary>
         /// <param name="cloudsToCheck"></param>
         /// <returns></returns>
-        [HttpPost]
+        [HttpGet]
         [Route("busyCloud/{name}", Name = "isBusyCloudByName")]
         [ProducesResponseType(typeof(int), (int)HttpStatusCode.OK)]
         [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.NotFound)]
@@ -462,7 +462,7 @@ namespace Middleware.RedisInterface.Controllers
         /// </summary>
         /// <param name="cloudsToCheck"></param>
         /// <returns></returns>
-        [HttpPost]
+        [HttpGet]
         [Route("busyCloud", Name = "isBusyCloudById")]
         [ProducesResponseType(typeof(int), (int)HttpStatusCode.OK)]
         [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.NotFound)]
