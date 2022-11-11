@@ -404,7 +404,7 @@ namespace Middleware.RedisInterface.Controllers
         /// <param name="cloudsToCheck"></param>
         /// <returns></returns>
         [HttpPost]
-        [Route("numContainers/{name}", Name = "GetNumContainersById")]
+        [Route("numContainers", Name = "GetNumContainersById")]
         [ProducesResponseType(typeof(int), (int)HttpStatusCode.OK)]
         [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.NotFound)]
         [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.BadRequest)]
@@ -426,6 +426,36 @@ namespace Middleware.RedisInterface.Controllers
             }
 
         }
+
+        /// <summary>
+        ///  Returns bool for status of BusyCloud by Name
+        /// </summary>
+        /// <param name="cloudsToCheck"></param>
+        /// <returns></returns>
+        [HttpPost]
+        [Route("busyCloud/{name}", Name = "isBusyCloudByName")]
+        [ProducesResponseType(typeof(int), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.NotFound)]
+        [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.BadRequest)]
+        [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.InternalServerError)]
+        public async Task<ActionResult<bool>> isBusyCloudByName(string name)
+        {
+            try
+            {
+
+                bool busy = await _cloudRepository.IsBusyCloudByNameAsync(name);
+                return Ok(busy);
+            }
+            catch (Exception ex)
+            {
+
+                int statusCode = (int)HttpStatusCode.InternalServerError;
+                _logger.LogError(ex, "An error occurred:");
+                return StatusCode(statusCode, new ApiResponse(statusCode, $"An error has occurred: {ex.Message}"));
+            }
+
+        }
+
 
 
 

@@ -189,5 +189,18 @@ namespace Middleware.Common.Repositories
             List<RelationModel> robotRelations = await GetRelation(cloudId, "LOCATED_AT", RelationDirection.Incoming);
             return robotRelations.Count();
         }
+
+        /// <summary>
+        /// Return bool if cloud is busy by cloud Name.
+        /// </summary>
+        /// <param name="cloudName"></param>
+        /// <returns></returns>
+        public async Task<bool> IsBusyCloudByNameAsync(string cloudName)
+        {
+            CloudModel cloud = (await GetAllAsync()).Where(x => x.Name == cloudName).FirstOrDefault();
+            List<RelationModel> robotRelations = await GetRelation(cloud.Id, "LOCATED_AT", RelationDirection.Incoming);
+            if (robotRelations.Count() > 0) { return false; }
+            else { return true; }
+        }
     }
 }

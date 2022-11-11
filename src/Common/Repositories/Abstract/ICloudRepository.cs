@@ -15,5 +15,7 @@ namespace Middleware.Common.Repositories.Abstract
         Task<int> GetNumContainersByNameAsync(string cloudName);
 
         Task<int> GetNumContainersByIdAsync(Guid cloudId);
+
+        Task<bool> IsBusyCloudByNameAsync(string cloudName)
     }
 }
