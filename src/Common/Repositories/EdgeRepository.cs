@@ -168,6 +168,19 @@ namespace Middleware.Common.Repositories
             else { return true; }
         }
 
+        /// <summary>
+        /// Return bool if edge is busy by edge name.
+        /// </summary>
+        /// <param name="cloudName"></param>
+        /// <returns></returns>
+        public async Task<bool> IsBusyEdgeByNameAsync(string edgeName)
+        {
+            EdgeModel edge = (await GetAllAsync()).Where(x => x.Name == edgeName).FirstOrDefault();
+            List<RelationModel> edgeRelations = await GetRelation(edge.Id, "LOCATED_AT", RelationDirection.Incoming);
+            if (edgeRelations.Count() > 0) { return false; }
+            else { return true; }
+        }
+
 
     }
 }

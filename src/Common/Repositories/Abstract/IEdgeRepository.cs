@@ -11,5 +11,7 @@ namespace Middleware.Common.Repositories.Abstract
         Task<EdgeModel> GetEdgeResourceDetailsByNameAsync(string name);
 
         Task<bool> IsBusyEdgeByIdAsync(Guid edgeId);
+
+        Task<bool> IsBusyEdgeByNameAsync(string edgeName);
     }
 }
