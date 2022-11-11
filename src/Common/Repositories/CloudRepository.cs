@@ -1,4 +1,5 @@
 using System.Text.Json;
+using System.Xml.Linq;
 using Microsoft.Extensions.Logging;
 using Middleware.Common.Enums;
 using Middleware.Common.Models;
@@ -171,9 +172,10 @@ namespace Middleware.Common.Repositories
         /// </summary>
         /// <param name="cloudName"></param>
         /// <returns></returns>
-        public async Task<int> GetNumContainersAsync(CloudModel cloudName)
+        public async Task<int> GetNumContainersAsync(string cloudName)
         {
-                List<RelationModel> robotRelations = await GetRelation(cloudName.Id, "LOCATED_AT", RelationDirection.Incoming);
+            CloudModel cloud = (await GetAllAsync()).Where(x => x.Name == cloudName).FirstOrDefault();
+            List<RelationModel> robotRelations = await GetRelation(cloud.Id, "LOCATED_AT", RelationDirection.Incoming);
                 return robotRelations.Count();
         }
     }

@@ -380,12 +380,12 @@ namespace Middleware.RedisInterface.Controllers
         [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.NotFound)]
         [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.BadRequest)]
         [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.InternalServerError)]
-        public async Task<ActionResult<List<CloudModel>>> GetNumContainersInClouds(CloudModel cloud)
+        public async Task<ActionResult<int>> GetNumContainersInClouds(string cloudName)
         {
             try
             {
-               
-                int countContainers = await _cloudRepository.GetNumContainersAsync(cloud);
+                
+                int countContainers = await _cloudRepository.GetNumContainersAsync(cloudName);
                 return Ok(countContainers);
             }
             catch (Exception ex)
