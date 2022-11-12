@@ -2,6 +2,6 @@
 
 namespace Middleware.ResourcePlanner.Models
 {
-    public record ResourceInput(TaskModel Task, RobotModel Robot, bool FullReplan);
+    public record ResourceInput(TaskModel Task, RobotModel Robot, bool FullReplan, List<RosTopicModel> InputTopics, List<RosTopicModel> OutputTopics);
     
 }

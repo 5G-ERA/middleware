@@ -46,7 +46,7 @@ namespace Middleware.ResourcePlanner.Controllers
             try
             {
 
-                TaskModel updatedTask = await _resourcePlanner.RePlan(resource.Task, resource.oldTask, resource.Robot, resource.FullReplan);
+                TaskModel updatedTask = await _resourcePlanner.RePlan(resource.Task, resource.oldTask, resource.Robot, resource.FullReplan,resource.InputTopics,resource.OutputTopics);
 
                 return Ok(updatedTask);
             }

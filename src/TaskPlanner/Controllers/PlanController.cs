@@ -78,10 +78,15 @@ namespace Middleware.TaskPlanner.Controllers
                 // call resource planner for resources
                 ResourcePlanner.TaskModel tmpTaskSend = _mapper.Map<ResourcePlanner.TaskModel>(plan);
                 ResourcePlanner.RobotModel tmpRobotSend = _mapper.Map<ResourcePlanner.RobotModel>(robot);
+                List<ResourcePlanner.RosTopicModel> tempInputTopic = _mapper.Map<List<ResourcePlanner.RosTopicModel>>(inputModel.InputTopics);
+                List<ResourcePlanner.RosTopicModel> tempOutputTopic = _mapper.Map<List<ResourcePlanner.RosTopicModel>>(inputModel.OutputTopics);
+
                 ResourcePlanner.ResourceInput resourceInput = new ResourcePlanner.ResourceInput
                 {
                     Robot = tmpRobotSend,
-                    Task = tmpTaskSend
+                    Task = tmpTaskSend,
+                    InputTopics = tempInputTopic,
+                    OutputTopics = tempOutputTopic
                 };
                 ResourcePlanner.TaskModel tmpFinalTask = await _resourcePlannerClient.GetResourcePlanAsync(resourceInput);//API call to resource planner
 

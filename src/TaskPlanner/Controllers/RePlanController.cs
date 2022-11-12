@@ -64,6 +64,8 @@ namespace Middleware.TaskPlanner.Controllers
                 ResourcePlanner.TaskModel tmpTaskSend = _mapper.Map<ResourcePlanner.TaskModel>(plan);
                 ResourcePlanner.TaskModel tmpOldPlanSend = _mapper.Map<ResourcePlanner.TaskModel>(oldPlan);
                 ResourcePlanner.RobotModel tmpRobotSend = _mapper.Map<ResourcePlanner.RobotModel>(robot);
+                List<ResourcePlanner.RosTopicModel> tempInputTopic = _mapper.Map<List<ResourcePlanner.RosTopicModel>>(inputModel.InputTopics);
+                List<ResourcePlanner.RosTopicModel> tempOutputTopic = _mapper.Map<List<ResourcePlanner.RosTopicModel>>(inputModel.OutputTopics);
 
 
                 ResourcePlanner.ResourceReplanInputModel tempReplanInput = new ResourcePlanner.ResourceReplanInputModel
@@ -71,7 +73,9 @@ namespace Middleware.TaskPlanner.Controllers
                     Task = tmpTaskSend,
                     OldTask = tmpOldPlanSend,
                     Robot = tmpRobotSend,
-                    FullReplan = CompleteReplan
+                    FullReplan = CompleteReplan,
+                    InputTopics = tempInputTopic,
+                    OutputTopics = tempOutputTopic
                 };
 
 

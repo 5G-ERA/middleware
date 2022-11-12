@@ -441,6 +441,20 @@
             "type": "integer",
             "format": "int32"
           },
+          "InputTypes": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "nullable": true
+          },
+          "OutputTypes": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "nullable": true
+          },
           "ROSDistro": {
             "type": "string",
             "nullable": true
@@ -522,6 +536,20 @@
           },
           "fullReplan": {
             "type": "boolean"
+          },
+          "inputTopics": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/RosTopicModel"
+            },
+            "nullable": true
+          },
+          "outputTopics": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/RosTopicModel"
+            },
+            "nullable": true
           }
         },
         "additionalProperties": false
@@ -540,6 +568,20 @@
           },
           "fullReplan": {
             "type": "boolean"
+          },
+          "inputTopics": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/RosTopicModel"
+            },
+            "nullable": true
+          },
+          "outputTopics": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/RosTopicModel"
+            },
+            "nullable": true
           }
         },
         "additionalProperties": false

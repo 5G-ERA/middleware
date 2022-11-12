@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using AutoMapper;
@@ -7,14 +8,14 @@ using Middleware.Common.Enums;
 using Middleware.Common.Models;
 using Middleware.Common.Repositories;
 using Middleware.ResourcePlanner.ApiReference;
-
+using Middleware.ResourcePlanner.Exceptions;
 
 namespace Middleware.ResourcePlanner;
 
 public interface IResourcePlanner
 {
-    Task<TaskModel> Plan(TaskModel taskModel, RobotModel robot);
-    Task<TaskModel> RePlan(TaskModel taskModel, TaskModel oldTaskmMdel, RobotModel robot, bool fullReplan);
+    Task<TaskModel> Plan(TaskModel taskModel, RobotModel robot, List<RosTopicModel> InputTopics, List<RosTopicModel> OutputTopics);
+    Task<TaskModel> RePlan(TaskModel taskModel, TaskModel oldTaskmMdel, RobotModel robot, bool fullReplan, List<RosTopicModel> InputTopics, List<RosTopicModel> OutputTopics);
 }
 
 public class ResourcePlanner : IResourcePlanner 
@@ -372,12 +373,70 @@ public class ResourcePlanner : IResourcePlanner
         }  
     }
 
+    /// <summary>
+    /// Attach robot input topics and output topics to instance according to instace type data.
+    /// </summary>
+    /// <param name="instance"></param>
+    /// <param name="inputTopicsParam"></param>
+    /// <param name="outputTopicsParam"></param>
+    private async Task<InstanceModel> RouteTopics(InstanceModel instance, List<RosTopicModel> inputTopicsParam, List<RosTopicModel> outputTopicsParam)
+    {
+        // Route inputTopics
+        Dictionary<string,string> tempInputTopicsTypes = new Dictionary<string,string>();
+        foreach(RosTopicModel inputTopic in inputTopicsParam)
+        {
+            tempInputTopicsTypes.Add(inputTopic.Type,inputTopic.Name);
+        }
+        
+        foreach(string topicType in instance.InputTypes)
+        {
+            bool checkAvailavility = tempInputTopicsTypes.ContainsKey(topicType);
+            if (checkAvailavility == true) {
+                int index = tempInputTopicsTypes.Keys.ToList().IndexOf(topicType);
+                RosTopicModel instancePubTopic = new RosTopicModel();
+                instancePubTopic.Name = tempInputTopicsTypes.ElementAt(index).Value;
+                instancePubTopic.Type = tempInputTopicsTypes.ElementAt(index).Key;
+                instancePubTopic.Description = "";
+                instance.RosTopicsSub.Add(instancePubTopic);
+                    }
+            if (checkAvailavility == false) { throw new TopicTypeNotAvailableInRobot(topicType); }
+        }
+        //Route output topics
+        Dictionary<string, string> tempOutputTopicsTypes = new Dictionary<string, string>();
+        foreach (RosTopicModel outputTopic in outputTopicsParam)
+        {
+            tempInputTopicsTypes.Add(outputTopic.Type, outputTopic.Name);
+        }
 
-    public async Task<TaskModel> Plan(TaskModel taskModel, RobotModel robot)
+
+        foreach (string topicType in instance.InputTypes)
+        {
+            bool checkAvailavility = tempOutputTopicsTypes.ContainsKey(topicType);
+            if (checkAvailavility == true)
+            {
+                int index = tempOutputTopicsTypes.Keys.ToList().IndexOf(topicType);
+                RosTopicModel instanceSubTopic = new RosTopicModel();
+                instanceSubTopic.Name = tempOutputTopicsTypes.ElementAt(index).Value;
+                instanceSubTopic.Type = tempOutputTopicsTypes.ElementAt(index).Key;
+                instanceSubTopic.Description = "";
+                instance.RosTopicsPub.Add(instanceSubTopic);
+            }
+            if (checkAvailavility == false) { throw new TopicTypeNotAvailableInRobot(topicType); }
+        }
+
+        //reset diccionaries:
+        tempInputTopicsTypes.Clear();
+        tempInputTopicsTypes.Clear();
+
+        return instance;
+      
+    }
+
+    public async Task<TaskModel> Plan(TaskModel taskModel, RobotModel robot, List<RosTopicModel> InputTopics, List<RosTopicModel> OutputTopics)
     {
         var list = new List<ActionModel>();
         // modify the existing plan with the candidates
-        return await Plan(taskModel, robot, list); 
+        return await Plan(taskModel, robot, InputTopics, OutputTopics, list); 
     }
 
 
@@ -388,7 +447,7 @@ public class ResourcePlanner : IResourcePlanner
     /// <param name="robot"></param>
     /// <returns></returns>
     /// <exception cref="ArgumentException"></exception>
-    protected async Task<TaskModel> Plan(TaskModel taskModel, RobotModel robot, List<ActionModel> actionCandidates)
+    protected async Task<TaskModel> Plan(TaskModel taskModel, RobotModel robot, List<RosTopicModel> InputTopics, List<RosTopicModel> OutputTopics, List<ActionModel> actionCandidates)
 
     {
         var redisApiClient = _apiClientBuilder.CreateRedisApiClient();
@@ -428,8 +487,11 @@ public class ResourcePlanner : IResourcePlanner
                         instance = reusedInstance;
                 }
 
+                // Route inputTopics to topic instance based on type.
+                InstanceModel instanceUpdated =  await RouteTopics(instance, InputTopics, OutputTopics);
+
                 // add instance to actions
-                action.Services.Add(instance);
+                action.Services.Add(instanceUpdated);
             }
             // Choose placement based on policy
             action.Placement = await InferResource(action, robot,false, actionCandidates);
@@ -446,7 +508,7 @@ public class ResourcePlanner : IResourcePlanner
     /// <param name="robot"></param>
     /// <returns>Updated task sequence with new placements.</returns>
     /// <exception cref="ArgumentException"></exception>
-    public async Task<TaskModel> RePlan(TaskModel taskModel, TaskModel oldTaskmMdel, RobotModel robot, bool fullReplan)
+    public async Task<TaskModel> RePlan(TaskModel taskModel, TaskModel oldTaskmMdel, RobotModel robot, bool fullReplan, List<RosTopicModel> InputTopics, List<RosTopicModel> OutputTopics)
     {
         List<ActionModel> FailedActions = new List<ActionModel>();
         List<ActionModel> ActionsCandidates = new List<ActionModel>();
@@ -490,21 +552,24 @@ public class ResourcePlanner : IResourcePlanner
         if (fullReplan == true)
         {
             // Make a new plan but considering only the actionCandidates and leaving the same the other actions.
-            taskModel = await Plan(taskModel, robot, ActionsCandidates);
+
+            taskModel = await Plan(taskModel, robot, InputTopics, OutputTopics, ActionsCandidates);
             taskModel.FullReplan = true;
         }
         // If full replan is neccesary because all actions in action sequence have failed.
         if (FailedActions.Count == oldActionSequence.Count)
         {
             // Make a new plan but considering only the actionCandidates and leaving the same the other actions.
-            taskModel = await Plan(taskModel, robot, ActionsCandidates);
+
+            taskModel = await Plan(taskModel, robot, InputTopics, OutputTopics, ActionsCandidates);
             taskModel.FullReplan = true;
         }
         // If partial replan is requested by robot.
         else
         {
             // Make a new plan but considering only the actionCandidates and leaving the same the other actions.
-            taskModel = await Plan(taskModel, robot, ActionsCandidates);
+
+            taskModel = await Plan(taskModel, robot, InputTopics, OutputTopics, ActionsCandidates);
             taskModel.PartialRePlan = true;
         }
             return taskModel;
