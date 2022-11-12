@@ -13,5 +13,9 @@ namespace Middleware.Common.Repositories.Abstract
         Task<bool> IsBusyEdgeByIdAsync(Guid edgeId);
 
         Task<bool> IsBusyEdgeByNameAsync(string edgeName);
+
+        Task<int> GetNumContainersByIdAsync(Guid edgeId);
+
+        Task<int> GetNumContainersByNameAsync(string edgeName);
     }
 }

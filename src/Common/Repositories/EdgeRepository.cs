@@ -181,6 +181,29 @@ namespace Middleware.Common.Repositories
             else { return true; }
         }
 
+        /// <summary>
+        /// Return number of containers alocated in edge with specific id
+        /// </summary>
+        /// <param name="edgeId"></param>
+        /// <returns></returns>
+        public async Task<int> GetNumContainersByIdAsync(Guid edgeId)
+        {
+            List<RelationModel> edgeRelations = await GetRelation(edgeId, "LOCATED_AT", RelationDirection.Incoming);
+            return edgeRelations.Count();
+        }
+
+        /// <summary>
+        /// Return number of containers alocated in edge with specific name
+        /// </summary>
+        /// <param name="edgeName"></param>
+        /// <returns></returns>
+        public async Task<int> GetNumContainersByNameAsync(string edgeName)
+        {
+            EdgeModel edge = (await GetAllAsync()).Where(x => x.Name == edgeName).FirstOrDefault();
+            List<RelationModel> robotRelations = await GetRelation(edge.Id, "LOCATED_AT", RelationDirection.Incoming);
+            return robotRelations.Count();
+        }
+
 
     }
 }

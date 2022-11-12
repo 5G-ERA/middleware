@@ -372,20 +372,20 @@ namespace Middleware.RedisInterface.Controllers
         /// <summary>
         ///  Returns the number of containers that are deployed in a cloud entity base on cloud Name. 
         /// </summary>
-        /// <param name="cloudsToCheck"></param>
-        /// <returns></returns>
+        /// <param name="name"></param>
+        /// <returns>int</returns>
         [HttpGet]
-        [Route("numContainers/{name}", Name = "GetNumContainersByName")]
+        [Route("numContainers/{name}", Name = "GetNumCloudContainersByName")]
         [ProducesResponseType(typeof(int), (int)HttpStatusCode.OK)]
         [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.NotFound)]
         [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.BadRequest)]
         [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.InternalServerError)]
-        public async Task<ActionResult<int>> GetNumContainersInClouds(string cloudName)
+        public async Task<ActionResult<int>> GetNumCloudContainersByName(string name)
         {
             try
             {
                 
-                int countContainers = await _cloudRepository.GetNumContainersByNameAsync(cloudName);
+                int countContainers = await _cloudRepository.GetNumContainersByNameAsync(name);
                 return Ok(countContainers);
             }
             catch (Exception ex)
@@ -401,15 +401,15 @@ namespace Middleware.RedisInterface.Controllers
         /// <summary>
         ///  Returns the number of containers that are deployed in a cloud entity base on cloud Id. 
         /// </summary>
-        /// <param name="cloudsToCheck"></param>
-        /// <returns></returns>
+        /// <param name="cloudId"></param>
+        /// <returns>int</returns>
         [HttpGet]
-        [Route("numContainers", Name = "GetNumContainersById")]
+        [Route("numContainersbyId", Name = "GetNumCloudContainersById")]
         [ProducesResponseType(typeof(int), (int)HttpStatusCode.OK)]
         [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.NotFound)]
         [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.BadRequest)]
         [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.InternalServerError)]
-        public async Task<ActionResult<int>> GetNumContainersById(Guid cloudId)
+        public async Task<ActionResult<int>> GetNumCloudContainersById(Guid cloudId)
         {
             try
             {
@@ -430,10 +430,10 @@ namespace Middleware.RedisInterface.Controllers
         /// <summary>
         ///  Returns bool for status of BusyCloud by Name
         /// </summary>
-        /// <param name="cloudsToCheck"></param>
-        /// <returns></returns>
+        /// <param name="name"></param>
+        /// <returns>bool</returns>
         [HttpGet]
-        [Route("busyCloud/{name}", Name = "isBusyCloudByName")]
+        [Route("isBusyCloud/{name}", Name = "isBusyCloudByName")]
         [ProducesResponseType(typeof(int), (int)HttpStatusCode.OK)]
         [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.NotFound)]
         [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.BadRequest)]
@@ -460,10 +460,10 @@ namespace Middleware.RedisInterface.Controllers
         /// <summary>
         ///  Returns bool for status of BusyCloud by Id
         /// </summary>
-        /// <param name="cloudsToCheck"></param>
-        /// <returns></returns>
+        /// <param name="cloudId"></param>
+        /// <returns>bool</returns>
         [HttpGet]
-        [Route("busyCloud", Name = "isBusyCloudById")]
+        [Route("isBusyCloudById", Name = "isBusyCloudById")]
         [ProducesResponseType(typeof(int), (int)HttpStatusCode.OK)]
         [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.NotFound)]
         [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.BadRequest)]
