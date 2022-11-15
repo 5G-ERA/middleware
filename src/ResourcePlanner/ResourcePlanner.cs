@@ -18,7 +18,7 @@ public interface IResourcePlanner
     Task<TaskModel> RePlan(TaskModel taskModel, TaskModel oldTaskmMdel, RobotModel robot, bool fullReplan, List<RosTopicModel> InputTopics, List<RosTopicModel> OutputTopics);
 }
 
-public class ResourcePlanner : IResourcePlanner 
+public class ResourcePlanner : IResourcePlanner
 {
     private readonly IApiClientBuilder _apiClientBuilder;
     private readonly IMapper _mapper;
@@ -47,41 +47,41 @@ public class ResourcePlanner : IResourcePlanner
         List<RedisInterface.ActivePolicy> activePolicies = (await redisApiClient.PolicyGetActiveAsync()).ToList();
 
         foreach (RedisInterface.ActivePolicy policy in activePolicies)
-        { 
-                if (policy.PolicyName == "Use5G")
+        {
+            if (policy.PolicyName == "Use5G")
+            {
+                //TODO: Query testbed for number of slices and types.
+
+                foreach (DialogueModel question in robot.Questions)
                 {
-                        //TODO: Query testbed for number of slices and types.
+                    if (question.Name == "StandAlone5G or NoneStandAlone5G")
+                    {
+                        Common.Models.KeyValuePair answer = question.Answer.First();
+                        bool StandAlone5GParam = (bool)answer.Value;
+                    }
+                }
 
-                        foreach (DialogueModel question in robot.Questions)
-                        {
-                            if (question.Name == "StandAlone5G or NoneStandAlone5G")
-                            {
-                                Common.Models.KeyValuePair answer = question.Answer.First();
-                                bool StandAlone5GParam = (bool)answer.Value;
-                            }
-                        }
-
-                        foreach (DialogueModel question in robot.Questions)
-                        {
-                            if (question.Name == "What type of 5G slice")
-                            {
-                                Common.Models.KeyValuePair answer = question.Answer.First();
-                                string Slice5gType = (string)answer.Value; // there is an upper limit of eight network slices that be used by a device
-                            }//Nest template
-                        }
+                foreach (DialogueModel question in robot.Questions)
+                {
+                    if (question.Name == "What type of 5G slice")
+                    {
+                        Common.Models.KeyValuePair answer = question.Answer.First();
+                        string Slice5gType = (string)answer.Value; // there is an upper limit of eight network slices that be used by a device
+                    }//Nest template
+                }
 
                 //TODO: Attach robot to slice in Redis graph
 
 
             }
-                if (policy.PolicyName == "Use4G")
-                {
+            if (policy.PolicyName == "Use4G")
+            {
 
-                }
-                if (policy.PolicyName == "UseWifi")
-                {
+            }
+            if (policy.PolicyName == "UseWifi")
+            {
 
-                }
+            }
 
         }
 
@@ -112,7 +112,7 @@ public class ResourcePlanner : IResourcePlanner
 
         // If replan flag is false
         if (replan == false)
-        { 
+        {
 
             // There are no free clouds
             if (freeClouds.Count() == 0)
@@ -133,20 +133,20 @@ public class ResourcePlanner : IResourcePlanner
             }
 
             //There are free clouds
-            
+
             else
             {
                 // Remove edges that do not have minimunm instance (NetApps) HW requirements
 
-                foreach(InstanceModel instance in actionParam.Services)
+                foreach (InstanceModel instance in actionParam.Services)
                 {
                     // Check with BB
-                     cloudsThatMeetNetAppRequirementsTotal.AddRange( freeClouds
-                    .Where(cloud => cloud.NumberOfCores <= instance.MinimumNumCores &&
-                            cloud.Ram <= actionParam.MinimumRam)
-                    .ToList());
+                    cloudsThatMeetNetAppRequirementsTotal.AddRange(freeClouds
+                   .Where(cloud => cloud.NumberOfCores <= instance.MinimumNumCores &&
+                           cloud.Ram <= actionParam.MinimumRam)
+                   .ToList());
                 }
-                
+
                 CloudModel freeCloudNodes = cloudsThatMeetNetAppRequirementsTotal.FirstOrDefault();
                 if (freeCloudNodes is not null)
                     return freeCloudNodes.Name;
@@ -201,7 +201,7 @@ public class ResourcePlanner : IResourcePlanner
     private Task<string> ResourcesInRequestedTaskRobot(RobotModel robot, ActionModel actionParam)
     {
         //Check if the robot can handle the HW requirements of instance (NetApp's)
-        foreach(InstanceModel instance in actionParam.Services)
+        foreach (InstanceModel instance in actionParam.Services)
         {
             if ((robot.NumberCores < actionParam.MinimumNumCores) && (robot.Ram < actionParam.MinimumRam))
             {
@@ -209,8 +209,8 @@ public class ResourcePlanner : IResourcePlanner
                 throw new Exception("The robot with ID " + robot.Id + "doesnt have the HW requirements to run the netApp with ID: " + actionParam.Id);
             }
         }
-            // Select the placement to te the robot
-            return Task.FromResult(robot.Name);//guid
+        // Select the placement to te the robot
+        return Task.FromResult(robot.Name);//guid
     }
 
     /// <summary>
@@ -254,21 +254,21 @@ public class ResourcePlanner : IResourcePlanner
                 // If list is empty, return empty string. TODO - Check with BB.
                 if (edgesThatMeetNetAppRequirements.Count() == 0)
                     return resourceName;
-                   //throw new InvalidOperationException("Coudnt not find a placement according to the active policies.");
+                //throw new InvalidOperationException("Coudnt not find a placement according to the active policies.");
             }
 
             //There are free edges
             else
             {
                 // Remove edges that do not have minimunm instance (NetApps) HW requirements
-                foreach(InstanceModel instance in actionParam.Services)
+                foreach (InstanceModel instance in actionParam.Services)
                 {
                     edgesThatMeetNetAppRequirementsTotal.AddRange(freeEdges
                     .Where(edge => edge.NumberOfCores <= actionParam.MinimumNumCores &&
                             edge.Ram <= actionParam.MinimumRam)
                     .ToList());
                 }
-                
+
                 EdgeModel freeEdgesNodes = edgesThatMeetNetAppRequirementsTotal.FirstOrDefault();
                 if (freeEdgesNodes is not null)
                     return freeEdgesNodes.Name;
@@ -277,7 +277,7 @@ public class ResourcePlanner : IResourcePlanner
 
         }
         // Replan flag is true
-        else 
+        else
         {
             // Get current HW resources of previosly selected edge
             RedisInterface.EdgeModel riEdgeData = await redisApiClient.EdgeGetDataByNameAsync(resourceName);
@@ -303,7 +303,7 @@ public class ResourcePlanner : IResourcePlanner
                     {
                         return lessBusyCandidatesEdges.Name;
                     }
-                    
+
                 }
             }
 
@@ -313,13 +313,13 @@ public class ResourcePlanner : IResourcePlanner
 
     }
 
-    private async Task<string> InferResource (ActionModel actionParam, RobotModel robot, bool rePlan, List<ActionModel> candidates) //Allocate correct placement based upon policies and priority
+    private async Task<string> InferResource(ActionModel actionParam, RobotModel robot, bool rePlan, List<ActionModel> candidates) //Allocate correct placement based upon policies and priority
     {
         bool ActionToConsider = false;
         // Check if this action requires infering a new placement
         foreach (ActionModel action in candidates)
         {
-            if ((actionParam.Name == action.Name) && (rePlan==true))
+            if ((actionParam.Name == action.Name) && (rePlan == true))
             {
                 ActionToConsider = true;
             }
@@ -359,9 +359,9 @@ public class ResourcePlanner : IResourcePlanner
                 //Store all in the cloud.
                 if (policy.PolicyName == "AllContainersInCloud")
                 {
-                    actionParam.Placement = await ResourcesInCloud(rePlan, robot, actionParam, resourceName);     
+                    actionParam.Placement = await ResourcesInCloud(rePlan, robot, actionParam, resourceName);
                 }
-               
+
             }
             // Return to the old placement - TODO: check if the placement is not fully busy.
             return actionParam.Placement;
@@ -370,7 +370,7 @@ public class ResourcePlanner : IResourcePlanner
         {
             // Return to the old placement.
             return actionParam.Placement;
-        }  
+        }
     }
 
     /// <summary>
@@ -379,64 +379,43 @@ public class ResourcePlanner : IResourcePlanner
     /// <param name="instance"></param>
     /// <param name="inputTopicsParam"></param>
     /// <param name="outputTopicsParam"></param>
-    private async Task<InstanceModel> RouteTopics(InstanceModel instance, List<RosTopicModel> inputTopicsParam, List<RosTopicModel> outputTopicsParam)
+    private InstanceModel RouteTopics(InstanceModel instance, List<RosTopicModel> inputTopicsParam, List<RosTopicModel> outputTopicsParam)
     {
         // Route inputTopics
-        Dictionary<string,string> tempInputTopicsTypes = new Dictionary<string,string>();
-        foreach(RosTopicModel inputTopic in inputTopicsParam)
-        {
-            tempInputTopicsTypes.Add(inputTopic.Type,inputTopic.Name);
-        }
-        
-        foreach(string topicType in instance.InputTypes)
-        {
-            bool checkAvailavility = tempInputTopicsTypes.ContainsKey(topicType);
-            if (checkAvailavility == true) {
-                int index = tempInputTopicsTypes.Keys.ToList().IndexOf(topicType);
-                RosTopicModel instancePubTopic = new RosTopicModel();
-                instancePubTopic.Name = tempInputTopicsTypes.ElementAt(index).Value;
-                instancePubTopic.Type = tempInputTopicsTypes.ElementAt(index).Key;
-                instancePubTopic.Description = "";
-                instance.RosTopicsSub.Add(instancePubTopic);
-                    }
-            if (checkAvailavility == false) { throw new TopicTypeNotAvailableInRobot(topicType); }
-        }
-        //Route output topics
-        Dictionary<string, string> tempOutputTopicsTypes = new Dictionary<string, string>();
-        foreach (RosTopicModel outputTopic in outputTopicsParam)
-        {
-            tempInputTopicsTypes.Add(outputTopic.Type, outputTopic.Name);
-        }
-
+        Dictionary<string, RosTopicModel> tempInputTopicsTypes = inputTopicsParam.ToDictionary(t => t.Type);
 
         foreach (string topicType in instance.InputTypes)
         {
-            bool checkAvailavility = tempOutputTopicsTypes.ContainsKey(topicType);
-            if (checkAvailavility == true)
-            {
-                int index = tempOutputTopicsTypes.Keys.ToList().IndexOf(topicType);
-                RosTopicModel instanceSubTopic = new RosTopicModel();
-                instanceSubTopic.Name = tempOutputTopicsTypes.ElementAt(index).Value;
-                instanceSubTopic.Type = tempOutputTopicsTypes.ElementAt(index).Key;
-                instanceSubTopic.Description = "";
-                instance.RosTopicsPub.Add(instanceSubTopic);
-            }
-            if (checkAvailavility == false) { throw new TopicTypeNotAvailableInRobot(topicType); }
+            bool topicExists = tempInputTopicsTypes.ContainsKey(topicType);
+            if (topicExists == false)
+                throw new TopicTypeNotAvailableInRobot(topicType);
+
+            var topic = tempInputTopicsTypes[topicType];
+            instance.RosTopicsSub.Add(topic);
         }
 
-        //reset diccionaries:
-        tempInputTopicsTypes.Clear();
-        tempInputTopicsTypes.Clear();
+        //Route output topics
+        Dictionary<string, RosTopicModel> tempOutputTopicsTypes = outputTopicsParam.ToDictionary(t => t.Type);
+
+        foreach (string topicType in instance.InputTypes)
+        {
+            bool topicExists = tempOutputTopicsTypes.ContainsKey(topicType);
+            if (topicExists == false)
+                throw new TopicTypeNotAvailableInRobot(topicType);
+
+            var topic = tempInputTopicsTypes[topicType];
+            instance.RosTopicsSub.Add(topic);
+        }
 
         return instance;
-      
+
     }
 
     public async Task<TaskModel> Plan(TaskModel taskModel, RobotModel robot, List<RosTopicModel> InputTopics, List<RosTopicModel> OutputTopics)
     {
         var list = new List<ActionModel>();
         // modify the existing plan with the candidates
-        return await Plan(taskModel, robot, InputTopics, OutputTopics, list); 
+        return await Plan(taskModel, robot, InputTopics, OutputTopics, list);
     }
 
 
@@ -488,13 +467,13 @@ public class ResourcePlanner : IResourcePlanner
                 }
 
                 // Route inputTopics to topic instance based on type.
-                InstanceModel instanceUpdated =  await RouteTopics(instance, InputTopics, OutputTopics);
+                InstanceModel instanceUpdated = RouteTopics(instance, InputTopics, OutputTopics);
 
                 // add instance to actions
                 action.Services.Add(instanceUpdated);
             }
             // Choose placement based on policy
-            action.Placement = await InferResource(action, robot,false, actionCandidates);
+            action.Placement = await InferResource(action, robot, false, actionCandidates);
         }
 
         return taskModel;
@@ -535,7 +514,7 @@ public class ResourcePlanner : IResourcePlanner
         // Check in which of the failed actions action planner has not done some modifications.
         foreach (ActionModel failedAction in FailedActions)
         {
-            foreach(ActionModel newAction in actionSequence)
+            foreach (ActionModel newAction in actionSequence)
             {
                 if (failedAction.Order == newAction.Order) //Compare old action with new one
                 {
@@ -544,7 +523,7 @@ public class ResourcePlanner : IResourcePlanner
                         // Action planner did no change to the failed action.
                         ActionsCandidates.Add(failedAction);
                     }
-                    
+
                 }
             }
         }
@@ -572,7 +551,7 @@ public class ResourcePlanner : IResourcePlanner
             taskModel = await Plan(taskModel, robot, InputTopics, OutputTopics, ActionsCandidates);
             taskModel.PartialRePlan = true;
         }
-            return taskModel;
+        return taskModel;
     }
 
     private async Task<InstanceModel> GetInstanceToReuse(InstanceModel instance, Orchestrator.OrchestratorApiClient orchestratorApi)
@@ -635,5 +614,5 @@ public class ResourcePlanner : IResourcePlanner
         return instance.IsReusable != null && instance.IsReusable.Value;
     }
 
-    
+
 }
