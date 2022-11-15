@@ -14,17 +14,17 @@ namespace Middleware.TaskPlanner.Services
 
     public class ActionPlanner : IActionPlanner
     {
-        private readonly RedisInterface.RedisApiClient _apiClient;
         private readonly IMapper _mapper;
+        private readonly IRedisInterfaceClientService _redisInterfaceClient;
         public List<ActionModel> ActionSequence { get; set; }
         public DateTime CurrentTime { get; set; }
         public string InferingProcess { get; set; }
 
         public List<Common.Models.KeyValuePair> Answer { get; set; }
 
-        public ActionPlanner(IApiClientBuilder apiBuilder, IMapper mapper)
+        public ActionPlanner(IApiClientBuilder apiBuilder, IMapper mapper, IRedisInterfaceClientService redisInterfaceClient)
         {
-            _apiClient = apiBuilder.CreateRedisApiClient();
+            _redisInterfaceClient = redisInterfaceClient;
             _mapper = mapper;
 
             InferingProcess = ""; //Predefined actionsequence by id or IA infering based on new task.
@@ -52,10 +52,9 @@ namespace Middleware.TaskPlanner.Services
             newAction.ActionPriority = action.ActionPriority;
             newAction.Relations = action.Relations;
 
-            foreach(InstanceModel instance in action.Services)
+            foreach (InstanceModel instance in action.Services)
             {
-               RedisInterface.InstanceModel riCandidate = await _apiClient.InstanceGetAlternativeAsync(instance.Id);
-               InstanceModel candidate = _mapper.Map<InstanceModel>(riCandidate);
+                InstanceModel candidate = await _redisInterfaceClient.GetInstanceAlternative(instance.Id);
                 newAction.Services.Add(candidate);
             }
             return null;
@@ -66,10 +65,9 @@ namespace Middleware.TaskPlanner.Services
         /// </summary>
         /// <param name="actionId"></param>
         /// <returns>List<RelationModel></returns>
-        protected async Task<List<RelationModel>> markovianActions(Guid actionId)
+        protected async Task<List<RelationModel>> GetMarkovianActions(Guid actionId)
         {
-            List<RedisInterface.RelationModel> dependsOnRelation = (await _apiClient.ActionGetRelationByNameAsync(actionId, "DEPENDS_ON"))?.ToList();
-            List<RelationModel> dependsOnAction = _mapper.Map<List<RelationModel>>(dependsOnRelation);
+            List<RelationModel> dependsOnAction = await _redisInterfaceClient.GetRelationForAction(actionId, "DEPENDS_ON");
             return dependsOnAction;
         }
 
@@ -78,18 +76,11 @@ namespace Middleware.TaskPlanner.Services
         /// </summary>
         /// <param name="actionId"></param>
         /// <returns></returns>
-        protected async Task<bool> CheckIfMarkovianAction(Guid actionId)
+        protected async Task<bool> IsMarkovianAction(Guid actionId)
         {
-            List<RedisInterface.RelationModel> dependsOnRelation = (await _apiClient.ActionGetRelationByNameAsync(actionId, "DEPENDS_ON"))?.ToList();
-            List<RelationModel> dependsOnAction = _mapper.Map<List<RelationModel>>(dependsOnRelation);
-            if (dependsOnAction.Count == 0)
-            {
-                return false;
-            }
-            else
-            {
-                return true;
-            }
+            var actions = await GetMarkovianActions(actionId);
+
+            return actions.Count != 0;
         }
 
         /// <summary>
@@ -132,7 +123,7 @@ namespace Middleware.TaskPlanner.Services
             //For every single action failed, there are X amount of possible markovian actions.
             foreach (ActionModel tempFailedAction in failedActions)
             {
-                List<RelationModel> dependsOnAction = await markovianActions(tempFailedAction.Id);
+                List<RelationModel> dependsOnAction = await GetMarkovianActions(tempFailedAction.Id);
 
                 //Check if these markovian actions are in the failed actions list
                 foreach (RelationModel relationData in dependsOnAction)
@@ -162,7 +153,7 @@ namespace Middleware.TaskPlanner.Services
             {
                 if (instance.RosVersion != robot.RosVersion)
                 {
-                    throw new IncorrectROSDistroException(); 
+                    throw new IncorrectROSDistroException();
                 }
 
                 if (instance.ROSDistro != robot.RosDistro)
@@ -238,17 +229,15 @@ namespace Middleware.TaskPlanner.Services
         public async Task<Tuple<TaskModel, RobotModel>> InferActionSequence(Guid currentTaskId, bool ContextKnown, bool resourceLock, List<DialogueModel> DialogueTemp, Guid robotId, List<ActionModel> candidatesToRePlan, List<ActionModel> replanedCompleteActionSeq)
         {
             //Load the robot asking for a plan from redis to middleware for infering action sequence.
-            RedisInterface.RobotModel robotRedis = await _apiClient.RobotGetByIdAsync(robotId);
-            RobotModel robot = _mapper.Map<RobotModel>(robotRedis);
+            RobotModel robot = await _redisInterfaceClient.RobotGetByIdAsync(robotId);
 
             // Backup list of replanedCompleteActionSeq for removing items when processed inside this function.
             List<ActionModel> replanedCompleteActionSeqBK = new List<ActionModel>();
             replanedCompleteActionSeqBK.AddRange(replanedCompleteActionSeq);
 
             robot.Questions.AddRange(DialogueTemp); //Append the questions-answers to the robot
-
-            RedisInterface.TaskModel tmpTask = await _apiClient.TaskGetByIdAsync(currentTaskId); //Get action plan from Redis
-            TaskModel task = _mapper.Map<TaskModel>(tmpTask);
+                                                    //
+            TaskModel task = await _redisInterfaceClient.TaskGetByIdAsync(currentTaskId); //Get action plan from Redis
             bool alreadyExist = task != null; //Check if CurrentTask is inside Redis model
             task.ActionPlanId = Guid.NewGuid();//Generate automatic new Guid for plan ID.
 
@@ -256,9 +245,18 @@ namespace Middleware.TaskPlanner.Services
             task.FullReplan = false; //By default
 
             // Set the task  replanning attribute accordingly.
-            if (replanedCompleteActionSeq.Count == 0 && candidatesToRePlan.Count != 0) { task.PartialRePlan = true; task.FullReplan = false; }
-            if (replanedCompleteActionSeq.Count != 0) { task.PartialRePlan = false; task.FullReplan = true; }
-            if (replanedCompleteActionSeq.Count == 0 && candidatesToRePlan.Count == 0) { task.PartialRePlan = false; task.FullReplan = false; }
+            if (replanedCompleteActionSeq.Count == 0 && candidatesToRePlan.Count != 0)
+            {
+                task.PartialRePlan = true; task.FullReplan = false;
+            }
+            if (replanedCompleteActionSeq.Count != 0)
+            {
+                task.PartialRePlan = false; task.FullReplan = true;
+            }
+            if (replanedCompleteActionSeq.Count == 0 && candidatesToRePlan.Count == 0)
+            {
+                task.PartialRePlan = false; task.FullReplan = false;
+            }
 
             bool ActionToConsider = false;
             bool AllActionToConsider = false;
@@ -267,10 +265,8 @@ namespace Middleware.TaskPlanner.Services
             if (alreadyExist == true)
             {
                 // For now query graph to get action sequence. It will be modified in later iterations.
-                List<RedisInterface.RelationModel> tempRelations = (await _apiClient.TaskGetRelationByNameAsync(currentTaskId, "EXTENDS"))?.ToList(); //returns x and y --> taskId and ActionID
-
                 // according to the StackOverflow this should work, if not let's map objects in the list one by one
-                List<RelationModel> relations = _mapper.Map<List<RelationModel>>(tempRelations);
+                List<RelationModel> relations = await _redisInterfaceClient.GetRelation(task, "EXTENDS"); //returns x and y --> taskId and ActionID
 
                 //Here is the list of the Ids of actions retrieved from the relation
                 List<Guid> actionGuids = relations.Select(r => r.PointsTo.Id).ToList();
@@ -286,8 +282,7 @@ namespace Middleware.TaskPlanner.Services
                     /////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
                     //Call to retrieve specific action
-                    RedisInterface.ActionModel tempAction = await _apiClient.ActionGetByIdAsync(actionId);
-                    ActionModel actionItem = _mapper.Map<ActionModel>(tempAction);
+                    ActionModel actionItem = await _redisInterfaceClient.ActionGetById(actionId);
 
                     // Check if the robot have the proper ROS distro and version.
                     CheckInstanceByRobotRosDistro(robot, actionItem);
@@ -372,7 +367,7 @@ namespace Middleware.TaskPlanner.Services
         /// <param name="CompleteReplan"></param>
         /// <param name="DialogueTemp"></param>
         /// <returns>Tuple<TaskModel, TaskModel, RobotModel</returns>
-        public async Task<Tuple<TaskModel, TaskModel, RobotModel>> ReInferActionSequence(TaskModel oldTask,  Guid RobotId, bool ContextKnown, bool CompleteReplan, List<DialogueModel> DialogueTemp)
+        public async Task<Tuple<TaskModel, TaskModel, RobotModel>> ReInferActionSequence(TaskModel oldTask, Guid RobotId, bool ContextKnown, bool CompleteReplan, List<DialogueModel> DialogueTemp)
         {
             bool MarkovianProcess = oldTask.MarkovianProcess;
             Guid currentTaskId = oldTask.Id;
@@ -401,13 +396,12 @@ namespace Middleware.TaskPlanner.Services
             task.FullReplan = true;
 
             // Load robot
-            RedisInterface.RobotModel robotRedis = await _apiClient.RobotGetByIdAsync(RobotId); 
-            RobotModel robot = _mapper.Map<RobotModel>(robotRedis);
+
+            RobotModel robot = await _redisInterfaceClient.RobotGetByIdAsync(RobotId);
             robot.Questions = DialogueTemp; //Add the questions-answers to the robot
 
             //Query Redis given old plan and obtain action seq.
-            RedisInterface.ActionPlanModel riActionPLan = await _apiClient.ActionPlanGetByIdAsync(currentPlanId);
-            var actionPlan = _mapper.Map<ActionPlanModel>(riActionPLan);
+            var actionPlan = await _redisInterfaceClient.ActionPlanGetByIdAsync(currentPlanId);
 
             // The robot requests to not change anything from action sequence but placement.
             if (ActionReplanLocked == false) // TODO - VALIDATION WITH CompleteReplan
@@ -437,7 +431,7 @@ namespace Middleware.TaskPlanner.Services
                 var areEqual = lists.Skip(1).All(hs => hs.SequenceEqual(first));
 
                 // A review of the action seq is neccesary --> there were no errors from the resource perspective.
-                if (InstanceError == false) 
+                if (InstanceError == false)
                 {
                     //Prepare a complete replan asked explicitely by the robot
                     if (CompleteReplan == true)
@@ -479,9 +473,7 @@ namespace Middleware.TaskPlanner.Services
                                 foreach (ActionModel fAction in FailedActions)
                                 {
                                     FinalCandidates.Add(fAction.Id);
-                                    RedisInterface.ActionModel riTempActionmodel = await _apiClient.ActionGetByIdAsync(fAction.Id);
-                                    ActionModel tempActionmodel = _mapper.Map<ActionModel>(riTempActionmodel);
-                                    FinalCandidatesActions.Add(tempActionmodel);
+                                    FinalCandidatesActions.Add(fAction);
                                 }
 
                                 //Ask for a new plan
@@ -498,7 +490,6 @@ namespace Middleware.TaskPlanner.Services
                     task.ActionSequence = actionPlan.ActionSequence;
                 }
 
-
                 return new Tuple<TaskModel, TaskModel, RobotModel>(task, oldTask, robot);
             }
             else
@@ -509,10 +500,6 @@ namespace Middleware.TaskPlanner.Services
             }
         }
 
-
     }
 
 }
-
-
-

@@ -10,14 +10,14 @@ public interface IRedisInterfaceClientService
     /// </summary>
     /// <param name="id">Unique identifier of <see cref="ActionPlanModel"/></param>
     /// <returns>Complete action plan</returns>
-    Task<Either<ActionPlanModel, InvalidOperationException>> ActionPlanGetByIdAsync(Guid id);
+    Task<ActionPlanModel> ActionPlanGetByIdAsync(Guid id);
     /// <summary>
     /// Get <see cref="ActionPlanModel"/> by its id
     /// </summary>
     /// <param name="id">Unique identifier of <see cref="ActionPlanModel"/></param>
     /// <param name="token">Cancellation token</param>
     /// <returns>Complete action plan</returns>
-    Task<Either<ActionPlanModel, InvalidOperationException>> ActionPlanGetByIdAsync(Guid id, CancellationToken token);
+    Task<ActionPlanModel> ActionPlanGetByIdAsync(Guid id, CancellationToken token);
 
     /// <summary>
     /// Gets robot data by id
@@ -50,6 +50,19 @@ public interface IRedisInterfaceClientService
     Task<TaskModel> TaskGetByIdAsync(Guid id, CancellationToken token);
     
     /// <summary>
+    /// Gets the alternative for the specified instance
+    /// </summary>
+    /// <param name="id">Id of an instance</param>
+    /// <returns>The instance that can be treated as alternative to the given instance</returns>
+    Task<InstanceModel> GetInstanceAlternative(Guid id);
+    /// <summary>
+    /// Gets the alternative for the specified instance
+    /// </summary>
+    /// <param name="id">Id of an instance</param>
+    /// <returns>The instance that can be treated as alternative to the given instance</returns>
+    Task<InstanceModel> GetInstanceAlternative(Guid id, CancellationToken token);
+
+    /// <summary>
     /// Create graph relation between objects
     /// </summary>
     /// <param name="source"></param>
@@ -58,8 +71,35 @@ public interface IRedisInterfaceClientService
     /// <typeparam name="TSource">Object that derives from <see cref="BaseModel"/></typeparam>
     /// <typeparam name="TDirection">Object that derives from <see cref="BaseModel"/></typeparam>
     /// <returns>Have relation been created</returns>
-    Task<Either<bool, Exception>> AddRelation<TSource, TDirection>(TSource source, TDirection direction, string name)
+    Task<bool> AddRelation<TSource, TDirection>(TSource source, TDirection direction, string name)
         where TSource : BaseModel where TDirection : BaseModel;
+
+    /// <summary>
+    /// Get relations with the specified name for action
+    /// </summary>
+    /// <param name="id"></param>
+    /// <returns></returns>
+    Task<List<RelationModel>> GetRelationForAction(Guid id, string relationName);
+
+    /// <summary>
+    /// Get the relations with the specified name that are outcoming from the specified object
+    /// </summary>
+    /// <typeparam name="TSource"></typeparam>
+    /// <param name="relationName"></param>
+    /// <returns></returns>
+    Task<List<RelationModel>> GetRelation<TSource>(TSource source, string relationName) where TSource : BaseModel;
     
-    
+    /// <summary>
+    /// Get Action by its id
+    /// </summary>
+    /// <param name="id"></param>
+    /// <returns></returns>
+    Task<ActionModel> ActionGetById(Guid id);
+
+    /// <summary>
+    /// Get Action by its id
+    /// </summary>
+    /// <param name="id"></param>
+    /// <returns></returns>
+    Task<ActionModel> ActionGetById(Guid id, CancellationToken token);
 }

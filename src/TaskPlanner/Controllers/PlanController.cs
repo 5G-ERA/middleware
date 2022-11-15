@@ -104,8 +104,6 @@ namespace Middleware.TaskPlanner.Controllers
                     foreach (InstanceModel instance in action.Services)
                     {
                         var result = await _redisInterfaceClient.AddRelation(instance, location, "LOCATED_AT");
-                        result.Match( success => success,
-                            ex => throw ex);
                     }
                 }
 

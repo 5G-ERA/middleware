@@ -1,4 +1,5 @@
-﻿using Middleware.Common.Config;
+﻿using System.Web;
+using Middleware.Common.Config;
 using Middleware.Common.ExtensionMethods;
 using Middleware.Common.Models;
 using Middleware.Common.Structs;
@@ -15,7 +16,7 @@ namespace Middleware.TaskPlanner.Services
             _logger = logger;
             _httpClient = httpClientFactory.CreateClient(AppConfig.RedisApiClientName);
         }
-        public async Task<Either<bool, Exception>> AddRelation<TSource, TDirection>(TSource source, TDirection direction, string name)
+        public async Task<bool> AddRelation<TSource, TDirection>(TSource source, TDirection direction, string name)
             where TSource : BaseModel where TDirection : BaseModel
         {
             if (source is null) throw new ArgumentNullException(nameof(source));
@@ -27,7 +28,7 @@ namespace Middleware.TaskPlanner.Services
                 var relation = CreateRelation(source, direction, name);
 
                 string url = $"/api/v1/{source.GetType().GetModelName()}/AddRelation";
-                    
+
                 var result = await _httpClient.PostAsJsonAsync(url, JsonConvert.SerializeObject(relation));
 
                 return result.IsSuccessStatusCode;
@@ -39,8 +40,8 @@ namespace Middleware.TaskPlanner.Services
             }
         }
 
-        private RelationModel CreateRelation<TSource, TDirection>(TSource source, TDirection direction, string name) 
-            where TSource : BaseModel 
+        private RelationModel CreateRelation<TSource, TDirection>(TSource source, TDirection direction, string name)
+            where TSource : BaseModel
             where TDirection : BaseModel
         {
             var initiatesFrom = new GraphEntityModel(source.Id, source.Name, source.GetType());
@@ -48,11 +49,11 @@ namespace Middleware.TaskPlanner.Services
             return new RelationModel(initiatesFrom, pointsTo, name);
         }
 
-        public Task<Either<ActionPlanModel, InvalidOperationException>> ActionPlanGetByIdAsync(Guid id)
+        public Task<ActionPlanModel> ActionPlanGetByIdAsync(Guid id)
         {
             return ActionPlanGetByIdAsync(id, CancellationToken.None);
         }
-        public async Task<Either<ActionPlanModel, InvalidOperationException>> ActionPlanGetByIdAsync(Guid id, CancellationToken token)
+        public async Task<ActionPlanModel> ActionPlanGetByIdAsync(Guid id, CancellationToken token)
         {
             if (id == default)
                 throw new ArgumentNullException(nameof(id));
@@ -81,7 +82,7 @@ namespace Middleware.TaskPlanner.Services
         {
             return await RobotGetByIdAsync(id, CancellationToken.None);
         }
-        
+
         public async Task<RobotModel> RobotGetByIdAsync(Guid id, CancellationToken token)
         {
             if (id == default)
@@ -128,6 +129,104 @@ namespace Middleware.TaskPlanner.Services
                 var body = await result.Content.ReadAsStringAsync(token);
                 var task = JsonConvert.DeserializeObject<TaskModel>(body);
                 return task;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "There was en error while calling for the action plan with id: {id}", id);
+                throw;
+            }
+        }
+
+        public async Task<InstanceModel> GetInstanceAlternative(Guid id)
+        {
+            return await GetInstanceAlternative(id, CancellationToken.None);
+        }
+
+        public async Task<InstanceModel> GetInstanceAlternative(Guid id, CancellationToken token)
+        {
+            if (id == default)
+                throw new ArgumentNullException(nameof(id));
+
+            string url = $"/api/v1/Instance/alternative/{id}";
+            try
+            {
+                var result = await _httpClient.GetAsync(url, token);
+
+                if (result.IsSuccessStatusCode == false)
+                {
+                    throw new InvalidOperationException();
+                }
+                var body = await result.Content.ReadAsStringAsync(token);
+                var instance = JsonConvert.DeserializeObject<InstanceModel>(body);
+                return instance;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "There was en error while calling for the action plan with id: {id}", id);
+                throw;
+            }
+        }
+
+        public async Task<List<RelationModel>> GetRelationForAction(Guid id, string relationName)
+        {
+            var action = new ActionModel { Id = id };
+            return await GetRelation(action, relationName);
+        }
+
+        public async Task<List<RelationModel>> GetRelation<TSource>(TSource source, string relationName) where TSource : BaseModel
+        {
+            if (source is null)
+                throw new ArgumentNullException(nameof(source));
+            if (relationName is null)
+                throw new ArgumentNullException(nameof(Relation));
+
+            try
+            {                
+                var builder = new UriBuilder($"{_httpClient.BaseAddress.ToString().TrimEnd('/')}/api/v1/{source.GetType().GetModelName()}/relation/{relationName}");
+                builder.Port = -1;
+                var query = HttpUtility.ParseQueryString(builder.Query);
+                query["id"] = $"{source.Id}";
+                builder.Query = query.ToString();
+                string url = builder.ToString();
+                var result = await _httpClient.GetAsync(url);
+
+                if (result.IsSuccessStatusCode == false)
+                {
+                    throw new InvalidOperationException();
+                }
+                var body = await result.Content.ReadAsStringAsync();
+                var relations = JsonConvert.DeserializeObject<List<RelationModel>>(body);
+                return relations;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "There was an error while creating a relation");
+                throw;
+            }
+        }
+
+        public async Task<ActionModel> ActionGetById(Guid id)
+        {
+            return await ActionGetById(id, CancellationToken.None);
+        }
+
+        public async Task<ActionModel> ActionGetById(Guid id, CancellationToken token)
+        {
+            if (id == default)
+                throw new ArgumentNullException(nameof(id));
+
+            string url = $"/api/v1/action/{id}";
+            try
+            {
+                var result = await _httpClient.GetAsync(url, token);
+
+                if (result.IsSuccessStatusCode == false)
+                {
+                    throw new InvalidOperationException();
+                }
+                var body = await result.Content.ReadAsStringAsync(token);
+                var action = JsonConvert.DeserializeObject<ActionModel>(body);
+                return action;
             }
             catch (Exception ex)
             {
