@@ -1,8 +1,8 @@
-﻿using System.Text.Json;
-using Middleware.Common.Config;
+﻿using Middleware.Common.Config;
 using Middleware.Common.ExtensionMethods;
 using Middleware.Common.Models;
 using Middleware.Common.Structs;
+using Newtonsoft.Json;
 
 namespace Middleware.TaskPlanner.Services
 {
@@ -28,7 +28,7 @@ namespace Middleware.TaskPlanner.Services
 
                 string url = $"/api/v1/{source.GetType().GetModelName()}/AddRelation";
                     
-                var result = await _httpClient.PostAsJsonAsync(url, JsonSerializer.Serialize(relation));
+                var result = await _httpClient.PostAsJsonAsync(url, JsonConvert.SerializeObject(relation));
 
                 return result.IsSuccessStatusCode;
             }
@@ -67,7 +67,7 @@ namespace Middleware.TaskPlanner.Services
                     throw new InvalidOperationException();
                 }
                 var body = await result.Content.ReadAsStringAsync(token);
-                ActionPlanModel actionPlan = JsonSerializer.Deserialize<ActionPlanModel>(body);
+                ActionPlanModel actionPlan = JsonConvert.DeserializeObject<ActionPlanModel>(body);
                 return actionPlan;
             }
             catch (Exception ex)
@@ -97,7 +97,7 @@ namespace Middleware.TaskPlanner.Services
                     throw new InvalidOperationException();
                 }
                 var body = await result.Content.ReadAsStringAsync(token);
-                RobotModel robot = JsonSerializer.Deserialize<RobotModel>(body);
+                RobotModel robot = JsonConvert.DeserializeObject<RobotModel>(body);
                 return robot;
             }
             catch (Exception ex)
@@ -126,7 +126,7 @@ namespace Middleware.TaskPlanner.Services
                     throw new InvalidOperationException();
                 }
                 var body = await result.Content.ReadAsStringAsync(token);
-                var task = JsonSerializer.Deserialize<TaskModel>(body);
+                var task = JsonConvert.DeserializeObject<TaskModel>(body);
                 return task;
             }
             catch (Exception ex)
