@@ -66,7 +66,7 @@ namespace Middleware.TaskPlanner.Controllers
                 
                 // var robot = await _redisInterfaceClient.RobotGetByIdAsync(robotId);
                 // var task = await _redisInterfaceClient.TaskGetByIdAsync(id);
-                await _redisInterfaceClient.AddRelation(robot2, resourcePlan, "OWNS");
+                await _redisInterfaceClient.AddRelationAsync(robot2, resourcePlan, "OWNS");
                 
                 // call orchestrator for deployment of the resources
                 // Orchestrator.TaskModel tmpTaskOrchestratorSend = _mapper.Map<Orchestrator.TaskModel>(resourcePlan);
@@ -88,7 +88,7 @@ namespace Middleware.TaskPlanner.Controllers
 
                     foreach (InstanceModel instance in action.Services)
                     {
-                        var result = await _redisInterfaceClient.AddRelation(instance, location, "LOCATED_AT");
+                        var result = await _redisInterfaceClient.AddRelationAsync(instance, location, "LOCATED_AT");
                     }
                 }
 

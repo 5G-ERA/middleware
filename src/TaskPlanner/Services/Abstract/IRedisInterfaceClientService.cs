@@ -54,13 +54,13 @@ public interface IRedisInterfaceClientService
     /// </summary>
     /// <param name="id">Id of an instance</param>
     /// <returns>The instance that can be treated as alternative to the given instance</returns>
-    Task<InstanceModel> GetInstanceAlternative(Guid id);
+    Task<InstanceModel> GetInstanceAlternativeAsync(Guid id);
     /// <summary>
     /// Gets the alternative for the specified instance
     /// </summary>
     /// <param name="id">Id of an instance</param>
     /// <returns>The instance that can be treated as alternative to the given instance</returns>
-    Task<InstanceModel> GetInstanceAlternative(Guid id, CancellationToken token);
+    Task<InstanceModel> GetInstanceAlternativeAsync(Guid id, CancellationToken token);
 
     /// <summary>
     /// Create graph relation between objects
@@ -71,7 +71,7 @@ public interface IRedisInterfaceClientService
     /// <typeparam name="TSource">Object that derives from <see cref="BaseModel"/></typeparam>
     /// <typeparam name="TDirection">Object that derives from <see cref="BaseModel"/></typeparam>
     /// <returns>Have relation been created</returns>
-    Task<bool> AddRelation<TSource, TDirection>(TSource source, TDirection direction, string name)
+    Task<bool> AddRelationAsync<TSource, TDirection>(TSource source, TDirection direction, string name)
         where TSource : BaseModel where TDirection : BaseModel;
 
     /// <summary>
@@ -79,7 +79,7 @@ public interface IRedisInterfaceClientService
     /// </summary>
     /// <param name="id"></param>
     /// <returns></returns>
-    Task<List<RelationModel>> GetRelationForAction(Guid id, string relationName);
+    Task<List<RelationModel>> GetRelationForActionAsync(Guid id, string relationName);
 
     /// <summary>
     /// Get the relations with the specified name that are outcoming from the specified object
@@ -87,21 +87,21 @@ public interface IRedisInterfaceClientService
     /// <typeparam name="TSource"></typeparam>
     /// <param name="relationName"></param>
     /// <returns></returns>
-    Task<List<RelationModel>> GetRelation<TSource>(TSource source, string relationName) where TSource : BaseModel;
+    Task<List<RelationModel>> GetRelationAsync<TSource>(TSource source, string relationName) where TSource : BaseModel;
     
     /// <summary>
     /// Get Action by its id
     /// </summary>
     /// <param name="id"></param>
     /// <returns></returns>
-    Task<ActionModel> ActionGetById(Guid id);
+    Task<ActionModel> ActionGetByIdAsync(Guid id);
 
     /// <summary>
     /// Get Action by its id
     /// </summary>
     /// <param name="id"></param>
     /// <returns></returns>
-    Task<ActionModel> ActionGetById(Guid id, CancellationToken token);
+    Task<ActionModel> ActionGetByIdAsync(Guid id, CancellationToken token);
 
     /// <summary>
     /// Get the latest action plan that robot has executed

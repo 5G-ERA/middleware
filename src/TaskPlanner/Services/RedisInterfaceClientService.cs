@@ -16,7 +16,7 @@ namespace Middleware.TaskPlanner.Services
             _logger = logger;
             _httpClient = httpClientFactory.CreateClient(AppConfig.RedisApiClientName);
         }
-        public async Task<bool> AddRelation<TSource, TDirection>(TSource source, TDirection direction, string name)
+        public async Task<bool> AddRelationAsync<TSource, TDirection>(TSource source, TDirection direction, string name)
             where TSource : BaseModel where TDirection : BaseModel
         {
             if (source is null) throw new ArgumentNullException(nameof(source));
@@ -137,12 +137,12 @@ namespace Middleware.TaskPlanner.Services
             }
         }
 
-        public async Task<InstanceModel> GetInstanceAlternative(Guid id)
+        public async Task<InstanceModel> GetInstanceAlternativeAsync(Guid id)
         {
-            return await GetInstanceAlternative(id, CancellationToken.None);
+            return await GetInstanceAlternativeAsync(id, CancellationToken.None);
         }
 
-        public async Task<InstanceModel> GetInstanceAlternative(Guid instanceId, CancellationToken token)
+        public async Task<InstanceModel> GetInstanceAlternativeAsync(Guid instanceId, CancellationToken token)
         {
             if (instanceId == default)
                 throw new ArgumentNullException(nameof(instanceId));
@@ -167,13 +167,13 @@ namespace Middleware.TaskPlanner.Services
             }
         }
 
-        public async Task<List<RelationModel>> GetRelationForAction(Guid id, string relationName)
+        public async Task<List<RelationModel>> GetRelationForActionAsync(Guid id, string relationName)
         {
             var action = new ActionModel { Id = id };
-            return await GetRelation(action, relationName);
+            return await GetRelationAsync(action, relationName);
         }
 
-        public async Task<List<RelationModel>> GetRelation<TSource>(TSource source, string relationName) where TSource : BaseModel
+        public async Task<List<RelationModel>> GetRelationAsync<TSource>(TSource source, string relationName) where TSource : BaseModel
         {
             if (source is null)
                 throw new ArgumentNullException(nameof(source));
@@ -205,12 +205,12 @@ namespace Middleware.TaskPlanner.Services
             }
         }
 
-        public async Task<ActionModel> ActionGetById(Guid id)
+        public async Task<ActionModel> ActionGetByIdAsync(Guid id)
         {
-            return await ActionGetById(id, CancellationToken.None);
+            return await ActionGetByIdAsync(id, CancellationToken.None);
         }
 
-        public async Task<ActionModel> ActionGetById(Guid id, CancellationToken token)
+        public async Task<ActionModel> ActionGetByIdAsync(Guid id, CancellationToken token)
         {
             if (id == default)
                 throw new ArgumentNullException(nameof(id));

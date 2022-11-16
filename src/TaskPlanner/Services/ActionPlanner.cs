@@ -54,7 +54,7 @@ namespace Middleware.TaskPlanner.Services
 
             foreach (InstanceModel instance in action.Services)
             {
-                InstanceModel candidate = await _redisInterfaceClient.GetInstanceAlternative(instance.Id);
+                InstanceModel candidate = await _redisInterfaceClient.GetInstanceAlternativeAsync(instance.Id);
                 newAction.Services.Add(candidate);
             }
             return null;
@@ -67,7 +67,7 @@ namespace Middleware.TaskPlanner.Services
         /// <returns>List<RelationModel></returns>
         protected async Task<List<RelationModel>> GetMarkovianActions(Guid actionId)
         {
-            List<RelationModel> dependsOnAction = await _redisInterfaceClient.GetRelationForAction(actionId, "DEPENDS_ON");
+            List<RelationModel> dependsOnAction = await _redisInterfaceClient.GetRelationForActionAsync(actionId, "DEPENDS_ON");
             return dependsOnAction;
         }
 
@@ -266,7 +266,7 @@ namespace Middleware.TaskPlanner.Services
             {
                 // For now query graph to get action sequence. It will be modified in later iterations.
                 // according to the StackOverflow this should work, if not let's map objects in the list one by one
-                List<RelationModel> relations = await _redisInterfaceClient.GetRelation(task, "EXTENDS"); //returns x and y --> taskId and ActionID
+                List<RelationModel> relations = await _redisInterfaceClient.GetRelationAsync(task, "EXTENDS"); //returns x and y --> taskId and ActionID
 
                 //Here is the list of the Ids of actions retrieved from the relation
                 List<Guid> actionGuids = relations.Select(r => r.PointsTo.Id).ToList();
@@ -282,7 +282,7 @@ namespace Middleware.TaskPlanner.Services
                     /////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
                     //Call to retrieve specific action
-                    ActionModel actionItem = await _redisInterfaceClient.ActionGetById(actionId);
+                    ActionModel actionItem = await _redisInterfaceClient.ActionGetByIdAsync(actionId);
 
                     // Check if the robot have the proper ROS distro and version.
                     CheckInstanceByRobotRosDistro(robot, actionItem);
