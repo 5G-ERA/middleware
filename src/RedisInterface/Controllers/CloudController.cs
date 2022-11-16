@@ -1,9 +1,7 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using System.Net;
 using Microsoft.AspNetCore.Mvc;
 using Middleware.Common.Models;
-using Middleware.Common.Repositories;
 using Middleware.Common.Repositories.Abstract;
-using System.Net;
 
 namespace Middleware.RedisInterface.Controllers
 {
@@ -98,11 +96,11 @@ namespace Middleware.RedisInterface.Controllers
             }
             try
             {
-                CloudModel cloud =  await _cloudRepository.AddAsync(model);
+                CloudModel cloud = await _cloudRepository.AddAsync(model);
                 if (cloud is null)
                 {
-                    return StatusCode((int) HttpStatusCode.InternalServerError,
-                        new ApiResponse((int) HttpStatusCode.InternalServerError,
+                    return StatusCode((int)HttpStatusCode.InternalServerError,
+                        new ApiResponse((int)HttpStatusCode.InternalServerError,
                             "Could not add the cloud to the data store"));
                 }
                 return Ok(model);
@@ -113,7 +111,7 @@ namespace Middleware.RedisInterface.Controllers
                 _logger.LogError(ex, "An error occurred:");
                 return StatusCode(statusCode, new ApiResponse(statusCode, $"An error has occurred: {ex.Message}"));
             }
-            
+
         }
 
         /// <summary>
@@ -365,12 +363,6 @@ namespace Middleware.RedisInterface.Controllers
                 _logger.LogError(ex, "An error occurred:");
                 return StatusCode(statusCode, new ApiResponse(statusCode, $"An error has occurred: {ex.Message}"));
             }
-
         }
-
-
-
-
-
     }
 }
