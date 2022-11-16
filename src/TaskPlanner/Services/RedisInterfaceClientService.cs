@@ -83,12 +83,12 @@ namespace Middleware.TaskPlanner.Services
             return await RobotGetByIdAsync(id, CancellationToken.None);
         }
 
-        public async Task<RobotModel> RobotGetByIdAsync(Guid id, CancellationToken token)
+        public async Task<RobotModel> RobotGetByIdAsync(Guid robotId, CancellationToken token)
         {
-            if (id == default)
-                throw new ArgumentNullException(nameof(id));
+            if (robotId == default)
+                throw new ArgumentNullException(nameof(robotId));
 
-            string url = $"/api/v1/robot/{id}";
+            string url = $"/api/v1/robot/{robotId}";
             try
             {
                 var result = await _httpClient.GetAsync(url, token);
@@ -103,7 +103,7 @@ namespace Middleware.TaskPlanner.Services
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "There was en error while calling for the action plan with id: {id}", id);
+                _logger.LogError(ex, "There was en error while calling for the robot with robotId: {robotId}", robotId);
                 throw;
             }
         }
@@ -112,12 +112,12 @@ namespace Middleware.TaskPlanner.Services
         {
             return await TaskGetByIdAsync(id, CancellationToken.None);
         }
-        public async Task<TaskModel> TaskGetByIdAsync(Guid id, CancellationToken token)
+        public async Task<TaskModel> TaskGetByIdAsync(Guid taskId, CancellationToken token)
         {
-            if (id == default)
-                throw new ArgumentNullException(nameof(id));
+            if (taskId == default)
+                throw new ArgumentNullException(nameof(taskId));
 
-            string url = $"/api/v1/task/{id}";
+            string url = $"/api/v1/task/{taskId}";
             try
             {
                 var result = await _httpClient.GetAsync(url, token);
@@ -132,7 +132,7 @@ namespace Middleware.TaskPlanner.Services
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "There was en error while calling for the action plan with id: {id}", id);
+                _logger.LogError(ex, "There was en error while calling for the task with taskId: {taskId}", taskId);
                 throw;
             }
         }
@@ -142,12 +142,12 @@ namespace Middleware.TaskPlanner.Services
             return await GetInstanceAlternative(id, CancellationToken.None);
         }
 
-        public async Task<InstanceModel> GetInstanceAlternative(Guid id, CancellationToken token)
+        public async Task<InstanceModel> GetInstanceAlternative(Guid instanceId, CancellationToken token)
         {
-            if (id == default)
-                throw new ArgumentNullException(nameof(id));
+            if (instanceId == default)
+                throw new ArgumentNullException(nameof(instanceId));
 
-            string url = $"/api/v1/Instance/alternative/{id}";
+            string url = $"/api/v1/Instance/alternative/{instanceId}";
             try
             {
                 var result = await _httpClient.GetAsync(url, token);
@@ -162,7 +162,7 @@ namespace Middleware.TaskPlanner.Services
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "There was en error while calling for the action plan with id: {id}", id);
+                _logger.LogError(ex, "There was en error while calling for the instance alternative with instanceId: {instanceId}", instanceId);
                 throw;
             }
         }
@@ -231,6 +231,96 @@ namespace Middleware.TaskPlanner.Services
             catch (Exception ex)
             {
                 _logger.LogError(ex, "There was en error while calling for the action plan with id: {id}", id);
+                throw;
+            }
+        }
+
+        public async Task<ActionPlanModel> GetLatestActionPlanByRobotIdAsync(Guid robotId)
+        {
+            return await GetLatestActionPlanByRobotIdAsync(robotId, CancellationToken.None);
+        }
+
+        public async Task<ActionPlanModel> GetLatestActionPlanByRobotIdAsync(Guid robotId, CancellationToken token)
+        {
+            if (robotId == default)
+                throw new ArgumentNullException(nameof(robotId));
+
+            string url = $"/api/v1/action/plan/robot/{robotId}";
+            try
+            {
+                var result = await _httpClient.GetAsync(url, token);
+
+                if (result.IsSuccessStatusCode == false)
+                {
+                    throw new InvalidOperationException();
+                }
+                var body = await result.Content.ReadAsStringAsync(token);
+                var actionPlan = JsonConvert.DeserializeObject<ActionPlanModel>(body);
+                return actionPlan;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "There was en error while calling for the latest action plan with robotId: {robotId}", robotId);
+                throw;
+            }
+        }
+
+        public async Task<EdgeModel> GetEdgeByNameAsync(string name)
+        {
+            return await GetEdgeByNameAsync(name, CancellationToken.None);
+        }
+
+        public async Task<EdgeModel> GetEdgeByNameAsync(string name, CancellationToken token)
+        {
+            if (string.IsNullOrWhiteSpace(name))
+                throw new ArgumentNullException(nameof(name));
+
+            string url = $"/api/v1/edge/name/{name}";
+            try
+            {
+                var result = await _httpClient.GetAsync(url, token);
+
+                if (result.IsSuccessStatusCode == false)
+                {
+                    throw new InvalidOperationException();
+                }
+                var body = await result.Content.ReadAsStringAsync(token);
+                var edge = JsonConvert.DeserializeObject<EdgeModel>(body);
+                return edge;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "There was en error while calling for the edge with name: {name}", name);
+                throw;
+            }
+        }
+
+        public Task<CloudModel> GetCloudByNameAsync(string name)
+        {
+            return GetCloudByNameAsync(name, CancellationToken.None);
+        }
+
+        public async Task<CloudModel> GetCloudByNameAsync(string name, CancellationToken token)
+        {
+            if (string.IsNullOrWhiteSpace(name))
+                throw new ArgumentNullException(nameof(name));
+
+            string url = $"/api/v1/cloud/name/{name}";
+            try
+            {
+                var result = await _httpClient.GetAsync(url, token);
+
+                if (result.IsSuccessStatusCode == false)
+                {
+                    throw new InvalidOperationException();
+                }
+                var body = await result.Content.ReadAsStringAsync(token);
+                var cloud = JsonConvert.DeserializeObject<CloudModel>(body);
+                return cloud;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "There was en error while calling for the cloud with name: {name}", name);
                 throw;
             }
         }

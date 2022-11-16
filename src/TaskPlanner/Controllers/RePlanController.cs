@@ -1,11 +1,10 @@
-﻿using System.Net;
-using Middleware.Common.Models;
-using Microsoft.AspNetCore.Mvc;
-using Middleware.TaskPlanner.Services;
+﻿using System;
+using System.Net;
 using AutoMapper;
+using Microsoft.AspNetCore.Mvc;
+using Middleware.Common.Models;
 using Middleware.TaskPlanner.ApiReference;
-using System;
-using YamlDotNet.Core;
+using Middleware.TaskPlanner.Services;
 
 namespace Middleware.TaskPlanner.Controllers
 {
@@ -18,10 +17,12 @@ namespace Middleware.TaskPlanner.Controllers
         private readonly ResourcePlanner.ResourcePlannerApiClient _resourcePlannerClient;
         private readonly Orchestrator.OrchestratorApiClient _orchestratorClient;
         private readonly IApiClientBuilder _apiClientBuilder;
+        private readonly IRedisInterfaceClientService _redisInterfaceClient;
 
 
-        public RePlanController(IActionPlanner actionPlanner, IApiClientBuilder builder, IMapper mapper)
+        public RePlanController(IActionPlanner actionPlanner, IApiClientBuilder builder, IMapper mapper, IRedisInterfaceClientService redisInterfaceClient)
         {
+            _redisInterfaceClient = redisInterfaceClient;
             _actionPlanner = actionPlanner;
             _mapper = mapper;
             _resourcePlannerClient = builder.CreateResourcePlannerApiClient();
@@ -30,14 +31,12 @@ namespace Middleware.TaskPlanner.Controllers
 
         }
 
-
         [HttpPost] //http get replan 
         [ProducesResponseType(typeof(TaskModel), (int)HttpStatusCode.OK)]
         public async Task<ActionResult<TaskModel>> GetReplan([FromBody] TaskReplanInputModel inputModel, bool dryRun = false)
         {
             try
             {
-                var _redisApiClient = _apiClientBuilder.CreateRedisApiClient();
                 _actionPlanner.Initialize(new List<ActionModel>(), DateTime.Now);
 
                 Guid oldTask = inputModel.TaskID; //Task the robot wanted to execute
@@ -46,17 +45,14 @@ namespace Middleware.TaskPlanner.Controllers
                 bool CompleteReplan = inputModel.CompleteReplan; // The robot wants a partial or complete replan.
                 List<DialogueModel> tempDialog = inputModel.Questions;
 
-                RedisInterface.TaskModel tempOldTaskObject = await _redisApiClient.TaskGetByIdAsync(oldTask);
-                TaskModel tempOldTaskModel = _mapper.Map<TaskModel>(tempOldTaskObject);
+                TaskModel tempOldTaskModel = await _redisInterfaceClient.TaskGetByIdAsync(oldTask);
 
                 //Adding the old plan to the old -tempOldTaskModel-
-                RedisInterface.ActionPlanModel RedOldPlan = await _redisApiClient.GetLatestActionPlanByRobotIdAsync(robotId);
-                ActionModel oldPlanModel = _mapper.Map<ActionModel>(RedOldPlan);
+                ActionPlanModel oldPlanModel = await _redisInterfaceClient.GetLatestActionPlanByRobotIdAsync(robotId);
                 if (oldPlanModel == null)
                 {
                     throw new NullReferenceException();
                 }
-
                 tempOldTaskModel.ActionPlanId = oldPlanModel.Id;
 
                 var (plan, oldPlan, robot) = await _actionPlanner.ReInferActionSequence(tempOldTaskModel, robotId, contextKnown, CompleteReplan, tempDialog);
@@ -64,7 +60,6 @@ namespace Middleware.TaskPlanner.Controllers
                 ResourcePlanner.TaskModel tmpTaskSend = _mapper.Map<ResourcePlanner.TaskModel>(plan);
                 ResourcePlanner.TaskModel tmpOldPlanSend = _mapper.Map<ResourcePlanner.TaskModel>(oldPlan);
                 ResourcePlanner.RobotModel tmpRobotSend = _mapper.Map<ResourcePlanner.RobotModel>(robot);
-
 
                 ResourcePlanner.ResourceReplanInputModel tempReplanInput = new ResourcePlanner.ResourceReplanInputModel
                 {
@@ -74,86 +69,44 @@ namespace Middleware.TaskPlanner.Controllers
                     FullReplan = CompleteReplan
                 };
 
-
                 ResourcePlanner.TaskModel tmpFinalTask = await _resourcePlannerClient.GetResourceRePlanAsync(tempReplanInput);//API call to resource planner
-                
+
                 if (dryRun) // Will skip the orchestrator if true (will not deploy the actual plan.)
                     return Ok(tmpFinalTask);
 
                 //Delete previous plan in orchestrator and graph. --> TODO: AL 06/11/22 The replan is not shown in the graph, only in the ActionPlanModel index db. 
                 await _orchestratorClient.DeletePlanByIdAsync(oldPlan.ActionPlanId);
 
-                // Create new relationship of types owns between robot and task.
-                RedisInterface.TaskModel tempTaskObject = await _redisApiClient.TaskGetByIdAsync(oldTask);
-                TaskModel tempTaskModel = _mapper.Map<TaskModel>(tempTaskObject);
+                await _redisInterfaceClient.AddRelation(robot, plan, "OWNS");
 
-                RedisInterface.GraphEntityModel tempRobotGraph = new RedisInterface.GraphEntityModel();
-                tempRobotGraph.Id = robotId;
-                tempRobotGraph.Name = robot.Name;
-
-                RedisInterface.GraphEntityModel tempTaskGraph = new RedisInterface.GraphEntityModel();
-                tempTaskGraph.Id = oldTask;
-                tempTaskGraph.Name = tempTaskModel.Name;
-
-                RedisInterface.RelationModel robotOwnsTaskRelation = new RedisInterface.RelationModel();
-                robotOwnsTaskRelation.RelationName = "OWNS";
-                robotOwnsTaskRelation.InitiatesFrom = tempRobotGraph;
-                robotOwnsTaskRelation.PointsTo = tempTaskGraph;
-
-                RedisInterface.RelationModel newRobotOwnsTaskRelation = await _redisApiClient.RobotAddRelationAsync(robotOwnsTaskRelation);
-
-
-                //Deploy replan
-                Orchestrator.OrchestratorResourceInput tmpTaskOrchestratorSend = _mapper.Map<Orchestrator.OrchestratorResourceInput>(tmpFinalTask);
+                // Deploy replan
+                Orchestrator.OrchestratorResourceInput tmpTaskOrchestratorSend = new Orchestrator.OrchestratorResourceInput()
+                {
+                    Task = _mapper.Map<Orchestrator.TaskModel>(plan),
+                    Robot = _mapper.Map<Orchestrator.RobotModel>(robot)
+                };
 
                 Orchestrator.TaskModel tmpFinalOrchestratorTask =
                     await _orchestratorClient.InstantiateNewPlanAsync(tmpTaskOrchestratorSend);
-                TaskModel finalPlan = _mapper.Map<TaskModel>(tmpFinalOrchestratorTask);
+                TaskModel orchestratedPlan = _mapper.Map<TaskModel>(tmpFinalOrchestratorTask);
 
-                //Create LOCATED_AT relationship in redis from instance to edge/cloud resource.
-                TaskModel tempNewPlan = _mapper.Map<TaskModel>(tmpFinalTask);
-
-                List<ActionModel> actionSequence = tempNewPlan.ActionSequence;
-                foreach (ActionModel action in actionSequence)
+                //Create LOCATED_AT relationship in redis from instance to edge/cloud resource.                
+                foreach (ActionModel action in orchestratedPlan.ActionSequence)
                 {
-                    RedisInterface.RelationModel tempRelationModel = new RedisInterface.RelationModel();
-                    tempRelationModel.RelationName = "LOCATED_AT";
-
-                    if (action.Placement.Contains("CLOUD"))
-                    {
-                        RedisInterface.CloudModel tempRedisCloud = await _redisApiClient.CloudGetDataByNameAsync(action.Placement);
-                        CloudModel tempCloud = _mapper.Map<CloudModel>(tempRedisCloud);
-                        RedisInterface.GraphEntityModel tempGraph = new RedisInterface.GraphEntityModel();
-                        tempGraph.Name = tempCloud.Name;
-                        tempGraph.Type = "CLOUD";
-                        tempGraph.Id = tempCloud.Id;
-                        tempRelationModel.PointsTo = tempGraph;
-                    }
-                    else
-                    {
-                        RedisInterface.EdgeModel tempRedisEdge = await _redisApiClient.EdgeGetDataByNameAsync(action.Placement);
-                        EdgeModel tempEdge = _mapper.Map<EdgeModel>(tempRedisEdge);
-                        RedisInterface.GraphEntityModel tempGraph = new RedisInterface.GraphEntityModel();
-                        tempGraph.Name = tempGraph.Name;
-                        tempGraph.Type = "EDGE";
-                        tempGraph.Id = tempGraph.Id;
-                        tempRelationModel.PointsTo = tempGraph;
-                    }
-
+                    BaseModel location;
+                    //TODO: recognize by type PlacementType property
+                    location = action.Placement.ToLower().Contains("cloud") 
+                        ? await _redisInterfaceClient.GetCloudByNameAsync(action.Placement) 
+                        : await _redisInterfaceClient.GetEdgeByNameAsync(action.Placement);
+                    
                     foreach (InstanceModel instance in action.Services)
                     {
-                        GraphEntityModel tempInstanceGraph = new GraphEntityModel(); //The instances that the action need.
-                        tempInstanceGraph.Name = instance.Name;
-                        tempInstanceGraph.Id = instance.Id;
-                        tempInstanceGraph.Type = "INSTANCE";
-
-                        //Add all the located_at relationships between all instances of 1 action and the resources been edge/cloud
-                        RedisInterface.RelationModel newRelation = await _redisApiClient.InstanceAddRelationAsync(tempRelationModel);
+                        var result = await _redisInterfaceClient.AddRelation(instance, location, "LOCATED_AT");
                     }
 
                 }
 
-                return Ok(finalPlan);
+                return Ok(orchestratedPlan);
             }
             catch (Orchestrator.ApiException<ResourcePlanner.ApiResponse> apiEx)
             {
@@ -170,7 +123,7 @@ namespace Middleware.TaskPlanner.Controllers
                     new ApiResponse(statusCode, $"There was an error while preparing the task plan: {ex.Message}"));
             }
         }
-            
+
     }
 }
 /*

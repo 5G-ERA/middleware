@@ -14,8 +14,7 @@ namespace Middleware.TaskPlanner.Controllers
         private readonly IActionPlanner _actionPlanner;
         private readonly IMapper _mapper;
         private readonly ResourcePlanner.ResourcePlannerApiClient _resourcePlannerClient;
-        private readonly Orchestrator.OrchestratorApiClient _orchestratorClient;
-        private readonly IApiClientBuilder _apiClientBuilder;
+        private readonly Orchestrator.OrchestratorApiClient _orchestratorClient;        
         private readonly IRedisInterfaceClientService _redisInterfaceClient;
 
 
@@ -26,7 +25,6 @@ namespace Middleware.TaskPlanner.Controllers
             _mapper = mapper;
             _resourcePlannerClient = builder.CreateResourcePlannerApiClient();
             _orchestratorClient = builder.CreateOrchestratorApiClient();
-            _apiClientBuilder = builder;
             _redisInterfaceClient = redisInterfaceClient;
         }
 
@@ -47,10 +45,6 @@ namespace Middleware.TaskPlanner.Controllers
             try
             {
                 _actionPlanner.Initialize(new List<ActionModel>(), DateTime.Now);
-
-                var redisApiClient = _apiClientBuilder.CreateRedisApiClient();
-                // Create a relationship of types OWNS between a robot and a task objects.
-
                 // INFER ACTION SEQUENCE PROCESS
                 var (plan, robot2) =
                     await _actionPlanner.InferActionSequence(id, contextKnown, lockResource, dialogueTemp, robotId);
@@ -66,7 +60,6 @@ namespace Middleware.TaskPlanner.Controllers
                 ResourcePlanner.TaskModel tmpFinalTask =
                     await _resourcePlannerClient.GetResourcePlanAsync(resourceInput); //API call to resource planner
                 TaskModel resourcePlan = _mapper.Map<TaskModel>(tmpFinalTask);
-
 
                 if (dryRun) // Will skip the orchestrator if true (will not deploy the actual plan.)
                     return Ok(resourcePlan);
@@ -88,18 +81,10 @@ namespace Middleware.TaskPlanner.Controllers
                 foreach (ActionModel action in resourcePlan.ActionSequence)
                 {
                     BaseModel location;
-                    if (action.Placement.ToLower().Contains("cloud"))
-                    {
-                        RedisInterface.CloudModel tempRedisCloud =
-                            await redisApiClient.CloudGetDataByNameAsync(action.Placement);
-                        location = _mapper.Map<CloudModel>(tempRedisCloud);
-                    }
-                    else
-                    {
-                        RedisInterface.EdgeModel tempRedisEdge =
-                            await redisApiClient.EdgeGetDataByNameAsync(action.Placement);
-                        location = _mapper.Map<EdgeModel>(tempRedisEdge);
-                    }
+                    //TODO: recognize by type PlacementType property
+                    location = action.Placement.ToLower().Contains("cloud")
+                        ? await _redisInterfaceClient.GetCloudByNameAsync(action.Placement)
+                        : await _redisInterfaceClient.GetEdgeByNameAsync(action.Placement);
 
                     foreach (InstanceModel instance in action.Services)
                     {

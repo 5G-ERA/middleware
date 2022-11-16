@@ -102,4 +102,41 @@ public interface IRedisInterfaceClientService
     /// <param name="id"></param>
     /// <returns></returns>
     Task<ActionModel> ActionGetById(Guid id, CancellationToken token);
+
+    /// <summary>
+    /// Get the latest action plan that robot has executed
+    /// </summary>
+    /// <param name="robotId">Robot Id</param>
+    /// <returns></returns>
+    Task<ActionPlanModel> GetLatestActionPlanByRobotIdAsync(Guid robotId);
+    /// <summary>
+    /// Get the latest action plan that robot has executed
+    /// </summary>
+    /// <param name="robotId">Robot Id</param>
+    /// <returns></returns>
+    Task<ActionPlanModel> GetLatestActionPlanByRobotIdAsync(Guid robotId, CancellationToken token);
+    /// <summary>
+    /// Get Edge Data by its name
+    /// </summary>
+    /// <param name="name"></param>
+    /// <returns></returns>
+    Task<EdgeModel> GetEdgeByNameAsync(string name);
+    /// <summary>
+    /// Get Edge Data by its name
+    /// </summary>
+    /// <param name="name"></param>
+    /// <returns></returns>
+    Task<EdgeModel> GetEdgeByNameAsync(string name, CancellationToken token);
+    /// <summary>
+    /// Get Cloud Data by its name
+    /// </summary>
+    /// <param name="name"></param>
+    /// <returns></returns>
+    Task<CloudModel> GetCloudByNameAsync(string name);
+    /// <summary>
+    /// Get Cloud Data by its name
+    /// </summary>
+    /// <param name="name"></param>
+    /// <returns></returns>
+    Task<CloudModel> GetCloudByNameAsync(string name, CancellationToken token);
 }
