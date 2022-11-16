@@ -16,9 +16,7 @@ namespace Middleware.TaskPlanner.Controllers
         private readonly IMapper _mapper;
         private readonly ResourcePlanner.ResourcePlannerApiClient _resourcePlannerClient;
         private readonly Orchestrator.OrchestratorApiClient _orchestratorClient;
-        private readonly IApiClientBuilder _apiClientBuilder;
         private readonly IRedisInterfaceClientService _redisInterfaceClient;
-
 
         public RePlanController(IActionPlanner actionPlanner, IApiClientBuilder builder, IMapper mapper, IRedisInterfaceClientService redisInterfaceClient)
         {
@@ -27,7 +25,6 @@ namespace Middleware.TaskPlanner.Controllers
             _mapper = mapper;
             _resourcePlannerClient = builder.CreateResourcePlannerApiClient();
             _orchestratorClient = builder.CreateOrchestratorApiClient();
-            _apiClientBuilder = builder;
 
         }
 
