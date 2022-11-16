@@ -1228,7 +1228,7 @@
         }
       }
     },
-    "/api/v1/Action/LastestPlan/robot/{robotId}": {
+    "/api/v1/Action/plan/robot/{robotId}/latest": {
       "get": {
         "tags": [
           "Action"

@@ -280,7 +280,7 @@ namespace Middleware.RedisInterface.Controllers
         [ProducesResponseType(typeof(CloudModel), (int)HttpStatusCode.OK)]
         [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.NotFound)]
         [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.InternalServerError)]
-        public async Task<ActionResult<CloudModel>> GetCloudResourceDetailsbyNameAsync(string name)
+        public async Task<ActionResult<CloudModel>> GetCloudResourceDetailsByNameAsync(string name)
         {
             try
             {
