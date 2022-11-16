@@ -276,7 +276,7 @@ namespace Middleware.RedisInterface.Controllers
         }
 
         [HttpGet]
-        [Route("CloudData/{name}", Name = "CloudGetDataByName")]
+        [Route("/name/{name}", Name = "CloudGetDataByName")]
         [ProducesResponseType(typeof(CloudModel), (int)HttpStatusCode.OK)]
         [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.NotFound)]
         [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.InternalServerError)]
@@ -300,7 +300,7 @@ namespace Middleware.RedisInterface.Controllers
         }
 
         /// <summary>
-        ///  Get the free clouds that have connectivity to the robot
+        /// Get the free clouds that have connectivity to the robot
         /// </summary>
         /// <param name="edgesToCheck"></param>
         /// <returns>list of cloudModel</returns>

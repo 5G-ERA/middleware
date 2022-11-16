@@ -338,14 +338,12 @@ namespace Middleware.RedisInterface.Controllers
 
         }
 
-        public record EdgeDataByName(string name);
-
         [HttpGet]
-        [Route("EdgeData/{name}", Name = "EdgeGetDataByName")]
+        [Route("name/{name}", Name = "EdgeGetDataByName")]
         [ProducesResponseType(typeof(EdgeModel), (int)HttpStatusCode.OK)]
         [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.NotFound)]
         [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.InternalServerError)]
-        public async Task<ActionResult<EdgeModel>> GetEdgeResourceDetailsbyNameAsync(string name)
+        public async Task<ActionResult<EdgeModel>> GetEdgeResourceDetailsByNameAsync(string name)
         {
             try
             {
@@ -363,8 +361,5 @@ namespace Middleware.RedisInterface.Controllers
                 return StatusCode(statusCode, new ApiResponse(statusCode, $"An error has occurred: {ex.Message}"));
             }
         }
-
-
-        
     }
 }
