@@ -1,5 +1,4 @@
-﻿using System.Drawing;
-using Middleware.Common.Repositories;
+﻿using Middleware.Common.Repositories;
 using Middleware.Common.Repositories.Abstract;
 
 namespace Middleware.RedisInterface.Services

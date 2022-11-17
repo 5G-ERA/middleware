@@ -109,8 +109,7 @@ namespace Middleware.Common.Repositories
             Dictionary<EdgeModel, int> tempDic = new Dictionary<EdgeModel, int>();
             //List<Guid> lessBusyEdges = new List<Guid>();
             List<EdgeModel> lessBusyEdges = new List<EdgeModel>();
-            //int counter = 0;
-            string previousEdge = "";
+            //int counter = 0;            
 
             foreach (EdgeModel busyEdge in busyEdgesTocheck)
             {
