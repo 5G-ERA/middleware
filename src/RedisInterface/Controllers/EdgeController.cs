@@ -114,7 +114,6 @@ namespace Middleware.RedisInterface.Controllers
             return Ok(model);
         }
 
-
         /// <summary>
         /// Partially update an existing InstanceModel entity
         /// </summary>
@@ -372,7 +371,7 @@ namespace Middleware.RedisInterface.Controllers
         /// <param name="edgeId"></param>
         /// <returns>bool</returns>
         [HttpGet]
-        [Route("isBusyEdgeById", Name = "isBusyEdgeById")]
+        [Route("{id}/busy", Name = "isBusyEdgeById")]
         [ProducesResponseType(typeof(EdgeModel), (int)HttpStatusCode.OK)]
         [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.NotFound)]
         [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.InternalServerError)]
@@ -397,7 +396,7 @@ namespace Middleware.RedisInterface.Controllers
         /// <param name="edgeId"></param>
         /// <returns>bool</returns>
         [HttpGet]
-        [Route("isBusyEdge/{name}", Name = "isBusyEdgeByName")]
+        [Route("{name}/busy", Name = "isBusyEdgeByName")]
         [ProducesResponseType(typeof(EdgeModel), (int)HttpStatusCode.OK)]
         [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.NotFound)]
         [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.InternalServerError)]
@@ -423,7 +422,7 @@ namespace Middleware.RedisInterface.Controllers
         /// <param name="edgeId"></param>
         /// <returns>int</returns>
         [HttpGet]
-        [Route("numContainersById", Name = "GetNumEdgeContainersById")]
+        [Route("{id}/containers/count", Name = "GetNumEdgeContainersById")]
         [ProducesResponseType(typeof(int), (int)HttpStatusCode.OK)]
         [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.NotFound)]
         [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.BadRequest)]
@@ -453,7 +452,7 @@ namespace Middleware.RedisInterface.Controllers
         /// <param name="cloudName"></param>
         /// <returns>int</returns>
         [HttpGet]
-        [Route("numContainers/{name}", Name = "GetNumEdgeContainersByName")]
+        [Route("{name}/containers/count", Name = "GetNumEdgeContainersByName")]
         [ProducesResponseType(typeof(int), (int)HttpStatusCode.OK)]
         [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.NotFound)]
         [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.BadRequest)]

@@ -24,7 +24,9 @@ public class ApiResponse
     /// </summary>
     [JsonPropertyName("timeStamp")]
     public DateTime TimeStamp { get; }
-
+    /// <summary>
+    /// Is error response
+    /// </summary>
     [JsonPropertyName("isError")]
     public bool IsError => StatusCode >= (int)HttpStatusCode.BadRequest;
 
@@ -42,15 +44,16 @@ public class ApiResponse
 
 public class ApiResponse<T> : ApiResponse
 {
-    public T Result { get; private set; }
-    public ApiResponse(T result)
+    [JsonPropertyName("data")]
+    public T Data { get; private set; }
+    public ApiResponse(T data)
     {
-        Result = result;
+        Data = data;
         StatusCode = (int)HttpStatusCode.OK;
     }
 
-    public ApiResponse(T result, int statusCode, string message) : base(statusCode, message)
+    public ApiResponse(T data, int statusCode, string message) : base(statusCode, message)
     {
-        Result = result;
+        Data = data;
     }
 }

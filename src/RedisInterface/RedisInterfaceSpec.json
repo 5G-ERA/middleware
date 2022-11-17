@@ -2363,7 +2363,7 @@
         }
       }
     },
-    "/api/v1/Cloud/numContainers/{name}": {
+    "/api/v1/Cloud/{name}/containers/count": {
       "get": {
         "tags": [
           "Cloud"
@@ -2466,7 +2466,7 @@
         }
       }
     },
-    "/api/v1/Cloud/numContainersbyId": {
+    "/api/v1/Cloud/{id}/containers/count": {
       "get": {
         "tags": [
           "Cloud"
@@ -2479,6 +2479,14 @@
             "schema": {
               "type": "string",
               "format": "uuid"
+            }
+          },
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
             }
           }
         ],
@@ -2569,12 +2577,12 @@
         }
       }
     },
-    "/api/v1/Cloud/isBusyCloud/{name}": {
+    "/api/v1/Cloud/{name}/busy": {
       "get": {
         "tags": [
           "Cloud"
         ],
-        "operationId": "isBusyCloudByName",
+        "operationId": "IsBusyCloudByName",
         "parameters": [
           {
             "name": "name",
@@ -2672,7 +2680,7 @@
         }
       }
     },
-    "/api/v1/Cloud/isBusyCloudById": {
+    "/api/v1/Cloud/{id}/busy": {
       "get": {
         "tags": [
           "Cloud"
@@ -2685,6 +2693,14 @@
             "schema": {
               "type": "string",
               "format": "uuid"
+            }
+          },
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
             }
           }
         ],
@@ -4623,7 +4639,7 @@
         }
       }
     },
-    "/api/v1/Edge/isBusyEdgeById": {
+    "/api/v1/Edge/{id}/busy": {
       "get": {
         "tags": [
           "Edge"
@@ -4636,6 +4652,14 @@
             "schema": {
               "type": "string",
               "format": "uuid"
+            }
+          },
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
             }
           }
         ],
@@ -4703,7 +4727,7 @@
         }
       }
     },
-    "/api/v1/Edge/isBusyEdge/{name}": {
+    "/api/v1/Edge/{name}/busy": {
       "get": {
         "tags": [
           "Edge"
@@ -4783,7 +4807,7 @@
         }
       }
     },
-    "/api/v1/Edge/numContainersById": {
+    "/api/v1/Edge/{id}/containers/count": {
       "get": {
         "tags": [
           "Edge"
@@ -4796,6 +4820,14 @@
             "schema": {
               "type": "string",
               "format": "uuid"
+            }
+          },
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
             }
           }
         ],
@@ -4886,7 +4918,7 @@
         }
       }
     },
-    "/api/v1/Edge/numContainers/{name}": {
+    "/api/v1/Edge/{name}/containers/count": {
       "get": {
         "tags": [
           "Edge"
@@ -8324,15 +8356,21 @@
         "properties": {
           "statusCode": {
             "type": "integer",
-            "format": "int32"
+            "format": "int32",
+            "readOnly": true
           },
           "message": {
             "type": "string",
-            "nullable": true
+            "nullable": true,
+            "readOnly": true
           },
           "timeStamp": {
             "type": "string",
             "format": "date-time",
+            "readOnly": true
+          },
+          "isError": {
+            "type": "boolean",
             "readOnly": true
           }
         },

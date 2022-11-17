@@ -1,4 +1,5 @@
-﻿using System.Text.Json;
+﻿using System.Runtime.InteropServices;
+using System.Text.Json;
 using Amazon.Runtime.Internal.Transform;
 using Microsoft.Extensions.Logging;
 using Middleware.Common.Enums;
@@ -103,7 +104,7 @@ namespace Middleware.Common.Repositories
             return TempFreeEdges;
         }
 
-        public async Task<List<EdgeModel>> GetLessBusyEdgesAsync(List<EdgeModel> busyEdgesTocheck)
+        public async Task<List<EdgeModel>> GetLessBusyEdgesAsync(List<EdgeModel> busyEdgesToCheck)
         {
             //Dictionary<Guid, int> tempDic = new Dictionary<Guid,int>();
             Dictionary<EdgeModel, int> tempDic = new Dictionary<EdgeModel, int>();
@@ -111,7 +112,7 @@ namespace Middleware.Common.Repositories
             List<EdgeModel> lessBusyEdges = new List<EdgeModel>();
             //int counter = 0;            
 
-            foreach (EdgeModel busyEdge in busyEdgesTocheck)
+            foreach (EdgeModel busyEdge in busyEdgesToCheck)
             {
                 List<RelationModel> robotRelations = await GetRelation(busyEdge.Id, "LOCATED_AT", RelationDirection.Incoming);
 
@@ -163,8 +164,7 @@ namespace Middleware.Common.Repositories
         public async Task<bool> IsBusyEdgeByIdAsync(Guid edgeId)
         {
             List<RelationModel> edgeRelations = await GetRelation(edgeId, "LOCATED_AT", RelationDirection.Incoming);
-            if (edgeRelations.Count() > 0) { return false; }
-            else { return true; }
+            return edgeRelations.Count > 0;
         }
 
         /// <summary>
@@ -175,9 +175,10 @@ namespace Middleware.Common.Repositories
         public async Task<bool> IsBusyEdgeByNameAsync(string edgeName)
         {
             EdgeModel edge = (await GetAllAsync()).Where(x => x.Name == edgeName).FirstOrDefault();
+            if (edge is null)
+                throw new ArgumentException("Edge does not exist", nameof(edgeName));
             List<RelationModel> edgeRelations = await GetRelation(edge.Id, "LOCATED_AT", RelationDirection.Incoming);
-            if (edgeRelations.Count() > 0) { return false; }
-            else { return true; }
+            return edgeRelations.Count > 0;
         }
 
         /// <summary>
@@ -188,7 +189,7 @@ namespace Middleware.Common.Repositories
         public async Task<int> GetNumContainersByIdAsync(Guid edgeId)
         {
             List<RelationModel> edgeRelations = await GetRelation(edgeId, "LOCATED_AT", RelationDirection.Incoming);
-            return edgeRelations.Count();
+            return edgeRelations.Count;
         }
 
         /// <summary>
@@ -199,10 +200,10 @@ namespace Middleware.Common.Repositories
         public async Task<int> GetNumContainersByNameAsync(string edgeName)
         {
             EdgeModel edge = (await GetAllAsync()).Where(x => x.Name == edgeName).FirstOrDefault();
+            if (edge is null)
+                throw new ArgumentException("Edge does not exist", nameof(edgeName));
             List<RelationModel> robotRelations = await GetRelation(edge.Id, "LOCATED_AT", RelationDirection.Incoming);
-            return robotRelations.Count();
+            return robotRelations.Count;
         }
-
-
     }
 }
