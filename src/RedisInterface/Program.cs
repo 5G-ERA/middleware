@@ -3,6 +3,7 @@ using Middleware.Common.ExtensionMethods;
 using Middleware.Common.Repositories;
 using Middleware.Common.Repositories.Abstract;
 using Middleware.RedisInterface;
+using Middleware.RedisInterface.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -29,20 +30,6 @@ builder.Services.AddHttpClient("healthCheckClient");
 
 builder.RegisterRedis();
 
-/*var config = builder.Configuration.GetSection(RedisConfig.ConfigName).Get<RedisConfig>();
-
-var redisHostname = Environment.GetEnvironmentVariable("REDIS_HOSTNAME") ?? "127.0.0.1";
-var redisPort = Environment.GetEnvironmentVariable("REDIS_PORT") ?? "6379";
-
-ConnectionMultiplexer multiplexer = ConnectionMultiplexer.Connect(config.HostName,  (c) => 
-{
-    c.Password = config.Password;
-});
-builder.Services.AddSingleton<IConnectionMultiplexer>(multiplexer);
-RedisGraphClient redisGraphClient = new RedisGraphClient(multiplexer);
-builder.Services.AddSingleton<IRedisGraphClient>(redisGraphClient);*/
-
-
 builder.Services.AddScoped<IActionRepository, ActionRepository>();
 builder.Services.AddScoped<IActionPlanRepository, ActionPlanRepository>();
 builder.Services.AddScoped<ICloudRepository, CloudRepository>();
@@ -52,6 +39,7 @@ builder.Services.AddScoped<IInstanceRepository, InstanceRepository>();
 builder.Services.AddScoped<IPolicyRepository, PolicyRepository>();
 builder.Services.AddScoped<IRobotRepository, RobotRepository>();
 builder.Services.AddScoped<ITaskRepository, TaskRepository>();
+builder.Services.AddScoped<IDashboardService, DashboardService>();
 
 var app = builder.Build();
 

@@ -3585,6 +3585,55 @@
         }
       }
     },
+    "/api/v1/Dashboard": {
+      "get": {
+        "tags": [
+          "Dashboard"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/TaskRobotResponseListApiResponse"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TaskRobotResponseListApiResponse"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TaskRobotResponseListApiResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Server Error",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/v1/Edge": {
       "get": {
         "tags": [
@@ -8300,6 +8349,10 @@
           "RobotId": {
             "type": "string",
             "format": "uuid"
+          },
+          "TaskStartedAt": {
+            "type": "string",
+            "format": "date-time"
           }
         },
         "additionalProperties": false
@@ -9070,6 +9123,73 @@
           },
           "value": {
             "$ref": "#/components/schemas/TaskModel"
+          }
+        },
+        "additionalProperties": false
+      },
+      "TaskRobotResponse": {
+        "type": "object",
+        "properties": {
+          "robotName": {
+            "type": "string",
+            "nullable": true
+          },
+          "robotId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "taskName": {
+            "type": "string",
+            "nullable": true
+          },
+          "taskId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "taskStartTime": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "taskCompletedTime": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "RobotStatus": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "TaskRobotResponseListApiResponse": {
+        "type": "object",
+        "properties": {
+          "statusCode": {
+            "type": "integer",
+            "format": "int32",
+            "readOnly": true
+          },
+          "message": {
+            "type": "string",
+            "nullable": true,
+            "readOnly": true
+          },
+          "timeStamp": {
+            "type": "string",
+            "format": "date-time",
+            "readOnly": true
+          },
+          "isError": {
+            "type": "boolean",
+            "readOnly": true
+          },
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/TaskRobotResponse"
+            },
+            "nullable": true
           }
         },
         "additionalProperties": false

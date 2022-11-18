@@ -1,7 +1,9 @@
-﻿namespace Middleware.RedisInterface.Services
+﻿using Middleware.RedisInterface.Responses;
+
+namespace Middleware.RedisInterface.Services
 {
     public interface IDashboardService
     {
-        Task GetRobotStatusList();
+        Task<List<TaskRobotResponse>> GetRobotStatusListAsync();
     }
 }
