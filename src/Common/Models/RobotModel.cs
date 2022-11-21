@@ -155,4 +155,63 @@ public class RobotModel : BaseModel
         }
         return true;
     }
+    /// <summary>
+    /// Set the topic to be enabled.
+    /// </summary>
+    /// <param name="topic"></param>
+    public void EnableRosTopic(RosTopicModel topic)
+    {
+        topic.Enabled = true;
+    }
+
+    /// <summary>
+    /// Set the topic to be disabled.
+    /// </summary>
+    /// <param name="topic"></param>
+    public void DisableRosTopic(RosTopicModel topic)
+    {
+        topic.Enabled = false;
+    }
+
+    /// <summary>
+    /// Get all topics of a robot in a single list.
+    /// </summary>
+    /// <param name="nodes"></param>
+    /// <returns></returns>
+    public List<RosTopicModel> GetAllRobotTopics()
+    {
+        List<RosTopicModel> topics = new List<RosTopicModel>();
+        foreach(ROSNodeModel node in ROSNodes)
+        {
+                foreach (RosTopicModel pubTopic in node.Publications)
+                {
+                    if (!(topics.Contains(pubTopic)))
+                    {
+                        topics.Add(pubTopic);
+                    }
+                }
+                foreach (RosTopicModel subTopic in node.Subscriptions)
+                {
+                    if (!(topics.Contains(subTopic)))
+                    {
+                        topics.Add(subTopic);
+                    }
+                }
+        }
+        return topics;
+    }
+
+    /// <summary>
+    /// Get topicModel entity from specific topic name
+    /// </summary>
+    /// <param name="topicName"></param>
+    /// <returns></returns>
+    public RosTopicModel GetTopicModelFromRobot(string topicName)
+    {
+        foreach (RosTopicModel topic in GetAllRobotTopics())
+        {
+            if(topicName== topic.Name) { return topic; }
+        }
+        return null;
+    }
 }

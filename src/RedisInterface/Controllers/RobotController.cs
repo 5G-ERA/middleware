@@ -1,7 +1,10 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Middleware.Common.Enums;
 using Middleware.Common.Models;
 using Middleware.Common.Repositories.Abstract;
+using System.Collections.Generic;
+using System.Linq;
 using System.Net;
 
 namespace Middleware.RedisInterface.Controllers
@@ -374,6 +377,35 @@ namespace Middleware.RedisInterface.Controllers
                 return StatusCode(statusCode, new ApiResponse(statusCode, $"An error has occurred: {ex.Message}"));
             }
 
+        }
+        [HttpGet]
+        [Route("{robotId}/topic", Name = "RobotChangeTopicStatus")]
+        [ProducesResponseType(typeof(RosTopicModel), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.NotFound)]
+        [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.BadRequest)]
+        [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.InternalServerError)]
+        public async Task<ActionResult> EnableTopicAsync(Guid robotId,string topicName, bool topicEnabled)
+        {
+            try
+            {
+                RobotModel robot = await _robotRepository.GetByIdAsync(robotId);
+                RosTopicModel topicModel = robot.GetTopicModelFromRobot(topicName);
+                if (topicEnabled == true)
+                {
+                    robot.EnableRosTopic(topicModel);                     
+                }
+                else
+                {
+                    robot.DisableRosTopic(topicModel);
+                }
+                return Ok(topicModel);
+            }
+            catch (Exception ex)
+            {
+                int statusCode = (int)HttpStatusCode.InternalServerError;
+                _logger.LogError(ex, "An error occurred:");
+                return StatusCode(statusCode, new ApiResponse(statusCode, $"An error has occurred: {ex.Message}"));
+            }
         }
     }
 }
