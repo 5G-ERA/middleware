@@ -143,5 +143,24 @@ namespace Middleware.Common.Repositories
             return clouds;
         }
 
+        /// <summary>
+        /// Set the topic to be enabled.
+        /// </summary>
+        /// <param name="topic"></param>
+        public void enableRosTopic(RosTopicModel topic)
+        {
+            topic.enabled = true;
+        }
+
+        /// <summary>
+        /// Set the topic to be disabled.
+        /// </summary>
+        /// <param name="topic"></param>
+        public void disableRosTopic(RosTopicModel topic)
+        {
+            topic.enabled = false;
+        }
+
+
     }
 }
