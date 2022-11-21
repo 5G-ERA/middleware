@@ -1,4 +1,6 @@
-﻿using Middleware.Common.Repositories;
+﻿using Middleware.Common;
+using Middleware.Common.Helpers;
+using Middleware.Common.Repositories;
 using Middleware.Common.Repositories.Abstract;
 using Middleware.RedisInterface.Responses;
 
@@ -17,7 +19,7 @@ namespace Middleware.RedisInterface.Services
             _robotRepository = robotRepository;
         }
 
-        public async Task<List<TaskRobotResponse>> GetRobotStatusListAsync()
+        public async Task<Tuple<List<TaskRobotResponse>, int>> GetRobotStatusListAsync(PaginationFilter filter)
         {
             var robots = await _robotRepository.GetAllAsync();
             var actionPlans = await _actionPlanRepository.GetAllAsync();
@@ -42,8 +44,12 @@ namespace Middleware.RedisInterface.Services
                 
                 responses.Add(response);
             }
-
-            return responses;
+            var count = responses.Count;
+            var retVal = responses
+                .Skip((filter.PageNumber - 1) * filter.PageSize)
+                .Take(filter.PageSize)
+                .ToList();
+            return new (retVal, count);
         }
     }
 }

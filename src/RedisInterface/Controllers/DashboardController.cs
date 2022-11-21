@@ -1,6 +1,8 @@
 ﻿using System.Net;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Middleware.Common;
+using Middleware.Common.Helpers;
 using Middleware.Common.Responses;
 using Middleware.RedisInterface.Responses;
 using Middleware.RedisInterface.Services;
@@ -13,22 +15,26 @@ namespace Middleware.RedisInterface.Controllers
     {
         private readonly IDashboardService _dashboardService;
         private readonly ILogger<DashboardController> _logger;
-        public DashboardController(IDashboardService dashboardService, ILogger<DashboardController> logger)
+        private readonly IUriService _uriService;
+        public DashboardController(IDashboardService dashboardService, ILogger<DashboardController> logger, IUriService uriService)
         {
+            _uriService = uriService;
             _logger = logger;
             _dashboardService = dashboardService;
         }
 
         [HttpGet]
-        [ProducesResponseType(typeof(ApiResponse<List<TaskRobotResponse>>), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(PagedResponse<List<TaskRobotResponse>>), (int)HttpStatusCode.OK)]
         [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.InternalServerError)]
-        public async Task<ActionResult<ApiResponse>> GetTaskRobotResponseAsync()
+        public async Task<IActionResult> GetTaskRobotResponseAsync([FromQuery] PaginationFilter filter)
         {
             try
             {
-                var data = await _dashboardService.GetRobotStatusListAsync();
+                var route = Request.Path.Value;
+                (var data, int count) = await _dashboardService.GetRobotStatusListAsync(filter);
 
-                return Ok(new ApiResponse<List<TaskRobotResponse>>(data));
+                var pagedResponse = data.ToPagedResponse(filter, count, _uriService, route);
+                return Ok(pagedResponse);
             }
             catch (Exception ex)
             {
@@ -39,4 +45,5 @@ namespace Middleware.RedisInterface.Controllers
             
         }
     }
+
 }

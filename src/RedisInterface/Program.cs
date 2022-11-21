@@ -29,6 +29,7 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddHttpClient("healthCheckClient");
 
 builder.RegisterRedis();
+builder.Services.AddUriHelper();
 
 builder.Services.AddScoped<IActionRepository, ActionRepository>();
 builder.Services.AddScoped<IActionPlanRepository, ActionPlanRepository>();
