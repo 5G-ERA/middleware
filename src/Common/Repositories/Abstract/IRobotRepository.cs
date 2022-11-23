@@ -1,4 +1,5 @@
-﻿using Middleware.Common.Models;
+﻿using Middleware.Common.Enums;
+using Middleware.Common.Models;
 
 namespace Middleware.Common.Repositories.Abstract
 {
@@ -9,5 +10,6 @@ namespace Middleware.Common.Repositories.Abstract
         Task<List<EdgeModel>> GetConnectedEdgesIdsAsync(Guid robotId);
 
         Task<List<CloudModel>> GetConnectedCloudsIdsAsync(Guid robotID);
+
     }
 }

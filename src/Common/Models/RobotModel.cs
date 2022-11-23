@@ -155,4 +155,37 @@ public class RobotModel : BaseModel
         }
         return true;
     }
+
+
+    /// <summary>
+    /// Get all topics of a robot in a single list.
+    /// </summary>
+    /// <param name="nodes"></param>
+    /// <returns></returns>
+    public HashSet<RosTopicModel> GetAllRobotTopics()
+    {
+        HashSet<RosTopicModel> topics = new HashSet<RosTopicModel>();
+        foreach(ROSNodeModel node in ROSNodes)
+        {
+                foreach (RosTopicModel pubTopic in node.Publications)
+                {
+                        topics.Add(pubTopic);
+                }
+                foreach (RosTopicModel subTopic in node.Subscriptions)
+                {
+                        topics.Add(subTopic);
+                }
+        }
+        return topics;
+    }
+
+    /// <summary>
+    /// Get topicModel entity from specific topic name
+    /// </summary>
+    /// <param name="topicName"></param>
+    /// <returns></returns>
+    public RosTopicModel GetTopicModelFromRobot(string topicName)
+    {
+        return GetAllRobotTopics().Where(t => t.Name == topicName).FirstOrDefault();
+    }
 }
