@@ -393,13 +393,12 @@ namespace Middleware.RedisInterface.Controllers
                 if (topicEnabled == true)
                 {
                     topicModel.Enable();
-                    await _robotRepository.AddAsync(robot, () => robot.Id);
                 }
                 else
                 {
                     topicModel.Disable();
-                    await _robotRepository.AddAsync(robot, () => robot.Id);
                 }
+                await _robotRepository.AddAsync(robot, () => robot.Id);
                 return Ok(topicModel);
             }
             catch (Exception ex)
