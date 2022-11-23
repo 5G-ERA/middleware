@@ -44,6 +44,26 @@ namespace Middleware.RedisInterface.Controllers
             }
             
         }
-    }
 
+        [HttpGet("locations")]
+        [ProducesResponseType(typeof(PagedResponse<List<LocationStatusResponse>>), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.InternalServerError)]
+        public async Task<IActionResult> GetCloudRobotStatusesAsync([FromQuery] PaginationFilter filter)
+        {
+            try
+            {
+                var route = Request.Path.Value;
+                (var data, int count) = await _dashboardService.GetLocationsStatusListAsync(filter);
+
+                var pagedResponse = data.ToPagedResponse(filter, count, _uriService, route);
+                return Ok(pagedResponse);
+            }
+            catch (Exception ex)
+            {
+                int statusCode = (int)HttpStatusCode.InternalServerError;
+                _logger.LogError(ex, "An error occurred:");
+                return StatusCode(statusCode, new ApiResponse(statusCode, $"An error has occurred: {ex.Message}"));
+            }
+        }
+    }
 }

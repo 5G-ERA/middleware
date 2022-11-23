@@ -37,6 +37,12 @@ public class EdgeModel : BaseModel
     [JsonPropertyName("NumberOfCores")]
     public int NumberOfCores { get; set; }
 
+    [JsonPropertyName("LastUpdatedTime")]
+    public DateTime LastUpdatedTime { get; set; }
+
+    [JsonPropertyName("IsOnline")]
+    public bool IsOnline { get; set; }
+
     /// <summary>
     /// Onboarding validation of the edge data object.
     /// </summary>

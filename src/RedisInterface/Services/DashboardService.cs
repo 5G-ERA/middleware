@@ -1,4 +1,5 @@
 ﻿using Middleware.Common;
+using Middleware.Common.Enums;
 using Middleware.Common.Helpers;
 using Middleware.Common.Repositories;
 using Middleware.Common.Repositories.Abstract;
@@ -11,12 +12,81 @@ namespace Middleware.RedisInterface.Services
         private readonly IRobotRepository _robotRepository;            
         private readonly ITaskRepository _taskRepository;
         private readonly IActionPlanRepository _actionPlanRepository;
+        private readonly IEdgeRepository _edgeRepository;
+        private readonly ICloudRepository _cloudRepository;
+        private readonly IInstanceRepository _instanceRepository;
 
-        public DashboardService(IRobotRepository robotRepository, ITaskRepository taskRepository, IActionPlanRepository actionPlanRepository)
+
+        public DashboardService(IRobotRepository robotRepository, 
+            ITaskRepository taskRepository, 
+            IActionPlanRepository actionPlanRepository, 
+            IEdgeRepository edgeRepository, 
+            ICloudRepository cloudRepository,
+            IInstanceRepository instanceRepository)
         {
+            _instanceRepository = instanceRepository;
+            _cloudRepository = cloudRepository;
+            _edgeRepository = edgeRepository;
             _actionPlanRepository = actionPlanRepository;
             _taskRepository = taskRepository;
             _robotRepository = robotRepository;
+        }
+
+        public async Task<Tuple<List<LocationStatusResponse>, int>> GetLocationsStatusListAsync(PaginationFilter filter)
+        {
+            var locations = new List<LocationStatusResponse>();
+            var clouds = await _cloudRepository.GetAllAsync();
+            
+            foreach (var cloud in clouds)
+            {
+                var locatedInstances = 
+                    await _cloudRepository.GetRelation(cloud.Id,"LOCATED_AT",RelationDirection.Incoming);
+
+                int noOfContainers = 0;
+                foreach (var item in locatedInstances)
+                {
+                    var instanceContainers = await _instanceRepository.GetRelation(item.InitiatesFrom.Id, "NEEDS");
+                    noOfContainers += instanceContainers.Count;
+                }
+
+                var location = new LocationStatusResponse(cloud.Name, 
+                                   cloud.LastUpdatedTime, 
+                                   cloud.CloudStatus, 
+                                   cloud.IsOnline, 
+                                   noOfContainers > 0, 
+                                   noOfContainers);
+                locations.Add(location);
+            }
+
+            var edges = await _edgeRepository.GetAllAsync();
+
+            foreach (var edge in edges)
+            {
+                var locatedInstances =
+                    await _edgeRepository.GetRelation(edge.Id, "LOCATED_AT", RelationDirection.Incoming);
+
+                int noOfContainers = 0;
+                foreach (var item in locatedInstances)
+                {
+                    var instanceContainers = await _instanceRepository.GetRelation(item.InitiatesFrom.Id, "NEEDS");
+                    noOfContainers += instanceContainers.Count;
+                }
+
+                var location = new LocationStatusResponse(edge.Name,
+                                   edge.LastUpdatedTime,
+                                   edge.EdgeStatus,
+                                   edge.IsOnline,
+                                   noOfContainers > 0,
+                                   noOfContainers);
+                locations.Add(location);
+            }
+            var count = locations.Count;
+            var retVal = locations
+                .Skip((filter.PageNumber - 1) * filter.PageSize)
+                .Take(filter.PageSize)
+                .ToList();
+
+            return new (retVal, count);
         }
 
         public async Task<Tuple<List<TaskRobotResponse>, int>> GetRobotStatusListAsync(PaginationFilter filter)
