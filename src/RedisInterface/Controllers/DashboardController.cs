@@ -23,7 +23,7 @@ namespace Middleware.RedisInterface.Controllers
             _dashboardService = dashboardService;
         }
 
-        [HttpGet]
+        [HttpGet("tasks")]
         [ProducesResponseType(typeof(PagedResponse<List<TaskRobotResponse>>), (int)HttpStatusCode.OK)]
         [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.InternalServerError)]
         public async Task<IActionResult> GetTaskRobotResponseAsync([FromQuery] PaginationFilter filter)
