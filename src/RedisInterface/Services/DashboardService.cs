@@ -80,13 +80,7 @@ namespace Middleware.RedisInterface.Services
                                    noOfContainers);
                 locations.Add(location);
             }
-            var count = locations.Count;
-            var retVal = locations
-                .Skip((filter.PageNumber - 1) * filter.PageSize)
-                .Take(filter.PageSize)
-                .ToList();
-
-            return new (retVal, count);
+            return new (filter.FilterResult(locations), locations.Count);
         }
 
         public async Task<Tuple<List<TaskRobotResponse>, int>> GetRobotStatusListAsync(PaginationFilter filter)
@@ -114,12 +108,7 @@ namespace Middleware.RedisInterface.Services
                 
                 responses.Add(response);
             }
-            var count = responses.Count;
-            var retVal = responses
-                .Skip((filter.PageNumber - 1) * filter.PageSize)
-                .Take(filter.PageSize)
-                .ToList();
-            return new (retVal, count);
+            return new (filter.FilterResult(responses), responses.Count);
         }
     }
 }
