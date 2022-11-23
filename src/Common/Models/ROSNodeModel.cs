@@ -22,21 +22,19 @@ namespace Middleware.Common.Models
         /// </summary>
         /// <param name="nodes"></param>
         /// <returns></returns>
-        public HashSet<RosTopicModel> GetAllNodeTopics(List<ROSNodeModel> nodes)
+        public HashSet<RosTopicModel> GetAllNodeTopics()
         {
             HashSet<RosTopicModel> topics = new HashSet<RosTopicModel>();
 
-            foreach (ROSNodeModel node in nodes)
+            foreach (RosTopicModel pubTopic in Publications)
             {
-                foreach (RosTopicModel pubTopic in node.Publications)
-                {
-                    topics.Add(pubTopic);
-                }
-                foreach (RosTopicModel subTopic in node.Subscriptions)
-                {
-                    topics.Add(subTopic);
-                }
+                topics.Add(pubTopic);
             }
+            foreach (RosTopicModel subTopic in Subscriptions)
+            {
+                topics.Add(subTopic);
+            }
+            
             return topics;
         }
 
