@@ -392,11 +392,13 @@ namespace Middleware.RedisInterface.Controllers
                 RosTopicModel topicModel = robot.GetTopicModelFromRobot(topicName);
                 if (topicEnabled == true)
                 {
-                    robot.EnableRosTopic(topicModel);                     
+                    topicModel.Enable();
+                    await _robotRepository.AddAsync(robot, () => robot.Id);
                 }
                 else
                 {
-                    robot.DisableRosTopic(topicModel);
+                    topicModel.Disable();
+                    await _robotRepository.AddAsync(robot, () => robot.Id);
                 }
                 return Ok(topicModel);
             }

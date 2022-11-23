@@ -1,11 +1,11 @@
-﻿using Middleware.Common.Models;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Middleware.Common.Enums
+
+namespace Middleware.Common.Models
 {
     public class ROSNodeModel
     {
@@ -22,25 +22,19 @@ namespace Middleware.Common.Enums
         /// </summary>
         /// <param name="nodes"></param>
         /// <returns></returns>
-        public List<RosTopicModel> GetAllNodeTopics(List<ROSNodeModel> nodes)
+        public HashSet<RosTopicModel> GetAllNodeTopics(List<ROSNodeModel> nodes)
         {
-            List<RosTopicModel> topics = new List<RosTopicModel>();
+            HashSet<RosTopicModel> topics = new HashSet<RosTopicModel>();
 
             foreach (ROSNodeModel node in nodes)
             {
                 foreach (RosTopicModel pubTopic in node.Publications)
                 {
-                    if (!(topics.Contains(pubTopic)))
-                    {
-                        topics.Add(pubTopic);
-                    }
+                    topics.Add(pubTopic);
                 }
                 foreach (RosTopicModel subTopic in node.Subscriptions)
                 {
-                    if (!(topics.Contains(subTopic)))
-                    {
-                        topics.Add(subTopic);
-                    }
+                    topics.Add(subTopic);
                 }
             }
             return topics;
