@@ -1228,7 +1228,7 @@
         }
       }
     },
-    "/api/v1/Action/LastestPlan/robot/{robotId}": {
+    "/api/v1/Action/plan/robot/{robotId}/latest": {
       "get": {
         "tags": [
           "Action"
@@ -2013,7 +2013,7 @@
         }
       }
     },
-    "/api/v1/Cloud/CloudData/{name}": {
+    "/name/{name}": {
       "get": {
         "tags": [
           "Cloud"
@@ -4131,7 +4131,7 @@
         }
       }
     },
-    "/api/v1/Edge/EdgeData/{name}": {
+    "/api/v1/Edge/name/{name}": {
       "get": {
         "tags": [
           "Edge"

@@ -1,4 +1,5 @@
 ﻿using Middleware.Common.Enums;
+using Middleware.Common.ExtensionMethods;
 
 namespace Middleware.Common.Models
 {
@@ -26,6 +27,13 @@ namespace Middleware.Common.Models
         {
             Id = id;
             Type = dbIndex.ToString().ToUpper();
+        }
+
+        public GraphEntityModel(Guid id, string name, Type type)
+        {
+            Id = id;
+            Name = name;
+            Type = type.GetModelName();
         }
     }
 }

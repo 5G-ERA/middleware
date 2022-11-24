@@ -1,6 +1,5 @@
 ﻿using Middleware.Common;
 using Middleware.TaskPlanner.Orchestrator;
-using Middleware.TaskPlanner.RedisInterface;
 using Middleware.TaskPlanner.ResourcePlanner;
 
 namespace Middleware.TaskPlanner.ApiReference;
@@ -14,18 +13,7 @@ public class ApiClientBuilder : IApiClientBuilder
     {
         _httpClientFactory = httpClientFactory;
         _env = env;
-    }
-
-    /// <summary>
-    /// <inheritdoc cref="IApiClientBuilder.CreateRedisApiClient"/>
-    /// </summary>
-    public RedisApiClient CreateRedisApiClient()
-    {
-        var address = _env.GetEnvVariable("REDIS_INTERFACE_ADDRESS") ??
-                      throw new ArgumentNullException("REDIS_INTERFACE_ADDRESS", "REDIS_INTERFACE_ADDRESS environment variable not specified");
-        var client = _httpClientFactory.CreateClient("redisApiClient");
-        return new RedisApiClient(address, client);
-    }
+    }    
 
     /// <summary>
     /// <inheritdoc cref="IApiClientBuilder.CreateRedisApiClient"/>
@@ -50,11 +38,6 @@ public class ApiClientBuilder : IApiClientBuilder
 
 public interface IApiClientBuilder
 {
-    /// <summary>
-    /// Creates the Redis Interface api
-    /// </summary>
-    /// <returns></returns>
-    RedisApiClient CreateRedisApiClient();
     /// <summary>
     /// Creates the Resource planner api client
     /// </summary>

@@ -1,8 +1,12 @@
 ﻿using System.Net;
+using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 using Middleware.Common.Models;
 using Middleware.Common.Repositories;
 using Middleware.Orchestrator.ApiReference;
+using Middleware.Orchestrator.RedisInterface;
+using ActionPlanModel = Middleware.Common.Models.ActionPlanModel;
+using ApiResponse = Middleware.Common.Models.ApiResponse;
 
 namespace Middleware.Orchestrator.Controllers;
 
@@ -14,13 +18,15 @@ public class StatusController : Controller
     private readonly IRobotStatusRepository _robotStatusRepository;
     private readonly IApiClientBuilder _clientBuilder;
     private readonly ILogger _logger;
+    private readonly IMapper _mapper;
 
-    public StatusController(INetAppStatusRepository netAppStatusRepository, IRobotStatusRepository robotStatusRepository, IApiClientBuilder clientBuilder, ILogger<StatusController> logger)
+    public StatusController(INetAppStatusRepository netAppStatusRepository, IRobotStatusRepository robotStatusRepository, IApiClientBuilder clientBuilder, ILogger<StatusController> logger, IMapper mapper)
     {
         _netAppStatusRepository = netAppStatusRepository;
         _robotStatusRepository = robotStatusRepository;
         _clientBuilder = clientBuilder;
         _logger = logger;
+        _mapper = mapper;
     }
     /// <summary>
     /// Get the robot status
@@ -41,7 +47,7 @@ public class StatusController : Controller
         }
         try
         {
-
+            //TODO: put behind service
             var status = await _robotStatusRepository.GetByIdAsync(id);
             if (status is null)
             {
@@ -74,6 +80,7 @@ public class StatusController : Controller
         }
         try
         {
+            //TODO: put behind service
             await _robotStatusRepository.AddAsync(model, () => model.Id);
         }
         catch (Exception ex)
@@ -104,6 +111,7 @@ public class StatusController : Controller
         }
         try
         {
+            //TODO: put behind service
             var status = await _netAppStatusRepository.GetByIdAsync(id);
             if (status is null)
             {
@@ -136,6 +144,7 @@ public class StatusController : Controller
         }
         try
         {
+            //TODO: put behind service
             await _netAppStatusRepository.AddAsync(model, () => model.Id);
         }
         catch (Exception ex)
@@ -167,9 +176,10 @@ public class StatusController : Controller
 
         try
         {
+            //TODO: put behind service
             var redisClient = _clientBuilder.CreateRedisApiClient();
             var riDeployedActionPlans = await redisClient.ActionPlanGetAllAsync();
-            var instanceIds = riDeployedActionPlans
+            var instanceIds = _mapper.Map<List<ActionPlanModel>>(riDeployedActionPlans) 
                 .SelectMany(a => a.ActionSequence.SelectMany(x => x.Services))
                 .Where(i => i.Id == id)
                 .Select(i => i.ServiceInstanceId)
@@ -192,7 +202,7 @@ public class StatusController : Controller
             }
             return Ok(statuses);
         }
-        catch (RedisInterface.ApiException<RedisInterface.ApiResponse> apiEx)
+        catch (ApiException<RedisInterface.ApiResponse> apiEx)
         {
             _logger.LogError(apiEx, "An error occurred:");
             return StatusCode(apiEx.StatusCode, apiEx.Result);
