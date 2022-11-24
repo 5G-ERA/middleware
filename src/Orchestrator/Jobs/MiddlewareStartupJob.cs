@@ -55,33 +55,34 @@ namespace Middleware.Orchestrator.Jobs
                 var serviceNames = services.Items.Select(d => d.Metadata.Name).ToArray();
                 var images = new List<string>
                     {"gateway", "redis-interface-api", "resource-planner-api", "task-planner-api"};
+
                 string orchestratorImage = deployments.Items
                     .First(d => d.Metadata.Name == "orchestrator-api").Spec.Template.Spec.Containers.FirstOrDefault().Image;
+
                 string tag = K8SImageHelper.GetTag(orchestratorImage);
 
                 foreach (string service in images)
                 {
                     Logger.LogDebug("Started deployment of {service}", service);
-                    var v1Deployment = _deploymentService.CreateStartupDeployment(service, tag);
 
-                    if (deploymentNames.Contains(v1Deployment.Metadata.Name))
+                    V1Deployment deployment = _deploymentService.CreateStartupDeployment(service, tag);
+
+                    if (deploymentNames.Contains(deployment.Metadata.Name) == false)
                     {
-                        Logger.LogDebug("{service} is already deployed, moved to the next service", service);
-                        continue;
+                        deployment = await kubeClient.AppsV1.CreateNamespacedDeploymentAsync(deployment, AppConfig.K8SNamespaceName,
+                            dryRun: shouldDryRun ? "All" : null);
                     }
 
-                    var result = await kubeClient.AppsV1.CreateNamespacedDeploymentAsync(v1Deployment, AppConfig.K8SNamespaceName,
-                        dryRun: shouldDryRun ? "All" : null);
-                    
+                    var kind = (service != "gateway") ? K8SServiceKindEnum.ClusterIp : K8SServiceKindEnum.LoadBalancer;
 
-                    var kind = service != "gateway" ? K8SServiceKindEnum.ClusterIp : K8SServiceKindEnum.LoadBalancer;
+                    V1Service lbService = _deploymentService.CreateService(service, kind, deployment.Metadata);
 
-                    var lbService = _deploymentService.CreateService(service, kind, result.Metadata);
-                    var createdService = await kubeClient.CoreV1.CreateNamespacedServiceAsync(lbService, AppConfig.K8SNamespaceName);
+                    if (serviceNames.Contains(lbService.Metadata.Name) == false)
+                        lbService = await kubeClient.CoreV1.CreateNamespacedServiceAsync(lbService, AppConfig.K8SNamespaceName);
 
                     if (service == "gateway")
                     {
-                        AppConfig.MiddlewareAddress = createdService.GetExternalAddress(Logger);
+                        AppConfig.MiddlewareAddress = lbService.GetExternalAddress(Logger);
 
                         if (string.IsNullOrEmpty(AppConfig.MiddlewareAddress))
                             Logger.LogError("Could not obtain the Gateway Address");
