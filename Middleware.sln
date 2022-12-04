@@ -25,7 +25,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Orchestrator.Tests.Unit", "
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Common.Tests.Unit", "test\Common.Tests.Unit\Common.Tests.Unit.csproj", "{9078DB0F-2E0E-4F40-8985-6C3AFC3C3D4E}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "dashboardEra5G", "D:\Adrian\Desktop\dashboardEra5G\dashboardEra5G\dashboardEra5G.csproj", "{8D2A7887-B92C-40C7-9B5C-C3B6DDACA0A6}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Dashboard5GEra", "D:\Adrian\Desktop\dashboardEra5G\dashboardEra5G\Dashboard5GEra.csproj", "{8D2A7887-B92C-40C7-9B5C-C3B6DDACA0A6}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
