@@ -1,0 +1,132 @@
+﻿@page
+@model Dashboard5GEra.Pages.MainModel
+@{
+    ViewData["Title"] = "Control panel:";
+}
+<h1>@ViewData["Title"]</h1>
+
+<div class="alert alert-primary" role="alert">
+    Robot task control grid:
+</div>
+
+<hr style="height:2px;border-width:0;color:gray;background-color:gray">
+
+<script type="text/javascript" src="Scripts/bootstrap.min.js"></script>
+<script type="text/javascript" src="Scripts/jquery-2.1.1.min.js"></script>
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.1.1/css/bootstrap.min.css" integrity="sha512-6KY5s6UI5J7SVYuZB4S/CZMyPylqyyNZco376NM2Z8Sb8OxEdp02e1jkKk/wZxIEmjQ6DRCEBhni+gpr9c4tvA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.1.1/js/bootstrap.min.js" integrity="sha512-ewfXo9Gq53e1q1+WDTjaHAGZ8UvCWq0eXONhwDuIoaH8xz2r96uoAYaQCm1oQhnBfRXrvJztNXFsTloJfgbL5Q==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+<div class="input-group mb-3">
+    <label class="btn btn-secondary active">
+        Start time
+    </label>
+    <input type="text" class="form-control" placeholder=" DD/MM/YY HH/MM/SS" aria-label="" aria-describedby="basic-addon1">
+    
+    <label class="btn btn-secondary active">
+         Finished time
+    </label>
+    <input type="text" class="form-control" placeholder=" DD/MM/YY HH/MM/SS" aria-label="" aria-describedby="basic-addon1">
+   
+    <!-- Default dropright button -->
+    <div class="dropdown">
+        <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            Robot Online
+        </button>
+        <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+            <a class="dropdown-item" href="#">True</a>
+            <a class="dropdown-item" href="#">False</a>
+        </div>
+    </div>
+    <input type="text" class="form-control" id= "boolOnlineRobotDrop" disabled placeholder ="True" aria-label="" aria-describedby="basic-addon1">
+
+    <!-- Default dropright button -->
+    <div class="dropdown">
+        <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            Task Status
+        </button>
+        <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+            <a class="dropdown-item" href="#">Completed</a>
+            <a class="dropdown-item" href="#">Failed</a>
+            <a class="dropdown-item" href="#">Ongoing</a>
+            <a class="dropdown-item" href="#">Unknown</a>
+        </div>
+    </div>
+    <input type="text" class="form-control" id="taskStatus" disabled placeholder="Completed" aria-label="" aria-describedby="basic-addon1">
+
+
+
+</div>
+
+
+<div class="input-group mb-3">
+    <!-- Default dropright button -->
+    <div class="dropdown">
+        <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            Robot Id
+        </button>
+        <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+            <a class="dropdown-item" href="#">Summit_XL_1</a>
+            <a class="dropdown-item" href="#">Aisoy_KiK_1</a>
+            <a class="dropdown-item" href="#">Aisoy_KiK_2</a>
+        </div>
+    </div>
+    <input type="text" class="form-control" id="taskStatus" disabled placeholder="robotId" aria-label="" aria-describedby="basic-addon1">
+
+    <div class="dropdown">
+        <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            Task Name
+        </button>
+        <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+            <a class="dropdown-item" href="#">Surveilance</a>
+            <a class="dropdown-item" href="#">Disaster Recovery</a>
+            <a class="dropdown-item" href="#">Cleaning</a>
+        </div>
+    </div>
+    <input type="text" class="form-control" id="taskStatus" disabled placeholder="Task name" aria-label="" aria-describedby="basic-addon1">
+
+
+</div>
+
+<div data-spy="scroll" data-target="#list-example" data-offset="0" class="scrollspy-example">
+<table class="table table-bordered">
+    <thead>
+        <tr>
+            <th scope="col">#</th>
+            <th scope="col">First</th>
+            <th scope="col">Last</th>
+            <th scope="col">Handle</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <th scope="row">1</th>
+            <td>Mark</td>
+            <td>Otto</td>
+            <td>mdo</td>
+        </tr>
+        <tr>
+            <th scope="row">2</th>
+            <td>Jacob</td>
+            <td>Thornton</td>
+            <td>fat</td>
+        </tr>
+        <tr>
+            <th scope="row">3</th>
+            <td colspan="2">Larry the Bird</td>
+            <td>twitter</td>
+        </tr>
+    </tbody>
+</table>
+</div>
+
+<button type="button" class="btn btn-outline-primary">Export Data</button>
+<div class="form-check">
+    <input type="checkbox" class="form-check-input" id="exampleCheck1">
+    <label class="form-check-label" for="exampleCheck1">csv</label>
+</div>
+<div class="form-check">
+    <input type="checkbox" class="form-check-input" id="exampleCheck1">
+    <label class="form-check-label" for="exampleCheck1">json</label>
+</div>
+<hr style="height:2px;border-width:0;color:gray;background-color:gray">
