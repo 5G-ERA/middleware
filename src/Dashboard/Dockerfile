@@ -7,16 +7,16 @@ EXPOSE 443
 
 FROM mcr.microsoft.com/dotnet/sdk:6.0 AS build
 WORKDIR /src
-COPY ["dashboardEra5G/dashboardEra5G.csproj", "dashboardEra5G/"]
-RUN dotnet restore "dashboardEra5G/dashboardEra5G.csproj"
+COPY ["Dashboard/Dashboard.csproj", "Dashboard/"]
+RUN dotnet restore "Dashboard/Dashboard.csproj"
 COPY . .
-WORKDIR "/src/dashboardEra5G"
-RUN dotnet build "dashboardEra5G.csproj" -c Release -o /app/build
+WORKDIR "/src/Dashboard"
+RUN dotnet build "Dashboard.csproj" -c Release -o /app/build
 
 FROM build AS publish
-RUN dotnet publish "dashboardEra5G.csproj" -c Release -o /app/publish /p:UseAppHost=false
+RUN dotnet publish "Dashboard.csproj" -c Release -o /app/publish /p:UseAppHost=false
 
 FROM base AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
-ENTRYPOINT ["dotnet", "dashboardEra5G.dll"]
+ENTRYPOINT ["dotnet", "Dashboard.dll"]
