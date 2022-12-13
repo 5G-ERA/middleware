@@ -1,10 +1,10 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using System.Net;
 using Microsoft.AspNetCore.Mvc;
 using Middleware.Common.Models;
-using Middleware.Common.Repositories;
 using Middleware.Common.Repositories.Abstract;
 using Middleware.Common.Responses;
 using System.Net;
+
 
 namespace Middleware.RedisInterface.Controllers
 {
@@ -278,11 +278,11 @@ namespace Middleware.RedisInterface.Controllers
         }
 
         [HttpGet]
-        [Route("CloudData/{name}", Name = "CloudGetDataByName")]
+        [Route("/name/{name}", Name = "CloudGetDataByName")]
         [ProducesResponseType(typeof(CloudModel), (int)HttpStatusCode.OK)]
         [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.NotFound)]
         [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.InternalServerError)]
-        public async Task<ActionResult<CloudModel>> GetCloudResourceDetailsbyNameAsync(string name)
+        public async Task<ActionResult<CloudModel>> GetCloudResourceDetailsByNameAsync(string name)
         {
             try
             {
@@ -302,7 +302,7 @@ namespace Middleware.RedisInterface.Controllers
         }
 
         /// <summary>
-        ///  Get the free clouds that have connectivity to the robot
+        /// Get the free clouds that have connectivity to the robot
         /// </summary>
         /// <param name="cloudsToCheck"></param>
         /// <returns>list of cloudModel</returns>
@@ -367,7 +367,6 @@ namespace Middleware.RedisInterface.Controllers
                 _logger.LogError(ex, "An error occurred:");
                 return StatusCode(statusCode, new ApiResponse(statusCode, $"An error has occurred: {ex.Message}"));
             }
-
         }
 
         /// <summary>

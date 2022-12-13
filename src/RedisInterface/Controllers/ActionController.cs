@@ -466,11 +466,11 @@ namespace Middleware.RedisInterface.Controllers
         #endregion
 
         /// <summary>
-        /// Get lastest action plan given robot Id.
+        /// Get latest action plan given robot Id.
         /// </summary>
         /// <returns>List<ActionPlanModel></returns>
         [HttpGet]
-        [Route("LastestPlan/robot/{robotId}", Name = "GetLatestActionPlanByRobotIdAsync")]
+        [Route("plan/robot/{robotId}/latest", Name = "GetLatestActionPlanByRobotIdAsync")]
         [ProducesResponseType(typeof(ActionPlanModel), (int)HttpStatusCode.OK)]
         [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.NotFound)]
         [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.InternalServerError)]

@@ -41,7 +41,6 @@ namespace Middleware.ResourcePlanner.Controllers
         [ProducesResponseType(typeof(TaskModel), (int)HttpStatusCode.OK)]
         [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.NotFound)]
         [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.InternalServerError)]
-
         public async Task<ActionResult<TaskModel>> GetResourceRePlan([FromBody] ResourceReplanInputModel resource)
         {
             try
