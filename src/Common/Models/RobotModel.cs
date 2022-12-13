@@ -94,6 +94,9 @@ public class RobotModel : BaseModel
     [JsonPropertyName("Questions")]
     public List<DialogueModel> Questions { get; set; }
 
+    [JsonPropertyName("LastUpdatedTime")]
+    public DateTime LastUpdatedTime { get; set; }
+
     /// <summary>
     ///  Onboarding validation of the robot data object.
     /// </summary>

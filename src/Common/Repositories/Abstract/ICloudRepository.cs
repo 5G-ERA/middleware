@@ -12,6 +12,12 @@ namespace Middleware.Common.Repositories.Abstract
 
         Task<List<CloudModel>> GetLessBusyCloudsAsync(List<CloudModel> busyCloudsTocheck);
 
-   
+        Task<int> GetNumContainersByNameAsync(string cloudName);
+
+        Task<int> GetNumContainersByIdAsync(Guid cloudId);
+
+        Task<bool> IsBusyCloudByNameAsync(string cloudName);
+
+        Task<bool> IsBusyCloudByIdAsync(Guid cloudId);
     }
 }

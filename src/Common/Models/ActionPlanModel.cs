@@ -4,6 +4,7 @@ namespace Middleware.Common.Models;
 
 public sealed class ActionPlanModel : BaseModel
 {
+
     [JsonPropertyName("Id")] //atuomatically generated plan id by middleware
     public override Guid Id { get; set; }
 
@@ -13,13 +14,11 @@ public sealed class ActionPlanModel : BaseModel
     [JsonPropertyName("Name")] // Name of task
     public override string Name { get; set; }
 
-
     /// <summary>
     /// Status of the whole plan
     /// </summary>
     [JsonPropertyName("Status")]
     public string Status { get; set; }
-
 
     [JsonPropertyName("IsReplan")] //Status of whole plan
     public bool IsReplan { get; set; }
@@ -32,6 +31,9 @@ public sealed class ActionPlanModel : BaseModel
 
     [JsonPropertyName("RobotId")]
     public Guid RobotId { get; set; }
+
+    [JsonPropertyName("TaskStartedAt")]
+    public DateTime TaskStartedAt { get; set; }
 
     public ActionPlanModel()
     {
@@ -47,6 +49,9 @@ public sealed class ActionPlanModel : BaseModel
 
     public void SetStatus(string status)
     {
+        if (Status is null)
+            TaskStartedAt = DateTime.UtcNow;
+        
         Status = status;
         LastStatusChange = DateTime.UtcNow;
     }

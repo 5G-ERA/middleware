@@ -1,7 +1,9 @@
 ﻿using System.Net;
 using Microsoft.AspNetCore.Mvc;
 using Middleware.Common.Models;
+using Middleware.Common.Repositories;
 using Middleware.Common.Repositories.Abstract;
+using Middleware.Common.Responses;
 
 namespace Middleware.RedisInterface.Controllers
 {
@@ -111,7 +113,6 @@ namespace Middleware.RedisInterface.Controllers
             }
             return Ok(model);
         }
-
 
         /// <summary>
         /// Partially update an existing InstanceModel entity
@@ -274,7 +275,7 @@ namespace Middleware.RedisInterface.Controllers
             }
         }
 
-        [HttpPost]
+        [HttpGet]
         [Route("free", Name = "GetFreeEdgesIds")]//edges
         [ProducesResponseType(typeof(List<EdgeModel>), (int)HttpStatusCode.OK)]
         [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.NotFound)]
@@ -306,7 +307,7 @@ namespace Middleware.RedisInterface.Controllers
 
         }
 
-        [HttpPost]
+        [HttpGet]
         [Route("lessBusy", Name = "GetLessBusyEdges")]
         [ProducesResponseType(typeof(List<EdgeModel>), (int)HttpStatusCode.OK)]
         [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.NotFound)]
@@ -361,5 +362,116 @@ namespace Middleware.RedisInterface.Controllers
                 return StatusCode(statusCode, new ApiResponse(statusCode, $"An error has occurred: {ex.Message}"));
             }
         }
+
+        /// <summary>
+        /// Check if a edge is busy by Id.
+        /// </summary>
+        /// <param name="edgeId"></param>
+        /// <returns>bool</returns>
+        [HttpGet]
+        [Route("{id}/busy", Name = "isBusyEdgeById")]
+        [ProducesResponseType(typeof(EdgeModel), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.NotFound)]
+        [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.InternalServerError)]
+        public async Task<ActionResult<bool>> isBusyEdgeById(Guid edgeId)
+        {
+            try
+            {
+                bool busy = await _edgeRepository.IsBusyEdgeByIdAsync(edgeId);
+                return Ok(busy);
+            }
+            catch (Exception ex)
+            {
+                int statusCode = (int)HttpStatusCode.InternalServerError;
+                _logger.LogError(ex, "An error occurred:");
+                return StatusCode(statusCode, new ApiResponse(statusCode, $"An error has occurred: {ex.Message}"));
+            }
+        }
+
+        /// <summary>
+        /// Check if a edge is busy by Name.
+        /// </summary>
+        /// <param name="edgeId"></param>
+        /// <returns>bool</returns>
+        [HttpGet]
+        [Route("{name}/busy", Name = "isBusyEdgeByName")]
+        [ProducesResponseType(typeof(EdgeModel), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.NotFound)]
+        [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.InternalServerError)]
+        public async Task<ActionResult<bool>> isBusyEdgeByName(string name)
+        {
+            try
+            {
+                bool busy = await _edgeRepository.IsBusyEdgeByNameAsync(name);
+                return Ok(busy);
+            }
+            catch (Exception ex)
+            {
+                int statusCode = (int)HttpStatusCode.InternalServerError;
+                _logger.LogError(ex, "An error occurred:");
+                return StatusCode(statusCode, new ApiResponse(statusCode, $"An error has occurred: {ex.Message}"));
+            }
+        }
+
+
+        /// <summary>
+        ///  Returns the number of containers that are deployed in a cloud entity base on cloud Id. 
+        /// </summary>
+        /// <param name="edgeId"></param>
+        /// <returns>int</returns>
+        [HttpGet]
+        [Route("{id}/containers/count", Name = "GetNumEdgeContainersById")]
+        [ProducesResponseType(typeof(int), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.NotFound)]
+        [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.BadRequest)]
+        [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.InternalServerError)]
+        public async Task<ActionResult<int>> GetNumEdgeContainersById(Guid edgeId)
+        {
+            try
+            {
+
+                int countContainers = await _edgeRepository.GetNumContainersByIdAsync(edgeId);
+                return Ok(countContainers);
+            }
+            catch (Exception ex)
+            {
+
+                int statusCode = (int)HttpStatusCode.InternalServerError;
+                _logger.LogError(ex, "An error occurred:");
+                return StatusCode(statusCode, new ApiResponse(statusCode, $"An error has occurred: {ex.Message}"));
+            }
+
+        }
+
+
+        /// <summary>
+        ///  Returns the number of containers that are deployed in a cloud entity base on cloud Name. 
+        /// </summary>
+        /// <param name="cloudName"></param>
+        /// <returns>int</returns>
+        [HttpGet]
+        [Route("{name}/containers/count", Name = "GetNumEdgeContainersByName")]
+        [ProducesResponseType(typeof(int), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.NotFound)]
+        [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.BadRequest)]
+        [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.InternalServerError)]
+        public async Task<ActionResult<int>> GetNumEdgeContainersByName(string cloudName)
+        {
+            try
+            {
+
+                int countContainers = await _edgeRepository.GetNumContainersByNameAsync(cloudName);
+                return Ok(countContainers);
+            }
+            catch (Exception ex)
+            {
+
+                int statusCode = (int)HttpStatusCode.InternalServerError;
+                _logger.LogError(ex, "An error occurred:");
+                return StatusCode(statusCode, new ApiResponse(statusCode, $"An error has occurred: {ex.Message}"));
+            }
+
+        }
+
     }
 }

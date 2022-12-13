@@ -4,6 +4,7 @@ using Middleware.Common.Enums;
 using Middleware.Common.Models;
 using Middleware.Common.Repositories;
 using Middleware.Common.Repositories.Abstract;
+using Middleware.Common.Responses;
 
 namespace Middleware.RedisInterface.Controllers
 {

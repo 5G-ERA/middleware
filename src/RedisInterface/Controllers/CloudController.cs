@@ -2,6 +2,9 @@
 using Microsoft.AspNetCore.Mvc;
 using Middleware.Common.Models;
 using Middleware.Common.Repositories.Abstract;
+using Middleware.Common.Responses;
+using System.Net;
+
 
 namespace Middleware.RedisInterface.Controllers
 {
@@ -16,6 +19,7 @@ namespace Middleware.RedisInterface.Controllers
         {
             _cloudRepository = cloudRepository ?? throw new ArgumentNullException(nameof(cloudRepository));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+
         }
 
         /// <summary>
@@ -300,24 +304,24 @@ namespace Middleware.RedisInterface.Controllers
         /// <summary>
         /// Get the free clouds that have connectivity to the robot
         /// </summary>
-        /// <param name="edgesToCheck"></param>
+        /// <param name="cloudsToCheck"></param>
         /// <returns>list of cloudModel</returns>
-        [HttpPost]
+        [HttpGet]
         [Route("free", Name = "GetFreeCloudIds")]
         [ProducesResponseType(typeof(List<CloudModel>), (int)HttpStatusCode.OK)]
         [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.NotFound)]
         [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.BadRequest)]
         [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.InternalServerError)]
-        public async Task<ActionResult<List<CloudModel>>> GetFreeCloudsIdsAsync(List<CloudModel> edgesToCheck)
+        public async Task<ActionResult<List<CloudModel>>> GetFreeCloudsIdsAsync(List<CloudModel> cloudsToCheck)
         {
             try
             {
-                if (!edgesToCheck.Any())
+                if (!cloudsToCheck.Any())
                 {
                     return BadRequest(new ApiResponse((int)HttpStatusCode.BadRequest, "No Edge ids were provided"));
                 }
 
-                List<CloudModel> edgeFree = await _cloudRepository.GetFreeCloudsIdsAsync(edgesToCheck);
+                List<CloudModel> edgeFree = await _cloudRepository.GetFreeCloudsIdsAsync(cloudsToCheck);
                 if (!edgeFree.Any())
                 {
                     return NotFound(new ApiResponse((int)HttpStatusCode.BadRequest, "There are no busy edges"));
@@ -334,7 +338,7 @@ namespace Middleware.RedisInterface.Controllers
 
         }
 
-        [HttpPost]
+        [HttpGet]
         [Route("lessBusy", Name = "GetLessBusyClouds")]
         [ProducesResponseType(typeof(List<CloudModel>), (int)HttpStatusCode.OK)]
         [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.NotFound)]
@@ -346,7 +350,7 @@ namespace Middleware.RedisInterface.Controllers
             {
                 if (!cloudsToCheck.Any())
                 {
-                    return BadRequest(new ApiResponse((int)HttpStatusCode.BadRequest, "No Edge ids were provided"));
+                    return BadRequest(new ApiResponse((int)HttpStatusCode.BadRequest, "No Cloud ids were provided"));
                 }
 
                 List<CloudModel> lessBusyCloud = await _cloudRepository.GetLessBusyCloudsAsync(cloudsToCheck);
@@ -355,6 +359,122 @@ namespace Middleware.RedisInterface.Controllers
                     return NotFound(new ApiResponse((int)HttpStatusCode.BadRequest, "There are no busy edges"));
                 }
                 return Ok(lessBusyCloud);
+            }
+            catch (Exception ex)
+            {
+
+                int statusCode = (int)HttpStatusCode.InternalServerError;
+                _logger.LogError(ex, "An error occurred:");
+                return StatusCode(statusCode, new ApiResponse(statusCode, $"An error has occurred: {ex.Message}"));
+            }
+        }
+
+        /// <summary>
+        ///  Returns the number of containers that are deployed in a cloud entity base on cloud Name. 
+        /// </summary>
+        /// <param name="name"></param>
+        /// <returns>int</returns>
+        [HttpGet]
+        [Route("{name}/containers/count", Name = "GetNumCloudContainersByName")]
+        [ProducesResponseType(typeof(int), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.NotFound)]
+        [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.BadRequest)]
+        [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.InternalServerError)]
+        public async Task<ActionResult<int>> GetNumCloudContainersByName(string name)
+        {
+            try
+            {
+
+                int countContainers = await _cloudRepository.GetNumContainersByNameAsync(name);
+                return Ok(countContainers);
+            }
+            catch (Exception ex)
+            {
+
+                int statusCode = (int)HttpStatusCode.InternalServerError;
+                _logger.LogError(ex, "An error occurred:");
+                return StatusCode(statusCode, new ApiResponse(statusCode, $"An error has occurred: {ex.Message}"));
+            }
+
+        }
+
+        /// <summary>
+        ///  Returns the number of containers that are deployed in a cloud entity base on cloud Id. 
+        /// </summary>
+        /// <param name="cloudId"></param>
+        /// <returns>int</returns>
+        [HttpGet]
+        [Route("{id}/containers/count", Name = "GetNumCloudContainersById")]
+        [ProducesResponseType(typeof(int), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.NotFound)]
+        [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.BadRequest)]
+        [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.InternalServerError)]
+        public async Task<ActionResult<int>> GetNumCloudContainersById(Guid cloudId)
+        {
+            try
+            {
+                int countContainers = await _cloudRepository.GetNumContainersByIdAsync(cloudId);
+                return Ok(countContainers);
+            }
+            catch (Exception ex)
+            {
+
+                int statusCode = (int)HttpStatusCode.InternalServerError;
+                _logger.LogError(ex, "An error occurred:");
+                return StatusCode(statusCode, new ApiResponse(statusCode, $"An error has occurred: {ex.Message}"));
+            }
+
+        }
+
+        /// <summary>
+        ///  Returns bool for status of BusyCloud by Name
+        /// </summary>
+        /// <param name="name"></param>
+        /// <returns>bool</returns>
+        [HttpGet]
+        [Route("{name}/busy", Name = "IsBusyCloudByName")]
+        [ProducesResponseType(typeof(int), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.NotFound)]
+        [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.BadRequest)]
+        [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.InternalServerError)]
+        public async Task<ActionResult<bool>> IsBusyCloudByName(string name)
+        {
+            try
+            {
+                if (string.IsNullOrWhiteSpace(name))
+                    return BadRequest(new ApiResponse((int)HttpStatusCode.BadRequest, "Name was not provided"));
+
+                bool busy = await _cloudRepository.IsBusyCloudByNameAsync(name);
+                return Ok(busy);
+            }
+            catch (Exception ex)
+            {
+
+                int statusCode = (int)HttpStatusCode.InternalServerError;
+                _logger.LogError(ex, "An error occurred:");
+                return StatusCode(statusCode, new ApiResponse(statusCode, $"An error has occurred: {ex.Message}"));
+            }
+
+        }
+
+        /// <summary>
+        /// Returns bool for status of BusyCloud by Id
+        /// </summary>
+        /// <param name="cloudId"></param>
+        /// <returns>bool</returns>
+        [HttpGet]
+        [Route("{id}/busy", Name = "isBusyCloudById")]
+        [ProducesResponseType(typeof(int), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.NotFound)]
+        [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.BadRequest)]
+        [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.InternalServerError)]
+        public async Task<ActionResult<bool>> IsBusyCloudById(Guid cloudId)
+        {
+            try
+            {
+
+                bool busy = await _cloudRepository.IsBusyCloudByIdAsync(cloudId);
+                return Ok(busy);
             }
             catch (Exception ex)
             {

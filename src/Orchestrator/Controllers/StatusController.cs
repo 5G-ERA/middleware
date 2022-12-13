@@ -3,10 +3,11 @@ using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 using Middleware.Common.Models;
 using Middleware.Common.Repositories;
+using Middleware.Common.Responses;
 using Middleware.Orchestrator.ApiReference;
 using Middleware.Orchestrator.RedisInterface;
 using ActionPlanModel = Middleware.Common.Models.ActionPlanModel;
-using ApiResponse = Middleware.Common.Models.ApiResponse;
+using ApiResponse = Middleware.Common.Responses.ApiResponse;
 
 namespace Middleware.Orchestrator.Controllers;
 

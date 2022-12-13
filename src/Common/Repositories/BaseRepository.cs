@@ -376,7 +376,7 @@ namespace Middleware.Common.Repositories
             graphEntity.Name = name.ToString();
         }
 
-        public virtual async Task<List<RelationModel>> GetReferencingRelationAsync(Guid id, string relationName)
+        public virtual Task<List<RelationModel>> GetReferencingRelationAsync(Guid id, string relationName)
         {
             //HERE
             throw new NotImplementedException();
