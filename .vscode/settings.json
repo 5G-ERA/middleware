@@ -1,6 +1,12 @@
 {
     "yaml.schemas": {
-        "kubernetes://schema/v1@serviceaccount": "file:///c%3A/Works/middleware/k8s/orchestrator_service_account.yaml",
+        "kubernetes://schema/v1@serviceaccount": [
+            "file:///c%3A/Works/middleware/k8s/orchestrator_service_account.yaml",
+            "untitled:Untitled-1"
+        ],
         "kubernetes://schema/rbac.authorization.k8s.io/v1@clusterrolebinding": "file:///c%3A/Works/middleware/k8s/orchestrator_cluster_role_binding.yaml"
-    }
+    },
+    "cSpell.words": [
+        "Redmine"
+    ]
 }
