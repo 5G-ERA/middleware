@@ -1,5 +1,6 @@
 ﻿using Amazon;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Middleware.Common.Config;
@@ -60,4 +61,19 @@ public static class CommonExtensions
         return builder;
 
     }
+
+    public static IServiceCollection AddUriHelper(this IServiceCollection services)
+    {
+
+        services.AddHttpContextAccessor();
+        services.AddSingleton<IUriService>(o =>
+        {
+            var accessor = o.GetRequiredService<IHttpContextAccessor>();
+            var request = accessor.HttpContext.Request;
+            var uri = string.Concat(request.Scheme, "://", request.Host.ToUriComponent());
+            return new UriService(uri);
+        });
+        return services;
+    }
+    
 }
