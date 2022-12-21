@@ -1,9 +1,11 @@
-﻿using Middleware.Common;
+﻿using Microsoft.AspNetCore.Mvc.ApplicationModels;
+using Middleware.Common;
 using Middleware.Common.Enums;
 using Middleware.Common.Helpers;
 using Middleware.Common.Repositories;
 using Middleware.Common.Repositories.Abstract;
 using Middleware.RedisInterface.Responses;
+using System.Threading.Tasks;
 
 namespace Middleware.RedisInterface.Services
 {
@@ -109,6 +111,30 @@ namespace Middleware.RedisInterface.Services
                 responses.Add(response);
             }
             return new (filter.FilterResult(responses), responses.Count);
+        }
+
+        /// <summary>
+        /// Get all action sequences  with only actions list names 
+        /// </summary>
+        /// <returns></returns>
+        public async Task<List<actionSequenceResponse>> GetActionSequenceAsync()
+        {
+            var tasks = await _taskRepository.GetAllAsync();
+            var responses = new List<actionSequenceResponse>();
+
+            foreach (var tempTask in tasks)
+            {
+                List<string> tempNamesActions = new List<string>();
+                List<Common.Models.ActionModel> actions = tempTask.ActionSequence;
+                foreach (var action in actions) tempNamesActions.Add(action.Name);
+                var response = new actionSequenceResponse(
+                    tempTask.Name,
+                    tempTask.Id,
+                    tempNamesActions
+                    );
+                responses.Add(response);
+            }
+            return responses;
         }
     }
 }

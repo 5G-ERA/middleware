@@ -1,4 +1,5 @@
 ﻿using System.Net;
+using Amazon.SecretsManager.Model;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Middleware.Common;
@@ -48,7 +49,7 @@ namespace Middleware.RedisInterface.Controllers
         [HttpGet("locations")]
         [ProducesResponseType(typeof(PagedResponse<List<LocationStatusResponse>>), (int)HttpStatusCode.OK)]
         [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.InternalServerError)]
-        public async Task<IActionResult> GetCloudRobotStatusesAsync([FromQuery] PaginationFilter filter)
+        public async Task<IActionResult> GetLocationStatusesAsync([FromQuery] PaginationFilter filter)
         {
             try
             {
@@ -57,6 +58,28 @@ namespace Middleware.RedisInterface.Controllers
 
                 var pagedResponse = data.ToPagedResponse(filter, count, _uriService, route);
                 return Ok(pagedResponse);
+            }
+            catch (Exception ex)
+            {
+                int statusCode = (int)HttpStatusCode.InternalServerError;
+                _logger.LogError(ex, "An error occurred:");
+                return StatusCode(statusCode, new ApiResponse(statusCode, $"An error has occurred: {ex.Message}"));
+            }
+        }
+
+        /// <summary>
+        /// Return to the cascading grid the action sequence for all tasks
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet("actionSequence")]
+        [ProducesResponseType(typeof(actionSequenceResponse), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.InternalServerError)]
+        public async Task<IActionResult> GetActionSequenceAsync()
+        {
+            try
+            {
+                List<actionSequenceResponse> actionsAndTask = await _dashboardService.GetActionSequenceAsync();
+                return Ok(actionsAndTask);
             }
             catch (Exception ex)
             {
