@@ -6,6 +6,7 @@ using Middleware.Common.Models;
 using Middleware.Common.Repositories;
 using Middleware.Common.Repositories.Abstract;
 using Middleware.RedisInterface.Responses;
+using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 
 namespace Middleware.RedisInterface.Services
@@ -35,6 +36,32 @@ namespace Middleware.RedisInterface.Services
             _robotRepository = robotRepository;
         }
 
+        /// <summary>
+        /// Basic control grid backend for netApps.
+        /// </summary>
+        /// <param name="filter"></param>
+        /// <returns></returns>
+        public async Task<Tuple<List<NetAppsDetailsResponse>, int>> GetNetAppsDataListAsync(PaginationFilter filter)
+        {
+            var instances = await _instanceRepository.GetAllAsync();
+            var instanceResponse = new List<NetAppsDetailsResponse>();
+            foreach (var netApp in instances)
+            {
+                var netAppTemp = new NetAppsDetailsResponse(netApp.Name,
+                netApp.InstanceFamily,
+                                   netApp.RosVersion,
+                                   netApp.ROSDistro,
+                                   netApp.OnboardedTime);
+                instanceResponse.Add(netAppTemp);
+            }
+            return new(filter.FilterResult(instanceResponse), instanceResponse.Count);
+        }
+
+        /// <summary>
+        /// Basic control grid backend for edge and clouds
+        /// </summary>
+        /// <param name="filter"></param>
+        /// <returns></returns>
         public async Task<Tuple<List<LocationStatusResponse>, int>> GetLocationsStatusListAsync(PaginationFilter filter)
         {
             var locations = new List<LocationStatusResponse>();
@@ -86,6 +113,11 @@ namespace Middleware.RedisInterface.Services
             return new (filter.FilterResult(locations), locations.Count);
         }
 
+        /// <summary>
+        /// Basic control grid backend for robot-tasks
+        /// </summary>
+        /// <param name="filter"></param>
+        /// <returns></returns>
         public async Task<Tuple<List<TaskRobotResponse>, int>> GetRobotStatusListAsync(PaginationFilter filter)
         {
             var robots = await _robotRepository.GetAllAsync();
@@ -115,7 +147,7 @@ namespace Middleware.RedisInterface.Services
         }
 
         /// <summary>
-        /// Get all action sequences  with only actions list names 
+        /// Get all action sequences with only actions list names 
         /// </summary>
         /// <returns></returns>
         public async Task<List<actionSequenceResponse>> GetActionSequenceAsync()
@@ -160,5 +192,29 @@ namespace Middleware.RedisInterface.Services
 
             return tempOnboardItemTypes;
         }
+
+        /// <summary>
+        /// Gets a list of robots with some of their data.
+        /// </summary>
+        /// <returns></returns>
+        public async Task<Tuple<List<RobotResponse>, int>> GetRobotsDataAsync(PaginationFilter filter)
+        {
+            var robots = await _robotRepository.GetAllAsync();
+            var robotsResponse = new List<RobotResponse>();
+            foreach (var robot in robotsResponse)
+            {
+                var netAppTemp = new RobotResponse(robot.RobotId,
+                robot.RobotName,
+                                   robot.Status,
+                                   robot.OnboardedTime,
+                                   robot.ROSVersion,
+                                   robot.ROSDistro,
+                                   robot.Company);
+                robotsResponse.Add(netAppTemp);
+            }
+            return new(filter.FilterResult(robotsResponse), robotsResponse.Count);
+        }
+
+
     }
 }

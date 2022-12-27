@@ -24,6 +24,11 @@ namespace Middleware.RedisInterface.Controllers
             _dashboardService = dashboardService;
         }
 
+        /// <summary>
+        /// Basic control grid for robot-tasks
+        /// </summary>
+        /// <param name="filter"></param>
+        /// <returns></returns>
         [HttpGet("tasks")]
         [ProducesResponseType(typeof(PagedResponse<List<TaskRobotResponse>>), (int)HttpStatusCode.OK)]
         [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.InternalServerError)]
@@ -46,6 +51,11 @@ namespace Middleware.RedisInterface.Controllers
             
         }
 
+        /// <summary>
+        /// Basic control grid for edge and cloud
+        /// </summary>
+        /// <param name="filter"></param>
+        /// <returns></returns>
         [HttpGet("locations")]
         [ProducesResponseType(typeof(PagedResponse<List<LocationStatusResponse>>), (int)HttpStatusCode.OK)]
         [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.InternalServerError)]
@@ -90,7 +100,7 @@ namespace Middleware.RedisInterface.Controllers
         }
 
         /// <summary>
-        /// Return to the onboarding types names 
+        /// Return the onboarding types names => Drop down menu.
         /// </summary>
         /// <returns></returns>
         [HttpGet("onboardingTypes")]
@@ -110,5 +120,59 @@ namespace Middleware.RedisInterface.Controllers
                 return StatusCode(statusCode, new ApiResponse(statusCode, $"An error has occurred: {ex.Message}"));
             }
         }
+
+        /// <summary>
+        /// Basic control grid for netApps
+        /// </summary>
+        /// <param name="filter"></param>
+        /// <returns></returns>
+        [HttpGet("netApps")]
+        [ProducesResponseType(typeof(PagedResponse<List<NetAppsDetailsResponse>>), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.InternalServerError)]
+        public async Task<IActionResult> GetNetAppsDataAsync([FromQuery] PaginationFilter filter)
+        {
+            try
+            {
+                var route = Request.Path.Value;
+                (var data, int count) = await _dashboardService.GetNetAppsDataListAsync(filter);
+
+                var pagedResponse = data.ToPagedResponse(filter, count, _uriService, route);
+                return Ok(pagedResponse);
+            }
+            catch (Exception ex)
+            {
+                int statusCode = (int)HttpStatusCode.InternalServerError;
+                _logger.LogError(ex, "An error occurred:");
+                return StatusCode(statusCode, new ApiResponse(statusCode, $"An error has occurred: {ex.Message}"));
+            }
+        }
+
+        /// <summary>
+        /// Basic control grid for robots along
+        /// </summary>
+        /// <param name="filter"></param>
+        /// <returns></returns>
+        [HttpGet("robots")]
+        [ProducesResponseType(typeof(PagedResponse<List<RobotResponse>>), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.InternalServerError)]
+        public async Task<IActionResult> GetRobotsAsync([FromQuery] PaginationFilter filter)
+        {
+            try
+            {
+                var route = Request.Path.Value;
+                (var data, int count) = await _dashboardService.GetRobotsDataAsync(filter);
+
+                var pagedResponse = data.ToPagedResponse(filter, count, _uriService, route);
+                return Ok(pagedResponse);
+            }
+            catch (Exception ex)
+            {
+                int statusCode = (int)HttpStatusCode.InternalServerError;
+                _logger.LogError(ex, "An error occurred:");
+                return StatusCode(statusCode, new ApiResponse(statusCode, $"An error has occurred: {ex.Message}"));
+            }
+        }
+
+
     }
 }

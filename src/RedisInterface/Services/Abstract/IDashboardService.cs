@@ -26,5 +26,9 @@ namespace Middleware.RedisInterface.Services
         Task<List<actionSequenceResponse>> GetActionSequenceAsync();
 
         Task<List<string>> GetOnboardingItemNamesAsync();
+
+        Task<Tuple<List<NetAppsDetailsResponse>, int>> GetNetAppsDataListAsync(PaginationFilter filter);
+
+        Task<Tuple<List<RobotResponse>, int>> GetRobotsDataAsync(PaginationFilter filter);
     }
 }

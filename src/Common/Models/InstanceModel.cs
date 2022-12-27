@@ -62,6 +62,9 @@ public class InstanceModel : BaseModel
     [JsonPropertyName("MinimumNumCores")]
     public int MinimumNumCores { get; set; } // Compulsory field
 
+    [JsonPropertyName("OnboardedTime")]
+    public DateTime OnboardedTime { get; set; } // Compulsory field
+
     /// <summary>
     /// Onboarding validation of the instance data object.
     /// </summary>
