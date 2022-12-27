@@ -24,5 +24,7 @@ namespace Middleware.RedisInterface.Services
         Task<Tuple<List<LocationStatusResponse>, int>> GetLocationsStatusListAsync(PaginationFilter filter);
 
         Task<List<actionSequenceResponse>> GetActionSequenceAsync();
+
+        Task<List<string>> GetOnboardingItemNamesAsync();
     }
 }

@@ -2,6 +2,7 @@
 using Middleware.Common;
 using Middleware.Common.Enums;
 using Middleware.Common.Helpers;
+using Middleware.Common.Models;
 using Middleware.Common.Repositories;
 using Middleware.Common.Repositories.Abstract;
 using Middleware.RedisInterface.Responses;
@@ -135,6 +136,29 @@ namespace Middleware.RedisInterface.Services
                 responses.Add(response);
             }
             return responses;
+        }
+
+        /// <summary>
+        /// Gets a list of onboarding item types.
+        /// </summary>
+        /// <returns></returns>
+        public async Task<List<string>> GetOnboardingItemNamesAsync()
+        {
+            List<string> tempOnboardItemTypes = new List<string>();
+            var cloud = new CloudModel();
+            var edge = new EdgeModel();
+            var robot = new RobotModel();
+            var instance = new InstanceModel();
+            var action = new Middleware.Common.Models.ActionModel();
+            var task = new Middleware.Common.Models.TaskModel();
+            tempOnboardItemTypes.Add(cloud.GetType().ToString());
+            tempOnboardItemTypes.Add(edge.GetType().ToString());
+            tempOnboardItemTypes.Add(robot.GetType().ToString());
+            tempOnboardItemTypes.Add(instance.GetType().ToString());
+            tempOnboardItemTypes.Add(action.GetType().ToString());
+            tempOnboardItemTypes.Add(task.GetType().ToString());
+
+            return tempOnboardItemTypes;
         }
     }
 }

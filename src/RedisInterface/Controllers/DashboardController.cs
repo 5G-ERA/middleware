@@ -68,7 +68,7 @@ namespace Middleware.RedisInterface.Controllers
         }
 
         /// <summary>
-        /// Return to the cascading grid the action sequence for all tasks
+        /// Return to the cascading grid the action sequence names for all tasks
         /// </summary>
         /// <returns></returns>
         [HttpGet("actionSequence")]
@@ -80,6 +80,28 @@ namespace Middleware.RedisInterface.Controllers
             {
                 List<actionSequenceResponse> actionsAndTask = await _dashboardService.GetActionSequenceAsync();
                 return Ok(actionsAndTask);
+            }
+            catch (Exception ex)
+            {
+                int statusCode = (int)HttpStatusCode.InternalServerError;
+                _logger.LogError(ex, "An error occurred:");
+                return StatusCode(statusCode, new ApiResponse(statusCode, $"An error has occurred: {ex.Message}"));
+            }
+        }
+
+        /// <summary>
+        /// Return to the onboarding types names 
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet("onboardingTypes")]
+        [ProducesResponseType(typeof(actionSequenceResponse), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.InternalServerError)]
+        public async Task<IActionResult> GetOnboardingItemTypesAsync()
+        {
+            try
+            {
+                List<string> onboardingTypes = await _dashboardService.GetOnboardingItemNamesAsync();
+                return Ok(onboardingTypes);
             }
             catch (Exception ex)
             {
