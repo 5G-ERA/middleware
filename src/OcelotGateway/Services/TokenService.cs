@@ -1,10 +1,10 @@
 ﻿using System;
-using Microsoft.IdentityModel.Tokens;
-using Middleware.Common.Models;
+using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
-using System.IdentityModel.Tokens.Jwt;
+using Microsoft.IdentityModel.Tokens;
 using Middleware.Common.Config;
+using Middleware.Common.Models;
 
 namespace Middleware.OcelotGateway.Services
 {
@@ -13,11 +13,11 @@ namespace Middleware.OcelotGateway.Services
         private JwtConfig _jwtConfig;
 
         public TokenService(JwtConfig jwtConfig)
-        {   
+        {
             _jwtConfig = jwtConfig;
         }
 
-        public TokenModel GenerateToken(Guid id) 
+        public TokenModel GenerateToken(Guid id)
         {
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_jwtConfig.Key));
             var credentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha256Signature);

@@ -53,7 +53,7 @@ public class EdgeModel : BaseModel
         if (string.IsNullOrEmpty(EdgeIp.ToString())) return false;
         if (string.IsNullOrEmpty(NumberOfCores.ToString())) return false;
         if (string.IsNullOrEmpty(DiskStorage.ToString())) return false;
-       // if (string.IsNullOrEmpty(MacAddress.ToString())) return false;
+        // if (string.IsNullOrEmpty(MacAddress.ToString())) return false;
         if (string.IsNullOrEmpty(Ram.ToString())) return false;
         return true;
     }

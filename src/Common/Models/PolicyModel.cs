@@ -1,6 +1,6 @@
-﻿using Microsoft.VisualBasic;
+﻿using System.Text.Json.Serialization;
+using Microsoft.VisualBasic;
 using Middleware.Common.Enums;
-using System.Text.Json.Serialization;
 
 namespace Middleware.Common.Models;
 

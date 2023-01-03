@@ -17,7 +17,7 @@ public static class K8SImageHelper
         if (string.IsNullOrWhiteSpace(repositoryName))
             throw new ArgumentException("Repository name not provided.", nameof(repositoryName));
 
-        StringBuilder builder =new StringBuilder();
+        StringBuilder builder = new StringBuilder();
         builder.Append(repositoryName);
 
         if (string.IsNullOrWhiteSpace(registry) == false)

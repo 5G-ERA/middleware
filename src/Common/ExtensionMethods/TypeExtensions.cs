@@ -1,4 +1,4 @@
-namespace Middleware.Common.ExtensionMethods;
+﻿namespace Middleware.Common.ExtensionMethods;
 
 public static class TypeExtensions
 {

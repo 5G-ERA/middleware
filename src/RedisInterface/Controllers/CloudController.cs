@@ -1,9 +1,9 @@
 ﻿using System.Net;
+using System.Net;
 using Microsoft.AspNetCore.Mvc;
 using Middleware.Common.Models;
 using Middleware.Common.Repositories.Abstract;
 using Middleware.Common.Responses;
-using System.Net;
 
 
 namespace Middleware.RedisInterface.Controllers

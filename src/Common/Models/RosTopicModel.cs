@@ -1,9 +1,9 @@
-﻿using Middleware.Common.Enums;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Middleware.Common.Enums;
 
 namespace Middleware.Common.Models
 {
@@ -29,7 +29,7 @@ namespace Middleware.Common.Models
         /// <param name="topic"></param>
         public void Disable()
         {
-          Enabled = false;
+            Enabled = false;
         }
     }
 

@@ -1,12 +1,12 @@
+﻿using System.Collections.Generic;
+using System.Linq;
+using System.Net;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Middleware.Common.Enums;
 using Middleware.Common.Models;
 using Middleware.Common.Repositories.Abstract;
 using Middleware.Common.Responses;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net;
 
 namespace Middleware.RedisInterface.Controllers
 {
@@ -385,7 +385,7 @@ namespace Middleware.RedisInterface.Controllers
         [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.NotFound)]
         [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.BadRequest)]
         [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.InternalServerError)]
-        public async Task<ActionResult> EnableTopicAsync(Guid robotId,string topicName, bool topicEnabled)
+        public async Task<ActionResult> EnableTopicAsync(Guid robotId, string topicName, bool topicEnabled)
         {
             try
             {

@@ -1,11 +1,11 @@
-﻿using System.Text.Json;
-using Middleware.Common.Models;
+﻿using System.Collections.Generic;
+using System.Text.Json;
+using Microsoft.Extensions.Logging;
 using Middleware.Common.Enums;
+using Middleware.Common.Models;
 using NReJSON;
 using RedisGraphDotNet.Client;
 using StackExchange.Redis;
-using Microsoft.Extensions.Logging;
-using System.Collections.Generic;
 
 namespace Middleware.Common.Repositories
 {
@@ -46,7 +46,7 @@ namespace Middleware.Common.Repositories
         public async Task<List<PolicyModel>> GetAllPoliciesAsync()
         {
             var keys = await GetKeysAsync("GetKeys");
-            var policies = new List<PolicyModel>();            
+            var policies = new List<PolicyModel>();
 
             foreach (var key in keys)
             {
@@ -74,7 +74,7 @@ namespace Middleware.Common.Repositories
         /// <param name="id"></param>
         /// <param name="patch"></param>
         /// <returns> Patched model </returns>
-        public async Task<PolicyModel> PatchPolicyAsync(Guid id, PolicyModel patch) 
+        public async Task<PolicyModel> PatchPolicyAsync(Guid id, PolicyModel patch)
         {
             string model = (string)await Db.JsonGetAsync(id.ToString());
             PolicyModel currentModel = JsonSerializer.Deserialize<PolicyModel>(model);
@@ -103,7 +103,7 @@ namespace Middleware.Common.Repositories
                     bool coexistanceCheck = CheckPolicyCanCoexist(patch, activePolicies);
                     if (coexistanceCheck == true) { currentModel.IsActive = patch.IsActive; }
                     else { throw new Exception("The proposed policy cannot coexists with the already active policies."); }
-                }  
+                }
             }
             if (!string.IsNullOrEmpty(patch.Description))
             {

@@ -1,6 +1,6 @@
-﻿using AutoMapper.Execution;
+﻿using System.Text.Json.Serialization;
+using AutoMapper.Execution;
 using Middleware.Common.Enums;
-using System.Text.Json.Serialization;
 
 namespace Middleware.Common.Models;
 
@@ -16,13 +16,13 @@ public class RobotModel : BaseModel
     public int RosVersion { get; set; } // Compulsory field
 
     [JsonPropertyName("RosDistro")]
-    public string RosDistro { get; set; } 
+    public string RosDistro { get; set; }
 
     [JsonPropertyName("MaximumPayload")]
-    public long MaximumPayload { get; set; } 
+    public long MaximumPayload { get; set; }
 
     [JsonPropertyName("MaximumTranslationalVelocity")]
-    public long MaximumTranslationalVelocity { get; set; } 
+    public long MaximumTranslationalVelocity { get; set; }
 
     [JsonPropertyName("MaximumRotationalVelocity")]
     public long MaximumRotationalVelocity { get; set; }
@@ -58,7 +58,7 @@ public class RobotModel : BaseModel
     [JsonPropertyName("BatteryStatus")]
     public long BatteryStatus { get; set; }
 
-    [JsonPropertyName("MacAddress")] 
+    [JsonPropertyName("MacAddress")]
     public string MacAddress { get; set; }
 
     [JsonPropertyName("LocomotionSystem")] // Compulsory field
@@ -82,11 +82,11 @@ public class RobotModel : BaseModel
     [JsonPropertyName("RAM")] // Compulsory field
     public long Ram { get; set; }
 
-  //  [JsonPropertyName("VirtualRam")]
-  //  public long VirtualRam { get; set; }
+    //  [JsonPropertyName("VirtualRam")]
+    //  public long VirtualRam { get; set; }
 
     [JsonPropertyName("StorageDisk")] // Compulsory field
-    public long StorageDisk { get; set; } 
+    public long StorageDisk { get; set; }
 
     [JsonPropertyName("NumberCores")] // Compulsory field
     public long NumberCores { get; set; }
@@ -125,7 +125,7 @@ public class RobotModel : BaseModel
             {
                 if (string.IsNullOrEmpty(sensor.Description.ToString())) return false;
                 if (string.IsNullOrEmpty(sensor.Name.ToString())) return false;
-               // if (string.IsNullOrEmpty(sensor.SensorLocation.ToString())) return false;
+                // if (string.IsNullOrEmpty(sensor.SensorLocation.ToString())) return false;
                 if (string.IsNullOrEmpty(sensor.Type.ToString())) return false;
                 if (!valSensorTypeEnum.Contains(sensor.Type)) return false;
                 if (sensor.number <= 0) return false;
@@ -168,16 +168,16 @@ public class RobotModel : BaseModel
     public HashSet<RosTopicModel> GetAllRobotTopics()
     {
         HashSet<RosTopicModel> topics = new HashSet<RosTopicModel>();
-        foreach(ROSNodeModel node in ROSNodes)
+        foreach (ROSNodeModel node in ROSNodes)
         {
-                foreach (RosTopicModel pubTopic in node.Publications)
-                {
-                        topics.Add(pubTopic);
-                }
-                foreach (RosTopicModel subTopic in node.Subscriptions)
-                {
-                        topics.Add(subTopic);
-                }
+            foreach (RosTopicModel pubTopic in node.Publications)
+            {
+                topics.Add(pubTopic);
+            }
+            foreach (RosTopicModel subTopic in node.Subscriptions)
+            {
+                topics.Add(subTopic);
+            }
         }
         return topics;
     }

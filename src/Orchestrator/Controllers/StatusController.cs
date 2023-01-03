@@ -43,7 +43,7 @@ public class StatusController : Controller
     {
         if (id == Guid.Empty)
         {
-            return BadRequest(new ApiResponse((int) HttpStatusCode.BadRequest,
+            return BadRequest(new ApiResponse((int)HttpStatusCode.BadRequest,
                 "Identifier of the robot must be specified"));
         }
         try
@@ -180,7 +180,7 @@ public class StatusController : Controller
             //TODO: put behind service
             var redisClient = _clientBuilder.CreateRedisApiClient();
             var riDeployedActionPlans = await redisClient.ActionPlanGetAllAsync();
-            var instanceIds = _mapper.Map<List<ActionPlanModel>>(riDeployedActionPlans) 
+            var instanceIds = _mapper.Map<List<ActionPlanModel>>(riDeployedActionPlans)
                 .SelectMany(a => a.ActionSequence.SelectMany(x => x.Services))
                 .Where(i => i.Id == id)
                 .Select(i => i.ServiceInstanceId)
@@ -188,7 +188,7 @@ public class StatusController : Controller
 
             if (instanceIds.Any() == false)
             {
-                return NotFound(new ApiResponse((int) HttpStatusCode.NotFound,
+                return NotFound(new ApiResponse((int)HttpStatusCode.NotFound,
                     $"No deployed instances of {id} were found"));
             }
 

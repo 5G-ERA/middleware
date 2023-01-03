@@ -34,7 +34,7 @@ namespace Middleware.Common.Models
             {
                 topics.Add(subTopic);
             }
-            
+
             return topics;
         }
 

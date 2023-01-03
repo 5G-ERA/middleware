@@ -6,25 +6,25 @@ namespace Middleware.RedisInterface.Responses
     {
         [JsonPropertyName("robotName")]
         public string RobotName { get; set; }
-        
+
         [JsonPropertyName("robotId")]
         public Guid RobotId { get; set; }
-        
+
         [JsonPropertyName("taskName")]
         public string TaskName { get; set; }
-        
+
         [JsonPropertyName("taskId")]
         public Guid TaskId { get; set; }
-        
+
         [JsonPropertyName("taskStartTime")]
         public DateTime TaskStartTime { get; set; }
-        
+
         [JsonPropertyName("taskCompletedTime")]
         public DateTime? TaskCompletedTime { get; set; }
-        
+
         [JsonPropertyName("RobotStatus")]
         public string RobotStatus { get; set; }
-        
+
         public TaskRobotResponse()
         {
 

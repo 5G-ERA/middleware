@@ -15,7 +15,7 @@ namespace Middleware.TaskPlanner.Controllers
         private readonly IActionPlanner _actionPlanner;
         private readonly IMapper _mapper;
         private readonly ResourcePlanner.ResourcePlannerApiClient _resourcePlannerClient;
-        private readonly Orchestrator.OrchestratorApiClient _orchestratorClient;        
+        private readonly Orchestrator.OrchestratorApiClient _orchestratorClient;
         private readonly IRedisInterfaceClientService _redisInterfaceClient;
 
 
@@ -64,11 +64,11 @@ namespace Middleware.TaskPlanner.Controllers
 
                 if (dryRun) // Will skip the orchestrator if true (will not deploy the actual plan.)
                     return Ok(resourcePlan);
-                
+
                 // var robot = await _redisInterfaceClient.RobotGetByIdAsync(robotId);
                 // var task = await _redisInterfaceClient.TaskGetByIdAsync(id);
                 await _redisInterfaceClient.AddRelationAsync(robot2, resourcePlan, "OWNS");
-                
+
                 // call orchestrator for deployment of the resources
                 // Orchestrator.TaskModel tmpTaskOrchestratorSend = _mapper.Map<Orchestrator.TaskModel>(resourcePlan);
                 Orchestrator.OrchestratorResourceInput tmpTaskOrchestratorSend =
@@ -77,7 +77,7 @@ namespace Middleware.TaskPlanner.Controllers
                 Orchestrator.TaskModel tmpFinalOrchestratorTask =
                     await _orchestratorClient.InstantiateNewPlanAsync(tmpTaskOrchestratorSend);
                 TaskModel finalPlan = _mapper.Map<TaskModel>(tmpFinalOrchestratorTask);
-                
+
                 //Create LOCATED_AT relationship in redis from instance to edge/cloud resource.
                 foreach (ActionModel action in resourcePlan.ActionSequence)
                 {

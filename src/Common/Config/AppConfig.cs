@@ -31,7 +31,7 @@ public static class AppConfig
     /// Mapping of the services for the conversion of the YAML files
     /// </summary>
     public static readonly Dictionary<string, Type> K8STypeMappings = new()
-        {{"v1/Pod", typeof(V1Pod)}, {"v1/Service", typeof(V1Service)}, {"apps/v1", typeof(V1Deployment)}};
+    { { "v1/Pod", typeof(V1Pod) }, { "v1/Service", typeof(V1Service) }, { "apps/v1", typeof(V1Deployment) } };
     /// <summary>
     /// Configuration of the application Development / Release
     /// </summary>

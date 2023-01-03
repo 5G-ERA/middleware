@@ -57,7 +57,7 @@ namespace Middleware.Common.Repositories
             if (!string.IsNullOrEmpty(patch.ServiceStatus))
             {
                 currentModel.ServiceStatus = patch.ServiceStatus;
-            }    
+            }
             await Db.JsonSetAsync(id.ToString(), JsonSerializer.Serialize(currentModel));
             return currentModel;
         }
@@ -73,12 +73,12 @@ namespace Middleware.Common.Repositories
             InstanceModel instance = await GetByIdAsync(instanceId);
 
             List<InstanceModel> instanceCandidatesFinal = new List<InstanceModel>();
-            List <InstanceModel> PotentialInstanceCandidates = await GetAllAsync();
+            List<InstanceModel> PotentialInstanceCandidates = await GetAllAsync();
             foreach (InstanceModel instanceCandidate in PotentialInstanceCandidates)
             {
-                if(instanceCandidate.Id != instance.Id)
+                if (instanceCandidate.Id != instance.Id)
                 {
-                    if((instanceCandidate.InstanceFamily == instance.InstanceFamily) && (instanceCandidate.ROSDistro== instance.ROSDistro) && (instanceCandidate.RosVersion == instance.RosVersion))
+                    if ((instanceCandidate.InstanceFamily == instance.InstanceFamily) && (instanceCandidate.ROSDistro == instance.ROSDistro) && (instanceCandidate.RosVersion == instance.RosVersion))
                     {
                         instanceCandidatesFinal.Add(instanceCandidate);
                     }

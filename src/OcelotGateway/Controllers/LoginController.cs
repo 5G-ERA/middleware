@@ -19,13 +19,13 @@ namespace Middleware.OcelotGateway.Controllers
         private readonly IUserRepository _userRepository;
         private readonly IOptions<JwtConfig> _jwtconfig;
         private readonly ILogger _logger;
-        
+
 
         public LoginController(IUserRepository userRepository, IOptions<JwtConfig> jwtconfig, ILogger<LoginController> logger)
         {
             _userRepository = userRepository ?? throw new ArgumentNullException(nameof(userRepository));
             _jwtconfig = jwtconfig ?? throw new ArgumentNullException(nameof(jwtconfig));
-            _logger = logger ?? throw new ArgumentNullException(nameof(logger));   
+            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
 
@@ -52,7 +52,7 @@ namespace Middleware.OcelotGateway.Controllers
                 register.Salt = Convert.ToBase64String(salt);
 
                 register.Password = ComputeHashPassword(register.Password, salt);
-        
+
                 await _userRepository.AddAsync(register, () => register.Id);
             }
             catch (Exception ex)
@@ -75,7 +75,7 @@ namespace Middleware.OcelotGateway.Controllers
         [ProducesResponseType(typeof(TokenModel), (int)HttpStatusCode.OK)]
         [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.BadRequest)]
         [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.Unauthorized)]
-        public async Task<IActionResult> Login([FromBody] UserModel login) 
+        public async Task<IActionResult> Login([FromBody] UserModel login)
         {
             if (login == null)
             {
@@ -100,7 +100,7 @@ namespace Middleware.OcelotGateway.Controllers
                 _logger.LogError(ex, "Unauthorized, username or password are incorect");
                 return StatusCode(statusCode, new ApiResponse(statusCode, $"Unauthorized, username or password are incorect: {ex.Message}"));
             }
-            
+
         }
 
 
@@ -109,7 +109,7 @@ namespace Middleware.OcelotGateway.Controllers
         /// </summary>
         /// <param name="login"></param>
         /// <returns> True or False according to users' credentials </returns>
-        private async Task<bool> AuthenticateUser(UserModel login) 
+        private async Task<bool> AuthenticateUser(UserModel login)
         {
             try
             {
@@ -120,7 +120,7 @@ namespace Middleware.OcelotGateway.Controllers
 
                 return computedHashedPassword.Equals(storedCredentials.Password) ? true : false;
             }
-            catch (Exception ex) 
+            catch (Exception ex)
             {
                 _logger.LogError(ex, "An error has occured during the authentication process");
                 return false;
@@ -133,7 +133,7 @@ namespace Middleware.OcelotGateway.Controllers
         /// <param name="clearTextPassword"></param>
         /// <param name="salt"></param>
         /// <returns> Hashed password </returns>
-        private string ComputeHashPassword(string clearTextPassword, byte[] salt) 
+        private string ComputeHashPassword(string clearTextPassword, byte[] salt)
         {
             string hashedPassword = Convert.ToBase64String(KeyDerivation.Pbkdf2(
                 password: clearTextPassword,
