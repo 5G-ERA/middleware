@@ -23,7 +23,12 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "test", "test", "{DC46C51D-7
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Orchestrator.Tests.Unit", "test\Orchestrator.Tests.Unit\Orchestrator.Tests.Unit.csproj", "{E3A68ADB-3453-4E14-BE84-351BF631918F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Common.Tests.Unit", "test\Common.Tests.Unit\Common.Tests.Unit.csproj", "{9078DB0F-2E0E-4F40-8985-6C3AFC3C3D4E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Common.Tests.Unit", "test\Common.Tests.Unit\Common.Tests.Unit.csproj", "{9078DB0F-2E0E-4F40-8985-6C3AFC3C3D4E}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{147E0419-2044-4F33-AA22-8AD342E2543A}"
+	ProjectSection(SolutionItems) = preProject
+		.editorconfig = .editorconfig
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

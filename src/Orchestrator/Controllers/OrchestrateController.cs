@@ -112,10 +112,10 @@ public class OrchestrateController : Controller
     [HttpPatch]
     [Route("plan", Name = "UpdatePlan")]
     [ProducesResponseType(typeof(TaskModel), (int)HttpStatusCode.OK)]
-    public Task<IActionResult> UpdatePlan([FromBody] TaskModel task)
+    public IActionResult UpdatePlan([FromBody] TaskModel task)
     {
         //TODO: redeploy services for new plan
-        return Task.FromResult(Ok(task));
+        return Ok(task);
     }
 
     /// <summary>
@@ -127,10 +127,10 @@ public class OrchestrateController : Controller
     [Route("action/{id}", Name = "DeleteActionById")]
     [ProducesResponseType((int)HttpStatusCode.OK)]
     [ProducesResponseType((int)HttpStatusCode.NotFound)]
-    public Task<IActionResult> DeleteActionById(Guid id)
+    public IActionResult DeleteActionById(Guid id)
     {
         // TODO: Delete action with specified Id
-        return Task.FromResult(Ok());
+        return Ok();
     }
     /// <summary>
     /// Delete plan by its id
