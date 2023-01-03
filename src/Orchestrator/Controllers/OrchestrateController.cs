@@ -246,7 +246,6 @@ public class OrchestrateController : Controller
         }
     }
 
-
     /// <summary>
     /// Instantiate the resources for specified actions
     /// </summary>
@@ -255,10 +254,10 @@ public class OrchestrateController : Controller
     [HttpPost]
     [Route("execute")]
     [ProducesResponseType(typeof(List<InstanceModel>), (int)HttpStatusCode.OK)]
-    public Task<IActionResult> InstantiateResources([FromBody] List<ActionModel> actions)
+    public IActionResult InstantiateResources([FromBody] List<ActionModel> actions)
     {
         //TODO: instantiate services for action
-        return Task.FromResult(Ok(new List<InstanceModel>()));
+        return Ok(new List<InstanceModel>());
     }
 
 }
