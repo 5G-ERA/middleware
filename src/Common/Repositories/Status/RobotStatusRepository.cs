@@ -14,7 +14,7 @@ public class RobotStatusRepository : BaseRepository<RobotStatusModel>, IRobotSta
     /// <param name="redisClient"></param>
     /// <param name="redisGraph"></param>
     /// <param name="logger"></param>
-    public RobotStatusRepository(IConnectionMultiplexer redisClient, IRedisGraphClient redisGraph, ILogger<RobotStatusRepository> logger) 
+    public RobotStatusRepository(IConnectionMultiplexer redisClient, IRedisGraphClient redisGraph, ILogger<RobotStatusRepository> logger)
         : base(RedisDbIndexEnum.RobotStatus, redisClient, redisGraph, logger, false)
     {
     }

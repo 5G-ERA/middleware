@@ -71,7 +71,7 @@ public class DeploymentService : IDeploymentService
                         // BB: service can be reused, to be decided by the resource planner
                         if (service.ServiceInstanceId != Guid.Empty)
                             continue;
-                        
+
                         await DeployService(k8SClient, service, deploymentNames);
                     }
                     catch (Exception ex)

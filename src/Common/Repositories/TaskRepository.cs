@@ -1,14 +1,14 @@
 ﻿using System.Text.Json;
-using Middleware.Common.Models;
+using Microsoft.Extensions.Logging;
 using Middleware.Common.Enums;
+using Middleware.Common.Models;
 using NReJSON;
 using RedisGraphDotNet.Client;
 using StackExchange.Redis;
-using Microsoft.Extensions.Logging;
 
 namespace Middleware.Common.Repositories
 {
-    public class TaskRepository : BaseRepository<TaskModel>,  ITaskRepository   
+    public class TaskRepository : BaseRepository<TaskModel>, ITaskRepository
     {
         /// <summary>
         /// Default constructor
@@ -26,7 +26,7 @@ namespace Middleware.Common.Repositories
         /// <param name="id"></param>
         /// <param name="patch"></param>
         /// <returns> Patched model </returns>
-        public async Task<TaskModel> PatchTaskAsync(Guid id, TaskModel patch) 
+        public async Task<TaskModel> PatchTaskAsync(Guid id, TaskModel patch)
         {
             string model = (string)await Db.JsonGetAsync(id.ToString());
             TaskModel currentModel = JsonSerializer.Deserialize<TaskModel>(model);

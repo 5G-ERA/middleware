@@ -32,5 +32,5 @@ public interface IEnvironment
     /// <param name="dir">full path of the directory</param>
     /// <returns></returns>
     List<string> GetFileNamesInDir(string dir);
-    
+
 }

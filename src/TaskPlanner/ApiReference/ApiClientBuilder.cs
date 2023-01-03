@@ -13,7 +13,7 @@ public class ApiClientBuilder : IApiClientBuilder
     {
         _httpClientFactory = httpClientFactory;
         _env = env;
-    }    
+    }
 
     /// <summary>
     /// <inheritdoc cref="IApiClientBuilder.CreateRedisApiClient"/>
@@ -25,7 +25,7 @@ public class ApiClientBuilder : IApiClientBuilder
         var client = _httpClientFactory.CreateClient("resourcePlannerApiClient");
         return new ResourcePlannerApiClient(address, client);
     }
-    
+
     /// <inheritdoc />
     public OrchestratorApiClient CreateOrchestratorApiClient()
     {

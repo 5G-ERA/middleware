@@ -5,8 +5,8 @@ using System.Linq;
 using System.Xml.Linq;
 using AutoMapper;
 using Middleware.Common.Models;
-using Middleware.TaskPlanner.ApiReference;
 using Middleware.Common.Repositories.Abstract;
+using Middleware.TaskPlanner.ApiReference;
 using Middleware.TaskPlanner.Exceptions;
 
 namespace Middleware.TaskPlanner.Services

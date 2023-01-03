@@ -46,7 +46,7 @@ public static class CommonExtensions
     /// </summary>
     /// <param name="builder"></param>
     /// <returns></returns>
-    public static WebApplicationBuilder RegisterRedis(this WebApplicationBuilder builder) 
+    public static WebApplicationBuilder RegisterRedis(this WebApplicationBuilder builder)
     {
         var config = builder.Configuration.GetSection(RedisConfig.ConfigName).Get<RedisConfig>();
 
@@ -75,5 +75,5 @@ public static class CommonExtensions
         });
         return services;
     }
-    
+
 }

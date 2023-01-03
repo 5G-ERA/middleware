@@ -1,4 +1,4 @@
-using Middleware.Common.Config;
+﻿using Middleware.Common.Config;
 using Middleware.Common.ExtensionMethods;
 using Middleware.Common.Repositories;
 using Middleware.Common.Repositories.Abstract;

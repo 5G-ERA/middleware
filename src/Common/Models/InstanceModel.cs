@@ -1,7 +1,7 @@
-﻿using Middleware.Common.Enums;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 using System.Diagnostics.CodeAnalysis;
 using System.Text.Json.Serialization;
+using Middleware.Common.Enums;
 
 namespace Middleware.Common.Models;
 
@@ -78,8 +78,8 @@ public class InstanceModel : BaseModel
         if (string.IsNullOrEmpty(ROSDistro.ToString())) return false;
         if (string.IsNullOrEmpty(InstanceFamily.ToString())) return false;
         if (!rosDistrosEnum.Contains(ROSDistro)) return false;
-     //   if (string.IsNullOrEmpty(RosTopicsPub.ToString())) return false;
-     //   if (string.IsNullOrEmpty(RosTopicsSub.ToString())) return false;
+        //   if (string.IsNullOrEmpty(RosTopicsPub.ToString())) return false;
+        //   if (string.IsNullOrEmpty(RosTopicsSub.ToString())) return false;
 
         return true;
     }

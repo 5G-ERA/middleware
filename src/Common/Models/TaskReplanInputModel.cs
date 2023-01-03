@@ -2,7 +2,7 @@
 
 namespace Middleware.Common.Models
 {
-    public class TaskReplanInputModel 
+    public class TaskReplanInputModel
     {
         [JsonPropertyName("RobotId")]
         public Guid RobotId { get; set; }

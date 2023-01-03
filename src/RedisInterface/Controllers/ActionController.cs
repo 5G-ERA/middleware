@@ -217,7 +217,7 @@ namespace Middleware.RedisInterface.Controllers
         {
             if (string.IsNullOrWhiteSpace(name))
             {
-                return BadRequest(new ApiResponse((int) HttpStatusCode.BadRequest, "Relation name not specified"));
+                return BadRequest(new ApiResponse((int)HttpStatusCode.BadRequest, "Relation name not specified"));
             }
 
             if (id == Guid.Empty)

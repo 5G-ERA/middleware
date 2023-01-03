@@ -14,7 +14,7 @@ namespace Middleware.TaskPlanner.Controllers
             _client = factory.CreateClient("healthCheckClient");
         }
 
-        [HttpGet(Name= "TaskPlannerHealthCheck")]
+        [HttpGet(Name = "TaskPlannerHealthCheck")]
         [ProducesResponseType((int)HttpStatusCode.OK)]
         public IActionResult Get()
         {

@@ -1,4 +1,4 @@
-using System.Text.Json;
+﻿using System.Text.Json;
 using System.Xml.Linq;
 using Microsoft.Extensions.Logging;
 using Middleware.Common.Enums;

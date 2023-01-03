@@ -14,7 +14,7 @@ namespace Middleware.Orchestrator.Controllers
             _client = factory.CreateClient("healthCheckClient");
         }
 
-        [HttpGet(Name="OrchestratorHealthCheck")]
+        [HttpGet(Name = "OrchestratorHealthCheck")]
         [ProducesResponseType((int)HttpStatusCode.OK)]
         public IActionResult Get()
         {

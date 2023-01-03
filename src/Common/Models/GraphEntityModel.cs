@@ -13,7 +13,7 @@ namespace Middleware.Common.Models
 
         public GraphEntityModel()
         {
-            
+
         }
 
         public GraphEntityModel(Guid id, string name, RedisDbIndexEnum dbIndex)

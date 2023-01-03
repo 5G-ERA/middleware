@@ -88,7 +88,7 @@ namespace Middleware.Common.Repositories
             {
                 //Get edge id from name
                 List<RelationModel> robotRelations = await GetRelation(edgeId.Id, "LOCATED_AT", RelationDirection.Incoming);
-                
+
                 foreach (RelationModel relationModel in robotRelations)
                 {
                     if (relationModel.PointsTo != null)
@@ -135,15 +135,15 @@ namespace Middleware.Common.Repositories
 
                 }*/
             }
-            var ordered = tempDic.OrderBy(x => x.Value).ToDictionary( x => x.Key, x => x.Value);  //Order the dictionary by value
+            var ordered = tempDic.OrderBy(x => x.Value).ToDictionary(x => x.Key, x => x.Value);  //Order the dictionary by value
             foreach (var element in ordered)
             {
                 lessBusyEdges.Add(element.Key);
             }
-            
+
             return lessBusyEdges;
         }
-        
+
         public async Task<EdgeModel> GetEdgeResourceDetailsByNameAsync(string name)
         {
             //RedisValue[] testValues = new RedisValue[] { name };
@@ -153,7 +153,7 @@ namespace Middleware.Common.Repositories
             //List<EdgeModel> edgeData = await ExecuteLuaQueryAsync("GetResourceEdgeData", testValues);
             EdgeModel edge = (await GetAllAsync()).Where(x => x.Name == name).FirstOrDefault();
             return edge;
-           // return edgeData;
+            // return edgeData;
         }
 
         /// <summary>

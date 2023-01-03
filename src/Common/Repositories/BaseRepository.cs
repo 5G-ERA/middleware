@@ -176,7 +176,7 @@ namespace Middleware.Common.Repositories
             return models;
         }
 
-        protected async Task<List<T>> ExecuteLuaQueryWithParamsAsync(string queryName,List<string> parameters)
+        protected async Task<List<T>> ExecuteLuaQueryWithParamsAsync(string queryName, List<string> parameters)
         {
             //TODO: implement launching lua query with parameters
             var script = await File.ReadAllTextAsync(GetScriptPath(queryName));
@@ -228,18 +228,18 @@ namespace Middleware.Common.Repositories
 
             if (RelationDirection.Incoming == direction)
             {
-                
+
                 relationName = relationName?.ToUpper();
                 query = "MATCH (x) MATCH (y) WHERE (x)-[: " + relationName + "]->(y: " + _redisDbIndex.ToString().ToUpper() + " {ID: '" + id +
                 "' }) RETURN x,y";
-            }     
+            }
             else
             {
                 relationName = relationName?.ToUpper();
                 query = "MATCH (x: " + _redisDbIndex.ToString().ToUpper() + " {ID: '" + id +
                                "' }) MATCH (y) WHERE (x)-[: " + relationName + "]->(y) RETURN x,y";
             }
-            
+
 
             ResultSet resultSet = await RedisGraph.Query(GraphName, query);
             // BB: 24.03.2022
@@ -382,6 +382,6 @@ namespace Middleware.Common.Repositories
             throw new NotImplementedException();
         }
 
-        
+
     }
 }

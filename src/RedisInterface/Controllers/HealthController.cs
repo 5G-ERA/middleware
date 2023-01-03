@@ -16,7 +16,7 @@ namespace Middleware.RedisInterface.Controllers
             _client = factory.CreateClient("healthCheckClient");
         }
 
-        [HttpGet(Name= "RedisInterfaceHealthCheck")]
+        [HttpGet(Name = "RedisInterfaceHealthCheck")]
         public IActionResult Get()
         {
             return Ok();
@@ -35,7 +35,7 @@ namespace Middleware.RedisInterface.Controllers
                 return NotFound();
             }
 
-            
+
             _client.BaseAddress = new Uri(addresses[0]);
 
             var bytes = await _client.GetByteArrayAsync("/swagger/v1/swagger.json");

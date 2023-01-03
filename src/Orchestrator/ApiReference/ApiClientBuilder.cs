@@ -26,7 +26,7 @@ public class ApiClientBuilder : IApiClientBuilder
         var client = _httpClientFactory.CreateClient(AppConfig.RedisApiClientName);
         return new RedisApiClient($"{address}", client);
     }
-    
+
     /// <summary>
     /// <inheritdoc cref="IApiClientBuilder.CreateOsmApiClient"/>
     /// </summary>

@@ -29,7 +29,7 @@ namespace Middleware.RedisInterface.Controllers
         [ProducesResponseType(typeof(PolicyModel), (int)HttpStatusCode.OK)]
         [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.BadRequest)]
         [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.InternalServerError)]
-        public async Task<ActionResult<PolicyModel>> PolicyAdd ([FromBody] PolicyModel model)
+        public async Task<ActionResult<PolicyModel>> PolicyAdd([FromBody] PolicyModel model)
         {
             if (model == null)
             {
@@ -74,7 +74,7 @@ namespace Middleware.RedisInterface.Controllers
                 }
                 return Ok(model);
             }
-            catch (Exception ex) 
+            catch (Exception ex)
             {
                 int statusCode = (int)HttpStatusCode.InternalServerError;
                 _logger.LogError(ex, "An error occurred:");
@@ -100,9 +100,9 @@ namespace Middleware.RedisInterface.Controllers
                     return NotFound(new ApiResponse((int)HttpStatusCode.NotFound, "Objects were not found."));
                 }
                 return Ok(models);
-                
+
             }
-            catch (Exception ex) 
+            catch (Exception ex)
             {
                 int statusCode = (int)HttpStatusCode.InternalServerError;
                 _logger.LogError(ex, "An error occurred:");
@@ -133,9 +133,9 @@ namespace Middleware.RedisInterface.Controllers
                     return NotFound(new ApiResponse((int)HttpStatusCode.NotFound, "Object was not found."));
                 }
                 List<ActivePolicy> activePoliciesRecords = activePolicies.Select(p => new ActivePolicy(p.Id, p.Name, p.Description)).ToList();
-                return Ok(activePoliciesRecords);     
+                return Ok(activePoliciesRecords);
             }
-            catch (Exception ex) 
+            catch (Exception ex)
             {
                 int statusCode = (int)HttpStatusCode.InternalServerError;
                 _logger.LogError(ex, "An error occurred:");
@@ -170,7 +170,7 @@ namespace Middleware.RedisInterface.Controllers
                 }
                 return Ok(model);
             }
-            catch (Exception ex) 
+            catch (Exception ex)
             {
                 int statusCode = (int)HttpStatusCode.InternalServerError;
                 _logger.LogError(ex, "An error occurred:");

@@ -14,7 +14,7 @@ namespace Middleware.ResourcePlanner.Controllers
             _client = factory.CreateClient("healthCheckClient");
         }
 
-        [HttpGet(Name= "ResourcePlannerHealthCheck")]
+        [HttpGet(Name = "ResourcePlannerHealthCheck")]
         [ProducesResponseType((int)HttpStatusCode.OK)]
         public IActionResult Get()
         {

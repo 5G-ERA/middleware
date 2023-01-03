@@ -95,8 +95,8 @@ namespace Middleware.RedisInterface.Controllers
                 ContainerImageModel cim = await _containerImageRepository.AddAsync(model);
                 if (cim is null)
                 {
-                    return StatusCode((int) HttpStatusCode.InternalServerError,
-                        new ApiResponse((int) HttpStatusCode.InternalServerError,
+                    return StatusCode((int)HttpStatusCode.InternalServerError,
+                        new ApiResponse((int)HttpStatusCode.InternalServerError,
                             "Could not add ContainerImage to the data store"));
                 }
                 return Ok(cim);
@@ -190,8 +190,8 @@ namespace Middleware.RedisInterface.Controllers
                 bool isValid = await _containerImageRepository.AddRelationAsync(model);
                 if (!isValid)
                 {
-                    return StatusCode((int) HttpStatusCode.InternalServerError,
-                        new ApiResponse((int) HttpStatusCode.InternalServerError, "The relation was not created"));
+                    return StatusCode((int)HttpStatusCode.InternalServerError,
+                        new ApiResponse((int)HttpStatusCode.InternalServerError, "The relation was not created"));
                 }
             }
             catch (Exception ex)

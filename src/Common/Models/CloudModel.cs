@@ -1,5 +1,5 @@
-﻿using Middleware.Common.Enums;
-using System.Text.Json.Serialization;
+﻿using System.Text.Json.Serialization;
+using Middleware.Common.Enums;
 
 namespace Middleware.Common.Models;
 

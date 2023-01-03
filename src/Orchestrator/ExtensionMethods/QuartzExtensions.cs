@@ -28,7 +28,7 @@ public static class QuartzExtensions
                 .WithIdentity("Update service status Job")
                 .WithDescription("Job that monitors the status of the deployed services by the Middleware. " +
                                  "Updates their status and reports any seen failures.")
-                .WithSimpleSchedule(x => 
+                .WithSimpleSchedule(x =>
                     x.WithInterval(TimeSpan.FromSeconds(AppConfig.StatusCheckInterval)).RepeatForever())
                 .StartAt(DateBuilder.EvenMinuteDateBefore(DateTimeOffset.UtcNow.AddMinutes(2))));
 

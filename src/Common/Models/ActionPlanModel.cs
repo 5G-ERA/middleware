@@ -51,7 +51,7 @@ public sealed class ActionPlanModel : BaseModel
     {
         if (Status is null)
             TaskStartedAt = DateTime.UtcNow;
-        
+
         Status = status;
         LastStatusChange = DateTime.UtcNow;
     }

@@ -34,7 +34,7 @@ namespace Middleware.Common.Models
         [JsonPropertyName("MarkovianProcess")]
         public bool MarkovianProcess { get; set; } //Check if  actions in action sequence are sequential or affect each other.
 
-        [JsonPropertyName("ActionSequence")] 
+        [JsonPropertyName("ActionSequence")]
         //[JsonIgnore]
         public List<ActionModel> ActionSequence { get; set; }
 

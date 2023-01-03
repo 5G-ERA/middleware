@@ -22,7 +22,7 @@ namespace Middleware.ResourcePlanner.Controllers
             _logger = logger;
         }
 
-       
+
         /// <summary>
         /// Return an updated taskModel with the resource specs.
         /// </summary>
@@ -32,14 +32,14 @@ namespace Middleware.ResourcePlanner.Controllers
         [ProducesResponseType(typeof(TaskModel), (int)HttpStatusCode.OK)]
         [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.NotFound)]
         [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.InternalServerError)]
-        
+
         public async Task<ActionResult<TaskModel>> GetResource([FromBody] ResourceInput resource)
         {
             try
             {
-              
+
                 TaskModel updatedTask = await _resourcePlanner.Plan(resource.Task, resource.Robot);
-                
+
                 return Ok(updatedTask);
             }
             catch (Orchestrator.ApiException<RedisInterface.ApiResponse> apiEx)
@@ -48,7 +48,7 @@ namespace Middleware.ResourcePlanner.Controllers
             }
             catch (Orchestrator.ApiException<Orchestrator.ApiResponse> apiEx)
             {
-                return StatusCode(apiEx.StatusCode,_mapper.Map<ApiResponse>(apiEx.Result));
+                return StatusCode(apiEx.StatusCode, _mapper.Map<ApiResponse>(apiEx.Result));
             }
             catch (Exception ex)
             {

@@ -39,7 +39,7 @@ namespace Middleware.RedisInterface.Controllers
                 }
                 return Ok(models);
             }
-            catch (Exception ex) 
+            catch (Exception ex)
             {
                 int statusCode = (int)HttpStatusCode.InternalServerError;
                 _logger.LogError(ex, "An error occurred:");
@@ -68,7 +68,7 @@ namespace Middleware.RedisInterface.Controllers
                 }
                 return Ok(model);
             }
-            catch (Exception ex) 
+            catch (Exception ex)
             {
                 int statusCode = (int)HttpStatusCode.InternalServerError;
                 _logger.LogError(ex, "An error occurred:");
@@ -95,13 +95,13 @@ namespace Middleware.RedisInterface.Controllers
             {
                 return BadRequest(new ApiResponse((int)HttpStatusCode.BadRequest, "Parameters were not specified or wrongly specified."));
             }
-            try 
-            { 
+            try
+            {
                 InstanceModel instance = await _instanceRepository.AddAsync(model);
                 if (instance is null)
                 {
-                    return StatusCode((int) HttpStatusCode.InternalServerError,
-                        new ApiResponse((int) HttpStatusCode.InternalServerError,
+                    return StatusCode((int)HttpStatusCode.InternalServerError,
+                        new ApiResponse((int)HttpStatusCode.InternalServerError,
                             "Could not add the instance to the data store"));
                 }
             }
@@ -140,7 +140,7 @@ namespace Middleware.RedisInterface.Controllers
                 }
                 return Ok(model);
             }
-            catch (Exception ex) 
+            catch (Exception ex)
             {
                 int statusCode = (int)HttpStatusCode.InternalServerError;
                 _logger.LogError(ex, "An error occurred:");
@@ -169,7 +169,7 @@ namespace Middleware.RedisInterface.Controllers
                 }
                 return Ok();
             }
-            catch (Exception ex) 
+            catch (Exception ex)
             {
                 int statusCode = (int)HttpStatusCode.InternalServerError;
                 _logger.LogError(ex, "An error occurred:");
@@ -210,7 +210,7 @@ namespace Middleware.RedisInterface.Controllers
             return Ok(model);
         }
 
-        
+
         /// <summary>
         /// Deletes a new relation between two models
         /// </summary>
@@ -260,13 +260,13 @@ namespace Middleware.RedisInterface.Controllers
             try
             {
                 var relations = await _instanceRepository.GetRelation(id, name);
-                if (!relations.Any()) 
+                if (!relations.Any())
                 {
                     return NotFound(new ApiResponse((int)HttpStatusCode.NotFound, "Relations were not found."));
                 }
                 return Ok(relations);
             }
-            catch(Exception ex) 
+            catch (Exception ex)
             {
                 int statusCode = (int)HttpStatusCode.InternalServerError;
                 _logger.LogError(ex, "An error occurred:");
@@ -298,7 +298,7 @@ namespace Middleware.RedisInterface.Controllers
                 }
                 return Ok(relations);
             }
-            catch (Exception ex) 
+            catch (Exception ex)
             {
                 int statusCode = (int)HttpStatusCode.InternalServerError;
                 _logger.LogError(ex, "An error occurred:");
