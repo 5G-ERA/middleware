@@ -1,11 +1,11 @@
-﻿using DataAccess.Repositories.Abstract;
-using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Logging;
 using Middleware.Common.Enums;
 using Middleware.Common.Models;
+using Middleware.DataAccess.Repositories.Abstract;
 using RedisGraphDotNet.Client;
 using StackExchange.Redis;
 
-namespace DataAccess.Repositories.Status;
+namespace Middleware.DataAccess.Repositories;
 
 public class RobotStatusRepository : BaseRepository<RobotStatusModel>, IRobotStatusRepository
 {
@@ -15,7 +15,7 @@ public class RobotStatusRepository : BaseRepository<RobotStatusModel>, IRobotSta
     /// <param name="redisClient"></param>
     /// <param name="redisGraph"></param>
     /// <param name="logger"></param>
-    public RobotStatusRepository(IConnectionMultiplexer redisClient, IRedisGraphClient redisGraph, ILogger<RobotStatusRepository> logger) 
+    public RobotStatusRepository(IConnectionMultiplexer redisClient, IRedisGraphClient redisGraph, ILogger<RobotStatusRepository> logger)
         : base(RedisDbIndexEnum.RobotStatus, redisClient, redisGraph, logger, false)
     {
     }

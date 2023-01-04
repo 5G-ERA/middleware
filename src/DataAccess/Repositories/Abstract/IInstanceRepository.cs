@@ -1,7 +1,6 @@
-﻿using Microsoft.AspNetCore.JsonPatch;
-using Middleware.Common.Models;
+﻿using Middleware.Common.Models;
 
-namespace DataAccess.Repositories.Abstract
+namespace Middleware.DataAccess.Repositories.Abstract
 {
     public interface IInstanceRepository : IBaseRepository<InstanceModel>
     {

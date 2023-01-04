@@ -1,12 +1,11 @@
-﻿using System.Reflection.Metadata.Ecma335;
-using DataAccess.Repositories.Abstract;
-using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Logging;
 using Middleware.Common.Enums;
 using Middleware.Common.Models;
+using Middleware.DataAccess.Repositories.Abstract;
 using RedisGraphDotNet.Client;
 using StackExchange.Redis;
 
-namespace DataAccess.Repositories.Status;
+namespace Middleware.DataAccess.Repositories;
 
 public class NetAppStatusRepository : BaseRepository<NetAppStatusModel>, INetAppStatusRepository
 {

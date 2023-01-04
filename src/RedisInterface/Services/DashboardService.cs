@@ -1,8 +1,7 @@
 ﻿using Middleware.Common;
 using Middleware.Common.Enums;
 using Middleware.Common.Helpers;
-using Middleware.Common.Repositories;
-using Middleware.Common.Repositories.Abstract;
+using Middleware.DataAccess.Repositories.Abstract;
 using Middleware.RedisInterface.Responses;
 
 namespace Middleware.RedisInterface.Services

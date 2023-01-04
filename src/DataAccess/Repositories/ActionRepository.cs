@@ -1,13 +1,13 @@
 ﻿using System.Text.Json;
-using DataAccess.Repositories.Abstract;
 using Microsoft.Extensions.Logging;
 using Middleware.Common.Enums;
 using Middleware.Common.Models;
+using Middleware.DataAccess.Repositories.Abstract;
 using NReJSON;
 using RedisGraphDotNet.Client;
 using StackExchange.Redis;
 
-namespace DataAccess.Repositories
+namespace Middleware.DataAccess.Repositories
 {
     public class ActionRepository : BaseRepository<ActionModel>, IActionRepository
     {
@@ -55,5 +55,5 @@ namespace DataAccess.Repositories
             await Db.JsonSetAsync(id.ToString(), JsonSerializer.Serialize(currentModel));
             return currentModel;
         }
-     }
+    }
 }

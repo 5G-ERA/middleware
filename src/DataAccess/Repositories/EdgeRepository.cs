@@ -1,15 +1,13 @@
-﻿using System.Runtime.InteropServices;
-using System.Text.Json;
-using Amazon.Runtime.Internal.Transform;
-using DataAccess.Repositories.Abstract;
+﻿using System.Text.Json;
 using Microsoft.Extensions.Logging;
 using Middleware.Common.Enums;
 using Middleware.Common.Models;
+using Middleware.DataAccess.Repositories.Abstract;
 using NReJSON;
 using RedisGraphDotNet.Client;
 using StackExchange.Redis;
 
-namespace DataAccess.Repositories
+namespace Middleware.DataAccess.Repositories
 {
     public class EdgeRepository : BaseRepository<EdgeModel>, IEdgeRepository
     {
@@ -45,7 +43,7 @@ namespace DataAccess.Repositories
             {
                 currentModel.EdgeStatus = patch.EdgeStatus;
             }
-            if (patch.EdgeIp != null && Uri.IsWellFormedUriString(patch.EdgeIp.ToString(), UriKind.RelativeOrAbsolute))
+            if ((patch.EdgeIp != null) && Uri.IsWellFormedUriString(patch.EdgeIp.ToString(), UriKind.RelativeOrAbsolute))
             {
                 currentModel.EdgeIp = patch.EdgeIp;
             }
@@ -88,7 +86,7 @@ namespace DataAccess.Repositories
             {
                 //Get edge id from name
                 List<RelationModel> robotRelations = await GetRelation(edgeId.Id, "LOCATED_AT", RelationDirection.Incoming);
-                
+
                 foreach (RelationModel relationModel in robotRelations)
                 {
                     if (relationModel.PointsTo != null)
@@ -135,15 +133,15 @@ namespace DataAccess.Repositories
 
                 }*/
             }
-            var ordered = tempDic.OrderBy(x => x.Value).ToDictionary( x => x.Key, x => x.Value);  //Order the dictionary by value
+            var ordered = tempDic.OrderBy(x => x.Value).ToDictionary(x => x.Key, x => x.Value);  //Order the dictionary by value
             foreach (var element in ordered)
             {
                 lessBusyEdges.Add(element.Key);
             }
-            
+
             return lessBusyEdges;
         }
-        
+
         public async Task<EdgeModel> GetEdgeResourceDetailsByNameAsync(string name)
         {
             //RedisValue[] testValues = new RedisValue[] { name };
@@ -153,7 +151,7 @@ namespace DataAccess.Repositories
             //List<EdgeModel> edgeData = await ExecuteLuaQueryAsync("GetResourceEdgeData", testValues);
             EdgeModel edge = (await GetAllAsync()).Where(x => x.Name == name).FirstOrDefault();
             return edge;
-           // return edgeData;
+            // return edgeData;
         }
 
         /// <summary>

@@ -2,12 +2,12 @@
 using Microsoft.Extensions.Logging;
 using Middleware.Common.Enums;
 using Middleware.Common.Models;
+using Middleware.DataAccess.Repositories.Abstract;
 using NReJSON;
 using RedisGraphDotNet.Client;
 using StackExchange.Redis;
-using Middleware.Common.Repositories;
 
-namespace DataAccess.Repositories
+namespace Middleware.DataAccess.Repositories
 {
     public class BaseRepository<T> : IBaseRepository<T> where T : BaseModel
     {
@@ -177,7 +177,7 @@ namespace DataAccess.Repositories
             return models;
         }
 
-        protected async Task<List<T>> ExecuteLuaQueryWithParamsAsync(string queryName,List<string> parameters)
+        protected async Task<List<T>> ExecuteLuaQueryWithParamsAsync(string queryName, List<string> parameters)
         {
             //TODO: implement launching lua query with parameters
             var script = await File.ReadAllTextAsync(GetScriptPath(queryName));
@@ -224,23 +224,23 @@ namespace DataAccess.Repositories
         /// <inheritdoc/>
         public virtual async Task<List<RelationModel>> GetRelation(Guid id, string relationName, RelationDirection direction = RelationDirection.Outgoing)
         {
-            string query = "";
+            string query = string.Empty;
             List<RelationModel> relationModels = new List<RelationModel>();
 
             if (RelationDirection.Incoming == direction)
             {
-                
+
                 relationName = relationName?.ToUpper();
                 query = "MATCH (x) MATCH (y) WHERE (x)-[: " + relationName + "]->(y: " + _redisDbIndex.ToString().ToUpper() + " {ID: '" + id +
                 "' }) RETURN x,y";
-            }     
+            }
             else
             {
                 relationName = relationName?.ToUpper();
                 query = "MATCH (x: " + _redisDbIndex.ToString().ToUpper() + " {ID: '" + id +
                                "' }) MATCH (y) WHERE (x)-[: " + relationName + "]->(y) RETURN x,y";
             }
-            
+
 
             ResultSet resultSet = await RedisGraph.Query(GraphName, query);
             // BB: 24.03.2022
@@ -312,7 +312,7 @@ namespace DataAccess.Repositories
                            "', Name: '" + model.Name + "'})";
             ResultSet resultSet = await RedisGraph.Query(GraphName, query);
 
-            return resultSet != null && resultSet.Metrics.NodesCreated == 1;
+            return (resultSet != null) && (resultSet.Metrics.NodesCreated == 1);
         }
 
         /// <summary>
@@ -327,7 +327,7 @@ namespace DataAccess.Repositories
                            "'}) CREATE (x)-[:" + relation.RelationName + "]->(c) ";
             ResultSet resultSet = await RedisGraph.Query(GraphName, query);
 
-            return resultSet != null && resultSet.Metrics.RelationshipsCreated == 1;
+            return (resultSet != null) && (resultSet.Metrics.RelationshipsCreated == 1);
         }
 
         /// <summary>
@@ -342,7 +342,7 @@ namespace DataAccess.Repositories
             string query = "MATCH (e: " + model.Type + " {ID: '" + model.Id + "'}) DELETE e";
             ResultSet resultSet = await RedisGraph.Query(GraphName, query);
 
-            return resultSet != null && resultSet.Metrics.NodesDeleted == 1;
+            return (resultSet != null) && (resultSet.Metrics.NodesDeleted == 1);
         }
 
         /// <summary>
@@ -357,7 +357,7 @@ namespace DataAccess.Repositories
                            relation.PointsTo.Id + "'}) DELETE e";
             ResultSet resultSet = await RedisGraph.Query(GraphName, query);
 
-            return resultSet != null && resultSet.Metrics.RelationshipsDeleted == 1;
+            return (resultSet != null) && (resultSet.Metrics.RelationshipsDeleted == 1);
         }
 
         /// <summary>
@@ -383,6 +383,6 @@ namespace DataAccess.Repositories
             throw new NotImplementedException();
         }
 
-        
+
     }
 }

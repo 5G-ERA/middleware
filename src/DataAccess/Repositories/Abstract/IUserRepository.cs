@@ -1,11 +1,8 @@
-﻿using Middleware.Common.Models;
-using System;
-using System.Collections.Generic;
+﻿using System;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using Middleware.Common.Models;
 
-namespace DataAccess.Repositories.Abstract
+namespace Middleware.DataAccess.Repositories.Abstract
 {
     public interface IUserRepository : IBaseRepository<UserModel>
     {

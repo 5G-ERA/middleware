@@ -1,9 +1,10 @@
 using Middleware.Common.Config;
 using Middleware.Common.ExtensionMethods;
-using Middleware.Common.Repositories;
-using Middleware.Common.Repositories.Abstract;
 using Middleware.RedisInterface;
 using Middleware.RedisInterface.Services;
+using Middleware.DataAccess.ExtensionMethods;
+using Middleware.DataAccess.Repositories;
+using Middleware.DataAccess.Repositories.Abstract;
 
 var builder = WebApplication.CreateBuilder(args);
 

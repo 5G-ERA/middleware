@@ -1,14 +1,13 @@
 using System.Text.Json;
-using System.Xml.Linq;
-using DataAccess.Repositories.Abstract;
 using Microsoft.Extensions.Logging;
 using Middleware.Common.Enums;
 using Middleware.Common.Models;
+using Middleware.DataAccess.Repositories.Abstract;
 using NReJSON;
 using RedisGraphDotNet.Client;
 using StackExchange.Redis;
 
-namespace DataAccess.Repositories
+namespace Middleware.DataAccess.Repositories
 {
     public class CloudRepository : BaseRepository<CloudModel>, ICloudRepository
     {
@@ -47,7 +46,7 @@ namespace DataAccess.Repositories
             {
                 currentModel.CloudStatus = patch.CloudStatus;
             }
-            if (patch.CloudIp != null && Uri.IsWellFormedUriString(patch.CloudIp.ToString(), UriKind.RelativeOrAbsolute))
+            if ((patch.CloudIp != null) && Uri.IsWellFormedUriString(patch.CloudIp.ToString(), UriKind.RelativeOrAbsolute))
             {
                 currentModel.CloudIp = patch.CloudIp;
             }
@@ -108,7 +107,7 @@ namespace DataAccess.Repositories
         {
             Dictionary<CloudModel, int> tempDic = new Dictionary<CloudModel, int>();
             List<CloudModel> lessBusyClouds = new List<CloudModel>();
-            string previousCloud = "";
+            string previousCloud = string.Empty;
 
             foreach (CloudModel busyCloud in busyCloudsToCheck)
             {

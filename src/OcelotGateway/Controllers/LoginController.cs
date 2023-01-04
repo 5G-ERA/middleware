@@ -6,8 +6,8 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using Middleware.Common.Config;
 using Middleware.Common.Models;
-using Middleware.Common.Repositories.Abstract;
 using Middleware.Common.Responses;
+using Middleware.DataAccess.Repositories.Abstract;
 using Middleware.OcelotGateway.Services;
 
 namespace Middleware.OcelotGateway.Controllers

@@ -178,7 +178,7 @@ namespace Middleware.TaskPlanner.Services
             if (source is null)
                 throw new ArgumentNullException(nameof(source));
             if (relationName is null)
-                throw new ArgumentNullException(nameof(Relation));
+                throw new ArgumentNullException(nameof(relationName));
 
             try
             {                

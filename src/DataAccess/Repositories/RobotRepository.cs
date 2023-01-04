@@ -1,18 +1,18 @@
-﻿using Middleware.Common.Models;
+﻿using System.Text.Json;
+using Microsoft.Extensions.Logging;
 using Middleware.Common.Enums;
+using Middleware.Common.Models;
+using Middleware.DataAccess.Repositories.Abstract;
 using NReJSON;
 using RedisGraphDotNet.Client;
 using StackExchange.Redis;
-using System.Text.Json;
-using DataAccess.Repositories.Abstract;
-using Microsoft.Extensions.Logging;
 
 
-namespace DataAccess.Repositories
+namespace Middleware.DataAccess.Repositories
 {
     public class RobotRepository : BaseRepository<RobotModel>, IRobotRepository
     {
- 
+
 
         /// <summary>
         /// Default constructor
@@ -20,9 +20,9 @@ namespace DataAccess.Repositories
         /// <param name="redisClient"></param>
         /// <param name="redisGraph"></param>
         /// <param name="logger"></param>
-        public RobotRepository(IConnectionMultiplexer redisClient,IRedisGraphClient redisGraph, ILogger<RobotRepository> logger) : base(RedisDbIndexEnum.Robot, redisClient, redisGraph, logger, true)
+        public RobotRepository(IConnectionMultiplexer redisClient, IRedisGraphClient redisGraph, ILogger<RobotRepository> logger) : base(RedisDbIndexEnum.Robot, redisClient, redisGraph, logger, true)
         {
-         
+
         }
 
         /// <summary>
@@ -31,7 +31,7 @@ namespace DataAccess.Repositories
         /// <param name="id"></param>
         /// <param name="patch"></param>
         /// <returns> Patched model </returns>
-        public async Task<RobotModel> PatchRobotAsync(Guid id, RobotModel patch) 
+        public async Task<RobotModel> PatchRobotAsync(Guid id, RobotModel patch)
         {
             string model = (string)await Db.JsonGetAsync(id.ToString());
             RobotModel currentModel = JsonSerializer.Deserialize<RobotModel>(model);
@@ -57,7 +57,7 @@ namespace DataAccess.Repositories
             }
             if (patch.TaskList != null)
             {
-                currentModel.TaskList = patch.TaskList; 
+                currentModel.TaskList = patch.TaskList;
             }
             if (!string.IsNullOrEmpty(patch.BatteryStatus.ToString()))
             {
@@ -104,13 +104,13 @@ namespace DataAccess.Repositories
         /// </summary>
         /// <param name="robotId"></param>
         /// <returns></returns>
-        public async Task<List<EdgeModel>> GetConnectedEdgesIdsAsync(Guid robotId) 
+        public async Task<List<EdgeModel>> GetConnectedEdgesIdsAsync(Guid robotId)
         {
             List<EdgeModel> edges = new List<EdgeModel>();
             List<RelationModel> robotRelations = await GetRelation(robotId, "CAN_REACH");
             foreach (RelationModel relationModel in robotRelations)
             {
-                if (relationModel.PointsTo.Type == "EDGE") 
+                if (relationModel.PointsTo.Type == "EDGE")
                 {
                     EdgeModel edgeObject = new EdgeModel();
                     edgeObject.Id = relationModel.PointsTo.Id;

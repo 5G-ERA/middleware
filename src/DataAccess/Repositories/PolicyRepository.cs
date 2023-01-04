@@ -1,14 +1,13 @@
 ﻿using System.Text.Json;
-using DataAccess.Repositories.Abstract;
-using Middleware.Common.Models;
+using Microsoft.Extensions.Logging;
 using Middleware.Common.Enums;
+using Middleware.Common.Models;
+using Middleware.DataAccess.Repositories.Abstract;
 using NReJSON;
 using RedisGraphDotNet.Client;
 using StackExchange.Redis;
-using Microsoft.Extensions.Logging;
-using System.Collections.Generic;
 
-namespace DataAccess.Repositories
+namespace Middleware.DataAccess.Repositories
 {
     public class PolicyRepository : BaseRepository<PolicyModel>, IPolicyRepository
     {
@@ -47,7 +46,7 @@ namespace DataAccess.Repositories
         public async Task<List<PolicyModel>> GetAllPoliciesAsync()
         {
             var keys = await GetKeysAsync("GetKeys");
-            var policies = new List<PolicyModel>();            
+            var policies = new List<PolicyModel>();
 
             foreach (var key in keys)
             {
@@ -75,7 +74,7 @@ namespace DataAccess.Repositories
         /// <param name="id"></param>
         /// <param name="patch"></param>
         /// <returns> Patched model </returns>
-        public async Task<PolicyModel> PatchPolicyAsync(Guid id, PolicyModel patch) 
+        public async Task<PolicyModel> PatchPolicyAsync(Guid id, PolicyModel patch)
         {
             string model = (string)await Db.JsonGetAsync(id.ToString());
             PolicyModel currentModel = JsonSerializer.Deserialize<PolicyModel>(model);
@@ -104,7 +103,7 @@ namespace DataAccess.Repositories
                     bool coexistanceCheck = CheckPolicyCanCoexist(patch, activePolicies);
                     if (coexistanceCheck == true) { currentModel.IsActive = patch.IsActive; }
                     else { throw new Exception("The proposed policy cannot coexists with the already active policies."); }
-                }  
+                }
             }
             if (!string.IsNullOrEmpty(patch.Description))
             {

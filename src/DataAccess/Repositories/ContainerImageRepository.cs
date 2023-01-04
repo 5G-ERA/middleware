@@ -2,12 +2,12 @@ using System.Text.Json;
 using Microsoft.Extensions.Logging;
 using Middleware.Common.Enums;
 using Middleware.Common.Models;
+using Middleware.DataAccess.Repositories.Abstract;
 using NReJSON;
 using RedisGraphDotNet.Client;
 using StackExchange.Redis;
-using Middleware.Common.Repositories;
 
-namespace DataAccess.Repositories
+namespace Middleware.DataAccess.Repositories
 {
     public class ContainerImageRepository : BaseRepository<ContainerImageModel>, Abstract.IContainerImageRepository
     {

@@ -2,8 +2,8 @@
 using System.Net;
 using Microsoft.AspNetCore.Mvc;
 using Middleware.Common.Models;
-using Middleware.Common.Repositories;
 using Middleware.Common.Responses;
+using Middleware.DataAccess.Repositories.Abstract;
 
 namespace Middleware.RedisInterface.Controllers
 {

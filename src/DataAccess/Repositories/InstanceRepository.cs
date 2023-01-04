@@ -2,12 +2,12 @@
 using Microsoft.Extensions.Logging;
 using Middleware.Common.Enums;
 using Middleware.Common.Models;
+using Middleware.DataAccess.Repositories.Abstract;
 using NReJSON;
 using RedisGraphDotNet.Client;
 using StackExchange.Redis;
-using Middleware.Common.Repositories;
 
-namespace DataAccess.Repositories
+namespace Middleware.DataAccess.Repositories
 {
     public class InstanceRepository : BaseRepository<InstanceModel>, IInstanceRepository
     {
@@ -51,14 +51,14 @@ namespace DataAccess.Repositories
             {
                 currentModel.DesiredStatus = patch.DesiredStatus;
             }
-            if (patch.ServiceUrl != null && Uri.IsWellFormedUriString(patch.ServiceUrl.ToString(), UriKind.RelativeOrAbsolute))
+            if ((patch.ServiceUrl != null) && Uri.IsWellFormedUriString(patch.ServiceUrl.ToString(), UriKind.RelativeOrAbsolute))
             {
                 currentModel.ServiceUrl = patch.ServiceUrl;
             }
             if (!string.IsNullOrEmpty(patch.ServiceStatus))
             {
                 currentModel.ServiceStatus = patch.ServiceStatus;
-            }    
+            }
             await Db.JsonSetAsync(id.ToString(), JsonSerializer.Serialize(currentModel));
             return currentModel;
         }
@@ -74,12 +74,12 @@ namespace DataAccess.Repositories
             InstanceModel instance = await GetByIdAsync(instanceId);
 
             List<InstanceModel> instanceCandidatesFinal = new List<InstanceModel>();
-            List <InstanceModel> PotentialInstanceCandidates = await GetAllAsync();
+            List<InstanceModel> PotentialInstanceCandidates = await GetAllAsync();
             foreach (InstanceModel instanceCandidate in PotentialInstanceCandidates)
             {
-                if(instanceCandidate.Id != instance.Id)
+                if (instanceCandidate.Id != instance.Id)
                 {
-                    if((instanceCandidate.InstanceFamily == instance.InstanceFamily) && (instanceCandidate.ROSDistro== instance.ROSDistro) && (instanceCandidate.RosVersion == instance.RosVersion))
+                    if ((instanceCandidate.InstanceFamily == instance.InstanceFamily) && (instanceCandidate.ROSDistro == instance.ROSDistro) && (instanceCandidate.RosVersion == instance.RosVersion))
                     {
                         instanceCandidatesFinal.Add(instanceCandidate);
                     }
