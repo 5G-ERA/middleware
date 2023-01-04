@@ -22,14 +22,14 @@ namespace Middleware.RedisInterface.Responses
         [JsonPropertyName("ROSDistro")]
         public string ROSDistro { get; set; }
 
-        [JsonPropertyName("Company")]
-        public string Company { get; set; }
+        [JsonPropertyName("Manufacturer")]
+        public string Manufacturer { get; set; }
 
         public RobotResponse()
         {
 
         }
-        public RobotResponse(Guid robotId, string robotName, string status, DateTime onboardedTime, int rosVersion,string rosDistro, string company)
+        public RobotResponse(Guid robotId, string robotName, string status, DateTime onboardedTime, int rosVersion,string rosDistro, string manufacturer)
         {
             RobotId = robotId;
             RobotName = robotName;
@@ -37,7 +37,7 @@ namespace Middleware.RedisInterface.Responses
             OnboardedTime = onboardedTime;
             ROSVersion = rosVersion;
             ROSDistro = rosDistro;
-            Company = company;
+            Manufacturer = manufacturer;
         }
 
     }

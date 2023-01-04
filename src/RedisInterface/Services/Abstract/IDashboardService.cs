@@ -23,7 +23,7 @@ namespace Middleware.RedisInterface.Services
         ///     Second: Total number of records</returns>
         Task<Tuple<List<LocationStatusResponse>, int>> GetLocationsStatusListAsync(PaginationFilter filter);
 
-        Task<List<actionSequenceResponse>> GetActionSequenceAsync();
+        Task<List<ActionSequenceResponse>> GetActionSequenceAsync();
 
         Task<List<string>> GetOnboardingItemNamesAsync();
 

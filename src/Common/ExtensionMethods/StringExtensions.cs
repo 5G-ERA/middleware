@@ -11,4 +11,14 @@ public static class StringExtensions
     {
         return str.Replace("\\n", "\n");
     }
+
+    public static string TrimSuffix(this string s, string suffix)
+    {
+        if (s.EndsWith(suffix))
+        {
+            return s.Substring(0, s.Length - suffix.Length);
+        }
+
+        return s;
+    }
 }

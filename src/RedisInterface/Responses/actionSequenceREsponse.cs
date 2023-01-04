@@ -2,7 +2,7 @@
 
 namespace Middleware.RedisInterface.Responses
 {
-    public record actionSequenceResponse
+    public record ActionSequenceResponse
     {
         [JsonPropertyName("TaskName")]
         public string TaskName { get; set; }
@@ -13,12 +13,12 @@ namespace Middleware.RedisInterface.Responses
         [JsonPropertyName("Actions")]
         public List<string> Actions { get; set; }
 
-        public actionSequenceResponse()
+        public ActionSequenceResponse()
         {
 
         }
 
-        public actionSequenceResponse(string taskName, Guid taskId, List<string> actions)
+        public ActionSequenceResponse(string taskName, Guid taskId, List<string> actions)
         {
             TaskName = taskName;
             TaskId = taskId;

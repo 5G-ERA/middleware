@@ -8,6 +8,7 @@ using Middleware.Common.Repositories.Abstract;
 using Middleware.RedisInterface.Responses;
 using System.Runtime.InteropServices;
 using System.Threading.Tasks;
+using Middleware.Common.ExtensionMethods;
 
 namespace Middleware.RedisInterface.Services
 {
@@ -150,17 +151,17 @@ namespace Middleware.RedisInterface.Services
         /// Get all action sequences with only actions list names 
         /// </summary>
         /// <returns></returns>
-        public async Task<List<actionSequenceResponse>> GetActionSequenceAsync()
+        public async Task<List<ActionSequenceResponse>> GetActionSequenceAsync()
         {
             var tasks = await _taskRepository.GetAllAsync();
-            var responses = new List<actionSequenceResponse>();
+            var responses = new List<ActionSequenceResponse>();
 
             foreach (var tempTask in tasks)
             {
                 List<string> tempNamesActions = new List<string>();
                 List<Common.Models.ActionModel> actions = tempTask.ActionSequence;
                 foreach (var action in actions) tempNamesActions.Add(action.Name);
-                var response = new actionSequenceResponse(
+                var response = new ActionSequenceResponse(
                     tempTask.Name,
                     tempTask.Id,
                     tempNamesActions
@@ -176,21 +177,9 @@ namespace Middleware.RedisInterface.Services
         /// <returns></returns>
         public async Task<List<string>> GetOnboardingItemNamesAsync()
         {
-            List<string> tempOnboardItemTypes = new List<string>();
-            var cloud = new CloudModel();
-            var edge = new EdgeModel();
-            var robot = new RobotModel();
-            var instance = new InstanceModel();
-            var action = new Middleware.Common.Models.ActionModel();
-            var task = new Middleware.Common.Models.TaskModel();
-            tempOnboardItemTypes.Add(cloud.GetType().ToString());
-            tempOnboardItemTypes.Add(edge.GetType().ToString());
-            tempOnboardItemTypes.Add(robot.GetType().ToString());
-            tempOnboardItemTypes.Add(instance.GetType().ToString());
-            tempOnboardItemTypes.Add(action.GetType().ToString());
-            tempOnboardItemTypes.Add(task.GetType().ToString());
-
-            return tempOnboardItemTypes;
+            var types = new Type[] { typeof(CloudModel), typeof(EdgeModel), typeof(RobotModel), typeof(InstanceModel) };
+            var typeNames = types.Select(t => t.Name.TrimSuffix("Model")).ToList();
+            return typeNames;
         }
 
         /// <summary>
@@ -209,7 +198,7 @@ namespace Middleware.RedisInterface.Services
                                    robot.OnboardedTime,
                                    robot.ROSVersion,
                                    robot.ROSDistro,
-                                   robot.Company);
+                                   robot.Manufacturer);
                 robotsResponse.Add(netAppTemp);
             }
             return new(filter.FilterResult(robotsResponse), robotsResponse.Count);

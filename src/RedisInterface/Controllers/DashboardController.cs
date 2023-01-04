@@ -82,13 +82,13 @@ namespace Middleware.RedisInterface.Controllers
         /// </summary>
         /// <returns></returns>
         [HttpGet("actionSequence")]
-        [ProducesResponseType(typeof(actionSequenceResponse), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(ActionSequenceResponse), (int)HttpStatusCode.OK)]
         [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.InternalServerError)]
         public async Task<IActionResult> GetActionSequenceAsync()
         {
             try
             {
-                List<actionSequenceResponse> actionsAndTask = await _dashboardService.GetActionSequenceAsync();
+                List<ActionSequenceResponse> actionsAndTask = await _dashboardService.GetActionSequenceAsync();
                 return Ok(actionsAndTask);
             }
             catch (Exception ex)
@@ -104,7 +104,7 @@ namespace Middleware.RedisInterface.Controllers
         /// </summary>
         /// <returns></returns>
         [HttpGet("onboardingTypes")]
-        [ProducesResponseType(typeof(actionSequenceResponse), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(ActionSequenceResponse), (int)HttpStatusCode.OK)]
         [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.InternalServerError)]
         public async Task<IActionResult> GetOnboardingItemTypesAsync()
         {
