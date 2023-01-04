@@ -175,9 +175,9 @@ namespace Middleware.RedisInterface.Services
         /// Gets a list of onboarding item types.
         /// </summary>
         /// <returns></returns>
-        public async Task<List<string>> GetOnboardingItemNamesAsync()
+        public List<string> GetOnboardingItemNames()
         {
-            var types = new Type[] { typeof(CloudModel), typeof(EdgeModel), typeof(RobotModel), typeof(InstanceModel) };
+            var types = new Type[] { typeof(CloudModel), typeof(EdgeModel), typeof(RobotModel), typeof(InstanceModel), typeof(TaskModel), typeof(ActionModel) };
             var typeNames = types.Select(t => t.Name.TrimSuffix("Model")).ToList();
             return typeNames;
         }
