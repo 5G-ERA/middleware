@@ -1,13 +1,9 @@
-﻿using Microsoft.AspNetCore.Mvc.ApplicationModels;
-using Middleware.Common;
+﻿using Middleware.Common;
 using Middleware.Common.Enums;
-using Middleware.Common.Helpers;
 using Middleware.Common.Models;
 using Middleware.Common.Repositories;
 using Middleware.Common.Repositories.Abstract;
 using Middleware.RedisInterface.Responses;
-using System.Runtime.InteropServices;
-using System.Threading.Tasks;
 using Middleware.Common.ExtensionMethods;
 
 namespace Middleware.RedisInterface.Services

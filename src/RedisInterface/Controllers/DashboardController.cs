@@ -110,7 +110,7 @@ namespace Middleware.RedisInterface.Controllers
         {
             try
             {
-                List<string> onboardingTypes = await _dashboardService.GetOnboardingItemNames();
+                List<string> onboardingTypes =  _dashboardService.GetOnboardingItemNames();
                 return Ok(onboardingTypes);
             }
             catch (Exception ex)
