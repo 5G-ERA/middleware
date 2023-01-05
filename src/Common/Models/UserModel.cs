@@ -14,7 +14,6 @@ namespace Middleware.Common.Models
         [JsonPropertyName("UserName")]
         public override string Name { get; set; }
 
-        public string Salt { get; set; }    
-        
+        public string Salt { get; set; }        
     }
 }

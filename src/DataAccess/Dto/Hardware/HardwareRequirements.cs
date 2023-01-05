@@ -1,0 +1,23 @@
+﻿using Redis.OM.Modeling;
+
+namespace Middleware.DataAccess.Dto.Hardware;
+
+[Document(StorageType = StorageType.Json)]
+public class HardwareRequirements
+{
+    [Indexed]
+    public int MinimumRam { get; set; }
+    [Indexed]
+    public int MinimumNumCores { get; set; }
+
+    public HardwareRequirements()
+    {
+
+    }
+    public HardwareRequirements(int minimumRam, int minimumNumCores)
+    {
+        MinimumRam = minimumRam;
+        MinimumNumCores = minimumNumCores;
+    }
+
+}
