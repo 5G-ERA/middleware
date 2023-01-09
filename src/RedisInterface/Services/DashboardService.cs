@@ -155,7 +155,7 @@ namespace Middleware.RedisInterface.Services
             foreach (var tempTask in tasks)
             {
                 List<string> tempNamesActions = new List<string>();
-                List<Common.Models.ActionModel> actions = tempTask.ActionSequence;
+                List<ActionModel> actions = tempTask.ActionSequence;
                 foreach (var action in actions) tempNamesActions.Add(action.Name);
                 var response = new ActionSequenceResponse(
                     tempTask.Name,
@@ -186,14 +186,14 @@ namespace Middleware.RedisInterface.Services
         {
             var robots = await _robotRepository.GetAllAsync();
             var robotsResponse = new List<RobotResponse>();
-            foreach (var robot in robotsResponse)
+            foreach (var robot in robots)
             {
-                var netAppTemp = new RobotResponse(robot.RobotId,
-                robot.RobotName,
-                                   robot.Status,
+                var netAppTemp = new RobotResponse(robot.Id,
+                robot.Name,
+                                   robot.RobotStatus,
                                    robot.OnboardedTime,
-                                   robot.ROSVersion,
-                                   robot.ROSDistro,
+                                   robot.RosVersion,
+                                   robot.RosDistro,
                                    robot.Manufacturer);
                 robotsResponse.Add(netAppTemp);
             }
