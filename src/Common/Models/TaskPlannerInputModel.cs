@@ -7,10 +7,10 @@ namespace Middleware.Common.Models
         [JsonPropertyName("RobotId")]
         public Guid RobotId { get; set; }
 
-        [JsonPropertyName("LockResourceReUse")]
+        [JsonPropertyName("LockResourceReUse")] // The middleware may not reuse containers from this plan
         public bool LockResourceReUse { get; set; }
 
-        [JsonPropertyName("ReplanActionPlannerLocked")]
+        [JsonPropertyName("ReplanActionPlannerLocked")] // The middleware may only change the resource allocation and not the action seq semantics.
         public bool ReplanActionPlannerLocked { get; set; }
 
         [JsonPropertyName("TaskId")]

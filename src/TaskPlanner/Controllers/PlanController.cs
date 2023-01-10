@@ -42,13 +42,14 @@ namespace Middleware.TaskPlanner.Controllers
             Guid robotId = inputModel.RobotId; //robot id
             bool contextKnown = inputModel.ContextKnown;
             List<Common.Models.DialogueModel> dialogueTemp = inputModel.Questions;
+            string description = inputModel.TaskDescription;
 
             try
             {
                 _actionPlanner.Initialize(new List<ActionModel>(), DateTime.Now);
                 // INFER ACTION SEQUENCE PROCESS
                 var (plan, robot2) =
-                    await _actionPlanner.InferActionSequence(id, contextKnown, lockResource, dialogueTemp, robotId);
+                    await _actionPlanner.InferActionSequence(id, description, contextKnown, lockResource, dialogueTemp, robotId);
 
                 // call resource planner for resources
                 ResourcePlanner.TaskModel tmpTaskSend = _mapper.Map<ResourcePlanner.TaskModel>(plan);

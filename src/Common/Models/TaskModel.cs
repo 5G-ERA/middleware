@@ -14,7 +14,7 @@ namespace Middleware.Common.Models
         public bool ReplanActionPlannerLocked { get; set; } //True: Dont change actions in action sequence replan
 
         [JsonPropertyName("ResourceLock")]
-        public bool ResourceLock { get; set; } //Avoid reusage of resources always.
+        public bool ResourceLock { get; set; } //If false: containers from the tasks will NOT be reused.
 
         [JsonPropertyName("TaskPriority")]
         public int TaskPriority { get; set; }

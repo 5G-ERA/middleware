@@ -45,6 +45,7 @@ namespace Middleware.TaskPlanner.Controllers
                 bool contextKnown = inputModel.ContextKnown;
                 bool CompleteReplan = inputModel.CompleteReplan; // The robot wants a partial or complete replan.
                 List<DialogueModel> tempDialog = inputModel.Questions;
+                string description = inputModel.Description;
 
                 TaskModel tempOldTaskModel = await _redisInterfaceClient.TaskGetByIdAsync(oldTask);
 
@@ -56,7 +57,7 @@ namespace Middleware.TaskPlanner.Controllers
                 }
                 tempOldTaskModel.ActionPlanId = oldPlanModel.Id;
 
-                var (plan, oldPlan, robot) = await _actionPlanner.ReInferActionSequence(tempOldTaskModel, robotId, contextKnown, CompleteReplan, tempDialog);
+                var (plan, oldPlan, robot) = await _actionPlanner.ReInferActionSequence(tempOldTaskModel, description, robotId, contextKnown, CompleteReplan, tempDialog);
 
                 ResourcePlanner.TaskModel tmpTaskSend = _mapper.Map<ResourcePlanner.TaskModel>(plan);
                 ResourcePlanner.TaskModel tmpOldPlanSend = _mapper.Map<ResourcePlanner.TaskModel>(oldPlan);
