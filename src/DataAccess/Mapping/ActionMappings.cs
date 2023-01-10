@@ -4,9 +4,9 @@ using Middleware.DataAccess.Dto.Hardware;
 
 namespace Middleware.DataAccess.Mapping;
 
-internal static class ActionMappings
+public static class ActionMappings
 {
-    internal static ActionModel ToActionModel(this ActionDto dto)
+    public static ActionModel ToActionModel(this ActionDto dto)
     {
         return new ActionModel
         {
@@ -18,7 +18,7 @@ internal static class ActionMappings
             Tags = dto.Tags
         };
     }
-    internal static ActionDto ToActionDto(this ActionModel actionModel)
+    public static ActionDto ToActionDto(this ActionModel actionModel)
     {
         return new ActionDto
         {

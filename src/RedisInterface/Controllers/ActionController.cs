@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Middleware.Common.Models;
 using Middleware.Common.Responses;
 using Middleware.DataAccess.Repositories.Abstract;
+using Middleware.RedisInterface.Services.Abstract;
 
 namespace Middleware.RedisInterface.Controllers
 {
@@ -13,12 +14,14 @@ namespace Middleware.RedisInterface.Controllers
         private readonly IActionRepository _actionRepository;
         private readonly IActionPlanRepository _actionPlanRepository;
         private readonly ILogger _logger;
+        private readonly IActionService _actionService;
 
-        public ActionController(IActionRepository actionRepository, IActionPlanRepository actionPlanRepository, ILogger<ActionController> logger)
+        public ActionController(IActionRepository actionRepository, IActionPlanRepository actionPlanRepository, ILogger<ActionController> logger, IActionService actionService)
         {
             _actionRepository = actionRepository ?? throw new ArgumentNullException(nameof(actionRepository));
             _actionPlanRepository = actionPlanRepository ?? throw new ArgumentNullException(nameof(actionPlanRepository));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+            _actionService = actionService;
         }
 
         /// <summary>
@@ -65,7 +68,7 @@ namespace Middleware.RedisInterface.Controllers
         {
             try
             {
-                ActionModel model = await _actionRepository.GetByIdAsync(id);
+                ActionModel model = await _actionService.GetByIdAsync(id);
                 if (model == null)
                 {
                     return NotFound(new ApiResponse((int)HttpStatusCode.NotFound, $"Action with id: '{id}' was not found."));
@@ -97,7 +100,7 @@ namespace Middleware.RedisInterface.Controllers
             }
             try
             {
-                await _actionRepository.AddAsync(model);
+                model = await _actionService.AddAsync(model);
             }
             catch (Exception ex)
             {

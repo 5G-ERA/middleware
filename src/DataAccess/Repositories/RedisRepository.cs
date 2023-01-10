@@ -5,7 +5,7 @@ using System.Linq.Expressions;
 
 namespace Middleware.DataAccess.Repositories
 {
-    internal class RedisRepository<T> : IRedisRepository<T> where T : Dto.Dto
+    public class RedisRepository<T> : IRedisRepository<T> where T : Dto.Dto
     {
         public IRedisCollection<T> _collection;
 
