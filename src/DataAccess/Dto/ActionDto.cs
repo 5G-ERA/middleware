@@ -4,17 +4,18 @@ using Redis.OM.Modeling;
 namespace Middleware.DataAccess.Dto;
 
 [Document(IndexName = "action-idx", StorageType = StorageType.Json, Prefixes =new[] { "Action" })]
-internal class ActionDto
+public class ActionDto : Dto
 {
     [Indexed]
-    public string? Id { get; set; }
+    [RedisIdField]
+    public string Id { get; init; } = default!;
     [Indexed]
-    public string? Name { get; set; }
+    public string Name { get; init; } = default!;
     [Indexed]
-    public List<string> Tags { get; set; } = new();
+    public List<string> Tags { get; init; } = new();
     [Indexed]
-    public string? ActionPriority { get; set; }
+    public string ActionPriority { get; init; } = default!;
 
-    public HardwareRequirements? HardwareRequirements { get; set; } = new();
+    public HardwareRequirements? HardwareRequirements { get; init; } = new();
     
 }

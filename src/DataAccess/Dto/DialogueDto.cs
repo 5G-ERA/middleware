@@ -3,14 +3,14 @@
 namespace Middleware.DataAccess.Dto
 {
     [Document(StorageType = StorageType.Json, IndexName = "dialogue-idx", Prefixes = new[] { "Dialogue" })]
-    internal class DialogueDto
+    public class DialogueDto: Dto
     {
         [Indexed]
-        public string? Id { get; set; }
+        [RedisIdField]
+        public override string Id { get; set; } = default!;
         /// <summary>
         /// Question / Name
         /// </summary>
-        [Indexed]
         [Searchable]
         public string? Question { get; set; }
         [Indexed]

@@ -1,4 +1,5 @@
 ﻿using System.Text.Json.Serialization;
+using Middleware.Common.Abstract;
 
 namespace Middleware.Common.Models;
 

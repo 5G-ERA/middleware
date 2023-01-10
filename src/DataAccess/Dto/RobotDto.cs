@@ -4,9 +4,10 @@ using Redis.OM.Modeling;
 namespace Middleware.DataAccess.Dto;
 
 [Document(IndexName = "robot-idx", StorageType = StorageType.Json, Prefixes = new[] { "Robot" })]
-internal class RobotDto
+internal class RobotDto : Dto
 {
     [Indexed]
+    [RedisIdField]
     public string? Id { get; set; }
     [Indexed]
     public string? Name { get; set; }
@@ -16,19 +17,21 @@ internal class RobotDto
     public DateTimeOffset LastUpdatedTime { get; set; }
     [Indexed]
     public string? RobotModelName { get; set; }
-
+    [Indexed]
     public string? RobotStatus { get; set; }
+    [Indexed]
     public string Manufacturer { get; set; }
 
     public Uri ManufacturerUrl { get; set; }
+    [Indexed]
     public long MaximumPayload { get; set; }
-
+    [Indexed]
     public long MaximumTranslationalVelocity { get; set; }
-
+    
     public long MaximumRotationalVelocity { get; set; }
 
-    public long RobotWeight { get; set; }    
-
+    public long RobotWeight { get; set; }
+    [Indexed]
     public long BatteryStatus { get; set; }
 
     public string? MacAddress { get; set; }
@@ -36,13 +39,13 @@ internal class RobotDto
     public string? LocomotionSystem { get; set; }
 
     public string? LocomotionType { get; set; } // Compulsory field
-
+    [Indexed]
     public List<Sensor> Sensors { get; set; } = new();
-
+    [Indexed]
     public List<Actuator> Actuators { get; set; } = new();
-
+    [Indexed]
     public List<Manipulator> Manipulators { get; set; } = new();
-
+    [Indexed]
     public List<string> QuestionIds { get; set; } = new();
 
 

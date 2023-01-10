@@ -1,64 +1,55 @@
-﻿using Middleware.Common.Enums;
-using Middleware.Common.Models;
-using Middleware.DataAccess.Repositories.Abstract;
+﻿using Middleware.DataAccess.Repositories.Abstract;
+using Redis.OM;
+using Redis.OM.Searching;
+using System.Linq.Expressions;
 
 namespace Middleware.DataAccess.Repositories
 {
-    internal class RedisRepository<T> : IBaseRepository<T> where T : class
+    internal class RedisRepository<T> : IRedisRepository<T> where T : Dto.Dto
     {
-        public Task<T> AddAsync(T model)
+        public IRedisCollection<T> _collection;
+
+        public RedisRepository(RedisConnectionProvider provider)
         {
-            throw new NotImplementedException();
+            _collection = provider.RedisCollection<T>();
+        }
+        public async Task<T> AddAsync(T model)
+        {
+            var id = await _collection.InsertAsync(model);
+            
+            return model;
         }
 
-        public Task<T> AddAsync(T model, Func<Guid> guidProvider)
+        public async Task DeleteAsync(T model)
         {
-            throw new NotImplementedException();
+            await _collection.DeleteAsync(model);
         }
 
-        public Task<bool> AddGraphAsync(GraphEntityModel model)
+        public async Task<List<T>> GetAllAsync()
         {
-            throw new NotImplementedException();
+            IList<T> listAsync = await _collection.ToListAsync();
+            return listAsync.ToList();
         }
 
-        public Task<bool> AddRelationAsync(RelationModel relation)
+        public async Task<T?> GetByIdAsync(Guid id)
         {
-            throw new NotImplementedException();
+           return await _collection.FindByIdAsync(id.ToString());
         }
 
-        public Task<bool> DeleteByIdAsync(Guid id)
+        public async Task<T?> FindSingleAsync(Expression<Func<T, bool>> predicate)
         {
-            throw new NotImplementedException();
+            return await _collection.SingleOrDefaultAsync(predicate);
         }
 
-        public Task<bool> DeleteGraphModelAsync(GraphEntityModel model)
+        public async Task<List<T>> FindAsync(Expression<Func<T, bool>> predicate)
         {
-            throw new NotImplementedException();
+            IList<T> list = await _collection.Where(predicate).ToListAsync();
+            return list.ToList();
         }
 
-        public Task<bool> DeleteRelationAsync(RelationModel relation)
+        public IRedisCollection<T> FindQuery(Expression<Func<T, bool>> predicate)
         {
-            throw new NotImplementedException();
-        }
-
-        public Task<List<T>> GetAllAsync()
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task<T> GetByIdAsync(Guid id)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task<List<RelationModel>> GetRelation(Guid id, string relationName, RelationDirection direction = RelationDirection.Outgoing)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task<List<RelationModel>> GetRelations(Guid id, List<string> relationNames)
-        {
-            throw new NotImplementedException();
+            return _collection.Where(predicate);
         }
     }
 }
