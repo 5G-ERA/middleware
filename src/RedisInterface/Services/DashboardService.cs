@@ -16,6 +16,7 @@ namespace Middleware.RedisInterface.Services
         private readonly IEdgeRepository _edgeRepository;
         private readonly ICloudRepository _cloudRepository;
         private readonly IInstanceRepository _instanceRepository;
+        private readonly IActionRepository _actionRepository;
 
 
         public DashboardService(IRobotRepository robotRepository, 
@@ -23,7 +24,8 @@ namespace Middleware.RedisInterface.Services
             IActionPlanRepository actionPlanRepository, 
             IEdgeRepository edgeRepository, 
             ICloudRepository cloudRepository,
-            IInstanceRepository instanceRepository)
+            IInstanceRepository instanceRepository,
+            IActionRepository actionRepository)
         {
             _instanceRepository = instanceRepository;
             _cloudRepository = cloudRepository;
@@ -31,6 +33,7 @@ namespace Middleware.RedisInterface.Services
             _actionPlanRepository = actionPlanRepository;
             _taskRepository = taskRepository;
             _robotRepository = robotRepository;
+            _actionRepository = actionRepository;
         }
 
         /// <summary>
@@ -152,17 +155,22 @@ namespace Middleware.RedisInterface.Services
             var tasks = await _taskRepository.GetAllAsync();
             var responses = new List<ActionSequenceResponse>();
 
-            foreach (var tempTask in tasks)
+            foreach (var taskTemp in tasks)
             {
                 List<string> tempNamesActions = new List<string>();
-                List<ActionModel> actions = tempTask.ActionSequence;
-                foreach (var action in actions) tempNamesActions.Add(action.Name);
+                List<RelationModel> action = await _taskRepository.GetRelation(taskTemp.Id, "EXTENDS");
+                foreach(RelationModel actionTemp in action)
+                {
+                    var actionModelTemp = await _actionRepository.GetByIdAsync(actionTemp.PointsTo.Id);
+                    tempNamesActions.Add(actionModelTemp.Name);
+                }
                 var response = new ActionSequenceResponse(
-                    tempTask.Name,
-                    tempTask.Id,
+                    taskTemp.Name,
+                    taskTemp.Id,
                     tempNamesActions
                     );
                 responses.Add(response);
+                //tempNamesActions.Clear();
             }
             return responses;
         }
