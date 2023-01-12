@@ -1,6 +1,4 @@
 ﻿using System.Net;
-using Amazon.SecretsManager.Model;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Middleware.Common;
 using Middleware.Common.Helpers;
@@ -48,7 +46,7 @@ namespace Middleware.RedisInterface.Controllers
                 _logger.LogError(ex, "An error occurred:");
                 return StatusCode(statusCode, new ApiResponse(statusCode, $"An error has occurred: {ex.Message}"));
             }
-            
+
         }
 
         /// <summary>
@@ -110,7 +108,7 @@ namespace Middleware.RedisInterface.Controllers
         {
             try
             {
-                List<string> onboardingTypes =  _dashboardService.GetOnboardingItemNames();
+                List<string> onboardingTypes = _dashboardService.GetOnboardingItemNames();
                 return Ok(onboardingTypes);
             }
             catch (Exception ex)
@@ -177,16 +175,16 @@ namespace Middleware.RedisInterface.Controllers
         /// Return the Graph
         /// </summary>
         /// <returns></returns>
-        [HttpGet("/dashboard/graph/")]
-        [ProducesResponseType(typeof(ActionSequenceResponse), (int)HttpStatusCode.OK)]
+        [HttpGet("dashboard/graph")]
+        [ProducesResponseType(typeof(GraphResponse), (int)HttpStatusCode.OK)]
         [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.InternalServerError)]
         public async Task<IActionResult> GetGraphAsync()
         {
             try
             {
-                List<string> onboardingTypes = _dashboardService.GetOnboardingItemNames();
-                
-                return Ok(onboardingTypes);
+                var relations = await _dashboardService.GetAllRelationModelsAsync();
+
+                return Ok(relations);
             }
             catch (Exception ex)
             {
@@ -195,7 +193,5 @@ namespace Middleware.RedisInterface.Controllers
                 return StatusCode(statusCode, new ApiResponse(statusCode, $"An error has occurred: {ex.Message}"));
             }
         }
-
-
     }
 }

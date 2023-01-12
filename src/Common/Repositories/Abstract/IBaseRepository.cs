@@ -58,5 +58,5 @@ public interface IBaseRepository<T> where T : class
 
     Task<bool> DeleteRelationAsync(RelationModel relation);
 
-    Task<List<RelationModel>> GetAllRelations();
+    Task<Dictionary<string, List<RedisGraphResult>>> GetAllRelations();
 }

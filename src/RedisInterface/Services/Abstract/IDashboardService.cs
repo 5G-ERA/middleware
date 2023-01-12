@@ -31,6 +31,6 @@ namespace Middleware.RedisInterface.Services
 
         Task<Tuple<List<RobotResponse>, int>> GetRobotsDataAsync(PaginationFilter filter);
 
-        Task<Tuple<List<RobotResponse>, int>> GetAllRelationModelsAsync(PaginationFilter filter);
+        Task<GraphResponse> GetAllRelationModelsAsync();
     }
 }
