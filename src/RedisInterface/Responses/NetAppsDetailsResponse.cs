@@ -17,7 +17,7 @@ namespace Middleware.RedisInterface.Responses
         public string ROSDistro { get; set; }
 
         [JsonPropertyName("OnboardedTime")]
-        public DateTime OnboardedTime { get; set; }
+        public DateTime? OnboardedTime { get; set; }
 
         public NetAppsDetailsResponse()
         {

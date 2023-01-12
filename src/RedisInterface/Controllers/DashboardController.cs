@@ -79,7 +79,7 @@ namespace Middleware.RedisInterface.Controllers
         /// Return to the cascading grid the action sequence names for all tasks
         /// </summary>
         /// <returns></returns>
-        [HttpGet("actionSequence")]
+        [HttpGet("tasks/actions")]
         [ProducesResponseType(typeof(ActionSequenceResponse), (int)HttpStatusCode.OK)]
         [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.InternalServerError)]
         public async Task<IActionResult> GetActionSequenceAsync()
@@ -101,7 +101,7 @@ namespace Middleware.RedisInterface.Controllers
         /// Return the onboarding types names => Drop down menu.
         /// </summary>
         /// <returns></returns>
-        [HttpGet("onboardingTypes")]
+        [HttpGet("types")]
         [ProducesResponseType(typeof(ActionSequenceResponse), (int)HttpStatusCode.OK)]
         [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.InternalServerError)]
         public async Task<IActionResult> GetOnboardingItemTypesAsync()
