@@ -57,4 +57,6 @@ public interface IBaseRepository<T> where T : class
     Task<bool> DeleteGraphModelAsync(GraphEntityModel model);
 
     Task<bool> DeleteRelationAsync(RelationModel relation);
+
+    Task<List<RelationModel>> GetAllRelations();
 }

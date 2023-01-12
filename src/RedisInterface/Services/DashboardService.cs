@@ -208,6 +208,18 @@ namespace Middleware.RedisInterface.Services
             return new(filter.FilterResult(robotsResponse), robotsResponse.Count);
         }
 
+        /// <summary>
+        /// Get all relationModels possible to reconstruct the graph
+        /// </summary>
+        /// <param name="filter"></param>
+        /// <returns></returns>
+        public async Task<Tuple<List<RobotResponse>, int>> GetAllRelationModelsAsync(PaginationFilter filter)
+        {
+            List<RelationModel> relations = await _robotRepository.GetAllRelations();
+
+            return null;
+        }
+
 
     }
 }

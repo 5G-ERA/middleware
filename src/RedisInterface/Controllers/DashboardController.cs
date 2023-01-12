@@ -173,6 +173,29 @@ namespace Middleware.RedisInterface.Controllers
             }
         }
 
+        /// <summary>
+        /// Return the Graph
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet("/dashboard/graph/")]
+        [ProducesResponseType(typeof(ActionSequenceResponse), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.InternalServerError)]
+        public async Task<IActionResult> GetGraphAsync()
+        {
+            try
+            {
+                List<string> onboardingTypes = _dashboardService.GetOnboardingItemNames();
+                
+                return Ok(onboardingTypes);
+            }
+            catch (Exception ex)
+            {
+                int statusCode = (int)HttpStatusCode.InternalServerError;
+                _logger.LogError(ex, "An error occurred:");
+                return StatusCode(statusCode, new ApiResponse(statusCode, $"An error has occurred: {ex.Message}"));
+            }
+        }
+
 
     }
 }

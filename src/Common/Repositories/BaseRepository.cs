@@ -315,6 +315,53 @@ namespace Middleware.Common.Repositories
         }
 
         /// <summary>
+        /// Return all RelationModels to recreate the graph.
+        /// </summary>
+        /// <returns></returns>
+        public virtual async Task<List<RelationModel>> GetAllRelations()
+        {
+            List<RelationModel> relationModels = new List<RelationModel>();
+            string query = "MATCH (x) RETURN x";
+            ResultSet resultSet = await RedisGraph.Query(GraphName, query);
+
+            for (int i = 0; i < resultSet.Results.Count; i++)
+            {
+                var res = resultSet.Results.ElementAt(i);
+                if (i % 2 == 0)
+                {
+                    foreach (RedisGraphResult node in res.Value)
+                    {
+
+                        var relationModel = new RelationModel
+                        {
+                            RelationName = "relationName"
+                        };
+                        if (node is Node nd)
+                        {
+                            SetGraphModelValues(relationModel.InitiatesFrom, nd);
+                        }
+
+                        relationModels.Add(relationModel);
+                    }
+                }
+                else
+                {
+                    foreach (RedisGraphResult node in res.Value)
+                    {
+                        var idxTmp = res.Value.IndexOf(node);
+                        var relationModel = relationModels[idxTmp];
+                        if (node is Node nd)
+                        {
+                            SetGraphModelValues(relationModel.PointsTo, nd);
+                        }
+                    }
+                }
+            }
+            return relationModels;
+
+        }
+
+        /// <summary>
         /// Creating a new relation between two models
         /// </summary>
         /// <param name="relation"></param>
