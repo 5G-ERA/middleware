@@ -1,0 +1,44 @@
+{
+  "Id": "32ce3e27-7654-4cf3-a296-de9a492106ef",
+  "Name": "lorem ipsum",
+  "ServiceInstanceId": "1f3cd73d-8b82-16f2-44d0-72b1ea58a8a1",
+  "ServiceType": "Web-API",
+  "IsReusable": true,
+  "DesiredStatus": "running",
+  "ServiceUrl": "http://localhost:4091",
+  "RosTopicsPub": [
+    {
+      "name": "iru",
+      "type": "Duis voluptate aliqua consequat",
+      "description": "id Lorem occaecat cupidatat"
+    },
+    {
+      "name": "proident elit dolore occaecat",
+      "type": "et velit pariatur",
+      "description": "laboris Ut dolor"
+    }
+  ],
+  "RosTopicsSub": [
+    {
+      "name": "mollit in",
+      "type": "sint tempor q",
+      "description": "cillum in consequat"
+    },
+    {
+      "name": "in consequat volupt",
+      "type": "ut laboris non",
+      "description": "ea adipisicing"
+    }
+  ],
+  "ROSVersion": 2,
+  "ROSDistro": "Foxy",
+  "Tags": [
+    "sunt occaeca",
+    "qui Duis aliqua dolor"
+  ],
+  "InstanceFamily": "Perception",
+  "SuccessRate": 90,
+  "ServiceStatus": "running",
+  "MinimumRam": 4,
+  "MinimumNumCores": 4
+}
