@@ -8,6 +8,8 @@ using Middleware.Common.Models;
 using Middleware.TaskPlanner.ApiReference;
 using Middleware.Common.Repositories.Abstract;
 using Middleware.TaskPlanner.Exceptions;
+using Middleware.Common.Repositories;
+using System.Threading.Tasks;
 
 namespace Middleware.TaskPlanner.Services
 {
@@ -16,6 +18,7 @@ namespace Middleware.TaskPlanner.Services
     {
         private readonly IMapper _mapper;
         private readonly IRedisInterfaceClientService _redisInterfaceClient;
+
         public List<ActionModel> ActionSequence { get; set; }
         public DateTime CurrentTime { get; set; }
         public string InferingProcess { get; set; }
@@ -26,7 +29,6 @@ namespace Middleware.TaskPlanner.Services
         {
             _redisInterfaceClient = redisInterfaceClient;
             _mapper = mapper;
-
             InferingProcess = ""; //Predefined actionsequence by id or IA infering based on new task.
         }
 
@@ -147,9 +149,25 @@ namespace Middleware.TaskPlanner.Services
             return FinalCandidates;
         }
 
-        protected void CheckInstanceByRobotRosDistro(RobotModel robot, ActionModel actionItem)
+        /// <summary>
+        /// Validation of robot and netApp match.
+        /// </summary>
+        /// <param name="robot"></param>
+        /// <param name="actionItem"></param>
+        /// <exception cref="IncorrectROSDistroException"></exception>
+        /// <exception cref="IncorrectROSVersionException"></exception>
+        protected async void validateRobotVsNetApp(RobotModel robot, ActionModel actionItem)
         {
-            foreach (InstanceModel instance in actionItem.Services)
+            var instances = new List<InstanceModel>();
+            List<RelationModel> relations = await _redisInterfaceClient.GetRelationAsync(actionItem, "NEEDS");
+            foreach(RelationModel tempRelation in relations)
+            {
+                var instanceTemp = await _redisInterfaceClient.InstanceGetByIdAsync(tempRelation.PointsTo.Id);
+                instances.Add(instanceTemp);
+            }
+
+            // Check if the netApp ROS distro is equal to the ROS distro of robot.
+            foreach (InstanceModel instance in instances)
             {
                 if (instance.RosVersion != robot.RosVersion)
                 {
@@ -161,20 +179,11 @@ namespace Middleware.TaskPlanner.Services
                     throw new IncorrectROSVersionException();
                 }
             }
-        }
 
-        /// <summary>
-        /// Check that the robot can run the netApp from HW, sensor & actuators perspective 
-        /// </summary>
-        /// <param name="robot"></param>
-        /// <param name="actionItem"></param>
-        /// <exception cref="InvalidOperationException"></exception>
-        protected void CheckInstanceByRobotHw(RobotModel robot, ActionModel actionItem)
-        {
             //Check if the instances (netApps) support the robot attributes, sensors and specifications.
             int numSensors = robot.Sensors.Count;
             int countTemp = 0;
-            foreach (InstanceModel instance in actionItem.Services)
+            foreach (InstanceModel instance in instances)
             {
                 if (instance.InstanceFamily == "ComputerVision")
                 {
@@ -195,7 +204,7 @@ namespace Middleware.TaskPlanner.Services
                 }
             }
 
-            if (numSensors == countTemp)
+            if (countTemp == 0)
             {
                 throw new InvalidOperationException("The robot does not have any proper sensors to feed the neccesary data to the netApp.");
             }
@@ -236,7 +245,11 @@ namespace Middleware.TaskPlanner.Services
             replanedCompleteActionSeqBK.AddRange(replanedCompleteActionSeq);
 
             robot.Questions.AddRange(DialogueTemp); //Append the questions-answers to the robot
-                                                    //
+            
+            if (ContextKnown == false)
+            {
+                throw new NotImplementedException();
+            }
             TaskModel task = await _redisInterfaceClient.TaskGetByIdAsync(currentTaskId); //Get action plan from Redis
             bool alreadyExist = task != null; //Check if CurrentTask is inside Redis model
             task.ActionPlanId = Guid.NewGuid();//Generate automatic new Guid for plan ID.
@@ -284,11 +297,8 @@ namespace Middleware.TaskPlanner.Services
                     //Call to retrieve specific action
                     ActionModel actionItem = await _redisInterfaceClient.ActionGetByIdAsync(actionId);
 
-                    // Check if the robot have the proper ROS distro and version.
-                    CheckInstanceByRobotRosDistro(robot, actionItem);
-
-                    // Check if the robot have the neccesary sensors and actuators for the netapp to correctly function.
-                    CheckInstanceByRobotHw(robot, actionItem);
+                    // Validate robot and netApp match.
+                    validateRobotVsNetApp(robot, actionItem);
 
                     //If the partial or complete replan was not activated, add the action to the action sequence. --> Normal plan
                     // PLAN ESTRATEGY A:

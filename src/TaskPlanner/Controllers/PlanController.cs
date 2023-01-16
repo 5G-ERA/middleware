@@ -37,6 +37,16 @@ namespace Middleware.TaskPlanner.Controllers
         public async Task<ActionResult<TaskModel>> GetPlan([FromBody] TaskPlannerInputModel inputModel,
             bool dryRun = false)
         {
+            if (inputModel == null)
+            {
+                return BadRequest("Parameters were not specified.");
+            }
+
+            if (inputModel.IsValid() == false)
+            {
+                return BadRequest(new ApiResponse((int)HttpStatusCode.BadRequest, "Parameters were not specified or wrongly specified."));
+            }
+
             Guid id = inputModel.Id; //task id
             bool lockResource = inputModel.LockResourceReUse;
             Guid robotId = inputModel.RobotId; //robot id
@@ -53,6 +63,7 @@ namespace Middleware.TaskPlanner.Controllers
                 // call resource planner for resources
                 ResourcePlanner.TaskModel tmpTaskSend = _mapper.Map<ResourcePlanner.TaskModel>(plan);
                 ResourcePlanner.RobotModel tmpRobotSend = _mapper.Map<ResourcePlanner.RobotModel>(robot2);
+
                 ResourcePlanner.ResourceInput resourceInput = new ResourcePlanner.ResourceInput
                 {
                     Robot = tmpRobotSend,

@@ -205,6 +205,36 @@ namespace Middleware.TaskPlanner.Services
             }
         }
 
+        public async Task<InstanceModel> InstanceGetByIdAsync(Guid id)
+        {
+            return await InstanceGetByIdAsync(id, CancellationToken.None);
+        }
+
+        public async Task<InstanceModel> InstanceGetByIdAsync(Guid id, CancellationToken token)
+        {
+            if (id == default)
+                throw new ArgumentNullException(nameof(id));
+            string url = $"/api/v1/instance/{id}";
+            try
+            {
+                var result = await _httpClient.GetAsync(url, token);
+
+                if (result.IsSuccessStatusCode == false)
+                {
+                    throw new InvalidOperationException();
+                }
+                var body = await result.Content.ReadAsStringAsync(token);
+                var instance = JsonConvert.DeserializeObject<InstanceModel>(body);
+                return instance;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "There was en error while calling for the instance with id: {id}", id);
+                throw;
+            }
+        }
+
+
         public async Task<ActionModel> ActionGetByIdAsync(Guid id)
         {
             return await ActionGetByIdAsync(id, CancellationToken.None);

@@ -10,6 +10,7 @@ public interface IRedisInterfaceClientService
     /// </summary>
     /// <param name="id">Unique identifier of <see cref="ActionPlanModel"/></param>
     /// <returns>Complete action plan</returns>
+    /// 
     Task<ActionPlanModel> ActionPlanGetByIdAsync(Guid id);
     /// <summary>
     /// Get <see cref="ActionPlanModel"/> by its id
@@ -139,4 +140,19 @@ public interface IRedisInterfaceClientService
     /// <param name="name"></param>
     /// <returns></returns>
     Task<CloudModel> GetCloudByNameAsync(string name, CancellationToken token);
+
+    /// <summary>
+    /// Get instance data by its id
+    /// </summary>
+    /// <param name="id"></param>
+    /// <returns></returns>
+    Task<InstanceModel> InstanceGetByIdAsync(Guid id);
+
+    /// <summary>
+    /// Get instance data by its id
+    /// </summary>
+    /// <param name="id"></param>
+    /// <param name="token"></param>
+    /// <returns></returns>
+    Task<InstanceModel> InstanceGetByIdAsync(Guid id, CancellationToken token);
 }

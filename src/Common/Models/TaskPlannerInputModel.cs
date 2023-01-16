@@ -1,4 +1,5 @@
-﻿using System.Text.Json.Serialization;
+﻿using Microsoft.Extensions.Logging;
+using System.Text.Json.Serialization;
 
 namespace Middleware.Common.Models
 {
@@ -24,5 +25,18 @@ namespace Middleware.Common.Models
 
         [JsonPropertyName("Questions")]
         public List<DialogueModel> Questions { get; set; }
+
+        public bool IsValid()
+        {
+            if ((RobotId == Guid.Empty) | (Id == Guid.Empty))
+            { 
+                return false;
+            }
+            else
+            {
+                return true;
+            }
+
+        }
     }
 }

@@ -175,7 +175,7 @@ namespace Middleware.RedisInterface.Controllers
         /// Return the Graph
         /// </summary>
         /// <returns></returns>
-        [HttpGet("dashboard/graph")]
+        [HttpGet("graph")]
         [ProducesResponseType(typeof(GraphResponse), (int)HttpStatusCode.OK)]
         [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.InternalServerError)]
         public async Task<IActionResult> GetGraphAsync()
