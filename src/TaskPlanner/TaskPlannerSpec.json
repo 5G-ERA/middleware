@@ -171,6 +171,16 @@
         "tags": [
           "RePlan"
         ],
+        "parameters": [
+          {
+            "name": "dryRun",
+            "in": "query",
+            "schema": {
+              "type": "boolean",
+              "default": false
+            }
+          }
+        ],
         "requestBody": {
           "content": {
             "application/json": {
@@ -294,6 +304,10 @@
           "timeStamp": {
             "type": "string",
             "format": "date-time",
+            "readOnly": true
+          },
+          "isError": {
+            "type": "boolean",
             "readOnly": true
           }
         },
@@ -434,6 +448,10 @@
           "MinimumNumCores": {
             "type": "integer",
             "format": "int32"
+          },
+          "OnboardedTime": {
+            "type": "string",
+            "format": "date-time"
           }
         },
         "additionalProperties": false
@@ -488,6 +506,9 @@
           "description": {
             "type": "string",
             "nullable": true
+          },
+          "enabled": {
+            "type": "boolean"
           }
         },
         "additionalProperties": false
