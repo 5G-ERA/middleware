@@ -9369,23 +9369,23 @@
       "NetAppsDetailsResponse": {
         "type": "object",
         "properties": {
-          "NetAppName": {
+          "name": {
             "type": "string",
             "nullable": true
           },
-          "NetAppFamily": {
+          "family": {
             "type": "string",
             "nullable": true
           },
-          "ROSVersion": {
+          "rosVersion": {
             "type": "integer",
             "format": "int32"
           },
-          "ROSDistro": {
+          "rosDistro": {
             "type": "string",
             "nullable": true
           },
-          "OnboardedTime": {
+          "onboardedTime": {
             "type": "string",
             "format": "date-time",
             "nullable": true
@@ -9740,11 +9740,11 @@
       "RobotResponse": {
         "type": "object",
         "properties": {
-          "RobotId": {
+          "Id": {
             "type": "string",
             "format": "uuid"
           },
-          "RobotName": {
+          "Name": {
             "type": "string",
             "nullable": true
           },
@@ -9757,15 +9757,15 @@
             "format": "date-time",
             "nullable": true
           },
-          "ROSVersion": {
+          "rosVersion": {
             "type": "integer",
             "format": "int32"
           },
-          "ROSDistro": {
+          "rosDistro": {
             "type": "string",
             "nullable": true
           },
-          "Manufacturer": {
+          "manufacturer": {
             "type": "string",
             "nullable": true
           }
