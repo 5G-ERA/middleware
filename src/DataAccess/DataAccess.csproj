@@ -15,10 +15,7 @@
 
 	<ItemGroup>
 		<ProjectReference Include="..\Common\Common.csproj" />
-	</ItemGroup>
-
-	<ItemGroup>
-	  <Folder Include="Dto\Other\" />
+		<ProjectReference Include="..\Models\Models.csproj" />
 	</ItemGroup>
 
 </Project>

@@ -1,10 +1,5 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
-using System.Xml.Linq;
-using AutoMapper;
-using Middleware.Common.Models;
+﻿using AutoMapper;
+using Middleware.Models.Domain;
 using Middleware.TaskPlanner.ApiReference;
 using Middleware.TaskPlanner.Exceptions;
 
@@ -19,7 +14,7 @@ namespace Middleware.TaskPlanner.Services
         public DateTime CurrentTime { get; set; }
         public string InferingProcess { get; set; }
 
-        public List<Common.Models.KeyValuePair> Answer { get; set; }
+        public List<Models.Domain.KeyValuePair> Answer { get; set; }
 
         public ActionPlanner(IApiClientBuilder apiBuilder, IMapper mapper, IRedisInterfaceClientService redisInterfaceClient)
         {

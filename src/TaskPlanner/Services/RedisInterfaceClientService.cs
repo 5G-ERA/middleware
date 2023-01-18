@@ -1,8 +1,7 @@
 ﻿using System.Web;
 using Middleware.Common.Config;
 using Middleware.Common.ExtensionMethods;
-using Middleware.Common.Models;
-using Middleware.Common.Structs;
+using Middleware.Models.Domain;
 using Newtonsoft.Json;
 
 namespace Middleware.TaskPlanner.Services
