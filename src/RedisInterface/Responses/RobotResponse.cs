@@ -4,11 +4,11 @@ namespace Middleware.RedisInterface.Responses
 {
     public record RobotResponse
     {
-        [JsonPropertyName("RobotId")]
-        public Guid RobotId { get; set; }
+        [JsonPropertyName("Id")]
+        public Guid Id { get; set; }
 
-        [JsonPropertyName("RobotName")]
-        public string RobotName { get; set; }
+        [JsonPropertyName("Name")]
+        public string Name { get; set; }
 
         [JsonPropertyName("Status")]
         public string Status { get; set; }
@@ -16,27 +16,27 @@ namespace Middleware.RedisInterface.Responses
         [JsonPropertyName("OnboardedTime")]
         public DateTime? OnboardedTime { get; set; }
 
-        [JsonPropertyName("ROSVersion")]
-        public int ROSVersion { get; set; }
+        [JsonPropertyName("rosVersion")]
+        public int RosVersion { get; set; }
 
-        [JsonPropertyName("ROSDistro")]
-        public string ROSDistro { get; set; }
+        [JsonPropertyName("rosDistro")]
+        public string RosDistro { get; set; }
 
-        [JsonPropertyName("Manufacturer")]
+        [JsonPropertyName("manufacturer")]
         public string Manufacturer { get; set; }
 
         public RobotResponse()
         {
 
         }
-        public RobotResponse(Guid robotId, string robotName, string status, DateTime onboardedTime, int rosVersion,string rosDistro, string manufacturer)
+        public RobotResponse(Guid id, string name, string status, DateTime onboardedTime, int rosVersion,string rosDistro, string manufacturer)
         {
-            RobotId = robotId;
-            RobotName = robotName;
+            Id = id;
+            Name = name;
             Status = status;
             OnboardedTime = onboardedTime;
-            ROSVersion = rosVersion;
-            ROSDistro = rosDistro;
+            RosVersion = rosVersion;
+            RosDistro = rosDistro;
             Manufacturer = manufacturer;
         }
 

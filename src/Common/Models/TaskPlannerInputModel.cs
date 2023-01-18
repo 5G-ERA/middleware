@@ -28,15 +28,7 @@ namespace Middleware.Common.Models
 
         public bool IsValid()
         {
-            if ((RobotId == Guid.Empty) | (Id == Guid.Empty))
-            { 
-                return false;
-            }
-            else
-            {
-                return true;
-            }
-
+            return RobotId != Guid.Empty && Id != Guid.Empty;
         }
     }
 }

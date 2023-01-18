@@ -4,30 +4,30 @@ namespace Middleware.RedisInterface.Responses
 {
     public record NetAppsDetailsResponse
     {
-        [JsonPropertyName("NetAppName")]
-        public string NetAppName { get; set; }
+        [JsonPropertyName("name")]
+        public string Name { get; set; }
 
-        [JsonPropertyName("NetAppFamily")]
-        public string NetAppFamily { get; set; }
+        [JsonPropertyName("family")]
+        public string Family { get; set; }
 
-        [JsonPropertyName("ROSVersion")]
-        public int ROSVersion { get; set; }
+        [JsonPropertyName("rosVersion")]
+        public int RosVersion { get; set; }
 
-        [JsonPropertyName("ROSDistro")]
-        public string ROSDistro { get; set; }
+        [JsonPropertyName("rosDistro")]
+        public string RosDistro { get; set; }
 
-        [JsonPropertyName("OnboardedTime")]
+        [JsonPropertyName("onboardedTime")]
         public DateTime? OnboardedTime { get; set; }
 
         public NetAppsDetailsResponse()
         {
         }
-        public NetAppsDetailsResponse(string netAppName, string netAppFamily, int rosVersion, string rosDistro , DateTime onboardedTime)
+        public NetAppsDetailsResponse(string name, string family, int rosVersion, string rosDistro , DateTime onboardedTime)
         {
-            NetAppName = netAppName;
-            NetAppFamily = netAppFamily;
-            ROSVersion = rosVersion;
-            ROSDistro = rosDistro;
+            Name = name;
+            Family = family;
+            RosVersion = rosVersion;
+            RosDistro = rosDistro;
             OnboardedTime = onboardedTime;
 
         }
