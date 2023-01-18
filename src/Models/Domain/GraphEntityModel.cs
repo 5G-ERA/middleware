@@ -24,12 +24,23 @@
             Id = id;
             Type = dbIndex.ToString().ToUpper();
         }
+        public GraphEntityModel(Guid id, string entityName)
+        {
+            Id = id;
+            Type = entityName;
+        }
 
         public GraphEntityModel(Guid id, string name, Type type)
         {
             Id = id;
             Name = name;
             Type = type.GetModelName();
+        }
+        public GraphEntityModel(Guid id, string name, string entityName)
+        {
+            Id = id;
+            Name = name;
+            Type = entityName;
         }
     }
 }

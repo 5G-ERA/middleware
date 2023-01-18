@@ -9,7 +9,7 @@ using StackExchange.Redis;
 
 namespace Middleware.DataAccess.Repositories
 {
-    public class BaseRepository<T> : IBaseRepository<T> where T : BaseModel
+    public class BaseRepository<T> : IBaseRepository<T>, IRelationRepository where T : BaseModel
     {
         /// <summary>
         /// Name of the graph to be queried for

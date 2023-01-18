@@ -5,7 +5,7 @@
     {
         [Indexed]
         [RedisIdField]
-        public override string Id { get; set; } = default!;
+        public override string Id { get; init; } = default!;
         /// <summary>
         /// Question / Name
         /// </summary>

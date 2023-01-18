@@ -3,26 +3,8 @@ using Redis.OM.Searching;
 
 namespace Middleware.DataAccess.Repositories.Abstract;
 
-public interface IRedisRepository<T>
+public interface IRedisRepository<T> : IRelationRepository, IBaseRepository<T> where T : class
 {
-    /// <summary>
-    /// Adds a new object to the data store
-    /// </summary>
-    /// <param name="model">Model of an object to be added</param>
-    /// <returns></returns>
-    Task<T> AddAsync(T model);
-    /// <summary>
-    /// Get the object by its id
-    /// </summary>
-    /// <param name="id">Identifier of the object</param>
-    /// <returns></returns>
-    Task<T?> GetByIdAsync(Guid id);
-
-    /// <summary>
-    /// Get all objects of the specified type from the data store
-    /// </summary>
-    /// <returns></returns>
-    Task<List<T>> GetAllAsync();
     /// <summary>
     /// Delete object from the data store
     /// </summary>
@@ -47,4 +29,10 @@ public interface IRedisRepository<T>
     /// <param name="predicate"></param>
     /// <returns></returns>
     IRedisCollection<T> FindQuery(Expression<Func<T, bool>> predicate);
+    /// <summary>
+    /// Updates the existing entity
+    /// </summary>
+    /// <param name="model"></param>
+    /// <returns></returns>
+    Task UpdateAsync(T model);
 }
