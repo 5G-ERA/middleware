@@ -42,6 +42,10 @@ namespace Middleware.TaskPlanner.Controllers
                 return BadRequest("Parameters were not specified.");
             }
 
+            if (inputModel.ContextKnown == false)
+            {
+                return BadRequest(new ApiResponse((int)HttpStatusCode.BadRequest, "Semmantic planning is not yet available."));
+            }
             if (inputModel.IsValid() == false)
             {
                 return BadRequest(new ApiResponse((int)HttpStatusCode.BadRequest, "Parameters were not specified or wrongly specified."));

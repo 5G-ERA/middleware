@@ -308,9 +308,7 @@ namespace Middleware.TaskPlanner.Services
                     /////////////////////////////////////////////////////////////////////////////////////////////////////////////                    
                     ActionModel actionItem = await _redisInterfaceClient.ActionGetByIdAsync(actionId);
 
-                    
-                    
-                    //await ValidateRobotVsNetApp(robot, actionItem);
+                    await ValidateRobotVsNetApp(robot, actionItem);
 
                     //If the partial or complete replan was not activated, add the action to the action sequence. --> Normal plan
                     // PLAN ESTRATEGY A:

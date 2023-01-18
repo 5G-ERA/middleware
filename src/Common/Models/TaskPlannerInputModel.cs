@@ -9,8 +9,10 @@ namespace Middleware.Common.Models
         public Guid RobotId { get; set; }
 
         [JsonPropertyName("LockResourceReUse")]
-        public bool LockResourceReUse { get; set; }
-
+        public bool LockResourceReUse { get; set; } //TODO: check only the instances that are avialable in the local middleware
+        /// <summary>
+        /// only change the instance placement in the existing plan during a replan
+        /// </summary>
         [JsonPropertyName("ReplanActionPlannerLocked")]
         public bool ReplanActionPlannerLocked { get; set; }
 
@@ -19,9 +21,12 @@ namespace Middleware.Common.Models
 
         [JsonPropertyName("TaskDescription")]
         public String TaskDescription { get; set; }
-
+        
+        /// <summary>
+        /// Use the hardcoded action plan if true, use the semantic planning if false
+        /// </summary>        
         [JsonPropertyName("ContextKnown")]
-        public bool ContextKnown { get; set; }
+        public bool ContextKnown { get; set; } = true; 
 
         [JsonPropertyName("Questions")]
         public List<DialogueModel> Questions { get; set; }
