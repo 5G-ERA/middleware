@@ -1029,6 +1029,10 @@
           "RobotId": {
             "type": "string",
             "format": "uuid"
+          },
+          "TaskStartedAt": {
+            "type": "string",
+            "format": "date-time"
           }
         },
         "additionalProperties": false
@@ -1044,14 +1048,14 @@
             "type": "string",
             "nullable": true
           },
-          "dof": {
+          "number": {
             "type": "integer",
             "format": "int32"
           },
           "nodes": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/ROSNodeModel"
+              "type": "string"
             },
             "nullable": true
           }
@@ -1072,6 +1076,10 @@
           "timeStamp": {
             "type": "string",
             "format": "date-time",
+            "readOnly": true
+          },
+          "isError": {
+            "type": "boolean",
             "readOnly": true
           }
         },
@@ -1212,6 +1220,10 @@
           "MinimumNumCores": {
             "type": "integer",
             "format": "int32"
+          },
+          "OnboardedTime": {
+            "type": "string",
+            "format": "date-time"
           }
         },
         "additionalProperties": false
@@ -1367,6 +1379,30 @@
             "type": "string",
             "nullable": true
           },
+          "RosVersion": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "RosDistro": {
+            "type": "string",
+            "nullable": true
+          },
+          "MaximumPayload": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "MaximumTranslationalVelocity": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "MaximumRotationalVelocity": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "RobotWeight": {
+            "type": "integer",
+            "format": "int64"
+          },
           "ROSRepo": {
             "type": "string",
             "format": "uri",
@@ -1396,7 +1432,7 @@
             "type": "string",
             "nullable": true
           },
-          "CurrentTaskID": {
+          "currentTaskId": {
             "type": "string",
             "format": "uuid"
           },
@@ -1452,10 +1488,6 @@
             "type": "integer",
             "format": "int64"
           },
-          "VirtualRam": {
-            "type": "integer",
-            "format": "int64"
-          },
           "StorageDisk": {
             "type": "integer",
             "format": "int64"
@@ -1470,6 +1502,14 @@
               "$ref": "#/components/schemas/DialogueModel"
             },
             "nullable": true
+          },
+          "LastUpdatedTime": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "OnboardedTime": {
+            "type": "string",
+            "format": "date-time"
           }
         },
         "additionalProperties": false
@@ -1575,6 +1615,9 @@
           "description": {
             "type": "string",
             "nullable": true
+          },
+          "enabled": {
+            "type": "boolean"
           }
         },
         "additionalProperties": false

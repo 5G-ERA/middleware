@@ -17,7 +17,7 @@ namespace Middleware.RedisInterface.Responses
         public Guid TaskId { get; set; }
         
         [JsonPropertyName("taskStartTime")]
-        public DateTime TaskStartTime { get; set; }
+        public DateTime? TaskStartTime { get; set; }
         
         [JsonPropertyName("taskCompletedTime")]
         public DateTime? TaskCompletedTime { get; set; }

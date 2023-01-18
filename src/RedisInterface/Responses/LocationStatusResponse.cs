@@ -5,7 +5,7 @@ namespace Middleware.RedisInterface.Responses;
 public class LocationStatusResponse
 {
     [JsonPropertyName("lastUpdatedTime")]
-    public DateTime LastUpdatedTime { get; set; }
+    public DateTime? LastUpdatedTime { get; set; }
 
     [JsonPropertyName("name")]
     public string Name { get; set; }

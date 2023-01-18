@@ -22,5 +22,15 @@ namespace Middleware.RedisInterface.Services
         ///     First: A list of <seealso cref="LocationStatusResponse"/> <br/>
         ///     Second: Total number of records</returns>
         Task<Tuple<List<LocationStatusResponse>, int>> GetLocationsStatusListAsync(PaginationFilter filter);
+
+        Task<List<ActionSequenceResponse>> GetActionSequenceAsync();
+
+        List<string> GetOnboardingItemNames();
+
+        Task<Tuple<List<NetAppsDetailsResponse>, int>> GetNetAppsDataListAsync(PaginationFilter filter);
+
+        Task<Tuple<List<RobotResponse>, int>> GetRobotsDataAsync(PaginationFilter filter);
+
+        Task<GraphResponse> GetAllRelationModelsAsync();
     }
 }
