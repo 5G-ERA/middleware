@@ -1,6 +1,5 @@
 ﻿using Middleware.Common.Models;
 using Middleware.DataAccess.Repositories.Redis;
-using Middleware.DataAccess.Mapping;
 using Middleware.RedisInterface.Services.Abstract;
 
 namespace Middleware.RedisInterface.Services

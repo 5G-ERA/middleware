@@ -1,4 +1,6 @@
-﻿using Middleware.Models.Dto.Hardware;
+﻿using Middleware.Models.Domain;
+using Middleware.Models.Dto.Hardware;
+using Redis.OM.Modeling;
 
 namespace Middleware.Models.Dto;
 
@@ -16,4 +18,12 @@ public class ActionDto : Dto
     public string ActionPriority { get; init; } = default!;
 
     public HardwareRequirements? HardwareRequirements { get; init; } = new();
+    
+    public override object ToModel()
+    {
+        return new ActionModel()
+        {
+
+        };
+    }
 }

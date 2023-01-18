@@ -1,8 +1,8 @@
-﻿using Middleware.Common.Models;
-using Middleware.DataAccess.Dto;
-using Middleware.DataAccess.Dto.Hardware;
+﻿using Middleware.Models.Domain;
+using Middleware.Models.Dto;
+using Middleware.Models.Dto.Hardware;
 
-namespace Middleware.DataAccess.Mapping;
+namespace Middleware.Models.Mapping;
 
 public static class ActionMappings
 {

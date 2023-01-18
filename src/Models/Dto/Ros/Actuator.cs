@@ -1,4 +1,6 @@
-﻿namespace Middleware.Models.Dto.Ros
+﻿using Redis.OM.Modeling;
+
+namespace Middleware.Models.Dto.Ros
 {
     [Document]
     internal class Actuator

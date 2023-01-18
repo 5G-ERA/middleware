@@ -1,4 +1,6 @@
-﻿namespace Middleware.Models.Dto.Hardware;
+﻿using Redis.OM.Modeling;
+
+namespace Middleware.Models.Dto.Hardware;
 
 [Document(StorageType = StorageType.Json)]
 public class HardwareRequirements

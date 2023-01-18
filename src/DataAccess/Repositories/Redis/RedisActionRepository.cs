@@ -2,7 +2,6 @@ using Middleware.Models.Domain;
 using Middleware.Models.Dto;
 using Middleware.Common.Models;
 using Middleware.DataAccess.Dto;
-using Middleware.DataAccess.Mapping;
 using Middleware.DataAccess.Repositories.Abstract;
 using Redis.OM;
 using RedisGraphDotNet.Client;

@@ -1,4 +1,5 @@
 ﻿using System.Text.Json.Serialization;
+using Middleware.Models.Enums;
 
 namespace Middleware.Models.Domain;
 
@@ -9,11 +10,6 @@ public class RobotModel : BaseModel
 
     [JsonPropertyName("Name")]
     public override string Name { get; set; } // Compulsory field
-
-    public override object ToDto()
-    {
-        return new RobotDto()
-    }
 
     [JsonPropertyName("RosVersion")]
     public int RosVersion { get; set; } // Compulsory field

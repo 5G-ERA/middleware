@@ -1,4 +1,7 @@
-﻿using Middleware.Models.Dto.Ros;
+﻿using Middleware.Models.Domain;
+using Middleware.Models.Dto.Hardware;
+using Middleware.Models.Dto.Ros;
+using Redis.OM.Modeling;
 
 namespace Middleware.Models.Dto;
 
@@ -7,7 +10,7 @@ internal class RobotDto : Dto
 {
     [Indexed]
     [RedisIdField]
-    public string? Id { get; set; }
+    public override string? Id { get; init; }
     [Indexed]
     public string? Name { get; set; }
     [Indexed(JsonPath = "$.RosDistro")]
@@ -46,4 +49,35 @@ internal class RobotDto : Dto
     public List<Manipulator> Manipulators { get; set; } = new();
     [Indexed]
     public List<string> QuestionIds { get; set; } = new();
+    public HardwareSpec HardwareSpec { get; set; } = new();
+
+    public override object ToModel()
+    {
+        var dto = this;
+        return new RobotModel()
+        {
+            Id = Guid.Parse(dto.Id!),
+            Name = dto.Name,
+            BatteryStatus = dto.BatteryStatus,
+            LocomotionSystem = dto.LocomotionSystem,
+            Manufacturer = dto.Manufacturer,
+            MacAddress = dto.MacAddress,
+            ManufacturerUrl = dto.ManufacturerUrl,
+            MaximumPayload = dto.MaximumPayload,
+            RobotStatus = dto.RobotStatus,
+            RobotWeight = dto.RobotWeight,
+            LastUpdatedTime = dto.LastUpdatedTime.DateTime,
+            RobotModelName = dto.RobotModelName,
+            MaximumRotationalVelocity = dto.MaximumRotationalVelocity,
+            MaximumTranslationalVelocity = dto.MaximumTranslationalVelocity,
+            Cpu = dto.HardwareSpec.Cpu,
+            Ram = dto.HardwareSpec.Ram,
+            NumberCores = dto.HardwareSpec.NumberCores,
+            StorageDisk = dto.HardwareSpec.StorageDisk,
+            LocomotionTypes = dto.LocomotionType,
+            RosDistro = dto.Ros.RosDistro,
+            RosVersion = dto.Ros.RosVersion,
+            //TODO: fill remaining specification of the robot
+        };
+    }
 }
