@@ -1,7 +1,4 @@
-﻿using System;
-using System.Linq;
-
-namespace Middleware.Common
+﻿namespace Middleware.Common
 {
     public interface IUriService
     {

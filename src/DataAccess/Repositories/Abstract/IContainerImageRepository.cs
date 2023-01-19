@@ -1,8 +1,8 @@
-﻿using Middleware.Common.Models;
+﻿using Middleware.Models.Domain;
 
 namespace Middleware.DataAccess.Repositories.Abstract
 {
-    public interface IContainerImageRepository : IBaseRepository<ContainerImageModel>
+    public interface IContainerImageRepository : IBaseRepository<ContainerImageModel>, IRelationRepository
     {
         Task<ContainerImageModel> PatchContainerImageAsync(Guid id, ContainerImageModel patch);
         /// <summary>

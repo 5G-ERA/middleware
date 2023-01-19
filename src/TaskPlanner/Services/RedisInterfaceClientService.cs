@@ -2,6 +2,7 @@
 using Middleware.Common.Config;
 using Middleware.Common.ExtensionMethods;
 using Middleware.Models.Domain;
+using Middleware.Models.ExtensionMethods;
 using Newtonsoft.Json;
 
 namespace Middleware.TaskPlanner.Services

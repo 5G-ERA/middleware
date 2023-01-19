@@ -1,9 +1,10 @@
 ﻿using System.Net;
 using Microsoft.AspNetCore.Mvc;
 using Middleware.Common.Enums;
-using Middleware.Common.Models;
 using Middleware.Common.Responses;
 using Middleware.DataAccess.Repositories.Abstract;
+using Middleware.Models.Domain;
+using Middleware.Models.Enums;
 
 namespace Middleware.RedisInterface.Controllers
 {

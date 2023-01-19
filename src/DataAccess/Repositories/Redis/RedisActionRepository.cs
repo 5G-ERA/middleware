@@ -1,8 +1,5 @@
 using Middleware.Models.Domain;
 using Middleware.Models.Dto;
-using Middleware.Common.Models;
-using Middleware.DataAccess.Dto;
-using Middleware.DataAccess.Repositories.Abstract;
 using Redis.OM;
 using RedisGraphDotNet.Client;
 
@@ -17,10 +14,7 @@ public class RedisActionRepository : RedisRepository<ActionModel, ActionDto>
 
     public async Task<ActionModel> PatchActionAsync(Guid id, ActionModel patch)
     {
-        ActionDto? model = await GetByIdAsync(id);
-        if(model is null)
-            return null;
-        ActionModel currentModel = model.ToActionModel();
+        ActionModel currentModel = await GetByIdAsync(id);
         if (currentModel == null)
         {
             return null;
@@ -42,7 +36,7 @@ public class RedisActionRepository : RedisRepository<ActionModel, ActionDto>
         {
             currentModel.ActionPriority = patch.ActionPriority;
         }
-        await UpdateAsync(currentModel.ToActionDto());        
+        await UpdateAsync(currentModel);
         return currentModel;
     }
 }

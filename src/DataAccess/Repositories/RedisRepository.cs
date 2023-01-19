@@ -1,16 +1,16 @@
 ﻿using Middleware.Common.Enums;
-using Middleware.Common.Models;
 using Middleware.DataAccess.Repositories.Abstract;
 using Redis.OM;
 using Redis.OM.Searching;
 using RedisGraphDotNet.Client;
 using StackExchange.Redis;
 using System.Linq.Expressions;
-using Middleware.Common.Models;
+using Middleware.Models.Domain;
+using Middleware.Models.Dto;
 
 namespace Middleware.DataAccess.Repositories
 {
-    public class RedisRepository<T, TDto> : IRedisRepository<T> where T : BaseModel where TDto : Dto.Dto
+    public class RedisRepository<T, TDto> : IRedisRepository<T> where T : BaseModel where TDto : Dto
     {
         private const string GraphName = "RESOURCE_PLANNER";
         protected IRedisCollection<T> Collection;

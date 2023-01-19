@@ -1,5 +1,5 @@
 ﻿using Microsoft.Extensions.Hosting;
-using Middleware.DataAccess.Dto;
+using Middleware.Models.Dto;
 using Redis.OM;
 
 namespace Middleware.DataAccess.HostedServices;

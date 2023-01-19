@@ -1,15 +1,16 @@
 using System.Text.Json;
 using Microsoft.Extensions.Logging;
 using Middleware.Common.Enums;
-using Middleware.Common.Models;
 using Middleware.DataAccess.Repositories.Abstract;
+using Middleware.Models.Domain;
+using Middleware.Models.Enums;
 using NReJSON;
 using RedisGraphDotNet.Client;
 using StackExchange.Redis;
 
 namespace Middleware.DataAccess.Repositories
 {
-    public class ContainerImageRepository : BaseRepository<ContainerImageModel>, Abstract.IContainerImageRepository
+    public class ContainerImageRepository : BaseRepository<ContainerImageModel>, IContainerImageRepository
     {
         private readonly IInstanceRepository _instanceRepository;
 
@@ -66,7 +67,7 @@ namespace Middleware.DataAccess.Repositories
         /// <inheritdoc/>
         public async Task<List<ContainerImageModel>> GetImagesForInstanceAsync(Guid instanceId)
         {
-
+            //TODO: extract this method to Container Image Service
             List<RelationModel> imageRelations = await _instanceRepository.GetRelation(instanceId, "needs");
 
             List<Guid> actionIds = imageRelations.Select(i => i.PointsTo.Id).ToList();

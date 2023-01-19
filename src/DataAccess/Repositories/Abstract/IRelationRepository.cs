@@ -1,7 +1,5 @@
 ﻿using Middleware.Common.Enums;
-using Middleware.Common.Models;
-using System;
-using System.Linq;
+using Middleware.Models.Domain;
 
 namespace Middleware.DataAccess.Repositories.Abstract
 {

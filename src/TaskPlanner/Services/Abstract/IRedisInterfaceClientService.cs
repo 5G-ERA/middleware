@@ -1,4 +1,3 @@
-using Middleware.Common.Structs;
 using Middleware.Models.Domain;
 
 namespace Middleware.TaskPlanner.Services;

@@ -1,4 +1,3 @@
-using Middleware.Common.Config;
 using Middleware.Common.ExtensionMethods;
 using Middleware.RedisInterface;
 using Middleware.RedisInterface.Services;

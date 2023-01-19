@@ -1,6 +1,4 @@
-﻿using System;
-using System.Linq;
-using Middleware.Common.Responses;
+﻿using Middleware.Common.Responses;
 
 namespace Middleware.Common.Helpers
 {

@@ -1,5 +1,4 @@
-﻿using Middleware.Common.Models;
-using Middleware.Common.Responses;
+﻿using Middleware.Common.Responses;
 using KeyValuePair = Middleware.Common.Models.KeyValuePair;
 
 namespace Middleware.ResourcePlanner.Config;

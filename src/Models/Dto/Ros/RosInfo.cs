@@ -2,7 +2,7 @@
 
 namespace Middleware.Models.Dto.Ros;
 
-internal class RosInfo
+public class RosInfo
 {
     [Indexed]
     public int RosVersion { get; set; }

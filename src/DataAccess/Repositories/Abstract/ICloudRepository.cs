@@ -1,8 +1,8 @@
-﻿using Middleware.Common.Models;
+﻿using Middleware.Models.Domain;
 
 namespace Middleware.DataAccess.Repositories.Abstract
 {
-    public interface ICloudRepository : IBaseRepository<CloudModel>
+    public interface ICloudRepository : IBaseRepository<CloudModel>, IRelationRepository
     {
         Task<CloudModel> PatchCloudAsync(Guid id, CloudModel patch);
 

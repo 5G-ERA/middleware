@@ -1,5 +1,4 @@
-﻿using Middleware.Common.Models;
-using Middleware.DataAccess.Dto;
+﻿using Middleware.Models.Domain;
 
 namespace Middleware.DataAccess.Repositories.Abstract
 {

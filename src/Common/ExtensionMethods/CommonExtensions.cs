@@ -4,7 +4,6 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Middleware.Common.Config;
-using StackExchange.Redis;
 
 namespace Middleware.Common.ExtensionMethods;
 

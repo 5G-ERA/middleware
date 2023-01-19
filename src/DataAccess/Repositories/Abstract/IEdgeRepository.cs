@@ -1,8 +1,8 @@
-﻿using Middleware.Common.Models;
+﻿using Middleware.Models.Domain;
 
 namespace Middleware.DataAccess.Repositories.Abstract
 {
-    public interface IEdgeRepository : IBaseRepository<EdgeModel>
+    public interface IEdgeRepository : IBaseRepository<EdgeModel>, IRelationRepository
     {
         Task<EdgeModel> PatchEdgeAsync(Guid id, EdgeModel patch);
         Task<List<EdgeModel>> GetFreeEdgesIdsAsync(List<EdgeModel> listofEdgesConnectedtoRobot);

@@ -1,4 +1,4 @@
-﻿using Middleware.Common.Models;
+﻿using Middleware.Models.Domain;
 
 namespace Middleware.RedisInterface.Services.Abstract;
 

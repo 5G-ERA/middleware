@@ -1,6 +1,5 @@
 ﻿using System.Text.Json;
 using Middleware.Common.Config;
-using Middleware.Common.Models;
 
 namespace Middleware.Orchestrator.Services
 {

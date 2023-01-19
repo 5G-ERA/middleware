@@ -1,10 +1,8 @@
-﻿using System;
-using System.Linq;
-using Middleware.Common.Models;
+﻿using Middleware.Models.Domain;
 
 namespace Middleware.DataAccess.Repositories.Abstract
 {
-    public interface IUserRepository : IBaseRepository<UserModel>
+    public interface IUserRepository : IBaseRepository<UserModel>, IRelationRepository
     {
     }
 }

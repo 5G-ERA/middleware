@@ -1,8 +1,8 @@
-﻿using Middleware.Common.Models;
+﻿using Middleware.Models.Domain;
 
 namespace Middleware.DataAccess.Repositories.Abstract;
 
-public interface IRobotStatusRepository : IBaseRepository<RobotStatusModel>
+public interface IRobotStatusRepository : IBaseRepository<RobotStatusModel>, IRelationRepository
 {
 
 }

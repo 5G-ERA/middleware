@@ -1,4 +1,7 @@
-﻿namespace Middleware.Models.Domain
+﻿using Middleware.Models.Enums;
+using Middleware.Models.ExtensionMethods;
+
+namespace Middleware.Models.Domain
 {
     public class GraphEntityModel
     {

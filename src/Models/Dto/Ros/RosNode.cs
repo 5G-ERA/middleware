@@ -2,7 +2,7 @@
 
 namespace Middleware.Models.Dto.Ros;
 
-internal class RosNode
+public class RosNode
 {
     [Indexed]
     public string? Name { get; set; }

@@ -1,8 +1,8 @@
-﻿using Middleware.Common.Models;
+﻿using Middleware.Models.Domain;
 
 namespace Middleware.DataAccess.Repositories.Abstract
 {
-    public interface IInstanceRepository : IBaseRepository<InstanceModel>
+    public interface IInstanceRepository : IBaseRepository<InstanceModel>, IRelationRepository
     {
         Task<InstanceModel> PatchInstanceAsync(Guid id, InstanceModel patch);
 

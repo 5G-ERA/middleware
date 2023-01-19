@@ -1,8 +1,9 @@
 using System.Text.Json;
 using Microsoft.Extensions.Logging;
 using Middleware.Common.Enums;
-using Middleware.Common.Models;
 using Middleware.DataAccess.Repositories.Abstract;
+using Middleware.Models.Domain;
+using Middleware.Models.Enums;
 using NReJSON;
 using RedisGraphDotNet.Client;
 using StackExchange.Redis;

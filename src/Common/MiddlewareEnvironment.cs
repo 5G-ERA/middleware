@@ -1,5 +1,4 @@
-﻿using System;
-namespace Middleware.Common;
+﻿namespace Middleware.Common;
 
 public class MiddlewareEnvironment : IEnvironment
 {

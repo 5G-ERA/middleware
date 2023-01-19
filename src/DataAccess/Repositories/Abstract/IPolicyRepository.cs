@@ -1,8 +1,8 @@
-﻿using Middleware.Common.Models;
+﻿using Middleware.Models.Domain;
 
 namespace Middleware.DataAccess.Repositories.Abstract
 {
-    public interface IPolicyRepository : IBaseRepository<PolicyModel>
+    public interface IPolicyRepository : IBaseRepository<PolicyModel>, IRelationRepository
     {
         /// <summary>
         /// Get all policies

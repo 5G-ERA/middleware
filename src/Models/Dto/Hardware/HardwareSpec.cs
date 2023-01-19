@@ -3,7 +3,7 @@
 namespace Middleware.Models.Dto.Hardware;
 
 [Document(StorageType = StorageType.Json)]
-internal class HardwareSpec
+public class HardwareSpec
 {
     [Indexed]
     public long Cpu { get; set; }

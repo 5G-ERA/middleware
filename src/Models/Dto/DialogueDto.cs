@@ -1,4 +1,6 @@
-﻿namespace Middleware.Models.Dto
+﻿using Redis.OM.Modeling;
+
+namespace Middleware.Models.Dto
 {
     [Document(StorageType = StorageType.Json, IndexName = "dialogue-idx", Prefixes = new[] { "Dialogue" })]
     public class DialogueDto : Dto

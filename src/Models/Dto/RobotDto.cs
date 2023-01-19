@@ -6,7 +6,7 @@ using Redis.OM.Modeling;
 namespace Middleware.Models.Dto;
 
 [Document(IndexName = "robot-idx", StorageType = StorageType.Json, Prefixes = new[] { "Robot" })]
-internal class RobotDto : Dto
+public class RobotDto : Dto
 {
     [Indexed]
     [RedisIdField]

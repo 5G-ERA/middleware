@@ -1,6 +1,6 @@
 ﻿namespace Middleware.Models.Dto.Ros;
 
-internal class RosTopic
+public class RosTopic
 {
     public string? Name { get; set; }
     public string? Type { get; set; }
