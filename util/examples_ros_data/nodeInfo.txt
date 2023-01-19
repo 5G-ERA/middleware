@@ -1,0 +1,38 @@
+--------------------------------------------------------------------------------
+Node [/airos/accel/accel_node]
+Publications: 
+ * /rosout [rosgraph_msgs/Log]
+ * /airos5/accel/data [airos_msgs/Accelerometer]
+ * /airos/accel/data [airos_msgs/Accelerometer]
+
+Subscriptions: None
+
+Services: 
+ * /airos/accel/accel_node/set_logger_level
+ * /airos/accel/accel_node/get_loggers
+
+
+contacting node http://127.0.0.1:35061/ ...
+Pid: 1370
+Connections:
+ * topic: /airos/accel/data
+    * to: /kik/events/events_node
+    * direction: outbound
+    * transport: TCPROS
+ * topic: /airos/accel/data
+    * to: /kik/actions/actions_node
+    * direction: outbound
+    * transport: TCPROS
+ * topic: /airos/accel/data
+    * to: /airos/system/system_node
+    * direction: outbound
+    * transport: TCPROS
+ * topic: /airos/accel/data
+    * to: /airos/face/faces_node
+    * direction: outbound
+    * transport: TCPROS
+ * topic: /rosout
+    * to: /rosout
+    * direction: outbound
+    * transport: TCPROS
+

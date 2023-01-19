@@ -1,0 +1,79 @@
+--------------------------------------------------------------------------------
+Node [/airos/audio/audio_node]
+Publications: 
+ * /airos/audio/finished [std_msgs/Int32]
+ * /rosout [rosgraph_msgs/Log]
+ * /airos/audio/is_playing [std_msgs/Bool]
+
+Subscriptions: 
+ * /airos/audio/play [airos_msgs/PlayAudio]
+ * /airos/audio/stop [std_msgs/Empty]
+ * /airos/stop_all [std_msgs/Empty]
+
+Services: 
+ * /airos/audio/play
+ * /airos/audio/restore_volume
+ * /airos/audio/play_volume
+ * /airos/audio/audio_node/get_loggers
+ * /airos5/audio/get_list_audio
+ * /airos/audio/play_file
+ * /airos/audio/get_volume
+ * /airos5/audio/stop_all
+ * /airos/audio/get_list_audio
+ * /airos/audio/stop
+ * /airos5/audio/play_volume
+ * /airos5/audio/set_volume
+ * /airos5/audio/stop
+ * /airos/audio/audio_node/set_logger_level
+ * /airos/audio/set_volume
+ * /airos/audio/stop_all
+ * /airos5/audio/play
+ * /airos5/audio/restore_volume
+ * /airos5/audio/get_volume
+ * /airos5/audio/play_file
+
+
+contacting node http://127.0.0.1:35523/ ...
+Pid: 1419
+Connections:
+ * topic: /airos/audio/is_playing
+    * to: /airos/asr/asrnode
+    * direction: outbound
+    * transport: TCPROS
+ * topic: /airos/audio/is_playing
+    * to: /airos/face/faces_node
+    * direction: outbound
+    * transport: TCPROS
+ * topic: /rosout
+    * to: /rosout
+    * direction: outbound
+    * transport: TCPROS
+ * topic: /airos/stop_all
+    * to: /airos/botapp/botapp_node (http://127.0.0.1:37943/)
+    * direction: inbound
+    * transport: TCPROS
+ * topic: /airos/audio/stop
+    * to: /kik/actions/actions_node (http://127.0.0.1:43375/)
+    * direction: inbound
+    * transport: TCPROS
+ * topic: /airos/audio/stop
+    * to: /airos/system/system_node (http://127.0.0.1:41939/)
+    * direction: inbound
+    * transport: TCPROS
+ * topic: /airos/audio/stop
+    * to: /airos/face/faces_node (http://127.0.0.1:41917/)
+    * direction: inbound
+    * transport: TCPROS
+ * topic: /airos/audio/play
+    * to: /kik/actions/actions_node (http://127.0.0.1:43375/)
+    * direction: inbound
+    * transport: TCPROS
+ * topic: /airos/audio/play
+    * to: /airos/system/system_node (http://127.0.0.1:41939/)
+    * direction: inbound
+    * transport: TCPROS
+ * topic: /airos/audio/play
+    * to: /airos/face/faces_node (http://127.0.0.1:41917/)
+    * direction: inbound
+    * transport: TCPROS
+

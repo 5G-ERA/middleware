@@ -1,0 +1,67 @@
+--------------------------------------------------------------------------------
+Node [/airos/servo/servo_node]
+Publications: 
+ * /airos/servo/joint_states [sensor_msgs/JointState]
+ * /airos/servo/finished_id [std_msgs/Int32]
+ * /rosout [rosgraph_msgs/Log]
+ * /airos/servo/is_moving [std_msgs/Bool]
+
+Subscriptions: 
+ * /airos/servo/stop_all [unknown type]
+ * /airos/servo/set_simple [airos_msgs/SetServoSimple]
+ * /airos/interruption_manager/output [unknown type]
+ * /airos/servo/set [airos_msgs/SetServo]
+
+Services: 
+ * /airos/servo/move
+ * /airos/servo/get_pos
+ * /airos5/servo/get_pos
+ * /airos5/servo/move
+ * /airos/servo/servo_node/get_loggers
+ * /airos/servo/servo_node/set_logger_level
+
+
+contacting node http://127.0.0.1:32839/ ...
+Pid: 1475
+Connections:
+ * topic: /airos/servo/finished_id
+    * to: /kik/actions/actions_node
+    * direction: outbound
+    * transport: TCPROS
+ * topic: /airos/servo/is_moving
+    * to: /airos/asr/asrnode
+    * direction: outbound
+    * transport: TCPROS
+ * topic: /airos/servo/is_moving
+    * to: /airos/face/faces_node
+    * direction: outbound
+    * transport: TCPROS
+ * topic: /rosout
+    * to: /rosout
+    * direction: outbound
+    * transport: TCPROS
+ * topic: /airos/servo/set
+    * to: /kik/actions/actions_node (http://127.0.0.1:43375/)
+    * direction: inbound
+    * transport: TCPROS
+ * topic: /airos/servo/set
+    * to: /airos/system/system_node (http://127.0.0.1:41939/)
+    * direction: inbound
+    * transport: TCPROS
+ * topic: /airos/servo/set
+    * to: /airos/face/faces_node (http://127.0.0.1:41917/)
+    * direction: inbound
+    * transport: TCPROS
+ * topic: /airos/servo/set_simple
+    * to: /kik/actions/actions_node (http://127.0.0.1:43375/)
+    * direction: inbound
+    * transport: TCPROS
+ * topic: /airos/servo/set_simple
+    * to: /airos/system/system_node (http://127.0.0.1:41939/)
+    * direction: inbound
+    * transport: TCPROS
+ * topic: /airos/servo/set_simple
+    * to: /airos/face/faces_node (http://127.0.0.1:41917/)
+    * direction: inbound
+    * transport: TCPROS
+
