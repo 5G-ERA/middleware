@@ -17,4 +17,9 @@ public class DialogueModel : BaseModel
 
     [JsonPropertyName("Answer")]
     public List<KeyValuePair> Answer { get; set; }
+    
+    public override object ToDto()
+    {
+        throw new NotImplementedException();
+    }
 }

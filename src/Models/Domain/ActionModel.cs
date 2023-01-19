@@ -1,4 +1,6 @@
 ﻿using System.Text.Json.Serialization;
+using Middleware.Models.Dto;
+using Middleware.Models.Dto.Hardware;
 
 namespace Middleware.Models.Domain;
 
@@ -9,6 +11,7 @@ public class ActionModel : BaseModel
 
     [JsonPropertyName("Name")]
     public override string Name { get; set; }
+    
 
     [JsonPropertyName("Tags")]
     public List<string> Tags { get; set; }
@@ -37,4 +40,21 @@ public class ActionModel : BaseModel
 
     [JsonPropertyName("MinimumNumCores")]
     public int MinimumNumCores { get; set; }
+    
+    public override object ToDto()
+    {
+        var domain = this;
+        return new ActionDto()
+        {
+            Id = domain.Id.ToString(),
+            ActionPriority = domain.ActionPriority,
+            Name = domain.Name,
+            HardwareRequirements = new HardwareRequirements()
+            {
+                MinimumRam = domain.MinimumRam,
+                MinimumNumCores = domain.MinimumNumCores
+            },
+            Tags = domain.Tags
+        };
+    }
 }

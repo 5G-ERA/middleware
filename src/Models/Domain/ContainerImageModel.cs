@@ -9,6 +9,7 @@ public class ContainerImageModel : BaseModel
 
     [JsonPropertyName("Name")]
     public override string Name { get; set; }
+    
 
     [JsonPropertyName("Timestamp")]
     public DateTime Timestamp { get; set; }
@@ -21,4 +22,9 @@ public class ContainerImageModel : BaseModel
 
     [JsonPropertyName("K8SService")]
     public string K8SService { get; set; }
+    
+    public override object ToDto()
+    {
+        throw new NotImplementedException();
+    }
 }

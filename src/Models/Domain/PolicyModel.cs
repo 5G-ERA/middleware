@@ -1,4 +1,5 @@
 ﻿using System.Text.Json.Serialization;
+using Middleware.Common.Enums;
 
 namespace Middleware.Models.Domain;
 
@@ -42,5 +43,9 @@ public class PolicyModel : BaseModel
 
 
         return true;
+    }
+    public override object ToDto()
+    {
+        throw new NotImplementedException();
     }
 }

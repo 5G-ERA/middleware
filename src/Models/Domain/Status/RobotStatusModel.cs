@@ -13,6 +13,7 @@ public class RobotStatusModel : BaseModel
     /// Name of the robot
     /// </summary>
     public override string Name { get; set; }
+
     /// <summary>
     /// Identifier of the currently executed action sequence
     /// </summary>
@@ -35,5 +36,9 @@ public class RobotStatusModel : BaseModel
     public bool IsValid()
     {
         return Id != Guid.Empty && ActionSequenceId != Guid.Empty && CurrentlyExecutedActionIndex.HasValue;
+    }
+    public override object ToDto()
+    {
+        throw new NotImplementedException();
     }
 }

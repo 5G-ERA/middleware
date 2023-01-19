@@ -54,4 +54,8 @@ public sealed class ActionPlanModel : BaseModel
         Status = status;
         LastStatusChange = DateTime.UtcNow;
     }
+    public override object ToDto()
+    {
+        throw new NotImplementedException();
+    }
 }

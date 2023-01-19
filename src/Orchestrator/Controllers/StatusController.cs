@@ -5,7 +5,7 @@ using Middleware.DataAccess.Repositories.Abstract;
 using Middleware.Models.Domain;
 using Middleware.Orchestrator.ApiReference;
 using Middleware.Orchestrator.RedisInterface;
-using ActionPlanModel = Middleware.Common.Models.ActionPlanModel;
+using ActionPlanModel = Middleware.Models.Domain.ActionPlanModel;
 using ApiResponse = Middleware.Common.Responses.ApiResponse;
 
 namespace Middleware.Orchestrator.Controllers;

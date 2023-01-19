@@ -15,5 +15,10 @@ namespace Middleware.Models.Dto
         public string? Question { get; set; }
         [Indexed]
         public bool IsSingleAnswer { get; set; }
+        
+        public override object ToModel()
+        {
+            throw new NotImplementedException();
+        }
     }
 }

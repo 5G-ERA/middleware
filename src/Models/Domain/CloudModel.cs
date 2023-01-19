@@ -9,6 +9,7 @@ public class CloudModel : BaseModel
 
     [JsonPropertyName("Name")]
     public override string Name { get; set; }
+    
 
     [JsonPropertyName("Type")]
     public string Type { get; set; }
@@ -56,5 +57,10 @@ public class CloudModel : BaseModel
         //if (string.IsNullOrEmpty(MacAddress.ToString())) return false;
         if (string.IsNullOrEmpty(Ram.ToString())) return false;
         return true;
+    }
+    public override object ToDto()
+    {
+        throw new NotImplementedException();
+
     }
 }

@@ -35,4 +35,9 @@ public class NetAppStatusModel : BaseModel
         return Id != Guid.Empty && HardLimit != default && OptimalLimit != default
                && CurrentRobotsCount.HasValue;
     }
+    
+    public override object ToDto()
+    {
+        throw new NotImplementedException();
+    }
 }

@@ -14,5 +14,9 @@ namespace Middleware.Models.Domain
         [JsonPropertyName("UserName")]
         public override string Name { get; set; }
         public string Salt { get; set; }
+        public override object ToDto()
+        {
+            throw new NotImplementedException();
+        }
     }
 }

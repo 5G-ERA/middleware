@@ -1,4 +1,5 @@
 ﻿using System.Text.Json.Serialization;
+using Middleware.Models.Enums;
 
 namespace Middleware.Models.Domain;
 
@@ -9,7 +10,7 @@ public class InstanceModel : BaseModel
 
     [JsonPropertyName("Name")]
     public override string Name { get; set; } // compulsory field
-
+    
     [JsonPropertyName("ServiceInstanceId")]
     public Guid ServiceInstanceId { get; set; }
 
@@ -79,5 +80,9 @@ public class InstanceModel : BaseModel
         //   if (string.IsNullOrEmpty(RosTopicsSub.ToString())) return false;
 
         return true;
+    }
+    public override object ToDto()
+    {
+        throw new NotImplementedException();
     }
 }

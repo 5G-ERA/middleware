@@ -1,5 +1,6 @@
 ﻿using k8s.Models;
 using Middleware.Common.Enums;
+using Middleware.Models.Domain;
 
 namespace Middleware.Orchestrator.Deployment;
 
