@@ -2,6 +2,7 @@
 using Middleware.Models.Domain;
 using Middleware.TaskPlanner.ApiReference;
 using Middleware.TaskPlanner.Exceptions;
+using KeyValuePair = Middleware.Models.Domain.KeyValuePair;
 
 namespace Middleware.TaskPlanner.Services
 {
@@ -344,7 +345,7 @@ namespace Middleware.TaskPlanner.Services
                 {
                     if (entryDialog.Name == "TaskPriority")
                     {
-                        Common.Models.KeyValuePair answer = Answer.First();
+                        KeyValuePair answer = Answer.First();
                         task.TaskPriority = (int)answer.Value;
                     }
                 }

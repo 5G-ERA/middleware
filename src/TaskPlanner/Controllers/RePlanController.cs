@@ -1,12 +1,9 @@
-using System;
 using System.Net;
 using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
-using Middleware.Common.Models;
 using Middleware.TaskPlanner.ApiReference;
-using System;
-using YamlDotNet.Core;
 using Middleware.Common.Responses;
+using Middleware.Models.Domain;
 using Middleware.TaskPlanner.Services;
 
 

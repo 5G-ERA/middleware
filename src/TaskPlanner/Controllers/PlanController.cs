@@ -1,8 +1,8 @@
 ﻿using System.Net;
 using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
-using Middleware.Common.Models;
 using Middleware.Common.Responses;
+using Middleware.Models.Domain;
 using Middleware.TaskPlanner.ApiReference;
 using Middleware.TaskPlanner.Services;
 
@@ -41,7 +41,7 @@ namespace Middleware.TaskPlanner.Controllers
             bool lockResource = inputModel.LockResourceReUse;
             Guid robotId = inputModel.RobotId; //robot id
             bool contextKnown = inputModel.ContextKnown;
-            List<Common.Models.DialogueModel> dialogueTemp = inputModel.Questions;
+            List<DialogueModel> dialogueTemp = inputModel.Questions;
 
             try
             {

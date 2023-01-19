@@ -1,6 +1,5 @@
-﻿using Middleware.Common.Models;
-using Middleware.Common.Responses;
-using KeyValuePair = Middleware.Common.Models.KeyValuePair;
+﻿using Middleware.Common.Responses;
+using Middleware.Models.Domain;
 
 namespace Middleware.TaskPlanner.Config;
 
