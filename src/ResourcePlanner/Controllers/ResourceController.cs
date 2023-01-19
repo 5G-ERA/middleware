@@ -2,6 +2,7 @@
 using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 using Middleware.Common.Responses;
+using Middleware.Models.Domain;
 using Middleware.ResourcePlanner.Models;
 
 namespace Middleware.ResourcePlanner.Controllers

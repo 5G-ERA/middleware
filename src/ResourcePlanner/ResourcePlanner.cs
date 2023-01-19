@@ -3,7 +3,9 @@ using AutoMapper;
 using Middleware.Common;
 using Middleware.Common.Enums;
 using Middleware.Common.Responses;
+using Middleware.Models.Domain;
 using Middleware.ResourcePlanner.ApiReference;
+using KeyValuePair = Middleware.Models.Domain.KeyValuePair;
 
 
 namespace Middleware.ResourcePlanner;
@@ -52,7 +54,7 @@ public class ResourcePlanner : IResourcePlanner
                         {
                             if (question.Name == "StandAlone5G or NoneStandAlone5G")
                             {
-                                Common.Models.KeyValuePair answer = question.Answer.First();
+                                KeyValuePair answer = question.Answer.First();
                                 bool StandAlone5GParam = (bool)answer.Value;
                             }
                         }
@@ -61,7 +63,7 @@ public class ResourcePlanner : IResourcePlanner
                         {
                             if (question.Name == "What type of 5G slice")
                             {
-                                Common.Models.KeyValuePair answer = question.Answer.First();
+                                KeyValuePair answer = question.Answer.First();
                                 string Slice5gType = (string)answer.Value; // there is an upper limit of eight network slices that be used by a device
                             }//Nest template
                         }

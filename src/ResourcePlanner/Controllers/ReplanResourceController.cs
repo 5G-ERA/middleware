@@ -3,6 +3,7 @@ using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 using Middleware.Common.Responses;
 using Middleware.DataAccess.Repositories.Abstract;
+using Middleware.Models.Domain;
 using Middleware.ResourcePlanner.ApiReference;
 using Middleware.ResourcePlanner.Models;
 
