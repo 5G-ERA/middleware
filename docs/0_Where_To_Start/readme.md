@@ -93,10 +93,10 @@ Consortiums : IQU, EBOS, WINGS, BRINGAUTO, ROBOTNIK, University of Bedfordshire,
 
 ### Use cases
 
-1. 	Public protection and disaster relief (PPDR)
-2.  5G enhanced semi-autonomous transport
-3.  5G enhanced healthcare robots
-4. 	5G remote assistance for manufacturing process
+1. Public protection and disaster relief (PPDR)
+2. 5G enhanced semi-autonomous transport
+3. 5G enhanced healthcare robots
+4. 5G remote assistance for manufacturing process
 
 
 
