@@ -7,14 +7,15 @@ using StackExchange.Redis;
 using System.Linq.Expressions;
 using Middleware.Models.Domain;
 using Middleware.Models.Dto;
+using Middleware.Models.Exceptions;
 
 namespace Middleware.DataAccess.Repositories
 {
-    public class RedisRepository<T, TDto> : IRedisRepository<T> where T : BaseModel where TDto : Dto
+    public class RedisRepository<TModel, TDto> : IRedisRepository<TModel, TDto> where TModel : BaseModel where TDto : Dto
     {
         private const string GraphName = "RESOURCE_PLANNER";
-        protected IRedisCollection<T> Collection;
-        protected IRedisGraphClient RedisGraph { get; init; }
+        protected readonly IRedisCollection<TDto> Collection;
+        protected IRedisGraphClient RedisGraph { get; }
         private readonly string _entityName;
         /// <summary>
         /// Specifies if the used model should be saved to the graph
@@ -24,12 +25,14 @@ namespace Middleware.DataAccess.Repositories
         {
             RedisGraph = redisGraph;
             _entityName = entityName.ToUpper();
-            Collection = provider.RedisCollection<T>();
+            Collection = provider.RedisCollection<TDto>();
             IsWritableToGraph = isWritableToGraph;
         }
-        public async Task<T> AddAsync(T model)
+        public async Task<TModel> AddAsync(TModel model)
         {
-            var id = await Collection.InsertAsync(model);
+            TDto dto = ToTDto(model);
+            
+            var id = await Collection.InsertAsync(dto);
             if (IsWritableToGraph)
             {
                 GraphEntityModel newGraphModel = new GraphEntityModel(Guid.Parse(id), model.Name, _entityName);
@@ -37,10 +40,12 @@ namespace Middleware.DataAccess.Repositories
             }
             return model;
         }
-        public async Task<T> AddAsync(T model, Func<Guid> guidProvider)
+        public async Task<TModel> AddAsync(TModel model, Func<Guid> guidProvider)
         {
-            await Collection.InsertAsync(model);
-            return model;
+            TDto dto = ToTDto(model);
+            var id = await Collection.InsertAsync(dto);
+            dto.Id = id;
+            return ToTModel(dto);
         }
         private async Task DeleteFromGraph(Guid id)
         {
@@ -54,44 +59,57 @@ namespace Middleware.DataAccess.Repositories
             var model = await GetByIdAsync(id);
             if (model is null)
                 return false;
-
-            await Collection.DeleteAsync(model);
+            TDto dto = ToTDto(model);
+            
+            await Collection.DeleteAsync(dto);
 
             if (IsWritableToGraph)
             {
                 await DeleteFromGraph(id);
             }
+            
             return true;
         }
 
-        public async Task DeleteAsync(T model)
+        public async Task DeleteAsync(TModel model)
         {
-            await Collection.DeleteAsync(model);
+            TDto dto = ToTDto(model);
+            await Collection.DeleteAsync(dto);
         }
 
-        public async Task<List<T>> GetAllAsync()
+        public async Task<List<TModel>> GetAllAsync()
         {
-            IList<T> listAsync = await Collection.ToListAsync();
-            return listAsync.ToList();
+            IList<TDto> listAsync = await Collection.ToListAsync();
+            return listAsync.Select(ToTModel).ToList();
         }
 
-        public async Task<T?> GetByIdAsync(Guid id)
+        public async Task<TModel?> GetByIdAsync(Guid id)
         {
-           return await Collection.FindByIdAsync(id.ToString());
+            var dto = await Collection.FindByIdAsync(id.ToString());
+            if (dto is null)
+            {
+                return null;
+            }
+            return ToTModel(dto);
         }
 
-        public async Task<T?> FindSingleAsync(Expression<Func<T, bool>> predicate)
+        public async Task<TModel?> FindSingleAsync(Expression<Func<TDto, bool>> predicate)
         {
-            return await Collection.SingleOrDefaultAsync(predicate);
+            var dto = await Collection.SingleOrDefaultAsync(predicate);
+            if (dto is null)
+            {
+                return null;
+            }
+            return ToTModel(dto);
         }
 
-        public async Task<List<T>> FindAsync(Expression<Func<T, bool>> predicate)
+        public async Task<List<TModel>> FindAsync(Expression<Func<TDto, bool>> predicate)
         {
-            IList<T> list = await Collection.Where(predicate).ToListAsync();
-            return list.ToList();
+            IList<TDto> list = await Collection.Where(predicate).ToListAsync();
+            return list.Select(ToTModel).ToList();
         }
 
-        public IRedisCollection<T> FindQuery(Expression<Func<T, bool>> predicate)
+        public IRedisCollection<TDto> FindQuery(Expression<Func<TDto, bool>> predicate)
         {
             return Collection.Where(predicate);
         }
@@ -245,9 +263,20 @@ namespace Middleware.DataAccess.Repositories
             graphEntity.Name = name.ToString();
         }
 
-        public async Task UpdateAsync(T model)
+        public async Task UpdateAsync(TModel model)
         {
-            await Collection.UpdateAsync(model);
+            TDto dto = ToTDto(model);
+            await Collection.UpdateAsync(dto);
+        }
+
+        protected TDto ToTDto(TModel model)
+        {
+            return model.ToDto() as TDto ?? throw new MappingException(typeof(TModel), typeof(TDto));
+        }
+
+        protected TModel ToTModel(TDto dto)
+        {
+            return dto.ToModel() as TModel ?? throw new MappingException(typeof(TDto), typeof(TModel));
         }
     }
 }

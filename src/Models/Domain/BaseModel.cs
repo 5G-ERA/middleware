@@ -8,6 +8,6 @@
 
         public List<RelationModel> Relations { get; set; } = new List<RelationModel>();
 
-        public abstract object ToDto();
+        public abstract Dto.Dto ToDto();
     }
 }

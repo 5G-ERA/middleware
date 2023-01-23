@@ -2,7 +2,7 @@
   <configuration default="false" name="docker-compose" type="docker-deploy" factoryName="docker-compose.yml" server-name="Docker">
     <deployment type="docker-compose.yml">
       <settings>
-        <option name="envFilePath" value="$PROJECT_DIR$/.env" />
+        <option name="envFilePath" value="" />
         <option name="commandLineOptions" value="--build" />
         <option name="secondarySourceFiles">
           <list>
@@ -12,9 +12,7 @@
         <option name="sourceFilePath" value="docker-compose.yml" />
       </settings>
     </deployment>
-    <EXTENSION ID="com.jetbrains.rider.docker.debug" isFastModeEnabled="true" isPublishEnabled="true" />
-    <method v="2">
-      <option name="Build Solution" enabled="true" />
-    </method>
+    <EXTENSION ID="com.jetbrains.rider.docker.debug" isFastModeEnabled="true" isSslEnabled="true" />
+    <method v="2" />
   </configuration>
 </component>

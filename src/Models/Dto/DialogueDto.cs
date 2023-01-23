@@ -7,7 +7,7 @@ namespace Middleware.Models.Dto
     {
         [Indexed]
         [RedisIdField]
-        public override string Id { get; init; } = default!;
+        public override string Id { get; set; } = default!;
         /// <summary>
         /// Question / Name
         /// </summary>

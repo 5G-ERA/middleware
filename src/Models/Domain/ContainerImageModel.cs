@@ -23,7 +23,7 @@ public class ContainerImageModel : BaseModel
     [JsonPropertyName("K8SService")]
     public string K8SService { get; set; }
     
-    public override object ToDto()
+    public override Dto.Dto ToDto()
     {
         throw new NotImplementedException();
     }

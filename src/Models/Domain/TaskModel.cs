@@ -54,7 +54,7 @@ namespace Middleware.Models.Domain
             Id = id;
             TaskPriority = priority;
         }
-        public override object ToDto()
+        public override Dto.Dto ToDto()
         {
             throw new NotImplementedException();
         }

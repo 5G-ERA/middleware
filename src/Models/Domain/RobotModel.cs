@@ -193,7 +193,7 @@ public class RobotModel : BaseModel
     {
         return GetAllRobotTopics().Where(t => t.Name == topicName).FirstOrDefault();
     }
-    public override object ToDto()
+    public override Dto.Dto ToDto()
     {
         throw new NotImplementedException();
     }

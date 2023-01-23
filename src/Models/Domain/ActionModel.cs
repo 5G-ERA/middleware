@@ -41,7 +41,7 @@ public class ActionModel : BaseModel
     [JsonPropertyName("MinimumNumCores")]
     public int MinimumNumCores { get; set; }
     
-    public override object ToDto()
+    public override Dto.Dto ToDto()
     {
         var domain = this;
         return new ActionDto()

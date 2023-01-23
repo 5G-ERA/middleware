@@ -57,7 +57,7 @@ public class EdgeModel : BaseModel
         if (string.IsNullOrEmpty(Ram.ToString())) return false;
         return true;
     }
-    public override object ToDto()
+    public override Dto.Dto ToDto()
     {
         throw new NotImplementedException();
     }

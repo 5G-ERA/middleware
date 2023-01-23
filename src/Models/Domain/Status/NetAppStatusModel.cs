@@ -36,7 +36,7 @@ public class NetAppStatusModel : BaseModel
                && CurrentRobotsCount.HasValue;
     }
     
-    public override object ToDto()
+    public override Dto.Dto ToDto()
     {
         throw new NotImplementedException();
     }

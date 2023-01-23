@@ -14,7 +14,7 @@ public class RedisActionRepository : RedisRepository<ActionModel, ActionDto>
 
     public async Task<ActionModel> PatchActionAsync(Guid id, ActionModel patch)
     {
-        ActionModel currentModel = await GetByIdAsync(id);
+        ActionModel? currentModel = await GetByIdAsync(id);
         if (currentModel == null)
         {
             return null;

@@ -10,7 +10,7 @@ public class RobotDto : Dto
 {
     [Indexed]
     [RedisIdField]
-    public override string? Id { get; init; }
+    public override string? Id { get; set; }
     [Indexed]
     public string? Name { get; set; }
     [Indexed(JsonPath = "$.RosDistro")]

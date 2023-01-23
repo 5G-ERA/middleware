@@ -9,7 +9,7 @@ public class ActionDto : Dto
 {
     [Indexed]
     [RedisIdField]
-    public override string Id { get; init; } = default!;
+    public override string Id { get; set; } = default!;
     [Indexed]
     public string Name { get; init; } = default!;
     [Indexed]
