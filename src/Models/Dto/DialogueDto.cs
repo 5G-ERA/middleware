@@ -1,4 +1,5 @@
-﻿using Redis.OM.Modeling;
+﻿using Middleware.Models.Domain;
+using Redis.OM.Modeling;
 
 namespace Middleware.Models.Dto
 {
@@ -16,7 +17,7 @@ namespace Middleware.Models.Dto
         [Indexed]
         public bool IsSingleAnswer { get; set; }
         
-        public override object ToModel()
+        public override BaseModel ToModel()
         {
             throw new NotImplementedException();
         }

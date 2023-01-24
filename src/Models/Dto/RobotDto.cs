@@ -10,7 +10,7 @@ public class RobotDto : Dto
 {
     [Indexed]
     [RedisIdField]
-    public override string? Id { get; set; }
+    public override string Id { get; set; }
     [Indexed]
     public string? Name { get; set; }
     [Indexed(JsonPath = "$.RosDistro")]
@@ -51,7 +51,7 @@ public class RobotDto : Dto
     public List<string> QuestionIds { get; set; } = new();
     public HardwareSpec HardwareSpec { get; set; } = new();
 
-    public override object ToModel()
+    public override BaseModel ToModel()
     {
         var dto = this;
         return new RobotModel()

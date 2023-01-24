@@ -17,13 +17,19 @@ public class ActionDto : Dto
     [Indexed]
     public string ActionPriority { get; init; } = default!;
 
-    public HardwareRequirements? HardwareRequirements { get; init; } = new();
+    public HardwareRequirements HardwareRequirements { get; init; } = new();
     
-    public override object ToModel()
+    public override BaseModel ToModel()
     {
+        var dto = this;
         return new ActionModel()
         {
-
+            Id = Guid.Parse(dto.Id),
+            Name = dto.Name,
+            Tags = dto.Tags,
+            MinimumRam = dto.HardwareRequirements.MinimumRam,
+            MinimumNumCores = dto.HardwareRequirements.MinimumNumCores,
+            ActionPriority = dto.ActionPriority
         };
     }
 }

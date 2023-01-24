@@ -506,7 +506,7 @@ public class ResourcePlanner : IResourcePlanner
             taskModel = await Plan(taskModel, robot, ActionsCandidates);
             taskModel.PartialRePlan = true;
         }
-            return taskModel;
+        return taskModel;
     }
 
     private async Task<InstanceModel> GetInstanceToReuse(InstanceModel instance, Orchestrator.OrchestratorApiClient orchestratorApi)
