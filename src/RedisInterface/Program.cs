@@ -34,14 +34,14 @@ builder.Services.AddHttpClient("healthCheckClient");
 
 builder.RegisterRedis();
 builder.Services.AddUriHelper();
-
+//TODO: proper redis implementation
 var provider = new RedisConnectionProvider("redis://localhost:6379");
 builder.Services.AddSingleton(provider);
 builder.Services.AddScoped<RedisActionRepository, RedisActionRepository>();
 builder.Services.AddScoped<IActionService, ActionService>();
 builder.Services.AddHostedService<IndexCreationService>();
 
-builder.Services.AddScoped<IActionRepository, ActionRepository>();
+builder.Services.AddScoped<IActionRepository, RedisActionRepository>();
 builder.Services.AddScoped<IActionPlanRepository, ActionPlanRepository>();
 builder.Services.AddScoped<ICloudRepository, CloudRepository>();
 builder.Services.AddScoped<IContainerImageRepository, ContainerImageRepository>();

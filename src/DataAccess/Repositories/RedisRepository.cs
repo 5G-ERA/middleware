@@ -35,10 +35,10 @@ namespace Middleware.DataAccess.Repositories
             var id = await Collection.InsertAsync(dto);
             if (IsWritableToGraph)
             {
-                GraphEntityModel newGraphModel = new GraphEntityModel(Guid.Parse(id), model.Name, _entityName);
+                GraphEntityModel newGraphModel = new GraphEntityModel(Guid.Parse(dto.Id), model.Name, _entityName);
                 await AddGraphAsync(newGraphModel);
             }
-            return model;
+            return ToTModel(dto);
         }
         public async Task<TModel> AddAsync(TModel model, Func<Guid> guidProvider)
         {

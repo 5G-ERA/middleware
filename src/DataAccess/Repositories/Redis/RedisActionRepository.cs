@@ -1,3 +1,4 @@
+using Middleware.DataAccess.Repositories.Abstract;
 using Middleware.Models.Domain;
 using Middleware.Models.Dto;
 using Redis.OM;
@@ -5,9 +6,9 @@ using RedisGraphDotNet.Client;
 
 namespace Middleware.DataAccess.Repositories.Redis;
 
-public class RedisActionRepository : RedisRepository<ActionModel, ActionDto>
+public class RedisActionRepository : RedisRepository<ActionModel, ActionDto>, IActionRepository
 {
-    public RedisActionRepository(RedisConnectionProvider provider, IRedisGraphClient redisGraph, string entityName, bool isWritableToGraph) : base(provider, redisGraph, "Action", true)
+    public RedisActionRepository(RedisConnectionProvider provider, IRedisGraphClient redisGraph) : base(provider, redisGraph, "Action", true)
     {
 
     }
