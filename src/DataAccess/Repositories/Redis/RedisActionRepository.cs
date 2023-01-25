@@ -8,7 +8,7 @@ namespace Middleware.DataAccess.Repositories.Redis;
 
 public class RedisActionRepository : RedisRepository<ActionModel, ActionDto>, IActionRepository
 {
-    public RedisActionRepository(RedisConnectionProvider provider, IRedisGraphClient redisGraph) : base(provider, redisGraph, "Action", true)
+    public RedisActionRepository(RedisConnectionProvider provider, IRedisGraphClient redisGraph) : base(provider, redisGraph, true)
     {
 
     }

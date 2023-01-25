@@ -13,8 +13,10 @@ public class RobotDto : Dto
     public override string Id { get; set; }
     [Indexed]
     public string? Name { get; set; }
+    
     [Indexed(JsonPath = "$.RosDistro")]
     public RosInfo Ros { get; set; } = new();
+
     [Indexed(Sortable = true)]
     public DateTimeOffset LastUpdatedTime { get; set; }
     [Indexed]
