@@ -1,14 +1,15 @@
 ﻿using Microsoft.Extensions.Hosting;
 using Middleware.Models.Dto;
 using Redis.OM;
+using Redis.OM.Contracts;
 
 namespace Middleware.DataAccess.HostedServices;
 
 public class IndexCreationService : IHostedService
 {
-    private readonly RedisConnectionProvider _provider;
+    private readonly IRedisConnectionProvider _provider;
 
-    public IndexCreationService(RedisConnectionProvider provider)
+    public IndexCreationService(IRedisConnectionProvider provider)
     {
         _provider = provider;
     }

@@ -7,7 +7,7 @@ namespace Middleware.RedisInterface.Services
 {
     public class DashboardService : IDashboardService
     {
-        private readonly IRobotRepository _robotRepository;            
+        private readonly IRobotRepository _robotRepository;
         private readonly ITaskRepository _taskRepository;
         private readonly IActionPlanRepository _actionPlanRepository;
         private readonly IEdgeRepository _edgeRepository;
@@ -15,10 +15,10 @@ namespace Middleware.RedisInterface.Services
         private readonly IInstanceRepository _instanceRepository;
 
 
-        public DashboardService(IRobotRepository robotRepository, 
-            ITaskRepository taskRepository, 
-            IActionPlanRepository actionPlanRepository, 
-            IEdgeRepository edgeRepository, 
+        public DashboardService(IRobotRepository robotRepository,
+            ITaskRepository taskRepository,
+            IActionPlanRepository actionPlanRepository,
+            IEdgeRepository edgeRepository,
             ICloudRepository cloudRepository,
             IInstanceRepository instanceRepository)
         {
@@ -34,11 +34,11 @@ namespace Middleware.RedisInterface.Services
         {
             var locations = new List<LocationStatusResponse>();
             var clouds = await _cloudRepository.GetAllAsync();
-            
+
             foreach (var cloud in clouds)
             {
-                var locatedInstances = 
-                    await _cloudRepository.GetRelation(cloud.Id,"LOCATED_AT",RelationDirection.Incoming);
+                var locatedInstances =
+                    await _cloudRepository.GetRelation(cloud.Id, "LOCATED_AT", RelationDirection.Incoming);
 
                 int noOfContainers = 0;
                 foreach (var item in locatedInstances)
@@ -47,12 +47,12 @@ namespace Middleware.RedisInterface.Services
                     noOfContainers += instanceContainers.Count;
                 }
 
-                var location = new LocationStatusResponse(cloud.Name, 
-                                   cloud.LastUpdatedTime, 
-                                   cloud.CloudStatus, 
-                                   cloud.IsOnline, 
-                                   noOfContainers > 0, 
-                                   noOfContainers);
+                var location = new LocationStatusResponse(cloud.Name,
+                    cloud.LastUpdatedTime,
+                    cloud.CloudStatus,
+                    cloud.IsOnline,
+                    noOfContainers > 0,
+                    noOfContainers);
                 locations.Add(location);
             }
 
@@ -71,14 +71,15 @@ namespace Middleware.RedisInterface.Services
                 }
 
                 var location = new LocationStatusResponse(edge.Name,
-                                   edge.LastUpdatedTime,
-                                   edge.EdgeStatus,
-                                   edge.IsOnline,
-                                   noOfContainers > 0,
-                                   noOfContainers);
+                    edge.LastUpdatedTime,
+                    edge.EdgeStatus,
+                    edge.IsOnline,
+                    noOfContainers > 0,
+                    noOfContainers);
                 locations.Add(location);
             }
-            return new (filter.FilterResult(locations), locations.Count);
+
+            return new(filter.FilterResult(locations), locations.Count);
         }
 
         public async Task<Tuple<List<TaskRobotResponse>, int>> GetRobotStatusListAsync(PaginationFilter filter)
@@ -103,10 +104,11 @@ namespace Middleware.RedisInterface.Services
                     ap.TaskStartedAt,
                     ap.Status == "completed" ? ap.LastStatusChange : null,
                     robot.RobotStatus);
-                
+
                 responses.Add(response);
             }
-            return new (filter.FilterResult(responses), responses.Count);
+
+            return new(filter.FilterResult(responses), responses.Count);
         }
     }
 }

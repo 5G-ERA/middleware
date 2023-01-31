@@ -2,13 +2,14 @@ using Middleware.DataAccess.Repositories.Abstract;
 using Middleware.Models.Domain;
 using Middleware.Models.Dto;
 using Redis.OM;
+using Redis.OM.Contracts;
 using RedisGraphDotNet.Client;
 
 namespace Middleware.DataAccess.Repositories.Redis;
 
 public class RedisActionRepository : RedisRepository<ActionModel, ActionDto>, IActionRepository
 {
-    public RedisActionRepository(RedisConnectionProvider provider, IRedisGraphClient redisGraph) : base(provider, redisGraph, true)
+    public RedisActionRepository(IRedisConnectionProvider provider, IRedisGraphClient redisGraph) : base(provider, redisGraph, true)
     {
 
     }

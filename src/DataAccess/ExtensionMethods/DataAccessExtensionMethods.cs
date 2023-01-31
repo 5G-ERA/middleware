@@ -2,6 +2,11 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Middleware.Common.Config;
+using Middleware.DataAccess.Repositories;
+using Middleware.DataAccess.Repositories.Abstract;
+using Middleware.DataAccess.Repositories.Redis;
+using Redis.OM;
+using Redis.OM.Contracts;
 using RedisGraphDotNet.Client;
 using StackExchange.Redis;
 
@@ -28,7 +33,25 @@ public static class DataAccessExtensionMethods
         builder.Services.AddSingleton<IConnectionMultiplexer>(multiplexer);
         RedisGraphClient redisGraphClient = new RedisGraphClient(multiplexer);
         builder.Services.AddSingleton<IRedisGraphClient>(redisGraphClient);
-
+        
+        IRedisConnectionProvider provider = new RedisConnectionProvider("redis://localhost:6379");
+        builder.Services.AddSingleton<IRedisConnectionProvider>(provider);
         return builder;
+    }
+
+    public static IServiceCollection RegisterRepositories(this IServiceCollection services)
+    {
+        services.AddScoped<IActionRepository, RedisActionRepository>();
+        services.AddScoped<IActionPlanRepository, ActionPlanRepository>();
+        services.AddScoped<ICloudRepository, CloudRepository>();
+        services.AddScoped<IContainerImageRepository, ContainerImageRepository>();
+        services.AddScoped<IEdgeRepository, EdgeRepository>();
+        services.AddScoped<IInstanceRepository, InstanceRepository>();
+        services.AddScoped<IPolicyRepository, PolicyRepository>();
+        services.AddScoped<IRobotRepository, RobotRepository>();
+        services.AddScoped<ITaskRepository, TaskRepository>();
+        
+
+        return services;
     }
 }

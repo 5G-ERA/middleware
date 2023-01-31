@@ -9,6 +9,7 @@ using Middleware.Models.Domain;
 using Middleware.Models.Dto;
 using Middleware.Models.Exceptions;
 using Middleware.Models.ExtensionMethods;
+using Redis.OM.Contracts;
 
 namespace Middleware.DataAccess.Repositories
 {
@@ -22,7 +23,7 @@ namespace Middleware.DataAccess.Repositories
         /// Specifies if the used model should be saved to the graph
         /// </summary>
         protected readonly bool IsWritableToGraph;
-        public RedisRepository(RedisConnectionProvider provider, IRedisGraphClient redisGraph, bool isWritableToGraph)
+        public RedisRepository(IRedisConnectionProvider provider, IRedisGraphClient redisGraph, bool isWritableToGraph)
         {
             RedisGraph = redisGraph;
             _entityName = typeof(TModel).GetModelName().ToUpper();
