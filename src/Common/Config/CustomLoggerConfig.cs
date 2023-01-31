@@ -1,11 +1,11 @@
 ﻿namespace Middleware.Common.Config;
 
-public class ElasticConfig
+public class CustomLoggerConfig
 {
     /// <summary>
     /// Name of the section in the appsettings.json file
     /// </summary>
-    public const string ConfigName = "Elasticsearch";
+    public const string ConfigName = "CustomLoger";
     /// <summary>
     /// Url of the service
     /// </summary>

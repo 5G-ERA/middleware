@@ -4,8 +4,10 @@ using Middleware.Common.Repositories;
 using Middleware.Common.Repositories.Abstract;
 using Middleware.RedisInterface;
 using Middleware.RedisInterface.Services;
+using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
+
 
 builder.RegisterSecretsManager();
 
@@ -50,6 +52,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+app.UseSerilogRequestLogging();
 
 //app.UseHttpsRedirection();
 
