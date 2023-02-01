@@ -30,6 +30,11 @@ namespace Middleware.DataAccess.Repositories
             Collection = provider.RedisCollection<TDto>();
             IsWritableToGraph = isWritableToGraph;
         }
+        /// <summary>
+        /// Add to redis a model and try adding also to the graph.
+        /// </summary>
+        /// <param name="model"></param>
+        /// <returns></returns>
         public async Task<TModel> AddAsync(TModel model)
         {
             TDto dto = ToTDto(model);
@@ -42,6 +47,12 @@ namespace Middleware.DataAccess.Repositories
             }
             return ToTModel(dto);
         }
+        /// <summary>
+        /// Add a model with specified identifier of type Guid.
+        /// </summary>
+        /// <param name="model"></param>
+        /// <param name="guidProvider"></param>
+        /// <returns></returns>
         public async Task<TModel> AddAsync(TModel model, Func<Guid> guidProvider)
         {
             TDto dto = ToTDto(model);
@@ -95,9 +106,14 @@ namespace Middleware.DataAccess.Repositories
             return ToTModel(dto);
         }
 
-        public async Task<TModel?> FindSingleAsync(Expression<Func<TDto, bool>> predicate)
+        /// <summary>
+        /// Find a single instance of a model 
+        /// </summary>
+        /// <param name="predicate"></param>
+        /// <returns></returns>
+        public async Task<TModel?> FindSingleAsync(Expression<Func<TDto, bool>> query)
         {
-            var dto = await Collection.SingleOrDefaultAsync(predicate);
+            var dto = await Collection.SingleOrDefaultAsync(query);
             if (dto is null)
             {
                 return null;
@@ -105,12 +121,22 @@ namespace Middleware.DataAccess.Repositories
             return ToTModel(dto);
         }
 
+        /// <summary>
+        /// Return all the models that match the query
+        /// </summary>
+        /// <param name="predicate"></param>
+        /// <returns></returns>
         public async Task<List<TModel>> FindAsync(Expression<Func<TDto, bool>> predicate)
         {
             IList<TDto> list = await Collection.Where(predicate).ToListAsync();
             return list.Select(ToTModel).ToList();
         }
 
+        /// <summary>
+        /// Returns a query that is not yet executed.
+        /// </summary>
+        /// <param name="predicate"></param>
+        /// <returns></returns>
         public IRedisCollection<TDto> FindQuery(Expression<Func<TDto, bool>> predicate)
         {
             return Collection.Where(predicate);
