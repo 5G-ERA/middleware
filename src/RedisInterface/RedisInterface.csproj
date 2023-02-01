@@ -23,7 +23,7 @@
     <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.15.0" />
     <PackageReference Include="NReJSON" Version="4.0.0" />
     <PackageReference Include="RedisGraphDotNet.Client" Version="0.1.0-alpha" />
-    <PackageReference Include="StackExchange.Redis" Version="2.5.43" />
+    <PackageReference Include="StackExchange.Redis" Version="2.6.90" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.3.0" />
     <PackageReference Include="System.Collections" Version="4.3.0" />
   </ItemGroup>
