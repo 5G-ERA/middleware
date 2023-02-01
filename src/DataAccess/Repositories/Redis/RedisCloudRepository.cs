@@ -11,7 +11,7 @@ using Redis.OM.Contracts;
 using RedisGraphDotNet.Client;
 using StackExchange.Redis;
 
-namespace Middleware.DataAccess.Repositories
+namespace Middleware.DataAccess.Repositories.Redis
 {
     public class RedisCloudRepository : RedisRepository<CloudModel, CloudDto>, ICloudRepository
     {
@@ -57,12 +57,8 @@ namespace Middleware.DataAccess.Repositories
 
 
         public async Task<CloudModel> GetCloudResourceDetailsByNameAsync(string name)
-        {
-            // var result = await FindQuery(dto => dto.Name == name).Select(dto => dto.MacAddress).ToList();
-            //
-            // var result2 = await FindSingleAsync(dto => dto.CloudStatus == name);
-            
-            CloudModel cloud = await FindSingleAsync(dto => dto.CloudStatus == name);
+        {   
+            CloudModel cloud = await FindSingleAsync(dto => dto.Name == name);
             return cloud;
         }
 
@@ -144,7 +140,7 @@ namespace Middleware.DataAccess.Repositories
         /// <returns></returns>
         public async Task<int> GetNumContainersByNameAsync(string cloudName)
         {
-            CloudModel cloud = await FindSingleAsync(dto => dto.CloudStatus == cloudName);
+            CloudModel cloud = await FindSingleAsync(dto => dto.Name == cloudName);
             if (cloud is null)
                 throw new ArgumentException("Cloud does not exist", nameof(cloudName));
 
@@ -170,7 +166,7 @@ namespace Middleware.DataAccess.Repositories
         /// <returns></returns>
         public async Task<bool> IsBusyCloudByNameAsync(string cloudName)
         {
-            CloudModel cloud = await FindSingleAsync(dto => dto.CloudStatus == cloudName);
+            CloudModel cloud = await FindSingleAsync(dto => dto.Name == cloudName);
             if (cloud is null)
                 throw new ArgumentException("Cloud does not exist", nameof(cloudName));
 
