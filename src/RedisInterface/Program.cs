@@ -11,7 +11,7 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.RegisterSecretsManager();
 
-builder.UseElasticSerilogLogger();
+builder.ConfigureLogger();
 
 
 // Add services to the container.
