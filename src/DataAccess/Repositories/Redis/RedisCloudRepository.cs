@@ -57,6 +57,10 @@ namespace Middleware.DataAccess.Repositories
 
         public async Task<CloudModel> GetCloudResourceDetailsByNameAsync(string name)
         {
+            // var result = await FindQuery(dto => dto.Name == name).Select(dto => dto.MacAddress).ToList();
+            //
+            // var result2 = await FindSingleAsync(dto => dto.CloudStatus == name);
+            
             CloudModel cloud = (await GetAllAsync()).Where(x => x.Name == name).FirstOrDefault();
             return cloud;
         }
