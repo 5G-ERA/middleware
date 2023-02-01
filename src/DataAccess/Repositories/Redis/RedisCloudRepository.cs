@@ -1,4 +1,5 @@
 ﻿using System.Text.Json;
+using System.Xml.Linq;
 using Microsoft.Extensions.Logging;
 using Middleware.Common.Enums;
 using Middleware.DataAccess.Repositories.Abstract;
@@ -61,7 +62,7 @@ namespace Middleware.DataAccess.Repositories
             //
             // var result2 = await FindSingleAsync(dto => dto.CloudStatus == name);
             
-            CloudModel cloud = (await GetAllAsync()).Where(x => x.Name == name).FirstOrDefault();
+            CloudModel cloud = await FindSingleAsync(dto => dto.CloudStatus == name);
             return cloud;
         }
 
@@ -143,7 +144,7 @@ namespace Middleware.DataAccess.Repositories
         /// <returns></returns>
         public async Task<int> GetNumContainersByNameAsync(string cloudName)
         {
-            CloudModel cloud = (await GetAllAsync()).Where(x => x.Name == cloudName).FirstOrDefault();
+            CloudModel cloud = await FindSingleAsync(dto => dto.CloudStatus == cloudName);
             if (cloud is null)
                 throw new ArgumentException("Cloud does not exist", nameof(cloudName));
 
@@ -169,7 +170,7 @@ namespace Middleware.DataAccess.Repositories
         /// <returns></returns>
         public async Task<bool> IsBusyCloudByNameAsync(string cloudName)
         {
-            CloudModel cloud = (await GetAllAsync()).Where(x => x.Name == cloudName).FirstOrDefault();
+            CloudModel cloud = await FindSingleAsync(dto => dto.CloudStatus == cloudName);
             if (cloud is null)
                 throw new ArgumentException("Cloud does not exist", nameof(cloudName));
 
