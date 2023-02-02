@@ -10,4 +10,15 @@ public class RosTopic
     public string? Description { get; set; }
     public bool Enabled { get; set; }
 
+    public BaseModel ToModel()
+    {
+        var dto = this;
+        return new RosTopicModel()
+        {
+            Name = dto.Name,
+            Type = dto.Type,
+            Description = dto.Description,
+            Enabled = dto.Enabled
+        };
+    }
 }
