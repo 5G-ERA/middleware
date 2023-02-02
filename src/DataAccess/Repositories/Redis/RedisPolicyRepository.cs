@@ -7,6 +7,7 @@ using Middleware.Models.Domain;
 using Middleware.Models.Dto;
 using Middleware.Models.Enums;
 using NReJSON;
+using Redis.OM.Contracts;
 using RedisGraphDotNet.Client;
 using StackExchange.Redis;
 
@@ -21,7 +22,8 @@ namespace Middleware.DataAccess.Repositories.Redis
         /// <param name="redisClient"></param>
         /// <param name="redisGraph"></param>
         /// <param name="logger"></param>
-        public RedisPolicyRepository(IConnectionMultiplexer redisClient, IRedisGraphClient redisGraph, ILogger<PolicyRepository> logger) : base(RedisDbIndexEnum.Policy, redisClient, redisGraph, logger, false)
+
+        public RedisPolicyRepository(IRedisConnectionProvider provider, IRedisGraphClient redisGraph) : base(provider, redisGraph, true)
         {
         }
 

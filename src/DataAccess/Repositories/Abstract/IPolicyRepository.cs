@@ -10,6 +10,7 @@ namespace Middleware.DataAccess.Repositories.Abstract
         /// </summary>
         /// <returns></returns>
 
+        Task<List<PolicyModel>> GetActivePoliciesAsync();
         Task<PolicyModel> PatchPolicyAsync(Guid id, PolicyModel patch);
     }
 }

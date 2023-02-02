@@ -57,7 +57,7 @@ public class InstanceDto : Dto
             IsReusable = dto.IsReusable,
             DesiredStatus = dto.DesiredStatus,
             ServiceUrl = dto.ServiceUrl,
-            RosTopicsPub = dto.RosTopicsPub.ToList().Select(x => x.ToModel()).ToList(),
+            RosTopicsPub = dto.RosTopicsPub.Select(x => x.ToModel()).ToList(),
 
         };
     }
