@@ -28,15 +28,14 @@ namespace Middleware.Models.Domain
         {
             Enabled = false;
         }
-        public Dto.Dto ToDto()
+        public RosTopic ToDto()
         {
-            var domain = this;
             return new RosTopic()//
             {
-                Name = domain.Name,
-                Type = domain.Type,
-                Description = domain.Description,
-                Enabled = domain.Enabled
+                Name = Name,
+                Type = Type,
+                Description = Description,
+                Enabled = Enabled
                 
             };
         }

@@ -10,7 +10,7 @@ public class RosTopic
     public string? Description { get; set; }
     public bool Enabled { get; set; }
 
-    public BaseModel ToModel()
+    public RosTopicModel ToModel()
     {
         var dto = this;
         return new RosTopicModel()
