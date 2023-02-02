@@ -24,7 +24,7 @@ public class ContainerImageDto : Dto
     [Indexed]
     public string K8SService { get; set; } = default!;
 
-    public override BaseModel ToModel()
+    public override ContainerImageModel ToModel()
     {
         var dto = this;
         return new ContainerImageModel()

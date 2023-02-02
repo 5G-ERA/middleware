@@ -1,4 +1,6 @@
-﻿using System.Text.Json.Serialization;
+﻿using Middleware.Models.Dto.Hardware;
+using Middleware.Models.Dto;
+using System.Text.Json.Serialization;
 
 namespace Middleware.Models.Domain;
 
@@ -22,9 +24,18 @@ public class ContainerImageModel : BaseModel
 
     [JsonPropertyName("K8SService")]
     public string K8SService { get; set; }
-    
+
     public override Dto.Dto ToDto()
     {
-        throw new NotImplementedException();
+        var domain = this;
+        return new ContainerImageDto()
+        {
+            Id = domain.Id.ToString(),
+            Name = domain.Name,
+            Timestamp = domain.Timestamp,
+            Description = domain.Description,
+            K8SDeployment = domain.K8SDeployment,
+            K8SService = domain.K8SService
+        };
     }
 }

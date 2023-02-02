@@ -58,7 +58,16 @@ public class InstanceDto : Dto
             DesiredStatus = dto.DesiredStatus,
             ServiceUrl = dto.ServiceUrl,
             RosTopicsPub = dto.RosTopicsPub.Select(x => x.ToModel()).ToList(),
-
+            RosTopicsSub = dto.RosTopicsSub.Select(x => x.ToModel()).ToList(),
+            RosVersion = dto.RosVersion,
+            ROSDistro = dto.ROSDistro,
+            Tags = dto.Tags,
+            InstanceFamily = dto.InstanceFamily,
+            SuccessRate = dto.SuccessRate,
+            ServiceStatus = dto.ServiceStatus,
+            ContainerImage = dto.ContainerImage.ToModel(),
+            MinimumRam = dto.MinimumRam,
+            MinimumNumCores = dto.MinimumNumCores
         };
     }
 }
