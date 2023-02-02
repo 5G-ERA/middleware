@@ -1,4 +1,6 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Middleware.Models.Dto.Hardware;
+using Middleware.Models.Dto;
+using System.ComponentModel.DataAnnotations;
 using System.Text.Json.Serialization;
 
 namespace Middleware.Models.Domain
@@ -16,7 +18,14 @@ namespace Middleware.Models.Domain
         public string Salt { get; set; }
         public override Dto.Dto ToDto()
         {
-            throw new NotImplementedException();
+            var domain = this;
+            return new UserDto()
+            {
+                Id = domain.Id.ToString(),
+                Password = domain.Password,
+                Salt = domain.Salt
+                
+            };
         }
     }
 }
