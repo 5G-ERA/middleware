@@ -36,7 +36,7 @@ public static class CommonExtensions
                 .Replace($"{AppConfig.SystemName}-", string.Empty)
                 .Replace("__", ":");
         });
-        builder.Services.Configure<ElasticConfig>(builder.Configuration.GetSection(ElasticConfig.ConfigName));
+        builder.Services.Configure<CustomLoggerConfig>(builder.Configuration.GetSection(CustomLoggerConfig.ConfigName));
         return builder;
     }
 
