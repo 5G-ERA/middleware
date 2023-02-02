@@ -1,4 +1,8 @@
-﻿namespace Middleware.Models.Domain
+﻿using Middleware.Models.Dto.Hardware;
+using Middleware.Models.Dto;
+using Middleware.Models.Dto.Ros;
+
+namespace Middleware.Models.Domain
 {
     public class RosTopicModel
     {
@@ -24,5 +28,6 @@
         {
             Enabled = false;
         }
+
     }
 }
