@@ -14,9 +14,14 @@ builder.RegisterSecretsManager();
 
 builder.ConfigureLogger();
 
+const string mwInstanceName = "MIDDLEWARE_LOCATION_NAME";
+
 builder.Host.ConfigureAppConfiguration((hostingContext, _) =>
 {
     AppConfig.AppConfiguration = hostingContext.HostingEnvironment.EnvironmentName;
+    AppConfig.MiddlewareDeploymentLocationName = Environment.GetEnvironmentVariable(mwInstanceName) ??
+                                                 throw new ArgumentNullException(mwInstanceName,
+                                                     "Name of the middleware instance has not been specified.");
     ServicePointManager.DnsRefreshTimeout = 60000;
     ServicePointManager.EnableDnsRoundRobin = true;
 });
@@ -30,14 +35,17 @@ builder.Services.AddSwaggerGen();
 
 builder.RegisterRedis();
 
-builder.Services.ConfigureAutoMapper();
+var rabbitmqConfig = builder.Configuration.GetSection(RabbitMqConfig.ConfigName).Get<RabbitMqConfig>();
+;
+builder.Services.RegisterRabbitMqConsumers(rabbitmqConfig)
+    .ConfigureAutoMapper();
+
+
 builder.Services.AddHttpClient(AppConfig.RedisApiClientName, (a) =>
 {
     a.BaseAddress = new Uri(Environment.GetEnvironmentVariable("REDIS_INTERFACE_ADDRESS"));
     a.DefaultRequestHeaders.Accept.Add(
-            new MediaTypeWithQualityHeaderValue("application/json"));
-
-
+        new MediaTypeWithQualityHeaderValue("application/json"));
 });
 builder.Services.AddHttpClient(AppConfig.OsmApiClientName);
 builder.Services.RegisterCommonServices();
