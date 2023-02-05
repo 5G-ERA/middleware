@@ -1,4 +1,5 @@
-﻿using System.Text.Json.Serialization;
+﻿using Middleware.Models.Dto;
+using System.Text.Json.Serialization;
 
 namespace Middleware.Models.Domain;
 
@@ -56,6 +57,18 @@ public sealed class ActionPlanModel : BaseModel
     }
     public override Dto.Dto ToDto()
     {
-        throw new NotImplementedException();
+        var domain = this;
+        return new ActionPlanDto()
+        {
+            Id = domain.Id.ToString(),
+            TaskId = domain.TaskId.ToString(),
+            Name = domain.Name,
+            Status = domain.Status,
+            IsReplan = domain.IsReplan,
+            LastStatusChange = domain.LastStatusChange,
+            ActionSequence = (List<ActionDto>)domain.ActionSequence.Select(x => x.ToDto()),
+            RobotId = domain.RobotId.ToString(),
+            TaskStartedAt = domain.TaskStartedAt,
+        }; ;
     }
 }
