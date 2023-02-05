@@ -1,4 +1,6 @@
-﻿using System.Text.Json.Serialization;
+﻿using Middleware.Models.Dto.Hardware;
+using Middleware.Models.Dto;
+using System.Text.Json.Serialization;
 
 namespace Middleware.Models.Domain
 {
@@ -56,7 +58,21 @@ namespace Middleware.Models.Domain
         }
         public override Dto.Dto ToDto()
         {
-            throw new NotImplementedException();
+            var domain = this;
+            return new TaskDto()
+            {
+                Id = domain.Id.ToString(),
+                Name = domain.Name,
+                ReplanActionPlannerLocked = domain.ReplanActionPlannerLocked,
+                ResourceLock = domain.ResourceLock,
+                TaskPriority = domain.TaskPriority,
+                ActionPlanId = domain.ActionPlanId.ToString(),
+                FullReplan = domain.FullReplan,
+                PartialRePlan = domain.PartialRePlan,
+                DeterministicTask = domain.DeterministicTask,
+                MarkovianProcess = domain.MarkovianProcess,
+                ActionSequence = (List<ActionDto>)domain.ActionSequence.Select(x => x.ToDto())
+            };
         }
     }
 }
