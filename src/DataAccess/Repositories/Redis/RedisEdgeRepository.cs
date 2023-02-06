@@ -10,6 +10,7 @@ using NReJSON;
 using Redis.OM.Contracts;
 using RedisGraphDotNet.Client;
 using StackExchange.Redis;
+using ILogger = Serilog.ILogger;
 
 namespace Middleware.DataAccess.Repositories.Redis
 {
@@ -21,7 +22,7 @@ namespace Middleware.DataAccess.Repositories.Redis
         /// <param name="redisClient"></param>
         /// <param name="redisGraph"></param>
         /// <param name="logger"></param>
-        public RedisEdgeRepository(IRedisConnectionProvider provider, IRedisGraphClient redisGraph) : base(provider, redisGraph, true)
+        public RedisEdgeRepository(IRedisConnectionProvider provider, IRedisGraphClient redisGraph, ILogger logger) : base(provider, redisGraph, true, logger)
         {
 
         }

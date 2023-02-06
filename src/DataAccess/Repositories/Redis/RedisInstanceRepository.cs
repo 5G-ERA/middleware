@@ -1,16 +1,13 @@
-﻿using System.Text.Json;
-using Microsoft.Extensions.Logging;
-using Middleware.DataAccess.Repositories.Abstract;
+﻿using Middleware.DataAccess.Repositories.Abstract;
 using Middleware.Models.Domain;
 using Middleware.Models.Dto;
-using Middleware.Models.Enums;
-using NReJSON;
+using Redis.OM.Contracts;
 using RedisGraphDotNet.Client;
-using StackExchange.Redis;
+using Serilog;
 
 namespace Middleware.DataAccess.Repositories
 {
-    public class redisInstanceRepository : RedisRepository<InstanceModel, InstanceDto>, IInstanceRepository
+    public class RedisInstanceRepository : RedisRepository<InstanceModel, InstanceDto>, IInstanceRepository
     {
         /// <summary>
         /// Default constructor
@@ -18,7 +15,7 @@ namespace Middleware.DataAccess.Repositories
         /// <param name="redisClient"></param>
         /// <param name="redisGraph"></param>
         /// <param name="logger"></param>
-        public redisInstanceRepository(IConnectionMultiplexer redisClient, IRedisGraphClient redisGraph, ILogger<InstanceRepository> logger) : base(RedisDbIndexEnum.Instance, redisClient, redisGraph, logger, true)
+        public RedisInstanceRepository(IRedisConnectionProvider provider, IRedisGraphClient redisGraph, ILogger logger) : base(provider, redisGraph, true, logger)
         {
         }
 

@@ -6,6 +6,7 @@ using Middleware.Common.ExtensionMethods;
 using Microsoft.AspNetCore.Http;
 using StackExchange.Redis;
 using System.Reflection.Metadata.Ecma335;
+using Middleware.Models.Domain;
 
 namespace Middleware.RedisInterface.Services
 {

@@ -10,6 +10,7 @@ using Middleware.Models.Dto;
 using Middleware.Models.Exceptions;
 using Middleware.Models.ExtensionMethods;
 using Redis.OM.Contracts;
+using Serilog;
 
 namespace Middleware.DataAccess.Repositories
 {
@@ -17,18 +18,23 @@ namespace Middleware.DataAccess.Repositories
     {
         private const string GraphName = "RESOURCE_PLANNER";
         protected readonly IRedisCollection<TDto> Collection;
+        
         protected IRedisGraphClient RedisGraph { get; }
         private readonly string _entityName;
         /// <summary>
         /// Specifies if the used model should be saved to the graph
         /// </summary>
         protected readonly bool IsWritableToGraph;
-        public RedisRepository(IRedisConnectionProvider provider, IRedisGraphClient redisGraph, bool isWritableToGraph)
+
+        protected readonly ILogger Logger;
+
+        public RedisRepository(IRedisConnectionProvider provider, IRedisGraphClient redisGraph, bool isWritableToGraph, ILogger logger)
         {
             RedisGraph = redisGraph;
             _entityName = typeof(TModel).GetModelName().ToUpper();
             Collection = provider.RedisCollection<TDto>();
             IsWritableToGraph = isWritableToGraph;
+            Logger = logger;
         }
         /// <summary>
         /// Add to redis a model and try adding also to the graph.
@@ -211,6 +217,19 @@ namespace Middleware.DataAccess.Repositories
             }
 
             return relations;
+        }
+        
+        /// <summary>
+        /// Return all RelationModels to recreate the graph.
+        /// </summary>
+        /// <returns></returns>
+        public virtual async Task<Dictionary<string, List<RedisGraphResult>>> GetAllRelations()
+        {
+            string query = "MATCH (n) OPTIONAL MATCH (n)-[r]-(m) RETURN n, type(r) as r, m";
+            ResultSet resultSet = await RedisGraph.Query(GraphName, query);
+            
+            return resultSet?.Results;
+
         }
 
         /// <summary>

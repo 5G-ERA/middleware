@@ -27,11 +27,10 @@ namespace Middleware.Models.Domain
             Id = id;
             Type = dbIndex.ToString().ToUpper();
         }
-        public GraphEntityModel(Guid id, string name, string type)
+        public GraphEntityModel(Guid id, string name)
         {
             Id = id;
             Name = name;
-            Type = type;
         }
 
         public GraphEntityModel(Guid id, string name, Type type)
