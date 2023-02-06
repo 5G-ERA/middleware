@@ -6,7 +6,7 @@ using Redis.OM.Contracts;
 using RedisGraphDotNet.Client;
 using Serilog;
 
-namespace Middleware.DataAccess.Repositories.Redis;
+namespace Middleware.DataAccess.Repositories;
 
 public class RedisActionRepository : RedisRepository<ActionModel, ActionDto>, IActionRepository
 {

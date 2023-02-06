@@ -25,7 +25,6 @@ namespace Middleware.DataAccess.Repositories
         /// <param name="redisGraph"></param>
         /// <param name="logger"></param>
 
-
         public RedisContainerImageRepository(IInstanceRepository instanceRepository, IRedisConnectionProvider provider, IRedisGraphClient redisGraph, ILogger logger) : base(provider, redisGraph, true, logger)
         {
             _instanceRepository = instanceRepository;

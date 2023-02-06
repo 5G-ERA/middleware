@@ -12,7 +12,7 @@ using RedisGraphDotNet.Client;
 using StackExchange.Redis;
 using ILogger = Serilog.ILogger;
 
-namespace Middleware.DataAccess.Repositories.Redis
+namespace Middleware.DataAccess.Repositories
 {
     public class RedisCloudRepository : RedisRepository<CloudModel, CloudDto>, ICloudRepository
     {
@@ -141,7 +141,7 @@ namespace Middleware.DataAccess.Repositories.Redis
         /// <returns></returns>
         public async Task<int> GetNumContainersByNameAsync(string cloudName)
         {
-            CloudModel cloud = await FindSingleAsync(dto => dto.Name == cloudName);
+            CloudModel? cloud = await FindSingleAsync(dto => dto.Name == cloudName);
             if (cloud is null)
                 throw new ArgumentException("Cloud does not exist", nameof(cloudName));
 

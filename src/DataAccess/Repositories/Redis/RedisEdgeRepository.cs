@@ -12,7 +12,7 @@ using RedisGraphDotNet.Client;
 using StackExchange.Redis;
 using ILogger = Serilog.ILogger;
 
-namespace Middleware.DataAccess.Repositories.Redis
+namespace Middleware.DataAccess.Repositories
 {
     public class RedisEdgeRepository : RedisRepository<EdgeModel, EdgeDto>, IEdgeRepository
     {

@@ -13,7 +13,7 @@ using StackExchange.Redis;
 using ILogger = Serilog.ILogger;
 
 
-namespace Middleware.DataAccess.Repositories.Redis
+namespace Middleware.DataAccess.Repositories
 {
     public class RedisActionPlanRepository : RedisRepository<ActionPlanModel, ActionPlanDto>, IActionPlanRepository
     {
