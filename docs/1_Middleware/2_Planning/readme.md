@@ -96,6 +96,55 @@ The parameters from the API call are fetch into the system and the actionPlanner
 7. Find a better placement to the old action for those actions according to established policies.
 8. Send new task back to the robot with the updated replan.
 
+Example of call plan to API:
+```
+http://localhost:5047/Task/Plan?dry=true
+```
+
+```json
+{
+    "RobotId": "62ccb5d8-dc1a-4c57-9068-062bde5c57a7",
+    "LockResourceReUse": true,
+    "ReplanActionPlannerLocked": true,
+    "TaskId":"fbbfd363-923c-414f-ad6c-5b28fa338576",
+    "TaskDescription": "Lorem ipsum",
+    "ContextKnown": true,
+    "Questions": [
+    {
+      "relations": [
+        {
+          "initiatesFrom": {
+            "id": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
+            "type": "string",
+            "name": "string"
+          },
+          "relationName": "string",
+          "relationAttributes": [
+            {
+              "key": "string",
+              "value": "string"
+            }
+          ],
+          "pointsTo": {
+            "id": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
+            "type": "string",
+            "name": "streing"
+          }
+        }
+      ],
+      "Id": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
+      "Question": "string",
+      "IsSingleAnswer": true,
+      "Answer": [
+        {
+          "key": "string",
+          "value": "string"
+        }
+      ]
+      }
+  ]
+}
+```
 ___
 
 ## 2) Unknown Context Planning:

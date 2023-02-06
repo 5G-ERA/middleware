@@ -1,0 +1,47 @@
+--------------------------------------------------------------------------------
+Node [/airos/display/display_node]
+Publications: 
+ * /rosout [rosgraph_msgs/Log]
+ * /airos/display/finished [std_msgs/Int32]
+
+Subscriptions: 
+ * /airos/display/draw [std_msgs/String]
+ * /airos/display/write [unknown type]
+ * /kik/emotions/data [unknown type]
+ * /airos/stop_all [std_msgs/Empty]
+ * /airos/tts/is_talking_performance [airos_msgs/IsTalking]
+
+Services: 
+ * /airos5/display/write
+ * /airos/display/write
+ * /airos/display/display_node/set_logger_level
+ * /airos/display/get_state
+ * /airos/display/get_img_list
+ * /airos5/mouth/draw_array
+ * /airos/display/draw_array
+ * /airos/display/draw
+ * /airos5/display/draw
+ * /airos/display/display_node/get_loggers
+ * /airos5/mouth/get_state
+
+
+contacting node http://127.0.0.1:38365/ ...
+Pid: 1433
+Connections:
+ * topic: /rosout
+    * to: /rosout
+    * direction: outbound
+    * transport: TCPROS
+ * topic: /airos/stop_all
+    * to: /airos/botapp/botapp_node (http://127.0.0.1:37943/)
+    * direction: inbound
+    * transport: TCPROS
+ * topic: /airos/display/draw
+    * to: /kik/actions/actions_node (http://127.0.0.1:43375/)
+    * direction: inbound
+    * transport: TCPROS
+ * topic: /airos/tts/is_talking_performance
+    * to: /airos/tts/tts_node (http://127.0.0.1:37097/)
+    * direction: inbound
+    * transport: TCPROS
+

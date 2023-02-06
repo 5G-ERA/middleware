@@ -96,6 +96,9 @@ public class RobotModel : BaseModel
     [JsonPropertyName("LastUpdatedTime")]
     public DateTime LastUpdatedTime { get; set; }
 
+    [JsonPropertyName("OnboardedTime")]
+    public DateTime OnboardedTime { get; set; }
+
     /// <summary>
     ///  Onboarding validation of the robot data object.
     /// </summary>
@@ -193,6 +196,7 @@ public class RobotModel : BaseModel
     {
         return GetAllRobotTopics().Where(t => t.Name == topicName).FirstOrDefault();
     }
+    
     public override Dto.Dto ToDto()
     {
         throw new NotImplementedException();

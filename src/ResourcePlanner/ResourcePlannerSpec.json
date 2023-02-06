@@ -332,6 +332,10 @@
             "type": "string",
             "format": "date-time",
             "readOnly": true
+          },
+          "isError": {
+            "type": "boolean",
+            "readOnly": true
           }
         },
         "additionalProperties": false
@@ -471,6 +475,10 @@
           "MinimumNumCores": {
             "type": "integer",
             "format": "int32"
+          },
+          "OnboardedTime": {
+            "type": "string",
+            "format": "date-time"
           }
         },
         "additionalProperties": false
@@ -703,6 +711,14 @@
               "$ref": "#/components/schemas/DialogueModel"
             },
             "nullable": true
+          },
+          "LastUpdatedTime": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "OnboardedTime": {
+            "type": "string",
+            "format": "date-time"
           }
         },
         "additionalProperties": false
@@ -766,6 +782,9 @@
           "description": {
             "type": "string",
             "nullable": true
+          },
+          "enabled": {
+            "type": "boolean"
           }
         },
         "additionalProperties": false

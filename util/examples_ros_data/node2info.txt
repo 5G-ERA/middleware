@@ -1,0 +1,78 @@
+--------------------------------------------------------------------------------
+Node [/airos/asr/asrnode]
+Publications: 
+ * /airos5/asr/recognition [std_msgs/String]
+ * /airos/asr/state [std_msgs/String]
+ * /rosout [rosgraph_msgs/Log]
+ * /airos/asr/recognition [std_msgs/String]
+ * /airos/asr/is_listening [std_msgs/Bool]
+
+Subscriptions: 
+ * /airos/aiplay/state [unknown type]
+ * /kik/presence [std_msgs/Bool]
+ * /airos/botapp/state [std_msgs/String]
+ * /airos/tts/is_talking [std_msgs/Bool]
+ * /airos/servo/is_moving [std_msgs/Bool]
+ * /airos/audio/is_playing [std_msgs/Bool]
+
+Services: 
+ * /airos/asr/set_language
+ * /airos5/asr/is_language_available
+ * /airos/asr/asrnode/set_logger_level
+ * /airos/asr/set_asr
+ * /airos5/asr/get_asr_name
+ * /airos/asr/is_language_available
+ * /airos/asr/get_asr_name
+ * /airos5/asr/get_available_languages
+ * /airos/asr/asrnode/get_loggers
+ * /airos/asr/get_available_languages
+ * /airos/asr/get_language
+ * /airos5/asr/set_asr
+ * /airos5/asr/set_language
+ * /airos5/asr/get_language
+
+
+contacting node http://127.0.0.1:43365/ ...
+Pid: 1388
+Connections:
+ * topic: /airos/asr/recognition
+    * to: /kik/events/events_node
+    * direction: outbound
+    * transport: TCPROS
+ * topic: /airos/asr/recognition
+    * to: /kik/emotional_engine/emotions_node
+    * direction: outbound
+    * transport: TCPROS
+ * topic: /rosout
+    * to: /rosout
+    * direction: outbound
+    * transport: TCPROS
+ * topic: /airos/tts/is_talking
+    * to: /airos/tts/tts_node (http://127.0.0.1:37097/)
+    * direction: inbound
+    * transport: TCPROS
+ * topic: /airos/audio/is_playing
+    * to: /airos/audio/audio_node (http://127.0.0.1:35523/)
+    * direction: inbound
+    * transport: TCPROS
+ * topic: /airos/servo/is_moving
+    * to: /airos/servo/servo_node (http://127.0.0.1:32839/)
+    * direction: inbound
+    * transport: TCPROS
+ * topic: /kik/presence
+    * to: /kik/events/events_node (http://127.0.0.1:40859/)
+    * direction: inbound
+    * transport: TCPROS
+ * topic: /kik/presence
+    * to: /airos/state/state_node (http://127.0.0.1:42771/)
+    * direction: inbound
+    * transport: TCPROS
+ * topic: /kik/presence
+    * to: /airos/botapp/botapp_node (http://127.0.0.1:37943/)
+    * direction: inbound
+    * transport: TCPROS
+ * topic: /airos/botapp/state
+    * to: /airos/botapp/botapp_node (http://127.0.0.1:37943/)
+    * direction: inbound
+    * transport: TCPROS
+

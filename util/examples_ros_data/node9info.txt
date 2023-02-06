@@ -1,0 +1,38 @@
+--------------------------------------------------------------------------------
+Node [/airos/identity/identity_node]
+Publications: 
+ * /rosout [rosgraph_msgs/Log]
+
+Subscriptions: None
+
+Services: 
+ * /airos/identity/get_hostname
+ * /airos/identity/set_user_param
+ * /airos/identity/get_os_version
+ * /airos/identity/get_robot_version
+ * /airos/identity/get_language
+ * /airos/identity/get_bot_name
+ * /airos/identity/get_list_param
+ * /airos/identity/get_list_user_param
+ * /airos/identity/get_ap_ssid
+ * /airos/identity/get_boot_type
+ * /airos/identity/identity_node/get_loggers
+ * /airos/identity/get_user_param
+ * /airos/identity/register
+ * /airos/identity/get_serial_number
+ * /airos/identity/identity_node/set_logger_level
+ * /airos/identity/flash_eeprom
+ * /airos/identity/get_param
+ * /airos/identity/get_ip
+ * /airos/identity/set_boot_type
+ * /airos/identity/get_mac
+
+
+contacting node http://127.0.0.1:43817/ ...
+Pid: 1436
+Connections:
+ * topic: /rosout
+    * to: /rosout
+    * direction: outbound
+    * transport: TCPROS
+

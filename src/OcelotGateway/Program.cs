@@ -15,7 +15,7 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.RegisterSecretsManager();
 
-builder.UseElasticSerilogLogger();
+builder.ConfigureLogger();
 
 builder.Host.ConfigureAppConfiguration((hostingContext, config) =>
 {

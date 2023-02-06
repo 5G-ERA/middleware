@@ -1,0 +1,31 @@
+--------------------------------------------------------------------------------
+Node [/airos/camera/camera_node]
+Publications: 
+ * /airos5/camera/image_low [sensor_msgs/Image]
+ * /airos/camera/image [sensor_msgs/Image]
+ * /rosout [rosgraph_msgs/Log]
+
+Subscriptions: None
+
+Services: 
+ * /airos/camera/camera_node/get_loggers
+ * /airos/camera/get_resolution
+ * /airos/camera/new_query
+ * /airos/camera/set_resolution
+ * /airos/camera/camera_node/set_logger_level
+ * /airos/camera/set_mode
+ * /airos/camera/get_mode
+
+
+contacting node http://127.0.0.1:46539/ ...
+Pid: 1423
+Connections:
+ * topic: /rosout
+    * to: /rosout
+    * direction: outbound
+    * transport: TCPROS
+ * topic: /airos5/camera/image_low
+    * to: /airos5/nodelet_manager
+    * direction: outbound
+    * transport: TCPROS
+

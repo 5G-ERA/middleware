@@ -1,0 +1,93 @@
+--------------------------------------------------------------------------------
+Node [/airos/botapp/botapp_node]
+Publications: 
+ * /kik/presence [std_msgs/Bool]
+ * /airos/botapp/state [std_msgs/String]
+ * /airos/stop_all [std_msgs/Empty]
+ * /rosout [rosgraph_msgs/Log]
+ * /airos/aiplay/reto_category [std_msgs/String]
+ * /kik/state/active [std_msgs/Bool]
+
+Subscriptions: 
+ * /airos/botapp/execute_script [unknown type]
+ * /airos/qr/code [unknown type]
+
+Services: 
+ * /airos/botapp/get_running_botapp_list
+ * /airos5/botapp/get_running_botapp_list
+ * /airos/botapp/install
+ * /airos/botapp/botapp_node/set_logger_level
+ * /airos5/botapp/install
+ * /airos/botapp/stop_all
+ * /airos5/botapp/get_botapp_list
+ * /airos/botapp/start
+ * /airos/botapp/remove
+ * /airos5/botapp/stop
+ * /airos/botapp/get_botapp_list
+ * /airos/botapp/botapp_node/get_loggers
+ * /airos/botapp/start_botapp_randomly
+ * /airos/botapp/get_botapp_dic
+ * /airos/botapp/stop
+ * /airos5/botapp/start_botapp_randomly
+ * /airos5/botapp/start
+ * /airos/botapp/execute_script
+ * /airos5/botapp/stop_all
+ * /airos5/botapp/remove
+
+
+contacting node http://127.0.0.1:37943/ ...
+Pid: 1420
+Connections:
+ * topic: /kik/state/active
+    * to: /kik/events/events_node
+    * direction: outbound
+    * transport: TCPROS
+ * topic: /kik/state/active
+    * to: /kik/emotional_engine/emotions_node
+    * direction: outbound
+    * transport: TCPROS
+ * topic: /airos/stop_all
+    * to: /airos/display/display_node
+    * direction: outbound
+    * transport: TCPROS
+ * topic: /airos/stop_all
+    * to: /airos/tts/tts_node
+    * direction: outbound
+    * transport: TCPROS
+ * topic: /airos/stop_all
+    * to: /airos/audio/audio_node
+    * direction: outbound
+    * transport: TCPROS
+ * topic: /airos/stop_all
+    * to: /kik/emotional_engine/emotions_node
+    * direction: outbound
+    * transport: TCPROS
+ * topic: /rosout
+    * to: /rosout
+    * direction: outbound
+    * transport: TCPROS
+ * topic: /airos/botapp/state
+    * to: /airos/asr/asrnode
+    * direction: outbound
+    * transport: TCPROS
+ * topic: /airos/botapp/state
+    * to: /kik/events/events_node
+    * direction: outbound
+    * transport: TCPROS
+ * topic: /airos/botapp/state
+    * to: /kik/life/life_node
+    * direction: outbound
+    * transport: TCPROS
+ * topic: /airos/botapp/state
+    * to: /kik/emotional_engine/emotions_node
+    * direction: outbound
+    * transport: TCPROS
+ * topic: /kik/presence
+    * to: /airos/asr/asrnode
+    * direction: outbound
+    * transport: TCPROS
+ * topic: /kik/presence
+    * to: /airos/face/faces_node
+    * direction: outbound
+    * transport: TCPROS
+

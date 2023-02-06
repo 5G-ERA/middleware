@@ -1,0 +1,2240 @@
+{
+    "relations": [],
+    "Id": "",
+    "Name": "",
+    "ROSRepo": "",
+    "ROSNodes": [
+        {
+            "Name": "airos/accel/accel_node",
+            "Publications": [
+                [
+                    {
+                        "Name": "/rosout",
+                        "Type": "[rosgraph_msgs/Log]",
+                        "Description": ""
+                    },
+                    {
+                        "Name": "/airos5/accel/data",
+                        "Type": "[airos_msgs/Accelerometer]",
+                        "Description": ""
+                    },
+                    {
+                        "Name": "/airos/accel/data",
+                        "Type": "[airos_msgs/Accelerometer]",
+                        "Description": ""
+                    }
+                ]
+            ],
+            "Subscriptions": [
+                []
+            ],
+            "Services": [
+                [
+                    {
+                        "Name": "/airos/accel/accel_node/set_logger_level",
+                        "Description": ""
+                    },
+                    {
+                        "Name": "/airos/accel/accel_node/get_loggers",
+                        "Description": ""
+                    }
+                ]
+            ]
+        },
+        {
+            "Name": "airos/asr/asrnode",
+            "Publications": [
+                [
+                    {
+                        "Name": "/airos5/asr/recognition",
+                        "Type": "[std_msgs/String]",
+                        "Description": ""
+                    },
+                    {
+                        "Name": "/airos/asr/state",
+                        "Type": "[std_msgs/String]",
+                        "Description": ""
+                    },
+                    {
+                        "Name": "/rosout",
+                        "Type": "[rosgraph_msgs/Log]",
+                        "Description": ""
+                    },
+                    {
+                        "Name": "/airos/asr/recognition",
+                        "Type": "[std_msgs/String]",
+                        "Description": ""
+                    },
+                    {
+                        "Name": "/airos/asr/is_listening",
+                        "Type": "[std_msgs/Bool]",
+                        "Description": ""
+                    }
+                ]
+            ],
+            "Subscriptions": [
+                [
+                    {
+                        "Name": "/airos/aiplay/state",
+                        "Type": "[unknown type]",
+                        "Description": ""
+                    },
+                    {
+                        "Name": "/kik/presence",
+                        "Type": "[std_msgs/Bool]",
+                        "Description": ""
+                    },
+                    {
+                        "Name": "/airos/botapp/state",
+                        "Type": "[std_msgs/String]",
+                        "Description": ""
+                    },
+                    {
+                        "Name": "/airos/tts/is_talking",
+                        "Type": "[std_msgs/Bool]",
+                        "Description": ""
+                    },
+                    {
+                        "Name": "/airos/servo/is_moving",
+                        "Type": "[std_msgs/Bool]",
+                        "Description": ""
+                    },
+                    {
+                        "Name": "/airos/audio/is_playing",
+                        "Type": "[std_msgs/Bool]",
+                        "Description": ""
+                    }
+                ]
+            ],
+            "Services": [
+                [
+                    {
+                        "Name": "/airos/asr/set_language",
+                        "Description": ""
+                    },
+                    {
+                        "Name": "/airos5/asr/is_language_available",
+                        "Description": ""
+                    },
+                    {
+                        "Name": "/airos/asr/asrnode/set_logger_level",
+                        "Description": ""
+                    },
+                    {
+                        "Name": "/airos/asr/set_asr",
+                        "Description": ""
+                    },
+                    {
+                        "Name": "/airos5/asr/get_asr_name",
+                        "Description": ""
+                    },
+                    {
+                        "Name": "/airos/asr/is_language_available",
+                        "Description": ""
+                    },
+                    {
+                        "Name": "/airos/asr/get_asr_name",
+                        "Description": ""
+                    },
+                    {
+                        "Name": "/airos5/asr/get_available_languages",
+                        "Description": ""
+                    },
+                    {
+                        "Name": "/airos/asr/asrnode/get_loggers",
+                        "Description": ""
+                    },
+                    {
+                        "Name": "/airos/asr/get_available_languages",
+                        "Description": ""
+                    },
+                    {
+                        "Name": "/airos/asr/get_language",
+                        "Description": ""
+                    },
+                    {
+                        "Name": "/airos5/asr/set_asr",
+                        "Description": ""
+                    },
+                    {
+                        "Name": "/airos5/asr/set_language",
+                        "Description": ""
+                    },
+                    {
+                        "Name": "/airos5/asr/get_language",
+                        "Description": ""
+                    }
+                ]
+            ]
+        },
+        {
+            "Name": "airos/audio/audio_node",
+            "Publications": [
+                [
+                    {
+                        "Name": "/airos/audio/finished",
+                        "Type": "[std_msgs/Int32]",
+                        "Description": ""
+                    },
+                    {
+                        "Name": "/rosout",
+                        "Type": "[rosgraph_msgs/Log]",
+                        "Description": ""
+                    },
+                    {
+                        "Name": "/airos/audio/is_playing",
+                        "Type": "[std_msgs/Bool]",
+                        "Description": ""
+                    }
+                ]
+            ],
+            "Subscriptions": [
+                [
+                    {
+                        "Name": "/airos/audio/play",
+                        "Type": "[airos_msgs/PlayAudio]",
+                        "Description": ""
+                    },
+                    {
+                        "Name": "/airos/audio/stop",
+                        "Type": "[std_msgs/Empty]",
+                        "Description": ""
+                    },
+                    {
+                        "Name": "/airos/stop_all",
+                        "Type": "[std_msgs/Empty]",
+                        "Description": ""
+                    }
+                ]
+            ],
+            "Services": [
+                [
+                    {
+                        "Name": "/airos/audio/play",
+                        "Description": ""
+                    },
+                    {
+                        "Name": "/airos/audio/restore_volume",
+                        "Description": ""
+                    },
+                    {
+                        "Name": "/airos5/audio/restore_volume",
+                        "Description": ""
+                    },
+                    {
+                        "Name": "/airos/audio/play_volume",
+                        "Description": ""
+                    },
+                    {
+                        "Name": "/airos/audio/audio_node/get_loggers",
+                        "Description": ""
+                    },
+                    {
+                        "Name": "/airos5/audio/get_list_audio",
+                        "Description": ""
+                    },
+                    {
+                        "Name": "/airos/audio/play_file",
+                        "Description": ""
+                    },
+                    {
+                        "Name": "/airos5/audio/set_volume",
+                        "Description": ""
+                    },
+                    {
+                        "Name": "/airos5/audio/stop",
+                        "Description": ""
+                    },
+                    {
+                        "Name": "/airos/audio/get_volume",
+                        "Description": ""
+                    },
+                    {
+                        "Name": "/airos5/audio/stop_all",
+                        "Description": ""
+                    },
+                    {
+                        "Name": "/airos/audio/get_list_audio",
+                        "Description": ""
+                    },
+                    {
+                        "Name": "/airos/audio/stop",
+                        "Description": ""
+                    },
+                    {
+                        "Name": "/airos5/audio/play_volume",
+                        "Description": ""
+                    },
+                    {
+                        "Name": "/airos/audio/audio_node/set_logger_level",
+                        "Description": ""
+                    },
+                    {
+                        "Name": "/airos/audio/set_volume",
+                        "Description": ""
+                    },
+                    {
+                        "Name": "/airos/audio/stop_all",
+                        "Description": ""
+                    },
+                    {
+                        "Name": "/airos5/audio/play",
+                        "Description": ""
+                    },
+                    {
+                        "Name": "/airos5/audio/get_volume",
+                        "Description": ""
+                    },
+                    {
+                        "Name": "/airos5/audio/play_file",
+                        "Description": ""
+                    }
+                ]
+            ]
+        },
+        {
+            "Name": "airos/botapp/botapp_node",
+            "Publications": [
+                [
+                    {
+                        "Name": "/kik/presence",
+                        "Type": "[std_msgs/Bool]",
+                        "Description": ""
+                    },
+                    {
+                        "Name": "/airos/botapp/state",
+                        "Type": "[std_msgs/String]",
+                        "Description": ""
+                    },
+                    {
+                        "Name": "/airos/stop_all",
+                        "Type": "[std_msgs/Empty]",
+                        "Description": ""
+                    },
+                    {
+                        "Name": "/rosout",
+                        "Type": "[rosgraph_msgs/Log]",
+                        "Description": ""
+                    },
+                    {
+                        "Name": "/airos/aiplay/reto_category",
+                        "Type": "[std_msgs/String]",
+                        "Description": ""
+                    },
+                    {
+                        "Name": "/kik/state/active",
+                        "Type": "[std_msgs/Bool]",
+                        "Description": ""
+                    }
+                ]
+            ],
+            "Subscriptions": [
+                [
+                    {
+                        "Name": "/airos/botapp/execute_script",
+                        "Type": "[unknown type]",
+                        "Description": ""
+                    },
+                    {
+                        "Name": "/airos/qr/code",
+                        "Type": "[unknown type]",
+                        "Description": ""
+                    }
+                ]
+            ],
+            "Services": [
+                [
+                    {
+                        "Name": "/airos/botapp/get_running_botapp_list",
+                        "Description": ""
+                    },
+                    {
+                        "Name": "/airos5/botapp/get_running_botapp_list",
+                        "Description": ""
+                    },
+                    {
+                        "Name": "/airos/botapp/install",
+                        "Description": ""
+                    },
+                    {
+                        "Name": "/airos/botapp/botapp_node/set_logger_level",
+                        "Description": ""
+                    },
+                    {
+                        "Name": "/airos5/botapp/install",
+                        "Description": ""
+                    },
+                    {
+                        "Name": "/airos/botapp/stop_all",
+                        "Description": ""
+                    },
+                    {
+                        "Name": "/airos5/botapp/get_botapp_list",
+                        "Description": ""
+                    },
+                    {
+                        "Name": "/airos/botapp/start",
+                        "Description": ""
+                    },
+                    {
+                        "Name": "/airos/botapp/remove",
+                        "Description": ""
+                    },
+                    {
+                        "Name": "/airos5/botapp/stop",
+                        "Description": ""
+                    },
+                    {
+                        "Name": "/airos/botapp/get_botapp_list",
+                        "Description": ""
+                    },
+                    {
+                        "Name": "/airos/botapp/botapp_node/get_loggers",
+                        "Description": ""
+                    },
+                    {
+                        "Name": "/airos/botapp/start_botapp_randomly",
+                        "Description": ""
+                    },
+                    {
+                        "Name": "/airos/botapp/get_botapp_dic",
+                        "Description": ""
+                    },
+                    {
+                        "Name": "/airos/botapp/stop",
+                        "Description": ""
+                    },
+                    {
+                        "Name": "/airos5/botapp/start_botapp_randomly",
+                        "Description": ""
+                    },
+                    {
+                        "Name": "/airos5/botapp/start",
+                        "Description": ""
+                    },
+                    {
+                        "Name": "/airos/botapp/execute_script",
+                        "Description": ""
+                    },
+                    {
+                        "Name": "/airos5/botapp/stop_all",
+                        "Description": ""
+                    },
+                    {
+                        "Name": "/airos5/botapp/remove",
+                        "Description": ""
+                    }
+                ]
+            ]
+        },
+        {
+            "Name": "airos/camera/camera_node",
+            "Publications": [
+                [
+                    {
+                        "Name": "/airos5/camera/image_low",
+                        "Type": "[sensor_msgs/Image]",
+                        "Description": ""
+                    },
+                    {
+                        "Name": "/airos/camera/image",
+                        "Type": "[sensor_msgs/Image]",
+                        "Description": ""
+                    },
+                    {
+                        "Name": "/rosout",
+                        "Type": "[rosgraph_msgs/Log]",
+                        "Description": ""
+                    }
+                ]
+            ],
+            "Subscriptions": [
+                []
+            ],
+            "Services": [
+                [
+                    {
+                        "Name": "/airos/camera/camera_node/get_loggers",
+                        "Description": ""
+                    },
+                    {
+                        "Name": "/airos/camera/get_resolution",
+                        "Description": ""
+                    },
+                    {
+                        "Name": "/airos/camera/new_query",
+                        "Description": ""
+                    },
+                    {
+                        "Name": "/airos/camera/set_resolution",
+                        "Description": ""
+                    },
+                    {
+                        "Name": "/airos/camera/camera_node/set_logger_level",
+                        "Description": ""
+                    },
+                    {
+                        "Name": "/airos/camera/set_mode",
+                        "Description": ""
+                    },
+                    {
+                        "Name": "/airos/camera/get_mode",
+                        "Description": ""
+                    }
+                ]
+            ]
+        },
+        {
+            "Name": "airos/color/color_node",
+            "Publications": [
+                [
+                    {
+                        "Name": "/airos/color/is_working",
+                        "Type": "[std_msgs/Bool]",
+                        "Description": ""
+                    },
+                    {
+                        "Name": "/rosout",
+                        "Type": "[rosgraph_msgs/Log]",
+                        "Description": ""
+                    },
+                    {
+                        "Name": "/airos/color/finished_id",
+                        "Type": "[std_msgs/Int32]",
+                        "Description": ""
+                    }
+                ]
+            ],
+            "Subscriptions": [
+                [
+                    {
+                        "Name": "/airos/tts/is_talking",
+                        "Type": "[std_msgs/Bool]",
+                        "Description": ""
+                    },
+                    {
+                        "Name": "/airos/color/set_name",
+                        "Type": "[airos_msgs/SetColorName]",
+                        "Description": ""
+                    },
+                    {
+                        "Name": "/airos/color/blink",
+                        "Type": "[std_msgs/Bool]",
+                        "Description": ""
+                    },
+                    {
+                        "Name": "/airos/interruption_manager/output",
+                        "Type": "[unknown type]",
+                        "Description": ""
+                    },
+                    {
+                        "Name": "/airos/color/set",
+                        "Type": "[airos_msgs/SetRgb]",
+                        "Description": ""
+                    }
+                ]
+            ],
+            "Services": [
+                [
+                    {
+                        "Name": "/airos5/color/set_rgb",
+                        "Description": ""
+                    },
+                    {
+                        "Name": "/airos/color/color_node/set_logger_level",
+                        "Description": ""
+                    },
+                    {
+                        "Name": "/airos/color/blink",
+                        "Description": ""
+                    },
+                    {
+                        "Name": "/airos5/color/flash",
+                        "Description": ""
+                    },
+                    {
+                        "Name": "/airos/color/set_rgb",
+                        "Description": ""
+                    },
+                    {
+                        "Name": "/airos/color/flash",
+                        "Description": ""
+                    },
+                    {
+                        "Name": "/airos5/color/blink",
+                        "Description": ""
+                    },
+                    {
+                        "Name": "/airos/color/color_node/get_loggers",
+                        "Description": ""
+                    },
+                    {
+                        "Name": "/airos5/color/stop_all",
+                        "Description": ""
+                    },
+                    {
+                        "Name": "/airos/color/stop_all",
+                        "Description": ""
+                    },
+                    {
+                        "Name": "/airos/color/get_rgb",
+                        "Description": ""
+                    },
+                    {
+                        "Name": "/airos5/color/get_rgb",
+                        "Description": ""
+                    }
+                ]
+            ]
+        },
+        {
+            "Name": "airos/display/display_node",
+            "Publications": [
+                [
+                    {
+                        "Name": "/rosout",
+                        "Type": "[rosgraph_msgs/Log]",
+                        "Description": ""
+                    },
+                    {
+                        "Name": "/airos/display/finished",
+                        "Type": "[std_msgs/Int32]",
+                        "Description": ""
+                    }
+                ]
+            ],
+            "Subscriptions": [
+                [
+                    {
+                        "Name": "/airos/display/draw",
+                        "Type": "[std_msgs/String]",
+                        "Description": ""
+                    },
+                    {
+                        "Name": "/airos/display/write",
+                        "Type": "[unknown type]",
+                        "Description": ""
+                    },
+                    {
+                        "Name": "/kik/emotions/data",
+                        "Type": "[unknown type]",
+                        "Description": ""
+                    },
+                    {
+                        "Name": "/airos/stop_all",
+                        "Type": "[std_msgs/Empty]",
+                        "Description": ""
+                    },
+                    {
+                        "Name": "/airos/tts/is_talking_performance",
+                        "Type": "[airos_msgs/IsTalking]",
+                        "Description": ""
+                    }
+                ]
+            ],
+            "Services": [
+                [
+                    {
+                        "Name": "/airos5/display/write",
+                        "Description": ""
+                    },
+                    {
+                        "Name": "/airos/display/write",
+                        "Description": ""
+                    },
+                    {
+                        "Name": "/airos/display/display_node/set_logger_level",
+                        "Description": ""
+                    },
+                    {
+                        "Name": "/airos/display/get_state",
+                        "Description": ""
+                    },
+                    {
+                        "Name": "/airos/display/get_img_list",
+                        "Description": ""
+                    },
+                    {
+                        "Name": "/airos5/mouth/draw_array",
+                        "Description": ""
+                    },
+                    {
+                        "Name": "/airos/display/draw_array",
+                        "Description": ""
+                    },
+                    {
+                        "Name": "/airos/display/draw",
+                        "Description": ""
+                    },
+                    {
+                        "Name": "/airos5/display/draw",
+                        "Description": ""
+                    },
+                    {
+                        "Name": "/airos/display/display_node/get_loggers",
+                        "Description": ""
+                    },
+                    {
+                        "Name": "/airos5/mouth/get_state",
+                        "Description": ""
+                    }
+                ]
+            ]
+        },
+        {
+            "Name": "airos/face/faces_node",
+            "Publications": [
+                [
+                    {
+                        "Name": "/airos/face/detected",
+                        "Type": "[std_msgs/Int32]",
+                        "Description": ""
+                    },
+                    {
+                        "Name": "/airos/audio/play",
+                        "Type": "[airos_msgs/PlayAudio]",
+                        "Description": ""
+                    },
+                    {
+                        "Name": "/airos/vision/start_detection",
+                        "Type": "[std_msgs/String]",
+                        "Description": ""
+                    },
+                    {
+                        "Name": "/airos/color/set_name",
+                        "Type": "[airos_msgs/SetColorName]",
+                        "Description": ""
+                    },
+                    {
+                        "Name": "/airos/servo/set_simple",
+                        "Type": "[airos_msgs/SetServoSimple]",
+                        "Description": ""
+                    },
+                    {
+                        "Name": "/airos/color/set",
+                        "Type": "[airos_msgs/SetRgb]",
+                        "Description": ""
+                    },
+                    {
+                        "Name": "/rosout",
+                        "Type": "[rosgraph_msgs/Log]",
+                        "Description": ""
+                    },
+                    {
+                        "Name": "/airos/color/blink",
+                        "Type": "[std_msgs/Bool]",
+                        "Description": ""
+                    },
+                    {
+                        "Name": "/airos/audio/stop",
+                        "Type": "[std_msgs/Empty]",
+                        "Description": ""
+                    },
+                    {
+                        "Name": "/airos/face/new_task",
+                        "Type": "[std_msgs/String]",
+                        "Description": ""
+                    },
+                    {
+                        "Name": "/airos/servo/set",
+                        "Type": "[airos_msgs/SetServo]",
+                        "Description": ""
+                    }
+                ]
+            ],
+            "Subscriptions": [
+                [
+                    {
+                        "Name": "/airos/vision/get_detection",
+                        "Type": "[unknown type]",
+                        "Description": ""
+                    },
+                    {
+                        "Name": "/airos/face/new_task",
+                        "Type": "[std_msgs/String]",
+                        "Description": ""
+                    },
+                    {
+                        "Name": "/kik/presence",
+                        "Type": "[std_msgs/Bool]",
+                        "Description": ""
+                    },
+                    {
+                        "Name": "/airos/tts/is_talking",
+                        "Type": "[std_msgs/Bool]",
+                        "Description": ""
+                    },
+                    {
+                        "Name": "/airos/servo/is_moving",
+                        "Type": "[std_msgs/Bool]",
+                        "Description": ""
+                    },
+                    {
+                        "Name": "/airos/audio/is_playing",
+                        "Type": "[std_msgs/Bool]",
+                        "Description": ""
+                    },
+                    {
+                        "Name": "/airos/accel/data",
+                        "Type": "[airos_msgs/Accelerometer]",
+                        "Description": ""
+                    }
+                ]
+            ],
+            "Services": [
+                [
+                    {
+                        "Name": "/airos/language/set",
+                        "Description": ""
+                    },
+                    {
+                        "Name": "/airos/face/faces_node/set_logger_level",
+                        "Description": ""
+                    },
+                    {
+                        "Name": "/airos/face/erase_bbdd",
+                        "Description": ""
+                    },
+                    {
+                        "Name": "/airos/face/faces_node/get_loggers",
+                        "Description": ""
+                    },
+                    {
+                        "Name": "/airos/face/get_saved_users",
+                        "Description": ""
+                    },
+                    {
+                        "Name": "/airos/language/get",
+                        "Description": ""
+                    }
+                ]
+            ]
+        },
+        {
+            "Name": "airos/identity/identity_node",
+            "Publications": [
+                [
+                    {
+                        "Name": "/rosout",
+                        "Type": "[rosgraph_msgs/Log]",
+                        "Description": ""
+                    }
+                ]
+            ],
+            "Subscriptions": [
+                []
+            ],
+            "Services": [
+                [
+                    {
+                        "Name": "/airos/identity/get_hostname",
+                        "Description": ""
+                    },
+                    {
+                        "Name": "/airos/identity/set_user_param",
+                        "Description": ""
+                    },
+                    {
+                        "Name": "/airos/identity/get_os_version",
+                        "Description": ""
+                    },
+                    {
+                        "Name": "/airos/identity/get_robot_version",
+                        "Description": ""
+                    },
+                    {
+                        "Name": "/airos/identity/get_language",
+                        "Description": ""
+                    },
+                    {
+                        "Name": "/airos/identity/get_bot_name",
+                        "Description": ""
+                    },
+                    {
+                        "Name": "/airos/identity/get_list_param",
+                        "Description": ""
+                    },
+                    {
+                        "Name": "/airos/identity/get_list_user_param",
+                        "Description": ""
+                    },
+                    {
+                        "Name": "/airos/identity/get_ap_ssid",
+                        "Description": ""
+                    },
+                    {
+                        "Name": "/airos/identity/get_boot_type",
+                        "Description": ""
+                    },
+                    {
+                        "Name": "/airos/identity/identity_node/get_loggers",
+                        "Description": ""
+                    },
+                    {
+                        "Name": "/airos/identity/get_user_param",
+                        "Description": ""
+                    },
+                    {
+                        "Name": "/airos/identity/register",
+                        "Description": ""
+                    },
+                    {
+                        "Name": "/airos/identity/get_serial_number",
+                        "Description": ""
+                    },
+                    {
+                        "Name": "/airos/identity/identity_node/set_logger_level",
+                        "Description": ""
+                    },
+                    {
+                        "Name": "/airos/identity/flash_eeprom",
+                        "Description": ""
+                    },
+                    {
+                        "Name": "/airos/identity/get_param",
+                        "Description": ""
+                    },
+                    {
+                        "Name": "/airos/identity/get_ip",
+                        "Description": ""
+                    },
+                    {
+                        "Name": "/airos/identity/set_boot_type",
+                        "Description": ""
+                    },
+                    {
+                        "Name": "/airos/identity/get_mac",
+                        "Description": ""
+                    }
+                ]
+            ]
+        },
+        {
+            "Name": "airos/performance/performance_node",
+            "Publications": [
+                [
+                    {
+                        "Name": "/rosout",
+                        "Type": "[rosgraph_msgs/Log]",
+                        "Description": ""
+                    }
+                ]
+            ],
+            "Subscriptions": [
+                [
+                    {
+                        "Name": "/airos/performance/set_emotion",
+                        "Type": "[std_msgs/String]",
+                        "Description": ""
+                    },
+                    {
+                        "Name": "/airos/performance/stop_performance",
+                        "Type": "[unknown type]",
+                        "Description": ""
+                    },
+                    {
+                        "Name": "/kik/emotions/data",
+                        "Type": "[unknown type]",
+                        "Description": ""
+                    },
+                    {
+                        "Name": "/airos/performance/stop_all_performances",
+                        "Type": "[unknown type]",
+                        "Description": ""
+                    },
+                    {
+                        "Name": "/airos/performance/start_performance",
+                        "Type": "[std_msgs/String]",
+                        "Description": ""
+                    },
+                    {
+                        "Name": "/kik/life/age",
+                        "Type": "[std_msgs/String]",
+                        "Description": ""
+                    }
+                ]
+            ],
+            "Services": [
+                [
+                    {
+                        "Name": "/airos5/performance/set_emotion",
+                        "Description": ""
+                    },
+                    {
+                        "Name": "/airos/performance/get_emotion",
+                        "Description": ""
+                    },
+                    {
+                        "Name": "/airos/performance/set_emotion",
+                        "Description": ""
+                    },
+                    {
+                        "Name": "/airos/performance/performance_node/get_loggers",
+                        "Description": ""
+                    },
+                    {
+                        "Name": "/airos5/performance/get_emotion",
+                        "Description": ""
+                    },
+                    {
+                        "Name": "/airos/performance/performance_node/set_logger_level",
+                        "Description": ""
+                    }
+                ]
+            ]
+        },
+        {
+            "Name": "airos/servo/servo_node",
+            "Publications": [
+                [
+                    {
+                        "Name": "/airos/servo/joint_states",
+                        "Type": "[sensor_msgs/JointState]",
+                        "Description": ""
+                    },
+                    {
+                        "Name": "/airos/servo/finished_id",
+                        "Type": "[std_msgs/Int32]",
+                        "Description": ""
+                    },
+                    {
+                        "Name": "/rosout",
+                        "Type": "[rosgraph_msgs/Log]",
+                        "Description": ""
+                    },
+                    {
+                        "Name": "/airos/servo/is_moving",
+                        "Type": "[std_msgs/Bool]",
+                        "Description": ""
+                    }
+                ]
+            ],
+            "Subscriptions": [
+                [
+                    {
+                        "Name": "/airos/servo/stop_all",
+                        "Type": "[unknown type]",
+                        "Description": ""
+                    },
+                    {
+                        "Name": "/airos/servo/set_simple",
+                        "Type": "[airos_msgs/SetServoSimple]",
+                        "Description": ""
+                    },
+                    {
+                        "Name": "/airos/interruption_manager/output",
+                        "Type": "[unknown type]",
+                        "Description": ""
+                    },
+                    {
+                        "Name": "/airos/servo/set",
+                        "Type": "[airos_msgs/SetServo]",
+                        "Description": ""
+                    }
+                ]
+            ],
+            "Services": [
+                [
+                    {
+                        "Name": "/airos/servo/move",
+                        "Description": ""
+                    },
+                    {
+                        "Name": "/airos/servo/get_pos",
+                        "Description": ""
+                    },
+                    {
+                        "Name": "/airos5/servo/get_pos",
+                        "Description": ""
+                    },
+                    {
+                        "Name": "/airos5/servo/move",
+                        "Description": ""
+                    },
+                    {
+                        "Name": "/airos/servo/servo_node/get_loggers",
+                        "Description": ""
+                    },
+                    {
+                        "Name": "/airos/servo/servo_node/set_logger_level",
+                        "Description": ""
+                    }
+                ]
+            ]
+        },
+        {
+            "Name": "airos/state/BaseSdk_1675619911554145698",
+            "Publications": [
+                [
+                    {
+                        "Name": "/rosout",
+                        "Type": "[rosgraph_msgs/Log]",
+                        "Description": ""
+                    }
+                ]
+            ],
+            "Subscriptions": [
+                [
+                    {
+                        "Name": "/airos5/display/error",
+                        "Type": "[unknown type]",
+                        "Description": ""
+                    },
+                    {
+                        "Name": "/airos5/touch/data",
+                        "Type": "[airos_msgs/Touch]",
+                        "Description": ""
+                    },
+                    {
+                        "Name": "/airos5/touch/error",
+                        "Type": "[unknown type]",
+                        "Description": ""
+                    }
+                ]
+            ],
+            "Services": [
+                [
+                    {
+                        "Name": "/airos/state/BaseSdk_1675619911554145698/set_logger_level",
+                        "Description": ""
+                    },
+                    {
+                        "Name": "/airos/state/BaseSdk_1675619911554145698/get_loggers",
+                        "Description": ""
+                    }
+                ]
+            ]
+        },
+        {
+            "Name": "airos/state/state_node",
+            "Publications": [
+                [
+                    {
+                        "Name": "/airos/performance/set_emotion",
+                        "Type": "[std_msgs/String]",
+                        "Description": ""
+                    },
+                    {
+                        "Name": "/airos/state/battery",
+                        "Type": "[std_msgs/String]",
+                        "Description": ""
+                    },
+                    {
+                        "Name": "/kik/presence",
+                        "Type": "[std_msgs/Bool]",
+                        "Description": ""
+                    },
+                    {
+                        "Name": "/rosout",
+                        "Type": "[rosgraph_msgs/Log]",
+                        "Description": ""
+                    },
+                    {
+                        "Name": "/airos/performance/start_performance",
+                        "Type": "[std_msgs/String]",
+                        "Description": ""
+                    },
+                    {
+                        "Name": "/kik/state/active",
+                        "Type": "[std_msgs/Bool]",
+                        "Description": ""
+                    }
+                ]
+            ],
+            "Subscriptions": [
+                [
+                    {
+                        "Name": "/airos/state/scratch_on",
+                        "Type": "[unknown type]",
+                        "Description": ""
+                    },
+                    {
+                        "Name": "/airos/state/switch_kik",
+                        "Type": "[unknown type]",
+                        "Description": ""
+                    },
+                    {
+                        "Name": "/kik/emotional_engine/data",
+                        "Type": "[airos_msgs/EM]",
+                        "Description": ""
+                    }
+                ]
+            ],
+            "Services": [
+                [
+                    {
+                        "Name": "/airos/state/set_language",
+                        "Description": ""
+                    },
+                    {
+                        "Name": "/airos/state/state_node/get_loggers",
+                        "Description": ""
+                    },
+                    {
+                        "Name": "/airos/state/device_connected",
+                        "Description": ""
+                    },
+                    {
+                        "Name": "/airos/state/battery",
+                        "Description": ""
+                    },
+                    {
+                        "Name": "/airos/state/get_language",
+                        "Description": ""
+                    },
+                    {
+                        "Name": "/airos/state/state_node/set_logger_level",
+                        "Description": ""
+                    }
+                ]
+            ]
+        },
+        {
+            "Name": "airos/system/system_node",
+            "Publications": [
+                [
+                    {
+                        "Name": "/airos/audio/play",
+                        "Type": "[airos_msgs/PlayAudio]",
+                        "Description": ""
+                    },
+                    {
+                        "Name": "/airos/vision/start_detection",
+                        "Type": "[std_msgs/String]",
+                        "Description": ""
+                    },
+                    {
+                        "Name": "/airos/color/set_name",
+                        "Type": "[airos_msgs/SetColorName]",
+                        "Description": ""
+                    },
+                    {
+                        "Name": "/airos/servo/set_simple",
+                        "Type": "[airos_msgs/SetServoSimple]",
+                        "Description": ""
+                    },
+                    {
+                        "Name": "/airos/system/state",
+                        "Type": "[std_msgs/String]",
+                        "Description": ""
+                    },
+                    {
+                        "Name": "/airos/color/set",
+                        "Type": "[airos_msgs/SetRgb]",
+                        "Description": ""
+                    },
+                    {
+                        "Name": "/airos/performance/start_private_performance",
+                        "Type": "[std_msgs/String]",
+                        "Description": ""
+                    },
+                    {
+                        "Name": "/rosout",
+                        "Type": "[rosgraph_msgs/Log]",
+                        "Description": ""
+                    },
+                    {
+                        "Name": "/airos/color/blink",
+                        "Type": "[std_msgs/Bool]",
+                        "Description": ""
+                    },
+                    {
+                        "Name": "/airos/audio/stop",
+                        "Type": "[std_msgs/Empty]",
+                        "Description": ""
+                    },
+                    {
+                        "Name": "/airos/system/internet_state",
+                        "Type": "[std_msgs/Bool]",
+                        "Description": ""
+                    },
+                    {
+                        "Name": "/airos/face/new_task",
+                        "Type": "[std_msgs/String]",
+                        "Description": ""
+                    },
+                    {
+                        "Name": "/airos/servo/set",
+                        "Type": "[airos_msgs/SetServo]",
+                        "Description": ""
+                    }
+                ]
+            ],
+            "Subscriptions": [
+                [
+                    {
+                        "Name": "/airos/vision/get_detection",
+                        "Type": "[unknown type]",
+                        "Description": ""
+                    },
+                    {
+                        "Name": "/airos/accel/data",
+                        "Type": "[airos_msgs/Accelerometer]",
+                        "Description": ""
+                    }
+                ]
+            ],
+            "Services": [
+                [
+                    {
+                        "Name": "/airos5/system/stop",
+                        "Description": ""
+                    },
+                    {
+                        "Name": "/airos/system/system_node/get_loggers",
+                        "Description": ""
+                    },
+                    {
+                        "Name": "/airos/system/update",
+                        "Description": ""
+                    },
+                    {
+                        "Name": "/airos/system/system_action",
+                        "Description": ""
+                    },
+                    {
+                        "Name": "/airos5/system/service_system_action",
+                        "Description": ""
+                    },
+                    {
+                        "Name": "/airos/system/get_connection_status",
+                        "Description": ""
+                    },
+                    {
+                        "Name": "/airos/system/get_network_param",
+                        "Description": ""
+                    },
+                    {
+                        "Name": "/airos5/system/get_list_wifi_networks",
+                        "Description": ""
+                    },
+                    {
+                        "Name": "/airos/system/get_list_wifi_networks",
+                        "Description": ""
+                    },
+                    {
+                        "Name": "/airos5/system/restart",
+                        "Description": ""
+                    },
+                    {
+                        "Name": "/airos/system/shutdown",
+                        "Description": ""
+                    },
+                    {
+                        "Name": "/airos/system/restart",
+                        "Description": ""
+                    },
+                    {
+                        "Name": "/airos/system/stop",
+                        "Description": ""
+                    },
+                    {
+                        "Name": "/airos/system/system_node/set_logger_level",
+                        "Description": ""
+                    },
+                    {
+                        "Name": "/airos/system/reboot",
+                        "Description": ""
+                    },
+                    {
+                        "Name": "/airos5/system/update",
+                        "Description": ""
+                    },
+                    {
+                        "Name": "/airos5/system/shutdown",
+                        "Description": ""
+                    },
+                    {
+                        "Name": "/airos5/system/reboot",
+                        "Description": ""
+                    },
+                    {
+                        "Name": "/airos5/system/configure_network",
+                        "Description": ""
+                    },
+                    {
+                        "Name": "/airos/system/configure_network",
+                        "Description": ""
+                    },
+                    {
+                        "Name": "/airos5/system/get_connection_status",
+                        "Description": ""
+                    }
+                ]
+            ]
+        },
+        {
+            "Name": "airos/touch/touch_node",
+            "Publications": [
+                [
+                    {
+                        "Name": "/airos/touch/data",
+                        "Type": "[airos_msgs/TouchAiros6]",
+                        "Description": ""
+                    },
+                    {
+                        "Name": "/airos5/touch/data",
+                        "Type": "[airos_msgs/Touch]",
+                        "Description": ""
+                    },
+                    {
+                        "Name": "/rosout",
+                        "Type": "[rosgraph_msgs/Log]",
+                        "Description": ""
+                    }
+                ]
+            ],
+            "Subscriptions": [
+                []
+            ],
+            "Services": [
+                [
+                    {
+                        "Name": "/airos/touch/touch_node/set_logger_level",
+                        "Description": ""
+                    },
+                    {
+                        "Name": "/airos/touch/block",
+                        "Description": ""
+                    },
+                    {
+                        "Name": "/airos/touch/touch_node/get_loggers",
+                        "Description": ""
+                    }
+                ]
+            ]
+        },
+        {
+            "Name": "airos/tts/tts_node",
+            "Publications": [
+                [
+                    {
+                        "Name": "/airos/tts/is_talking",
+                        "Type": "[std_msgs/Bool]",
+                        "Description": ""
+                    },
+                    {
+                        "Name": "/airos5/tts/is_talking",
+                        "Type": "[std_msgs/Bool]",
+                        "Description": ""
+                    },
+                    {
+                        "Name": "/airos5/tts/is_talking_performance",
+                        "Type": "[airos_msgs/IsTalking]",
+                        "Description": ""
+                    },
+                    {
+                        "Name": "/rosout",
+                        "Type": "[rosgraph_msgs/Log]",
+                        "Description": ""
+                    },
+                    {
+                        "Name": "/airos/tts/finished_id",
+                        "Type": "[std_msgs/Int32]",
+                        "Description": ""
+                    },
+                    {
+                        "Name": "/airos/tts/is_talking_performance",
+                        "Type": "[airos_msgs/IsTalking]",
+                        "Description": ""
+                    }
+                ]
+            ],
+            "Subscriptions": [
+                [
+                    {
+                        "Name": "/airos/tts/say_topic",
+                        "Type": "[airos_msgs/SayTopic]",
+                        "Description": ""
+                    },
+                    {
+                        "Name": "/airos/interruption_manager/output",
+                        "Type": "[unknown type]",
+                        "Description": ""
+                    },
+                    {
+                        "Name": "/airos/stop_all",
+                        "Type": "[std_msgs/Empty]",
+                        "Description": ""
+                    }
+                ]
+            ],
+            "Services": [
+                [
+                    {
+                        "Name": "/airos5/tts/get_language",
+                        "Description": ""
+                    },
+                    {
+                        "Name": "/airos/tts/get_language",
+                        "Description": ""
+                    },
+                    {
+                        "Name": "/airos/tts/say",
+                        "Description": ""
+                    },
+                    {
+                        "Name": "/airos/tts/tts_node/set_logger_level",
+                        "Description": ""
+                    },
+                    {
+                        "Name": "/airos5/tts/get_available_languages",
+                        "Description": ""
+                    },
+                    {
+                        "Name": "/airos5/tts/is_language_available",
+                        "Description": ""
+                    },
+                    {
+                        "Name": "/airos/tts/get_available_languages",
+                        "Description": ""
+                    },
+                    {
+                        "Name": "/airos5/tts/set_tts",
+                        "Description": ""
+                    },
+                    {
+                        "Name": "/airos5/tts/say_performance",
+                        "Description": ""
+                    },
+                    {
+                        "Name": "/airos/tts/set_voice",
+                        "Description": ""
+                    },
+                    {
+                        "Name": "/airos/tts/get_voice",
+                        "Description": ""
+                    },
+                    {
+                        "Name": "/airos/tts/get_tts_name",
+                        "Description": ""
+                    },
+                    {
+                        "Name": "/airos/tts/set_language",
+                        "Description": ""
+                    },
+                    {
+                        "Name": "/airos/tts/say_emotion",
+                        "Description": ""
+                    },
+                    {
+                        "Name": "/airos/tts/tts_node/get_loggers",
+                        "Description": ""
+                    },
+                    {
+                        "Name": "/airos5/tts/say",
+                        "Description": ""
+                    },
+                    {
+                        "Name": "/airos5/tts/set_language",
+                        "Description": ""
+                    },
+                    {
+                        "Name": "/airos/tts/say_performance",
+                        "Description": ""
+                    },
+                    {
+                        "Name": "/airos/tts/set_tts",
+                        "Description": ""
+                    },
+                    {
+                        "Name": "/airos/tts/say_from_file",
+                        "Description": ""
+                    },
+                    {
+                        "Name": "/airos5/tts/get_tts_name",
+                        "Description": ""
+                    },
+                    {
+                        "Name": "/airos/tts/is_language_available",
+                        "Description": ""
+                    }
+                ]
+            ]
+        },
+        {
+            "Name": "airos5/color_vision/color_vision_ros",
+            "Publications": [
+                [
+                    {
+                        "Name": "/airos5/nodelet_manager/bond",
+                        "Type": "[bond/Status]",
+                        "Description": ""
+                    },
+                    {
+                        "Name": "/rosout",
+                        "Type": "[rosgraph_msgs/Log]",
+                        "Description": ""
+                    }
+                ]
+            ],
+            "Subscriptions": [
+                [
+                    {
+                        "Name": "/airos5/nodelet_manager/bond",
+                        "Type": "[bond/Status]",
+                        "Description": ""
+                    }
+                ]
+            ],
+            "Services": [
+                [
+                    {
+                        "Name": "/airos5/color_vision/color_vision_ros/set_logger_level",
+                        "Description": ""
+                    },
+                    {
+                        "Name": "/airos5/color_vision/color_vision_ros/get_loggers",
+                        "Description": ""
+                    }
+                ]
+            ]
+        },
+        {
+            "Name": "airos5/nodelet_manager",
+            "Publications": [
+                [
+                    {
+                        "Name": "/airos5/error",
+                        "Type": "[std_msgs/String]",
+                        "Description": ""
+                    },
+                    {
+                        "Name": "/airos5/vision/dark",
+                        "Type": "[std_msgs/Bool]",
+                        "Description": ""
+                    },
+                    {
+                        "Name": "/airos5/nodelet_manager/bond",
+                        "Type": "[bond/Status]",
+                        "Description": ""
+                    },
+                    {
+                        "Name": "/rosout",
+                        "Type": "[rosgraph_msgs/Log]",
+                        "Description": ""
+                    },
+                    {
+                        "Name": "/airos5/color_vision/detected",
+                        "Type": "[std_msgs/String]",
+                        "Description": ""
+                    },
+                    {
+                        "Name": "/airos5/qr/code",
+                        "Type": "[std_msgs/String]",
+                        "Description": ""
+                    },
+                    {
+                        "Name": "/airos4/qr/code",
+                        "Type": "[std_msgs/String]",
+                        "Description": ""
+                    },
+                    {
+                        "Name": "/airos4/vision/dark",
+                        "Type": "[std_msgs/Bool]",
+                        "Description": ""
+                    }
+                ]
+            ],
+            "Subscriptions": [
+                [
+                    {
+                        "Name": "/airos5/nodelet_manager/bond",
+                        "Type": "[bond/Status]",
+                        "Description": ""
+                    },
+                    {
+                        "Name": "/airos5/camera/image_low",
+                        "Type": "[sensor_msgs/Image]",
+                        "Description": ""
+                    }
+                ]
+            ],
+            "Services": [
+                [
+                    {
+                        "Name": "/airos5/nodelet_manager/unload_nodelet",
+                        "Description": ""
+                    },
+                    {
+                        "Name": "/airos5/nodelet_manager/get_loggers",
+                        "Description": ""
+                    },
+                    {
+                        "Name": "/airos5/nodelet_manager/list",
+                        "Description": ""
+                    },
+                    {
+                        "Name": "/airos5/nodelet_manager/load_nodelet",
+                        "Description": ""
+                    },
+                    {
+                        "Name": "/airos5/nodelet_manager/set_logger_level",
+                        "Description": ""
+                    }
+                ]
+            ]
+        },
+        {
+            "Name": "airos5/qr/qr_ros",
+            "Publications": [
+                [
+                    {
+                        "Name": "/airos5/nodelet_manager/bond",
+                        "Type": "[bond/Status]",
+                        "Description": ""
+                    },
+                    {
+                        "Name": "/rosout",
+                        "Type": "[rosgraph_msgs/Log]",
+                        "Description": ""
+                    }
+                ]
+            ],
+            "Subscriptions": [
+                [
+                    {
+                        "Name": "/airos5/nodelet_manager/bond",
+                        "Type": "[bond/Status]",
+                        "Description": ""
+                    }
+                ]
+            ],
+            "Services": [
+                [
+                    {
+                        "Name": "/airos5/qr/qr_ros/set_logger_level",
+                        "Description": ""
+                    },
+                    {
+                        "Name": "/airos5/qr/qr_ros/get_loggers",
+                        "Description": ""
+                    }
+                ]
+            ]
+        },
+        {
+            "Name": "airos5/vision/vision_ros",
+            "Publications": [
+                [
+                    {
+                        "Name": "/airos5/nodelet_manager/bond",
+                        "Type": "[bond/Status]",
+                        "Description": ""
+                    },
+                    {
+                        "Name": "/rosout",
+                        "Type": "[rosgraph_msgs/Log]",
+                        "Description": ""
+                    }
+                ]
+            ],
+            "Subscriptions": [
+                [
+                    {
+                        "Name": "/airos5/nodelet_manager/bond",
+                        "Type": "[bond/Status]",
+                        "Description": ""
+                    }
+                ]
+            ],
+            "Services": [
+                [
+                    {
+                        "Name": "/airos5/vision/vision_ros/get_loggers",
+                        "Description": ""
+                    },
+                    {
+                        "Name": "/airos5/vision/vision_ros/set_logger_level",
+                        "Description": ""
+                    }
+                ]
+            ]
+        },
+        {
+            "Name": "kik/actions/actions_node",
+            "Publications": [
+                [
+                    {
+                        "Name": "/airos/audio/play",
+                        "Type": "[airos_msgs/PlayAudio]",
+                        "Description": ""
+                    },
+                    {
+                        "Name": "/airos/vision/start_detection",
+                        "Type": "[std_msgs/String]",
+                        "Description": ""
+                    },
+                    {
+                        "Name": "/airos/display/draw",
+                        "Type": "[std_msgs/String]",
+                        "Description": ""
+                    },
+                    {
+                        "Name": "/kik/actions/finished_id",
+                        "Type": "[std_msgs/Int32]",
+                        "Description": ""
+                    },
+                    {
+                        "Name": "/airos/color/set_name",
+                        "Type": "[airos_msgs/SetColorName]",
+                        "Description": ""
+                    },
+                    {
+                        "Name": "/airos/servo/set_simple",
+                        "Type": "[airos_msgs/SetServoSimple]",
+                        "Description": ""
+                    },
+                    {
+                        "Name": "/airos/color/set",
+                        "Type": "[airos_msgs/SetRgb]",
+                        "Description": ""
+                    },
+                    {
+                        "Name": "/airos/tts/say_topic",
+                        "Type": "[airos_msgs/SayTopic]",
+                        "Description": ""
+                    },
+                    {
+                        "Name": "/kik/actions/working",
+                        "Type": "[std_msgs/Bool]",
+                        "Description": ""
+                    },
+                    {
+                        "Name": "/rosout",
+                        "Type": "[rosgraph_msgs/Log]",
+                        "Description": ""
+                    },
+                    {
+                        "Name": "/airos/color/blink",
+                        "Type": "[std_msgs/Bool]",
+                        "Description": ""
+                    },
+                    {
+                        "Name": "/airos/audio/stop",
+                        "Type": "[std_msgs/Empty]",
+                        "Description": ""
+                    },
+                    {
+                        "Name": "/airos/face/new_task",
+                        "Type": "[std_msgs/String]",
+                        "Description": ""
+                    },
+                    {
+                        "Name": "/airos/servo/set",
+                        "Type": "[airos_msgs/SetServo]",
+                        "Description": ""
+                    }
+                ]
+            ],
+            "Subscriptions": [
+                [
+                    {
+                        "Name": "/airos/servo/finished_id",
+                        "Type": "[std_msgs/Int32]",
+                        "Description": ""
+                    },
+                    {
+                        "Name": "/airos/vision/get_detection",
+                        "Type": "[unknown type]",
+                        "Description": ""
+                    },
+                    {
+                        "Name": "/kik/actions/start",
+                        "Type": "[std_msgs/String]",
+                        "Description": ""
+                    },
+                    {
+                        "Name": "/airos/tts/finished_id",
+                        "Type": "[std_msgs/Int32]",
+                        "Description": ""
+                    },
+                    {
+                        "Name": "/airos/color/finished_id",
+                        "Type": "[std_msgs/Int32]",
+                        "Description": ""
+                    },
+                    {
+                        "Name": "/kik/actions/start_id",
+                        "Type": "[unknown type]",
+                        "Description": ""
+                    },
+                    {
+                        "Name": "/airos/accel/data",
+                        "Type": "[airos_msgs/Accelerometer]",
+                        "Description": ""
+                    }
+                ]
+            ],
+            "Services": [
+                [
+                    {
+                        "Name": "/kik/actions/actions_node/get_loggers",
+                        "Description": ""
+                    },
+                    {
+                        "Name": "/kik/actions/actions_node/set_logger_level",
+                        "Description": ""
+                    }
+                ]
+            ]
+        },
+        {
+            "Name": "kik/emotional_engine/emotions_node",
+            "Publications": [
+                [
+                    {
+                        "Name": "/airos/performance/set_emotion",
+                        "Type": "[std_msgs/String]",
+                        "Description": ""
+                    },
+                    {
+                        "Name": "/kik/emotional_engine/action",
+                        "Type": "[std_msgs/String]",
+                        "Description": ""
+                    },
+                    {
+                        "Name": "/kik/emotional_engine/event",
+                        "Type": "[std_msgs/String]",
+                        "Description": ""
+                    },
+                    {
+                        "Name": "/kik/emotional_engine/data",
+                        "Type": "[airos_msgs/EM]",
+                        "Description": ""
+                    },
+                    {
+                        "Name": "/rosout",
+                        "Type": "[rosgraph_msgs/Log]",
+                        "Description": ""
+                    },
+                    {
+                        "Name": "/kik/actions/start",
+                        "Type": "[std_msgs/String]",
+                        "Description": ""
+                    },
+                    {
+                        "Name": "/kik/emotional_engine/emotion",
+                        "Type": "[std_msgs/String]",
+                        "Description": ""
+                    }
+                ]
+            ],
+            "Subscriptions": [
+                [
+                    {
+                        "Name": "/kik/events/data",
+                        "Type": "[std_msgs/String]",
+                        "Description": ""
+                    },
+                    {
+                        "Name": "/airos/asr/recognition",
+                        "Type": "[std_msgs/String]",
+                        "Description": ""
+                    },
+                    {
+                        "Name": "/airos/botapp/state",
+                        "Type": "[std_msgs/String]",
+                        "Description": ""
+                    },
+                    {
+                        "Name": "/kik/state/active",
+                        "Type": "[std_msgs/Bool]",
+                        "Description": ""
+                    },
+                    {
+                        "Name": "/airos/stop_all",
+                        "Type": "[std_msgs/Empty]",
+                        "Description": ""
+                    }
+                ]
+            ],
+            "Services": [
+                [
+                    {
+                        "Name": "/kik/emotional_engine/emotions_node/set_logger_level",
+                        "Description": ""
+                    },
+                    {
+                        "Name": "/kik/emotional_engine/emotions_node/get_loggers",
+                        "Description": ""
+                    },
+                    {
+                        "Name": "/kik/emotions/set_kik_mode",
+                        "Description": ""
+                    },
+                    {
+                        "Name": "/kik/emotions/get_kik_mode",
+                        "Description": ""
+                    }
+                ]
+            ]
+        },
+        {
+            "Name": "kik/events/events_node",
+            "Publications": [
+                [
+                    {
+                        "Name": "/kik/events/data",
+                        "Type": "[std_msgs/String]",
+                        "Description": ""
+                    },
+                    {
+                        "Name": "/kik/presence",
+                        "Type": "[std_msgs/Bool]",
+                        "Description": ""
+                    },
+                    {
+                        "Name": "/airos/performance/start_private_performance",
+                        "Type": "[std_msgs/String]",
+                        "Description": ""
+                    },
+                    {
+                        "Name": "/rosout",
+                        "Type": "[rosgraph_msgs/Log]",
+                        "Description": ""
+                    },
+                    {
+                        "Name": "/kik/actions/start",
+                        "Type": "[std_msgs/String]",
+                        "Description": ""
+                    },
+                    {
+                        "Name": "/kik/state/active",
+                        "Type": "[std_msgs/Bool]",
+                        "Description": ""
+                    },
+                    {
+                        "Name": "/kik/presence/state",
+                        "Type": "[std_msgs/String]",
+                        "Description": ""
+                    }
+                ]
+            ],
+            "Subscriptions": [
+                [
+                    {
+                        "Name": "/kik/actions/working",
+                        "Type": "[std_msgs/Bool]",
+                        "Description": ""
+                    },
+                    {
+                        "Name": "/airos/touch/data",
+                        "Type": "[airos_msgs/TouchAiros6]",
+                        "Description": ""
+                    },
+                    {
+                        "Name": "/airos/asr/recognition",
+                        "Type": "[std_msgs/String]",
+                        "Description": ""
+                    },
+                    {
+                        "Name": "/airos/botapp/state",
+                        "Type": "[std_msgs/String]",
+                        "Description": ""
+                    },
+                    {
+                        "Name": "/kik/state/active",
+                        "Type": "[std_msgs/Bool]",
+                        "Description": ""
+                    },
+                    {
+                        "Name": "/kik/presence/state",
+                        "Type": "[std_msgs/String]",
+                        "Description": ""
+                    },
+                    {
+                        "Name": "/airos5/qr/code",
+                        "Type": "[std_msgs/String]",
+                        "Description": ""
+                    },
+                    {
+                        "Name": "/airos/accel/data",
+                        "Type": "[airos_msgs/Accelerometer]",
+                        "Description": ""
+                    }
+                ]
+            ],
+            "Services": [
+                [
+                    {
+                        "Name": "/kik/events/events_node/set_logger_level",
+                        "Description": ""
+                    },
+                    {
+                        "Name": "/kik/events/events_node/get_loggers",
+                        "Description": ""
+                    }
+                ]
+            ]
+        },
+        {
+            "Name": "kik/life/life_node",
+            "Publications": [
+                [
+                    {
+                        "Name": "/rosout",
+                        "Type": "[rosgraph_msgs/Log]",
+                        "Description": ""
+                    },
+                    {
+                        "Name": "/kik/life/age",
+                        "Type": "[std_msgs/String]",
+                        "Description": ""
+                    }
+                ]
+            ],
+            "Subscriptions": [
+                [
+                    {
+                        "Name": "/kik/emotional_engine/data",
+                        "Type": "[airos_msgs/EM]",
+                        "Description": ""
+                    },
+                    {
+                        "Name": "/airos/botapp/state",
+                        "Type": "[std_msgs/String]",
+                        "Description": ""
+                    }
+                ]
+            ],
+            "Services": [
+                [
+                    {
+                        "Name": "/kik/life/get_age",
+                        "Description": ""
+                    },
+                    {
+                        "Name": "/kik/life/life_node/set_logger_level",
+                        "Description": ""
+                    },
+                    {
+                        "Name": "/kik/life/life_node/get_loggers",
+                        "Description": ""
+                    }
+                ]
+            ]
+        },
+        {
+            "Name": "kik/mentor/mentor_node",
+            "Publications": [
+                [
+                    {
+                        "Name": "/rosout",
+                        "Type": "[rosgraph_msgs/Log]",
+                        "Description": ""
+                    }
+                ]
+            ],
+            "Subscriptions": [
+                []
+            ],
+            "Services": [
+                [
+                    {
+                        "Name": "/kik/mentor/get_mi_profile_list",
+                        "Description": ""
+                    },
+                    {
+                        "Name": "/kik/mentor/get_category_recomendation",
+                        "Description": ""
+                    },
+                    {
+                        "Name": "/kik/mentor/mentor_node/get_loggers",
+                        "Description": ""
+                    },
+                    {
+                        "Name": "/kik/mentor/mentor_node/set_logger_level",
+                        "Description": ""
+                    }
+                ]
+            ]
+        },
+        {
+            "Name": "rosbridge_scratch3",
+            "Publications": [
+                [
+                    {
+                        "Name": "/rosout",
+                        "Type": "[rosgraph_msgs/Log]",
+                        "Description": ""
+                    }
+                ]
+            ],
+            "Subscriptions": [
+                []
+            ],
+            "Services": [
+                [
+                    {
+                        "Name": "/rosbridge_scratch3/set_logger_level",
+                        "Description": ""
+                    },
+                    {
+                        "Name": "/rosbridge_scratch3/get_loggers",
+                        "Description": ""
+                    }
+                ]
+            ]
+        },
+        {
+            "Name": "rosbridge_websocket_aisoy_lab",
+            "Publications": [
+                [
+                    {
+                        "Name": "/rosout",
+                        "Type": "[rosgraph_msgs/Log]",
+                        "Description": ""
+                    }
+                ]
+            ],
+            "Subscriptions": [
+                []
+            ],
+            "Services": [
+                [
+                    {
+                        "Name": "/rosbridge_websocket_aisoy_lab/set_logger_level",
+                        "Description": ""
+                    },
+                    {
+                        "Name": "/rosbridge_websocket_aisoy_lab/get_loggers",
+                        "Description": ""
+                    }
+                ]
+            ]
+        }
+    ],
+    "Manufacturer": "",
+    "ManufacturerUrl": "",
+    "RobotModel": "",
+    "RobotStatus": "",
+    "TaskList": "",
+    "BatteryStatus": 0,
+    "MacAddress": "",
+    "LocomotionSystem": "",
+    "LocomotionTypes": "",
+    "Sensors": [
+        {
+            "Name": "",
+            "Nodes": [],
+            "Type": "",
+            "number": 1,
+            "Description": ""
+        }
+    ],
+    "Actuator": [
+        {
+            "Name": "",
+            "Number": 1,
+            "Type": "",
+            "Nodes": []
+        }
+    ],
+    "Manipulators": [],
+    "CPU": 1,
+    "RAM": 1,
+    "StorageDisk": 8,
+    "NumberCores": 1,
+    "Questions": []
+}
