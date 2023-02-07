@@ -2,7 +2,26 @@
 
 ## Register New User
 
-To create a new user in the system use the following endpoint. You will be required to enter a randomly generated GUID and a password. Remember this ones for future log in.Change localhost to the IP of your middleware is you are not working in development enviroment under visual studio. Here, we are using Postman. To create a new user in the system, use the following endpoint. You will be required to enter a randomly generated GUID and a password, and remember the details for future login.        
+To create a new user in the system use the following endpoint. You will be required to enter a randomly generated GUID and a password. Remember this ones for future log in.Change localhost to the IP of your middleware is you are not working in development enviroment under visual studio. Here, we are using Postman. To create a new user in the system, use the following endpoint. You will be required to enter a randomly generated GUID and a password, and remember the details for future login.     
+To run the onboarding script, copy the python file to the robot directory you prefer. Make sure the script have running permission.
+
+```
+chmod 777
+```
+
+Install the program dependences:
+
+```
+pip install -r requirements.txt
+```
+
+Launch the code with the following statement:
+
+```
+python3 onboarding_robot.py
+```
+
+The output file will be named **robot_onboarding_v1.json** and it will have the ROS node section completed by quering the ROS for each single node.   
 
 
 ```
