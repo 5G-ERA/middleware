@@ -1,4 +1,5 @@
-﻿using System.Text.Json.Serialization;
+﻿using Middleware.Models.Dto;
+using System.Text.Json.Serialization;
 
 namespace Middleware.Models.Domain;
 
@@ -60,7 +61,23 @@ public class CloudModel : BaseModel
     }
     public override Dto.Dto ToDto()
     {
-        throw new NotImplementedException();
+        var domain = this;
+        return new CloudDto()
+        {
+            Id = domain.Id.ToString(),
+            Name = domain.Name,
+            Type = domain.Type,
+            CloudStatus = domain.CloudStatus,
+            CloudIp = domain.CloudIp,
+            NumberOfCores = domain.NumberOfCores,
+            DiskStorage = domain.DiskStorage,
+            VirtualRam = domain.VirtualRam,
+            Cpu = domain.Cpu,
+            Ram = domain.Ram,
+            MacAddress = domain.MacAddress,
+            LastUpdatedTime = domain.LastUpdatedTime,
+            IsOnline = domain.IsOnline
+        };
 
     }
 }

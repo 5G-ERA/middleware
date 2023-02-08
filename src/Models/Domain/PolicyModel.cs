@@ -55,6 +55,7 @@ public class PolicyModel : BaseModel
             Name = domain.Name,
             Type = domain.Type,
             Timestamp = domain.Timestamp,
+            IsActive = domain.IsActive,
             Description = domain.Description,
             IsExclusiveWithinType = domain.IsExclusiveWithinType
         };
