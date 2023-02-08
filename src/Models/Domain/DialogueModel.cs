@@ -1,4 +1,5 @@
 ﻿using System.Text.Json.Serialization;
+using Middleware.Models.Dto;
 
 namespace Middleware.Models.Domain;
 
@@ -20,6 +21,14 @@ public class DialogueModel : BaseModel
     
     public override Dto.Dto ToDto()
     {
-        throw new NotImplementedException();
+        var domain = this;
+        return new DialogueDto()
+        {
+            Id = domain.Id.ToString(),
+            Name = domain.Name,
+            IsSingleAnswer = domain.IsSingleAnswer,
+            Answer = domain.Answer.ToList(),
+
+        };
     }
 }
