@@ -1,4 +1,5 @@
 ﻿using System.Text.Json.Serialization;
+using Middleware.Models.Dto;
 using Middleware.Models.Enums;
 
 namespace Middleware.Models.Domain;
@@ -86,6 +87,28 @@ public class InstanceModel : BaseModel
     }
     public override Dto.Dto ToDto()
     {
-        throw new NotImplementedException();
+        var domain = this;
+        return new InstanceDto()
+        {
+            Id = domain.Id.ToString(),
+            Name = domain.Name,
+            ServiceInstanceId = domain.ServiceInstanceId.ToString(),
+            ServiceType = domain.ServiceType,
+            IsReusable = domain.IsReusable,
+            DesiredStatus = domain.DesiredStatus,
+            ServiceUrl = domain.ServiceUrl,
+            RosTopicsPub = domain.RosTopicsPub.Select(x => x.ToDto()).ToList(),
+            RosTopicsSub = domain.RosTopicsSub.Select(x => x.ToDto()).ToList(),
+            RosVersion = domain.RosVersion,
+            ROSDistro = domain.ROSDistro,
+            Tags = domain.Tags,
+            InstanceFamily = domain.InstanceFamily,
+            SuccessRate = domain.SuccessRate,
+            ServiceStatus = domain.ServiceStatus,
+            ContainerImage = (ContainerImageDto)domain.ContainerImage.ToDto(),
+            MinimumRam = domain.MinimumRam,
+            MinimumNumCores = domain.MinimumNumCores,
+            OnboardedTime = domain.OnboardedTime
+        };
     }
 }

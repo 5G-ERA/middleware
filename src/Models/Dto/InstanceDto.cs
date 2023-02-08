@@ -45,6 +45,9 @@ public class InstanceDto : Dto
     [Indexed(Sortable = true)]
     public int MinimumNumCores { get; set; } = default!;
 
+    [Indexed(Sortable = true)]
+    public DateTime OnboardedTime { get; set; }
+
     public override BaseModel ToModel()
     {
         var dto = this;
@@ -67,7 +70,8 @@ public class InstanceDto : Dto
             ServiceStatus = dto.ServiceStatus,
             ContainerImage = dto.ContainerImage.ToModel(),
             MinimumRam = dto.MinimumRam,
-            MinimumNumCores = dto.MinimumNumCores
+            MinimumNumCores = dto.MinimumNumCores,
+            OnboardedTime = dto.OnboardedTime
         };
     }
 }
