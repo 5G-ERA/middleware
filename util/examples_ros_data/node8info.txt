@@ -1,0 +1,113 @@
+--------------------------------------------------------------------------------
+Node [/airos/face/faces_node]
+Publications: 
+ * /airos/face/detected [std_msgs/Int32]
+ * /airos/audio/play [airos_msgs/PlayAudio]
+ * /airos/vision/start_detection [std_msgs/String]
+ * /airos/color/set_name [airos_msgs/SetColorName]
+ * /airos/servo/set_simple [airos_msgs/SetServoSimple]
+ * /airos/color/set [airos_msgs/SetRgb]
+ * /rosout [rosgraph_msgs/Log]
+ * /airos/color/blink [std_msgs/Bool]
+ * /airos/audio/stop [std_msgs/Empty]
+ * /airos/face/new_task [std_msgs/String]
+ * /airos/servo/set [airos_msgs/SetServo]
+
+Subscriptions: 
+ * /airos/vision/get_detection [unknown type]
+ * /kik/presence [std_msgs/Bool]
+ * /airos/tts/is_talking [std_msgs/Bool]
+ * /airos/servo/is_moving [std_msgs/Bool]
+ * /airos/audio/is_playing [std_msgs/Bool]
+ * /airos/face/new_task [std_msgs/String]
+ * /airos/accel/data [airos_msgs/Accelerometer]
+
+Services: 
+ * /airos/language/set
+ * /airos/face/faces_node/set_logger_level
+ * /airos/face/erase_bbdd
+ * /airos/face/faces_node/get_loggers
+ * /airos/face/get_saved_users
+ * /airos/language/get
+
+
+contacting node http://127.0.0.1:41917/ ...
+Pid: 1449
+Connections:
+ * topic: /airos/servo/set_simple
+    * to: /airos/servo/servo_node
+    * direction: outbound
+    * transport: TCPROS
+ * topic: /airos/audio/play
+    * to: /airos/audio/audio_node
+    * direction: outbound
+    * transport: TCPROS
+ * topic: /airos/color/set_name
+    * to: /airos/color/color_node
+    * direction: outbound
+    * transport: TCPROS
+ * topic: /airos/servo/set
+    * to: /airos/servo/servo_node
+    * direction: outbound
+    * transport: TCPROS
+ * topic: /rosout
+    * to: /rosout
+    * direction: outbound
+    * transport: TCPROS
+ * topic: /airos/color/set
+    * to: /airos/color/color_node
+    * direction: outbound
+    * transport: TCPROS
+ * topic: /airos/color/blink
+    * to: /airos/color/color_node
+    * direction: outbound
+    * transport: TCPROS
+ * topic: /airos/audio/stop
+    * to: /airos/audio/audio_node
+    * direction: outbound
+    * transport: TCPROS
+ * topic: /airos/face/new_task
+    * to: /airos/face/faces_node
+    * direction: outbound
+    * transport: TCPROS
+ * topic: /airos/tts/is_talking
+    * to: /airos/tts/tts_node (http://127.0.0.1:37097/)
+    * direction: inbound
+    * transport: TCPROS
+ * topic: /airos/audio/is_playing
+    * to: /airos/audio/audio_node (http://127.0.0.1:35523/)
+    * direction: inbound
+    * transport: TCPROS
+ * topic: /airos/servo/is_moving
+    * to: /airos/servo/servo_node (http://127.0.0.1:32839/)
+    * direction: inbound
+    * transport: TCPROS
+ * topic: /airos/face/new_task
+    * to: /airos/system/system_node (http://127.0.0.1:41939/)
+    * direction: inbound
+    * transport: TCPROS
+ * topic: /airos/face/new_task
+    * to: /kik/actions/actions_node (http://127.0.0.1:43375/)
+    * direction: inbound
+    * transport: TCPROS
+ * topic: /airos/face/new_task
+    * to: /airos/face/faces_node (http://127.0.0.1:41917/)
+    * direction: inbound
+    * transport: TCPROS
+ * topic: /airos/accel/data
+    * to: /airos/accel/accel_node (http://127.0.0.1:35681/)
+    * direction: inbound
+    * transport: TCPROS
+ * topic: /kik/presence
+    * to: /kik/events/events_node (http://127.0.0.1:40859/)
+    * direction: inbound
+    * transport: TCPROS
+ * topic: /kik/presence
+    * to: /airos/state/state_node (http://127.0.0.1:42771/)
+    * direction: inbound
+    * transport: TCPROS
+ * topic: /kik/presence
+    * to: /airos/botapp/botapp_node (http://127.0.0.1:37943/)
+    * direction: inbound
+    * transport: TCPROS
+

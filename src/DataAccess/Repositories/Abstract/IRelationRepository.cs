@@ -27,5 +27,7 @@ namespace Middleware.DataAccess.Repositories.Abstract
         Task<bool> DeleteGraphModelAsync(GraphEntityModel model);
 
         Task<bool> DeleteRelationAsync(RelationModel relation);
+
+        Task<Dictionary<string, List<RedisGraphResult>>> GetAllRelations();
     }
 }

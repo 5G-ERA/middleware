@@ -4,12 +4,13 @@ using Middleware.Models.Dto;
 using Redis.OM;
 using Redis.OM.Contracts;
 using RedisGraphDotNet.Client;
+using Serilog;
 
-namespace Middleware.DataAccess.Repositories.Redis;
+namespace Middleware.DataAccess.Repositories;
 
 public class RedisActionRepository : RedisRepository<ActionModel, ActionDto>, IActionRepository
 {
-    public RedisActionRepository(IRedisConnectionProvider provider, IRedisGraphClient redisGraph) : base(provider, redisGraph, true)
+    public RedisActionRepository(IRedisConnectionProvider provider, IRedisGraphClient redisGraph, ILogger logger) : base(provider, redisGraph, true, logger)
     {
 
     }

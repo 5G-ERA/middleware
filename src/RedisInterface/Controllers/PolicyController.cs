@@ -94,7 +94,7 @@ namespace Middleware.RedisInterface.Controllers
         {
             try
             {
-                List<PolicyModel> models = await _policyRepository.GetAllPoliciesAsync();
+                List<PolicyModel> models = await _policyRepository.GetAllAsync();
                 if (models.Any() == false)
                 {
                     return NotFound(new ApiResponse((int)HttpStatusCode.NotFound, "Objects were not found."));

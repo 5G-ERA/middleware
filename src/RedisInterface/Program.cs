@@ -4,12 +4,14 @@ using Middleware.RedisInterface.Services;
 using Middleware.DataAccess.ExtensionMethods;
 using Middleware.RedisInterface.Services.Abstract;
 using Middleware.DataAccess.HostedServices;
+using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
 
+
 builder.RegisterSecretsManager();
 
-builder.UseElasticSerilogLogger();
+builder.ConfigureLogger();
 
 
 // Add services to the container.
@@ -42,6 +44,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+app.UseSerilogRequestLogging();
 
 //app.UseHttpsRedirection();
 

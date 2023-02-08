@@ -1,12 +1,9 @@
-﻿using Microsoft.Extensions.Logging;
-using Middleware.Common.Enums;
-using Middleware.DataAccess.Repositories.Abstract;
+﻿using Middleware.DataAccess.Repositories.Abstract;
 using Middleware.Models.Domain;
 using Middleware.Models.Dto;
-using Middleware.Models.Enums;
 using Redis.OM.Contracts;
 using RedisGraphDotNet.Client;
-using StackExchange.Redis;
+using Serilog;
 
 namespace Middleware.DataAccess.Repositories
 {
@@ -18,7 +15,7 @@ namespace Middleware.DataAccess.Repositories
         /// <param name="redisClient"></param>
         /// <param name="redisGraph"></param>
         /// <param name="logger"></param>
-        public RedisUserRepository(IRedisConnectionProvider provider, IRedisGraphClient redisGraph) : base(provider, redisGraph, true)
+        public RedisUserRepository(IRedisConnectionProvider provider, IRedisGraphClient redisGraph, ILogger logger) : base(provider, redisGraph, true, logger)
         {
         }
     }

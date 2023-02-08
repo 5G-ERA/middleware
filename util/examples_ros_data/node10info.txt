@@ -1,0 +1,46 @@
+--------------------------------------------------------------------------------
+Node [/airos/performance/performance_node]
+Publications: 
+ * /rosout [rosgraph_msgs/Log]
+
+Subscriptions: 
+ * /airos/performance/set_emotion [std_msgs/String]
+ * /airos/performance/stop_performance [unknown type]
+ * /airos/performance/stop_all_performances [unknown type]
+ * /kik/emotions/data [unknown type]
+ * /airos/performance/start_performance [std_msgs/String]
+ * /kik/life/age [std_msgs/String]
+
+Services: 
+ * /airos5/performance/set_emotion
+ * /airos/performance/get_emotion
+ * /airos/performance/set_emotion
+ * /airos/performance/performance_node/get_loggers
+ * /airos5/performance/get_emotion
+ * /airos/performance/performance_node/set_logger_level
+
+
+contacting node http://127.0.0.1:33045/ ...
+Pid: 1455
+Connections:
+ * topic: /rosout
+    * to: /rosout
+    * direction: outbound
+    * transport: TCPROS
+ * topic: /airos/performance/set_emotion
+    * to: /airos/state/state_node (http://127.0.0.1:42771/)
+    * direction: inbound
+    * transport: TCPROS
+ * topic: /airos/performance/set_emotion
+    * to: /kik/emotional_engine/emotions_node (http://127.0.0.1:42985/)
+    * direction: inbound
+    * transport: TCPROS
+ * topic: /airos/performance/start_performance
+    * to: /airos/state/state_node (http://127.0.0.1:42771/)
+    * direction: inbound
+    * transport: TCPROS
+ * topic: /kik/life/age
+    * to: /kik/life/life_node (http://127.0.0.1:34175/)
+    * direction: inbound
+    * transport: TCPROS
+

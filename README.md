@@ -16,6 +16,9 @@ For workshops demostrations and tutorials visit our [Youtube Channel](https://ww
 
 5G-ERA Middleware is the Orchestration software responsible for linking vertical applications managed by ROS (Robot Operating System), a 5G infrastructure managed by Open Source MANO (OSM) and the cloud-native network applications ([NetApps](https://github.com/5G-ERA/Reference-NetApp)). It realizes the 5G intent-based networking by utilizing the cloud-native design. The core principles and functionality of the Middleware cover the lifecycle management, recovery and error handling of the applications, and integration of the semantic planning into the orchestration process.
 
+## Where to start?
+Please, for the very initial description, setup and configuration, [follow](https://github.com/5G-ERA/middleware/tree/main/docs/0_Where_To_Start) 
+
 ## Design and Architecture
 
 The 5G-ERA Middleware is designed to connect three layers of application networks. First, it combines the ROS network on which the Robot specific application runs with the resource layer network. The Kubernetes network is managed by the OSM and the SDN Controllers that are part of the resource enablement network.

@@ -9,6 +9,7 @@ using NReJSON;
 using Redis.OM.Contracts;
 using RedisGraphDotNet.Client;
 using StackExchange.Redis;
+using ILogger = Serilog.ILogger;
 
 namespace Middleware.DataAccess.Repositories
 {
@@ -24,8 +25,7 @@ namespace Middleware.DataAccess.Repositories
         /// <param name="redisGraph"></param>
         /// <param name="logger"></param>
 
-
-        public RedisContainerImageRepository(IInstanceRepository instanceRepository, IRedisConnectionProvider provider, IRedisGraphClient redisGraph) : base(provider, redisGraph, true)
+        public RedisContainerImageRepository(IInstanceRepository instanceRepository, IRedisConnectionProvider provider, IRedisGraphClient redisGraph, ILogger logger) : base(provider, redisGraph, true, logger)
         {
             _instanceRepository = instanceRepository;
         }
