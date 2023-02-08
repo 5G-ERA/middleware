@@ -1,5 +1,7 @@
 ﻿using System.Text.Json.Serialization;
 using Middleware.Common.Enums;
+using Middleware.Models.Dto.Hardware;
+using Middleware.Models.Dto;
 
 namespace Middleware.Models.Domain;
 
@@ -24,7 +26,7 @@ public class PolicyModel : BaseModel
     public string Description { get; set; }
 
     [JsonPropertyName("IsExclusiveWithinType")]
-    public int IsExclusiveWithinType { get; set; }
+    public int IsExclusiveWithinType { get; set; } 
 
 
     /// <summary>
@@ -46,6 +48,15 @@ public class PolicyModel : BaseModel
     }
     public override Dto.Dto ToDto()
     {
-        throw new NotImplementedException();
+        var domain = this;
+        return new PolicyDto()
+        {
+            Id = domain.Id.ToString(),
+            Name = domain.Name,
+            Type = domain.Type,
+            Timestamp = domain.Timestamp,
+            Description = domain.Description,
+            IsExclusiveWithinType = domain.IsExclusiveWithinType
+        };
     }
 }
