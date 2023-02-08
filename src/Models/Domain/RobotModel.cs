@@ -1,4 +1,6 @@
 ﻿using System.Text.Json.Serialization;
+using System.Xml.Linq;
+using Middleware.Models.Dto;
 using Middleware.Models.Enums;
 
 namespace Middleware.Models.Domain;
@@ -70,10 +72,10 @@ public class RobotModel : BaseModel
     public List<SensorModel> Sensors { get; set; }
 
     [JsonPropertyName("Actuator")]
-    public List<ActuatorModel> Actuator { get; set; }
+    public List<ActuatorModel> Actuators { get; set; }
 
     [JsonPropertyName("Manipulators")]
-    public List<RobotManipulatorModel> Manipulators { get; set; }
+    public List<ManipulatorModel> Manipulators { get; set; }
 
     [JsonPropertyName("CPU")]
     public long Cpu { get; set; }
@@ -130,15 +132,15 @@ public class RobotModel : BaseModel
                 // if (string.IsNullOrEmpty(sensor.SensorLocation.ToString())) return false;
                 if (string.IsNullOrEmpty(sensor.Type.ToString())) return false;
                 if (!valSensorTypeEnum.Contains(sensor.Type)) return false;
-                if (sensor.number <= 0) return false;
+                if (sensor.Number <= 0) return false;
             }
         }
 
         //Check actuators validity
-        if (Actuator.Any() == true)
+        if (Actuators.Any() == true)
         {
             var valActuatorTypesEnum = Enum.GetNames(typeof(RobotActuatorTypesEnum)).ToList();
-            foreach (ActuatorModel actuator in Actuator)
+            foreach (ActuatorModel actuator in Actuators)
             {
                 if (string.IsNullOrEmpty(actuator.Name.ToString())) return false;
                 if (string.IsNullOrEmpty(actuator.Name.ToString())) return false;
@@ -150,12 +152,12 @@ public class RobotModel : BaseModel
         if (Manipulators.Any() == true)
         {
             var valActuatorTypesEnum = Enum.GetNames(typeof(RobotActuatorTypesEnum)).ToList();
-            foreach (RobotManipulatorModel manipulator in Manipulators)
+            foreach (ManipulatorModel manipulator in Manipulators)
             {
                 if (string.IsNullOrEmpty(manipulator.ActuatorName.ToString())) return false;
                 if (string.IsNullOrEmpty(manipulator.Dof.ToString())) return false;
                 if (manipulator.Dof <= 0) return false;
-                if (manipulator.number <= 0) return false;
+                if (manipulator.Number <= 0) return false;
             }
         }
 
@@ -199,6 +201,40 @@ public class RobotModel : BaseModel
     
     public override Dto.Dto ToDto()
     {
-        throw new NotImplementedException();
+
+        var domain = this;
+        return new RobotDto()
+        {
+            Id = domain.Id.ToString(),
+            Name = domain.Name,
+            RosVersion = domain.RosVersion,
+            RosDistro = domain.RosDistro,
+            MaximumPayload = domain.MaximumPayload,
+            MaximumTranslationalVelocity = domain.MaximumTranslationalVelocity,
+            MaximumRotationalVelocity = domain.MaximumRotationalVelocity,
+            RobotWeight = domain.RobotWeight,
+            ROSRepo = domain.ROSRepo,
+            ROSNodes = domain.ROSNodes,
+            Manufacturer = domain.Manufacturer,
+            ManufacturerUrl = domain.ManufacturerUrl,
+            RobotModelName = domain.RobotModelName,
+            RobotStatus = domain.RobotStatus,
+            CurrentTaskId = domain.CurrentTaskId.ToString(),
+            TaskList = domain.TaskList,
+            BatteryStatus = domain.BatteryStatus,
+            MacAddress = domain.MacAddress,
+            LocomotionSystem = domain.LocomotionSystem,
+            LocomotionTypes = domain.LocomotionTypes,
+            Sensors = domain.Sensors.Select(x => x.ToDto()).ToList(),
+            Actuators = domain.Actuators.Select(x => x.ToDto()).ToList(),
+            Manipulators = domain.Manipulators.Select(x => x.ToDto()).ToList(),
+            Cpu = domain.Cpu,
+            Ram = domain.Ram,
+            StorageDisk = domain.StorageDisk,
+            NumberCores = domain.NumberCores,
+            Questions = domain.Questions,
+            LastUpdatedTime = domain.LastUpdatedTime,
+            OnboardedTime = domain.OnboardedTime
+        };
     }
 }

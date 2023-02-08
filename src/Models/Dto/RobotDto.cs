@@ -13,7 +13,13 @@ public class RobotDto : Dto
     public override string Id { get; set; }
     [Indexed]
     public string? Name { get; set; }
-    
+
+    [Indexed]
+    public int RosVersion { get; set; }
+
+    [Indexed]
+    public string RosDistro { get; set; }
+
     [Indexed(JsonPath = "$.RosDistro")]
     public RosInfo Ros { get; set; } = new();
 
@@ -32,6 +38,22 @@ public class RobotDto : Dto
     [Indexed]
     public long MaximumTranslationalVelocity { get; set; }
 
+    [Indexed]
+    public Uri ROSRepo { get; set; }
+
+    [Indexed]
+    public List<ROSNodeModel> ROSNodes { get; set; }
+
+    [Indexed]
+    public string CurrentTaskId { get; set; }
+
+    [Indexed]
+    public List<string> TaskList { get; set; }
+
+    [Indexed]
+    public string LocomotionTypes { get; set; }
+
+
     public long MaximumRotationalVelocity { get; set; }
 
     public long RobotWeight { get; set; }
@@ -49,6 +71,25 @@ public class RobotDto : Dto
     public List<Actuator> Actuators { get; set; } = new();
     [Indexed]
     public List<Manipulator> Manipulators { get; set; } = new();
+
+    [Indexed]
+    public long Cpu { get; set; }
+
+    [Indexed]
+    public long Ram { get; set; }
+
+    [Indexed]
+    public long StorageDisk { get; set; }
+
+    [Indexed]
+    public long NumberCores { get; set; }
+
+    [Indexed]
+    public List<DialogueModel> Questions { get; set; }
+
+    [Indexed]
+    public DateTime OnboardedTime { get; set; }
+
     [Indexed]
     public List<string> QuestionIds { get; set; } = new();
     public HardwareSpec HardwareSpec { get; set; } = new();

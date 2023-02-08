@@ -1,4 +1,5 @@
-﻿using Redis.OM.Modeling;
+﻿using Middleware.Models.Domain;
+using Redis.OM.Modeling;
 
 namespace Middleware.Models.Dto.Ros;
 
@@ -14,4 +15,19 @@ public class Manipulator
     /// </summary>
     [Indexed]
     public int Dof { get; set; }
+
+    [Indexed]
+    public int Number { get; set; }
+
+
+    public ManipulatorModel ToModel()
+    {
+        var dto = this;
+        return new ManipulatorModel()
+        {
+            ActuatorName = dto.ActuatorName,
+            Dof = dto.Dof,
+            Number = dto.Number
+        };
+    }
 }
