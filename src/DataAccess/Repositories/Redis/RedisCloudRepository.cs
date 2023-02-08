@@ -1,6 +1,7 @@
 ﻿using System.Text.Json;
 using System.Xml.Linq;
 using Microsoft.Extensions.Logging;
+using Microsoft.IdentityModel.Tokens;
 using Middleware.Common.Enums;
 using Middleware.DataAccess.Repositories.Abstract;
 using Middleware.Models.Domain;
@@ -70,25 +71,21 @@ namespace Middleware.DataAccess.Repositories
         /// <returns></returns>
         public async Task<List<CloudModel>> GetFreeCloudsIdsAsync(List<CloudModel> cloudsToCheck)
         {
+            //get all clouds
             List<CloudModel> TempFreeClouds = new List<CloudModel>();
 
-            foreach (CloudModel cloudId in cloudsToCheck)
+            // Find all clouds that dont have a relationship of type -LOCATED_AT-
+
+            foreach (CloudModel cloud in cloudsToCheck)
             {
-                // Get cloud id from name
-                List<RelationModel> robotRelations = await GetRelation(
-                    cloudId.Id,
+                // Get only a list of relatioModel with relations that have a localited_At property and cloud iD.
+                List<RelationModel> relations = await GetRelation(
+                    cloud.Id,
                     "LOCATED_AT",
                     RelationDirection.Incoming);
 
-                foreach (RelationModel relationModel in robotRelations)
-                {
-                    if (relationModel.PointsTo != null)
-                    {
-                        CloudModel cloud = new CloudModel();
-                        cloud.Id = relationModel.PointsTo.Id;
-                        cloud.Name = relationModel.PointsTo.Name;
-                        TempFreeClouds.Add(cloud);
-                    }
+                if (relations.IsNullOrEmpty()){
+                    TempFreeClouds.Add(cloud);
                 }
             }
             return TempFreeClouds;
