@@ -31,39 +31,39 @@ public class IndexCreationService : IHostedService
         }
         if (info.Any(x => x == "actionPlan-idx") == false)
         {
-            await _provider.Connection.CreateIndexAsync(typeof(RobotDto));
+            await _provider.Connection.CreateIndexAsync(typeof(ActionPlanDto));
         }
         if (info.Any(x => x == "cloud-idx") == false)
         {
-            await _provider.Connection.CreateIndexAsync(typeof(RobotDto));
+            await _provider.Connection.CreateIndexAsync(typeof(CloudDto));
         }
         if (info.Any(x => x == "containerImage-idx") == false)
         {
-            await _provider.Connection.CreateIndexAsync(typeof(RobotDto));
+            await _provider.Connection.CreateIndexAsync(typeof(ContainerImageDto));
         }
         if (info.Any(x => x == "dialogue-idx") == false)
         {
-            await _provider.Connection.CreateIndexAsync(typeof(RobotDto));
+            await _provider.Connection.CreateIndexAsync(typeof(DialogueDto));
         }
         if (info.Any(x => x == "edge-idx") == false)
         {
-            await _provider.Connection.CreateIndexAsync(typeof(RobotDto));
+            await _provider.Connection.CreateIndexAsync(typeof(EdgeDto));
         }
         if (info.Any(x => x == "instance-idx") == false)
         {
-            await _provider.Connection.CreateIndexAsync(typeof(RobotDto));
+            await _provider.Connection.CreateIndexAsync(typeof(InstanceDto));
         }
         if (info.Any(x => x == "policy-idx") == false)
         {
-            await _provider.Connection.CreateIndexAsync(typeof(RobotDto));
+            await _provider.Connection.CreateIndexAsync(typeof(PolicyDto));
         }
         if (info.Any(x => x == "task-idx") == false)
         {
-            await _provider.Connection.CreateIndexAsync(typeof(RobotDto));
+            await _provider.Connection.CreateIndexAsync(typeof(TaskDto));
         }
         if (info.Any(x => x == "user-idx") == false)
         {
-            await _provider.Connection.CreateIndexAsync(typeof(RobotDto));
+            await _provider.Connection.CreateIndexAsync(typeof(UserDto));
         }
     }
 
