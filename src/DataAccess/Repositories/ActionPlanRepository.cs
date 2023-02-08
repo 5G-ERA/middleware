@@ -24,7 +24,7 @@ public class ActionPlanRepository : BaseRepository<ActionPlanModel>, IActionPlan
     /// Retrieves actionPlanModels 
     /// </summary>
     /// <returns> List<ActionPlanModel> </returns>
-    public async Task<List<ActionPlanModel>> GetActionPlanModelsAsync(Guid robotId)
+    public async Task<List<ActionPlanModel>> GetRobotActionPlans(Guid robotId)
     {
         List<ActionPlanModel> planModels = await ExecuteLuaQueryAsync("GetPlanByRobotId");
 

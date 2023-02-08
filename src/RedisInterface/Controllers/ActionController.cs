@@ -450,7 +450,7 @@ namespace Middleware.RedisInterface.Controllers
                     return BadRequest(new ApiResponse((int)HttpStatusCode.BadRequest, "Robot id has not been specified"));
                 }
                 // Get list of actionPlans from specific robotId.
-                List<ActionPlanModel> actionPlans = await _actionPlanRepository.GetActionPlanModelsAsync(robotId);
+                List<ActionPlanModel> actionPlans = await _actionPlanRepository.GetRobotActionPlans(robotId);
                 if (actionPlans == null)
                 {
                     return NotFound(new ApiResponse((int)HttpStatusCode.NotFound, "Object was not found."));
@@ -485,7 +485,7 @@ namespace Middleware.RedisInterface.Controllers
                     return BadRequest(new ApiResponse((int)HttpStatusCode.BadRequest, "Robot id has not been specified"));
                 }
                 // Get list of actionPlans from specific robotId.
-                List<ActionPlanModel> actionPlans = await _actionPlanRepository.GetActionPlanModelsAsync(robotId);
+                List<ActionPlanModel> actionPlans = await _actionPlanRepository.GetRobotActionPlans(robotId);
 
                 //Get the newest task of robot.
                 Dictionary<ActionPlanModel, DateTime> tempDic = new Dictionary<ActionPlanModel, DateTime>();

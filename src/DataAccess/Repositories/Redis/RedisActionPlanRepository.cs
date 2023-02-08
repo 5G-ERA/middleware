@@ -32,7 +32,7 @@ namespace Middleware.DataAccess.Repositories
         /// Retrieves all actionPlanModels associated with an specific robot Id.
         /// </summary>
         /// <returns> List<ActionPlanModel> </returns>
-        public async Task<List<ActionPlanModel>> GetActionPlanModelsAsync(Guid robotId)
+        public async Task<List<ActionPlanModel>> GetRobotActionPlans(Guid robotId)
         {
             var ActionPlans = FindQuery(Dto => Dto.RobotId == robotId.ToString()).ToList().Select(x => ToTModel(x)).ToList();
             return ActionPlans;
