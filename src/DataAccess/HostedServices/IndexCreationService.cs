@@ -29,6 +29,42 @@ public class IndexCreationService : IHostedService
         {
             await _provider.Connection.CreateIndexAsync(typeof(RobotDto));
         }
+        if (info.Any(x => x == "actionPlan-idx") == false)
+        {
+            await _provider.Connection.CreateIndexAsync(typeof(RobotDto));
+        }
+        if (info.Any(x => x == "cloud-idx") == false)
+        {
+            await _provider.Connection.CreateIndexAsync(typeof(RobotDto));
+        }
+        if (info.Any(x => x == "containerImage-idx") == false)
+        {
+            await _provider.Connection.CreateIndexAsync(typeof(RobotDto));
+        }
+        if (info.Any(x => x == "dialogue-idx") == false)
+        {
+            await _provider.Connection.CreateIndexAsync(typeof(RobotDto));
+        }
+        if (info.Any(x => x == "edge-idx") == false)
+        {
+            await _provider.Connection.CreateIndexAsync(typeof(RobotDto));
+        }
+        if (info.Any(x => x == "instance-idx") == false)
+        {
+            await _provider.Connection.CreateIndexAsync(typeof(RobotDto));
+        }
+        if (info.Any(x => x == "policy-idx") == false)
+        {
+            await _provider.Connection.CreateIndexAsync(typeof(RobotDto));
+        }
+        if (info.Any(x => x == "task-idx") == false)
+        {
+            await _provider.Connection.CreateIndexAsync(typeof(RobotDto));
+        }
+        if (info.Any(x => x == "user-idx") == false)
+        {
+            await _provider.Connection.CreateIndexAsync(typeof(RobotDto));
+        }
     }
 
     public Task StopAsync(CancellationToken cancellationToken)
