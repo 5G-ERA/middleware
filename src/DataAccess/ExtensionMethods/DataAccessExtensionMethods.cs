@@ -42,14 +42,14 @@ public static class DataAccessExtensionMethods
     public static IServiceCollection RegisterRepositories(this IServiceCollection services)
     {
         services.AddScoped<IActionRepository, RedisActionRepository>();
-        services.AddScoped<IActionPlanRepository, ActionPlanRepository>();
-        services.AddScoped<ICloudRepository, CloudRepository>();
-        services.AddScoped<IContainerImageRepository, ContainerImageRepository>();
-        services.AddScoped<IEdgeRepository, EdgeRepository>();
-        services.AddScoped<IInstanceRepository, InstanceRepository>();
-        services.AddScoped<IPolicyRepository, PolicyRepository>();
+        services.AddScoped<IActionPlanRepository, RedisActionPlanRepository>();
+        services.AddScoped<ICloudRepository, RedisCloudRepository>();
+        services.AddScoped<IContainerImageRepository, RedisContainerImageRepository>();
+        services.AddScoped<IEdgeRepository, RedisEdgeRepository>();
+        services.AddScoped<IInstanceRepository, RedisInstanceRepository>();
+        services.AddScoped<IPolicyRepository, RedisPolicyRepository>();
         services.AddScoped<IRobotRepository, RobotRepository>();
-        services.AddScoped<ITaskRepository, TaskRepository>();
+        services.AddScoped<ITaskRepository, RedisTaskRepository>();
         
 
         return services;
