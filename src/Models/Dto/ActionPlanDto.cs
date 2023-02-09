@@ -21,7 +21,7 @@ public class ActionPlanDto : Dto
     [Indexed(Sortable = true)]
     public DateTime LastStatusChange { get; set; }
     [Indexed]
-    public List<ActionModel> ActionSequence { get; set; }
+    public List<ActionDto> ActionSequence { get; set; }
     [Indexed]
     public string RobotId { get; set; }
     [Indexed(Sortable = true)]

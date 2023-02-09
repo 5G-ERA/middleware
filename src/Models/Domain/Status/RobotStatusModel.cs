@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using Middleware.Models.Dto;
 
 namespace Middleware.Models.Domain;
 
@@ -39,6 +40,15 @@ public class RobotStatusModel : BaseModel
     }
     public override Dto.Dto ToDto()
     {
-        throw new NotImplementedException();
+        var domain = this;
+        return new RobotStatusDto()
+        {
+            Id = domain.Id.ToString(),
+            Name = domain.Name,
+            ActionSequenceId = domain.ActionSequenceId.ToString(),
+            CurrentlyExecutedActionIndex = domain.CurrentlyExecutedActionIndex,
+            BatteryLevel = domain.BatteryLevel,
+            Timestamp = domain.Timestamp
+        };
     }
 }

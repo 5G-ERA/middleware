@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using Middleware.Models.Dto;
 
 namespace Middleware.Models.Domain;
 
@@ -38,6 +39,15 @@ public class NetAppStatusModel : BaseModel
     
     public override Dto.Dto ToDto()
     {
-        throw new NotImplementedException();
+        var domain = this;
+        return new NetAppStatusDto()
+        {
+            Id = domain.Id.ToString(),
+            Name = domain.Name,
+            HardLimit = domain.HardLimit,
+            OptimalLimit = domain.OptimalLimit,
+            CurrentRobotsCount = domain.CurrentRobotsCount,
+            Timestamp = domain.Timestamp
+        };
     }
 }

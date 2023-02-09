@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.Hosting;
+using Middleware.Common.Enums;
 using Middleware.Models.Dto;
 using Redis.OM;
 using Redis.OM.Contracts;
@@ -64,6 +65,14 @@ public class IndexCreationService : IHostedService
         if (info.Any(x => x == "user-idx") == false)
         {
             await _provider.Connection.CreateIndexAsync(typeof(UserDto));
+        }
+        if (info.Any(x => x == "robotStatus-idx") == false)
+        {
+            await _provider.Connection.CreateIndexAsync(typeof(RobotStatusDto));
+        }
+        if (info.Any(x => x == "netAppStatus-idx") == false) 
+        {
+            await _provider.Connection.CreateIndexAsync(typeof(NetAppStatusDto));
         }
     }
 

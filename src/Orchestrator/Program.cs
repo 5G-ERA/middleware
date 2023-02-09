@@ -5,6 +5,7 @@ using Middleware.Common.ExtensionMethods;
 using Middleware.DataAccess.ExtensionMethods;
 using Middleware.DataAccess.Repositories;
 using Middleware.DataAccess.Repositories.Abstract;
+using Middleware.DataAccess.Repositories.Redis;
 using Middleware.Orchestrator.ApiReference;
 using Middleware.Orchestrator.Config;
 using Middleware.Orchestrator.Deployment;
@@ -46,8 +47,8 @@ builder.Services.RegisterCommonServices();
 builder.Services.AddScoped<IApiClientBuilder, ApiClientBuilder>();
 builder.Services.AddScoped<IKubernetesBuilder, KubernetesBuilder>();
 builder.Services.AddScoped<IDeploymentService, DeploymentService>();
-builder.Services.AddScoped<INetAppStatusRepository, NetAppStatusRepository>();
-builder.Services.AddScoped<IRobotStatusRepository, RobotStatusRepository>();
+builder.Services.AddScoped<INetAppStatusRepository, RedisNetAppStatusRepository>();
+builder.Services.AddScoped<IRobotStatusRepository, RedisRobotStatusRepository>();
 
 builder.Services.AddHttpClient("healthCheckClient");
 
