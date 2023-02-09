@@ -12,7 +12,7 @@
         }
 
         public RelationModel(GraphEntityModel initiatesFrom, GraphEntityModel pointsTo, string relationName,
-            List<KeyValuePair> relationAttributes = null)
+            List<KeyValuePair> relationAttributes)
         {
             InitiatesFrom = initiatesFrom;
             PointsTo = pointsTo;
