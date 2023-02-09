@@ -31,7 +31,7 @@ public class RedisEdgeRepositoryTests
         var unusedEdges = allEdges.Take(2).ToList();
         var occupiedEdges = allEdges.Skip(2).ToList();
         var guidStr = Guid.NewGuid().ToString();
-        
+        var rng = new Random(420);
         var dummyNode = new Node(int.MaxValue)
         {
             Properties = new Dictionary<string, RedisValue>()
@@ -42,29 +42,44 @@ public class RedisEdgeRepositoryTests
             }
         };
         
-        var resultSet = new ResultSet();
-        resultSet.Metrics = new QueryExecutionMetrics();
-        resultSet.Results = new Dictionary<string, List<RedisGraphResult>>()
+        foreach (var dict in occupiedEdges)
         {
+            var resultSet = new ResultSet();
+            resultSet.Metrics = new QueryExecutionMetrics();
+            resultSet.Results = new Dictionary<string, List<RedisGraphResult>>()
             {
-                "initiatesFrom", new List<RedisGraphResult>()
                 {
-                    dummyNode, dummyNode
-                }
-            },
-            {
-                "PointsTo", new List<RedisGraphResult>(occupiedEdges.Select((c, idx) => new Node(idx)
+                    "initiatesFrom", new List<RedisGraphResult>(new[] { dummyNode })
+                },
                 {
-                    Properties = new Dictionary<string, RedisValue>()
+                    "PointsTo", new List<RedisGraphResult>
                     {
-                        { "ID", new RedisValue(c.Id.ToString()) },
-                        { "Type", new RedisValue("Edge") },
-                        { "Name", new RedisValue(c.Name) }
+                        new Node(rng.Next())
+                        {
+                            Properties = new Dictionary<string, RedisValue>()
+                            {
+                                { "ID", new RedisValue(dict.Id.ToString()) },
+                                { "Type", new RedisValue("EDGE") },
+                                { "Name", new RedisValue(dict.Name) }
+                            }
+                        }
                     }
-                }))
-            }
-        };
-        _graphClient.Query(Arg.Any<string>(), Arg.Any<string>()).Returns(resultSet);
+                }
+            };
+
+            _graphClient.Query(Arg.Any<string>(), Arg.Is<string>(t => t.Contains(dict.Id.ToString())))
+                .Returns(resultSet);
+        }
+
+        foreach (var edge in unusedEdges)
+        {
+            var resultSet = new ResultSet();
+            resultSet.Metrics = new QueryExecutionMetrics();
+            resultSet.Results = new Dictionary<string, List<RedisGraphResult>>();
+
+            _graphClient.Query(Arg.Any<string>(), Arg.Is<string>(t => t.Contains(edge.Id.ToString())))
+                .Returns(resultSet);
+        }
         // act
         var result = await _sut.GetFreeEdgesIdsAsync(allEdges);
         // assert

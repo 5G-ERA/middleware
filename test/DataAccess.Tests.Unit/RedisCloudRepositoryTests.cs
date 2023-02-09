@@ -30,29 +30,48 @@ public class RedisCloudRepositoryTests
         var allClouds = GetExampleClouds(4);
         var unusedClouds = allClouds.Take(2).ToList();
         var occupiedClouds = allClouds.Skip(2).ToList();
-
+        var rng = new Random(420);
         var dummyNode = GetGraphNode();
 
-        var resultSet = new ResultSet();
-        resultSet.Metrics = new QueryExecutionMetrics();
-        resultSet.Results = new Dictionary<string, List<RedisGraphResult>>()
+        foreach (var dict in occupiedClouds)
         {
+            var resultSet = new ResultSet();
+            resultSet.Metrics = new QueryExecutionMetrics();
+            resultSet.Results = new Dictionary<string, List<RedisGraphResult>>()
             {
-                "initiatesFrom", new List<RedisGraphResult>(Enumerable.Repeat(dummyNode, occupiedClouds.Count))
-            },
-            {
-                "PointsTo", new List<RedisGraphResult>(occupiedClouds.Select((c, idx) => new Node(idx)
                 {
-                    Properties = new Dictionary<string, RedisValue>()
+                    "initiatesFrom", new List<RedisGraphResult>(new[] { dummyNode })
+                },
+                {
+                    "PointsTo", new List<RedisGraphResult>
                     {
-                        { "ID", new RedisValue(c.Id.ToString()) },
-                        { "Type", new RedisValue("CLOUD") },
-                        { "Name", new RedisValue(c.Name) }
+                        new Node(rng.Next())
+                        {
+                            Properties = new Dictionary<string, RedisValue>()
+                            {
+                                { "ID", new RedisValue(dict.Id.ToString()) },
+                                { "Type", new RedisValue("CLOUD") },
+                                { "Name", new RedisValue(dict.Name) }
+                            }
+                        }
                     }
-                }))
-            }
-        };
-        _graphClient.Query(Arg.Any<string>(), Arg.Any<string>()).Returns(resultSet);
+                }
+            };
+
+            _graphClient.Query(Arg.Any<string>(), Arg.Is<string>(t => t.Contains(dict.Id.ToString())))
+                .Returns(resultSet);
+        }
+
+        foreach (var cloud in unusedClouds)
+        {
+            var resultSet = new ResultSet();
+            resultSet.Metrics = new QueryExecutionMetrics();
+            resultSet.Results = new Dictionary<string, List<RedisGraphResult>>();
+
+            _graphClient.Query(Arg.Any<string>(), Arg.Is<string>(t => t.Contains(cloud.Id.ToString())))
+                .Returns(resultSet);
+        }
+
         // act
         var result = await _sut.GetFreeCloudsIdsAsync(allClouds);
 
@@ -118,7 +137,6 @@ public class RedisCloudRepositoryTests
         result.Should().BeEquivalentTo(expectedList);
         result.Should().ContainInOrder(expectedList);
         result.Should().HaveSameCount(allClouds);
-
     }
 
     private List<CloudModel> GetExampleClouds(int cnt)
