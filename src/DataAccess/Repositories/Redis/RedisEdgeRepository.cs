@@ -82,26 +82,22 @@ namespace Middleware.DataAccess.Repositories
 
         public async Task<List<EdgeModel>> GetFreeEdgesIdsAsync(List<EdgeModel> edgesToCheck)
         {
-            //List<Guid> TempFreeEdges = new List<Guid>();
+            //get all clouds
             List<EdgeModel> TempFreeEdges = new List<EdgeModel>();
-            //edgesToCheck.AddRange(TempFreeEdges);
-            //TempFreeEdges = edgesToCheck;
 
-            foreach (EdgeModel edgeId in edgesToCheck)
+            // Find all clouds that dont have a relationship of type -LOCATED_AT-
+
+            foreach (EdgeModel edge in edgesToCheck)
             {
-                //Get edge id from name
-                List<RelationModel> robotRelations = await GetRelation(edgeId.Id, "LOCATED_AT", RelationDirection.Incoming);
+                // Get only a list of relatioModel with relations that have a localited_At property and cloud iD.
+                List<RelationModel> relations = await GetRelation(
+                    edge.Id,
+                    "LOCATED_AT",
+                    RelationDirection.Incoming);
 
-                foreach (RelationModel relationModel in robotRelations)
+                if (relations.Count ==0 )
                 {
-                    if (relationModel.PointsTo != null)
-                    {
-                        EdgeModel edge = new EdgeModel();
-                        edge.Id = relationModel.PointsTo.Id;
-                        edge.Name = relationModel.PointsTo.Name;
-                        //TempFreeEdges.Remove(relationModel.PointsTo.Id);
-                        TempFreeEdges.Add(edge);
-                    }
+                    TempFreeEdges.Add(edge);
                 }
             }
             return TempFreeEdges;

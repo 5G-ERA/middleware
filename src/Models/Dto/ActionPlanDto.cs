@@ -21,7 +21,7 @@ public class ActionPlanDto : Dto
     [Indexed(Sortable = true)]
     public DateTime LastStatusChange { get; set; }
     [Indexed]
-    public List<ActionDto> ActionSequence { get; set; }
+    public List<ActionModel> ActionSequence { get; set; }
     [Indexed]
     public string RobotId { get; set; }
     [Indexed(Sortable = true)]
@@ -38,7 +38,7 @@ public class ActionPlanDto : Dto
             Status = dto.Status,
             IsReplan = dto.IsReplan,
             LastStatusChange = dto.LastStatusChange,
-            ActionSequence = (List<ActionModel>)dto.ActionSequence.Select(x => x.ToModel()),
+            ActionSequence = (List<ActionModel>)dto.ActionSequence,
             RobotId = Guid.Parse(dto.RobotId),
             TaskStartedAt = (DateTime)dto.TaskStartedAt
         };

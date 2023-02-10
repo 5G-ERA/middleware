@@ -3,8 +3,8 @@
 [Serializable]
 public class MappingException : Exception
 {
-    public Type TypeFrom { get; set; }
-    public Type TypeTo { get; set; }
+    public Type TypeFrom { get;  }
+    public Type TypeTo { get;  }
 
     public MappingException(Type typeFrom, Type typeTo) : base(message: $"Cannot convert {typeFrom} to {typeTo}")
     {

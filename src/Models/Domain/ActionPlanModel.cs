@@ -66,7 +66,7 @@ public sealed class ActionPlanModel : BaseModel
             Status = domain.Status,
             IsReplan = domain.IsReplan,
             LastStatusChange = domain.LastStatusChange,
-            ActionSequence = (List<ActionDto>)domain.ActionSequence.Select(x => x.ToDto()),
+            ActionSequence = domain.ActionSequence,
             RobotId = domain.RobotId.ToString(),
             TaskStartedAt = domain.TaskStartedAt,
         }; ;
