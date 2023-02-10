@@ -7,5 +7,6 @@
         public string HostName { get; set; }
 
         public string Password { get; set; }
+        public string ClusterHostname { get; set; }
     }
 }

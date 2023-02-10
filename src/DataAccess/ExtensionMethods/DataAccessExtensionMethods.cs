@@ -34,7 +34,7 @@ public static class DataAccessExtensionMethods
         RedisGraphClient redisGraphClient = new RedisGraphClient(multiplexer);
         builder.Services.AddSingleton<IRedisGraphClient>(redisGraphClient);
         
-        IRedisConnectionProvider provider = new RedisConnectionProvider("redis://localhost:6379");
+        IRedisConnectionProvider provider = new RedisConnectionProvider($"redis://{config.ClusterHostname}");
         builder.Services.AddSingleton<IRedisConnectionProvider>(provider);
         return builder;
     }
