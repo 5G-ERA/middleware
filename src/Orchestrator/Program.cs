@@ -10,17 +10,22 @@ using Middleware.Orchestrator.ExtensionMethods;
 
 var builder = WebApplication.CreateBuilder(args);
 
+builder.Configuration.AddEnvironmentVariables();
+
 builder.RegisterSecretsManager();
 
 builder.ConfigureLogger();
 
+
+
+var mwConfig = builder.Configuration.GetSection(MiddlewareConfig.ConfigName).Get<MiddlewareConfig>();
 const string mwInstanceName = "MIDDLEWARE_LOCATION_NAME";
 
 builder.Host.ConfigureAppConfiguration((hostingContext, _) =>
 {
     AppConfig.AppConfiguration = hostingContext.HostingEnvironment.EnvironmentName;
-    AppConfig.MiddlewareDeploymentLocationName = Environment.GetEnvironmentVariable(mwInstanceName) ??
-                                                 throw new ArgumentNullException(mwInstanceName,
+    AppConfig.MiddlewareDeploymentLocationName = mwConfig.InstanceName ??
+                                                 throw new ArgumentNullException(nameof(mwConfig.InstanceName),
                                                      "Name of the middleware instance has not been specified.");
     ServicePointManager.DnsRefreshTimeout = 60000;
     ServicePointManager.EnableDnsRoundRobin = true;

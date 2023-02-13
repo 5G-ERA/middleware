@@ -7,6 +7,7 @@ using Middleware.TaskPlanner.Services;
 
 
 var builder = WebApplication.CreateBuilder(args);
+builder.Configuration.AddEnvironmentVariables();
 
 builder.RegisterSecretsManager();
 
