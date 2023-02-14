@@ -33,8 +33,8 @@ public static class DataAccessExtensionMethods
         builder.Services.AddSingleton<IConnectionMultiplexer>(multiplexer);
         RedisGraphClient redisGraphClient = new RedisGraphClient(multiplexer);
         builder.Services.AddSingleton<IRedisGraphClient>(redisGraphClient);
-        
-        var mux2 = ConnectionMultiplexer.Connect(config.ClusterHostname, c => c.Password = config.Password);
+        //For the redis-cluster master node, port 6380 should be used, using port 6379 will point to the replicas of the redis-cluster
+        var mux2 = ConnectionMultiplexer.Connect($"{config.ClusterHostname}:6380", c => c.Password = config.Password);
         IRedisConnectionProvider provider = new RedisConnectionProvider(mux2);
         builder.Services.AddSingleton(provider);
         return builder;
