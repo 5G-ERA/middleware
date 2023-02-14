@@ -1,21 +1,19 @@
-﻿using MassTransit;
+﻿using k8s.KubeConfigModels;
+using MassTransit;
+using MassTransit.RabbitMqTransport.Configuration;
 using Middleware.Common.Config;
 using Middleware.Common.MessageContracts;
-using Middleware.Orchestrator.Handlers;
 using RabbitMQ.Client;
-using static MassTransit.Logging.OperationName;
 
-namespace Middleware.Orchestrator.ExtensionMethods;
+namespace Middleware.TaskPlanner.ExtensionMethods;
 
 public static class ServiceCollectionExtensions
 {
-    public static IServiceCollection RegisterRabbitMqConsumers(this IServiceCollection services,
-        RabbitMqConfig mqConfig, MiddlewareConfig mwConfig)
+    public static IServiceCollection RegisterRabbitMqPublishers(this IServiceCollection services,
+        RabbitMqConfig mqConfig)
     {
         services.AddMassTransit(x =>
         {
-            services.AddScoped<DeployPlanConsumer>();
-            x.AddConsumer<DeployPlanConsumer>();
             x.UsingRabbitMq((busRegistrationContext, mqBusFactoryConfigurator) =>
             {
                 //mqBusFactoryConfigurator.SetKebabCaseEndpointNameFormatter();
@@ -26,18 +24,12 @@ public static class ServiceCollectionExtensions
                     hostConfig.Username(mqConfig.User);
                     hostConfig.Password(mqConfig.Pass);
                 });
-
-                mqBusFactoryConfigurator.ReceiveEndpoint("deployments", ec =>
+                mqBusFactoryConfigurator.Send<DeployPlanMessage>(x =>
                 {
-                    ec.ConfigureConsumeTopology = false;
-                    ec.Bind(nameof(DeployPlanMessage), b =>
-                    {
-                        b.RoutingKey = mwConfig.InstanceName;
-                        b.ExchangeType = ExchangeType.Direct;
-                    });
-
-                    ec.ConfigureConsumer<DeployPlanConsumer>(busRegistrationContext);
+                    x.UseRoutingKeyFormatter(t => t.Message.DeploymentLocation);
                 });
+                mqBusFactoryConfigurator.Message<DeployPlanMessage>(x => x.SetEntityName(nameof(DeployPlanMessage)));
+                mqBusFactoryConfigurator.Publish<DeployPlanMessage>(x => { x.ExchangeType = ExchangeType.Direct; });
 
                 mqBusFactoryConfigurator.ConfigureEndpoints(busRegistrationContext);
             });

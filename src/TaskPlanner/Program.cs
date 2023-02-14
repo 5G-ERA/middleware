@@ -3,6 +3,7 @@ using Middleware.Common.Config;
 using Middleware.Common.ExtensionMethods;
 using Middleware.TaskPlanner.ApiReference;
 using Middleware.TaskPlanner.Config;
+using Middleware.TaskPlanner.ExtensionMethods;
 using Middleware.TaskPlanner.Services;
 
 
@@ -12,8 +13,9 @@ builder.Configuration.AddEnvironmentVariables();
 builder.RegisterSecretsManager();
 
 builder.ConfigureLogger();
+var mqConfig = builder.Configuration.GetSection(RabbitMqConfig.ConfigName).Get<RabbitMqConfig>();
 // Add services to the container.
-
+builder.Services.RegisterRabbitMqPublishers(mqConfig);
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();

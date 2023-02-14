@@ -16,10 +16,7 @@ builder.RegisterSecretsManager();
 
 builder.ConfigureLogger();
 
-
-
 var mwConfig = builder.Configuration.GetSection(MiddlewareConfig.ConfigName).Get<MiddlewareConfig>();
-const string mwInstanceName = "MIDDLEWARE_LOCATION_NAME";
 
 builder.Host.ConfigureAppConfiguration((hostingContext, _) =>
 {
@@ -41,8 +38,8 @@ builder.Services.AddSwaggerGen();
 builder.RegisterRedis();
 
 var rabbitmqConfig = builder.Configuration.GetSection(RabbitMqConfig.ConfigName).Get<RabbitMqConfig>();
-;
-builder.Services.RegisterRabbitMqConsumers(rabbitmqConfig)
+
+builder.Services.RegisterRabbitMqConsumers(rabbitmqConfig, mwConfig)
     .ConfigureAutoMapper();
 
 
