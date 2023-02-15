@@ -8,9 +8,10 @@ using Redis.OM.Modeling;
 
 namespace Middleware.Models.Dto
 {
-    [Document(IndexName = "robotStatus-idx", StorageType = StorageType.Json, Prefixes = new[] { "RobotStatus" })]
+    [Document(IndexName = "robotStatus-idx", StorageType = StorageType.Json, Prefixes = new[] { RobotStatusDto.Prefix })]
     public class RobotStatusDto : Dto
     {
+        public const string Prefix = "RobotStatus";
         [Indexed]
         [RedisIdField]
         public override string Id { get; set; }
@@ -37,7 +38,7 @@ namespace Middleware.Models.Dto
             var dto = this;
             return new RobotStatusModel()
             {
-                Id = Guid.Parse(dto.Id!),
+                Id = Guid.Parse(dto.Id!.Replace(Prefix, "")),
                 Name = dto.Name,
                 ActionSequenceId = Guid.Parse(dto.ActionSequenceId!),
                 CurrentlyExecutedActionIndex = dto.CurrentlyExecutedActionIndex,

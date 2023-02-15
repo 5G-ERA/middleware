@@ -3,9 +3,10 @@ using Redis.OM.Modeling;
 
 namespace Middleware.Models.Dto;
 
-[Document(IndexName = "policy-idx", StorageType = StorageType.Json, Prefixes = new[] { "Policy" })]
+[Document(IndexName = "policy-idx", StorageType = StorageType.Json, Prefixes = new[] { PolicyDto.Prefix })]
 public class PolicyDto: Dto
 {
+    public const string Prefix = "Policy";
     [Indexed]
     [RedisIdField]
     public override string Id { get; set; }
@@ -28,7 +29,7 @@ public class PolicyDto: Dto
         var dto = this;
         return new PolicyModel()
         {
-            Id = Guid.Parse(dto.Id!),
+            Id = Guid.Parse(dto.Id!.Replace(Prefix, "")),
             Name = dto.Name,
             Type = dto.Type,
             Timestamp = dto.Timestamp,

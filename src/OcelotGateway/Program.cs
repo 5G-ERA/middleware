@@ -48,7 +48,7 @@ builder.Services.AddAuthentication(
     });
 builder.RegisterRedis();
 
-builder.Services.AddScoped<IUserRepository, UserRepository>();
+builder.Services.AddScoped<IUserRepository, RedisUserRepository>();
 
 var app = builder.Build();
 

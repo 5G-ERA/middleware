@@ -3,9 +3,10 @@ using Redis.OM.Modeling;
 
 namespace Middleware.Models.Dto;
 
-[Document(IndexName = "edge-idx", StorageType = StorageType.Json, Prefixes = new[] { "Edge" })]
+[Document(IndexName = "edge-idx", StorageType = StorageType.Json, Prefixes = new[] { EdgeDto.Prefix })]
 public class EdgeDto : Dto
 {
+    public const string Prefix = "Edge";
     [Indexed]
     [RedisIdField]
     public override string Id { get; set; }
@@ -38,13 +39,13 @@ public class EdgeDto : Dto
     public override BaseModel ToModel()
     {
         var dto = this;
-        return new CloudModel()
+        return new EdgeModel()
         {
-            Id = Guid.Parse(dto.Id!),
+            Id = Guid.Parse(dto.Id!.Replace(Prefix, "")),
             Name = dto.Name,
             Type = dto.Type,
-            CloudStatus = dto.EdgeStatus,
-            CloudIp = dto.EdgeIp,
+            EdgeStatus = dto.EdgeStatus,
+            EdgeIp = dto.EdgeIp,
             NumberOfCores = dto.NumberOfCores,
             DiskStorage = dto.DiskStorage,
             VirtualRam = dto.VirtualRam,
@@ -55,5 +56,4 @@ public class EdgeDto : Dto
             IsOnline = dto.IsOnline
         };
     }
-
 }

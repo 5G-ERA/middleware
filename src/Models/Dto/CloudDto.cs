@@ -3,9 +3,10 @@ using Redis.OM.Modeling;
 
 namespace Middleware.Models.Dto;
 
-[Document(IndexName = "cloud-idx", StorageType = StorageType.Json, Prefixes = new[] { "Cloud" })]
+[Document(IndexName = "cloud-idx", StorageType = StorageType.Json, Prefixes = new[] { CloudDto.Prefix })]
 public class CloudDto : Dto
 {
+    public const string Prefix = "Cloud";
     [Indexed]
     [RedisIdField]
     public override string Id { get; set; }
@@ -40,7 +41,7 @@ public class CloudDto : Dto
         var dto = this;
         return new CloudModel()
         {
-            Id = Guid.Parse(dto.Id!),
+            Id = Guid.Parse(dto.Id!.Replace(Prefix, "")),
             Name = dto.Name,
             Type = dto.Type,
             CloudStatus = dto.CloudStatus,

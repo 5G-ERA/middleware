@@ -3,9 +3,10 @@ using Redis.OM.Modeling;
 
 namespace Middleware.Models.Dto
 {
-    [Document(IndexName = "netAppStatus-idx", StorageType = StorageType.Json, Prefixes = new[] { "NetAppStatus" })]
+    [Document(IndexName = "netAppStatus-idx", StorageType = StorageType.Json, Prefixes = new[] { NetAppStatusDto.Prefix })]
     public class NetAppStatusDto : Dto
     {
+        public const string Prefix = "NetAppStatus";
         [Indexed]
         [RedisIdField]
         public override string Id { get; set; }
@@ -30,7 +31,7 @@ namespace Middleware.Models.Dto
             var dto = this;
             return new NetAppStatusModel()
             {
-                Id = Guid.Parse(dto.Id!),
+                Id = Guid.Parse(dto.Id!.Replace(Prefix, "")),
                 Name = dto.Name,
                 HardLimit = dto.HardLimit,
                 OptimalLimit = dto.OptimalLimit,

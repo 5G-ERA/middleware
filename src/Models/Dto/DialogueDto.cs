@@ -4,9 +4,10 @@ using KeyValuePair = Middleware.Models.Domain.KeyValuePair;
 
 namespace Middleware.Models.Dto
 {
-    [Document(StorageType = StorageType.Json, IndexName = "dialogue-idx", Prefixes = new[] { "Dialogue" })]
+    [Document(StorageType = StorageType.Json, IndexName = "dialogue-idx", Prefixes = new[] { DialogueDto.Prefix })]
     public class DialogueDto : Dto
     {
+        public const string Prefix = "Dialogue";
         [Indexed]
         [RedisIdField]
         public override string Id { get; set; } = default!;
@@ -26,7 +27,7 @@ namespace Middleware.Models.Dto
             var dto = this;
             return new DialogueModel()
             {
-                Id = Guid.Parse(dto.Id!),
+                Id = Guid.Parse(dto.Id!.Replace(Prefix, "")),
                 Name = dto.Name,
                 IsSingleAnswer = dto.IsSingleAnswer,
                 Answer = dto.Answer

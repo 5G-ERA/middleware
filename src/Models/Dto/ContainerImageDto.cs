@@ -7,9 +7,10 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace Middleware.Models.Dto;
-[Document(IndexName = "containerImage-idx", StorageType = StorageType.Json, Prefixes = new[] { "ContainerImage" })]
+[Document(IndexName = "containerImage-idx", StorageType = StorageType.Json, Prefixes = new[] { ContainerImageDto.Prefix })]
 public class ContainerImageDto : Dto
 {
+    public const string Prefix = "ContainerImage";
     [Indexed]
     [RedisIdField]
     public override string Id { get; set; } = default!;
@@ -29,7 +30,7 @@ public class ContainerImageDto : Dto
         var dto = this;
         return new ContainerImageModel()
         {
-            Id = Guid.Parse(dto.Id!),
+            Id = Guid.Parse(dto.Id!.Replace(Prefix, "")),
             Name = dto.Name,
             Timestamp = dto.Timestamp,
             Description = dto.Description,

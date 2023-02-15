@@ -4,9 +4,10 @@ using Middleware.Models.Dto.Ros;
 
 namespace Middleware.Models.Dto;
 
-[Document(IndexName = "instance-idx", StorageType = StorageType.Json, Prefixes = new[] { "Instance" })]
+[Document(IndexName = "instance-idx", StorageType = StorageType.Json, Prefixes = new[] { InstanceDto.Prefix })]
 public class InstanceDto : Dto
 {
+    public const string Prefix = "Instance";
     [Indexed]
     [RedisIdField]
     public override string Id { get; set; } = default!;
@@ -53,7 +54,7 @@ public class InstanceDto : Dto
         var dto = this;
         return new InstanceModel()
         {
-            Id = Guid.Parse(dto.Id),
+            Id = Guid.Parse(dto.Id.Replace(Prefix, "")),
             Name = dto.Name,
             ServiceInstanceId = Guid.Parse(dto.ServiceInstanceId),
             ServiceType = dto.ServiceType,
