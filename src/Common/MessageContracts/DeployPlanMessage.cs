@@ -2,11 +2,18 @@
 
 namespace Middleware.Common.MessageContracts;
 
-public record DeployPlanMessage
+public record DeployPlanMessage : Message
 {
-    public string Message { get; init; }
+    /// <summary>
+    /// Middleware location name that 
+    /// </summary>
     public string DeploymentLocation { get; init; }
-    // public TaskModel Task { get; init; }
-    //
-    // public Guid RobotId { get; init; }
+    /// <summary>
+    /// The constructed task to be deployed
+    /// </summary>
+    public TaskModel Task { get; init; }
+    /// <summary>
+    /// Robot identifier
+    /// </summary>
+    public Guid RobotId { get; init; }
 }

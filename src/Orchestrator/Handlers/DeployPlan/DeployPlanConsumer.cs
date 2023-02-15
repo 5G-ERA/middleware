@@ -18,11 +18,7 @@ public class DeployPlanConsumer : IConsumer<DeployPlanMessage>
 
     public async Task Consume(ConsumeContext<DeployPlanMessage> ctx)
     {
-        //TODO: additional handlers
-        
-        var plan = ctx.Message ?? throw new ArgumentNullException("ctx.Message");
-        _logger.Warning(plan.Message);
-        Console.WriteLine(plan.Message);
-        //var result = await _deploymentService.DeployAsync(plan.Task, plan.RobotId);
+        var plan = ctx.Message;
+        var _ = await _deploymentService.DeployAsync(plan.Task, plan.RobotId);
     }
 }

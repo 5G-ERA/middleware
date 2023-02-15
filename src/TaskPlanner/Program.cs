@@ -1,11 +1,12 @@
 using System.Net.Http.Headers;
 using Middleware.Common.Config;
 using Middleware.Common.ExtensionMethods;
+using Middleware.Common.MessageContracts;
 using Middleware.TaskPlanner.ApiReference;
 using Middleware.TaskPlanner.Config;
 using Middleware.TaskPlanner.ExtensionMethods;
+using Middleware.TaskPlanner.Publishers;
 using Middleware.TaskPlanner.Services;
-
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Configuration.AddEnvironmentVariables();
@@ -36,6 +37,7 @@ builder.Services.RegisterCommonServices();
 builder.Services.AddScoped<IApiClientBuilder, ApiClientBuilder>();
 builder.Services.AddScoped<IActionPlanner, ActionPlanner>();
 builder.Services.AddScoped<IRedisInterfaceClientService, RedisInterfaceClientService>();
+builder.Services.AddScoped<IPublisher<DeployPlanMessage>, DeployPlanMessagePublisher>();
 
 var app = builder.Build();
 
