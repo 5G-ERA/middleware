@@ -7,6 +7,7 @@ using Middleware.Common.Enums;
 using Middleware.Common.ExtensionMethods;
 using Middleware.Common.Models;
 using Middleware.Common.Responses;
+using Middleware.Common.Services;
 using Middleware.Orchestrator.ApiReference;
 using Middleware.Orchestrator.Exceptions;
 using Middleware.Orchestrator.Models;
@@ -31,6 +32,9 @@ public class DeploymentService : IDeploymentService
     /// Logger instance
     /// </summary>
     private readonly ILogger _logger;
+
+    private readonly IRedisInterfaceClientService _redisInterfaceClient;
+
     /// <summary>
     /// Redis Interface client allowing to make calls to the Redis Cache
     /// </summary>
@@ -40,12 +44,13 @@ public class DeploymentService : IDeploymentService
     /// </summary>
     private readonly string _awsRegistryName;
 
-    public DeploymentService(IKubernetesBuilder kubernetesBuilder, IApiClientBuilder apiClientBuilder, IEnvironment env, IMapper mapper, ILogger<DeploymentService> logger)
+    public DeploymentService(IKubernetesBuilder kubernetesBuilder, IApiClientBuilder apiClientBuilder, IEnvironment env, IMapper mapper, ILogger<DeploymentService> logger, IRedisInterfaceClientService redisInterfaceClient)
     {
         _kubernetesBuilder = kubernetesBuilder;
         _env = env;
         _mapper = mapper;
         _logger = logger;
+        _redisInterfaceClient = redisInterfaceClient;
         _redisClient = apiClientBuilder.CreateRedisApiClient();
         _awsRegistryName = _env.GetEnvVariable("AWS_IMAGE_REGISTRY");
     }
@@ -64,6 +69,10 @@ public class DeploymentService : IDeploymentService
 
             foreach (var seq in task.ActionSequence)
             {
+                BaseModel location;
+                location = seq.PlacementType.ToLower().Contains("cloud")
+                    ? await _redisInterfaceClient.GetCloudByNameAsync(seq.Placement)
+                    : await _redisInterfaceClient.GetEdgeByNameAsync(seq.Placement);
                 foreach (var service in seq.Services)
                 {
                     try
@@ -73,6 +82,7 @@ public class DeploymentService : IDeploymentService
                             continue;
                         
                         await DeployService(k8SClient, service, deploymentNames);
+                        await _redisInterfaceClient.AddRelationAsync(service, location, "LOCATED_AT");
                     }
                     catch (Exception ex)
                     {

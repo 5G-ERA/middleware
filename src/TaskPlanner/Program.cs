@@ -2,6 +2,7 @@ using System.Net.Http.Headers;
 using Middleware.Common.Config;
 using Middleware.Common.ExtensionMethods;
 using Middleware.Common.MessageContracts;
+using Middleware.Common.Services;
 using Middleware.TaskPlanner.ApiReference;
 using Middleware.TaskPlanner.Config;
 using Middleware.TaskPlanner.ExtensionMethods;

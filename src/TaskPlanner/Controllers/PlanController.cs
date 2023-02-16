@@ -3,6 +3,7 @@ using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 using Middleware.Common.Models;
 using Middleware.Common.Responses;
+using Middleware.Common.Services;
 using Middleware.TaskPlanner.ApiReference;
 using Middleware.TaskPlanner.Services;
 
@@ -87,25 +88,10 @@ namespace Middleware.TaskPlanner.Controllers
                 //TODO: orchestrator has to create the relations between the instance and the location the services are deployed in
                 /*Orchestrator.OrchestratorResourceInput tmpTaskOrchestratorSend =
                     _mapper.Map<Orchestrator.OrchestratorResourceInput>(resourcePlan);
-
-
                 Orchestrator.TaskModel tmpFinalOrchestratorTask =
                     await _orchestratorClient.InstantiateNewPlanAsync(tmpTaskOrchestratorSend);
                 TaskModel finalPlan = _mapper.Map<TaskModel>(tmpFinalOrchestratorTask);
-
-                //Create LOCATED_AT relationship in redis from instance to edge/cloud resource.
-                foreach (ActionModel action in resourcePlan.ActionSequence)
-                {
-                    BaseModel location;
-                    location = action.PlacementType.ToLower().Contains("cloud")
-                        ? await _redisInterfaceClient.GetCloudByNameAsync(action.Placement)
-                        : await _redisInterfaceClient.GetEdgeByNameAsync(action.Placement);
-
-                    foreach (InstanceModel instance in action.Services)
-                    {
-                        var result = await _redisInterfaceClient.AddRelationAsync(instance, location, "LOCATED_AT");
-                    }
-                }
+         
                 */
                 return Ok(resourcePlan);
             }

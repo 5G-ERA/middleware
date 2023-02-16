@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Middleware.Common.MessageContracts;
 using Middleware.Common.Models;
+using Middleware.Common.Services;
 using Middleware.TaskPlanner.ApiReference;
 using Middleware.TaskPlanner.Exceptions;
 using Middleware.TaskPlanner.Publishers;

@@ -1,11 +1,13 @@
-﻿using System.Web;
+﻿using System.Net.Http.Json;
+using System.Web;
+using Microsoft.Extensions.Logging;
 using Middleware.Common.Config;
 using Middleware.Common.ExtensionMethods;
 using Middleware.Common.Models;
 using Middleware.Common.Structs;
 using Newtonsoft.Json;
 
-namespace Middleware.TaskPlanner.Services
+namespace Middleware.Common.Services
 {
     public class RedisInterfaceClientService : IRedisInterfaceClientService
     {
