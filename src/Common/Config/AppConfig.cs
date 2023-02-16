@@ -1,5 +1,4 @@
-﻿using System.Text;
-using k8s.Models;
+﻿using k8s.Models;
 using Middleware.Common.Enums;
 using Middleware.Common.ExtensionMethods;
 
@@ -60,4 +59,5 @@ public static class AppConfig
         builder.Path = "/status/netapp";
         return builder.ToString();
     }
+    public static string MiddlewareDeploymentLocationName { get; set; }
 }

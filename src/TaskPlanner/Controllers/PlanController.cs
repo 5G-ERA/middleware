@@ -3,6 +3,7 @@ using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 using Middleware.Common.Models;
 using Middleware.Common.Responses;
+using Middleware.Common.Services;
 using Middleware.TaskPlanner.ApiReference;
 using Middleware.TaskPlanner.Services;
 
@@ -15,7 +16,7 @@ namespace Middleware.TaskPlanner.Controllers
         private readonly IActionPlanner _actionPlanner;
         private readonly IMapper _mapper;
         private readonly ResourcePlanner.ResourcePlannerApiClient _resourcePlannerClient;
-        private readonly Orchestrator.OrchestratorApiClient _orchestratorClient;        
+        private readonly Orchestrator.OrchestratorApiClient _orchestratorClient;
         private readonly IRedisInterfaceClientService _redisInterfaceClient;
 
 
@@ -38,17 +39,18 @@ namespace Middleware.TaskPlanner.Controllers
             bool dryRun = false)
         {
             if (inputModel == null)
-            {
                 return BadRequest("Parameters were not specified.");
-            }
 
             if (inputModel.ContextKnown == false)
             {
-                return BadRequest(new ApiResponse((int)HttpStatusCode.BadRequest, "Semmantic planning is not yet available."));
+                return BadRequest(new ApiResponse((int)HttpStatusCode.BadRequest,
+                    "Semmantic planning is not yet available."));
             }
+
             if (inputModel.IsValid() == false)
             {
-                return BadRequest(new ApiResponse((int)HttpStatusCode.BadRequest, "Parameters were not specified or wrongly specified."));
+                return BadRequest(new ApiResponse((int)HttpStatusCode.BadRequest,
+                    "Parameters were not specified or wrongly specified."));
             }
 
             Guid id = inputModel.Id; //task id
@@ -67,48 +69,31 @@ namespace Middleware.TaskPlanner.Controllers
                 // call resource planner for resources
                 ResourcePlanner.TaskModel tmpTaskSend = _mapper.Map<ResourcePlanner.TaskModel>(plan);
                 ResourcePlanner.RobotModel tmpRobotSend = _mapper.Map<ResourcePlanner.RobotModel>(robot2);
-
                 ResourcePlanner.ResourceInput resourceInput = new ResourcePlanner.ResourceInput
                 {
                     Robot = tmpRobotSend,
                     Task = tmpTaskSend
                 };
                 ResourcePlanner.TaskModel tmpFinalTask =
-                    await _resourcePlannerClient.GetResourcePlanAsync(resourceInput); //API call to resource planner
+                    await _resourcePlannerClient.GetResourcePlanAsync(resourceInput); 
                 TaskModel resourcePlan = _mapper.Map<TaskModel>(tmpFinalTask);
 
                 if (dryRun) // Will skip the orchestrator if true (will not deploy the actual plan.)
                     return Ok(resourcePlan);
-                
-                // var robot = await _redisInterfaceClient.RobotGetByIdAsync(robotId);
-                // var task = await _redisInterfaceClient.TaskGetByIdAsync(id);
+
                 await _redisInterfaceClient.AddRelationAsync(robot2, resourcePlan, "OWNS");
                 
-                // call orchestrator for deployment of the resources
-                // Orchestrator.TaskModel tmpTaskOrchestratorSend = _mapper.Map<Orchestrator.TaskModel>(resourcePlan);
-                Orchestrator.OrchestratorResourceInput tmpTaskOrchestratorSend =
-                    _mapper.Map<Orchestrator.OrchestratorResourceInput>(resourcePlan);
+                await _actionPlanner.PublishPlanAsync(resourcePlan, robot2);
 
+                //TODO: orchestrator has to create the relations between the instance and the location the services are deployed in
+                /*Orchestrator.OrchestratorResourceInput tmpTaskOrchestratorSend =
+                    _mapper.Map<Orchestrator.OrchestratorResourceInput>(resourcePlan);
                 Orchestrator.TaskModel tmpFinalOrchestratorTask =
                     await _orchestratorClient.InstantiateNewPlanAsync(tmpTaskOrchestratorSend);
                 TaskModel finalPlan = _mapper.Map<TaskModel>(tmpFinalOrchestratorTask);
-                
-                //Create LOCATED_AT relationship in redis from instance to edge/cloud resource.
-                foreach (ActionModel action in resourcePlan.ActionSequence)
-                {
-                    BaseModel location;
-                    //TODO: recognize by type PlacementType property
-                    location = action.Placement.ToLower().Contains("cloud")
-                        ? await _redisInterfaceClient.GetCloudByNameAsync(action.Placement)
-                        : await _redisInterfaceClient.GetEdgeByNameAsync(action.Placement);
-
-                    foreach (InstanceModel instance in action.Services)
-                    {
-                        var result = await _redisInterfaceClient.AddRelationAsync(instance, location, "LOCATED_AT");
-                    }
-                }
-
-                return Ok(finalPlan);
+         
+                */
+                return Ok(resourcePlan);
             }
             catch (Orchestrator.ApiException<ResourcePlanner.ApiResponse> apiEx)
             {

@@ -1,15 +1,10 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
-using System.Xml.Linq;
-using AutoMapper;
+﻿using AutoMapper;
+using Middleware.Common.MessageContracts;
 using Middleware.Common.Models;
+using Middleware.Common.Services;
 using Middleware.TaskPlanner.ApiReference;
-using Middleware.Common.Repositories.Abstract;
 using Middleware.TaskPlanner.Exceptions;
-using Middleware.Common.Repositories;
-using System.Threading.Tasks;
+using Middleware.TaskPlanner.Publishers;
 
 namespace Middleware.TaskPlanner.Services
 {
@@ -18,6 +13,7 @@ namespace Middleware.TaskPlanner.Services
     {
         private readonly IMapper _mapper;
         private readonly IRedisInterfaceClientService _redisInterfaceClient;
+        private readonly IPublisher<DeployPlanMessage> _deployPlanPublisher;
 
         public List<ActionModel> ActionSequence { get; set; }
         public DateTime CurrentTime { get; set; }
@@ -25,9 +21,10 @@ namespace Middleware.TaskPlanner.Services
 
         public List<Common.Models.KeyValuePair> Answer { get; set; }
 
-        public ActionPlanner(IApiClientBuilder apiBuilder, IMapper mapper, IRedisInterfaceClientService redisInterfaceClient)
+        public ActionPlanner(IApiClientBuilder apiBuilder, IMapper mapper, IRedisInterfaceClientService redisInterfaceClient, IPublisher<DeployPlanMessage> deployPlanPublisher)
         {
             _redisInterfaceClient = redisInterfaceClient;
+            _deployPlanPublisher = deployPlanPublisher;
             _mapper = mapper;
             InferingProcess = ""; //Predefined actionsequence by id or IA infering based on new task.
         }
@@ -520,6 +517,17 @@ namespace Middleware.TaskPlanner.Services
             }
         }
 
+        public async Task PublishPlanAsync(TaskModel task, RobotModel robot)
+        {
+            var location = task.ActionSequence.Select(a => a.Placement).Distinct().First();
+            var message = new DeployPlanMessage()
+            {
+                Task = task,
+                RobotId = robot.Id,
+                DeploymentLocation = location
+            };
+            await _deployPlanPublisher.PublishAsync(message);
+        }
     }
 
 }

@@ -1,7 +1,6 @@
-using Middleware.Common.Models;
-using Middleware.Common.Structs;
+﻿using Middleware.Common.Models;
 
-namespace Middleware.TaskPlanner.Services;
+namespace Middleware.Common.Services;
 
 public interface IRedisInterfaceClientService
 {
