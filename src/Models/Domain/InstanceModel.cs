@@ -53,7 +53,7 @@ public class InstanceModel : BaseModel
 
     [JsonPropertyName("ContainerImage")]
     [JsonIgnore]
-    public ContainerImageModel ContainerImage { get; set; }
+    public ContainerImageModel? ContainerImage { get; set; }
 
     [JsonPropertyName("MinimumRam")]
     public int MinimumRam { get; set; } // Compulsory field
@@ -105,7 +105,7 @@ public class InstanceModel : BaseModel
             InstanceFamily = domain.InstanceFamily,
             SuccessRate = domain.SuccessRate,
             ServiceStatus = domain.ServiceStatus,
-            ContainerImage = (ContainerImageDto)domain.ContainerImage.ToDto(),
+            //ContainerImage = (ContainerImageDto)domain.ContainerImage.ToDto(),
             MinimumRam = domain.MinimumRam,
             MinimumNumCores = domain.MinimumNumCores,
             OnboardedTime = domain.OnboardedTime
