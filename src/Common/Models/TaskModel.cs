@@ -13,6 +13,9 @@ namespace Middleware.Common.Models
         [JsonPropertyName("ReplanActionPlannerLocked")] // True: The robot requests to not change anything from action sequence but placement.
         public bool ReplanActionPlannerLocked { get; set; } //True: Dont change actions in action sequence replan
 
+        /// <summary>
+        /// Should the resources be limited to the current deployment location
+        /// </summary>
         [JsonPropertyName("ResourceLock")]
         public bool ResourceLock { get; set; } //Avoid reusage of resources always.
 
