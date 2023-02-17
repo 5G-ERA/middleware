@@ -69,7 +69,7 @@ public class InstanceDto : Dto
             InstanceFamily = dto.InstanceFamily,
             SuccessRate = dto.SuccessRate,
             ServiceStatus = dto.ServiceStatus,
-            ContainerImage = dto.ContainerImage.ToModel(),
+            //ContainerImage = dto.ContainerImage?.ToModel(),
             MinimumRam = dto.MinimumRam,
             MinimumNumCores = dto.MinimumNumCores,
             OnboardedTime = dto.OnboardedTime
