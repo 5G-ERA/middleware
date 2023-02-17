@@ -8,6 +8,7 @@ using System;
 using YamlDotNet.Core;
 using Middleware.Common.Responses;
 using Middleware.Common.Services;
+using Middleware.TaskPlanner.Contracts.Requests;
 using Middleware.TaskPlanner.Services;
 
 

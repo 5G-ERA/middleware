@@ -5,6 +5,7 @@ using Middleware.Common.Models;
 using Middleware.Common.Responses;
 using Middleware.Common.Services;
 using Middleware.TaskPlanner.ApiReference;
+using Middleware.TaskPlanner.Contracts.Requests;
 using Middleware.TaskPlanner.Services;
 
 namespace Middleware.TaskPlanner.Controllers
