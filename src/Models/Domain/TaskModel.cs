@@ -40,7 +40,7 @@ namespace Middleware.Models.Domain
 
         [JsonPropertyName("ActionSequence")]
         //[JsonIgnore]
-        public List<ActionModel> ActionSequence { get; set; }
+        public List<ActionModel>? ActionSequence { get; set; }
 
         [JsonPropertyName("Tags")] //TODO: define allows tags
         //[JsonIgnore]
@@ -71,7 +71,7 @@ namespace Middleware.Models.Domain
                 PartialRePlan = domain.PartialRePlan,
                 DeterministicTask = domain.DeterministicTask,
                 MarkovianProcess = domain.MarkovianProcess,
-                ActionSequence = (List<ActionDto>)domain.ActionSequence.Select(x => x.ToDto())
+                //ActionSequence = (List<ActionDto>)domain.ActionSequence.Select(x => x.ToDto())
             };
         }
     }

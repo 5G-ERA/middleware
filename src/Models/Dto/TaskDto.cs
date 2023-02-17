@@ -29,8 +29,8 @@ public class TaskDto : Dto
     public bool DeterministicTask { get; set; } // The result is always the same if true.
     [Indexed]
     public bool MarkovianProcess { get; set; } // If true, actions are not independant and need to be executed in order.
-    [Indexed]
-    public List<ActionDto> ActionSequence { get; set; }
+    /*[Indexed]
+    public List<ActionDto> ActionSequence { get; set; }*/
     [Indexed]
     public List<string> Tags { get; set; }
  
@@ -50,7 +50,7 @@ public class TaskDto : Dto
             PartialRePlan = dto.PartialRePlan,
             DeterministicTask = dto.DeterministicTask,
             MarkovianProcess = dto.MarkovianProcess,
-            ActionSequence = (List<ActionModel>)dto.ActionSequence.Select(x => x.ToModel()),
+            //ActionSequence = (List<ActionModel>)dto.ActionSequence.Select(x => x.ToModel()),
             Tags = dto.Tags
         };
     }
