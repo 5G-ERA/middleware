@@ -41,6 +41,70 @@ namespace Middleware.TaskPlanner.Controllers
         {
             if (inputModel == null)
                 return BadRequest("Parameters were not specified.");
+            
+            if (inputModel.IsValid() == false)
+                return BadRequest(new ApiResponse((int)HttpStatusCode.BadRequest,
+                    "Parameters were not specified or wrongly specified."));
+
+            Guid id = inputModel.Id;
+            bool lockResource = inputModel.LockResourceReUse;
+            Guid robotId = inputModel.RobotId; 
+
+            try
+            {
+                _actionPlanner.Initialize(new List<ActionModel>(), DateTime.Now);
+                
+                var (plan, robot2) =
+                    await _actionPlanner.Plan(id, robotId);
+                plan.ResourceLock = lockResource;
+                
+                // call resource planner for resources
+                ResourcePlanner.TaskModel tmpTaskSend = _mapper.Map<ResourcePlanner.TaskModel>(plan);
+                ResourcePlanner.RobotModel tmpRobotSend = _mapper.Map<ResourcePlanner.RobotModel>(robot2);
+                ResourcePlanner.ResourceInput resourceInput = new ResourcePlanner.ResourceInput
+                {
+                    Robot = tmpRobotSend,
+                    Task = tmpTaskSend
+                };
+                ResourcePlanner.TaskModel tmpFinalTask =
+                    await _resourcePlannerClient.GetResourcePlanAsync(resourceInput); 
+                TaskModel resourcePlan = _mapper.Map<TaskModel>(tmpFinalTask);
+
+                if (dryRun)
+                    return Ok(resourcePlan);
+
+                await _redisInterfaceClient.AddRelationAsync(robot2, resourcePlan, "OWNS");
+                
+                await _actionPlanner.PublishPlanAsync(resourcePlan, robot2);
+
+                return Ok(resourcePlan);
+            }
+            catch (Orchestrator.ApiException<ResourcePlanner.ApiResponse> apiEx)
+            {
+                return StatusCode(apiEx.StatusCode, _mapper.Map<ApiResponse>(apiEx.Result));
+            }
+            catch (Orchestrator.ApiException<Orchestrator.ApiResponse> apiEx)
+            {
+                return StatusCode(apiEx.StatusCode, _mapper.Map<ApiResponse>(apiEx.Result));
+            }
+            catch (Exception ex)
+            {
+                int statusCode = (int)HttpStatusCode.InternalServerError;
+                return StatusCode(statusCode,
+                    new ApiResponse(statusCode, $"There was an error while preparing the task plan: {ex.Message}"));
+            }
+        }
+        
+        [HttpPost("semantic")]
+        [ProducesResponseType(typeof(TaskModel), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.NotFound)]
+        [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.BadRequest)]
+        [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.InternalServerError)]
+        public async Task<ActionResult<TaskModel>> GetSemanticPlan([FromBody] CreatePlanRequest inputModel,
+            bool dryRun = false)
+        {
+            if (inputModel == null)
+                return BadRequest("Parameters were not specified.");
 
             if (inputModel.ContextKnown == false)
             {

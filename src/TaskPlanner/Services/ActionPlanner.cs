@@ -37,6 +37,45 @@ public class ActionPlanner : IActionPlanner
     }
 
     /// <summary>
+    /// Create basic plan based on the configured action sequence
+    /// </summary>
+    /// <param name="taskId"></param>
+    /// <param name="robotId"></param>
+    /// <returns></returns>
+    /// <exception cref="NotImplementedException"></exception>
+    public async Task<Tuple<TaskModel, RobotModel>> Plan(Guid taskId, Guid robotId)
+    {
+        if (taskId == Guid.Empty)
+            throw new ArgumentException(nameof(taskId));
+        if (robotId == Guid.Empty)
+            throw new ArgumentException(nameof(robotId));
+
+
+        var robot = await _redisInterfaceClient.RobotGetByIdAsync(robotId);
+        if (robot is null)
+            throw new ArgumentException("The specified robot is not present in the Middleware database", nameof(robot));
+        var task = await _redisInterfaceClient.TaskGetByIdAsync(taskId);
+        if (task is null)
+            throw new ArgumentException("The specified task is not present in the Middleware database", nameof(robot));
+
+        List<RelationModel> relations = await _redisInterfaceClient.GetRelationAsync(task, "EXTENDS");
+
+        List<Guid> actionGuids = relations.Select(r => r.PointsTo.Id).ToList();
+
+        foreach (Guid actionId in
+                 actionGuids) //Iterate over the pre-defined action sequence of the knowledge redis graph.
+        {
+            ActionModel actionItem = await _redisInterfaceClient.ActionGetByIdAsync(actionId);
+            if (actionItem is null)
+                continue;
+            
+            task.ActionSequence.Add(actionItem);
+        }
+        
+        return new Tuple<TaskModel, RobotModel>(task, robot);
+    }
+
+    /// <summary>
     /// Find an alternative action because replanning.
     /// </summary>
     /// <param name="action"></param>
