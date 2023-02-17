@@ -160,7 +160,7 @@ namespace Middleware.DataAccess.Repositories
             string entityDef = _entityName + " {ID: '" + id + "' }";
             query = RelationDirection.Incoming == direction 
                 ? "MATCH (x) MATCH (y) WHERE (x)-[: " + relationName + "]->(y: " + entityDef + " ) RETURN x,y" 
-                : "MATCH (x: " + entityDef + "}) MATCH(y) WHERE(x) -[: " + relationName + "]->(y) RETURN x, y";
+                : "MATCH (x: " + entityDef + ") MATCH(y) WHERE(x) -[: " + relationName + "]->(y) RETURN x, y";
 
             ResultSet resultSet = await RedisGraph.Query(GraphName, query);
             // BB: 24.03.2022
