@@ -36,7 +36,7 @@ namespace Middleware.TaskPlanner.Controllers
 
         [HttpPost] //http get replan 
         [ProducesResponseType(typeof(TaskModel), (int)HttpStatusCode.OK)]
-        public async Task<ActionResult<TaskModel>> GetReplan([FromBody] TaskReplanInputModel inputModel, bool dryRun = false)
+        public async Task<ActionResult<TaskModel>> GetReplan([FromBody] CreateRePlanRequest inputModel, bool dryRun = false)
         {
             try
             {

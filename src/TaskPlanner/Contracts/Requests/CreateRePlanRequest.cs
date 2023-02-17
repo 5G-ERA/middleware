@@ -3,7 +3,7 @@ using Middleware.Common.Models;
 
 namespace Middleware.TaskPlanner.Contracts.Requests;
 
-public class TaskReplanInputModel 
+public class CreateRePlanRequest 
 {
     [JsonPropertyName("RobotId")]
     public Guid RobotId { get; set; }

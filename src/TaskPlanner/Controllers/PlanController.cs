@@ -36,7 +36,7 @@ namespace Middleware.TaskPlanner.Controllers
         [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.NotFound)]
         [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.BadRequest)]
         [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.InternalServerError)]
-        public async Task<ActionResult<TaskModel>> GetPlan([FromBody] TaskPlannerInputModel inputModel,
+        public async Task<ActionResult<TaskModel>> GetPlan([FromBody] CreatePlanRequest inputModel,
             bool dryRun = false)
         {
             if (inputModel == null)
