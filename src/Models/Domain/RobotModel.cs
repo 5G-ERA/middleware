@@ -44,7 +44,7 @@ public class RobotModel : BaseModel
     [JsonPropertyName("ManufacturerUrl")]
     public Uri ManufacturerUrl { get; set; }
 
-    [JsonPropertyName("RobotModel")]
+    [JsonPropertyName("RobotModelName")]
     public string RobotModelName { get; set; }
 
     [JsonPropertyName("RobotStatus")]
@@ -71,7 +71,7 @@ public class RobotModel : BaseModel
     [JsonPropertyName("Sensors")]
     public List<SensorModel> Sensors { get; set; }
 
-    [JsonPropertyName("Actuator")]
+    [JsonPropertyName("Actuators")]
     public List<ActuatorModel> Actuators { get; set; }
 
     [JsonPropertyName("Manipulators")]
