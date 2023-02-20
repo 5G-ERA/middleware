@@ -6,28 +6,31 @@ This document describes the functionality needed to run and contribute to the 5G
 
 If you stumble upon a bug or would like to propose a new feature or functionality, please create the new issue and describe it in detail. 
 
+When creating new issues or proposals, please try to use templates as they allow us to get a better idea about your problem or idea.
+
 ## Development Environment configuration
 
 The Middleware application is designed to be built around the Visual Studio 2022 installation utilizing the docker-compose support for the testing in the local development environment.
 The following components have to be installed to successfully develop and test the applications in the DEV environment.
 
-* **ROS Galactic** - currently Middleware supports only ROS Galactic due to the compatibility with the [5G-ERA NetApps](https://github.com/5G-ERA/Reference-NetApp)
+* **ROS Foxy** - currently Middleware supports only ROS Foxy due to the compatibility with the [5G-ERA NetApps](https://github.com/5G-ERA/Reference-NetApp)
 * **Preferred .NET IDE** - Rider / Visual Studio Code / Visual Studio 2022 (for windows and WSL development)
-* **Bridge to Kubernetes** - the Visual Studio / Visual Studio Code extension that allows to remotely debug applications running in the Kubernetes cluster. To install it, follow the [official guide](https://docs.microsoft.com/en-us/visualstudio/bridge/bridge-to-kubernetes-vs)
+* **Bridge to Kubernetes** - the Visual Studio / Visual Studio Code extension that allows remote debugging applications running in the Kubernetes cluster. To install it, follow the [official guide](https://docs.microsoft.com/en-us/visualstudio/bridge/bridge-to-kubernetes-vs)
 
 For the correct work of the Middleware, the Environment Variables have to be defined in the Operating system. Add 3 new Environment Variables if not defined already:
 
 * **AWS_IMAGE_REGISTRY** - the address of the AWS Container Image Registry that hosts the official images for the 5G-ERA middleware
 
-In addition, the Middleware has an option to log to centralized Elasticsearch. For this, the AWS SecretManager is used. The 2 environment variables have to be set to authenticate the machine against AWS.
+In addition, the Middleware has the option to log to centralized Elasticsearch. For this, the AWS SecretManager is used. The 2 environment variables have to be set to authenticate the machine against AWS.
 
 * **AWS_ACCESS_KEY_ID** - AccessKeyId of the IAM user for the AWS account
 * **AWS_SECRET_ACCESS_KEY** - Secret Access Key of the IAM user for the AWS account
 
 For the AWS Secret Manager, the secrets are configured to be stored as plaintext and the names should have the following format: `Middleware-{SettingGroup}__{SettingValue}` for example `Middleware-Database__ConnectionString`.
 
-The SecretManager will automatically map the required `appsettings.json` configuration sections into the correct data. The `{SettingGroup}` section represents the configuration group in the `appsettings.json` file. The `{SettingValue}` property allows to set the property value and the `__` is used to 
+The SecretManager will automatically map the required `appsettings.json` configuration sections into the correct data. The `{SettingGroup}` section represents the configuration group in the `appsettings.json` file. The `{SettingValue}` property allows to set the property values and the `__` is used to specify the variables indented into the `json` setting objects.
 
+For setting localized development environment `appsetting.json` values the .NET user secrets are preferred.
 
 ### Launching and debugging the application
 
@@ -40,7 +43,7 @@ kubectl apply -f k8s/orchestrator/orchestrator_deployment.yaml -n middleware
 
 ## Handle changes to the API definition
 
-The code contains the internal references to the current definition of the API using the OpenAPI 3.0 specification schema. Based on this specification the code is automatically generated to create the clients for easier access to the API endpoints from the code.
+The code contains internal references to the current definition of the API using the OpenAPI 3.0 specification schema. Based on this specification the code is automatically generated to create the clients for easier access to the API endpoints from the code.
 
 The API schema specification needs to be updated after each change to the endpoints definition. Each change of the return value, status code, adding new endpoints and removing existing or the definition of the models has to be followed with the appropriate procedure described, to make sure that all the APIs are working as expected.
 
@@ -51,7 +54,8 @@ The API schema specification needs to be updated after each change to the endpoi
 3. Execute endpoint `api/health/spec` to download the latest information about the API by pressing the `Try it out` button`
 4. Close browser window
 5. Rebuild the whole solution to check for any errors across
-6. Commit changes
+6. Use [util/merge_open_api_spec.py](util/merge_open_api_spec.py) for creating the final API spec.
+7. Commit changes
 
 ## K8s cluster configuration 
 
