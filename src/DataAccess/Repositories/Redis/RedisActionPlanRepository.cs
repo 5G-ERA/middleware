@@ -23,21 +23,21 @@ namespace Middleware.DataAccess.Repositories
         /// <param name="redisClient"></param>
         /// <param name="redisGraph"></param>
         /// <param name="logger"></param>
-
-        public RedisActionPlanRepository(IRedisConnectionProvider provider, IRedisGraphClient redisGraph, ILogger logger) : base(provider, redisGraph, true, logger)
+        public RedisActionPlanRepository(IRedisConnectionProvider provider, IRedisGraphClient redisGraph,
+            ILogger logger) : base(provider, redisGraph, true, logger)
         {
         }
 
         /// <summary>
         /// Retrieves all actionPlanModels associated with an specific robot Id.
         /// </summary>
-        /// <returns> List<ActionPlanModel> </returns>
+        /// <returns> List of ActionPlanModel </returns>
         public async Task<List<ActionPlanModel>> GetRobotActionPlans(Guid robotId)
         {
-            var ActionPlans = FindQuery(Dto => Dto.RobotId == robotId.ToString()).ToList().Select(x => ToTModel(x)).ToList();
-            return ActionPlans;
+            var guidStr = robotId.ToString();
+            var actionPlans = await FindQuery(dto => dto.RobotId == guidStr).ToListAsync();
+            var planModels = actionPlans.Select(ToTModel).ToList();
+            return planModels;
         }
-
-
     }
 }
