@@ -63,7 +63,10 @@ namespace Middleware.DataAccess.Repositories
         {
             TDto dto = ToTDto(model);
             var id = await Collection.InsertAsync(dto);
-            dto.Id = id;
+            if (string.IsNullOrEmpty(id))
+            {
+                return null!;
+            }
             return ToTModel(dto);
         }
         private async Task DeleteFromGraph(Guid id)
