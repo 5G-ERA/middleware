@@ -1,3 +1,4 @@
+using System.Net.Http.Headers;
 using Middleware.Common.Config;
 using Middleware.Common.ExtensionMethods;
 using Middleware.ResourcePlanner;
@@ -19,6 +20,12 @@ builder.Services.ConfigureAutoMapper();
 builder.Services.RegisterCommonServices();
 builder.Services.AddHttpClient("healthCheckClient");
 builder.Services.AddHttpClient(AppConfig.OrchestratorApiClientName);
+builder.Services.AddHttpClient(AppConfig.RedisApiClientName, (a) =>
+{
+    a.BaseAddress = new Uri(Environment.GetEnvironmentVariable("REDIS_INTERFACE_ADDRESS"));
+    a.DefaultRequestHeaders.Accept.Add(
+        new MediaTypeWithQualityHeaderValue("application/json"));
+});
 builder.Services.AddScoped<IResourcePlanner, ResourcePlanner>();
 builder.Services.AddScoped<IApiClientBuilder, ApiClientBuilder>();
 

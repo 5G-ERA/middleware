@@ -51,22 +51,11 @@ public class ResourcePlanner : IResourcePlanner
         // iterate throught actions in actionSequence
         foreach (ActionModel action in actionSequence)
         {
-
-            List<RedisInterface.RelationModel> imagesTmp =
-                (await redisApiClient.ActionGetRelationByNameAsync(action.Id, "NEEDS")).ToList();
-            List<RelationModel> images = new List<RelationModel>();
-            foreach (RedisInterface.RelationModel imgTmp in imagesTmp)
-            {
-                RelationModel relation = _mapper.Map<RelationModel>(imgTmp);
-                images.Add(relation);
-            }
-
+            var images = await _redisInterfaceClient.GetRelationAsync(action, "NEEDS");
             // images -> list of all relations with images for the action
             foreach (RelationModel relation in images)
             {
-                RedisInterface.InstanceModel instanceTmp = await redisApiClient.InstanceGetByIdAsync(relation.PointsTo.Id); //Get instance values
-
-                InstanceModel instance = _mapper.Map<InstanceModel>(instanceTmp);
+                InstanceModel instance = await _redisInterfaceClient.InstanceGetByIdAsync(relation.PointsTo.Id);
 
                 if (CanBeReused(instance) && taskModel.ResourceLock)
                 {
