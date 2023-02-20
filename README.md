@@ -56,7 +56,7 @@ Try the API with the custom python library [link](https://github.com/5G-ERA/midd
 To see how to deploy the 5G-ERA Middleware see the instructions in [ENVIRONMENT.md](ENVIRONMENT.md).
 
 ## Developing the 5G-ERA Middleware
-To see how to deploy the 5G-ERA Middleware development enviroment, see the instructions in [ENVIRONMENT.md](ENVIRONMENT.md).
+To see how to deploy the 5G-ERA Middleware development environment and how to contribute to the 5G-ERA development, see the instructions in [CONTRIBUTING.md](contributing.md).
 
 ## License 
 For the licensing information see [LICENSE](LICENSE).
