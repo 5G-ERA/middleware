@@ -1,1 +1,1 @@
-User documentation contains all the generic infromation needed for onboarding, offboarding of the new Robot. It also has all the relevant documents of policies, planning, flowchart, design netapp guidelines and in-general all the requirements for the user. 
+User documentation contains all the generic information needed for the onboarding and offboarding of the new Robot. It also has all the relevant documents of policies, planning, flowchart, design NetApp guidelines and the requirements for the user. 
