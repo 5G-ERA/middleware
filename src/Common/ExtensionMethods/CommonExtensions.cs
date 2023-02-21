@@ -1,9 +1,11 @@
-﻿using Amazon;
+﻿using System.Net.Http.Headers;
+using Amazon;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Middleware.Common.Config;
+using Middleware.Common.Services;
 using RedisGraphDotNet.Client;
 using StackExchange.Redis;
 
@@ -14,6 +16,16 @@ public static class CommonExtensions
     public static IServiceCollection RegisterCommonServices(this IServiceCollection services)
     {
         services.AddSingleton<IEnvironment, MiddlewareEnvironment>();
+        
+        services.AddHttpClient(AppConfig.RedisApiClientName, (a) =>
+        {
+            a.BaseAddress = new Uri(Environment.GetEnvironmentVariable("REDIS_INTERFACE_ADDRESS"));
+            a.DefaultRequestHeaders.Accept.Add(
+                new MediaTypeWithQualityHeaderValue("application/json"));
+        });
+        services.AddScoped<IRedisInterfaceClientService, RedisInterfaceClientService>();
+        
+        
         return services;
     }
     /// <summary>

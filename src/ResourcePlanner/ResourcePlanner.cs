@@ -1,20 +1,18 @@
-﻿using System;
-using System.Linq;
-using System.Net;
+﻿using System.Net;
 using AutoMapper;
 using Middleware.Common;
 using Middleware.Common.Enums;
 using Middleware.Common.Models;
-using Middleware.Common.Repositories;
 using Middleware.Common.Responses;
+using Middleware.Common.Services;
 using Middleware.ResourcePlanner.ApiReference;
-
 
 namespace Middleware.ResourcePlanner;
 
 public interface IResourcePlanner
 {
     Task<TaskModel> Plan(TaskModel taskModel, RobotModel robot);
+    Task<TaskModel> SemanticPlan(TaskModel taskModel, RobotModel robot);
     Task<TaskModel> RePlan(TaskModel taskModel, TaskModel oldTaskmMdel, RobotModel robot, bool fullReplan);
 }
 
@@ -24,23 +22,57 @@ public class ResourcePlanner : IResourcePlanner
     private readonly IMapper _mapper;
     private readonly IEnvironment _env;
     private readonly ILogger _logger;
-
-
-    public string Slice5gType { get; private set; } //eMBB, URLL, mMTC, MIoT, V2X
-    public bool StandAlone5GParam { get; private set; } // Standalone 5G or none-standalone.
-    public int NumSlicesTestBed { get; private set; } //number of slices available in testbed.
-
+    private readonly IRedisInterfaceClientService _redisInterfaceClient;
+    
     public ResourcePlanner(IApiClientBuilder apiClientBuilder, IMapper mapper, IEnvironment env,
-        ILogger<ResourcePlanner> logger)
+        ILogger<ResourcePlanner> logger,
+        IRedisInterfaceClientService redisInterfaceClient)
 
     {
         _apiClientBuilder = apiClientBuilder;
         _mapper = mapper;
         _env = env;
         _logger = logger;
-
+        _redisInterfaceClient = redisInterfaceClient;
     }
 
+    public async Task<TaskModel> Plan(TaskModel taskModel, RobotModel robot)
+    {
+        var redisApiClient = _apiClientBuilder.CreateRedisApiClient();
+        var orchestratorApiClient = _apiClientBuilder.CreateOrchestratorApiClient();
+        // actionPlanner will give resource planner the actionSequence. 
+
+        // Get action sequence 
+        List<ActionModel> actionSequence = taskModel.ActionSequence;
+        if (actionSequence == null || actionSequence.Count == 0)
+            throw new ArgumentException("Action sequence cannot be empty");
+
+
+        // iterate throught actions in actionSequence
+        foreach (ActionModel action in actionSequence)
+        {
+            var images = await _redisInterfaceClient.GetRelationAsync(action, "NEEDS");
+            // images -> list of all relations with images for the action
+            foreach (RelationModel relation in images)
+            {
+                InstanceModel instance = await _redisInterfaceClient.InstanceGetByIdAsync(relation.PointsTo.Id);
+
+                if (CanBeReused(instance) && taskModel.ResourceLock)
+                {
+                    var reusedInstance = await GetInstanceToReuse(instance, orchestratorApiClient);
+                    if (reusedInstance is not null)
+                        instance = reusedInstance;
+                }
+                // add instance to actions
+                action.Services.Add(instance);
+            }
+            //Choose placement based on policy
+            // TODO: deploy only in the local MW
+            action.Placement = "local";//await InferResource(action, robot,false, new());
+        }
+
+        return taskModel;
+    }
     private async Task NetworkPlan(RobotModel robot)
     {
         var redisApiClient = _apiClientBuilder.CreateRedisApiClient();
@@ -374,7 +406,9 @@ public class ResourcePlanner : IResourcePlanner
     }
 
 
-    public async Task<TaskModel> Plan(TaskModel taskModel, RobotModel robot)
+    
+
+    public async Task<TaskModel> SemanticPlan(TaskModel taskModel, RobotModel robot)
     {
         var list = new List<ActionModel>();
         // modify the existing plan with the candidates
@@ -383,7 +417,7 @@ public class ResourcePlanner : IResourcePlanner
 
 
     /// <summary>
-    /// Plan from the resource level. Create relation for instancse and decide placement.
+    /// SemmanticPlan from the resource level. Create relation for instancse and decide placement.
     /// </summary>
     /// <param name="taskModel"></param>
     /// <param name="robot"></param>
@@ -570,6 +604,4 @@ public class ResourcePlanner : IResourcePlanner
     {
         return instance.IsReusable != null && instance.IsReusable.Value;
     }
-
-    
 }

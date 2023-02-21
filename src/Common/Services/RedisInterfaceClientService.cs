@@ -4,7 +4,6 @@ using Microsoft.Extensions.Logging;
 using Middleware.Common.Config;
 using Middleware.Common.ExtensionMethods;
 using Middleware.Common.Models;
-using Middleware.Common.Structs;
 using Newtonsoft.Json;
 
 namespace Middleware.Common.Services
@@ -180,11 +179,11 @@ namespace Middleware.Common.Services
             if (source is null)
                 throw new ArgumentNullException(nameof(source));
             if (relationName is null)
-                throw new ArgumentNullException(nameof(Relation));
+                throw new ArgumentNullException(nameof(relationName));
 
             try
             {                
-                var builder = new UriBuilder($"{_httpClient.BaseAddress.ToString().TrimEnd('/')}/api/v1/{source.GetType().GetModelName()}/relation/{relationName}");
+                var builder = new UriBuilder($"{_httpClient.BaseAddress!.ToString().TrimEnd('/')}/api/v1/{source.GetType().GetModelName()}/relation/{relationName}");
                 builder.Port = -1;
                 var query = HttpUtility.ParseQueryString(builder.Query);
                 query["id"] = $"{source.Id}";

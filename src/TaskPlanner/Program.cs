@@ -27,17 +27,9 @@ builder.Services.ConfigureAutoMapper();
 builder.Services.AddHttpClient("healthCheckClient");
 builder.Services.AddHttpClient("resourcePlannerApiClient");
 builder.Services.AddHttpClient("orchestratorApiClient");
-builder.Services.AddHttpClient(AppConfig.RedisApiClientName, (a) =>
-{
-    a.BaseAddress = new Uri(Environment.GetEnvironmentVariable("REDIS_INTERFACE_ADDRESS"));
-    a.DefaultRequestHeaders.Accept.Add(
-        new MediaTypeWithQualityHeaderValue("application/json"));
-});
-
 builder.Services.RegisterCommonServices();
 builder.Services.AddScoped<IApiClientBuilder, ApiClientBuilder>();
 builder.Services.AddScoped<IActionPlanner, ActionPlanner>();
-builder.Services.AddScoped<IRedisInterfaceClientService, RedisInterfaceClientService>();
 builder.Services.AddScoped<IPublisher<DeployPlanMessage>, DeployPlanMessagePublisher>();
 
 var app = builder.Build();

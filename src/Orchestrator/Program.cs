@@ -27,7 +27,6 @@ builder.Host.ConfigureAppConfiguration((hostingContext, _) =>
     ServicePointManager.DnsRefreshTimeout = 60000;
     ServicePointManager.EnableDnsRoundRobin = true;
 });
-
 // Add services to the container.
 
 builder.Services.AddControllers();
@@ -42,13 +41,6 @@ var rabbitmqConfig = builder.Configuration.GetSection(RabbitMqConfig.ConfigName)
 builder.Services.RegisterRabbitMqConsumers(rabbitmqConfig, mwConfig)
     .ConfigureAutoMapper();
 
-
-builder.Services.AddHttpClient(AppConfig.RedisApiClientName, (a) =>
-{
-    a.BaseAddress = new Uri(Environment.GetEnvironmentVariable("REDIS_INTERFACE_ADDRESS"));
-    a.DefaultRequestHeaders.Accept.Add(
-        new MediaTypeWithQualityHeaderValue("application/json"));
-});
 builder.Services.AddHttpClient(AppConfig.OsmApiClientName);
 builder.Services.RegisterCommonServices();
 builder.Services.AddScoped<IApiClientBuilder, ApiClientBuilder>();
