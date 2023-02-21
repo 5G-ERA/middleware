@@ -584,3 +584,4 @@ qtcreator-*
 
 # Catkin custom files
 CATKIN_IGNORE
+.idea/.idea.Middleware/Docker/docker-compose.generated.override.yml
