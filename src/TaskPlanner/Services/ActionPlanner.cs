@@ -58,6 +58,7 @@ public class ActionPlanner : IActionPlanner
         if (task is null)
             throw new ArgumentException("The specified task is not present in the Middleware database", nameof(robot));
 
+        task.ActionSequence = new();
         List<RelationModel> relations = await _redisInterfaceClient.GetRelationAsync(task, "EXTENDS");
 
         List<Guid> actionGuids = relations.Select(r => r.PointsTo.Id).ToList();
