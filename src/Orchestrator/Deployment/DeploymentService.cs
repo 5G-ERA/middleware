@@ -34,6 +34,7 @@ public class DeploymentService : IDeploymentService
     private readonly ILogger _logger;
 
     private readonly IRedisInterfaceClientService _redisInterfaceClient;
+    private readonly IConfiguration _configuration;
 
     /// <summary>
     /// Redis Interface client allowing to make calls to the Redis Cache
@@ -44,13 +45,14 @@ public class DeploymentService : IDeploymentService
     /// </summary>
     private readonly string _awsRegistryName;
 
-    public DeploymentService(IKubernetesBuilder kubernetesBuilder, IApiClientBuilder apiClientBuilder, IEnvironment env, IMapper mapper, ILogger<DeploymentService> logger, IRedisInterfaceClientService redisInterfaceClient)
+    public DeploymentService(IKubernetesBuilder kubernetesBuilder, IApiClientBuilder apiClientBuilder, IEnvironment env, IMapper mapper, ILogger<DeploymentService> logger, IRedisInterfaceClientService redisInterfaceClient, IConfiguration configuration)
     {
         _kubernetesBuilder = kubernetesBuilder;
         _env = env;
         _mapper = mapper;
         _logger = logger;
         _redisInterfaceClient = redisInterfaceClient;
+        _configuration = configuration;
         _redisClient = apiClientBuilder.CreateRedisApiClient();
         _awsRegistryName = _env.GetEnvVariable("AWS_IMAGE_REGISTRY");
     }
@@ -354,6 +356,7 @@ public class DeploymentService : IDeploymentService
     /// <param name="tag1"></param>
     public V1Deployment CreateStartupDeployment(string name, string tag)
     {
+        var mwConfig = _configuration.GetSection(MiddlewareConfig.ConfigName).Get<MiddlewareConfig>();
         var selector = new V1LabelSelector
         {
             MatchLabels = new Dictionary<string, string> { { "app", name } }
@@ -371,7 +374,10 @@ public class DeploymentService : IDeploymentService
             new ("REDIS_INTERFACE_ADDRESS", $"http://redis-interface-api"),
             new ("ORCHESTRATOR_ADDRESS", $"http://orchestrator-api"),
             new ("TASK_PLANNER_ADDRESS", $"http://task-planner-api"),
-            new ("RESOURCE_PLANNER_ADDRESS", $"http://resource-planner-api")
+            new ("RESOURCE_PLANNER_ADDRESS", $"http://resource-planner-api"),
+            new ("Middleware__Organization", mwConfig.Organization),
+            new ("Middleware__InstanceName", mwConfig.InstanceName),
+            new ("Middleware__InstanceType", mwConfig.InstanceType)
         };
         if (name.Contains("redis") || name == "gateway")
         {
