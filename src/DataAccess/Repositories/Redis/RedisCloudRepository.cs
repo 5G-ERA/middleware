@@ -45,6 +45,10 @@ namespace Middleware.DataAccess.Repositories
             {
                 currentModel.Name = patch.Name;
             }
+            if (!string.IsNullOrEmpty(patch.Type))
+            {
+                currentModel.Type = patch.Type;
+            }
             if (!string.IsNullOrEmpty(patch.CloudStatus))
             {
                 currentModel.CloudStatus = patch.CloudStatus;
@@ -52,6 +56,38 @@ namespace Middleware.DataAccess.Repositories
             if ((patch.CloudIp != null) && Uri.IsWellFormedUriString(patch.CloudIp.ToString(), UriKind.RelativeOrAbsolute))
             {
                 currentModel.CloudIp = patch.CloudIp;
+            }
+            if (!string.IsNullOrEmpty(patch.NumberOfCores.ToString()))
+            {
+                currentModel.NumberOfCores = patch.NumberOfCores;
+            }
+            if (!string.IsNullOrEmpty(patch.DiskStorage.ToString()))
+            {
+                currentModel.DiskStorage = patch.DiskStorage;
+            }
+            if (!string.IsNullOrEmpty(patch.VirtualRam.ToString()))
+            {
+                currentModel.VirtualRam = patch.VirtualRam;
+            }
+            if (!string.IsNullOrEmpty(patch.Cpu.ToString()))
+            {
+                currentModel.Cpu = patch.Cpu;
+            }
+            if (!string.IsNullOrEmpty(patch.Ram.ToString()))
+            {
+                currentModel.Ram = patch.Ram;
+            }
+            if (!string.IsNullOrEmpty(patch.MacAddress))
+            {
+                currentModel.MacAddress = patch.MacAddress;
+            }
+            if (!string.IsNullOrEmpty(patch.LastUpdatedTime.ToString()))
+            {
+                currentModel.LastUpdatedTime = patch.LastUpdatedTime;
+            }
+            if (patch.IsOnline != null)
+            {
+                currentModel.IsOnline = patch.IsOnline;
             }
             await UpdateAsync(currentModel);
             return currentModel;

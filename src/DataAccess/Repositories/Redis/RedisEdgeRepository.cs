@@ -44,6 +44,10 @@ namespace Middleware.DataAccess.Repositories
             {
                 currentModel.Name = patch.Name;
             }
+            if (!string.IsNullOrEmpty(patch.Type))
+            {
+                currentModel.Type = patch.Type;
+            }
             if (!string.IsNullOrEmpty(patch.EdgeStatus))
             {
                 currentModel.EdgeStatus = patch.EdgeStatus;
@@ -75,6 +79,14 @@ namespace Middleware.DataAccess.Repositories
             if (!string.IsNullOrEmpty(patch.NumberOfCores.ToString()))
             {
                 currentModel.NumberOfCores = patch.NumberOfCores;
+            }
+            if (!string.IsNullOrEmpty(patch.LastUpdatedTime.ToString()))
+            {
+                currentModel.LastUpdatedTime = patch.LastUpdatedTime;
+            }
+            if (patch.IsOnline != null)
+            {
+                currentModel.IsOnline = patch.IsOnline;
             }
             await UpdateAsync(currentModel);
             return currentModel;

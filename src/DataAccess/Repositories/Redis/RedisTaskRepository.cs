@@ -45,9 +45,41 @@ namespace Middleware.DataAccess.Repositories.Redis
             {
                 currentModel.Name = patch.Name;
             }
+            if (patch.ReplanActionPlannerLocked != null)
+            {
+                currentModel.ReplanActionPlannerLocked = patch.ReplanActionPlannerLocked;
+            }
+            if (patch.ResourceLock != null)
+            {
+                currentModel.ResourceLock = patch.ResourceLock;
+            }
             if (!string.IsNullOrEmpty(patch.TaskPriority.ToString()))
             {
                 currentModel.TaskPriority = patch.TaskPriority;
+            }
+            if (patch.FullReplan != null)
+            {
+                currentModel.FullReplan = patch.FullReplan;
+            }
+            if (patch.PartialRePlan != null)
+            {
+                currentModel.PartialRePlan = patch.PartialRePlan;
+            }
+            if (patch.DeterministicTask != null)
+            {
+                currentModel.DeterministicTask = patch.DeterministicTask;
+            }
+            if (patch.MarkovianProcess != null)
+            {
+                currentModel.MarkovianProcess = patch.MarkovianProcess;
+            }
+            if (patch.ActionSequence != null)
+            {
+                currentModel.ActionSequence = patch.ActionSequence;
+            }
+            if (patch.Tags != null)
+            {
+                currentModel.Tags = patch.Tags;
             }
             await UpdateAsync(currentModel);
             return currentModel;

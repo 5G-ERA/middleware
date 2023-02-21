@@ -52,9 +52,53 @@ namespace Middleware.DataAccess.Repositories
             {
                 currentModel.ServiceUrl = patch.ServiceUrl;
             }
+            if (patch.RosTopicsPub != null)
+            {
+                currentModel.RosTopicsPub = patch.RosTopicsPub;
+            }
+            if (patch.RosTopicsSub != null)
+            {
+                currentModel.RosTopicsSub = patch.RosTopicsSub;
+            }
+            if (!string.IsNullOrEmpty(patch.RosVersion.ToString()))
+            {
+                currentModel.RosVersion = patch.RosVersion;
+            }
+            if (!string.IsNullOrEmpty(patch.ROSDistro))
+            {
+                currentModel.ROSDistro = patch.ROSDistro;
+            }
+            if (patch.Tags != null)
+            {
+                currentModel.Tags = patch.Tags;
+            }
+            if (!string.IsNullOrEmpty(patch.InstanceFamily.ToString()))
+            {
+                currentModel.InstanceFamily = patch.InstanceFamily;
+            }
+            if (!string.IsNullOrEmpty(patch.SuccessRate.ToString()))
+            {
+                currentModel.SuccessRate = patch.SuccessRate;
+            }
             if (!string.IsNullOrEmpty(patch.ServiceStatus))
             {
                 currentModel.ServiceStatus = patch.ServiceStatus;
+            }
+            if (patch.ContainerImage != null)
+            {
+                currentModel.ContainerImage = patch.ContainerImage;
+            }
+            if (!string.IsNullOrEmpty(patch.MinimumRam.ToString()))
+            {
+                currentModel.MinimumRam = patch.MinimumRam;
+            }
+            if (!string.IsNullOrEmpty(patch.MinimumNumCores.ToString()))
+            {
+                currentModel.MinimumNumCores = patch.MinimumNumCores;
+            }
+            if (!string.IsNullOrEmpty(patch.OnboardedTime.ToString()))
+            {
+                currentModel.OnboardedTime = patch.OnboardedTime;
             }
             await UpdateAsync(currentModel);
             return currentModel;

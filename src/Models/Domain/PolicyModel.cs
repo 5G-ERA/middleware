@@ -17,7 +17,7 @@ public class PolicyModel : BaseModel
     public string Type { get; set; }
 
     [JsonPropertyName("Timestamp")]
-    public DateTime? Timestamp { get; set; }
+    public DateTime Timestamp { get; set; }
 
     [JsonPropertyName("IsActive")]
     public bool? IsActive { get; set; }

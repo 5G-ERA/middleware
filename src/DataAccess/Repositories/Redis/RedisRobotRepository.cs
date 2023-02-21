@@ -46,9 +46,45 @@ namespace Middleware.DataAccess.Repositories
             {
                 currentModel.Name = patch.Name;
             }
+            if (!string.IsNullOrEmpty(patch.RosVersion.ToString()))
+            {
+                currentModel.RosVersion = patch.RosVersion;
+            }
+            if (!string.IsNullOrEmpty(patch.RosDistro))
+            {
+                currentModel.RosDistro = patch.RosDistro;
+            }
+            if (!string.IsNullOrEmpty(patch.MaximumPayload.ToString()))
+            {
+                currentModel.MaximumPayload = patch.MaximumPayload;
+            }
+            if (!string.IsNullOrEmpty(patch.MaximumTranslationalVelocity.ToString()))
+            {
+                currentModel.MaximumTranslationalVelocity = patch.MaximumTranslationalVelocity;
+            }
+            if (!string.IsNullOrEmpty(patch.MaximumRotationalVelocity.ToString()))
+            {
+                currentModel.MaximumRotationalVelocity = patch.MaximumRotationalVelocity;
+            }
+            if (!string.IsNullOrEmpty(patch.RobotWeight.ToString()))
+            {
+                currentModel.RobotWeight = patch.RobotWeight;
+            }
+            if ((patch.ROSRepo != null) && Uri.IsWellFormedUriString(patch.ROSRepo.ToString(), UriKind.RelativeOrAbsolute))
+            {
+                currentModel.ROSRepo = patch.ROSRepo;
+            }
+            if (patch.ROSNodes != null)
+            {
+                currentModel.ROSNodes = patch.ROSNodes;
+            }
             if (!string.IsNullOrEmpty(patch.Manufacturer))
             {
                 currentModel.Manufacturer = patch.Manufacturer;
+            }
+            if ((patch.ManufacturerUrl != null) && Uri.IsWellFormedUriString(patch.ManufacturerUrl.ToString(), UriKind.RelativeOrAbsolute))
+            {
+                currentModel.ManufacturerUrl = patch.ManufacturerUrl;
             }
             if (!string.IsNullOrEmpty(patch.RobotModelName))
             {
@@ -78,6 +114,14 @@ namespace Middleware.DataAccess.Repositories
             {
                 currentModel.Sensors = patch.Sensors;
             }
+            if (patch.Actuators != null)
+            {
+                currentModel.Actuators = patch.Actuators;
+            }
+            if (patch.Manipulators != null)
+            {
+                currentModel.Manipulators = patch.Manipulators;
+            }
             if (!string.IsNullOrEmpty(patch.Cpu.ToString()))
             {
                 currentModel.Cpu = patch.Cpu;
@@ -97,6 +141,14 @@ namespace Middleware.DataAccess.Repositories
             if (patch.Questions != null)
             {
                 currentModel.Questions = patch.Questions;
+            }
+            if (!string.IsNullOrEmpty(patch.LastUpdatedTime.ToString()))
+            {
+                currentModel.LastUpdatedTime = patch.LastUpdatedTime;
+            }
+            if (!string.IsNullOrEmpty(patch.OnboardedTime.ToString()))
+            {
+                currentModel.OnboardedTime = patch.OnboardedTime;
             }
             await UpdateAsync(currentModel);
             return currentModel;

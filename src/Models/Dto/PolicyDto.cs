@@ -15,7 +15,7 @@ public class PolicyDto: Dto
     [Indexed]
     public string Type { get; set; }
     [Indexed(Sortable = true)]
-    public DateTime? Timestamp { get; set; }
+    public DateTimeOffset Timestamp { get; set; }
     [Indexed]
     public bool? IsActive { get; set; }
 
@@ -32,7 +32,7 @@ public class PolicyDto: Dto
             Id = Guid.Parse(dto.Id!.Replace(Prefix, "")),
             Name = dto.Name,
             Type = dto.Type,
-            Timestamp = dto.Timestamp,
+            Timestamp = dto.Timestamp.DateTime,
             IsActive = dto.IsActive,
             Description = dto.Description,
             IsExclusiveWithinType = dto.IsExclusiveWithinType
