@@ -93,7 +93,7 @@ public class RedisCloudRepositoryTests
         return dummyNode;
     }
 
-    [Fact]
+    [Fact(Skip ="Skipped because it is not needed for the latest release as semantic planning is disabled")]
     public async Task GetLessBusyCloudsAsync_ShouldReturnOrderedEdgesInAscendingOrder_WhenProvidedWithListOfClouds()
     {
         // arrange

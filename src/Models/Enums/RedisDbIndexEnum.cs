@@ -7,7 +7,7 @@
         Instance =2,
         Policy =3,
         Dialogue =4,
-        Container =5,
+        ContainerImage =5,
         Task =6,
         Robot =7,
         Edge =8,

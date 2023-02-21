@@ -105,7 +105,6 @@ public class InstanceModel : BaseModel
             InstanceFamily = domain.InstanceFamily,
             SuccessRate = domain.SuccessRate,
             ServiceStatus = domain.ServiceStatus,
-            //ContainerImage = (ContainerImageDto)domain.ContainerImage.ToDto(),
             MinimumRam = domain.MinimumRam,
             MinimumNumCores = domain.MinimumNumCores,
             OnboardedTime = domain.OnboardedTime

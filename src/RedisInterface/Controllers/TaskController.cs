@@ -311,6 +311,7 @@ namespace Middleware.RedisInterface.Controllers
                     {
                         var tmpImage = instanceModel.ContainerImage;
                         instanceModel.ContainerImage = null;
+                        instanceModel.OnboardedTime = DateTime.UtcNow;
                         await _instanceRepository.AddAsync(instanceModel);
                         instanceModel.ContainerImage = tmpImage;
                         if (instanceModel.ContainerImage == null)
@@ -320,7 +321,7 @@ namespace Middleware.RedisInterface.Controllers
                         await _containerImageRepository.AddAsync(instanceModel.ContainerImage);
 
                         //RELATIONSHIP--NEEDS (INSTANCE-IMAGE)
-                        RelationModel imageRelation = CreateGraphRelation(instanceModel, RedisDbIndexEnum.Instance, instanceModel.ContainerImage, RedisDbIndexEnum.Container);
+                        RelationModel imageRelation = CreateGraphRelation(instanceModel, RedisDbIndexEnum.Instance, instanceModel.ContainerImage, RedisDbIndexEnum.ContainerImage);
                         bool isImageValid = await _containerImageRepository.AddRelationAsync(imageRelation);
                         if (!isImageValid)
                         {

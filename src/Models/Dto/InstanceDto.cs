@@ -38,9 +38,8 @@ public class InstanceDto : Dto
     [Indexed(Sortable = true)]
     public int SuccessRate { get; set; } = default!;
     [Indexed]
-    public string ServiceStatus { get; set; } = default!;
-    [Indexed]
-    public ContainerImageDto ContainerImage { get; set; } = new();
+    public string ServiceStatus { get; set; } = default!;    
+    
     [Indexed(Sortable = true)]
     public int MinimumRam { get; set; } = default!;
     [Indexed(Sortable = true)]
@@ -69,7 +68,6 @@ public class InstanceDto : Dto
             InstanceFamily = dto.InstanceFamily,
             SuccessRate = dto.SuccessRate,
             ServiceStatus = dto.ServiceStatus,
-            //ContainerImage = dto.ContainerImage?.ToModel(),
             MinimumRam = dto.MinimumRam,
             MinimumNumCores = dto.MinimumNumCores,
             OnboardedTime = dto.OnboardedTime
