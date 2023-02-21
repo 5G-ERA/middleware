@@ -5,7 +5,7 @@ public class RabbitMqConfig
     /// <summary>
     /// Name of the section to be parsed
     /// </summary>
-    public const string ConfigName = "CustomLogger";
+    public const string ConfigName = "RabbitMQ";
     /// <summary>
     /// RabbitMQ broker address
     /// </summary>
