@@ -18,13 +18,14 @@ public class UpdateStatusJob : BaseJob<UpdateStatusJob>
     private readonly IKubernetesBuilder _kubeBuilder;
     private readonly IMapper _mapper;
     private readonly RedisInterface.RedisApiClient _redisApiClient;
+    private readonly MiddlewareConfig _middlewareConfig;
 
-    public UpdateStatusJob(IKubernetesBuilder kubeBuilder, IApiClientBuilder apiBuilder, IMapper mapper, ILogger<UpdateStatusJob> logger) : base(logger)
+    public UpdateStatusJob(IKubernetesBuilder kubeBuilder, IApiClientBuilder apiBuilder, IMapper mapper, ILogger<UpdateStatusJob> logger, IConfiguration configuration) : base(logger)
     {
         _kubeBuilder = kubeBuilder;
         _mapper = mapper;
         _redisApiClient = apiBuilder.CreateRedisApiClient();
-
+        _middlewareConfig = configuration.GetSection(MiddlewareConfig.ConfigName).Get<MiddlewareConfig>();
     }
 
     protected override async Task ExecuteJobAsync(IJobExecutionContext context)
@@ -47,6 +48,9 @@ public class UpdateStatusJob : BaseJob<UpdateStatusJob>
                     //     continue;
                     // }
 
+                    if (updatedSeq is null)
+                        continue;
+                    
                     var riSeq = _mapper.Map<RedisInterface.ActionPlanModel>(updatedSeq);
                     await _redisApiClient.ActionPlanAddAsync(riSeq);
                 }
@@ -75,15 +79,19 @@ public class UpdateStatusJob : BaseJob<UpdateStatusJob>
         }
     }
 
-    private async Task<ActionPlanModel> ValidateSequenceStatusAsync(ActionPlanModel seq, IKubernetes kubeClient)
+    private async Task<ActionPlanModel?> ValidateSequenceStatusAsync(ActionPlanModel seq, IKubernetes kubeClient)
     {
+        bool validated = false;
         //check if all instances are down for at least half an hour, then terminate
         foreach (var action in seq.ActionSequence)
         {
+            if (action.Placement != _middlewareConfig.InstanceName)
+                continue;
+            
             foreach (var instance in action.Services)
             {
                 var instanceId = instance.ServiceInstanceId;
-
+                validated = true;
                 var deployments = await kubeClient.AppsV1.ListNamespacedDeploymentAsync(AppConfig.K8SNamespaceName,
                     labelSelector: V1ObjectExtensions.GetNetAppLabelSelector(instance.ServiceInstanceId));
 
@@ -96,7 +104,7 @@ public class UpdateStatusJob : BaseJob<UpdateStatusJob>
             }
         }
 
-        return seq;
+        return validated ? seq : null;
     }
 
     private void ValidateDeploymentStatus(V1DeploymentList deployments, InstanceModel instance)
