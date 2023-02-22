@@ -9,3 +9,4 @@ public class GraphResponse
 
     public List<SimpleRelation> Relations { get; set; }
 }
+

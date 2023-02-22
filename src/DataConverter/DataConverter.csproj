@@ -12,6 +12,7 @@
       <ProjectReference Include="..\Common\Common.csproj" />
       <ProjectReference Include="..\DataAccess\DataAccess.csproj" />
       <ProjectReference Include="..\Models\Models.csproj" />
+      <ProjectReference Include="..\RedisInterface\RedisInterface.csproj" />
     </ItemGroup>
 
     <ItemGroup>
