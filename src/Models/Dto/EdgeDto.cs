@@ -1,4 +1,5 @@
 ﻿using Middleware.Models.Domain;
+using Middleware.Models.Dto.Hardware;
 using Redis.OM.Modeling;
 
 namespace Middleware.Models.Dto;
@@ -21,18 +22,12 @@ public class EdgeDto : Dto
     public Uri EdgeIp { get; set; }
     [Indexed]
     public string MacAddress { get; set; }
+
+    [Indexed()]
+    public HardwareSpec HardwareSpec { get; set; } = new();
+    
     [Indexed(Sortable = true)]
-    public int Cpu { get; set; }
-    [Indexed(Sortable = true)]
-    public int Ram { get; set; }
-    [Indexed(Sortable = true)]
-    public int VirtualRam { get; set; }
-    [Indexed(Sortable = true)]
-    public long DiskStorage { get; set; }
-    [Indexed(Sortable = true)]
-    public int NumberOfCores { get; set; }
-    [Indexed(Sortable = true)]
-    public DateTimeOffset LastUpdatedTime { get; set; }
+    public DateTimeOffset LastUpdatedTime { get; set; } = DateTimeOffset.Now;
     [Indexed]
     public bool IsOnline { get; set; }
 
@@ -46,11 +41,11 @@ public class EdgeDto : Dto
             Type = dto.Type,
             EdgeStatus = dto.EdgeStatus,
             EdgeIp = dto.EdgeIp,
-            NumberOfCores = dto.NumberOfCores,
-            DiskStorage = dto.DiskStorage,
-            VirtualRam = dto.VirtualRam,
-            Cpu = dto.Cpu,
-            Ram = dto.Ram,
+            NumberOfCores = dto.HardwareSpec.NumberCores,
+            DiskStorage = dto.HardwareSpec.StorageDisk,
+            VirtualRam = dto.HardwareSpec.VirtualRam,
+            Cpu = dto.HardwareSpec.Cpu,
+            Ram = dto.HardwareSpec.Ram,
             MacAddress = dto.MacAddress,
             LastUpdatedTime = dto.LastUpdatedTime.DateTime,
             IsOnline = dto.IsOnline

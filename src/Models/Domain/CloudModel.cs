@@ -28,13 +28,13 @@ public class CloudModel : BaseModel
     public long DiskStorage { get; set; }
 
     [JsonPropertyName("VirtualRam")]
-    public int VirtualRam { get; set; }
+    public long? VirtualRam { get; set; }
 
     [JsonPropertyName("CPU")]
     public int Cpu { get; set; }
 
     [JsonPropertyName("RAM")]
-    public int Ram { get; set; }
+    public long Ram { get; set; }
 
     [JsonPropertyName("MacAddress")]
     public string MacAddress { get; set; }
@@ -69,15 +69,17 @@ public class CloudModel : BaseModel
             Type = domain.Type,
             CloudStatus = domain.CloudStatus,
             CloudIp = domain.CloudIp,
-            NumberOfCores = domain.NumberOfCores,
-            DiskStorage = domain.DiskStorage,
-            VirtualRam = domain.VirtualRam,
-            Cpu = domain.Cpu,
-            Ram = domain.Ram,
+            HardwareSpec = new()
+            {
+                Cpu = domain.Cpu,
+                StorageDisk = domain.DiskStorage,
+                VirtualRam = domain.VirtualRam,
+                Ram = domain.Ram,
+                NumberCores = domain.NumberOfCores
+            },
             MacAddress = domain.MacAddress,
             LastUpdatedTime = domain.LastUpdatedTime,
             IsOnline = domain.IsOnline
         };
-
     }
 }

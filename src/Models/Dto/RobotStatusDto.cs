@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Middleware.Models.Domain;
+﻿using Middleware.Models.Domain;
 using Redis.OM.Modeling;
 
 namespace Middleware.Models.Dto
@@ -30,8 +25,6 @@ namespace Middleware.Models.Dto
 
         [Indexed(Sortable = true)]
         public DateTimeOffset Timestamp { get; set; }
-
-
 
         public override BaseModel ToModel()
         {

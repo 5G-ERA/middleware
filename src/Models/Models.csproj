@@ -11,8 +11,4 @@
       <PackageReference Include="Redis.OM" Version="0.4.0" />
     </ItemGroup>
 
-    <ItemGroup>
-      <Folder Include="Mapping\" />
-    </ItemGroup>
-
 </Project>

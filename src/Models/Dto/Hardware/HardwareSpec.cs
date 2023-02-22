@@ -6,11 +6,13 @@ namespace Middleware.Models.Dto.Hardware;
 public class HardwareSpec
 {
     [Indexed]
-    public long Cpu { get; set; }
+    public int Cpu { get; set; }
     [Indexed]
     public long Ram { get; set; }
     [Indexed]
     public long StorageDisk { get; set; }
     [Indexed]
-    public long NumberCores { get; set; }
+    public int NumberCores { get; set; }
+    [Indexed]
+    public long? VirtualRam { get; set; }
 }

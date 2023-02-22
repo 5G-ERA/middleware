@@ -1,5 +1,6 @@
 ﻿using System.Text.Json.Serialization;
 using Middleware.Models.Dto;
+using Middleware.Models.Dto.Hardware;
 
 namespace Middleware.Models.Domain;
 
@@ -27,10 +28,10 @@ public class EdgeModel : BaseModel
     public int Cpu { get; set; }
 
     [JsonPropertyName("RAM")]
-    public int Ram { get; set; }
+    public long Ram { get; set; }
 
     [JsonPropertyName("VirtualRam")]
-    public int VirtualRam { get; set; }
+    public long? VirtualRam { get; set; }
 
     [JsonPropertyName("DiskStorage")]
     public long DiskStorage { get; set; }
@@ -69,11 +70,14 @@ public class EdgeModel : BaseModel
             EdgeStatus = domain.EdgeStatus,
             EdgeIp = domain.EdgeIp,
             MacAddress = domain.MacAddress,
-            Cpu = domain.Cpu,
-            Ram = domain.Ram,
-            VirtualRam = domain.VirtualRam,
-            DiskStorage = domain.DiskStorage,
-            NumberOfCores = domain.NumberOfCores,
+            HardwareSpec = new HardwareSpec
+            {
+              Cpu  = domain.Cpu,
+              Ram = domain.Ram,
+              NumberCores = domain.NumberOfCores,
+              StorageDisk = domain.DiskStorage,
+              VirtualRam = domain.VirtualRam
+            },
             LastUpdatedTime = domain.LastUpdatedTime,
             IsOnline = domain.IsOnline
         };
