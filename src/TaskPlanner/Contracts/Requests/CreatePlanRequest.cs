@@ -1,5 +1,5 @@
 ﻿using System.Text.Json.Serialization;
-using Middleware.Common.Models;
+using Middleware.Models.Domain;
 
 namespace Middleware.TaskPlanner.Contracts.Requests;
 
