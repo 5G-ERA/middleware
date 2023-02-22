@@ -98,8 +98,8 @@ public class InstanceModel : BaseModel
             IsReusable = domain.IsReusable,
             DesiredStatus = domain.DesiredStatus,
             ServiceUrl = domain.ServiceUrl,
-            RosTopicsPub = domain.RosTopicsPub?.Select(x => x.ToDto()).ToList(),
-            RosTopicsSub = domain.RosTopicsSub?.Select(x => x.ToDto()).ToList(),
+            RosTopicsPub = domain.RosTopicsPub.Select(x => x.ToDto()).ToList(),
+            RosTopicsSub = domain.RosTopicsSub.Select(x => x.ToDto()).ToList(),
             RosVersion = domain.RosVersion,
             ROSDistro = domain.ROSDistro,
             Tags = domain.Tags,
@@ -111,7 +111,7 @@ public class InstanceModel : BaseModel
                 MinimumRam = domain.MinimumRam,
                 MinimumNumCores = domain.MinimumRam
             },
-            OnboardedTime = domain.OnboardedTime == default ? DateTimeOffset.Now : domain.OnboardedTime
+            OnboardedTime = domain.OnboardedTime
         };
     }
 }

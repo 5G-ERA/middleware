@@ -78,7 +78,7 @@ public class CloudModel : BaseModel
                 NumberCores = domain.NumberOfCores
             },
             MacAddress = domain.MacAddress,
-            LastUpdatedTime = domain.LastUpdatedTime == default ? DateTimeOffset.Now : domain.LastUpdatedTime,
+            LastUpdatedTime = domain.LastUpdatedTime,
             IsOnline = domain.IsOnline
         };
     }

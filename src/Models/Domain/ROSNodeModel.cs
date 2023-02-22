@@ -40,9 +40,9 @@ namespace Middleware.Models.Domain
             return new RosNode()
             {
                 Name = domain.Name,
-                Publications = domain.Publications?.Select(x => x.ToDto()).ToList(),
-                Subscriptions = domain.Subscriptions?.Select(x => x.ToDto()).ToList(),
-                Services = domain.Services?.Select(x => x.ToDto()).ToList()
+                Publications = domain.Publications.Select(x => x.ToDto()).ToList(),
+                Subscriptions = domain.Subscriptions.Select(x => x.ToDto()).ToList(),
+                Services = domain.Services.Select(x => x.ToDto()).ToList()
             };
         }
     }

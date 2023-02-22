@@ -240,8 +240,7 @@ namespace Middleware.RedisInterface.Services
                     continue;
 
                 entity.Id = Guid.Parse(id?.ToString());
-                var typeStr = type?.ToString(); 
-                entity.Type = (typeStr == "CONTAINER" ? "CONTAINERIMAGE" : typeStr)!;
+                entity.Type = type?.ToString();
                 entity.Name = name?.ToString();
 
                 entities.Add(entity);

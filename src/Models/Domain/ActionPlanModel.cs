@@ -65,10 +65,10 @@ public sealed class ActionPlanModel : BaseModel
             Name = domain.Name,
             Status = domain.Status,
             IsReplan = domain.IsReplan,
-            LastStatusChange = domain.LastStatusChange == default ? DateTimeOffset.Now : domain.LastStatusChange,
+            LastStatusChange = domain.LastStatusChange,
             ActionSequence = domain.ActionSequence,
             RobotId = domain.RobotId.ToString(),
-            TaskStartedAt = domain.TaskStartedAt == default ? DateTimeOffset.Now : domain.TaskStartedAt,
+            TaskStartedAt = domain.TaskStartedAt,
         }; ;
     }
 }

@@ -78,7 +78,7 @@ public class EdgeModel : BaseModel
               StorageDisk = domain.DiskStorage,
               VirtualRam = domain.VirtualRam
             },
-            LastUpdatedTime = domain.LastUpdatedTime == default ? DateTimeOffset.Now : domain.LastUpdatedTime,
+            LastUpdatedTime = domain.LastUpdatedTime,
             IsOnline = domain.IsOnline
         };
     }
