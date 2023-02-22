@@ -30,7 +30,7 @@ public static class QuartzExtensions
                                  "Updates their status and reports any seen failures.")
                 .WithSimpleSchedule(x => 
                     x.WithInterval(TimeSpan.FromSeconds(AppConfig.StatusCheckInterval)).RepeatForever())
-                .StartAt(DateBuilder.EvenMinuteDateBefore(DateTimeOffset.UtcNow.AddMinutes(2))));
+                .StartAt(DateBuilder.EvenMinuteDateBefore(DateTimeOffset.Now.AddMinutes(2))));
 
             q.ScheduleJob<RefreshMiddlewareAddressJob>(trg => trg
                 .WithIdentity("Update the Middleware address Job")
