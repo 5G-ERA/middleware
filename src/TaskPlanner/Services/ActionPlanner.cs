@@ -1,7 +1,8 @@
-﻿using Middleware.Common.MessageContracts;
-using Middleware.Common.Models;
-using Middleware.Common.Services;
+using Middleware.Models.Domain;
 using Middleware.TaskPlanner.Exceptions;
+using KeyValuePair = Middleware.Models.Domain.KeyValuePair;
+using Middleware.Common.MessageContracts;
+using Middleware.Common.Services;
 using Middleware.TaskPlanner.Publishers;
 
 namespace Middleware.TaskPlanner.Services;
@@ -15,7 +16,7 @@ public class ActionPlanner : IActionPlanner
     public DateTime CurrentTime { get; set; }
     public string InferingProcess { get; set; }
 
-    public List<Common.Models.KeyValuePair> Answer { get; set; }
+    public List<KeyValuePair> Answer { get; set; }
 
     public ActionPlanner(IRedisInterfaceClientService redisInterfaceClient,
         IPublisher<DeployPlanMessage> deployPlanPublisher)
@@ -49,8 +50,6 @@ public class ActionPlanner : IActionPlanner
             throw new ArgumentException(nameof(taskId));
         if (robotId == Guid.Empty)
             throw new ArgumentException(nameof(robotId));
-
-
         var robot = await _redisInterfaceClient.RobotGetByIdAsync(robotId);
         if (robot is null)
             throw new ArgumentException("The specified robot is not present in the Middleware database", nameof(robot));
@@ -69,10 +68,10 @@ public class ActionPlanner : IActionPlanner
             ActionModel actionItem = await _redisInterfaceClient.ActionGetByIdAsync(actionId);
             if (actionItem is null)
                 continue;
-            
+
             task.ActionSequence.Add(actionItem);
         }
-        
+
         return new Tuple<TaskModel, RobotModel>(task, robot);
     }
 
@@ -427,7 +426,7 @@ public class ActionPlanner : IActionPlanner
             {
                 if (entryDialog.Name == "TaskPriority")
                 {
-                    Common.Models.KeyValuePair answer = Answer.First();
+                    KeyValuePair answer = Answer.First();
                     task.TaskPriority = (int)answer.Value;
                 }
             }

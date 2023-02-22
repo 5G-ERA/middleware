@@ -1,4 +1,6 @@
-﻿using Middleware.Common.Models;
+﻿
+
+using Middleware.Models.Domain;
 
 namespace Middleware.Common.MessageContracts;
 

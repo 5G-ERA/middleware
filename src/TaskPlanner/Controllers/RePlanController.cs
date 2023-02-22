@@ -1,12 +1,9 @@
-using System;
 using System.Net;
 using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
-using Middleware.Common.Models;
 using Middleware.TaskPlanner.ApiReference;
-using System;
-using YamlDotNet.Core;
 using Middleware.Common.Responses;
+using Middleware.Models.Domain;
 using Middleware.Common.Services;
 using Middleware.TaskPlanner.Contracts.Requests;
 using Middleware.TaskPlanner.Services;
@@ -98,10 +95,10 @@ namespace Middleware.TaskPlanner.Controllers
                 {
                     BaseModel location;
                     //TODO: recognize by type PlacementType property
-                    location = action.Placement.ToLower().Contains("cloud") 
-                        ? await _redisInterfaceClient.GetCloudByNameAsync(action.Placement) 
+                    location = action.Placement.ToLower().Contains("cloud")
+                        ? await _redisInterfaceClient.GetCloudByNameAsync(action.Placement)
                         : await _redisInterfaceClient.GetEdgeByNameAsync(action.Placement);
-                    
+
                     foreach (InstanceModel instance in action.Services)
                     {
                         var result = await _redisInterfaceClient.AddRelationAsync(instance, location, "LOCATED_AT");

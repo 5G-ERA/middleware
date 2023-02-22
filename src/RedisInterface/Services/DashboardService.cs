@@ -1,13 +1,12 @@
 ﻿using Middleware.Common;
 using Middleware.Common.Enums;
-using Middleware.Common.Models;
-using Middleware.Common.Repositories;
-using Middleware.Common.Repositories.Abstract;
+using Middleware.DataAccess.Repositories.Abstract;
 using Middleware.RedisInterface.Responses;
 using Middleware.Common.ExtensionMethods;
 using Microsoft.AspNetCore.Http;
 using StackExchange.Redis;
 using System.Reflection.Metadata.Ecma335;
+using Middleware.Models.Domain;
 
 namespace Middleware.RedisInterface.Services
 {
@@ -83,11 +82,11 @@ namespace Middleware.RedisInterface.Services
                 }
 
                 var location = new LocationStatusResponse(cloud.Name,
-                                   cloud.LastUpdatedTime,
-                                   cloud.CloudStatus,
-                                   cloud.IsOnline,
-                                   noOfContainers > 0,
-                                   noOfContainers);
+                    cloud.LastUpdatedTime,
+                    cloud.CloudStatus,
+                    cloud.IsOnline,
+                    noOfContainers > 0,
+                    noOfContainers);
                 locations.Add(location);
             }
 
@@ -106,11 +105,11 @@ namespace Middleware.RedisInterface.Services
                 }
 
                 var location = new LocationStatusResponse(edge.Name,
-                                   edge.LastUpdatedTime,
-                                   edge.EdgeStatus,
-                                   edge.IsOnline,
-                                   noOfContainers > 0,
-                                   noOfContainers);
+                    edge.LastUpdatedTime,
+                    edge.EdgeStatus,
+                    edge.IsOnline,
+                    noOfContainers > 0,
+                    noOfContainers);
                 locations.Add(location);
             }
             return new(filter.FilterResult(locations), locations.Count);

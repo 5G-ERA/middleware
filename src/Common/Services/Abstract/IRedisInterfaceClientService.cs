@@ -1,4 +1,4 @@
-﻿using Middleware.Common.Models;
+using Middleware.Models.Domain;
 
 namespace Middleware.Common.Services;
 
@@ -33,7 +33,7 @@ public interface IRedisInterfaceClientService
     /// <param name="token">Token</param>
     /// <returns>Robot data</returns>
     Task<RobotModel> RobotGetByIdAsync(Guid id, CancellationToken token);
-    
+
     /// <summary>
     /// Gets task definition by id
     /// </summary>
@@ -48,7 +48,7 @@ public interface IRedisInterfaceClientService
     /// <param name="token">Token</param>
     /// <returns>Task data</returns>
     Task<TaskModel> TaskGetByIdAsync(Guid id, CancellationToken token);
-    
+
     /// <summary>
     /// Gets the alternative for the specified instance
     /// </summary>
@@ -88,7 +88,7 @@ public interface IRedisInterfaceClientService
     /// <param name="relationName"></param>
     /// <returns></returns>
     Task<List<RelationModel>> GetRelationAsync<TSource>(TSource source, string relationName) where TSource : BaseModel;
-    
+
     /// <summary>
     /// Get Action by its id
     /// </summary>

@@ -1,7 +1,5 @@
 ﻿using System.Net;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Middleware.Common.Models;
 
 namespace Middleware.RedisInterface.Controllers
 {

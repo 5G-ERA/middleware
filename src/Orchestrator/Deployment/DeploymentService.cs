@@ -5,9 +5,9 @@ using Middleware.Common;
 using Middleware.Common.Config;
 using Middleware.Common.Enums;
 using Middleware.Common.ExtensionMethods;
-using Middleware.Common.Models;
 using Middleware.Common.Responses;
 using Middleware.Common.Services;
+using Middleware.Models.Domain;
 using Middleware.Orchestrator.ApiReference;
 using Middleware.Orchestrator.Exceptions;
 using Middleware.Orchestrator.Models;
@@ -82,7 +82,7 @@ public class DeploymentService : IDeploymentService
                         // BB: service can be reused, to be decided by the resource planner
                         if (service.ServiceInstanceId != Guid.Empty)
                             continue;
-                        
+
                         await DeployService(k8SClient, service, deploymentNames);
                         await _redisInterfaceClient.AddRelationAsync(service, location, "LOCATED_AT");
                     }

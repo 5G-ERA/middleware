@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Middleware.Common.Config
+﻿namespace Middleware.Common.Config
 {
     public class RedisConfig
     {
@@ -13,5 +7,6 @@ namespace Middleware.Common.Config
         public string HostName { get; set; }
 
         public string Password { get; set; }
+        public string ClusterHostname { get; set; }
     }
 }

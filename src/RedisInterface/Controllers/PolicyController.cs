@@ -1,8 +1,8 @@
 ﻿using System.Net;
 using Microsoft.AspNetCore.Mvc;
-using Middleware.Common.Models;
-using Middleware.Common.Repositories;
 using Middleware.Common.Responses;
+using Middleware.DataAccess.Repositories.Abstract;
+using Middleware.Models.Domain;
 
 namespace Middleware.RedisInterface.Controllers
 {
@@ -94,7 +94,7 @@ namespace Middleware.RedisInterface.Controllers
         {
             try
             {
-                List<PolicyModel> models = await _policyRepository.GetAllPoliciesAsync();
+                List<PolicyModel> models = await _policyRepository.GetAllAsync();
                 if (models.Any() == false)
                 {
                     return NotFound(new ApiResponse((int)HttpStatusCode.NotFound, "Objects were not found."));

@@ -16,7 +16,7 @@ public static class CommonExtensions
     public static IServiceCollection RegisterCommonServices(this IServiceCollection services)
     {
         services.AddSingleton<IEnvironment, MiddlewareEnvironment>();
-        
+
         services.AddHttpClient(AppConfig.RedisApiClientName, (a) =>
         {
             a.BaseAddress = new Uri(Environment.GetEnvironmentVariable("REDIS_INTERFACE_ADDRESS"));
@@ -24,8 +24,8 @@ public static class CommonExtensions
                 new MediaTypeWithQualityHeaderValue("application/json"));
         });
         services.AddScoped<IRedisInterfaceClientService, RedisInterfaceClientService>();
-        
-        
+
+
         return services;
     }
     /// <summary>
@@ -52,28 +52,6 @@ public static class CommonExtensions
         return builder;
     }
 
-    /// <summary>
-    /// Configures the Redis Connection for the Application. The connection includes standard redis client via <see cref="ConnectionMultiplexer"/>
-    /// and connection to Redis Graph using <seealso cref="RedisGraphClient"/>.
-    /// </summary>
-    /// <param name="builder"></param>
-    /// <returns></returns>
-    public static WebApplicationBuilder RegisterRedis(this WebApplicationBuilder builder) 
-    {
-        var config = builder.Configuration.GetSection(RedisConfig.ConfigName).Get<RedisConfig>();
-
-        ConnectionMultiplexer multiplexer = ConnectionMultiplexer.Connect(config.HostName, (c) =>
-        {
-            c.Password = config.Password;
-        });
-        builder.Services.AddSingleton<IConnectionMultiplexer>(multiplexer);
-        RedisGraphClient redisGraphClient = new RedisGraphClient(multiplexer);
-        builder.Services.AddSingleton<IRedisGraphClient>(redisGraphClient);
-
-        return builder;
-
-    }
-
     public static IServiceCollection AddUriHelper(this IServiceCollection services)
     {
 
@@ -87,5 +65,5 @@ public static class CommonExtensions
         });
         return services;
     }
-    
+
 }

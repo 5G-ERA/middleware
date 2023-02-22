@@ -1,8 +1,8 @@
 ﻿using System.Net;
 using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
-using Middleware.Common.Models;
 using Middleware.Common.Responses;
+using Middleware.Models.Domain;
 using Middleware.Orchestrator.ApiReference;
 using Middleware.Orchestrator.Deployment;
 

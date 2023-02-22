@@ -1,8 +1,8 @@
 ﻿using System.Net;
 using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
-using Middleware.Common.Models;
 using Middleware.Common.Responses;
+using Middleware.Models.Domain;
 using Middleware.Common.Services;
 using Middleware.TaskPlanner.ApiReference;
 using Middleware.TaskPlanner.Contracts.Requests;
@@ -41,23 +41,23 @@ namespace Middleware.TaskPlanner.Controllers
         {
             if (inputModel == null)
                 return BadRequest("Parameters were not specified.");
-            
+
             if (inputModel.IsValid() == false)
                 return BadRequest(new ApiResponse((int)HttpStatusCode.BadRequest,
                     "Parameters were not specified or wrongly specified."));
 
             Guid id = inputModel.Id;
             bool lockResource = inputModel.LockResourceReUse;
-            Guid robotId = inputModel.RobotId; 
+            Guid robotId = inputModel.RobotId;
 
             try
             {
                 _actionPlanner.Initialize(new List<ActionModel>(), DateTime.Now);
-                
+
                 var (plan, robot2) =
                     await _actionPlanner.Plan(id, robotId);
                 plan.ResourceLock = lockResource;
-                
+
                 // call resource planner for resources
                 ResourcePlanner.TaskModel tmpTaskSend = _mapper.Map<ResourcePlanner.TaskModel>(plan);
                 ResourcePlanner.RobotModel tmpRobotSend = _mapper.Map<ResourcePlanner.RobotModel>(robot2);
@@ -67,14 +67,14 @@ namespace Middleware.TaskPlanner.Controllers
                     Task = tmpTaskSend
                 };
                 ResourcePlanner.TaskModel tmpFinalTask =
-                    await _resourcePlannerClient.GetResourcePlanAsync(resourceInput); 
+                    await _resourcePlannerClient.GetResourcePlanAsync(resourceInput);
                 TaskModel resourcePlan = _mapper.Map<TaskModel>(tmpFinalTask);
 
                 if (dryRun)
                     return Ok(resourcePlan);
 
                 await _redisInterfaceClient.AddRelationAsync(robot2, resourcePlan, "OWNS");
-                
+
                 await _actionPlanner.PublishPlanAsync(resourcePlan, robot2);
 
                 return Ok(resourcePlan);
@@ -94,7 +94,7 @@ namespace Middleware.TaskPlanner.Controllers
                     new ApiResponse(statusCode, $"There was an error while preparing the task plan: {ex.Message}"));
             }
         }
-        
+
         [HttpPost("semantic")]
         [ProducesResponseType(typeof(TaskModel), (int)HttpStatusCode.OK)]
         [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.NotFound)]
@@ -122,7 +122,7 @@ namespace Middleware.TaskPlanner.Controllers
             bool lockResource = inputModel.LockResourceReUse;
             Guid robotId = inputModel.RobotId; //robot id
             bool contextKnown = inputModel.ContextKnown;
-            List<Common.Models.DialogueModel> dialogueTemp = inputModel.Questions;
+            List<DialogueModel> dialogueTemp = inputModel.Questions;
 
             try
             {
@@ -140,14 +140,14 @@ namespace Middleware.TaskPlanner.Controllers
                     Task = tmpTaskSend
                 };
                 ResourcePlanner.TaskModel tmpFinalTask =
-                    await _resourcePlannerClient.GetResourcePlanAsync(resourceInput); 
+                    await _resourcePlannerClient.GetResourcePlanAsync(resourceInput);
                 TaskModel resourcePlan = _mapper.Map<TaskModel>(tmpFinalTask);
 
                 if (dryRun) // Will skip the orchestrator if true (will not deploy the actual plan.)
                     return Ok(resourcePlan);
 
                 await _redisInterfaceClient.AddRelationAsync(robot2, resourcePlan, "OWNS");
-                
+
                 await _actionPlanner.PublishPlanAsync(resourcePlan, robot2);
 
                 //TODO: orchestrator has to create the relations between the instance and the location the services are deployed in

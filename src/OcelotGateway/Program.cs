@@ -3,8 +3,9 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using Middleware.Common.Config;
 using Middleware.Common.ExtensionMethods;
-using Middleware.Common.Repositories;
-using Middleware.Common.Repositories.Abstract;
+using Middleware.DataAccess.ExtensionMethods;
+using Middleware.DataAccess.Repositories;
+using Middleware.DataAccess.Repositories.Abstract;
 using Ocelot.Cache.CacheManager;
 using Ocelot.DependencyInjection;
 using Ocelot.Middleware;
@@ -46,7 +47,8 @@ builder.Services.AddAuthentication(
         };
     });
 builder.RegisterRedis();
-builder.Services.AddScoped<IUserRepository, UserRepository>();
+
+builder.Services.AddScoped<IUserRepository, RedisUserRepository>();
 
 var app = builder.Build();
 

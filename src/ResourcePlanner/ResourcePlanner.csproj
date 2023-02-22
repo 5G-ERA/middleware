@@ -12,6 +12,13 @@
 	</PropertyGroup>
 
 	<ItemGroup>
+	  <Compile Remove="Exceptions\**" />
+	  <Content Remove="Exceptions\**" />
+	  <EmbeddedResource Remove="Exceptions\**" />
+	  <None Remove="Exceptions\**" />
+	</ItemGroup>
+
+	<ItemGroup>
 
 
 		<OpenApiReference Include="..\Orchestrator\OrchestratorSpec.json" CodeGenerator="NSwagCSharp" Namespace="Middleware.ResourcePlanner.Orchestrator" ClassName="OrchestratorApiClient" Link="OpenAPIs\OrchestratorSpec.json" />
@@ -40,6 +47,7 @@
 
 	<ItemGroup>
 		<ProjectReference Include="..\Common\Common.csproj" />
+		<ProjectReference Include="..\DataAccess\DataAccess.csproj" />
 	</ItemGroup>
 
 </Project>

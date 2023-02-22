@@ -38,4 +38,8 @@
 	  <PackageReference Include="System.Collections" Version="4.3.0" />	
 	  <PackageReference Include="KubernetesClient" Version="8.0.12" />
 	</ItemGroup>
+
+	<ItemGroup>
+	  <ProjectReference Include="..\Models\Models.csproj" />
+	</ItemGroup>
 </Project>

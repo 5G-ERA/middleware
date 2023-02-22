@@ -1,9 +1,9 @@
-using Middleware.Common.Config;
 using Middleware.Common.ExtensionMethods;
-using Middleware.Common.Repositories;
-using Middleware.Common.Repositories.Abstract;
 using Middleware.RedisInterface;
 using Middleware.RedisInterface.Services;
+using Middleware.DataAccess.ExtensionMethods;
+using Middleware.RedisInterface.Services.Abstract;
+using Middleware.DataAccess.HostedServices;
 using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -32,18 +32,10 @@ builder.Services.AddHttpClient("healthCheckClient");
 
 builder.RegisterRedis();
 builder.Services.AddUriHelper();
-
-builder.Services.AddScoped<IActionRepository, ActionRepository>();
-builder.Services.AddScoped<IActionPlanRepository, ActionPlanRepository>();
-builder.Services.AddScoped<ICloudRepository, CloudRepository>();
-builder.Services.AddScoped<IContainerImageRepository, ContainerImageRepository>();
-builder.Services.AddScoped<IEdgeRepository, EdgeRepository>();
-builder.Services.AddScoped<IInstanceRepository, InstanceRepository>();
-builder.Services.AddScoped<IPolicyRepository, PolicyRepository>();
-builder.Services.AddScoped<IRobotRepository, RobotRepository>();
-builder.Services.AddScoped<ITaskRepository, TaskRepository>();
+builder.Services.AddHostedService<IndexCreationService>();
+builder.Services.RegisterRepositories();
 builder.Services.AddScoped<IDashboardService, DashboardService>();
-
+builder.Services.AddScoped<IActionService, ActionService>();
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.

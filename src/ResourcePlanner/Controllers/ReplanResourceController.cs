@@ -1,10 +1,9 @@
-﻿using System.Collections.Generic;
-using System.Net;
+﻿using System.Net;
 using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
-using Middleware.Common.Models;
-using Middleware.Common.Repositories;
 using Middleware.Common.Responses;
+using Middleware.DataAccess.Repositories.Abstract;
+using Middleware.Models.Domain;
 using Middleware.ResourcePlanner.ApiReference;
 using Middleware.ResourcePlanner.Models;
 

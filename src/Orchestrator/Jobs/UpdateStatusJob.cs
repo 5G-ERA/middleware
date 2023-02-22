@@ -5,7 +5,7 @@ using k8s.Models;
 using Middleware.Common.Config;
 using Middleware.Common.Enums;
 using Middleware.Common.ExtensionMethods;
-using Middleware.Common.Models;
+using Middleware.Models.Domain;
 using Middleware.Orchestrator.ApiReference;
 using Middleware.Orchestrator.Deployment;
 using Quartz;
