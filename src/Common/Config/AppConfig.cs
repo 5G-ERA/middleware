@@ -59,4 +59,5 @@ public static class AppConfig
         builder.Path = "/status/netapp";
         return builder.ToString();
     }
+    public static string MiddlewareDeploymentLocationName { get; set; }
 }

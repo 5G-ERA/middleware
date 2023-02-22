@@ -4,82 +4,117 @@ using Middleware.Common;
 using Middleware.Common.Enums;
 using Middleware.Common.Responses;
 using Middleware.Models.Domain;
+using Middleware.Common.Services;
 using Middleware.ResourcePlanner.ApiReference;
 using KeyValuePair = Middleware.Models.Domain.KeyValuePair;
-
 
 namespace Middleware.ResourcePlanner;
 
 public interface IResourcePlanner
 {
     Task<TaskModel> Plan(TaskModel taskModel, RobotModel robot);
+    Task<TaskModel> SemanticPlan(TaskModel taskModel, RobotModel robot);
     Task<TaskModel> RePlan(TaskModel taskModel, TaskModel oldTaskmMdel, RobotModel robot, bool fullReplan);
 }
 
-public class ResourcePlanner : IResourcePlanner 
+public class ResourcePlanner : IResourcePlanner
 {
     private readonly IApiClientBuilder _apiClientBuilder;
     private readonly IMapper _mapper;
     private readonly IEnvironment _env;
     private readonly ILogger _logger;
-
-
-    public string Slice5gType { get; private set; } //eMBB, URLL, mMTC, MIoT, V2X
-    public bool StandAlone5GParam { get; private set; } // Standalone 5G or none-standalone.
-    public int NumSlicesTestBed { get; private set; } //number of slices available in testbed.
+    private readonly IRedisInterfaceClientService _redisInterfaceClient;
 
     public ResourcePlanner(IApiClientBuilder apiClientBuilder, IMapper mapper, IEnvironment env,
-        ILogger<ResourcePlanner> logger)
+        ILogger<ResourcePlanner> logger,
+        IRedisInterfaceClientService redisInterfaceClient)
 
     {
         _apiClientBuilder = apiClientBuilder;
         _mapper = mapper;
         _env = env;
         _logger = logger;
-
+        _redisInterfaceClient = redisInterfaceClient;
     }
 
+    public async Task<TaskModel> Plan(TaskModel taskModel, RobotModel robot)
+    {
+        var redisApiClient = _apiClientBuilder.CreateRedisApiClient();
+        var orchestratorApiClient = _apiClientBuilder.CreateOrchestratorApiClient();
+        // actionPlanner will give resource planner the actionSequence. 
+
+        // Get action sequence 
+        List<ActionModel> actionSequence = taskModel.ActionSequence;
+        if (actionSequence == null || actionSequence.Count == 0)
+            throw new ArgumentException("Action sequence cannot be empty");
+
+
+        // iterate throught actions in actionSequence
+        foreach (ActionModel action in actionSequence)
+        {
+            var images = await _redisInterfaceClient.GetRelationAsync(action, "NEEDS");
+            // images -> list of all relations with images for the action
+            foreach (RelationModel relation in images)
+            {
+                InstanceModel instance = await _redisInterfaceClient.InstanceGetByIdAsync(relation.PointsTo.Id);
+
+                if (CanBeReused(instance) && taskModel.ResourceLock)
+                {
+                    var reusedInstance = await GetInstanceToReuse(instance, orchestratorApiClient);
+                    if (reusedInstance is not null)
+                        instance = reusedInstance;
+                }
+                // add instance to actions
+                action.Services.Add(instance);
+            }
+            //Choose placement based on policy
+            // TODO: deploy only in the local MW
+            action.Placement = "local";//await InferResource(action, robot,false, new());
+        }
+
+        return taskModel;
+    }
     private async Task NetworkPlan(RobotModel robot)
     {
         var redisApiClient = _apiClientBuilder.CreateRedisApiClient();
         List<RedisInterface.ActivePolicy> activePolicies = (await redisApiClient.PolicyGetActiveAsync()).ToList();
 
         foreach (RedisInterface.ActivePolicy policy in activePolicies)
-        { 
-                if (policy.PolicyName == "Use5G")
+        {
+            if (policy.PolicyName == "Use5G")
+            {
+                //TODO: Query testbed for number of slices and types.
+
+                foreach (DialogueModel question in robot.Questions)
                 {
-                        //TODO: Query testbed for number of slices and types.
+                    if (question.Name == "StandAlone5G or NoneStandAlone5G")
+                    {
+                        KeyValuePair answer = question.Answer.First();
+                        bool StandAlone5GParam = (bool)answer.Value;
+                    }
+                }
 
-                        foreach (DialogueModel question in robot.Questions)
-                        {
-                            if (question.Name == "StandAlone5G or NoneStandAlone5G")
-                            {
-                                KeyValuePair answer = question.Answer.First();
-                                bool StandAlone5GParam = (bool)answer.Value;
-                            }
-                        }
-
-                        foreach (DialogueModel question in robot.Questions)
-                        {
-                            if (question.Name == "What type of 5G slice")
-                            {
-                                KeyValuePair answer = question.Answer.First();
-                                string Slice5gType = (string)answer.Value; // there is an upper limit of eight network slices that be used by a device
-                            }//Nest template
-                        }
+                foreach (DialogueModel question in robot.Questions)
+                {
+                    if (question.Name == "What type of 5G slice")
+                    {
+                        KeyValuePair answer = question.Answer.First();
+                        string Slice5gType = (string)answer.Value; // there is an upper limit of eight network slices that be used by a device
+                    }//Nest template
+                }
 
                 //TODO: Attach robot to slice in Redis graph
 
 
             }
-                if (policy.PolicyName == "Use4G")
-                {
+            if (policy.PolicyName == "Use4G")
+            {
 
-                }
-                if (policy.PolicyName == "UseWifi")
-                {
+            }
+            if (policy.PolicyName == "UseWifi")
+            {
 
-                }
+            }
 
         }
 
@@ -110,7 +145,7 @@ public class ResourcePlanner : IResourcePlanner
 
         // If replan flag is false
         if (replan == false)
-        { 
+        {
 
             // There are no free clouds
             if (freeClouds.Count() == 0)
@@ -131,20 +166,20 @@ public class ResourcePlanner : IResourcePlanner
             }
 
             //There are free clouds
-            
+
             else
             {
                 // Remove edges that do not have minimunm instance (NetApps) HW requirements
 
-                foreach(InstanceModel instance in actionParam.Services)
+                foreach (InstanceModel instance in actionParam.Services)
                 {
                     // Check with BB
-                     cloudsThatMeetNetAppRequirementsTotal.AddRange( freeClouds
-                    .Where(cloud => cloud.NumberOfCores <= instance.MinimumNumCores &&
-                            cloud.Ram <= actionParam.MinimumRam)
-                    .ToList());
+                    cloudsThatMeetNetAppRequirementsTotal.AddRange(freeClouds
+                   .Where(cloud => cloud.NumberOfCores <= instance.MinimumNumCores &&
+                           cloud.Ram <= actionParam.MinimumRam)
+                   .ToList());
                 }
-                
+
                 CloudModel freeCloudNodes = cloudsThatMeetNetAppRequirementsTotal.FirstOrDefault();
                 if (freeCloudNodes is not null)
                     return freeCloudNodes.Name;
@@ -199,7 +234,7 @@ public class ResourcePlanner : IResourcePlanner
     private Task<string> ResourcesInRequestedTaskRobot(RobotModel robot, ActionModel actionParam)
     {
         //Check if the robot can handle the HW requirements of instance (NetApp's)
-        foreach(InstanceModel instance in actionParam.Services)
+        foreach (InstanceModel instance in actionParam.Services)
         {
             if ((robot.NumberCores < actionParam.MinimumNumCores) && (robot.Ram < actionParam.MinimumRam))
             {
@@ -207,8 +242,8 @@ public class ResourcePlanner : IResourcePlanner
                 throw new Exception("The robot with ID " + robot.Id + "doesnt have the HW requirements to run the netApp with ID: " + actionParam.Id);
             }
         }
-            // Select the placement to te the robot
-            return Task.FromResult(robot.Name);//guid
+        // Select the placement to te the robot
+        return Task.FromResult(robot.Name);//guid
     }
 
     /// <summary>
@@ -252,21 +287,21 @@ public class ResourcePlanner : IResourcePlanner
                 // If list is empty, return empty string. TODO - Check with BB.
                 if (edgesThatMeetNetAppRequirements.Count() == 0)
                     return resourceName;
-                   //throw new InvalidOperationException("Coudnt not find a placement according to the active policies.");
+                //throw new InvalidOperationException("Coudnt not find a placement according to the active policies.");
             }
 
             //There are free edges
             else
             {
                 // Remove edges that do not have minimunm instance (NetApps) HW requirements
-                foreach(InstanceModel instance in actionParam.Services)
+                foreach (InstanceModel instance in actionParam.Services)
                 {
                     edgesThatMeetNetAppRequirementsTotal.AddRange(freeEdges
                     .Where(edge => edge.NumberOfCores <= actionParam.MinimumNumCores &&
                             edge.Ram <= actionParam.MinimumRam)
                     .ToList());
                 }
-                
+
                 EdgeModel freeEdgesNodes = edgesThatMeetNetAppRequirementsTotal.FirstOrDefault();
                 if (freeEdgesNodes is not null)
                     return freeEdgesNodes.Name;
@@ -275,7 +310,7 @@ public class ResourcePlanner : IResourcePlanner
 
         }
         // Replan flag is true
-        else 
+        else
         {
             // Get current HW resources of previosly selected edge
             RedisInterface.EdgeModel riEdgeData = await redisApiClient.EdgeGetDataByNameAsync(resourceName);
@@ -301,7 +336,7 @@ public class ResourcePlanner : IResourcePlanner
                     {
                         return lessBusyCandidatesEdges.Name;
                     }
-                    
+
                 }
             }
 
@@ -311,13 +346,13 @@ public class ResourcePlanner : IResourcePlanner
 
     }
 
-    private async Task<string> InferResource (ActionModel actionParam, RobotModel robot, bool rePlan, List<ActionModel> candidates) //Allocate correct placement based upon policies and priority
+    private async Task<string> InferResource(ActionModel actionParam, RobotModel robot, bool rePlan, List<ActionModel> candidates) //Allocate correct placement based upon policies and priority
     {
         bool ActionToConsider = false;
         // Check if this action requires infering a new placement
         foreach (ActionModel action in candidates)
         {
-            if ((actionParam.Name == action.Name) && (rePlan==true))
+            if ((actionParam.Name == action.Name) && (rePlan == true))
             {
                 ActionToConsider = true;
             }
@@ -357,9 +392,9 @@ public class ResourcePlanner : IResourcePlanner
                 //Store all in the cloud.
                 if (policy.PolicyName == "AllContainersInCloud")
                 {
-                    actionParam.Placement = await ResourcesInCloud(rePlan, robot, actionParam, resourceName);     
+                    actionParam.Placement = await ResourcesInCloud(rePlan, robot, actionParam, resourceName);
                 }
-               
+
             }
             // Return to the old placement - TODO: check if the placement is not fully busy.
             return actionParam.Placement;
@@ -368,20 +403,22 @@ public class ResourcePlanner : IResourcePlanner
         {
             // Return to the old placement.
             return actionParam.Placement;
-        }  
+        }
     }
 
 
-    public async Task<TaskModel> Plan(TaskModel taskModel, RobotModel robot)
+
+
+    public async Task<TaskModel> SemanticPlan(TaskModel taskModel, RobotModel robot)
     {
         var list = new List<ActionModel>();
         // modify the existing plan with the candidates
-        return await Plan(taskModel, robot, list); 
+        return await Plan(taskModel, robot, list);
     }
 
 
     /// <summary>
-    /// Plan from the resource level. Create relation for instancse and decide placement.
+    /// SemmanticPlan from the resource level. Create relation for instancse and decide placement.
     /// </summary>
     /// <param name="taskModel"></param>
     /// <param name="robot"></param>
@@ -431,7 +468,7 @@ public class ResourcePlanner : IResourcePlanner
                 action.Services.Add(instance);
             }
             // Choose placement based on policy
-            action.Placement = await InferResource(action, robot,false, actionCandidates);
+            action.Placement = await InferResource(action, robot, false, actionCandidates);
         }
 
         return taskModel;
@@ -472,7 +509,7 @@ public class ResourcePlanner : IResourcePlanner
         // Check in which of the failed actions action planner has not done some modifications.
         foreach (ActionModel failedAction in FailedActions)
         {
-            foreach(ActionModel newAction in actionSequence)
+            foreach (ActionModel newAction in actionSequence)
             {
                 if (failedAction.Order == newAction.Order) //Compare old action with new one
                 {
@@ -481,7 +518,7 @@ public class ResourcePlanner : IResourcePlanner
                         // Action planner did no change to the failed action.
                         ActionsCandidates.Add(failedAction);
                     }
-                    
+
                 }
             }
         }
@@ -568,6 +605,4 @@ public class ResourcePlanner : IResourcePlanner
     {
         return instance.IsReusable != null && instance.IsReusable.Value;
     }
-
-    
 }

@@ -4,6 +4,8 @@ using Microsoft.AspNetCore.Mvc;
 using Middleware.TaskPlanner.ApiReference;
 using Middleware.Common.Responses;
 using Middleware.Models.Domain;
+using Middleware.Common.Services;
+using Middleware.TaskPlanner.Contracts.Requests;
 using Middleware.TaskPlanner.Services;
 
 
@@ -31,7 +33,7 @@ namespace Middleware.TaskPlanner.Controllers
 
         [HttpPost] //http get replan 
         [ProducesResponseType(typeof(TaskModel), (int)HttpStatusCode.OK)]
-        public async Task<ActionResult<TaskModel>> GetReplan([FromBody] TaskReplanInputModel inputModel, bool dryRun = false)
+        public async Task<ActionResult<TaskModel>> GetReplan([FromBody] CreateRePlanRequest inputModel, bool dryRun = false)
         {
             try
             {
@@ -93,10 +95,10 @@ namespace Middleware.TaskPlanner.Controllers
                 {
                     BaseModel location;
                     //TODO: recognize by type PlacementType property
-                    location = action.Placement.ToLower().Contains("cloud") 
-                        ? await _redisInterfaceClient.GetCloudByNameAsync(action.Placement) 
+                    location = action.Placement.ToLower().Contains("cloud")
+                        ? await _redisInterfaceClient.GetCloudByNameAsync(action.Placement)
                         : await _redisInterfaceClient.GetEdgeByNameAsync(action.Placement);
-                    
+
                     foreach (InstanceModel instance in action.Services)
                     {
                         var result = await _redisInterfaceClient.AddRelationAsync(instance, location, "LOCATED_AT");

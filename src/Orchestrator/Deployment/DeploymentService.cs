@@ -6,6 +6,7 @@ using Middleware.Common.Config;
 using Middleware.Common.Enums;
 using Middleware.Common.ExtensionMethods;
 using Middleware.Common.Responses;
+using Middleware.Common.Services;
 using Middleware.Models.Domain;
 using Middleware.Orchestrator.ApiReference;
 using Middleware.Orchestrator.Exceptions;
@@ -31,6 +32,10 @@ public class DeploymentService : IDeploymentService
     /// Logger instance
     /// </summary>
     private readonly ILogger _logger;
+
+    private readonly IRedisInterfaceClientService _redisInterfaceClient;
+    private readonly IConfiguration _configuration;
+
     /// <summary>
     /// Redis Interface client allowing to make calls to the Redis Cache
     /// </summary>
@@ -40,12 +45,14 @@ public class DeploymentService : IDeploymentService
     /// </summary>
     private readonly string _awsRegistryName;
 
-    public DeploymentService(IKubernetesBuilder kubernetesBuilder, IApiClientBuilder apiClientBuilder, IEnvironment env, IMapper mapper, ILogger<DeploymentService> logger)
+    public DeploymentService(IKubernetesBuilder kubernetesBuilder, IApiClientBuilder apiClientBuilder, IEnvironment env, IMapper mapper, ILogger<DeploymentService> logger, IRedisInterfaceClientService redisInterfaceClient, IConfiguration configuration)
     {
         _kubernetesBuilder = kubernetesBuilder;
         _env = env;
         _mapper = mapper;
         _logger = logger;
+        _redisInterfaceClient = redisInterfaceClient;
+        _configuration = configuration;
         _redisClient = apiClientBuilder.CreateRedisApiClient();
         _awsRegistryName = _env.GetEnvVariable("AWS_IMAGE_REGISTRY");
     }
@@ -64,6 +71,10 @@ public class DeploymentService : IDeploymentService
 
             foreach (var seq in task.ActionSequence)
             {
+                BaseModel location;
+                location = seq.PlacementType.ToLower().Contains("cloud")
+                    ? await _redisInterfaceClient.GetCloudByNameAsync(seq.Placement)
+                    : await _redisInterfaceClient.GetEdgeByNameAsync(seq.Placement);
                 foreach (var service in seq.Services)
                 {
                     try
@@ -71,8 +82,9 @@ public class DeploymentService : IDeploymentService
                         // BB: service can be reused, to be decided by the resource planner
                         if (service.ServiceInstanceId != Guid.Empty)
                             continue;
-                        
+
                         await DeployService(k8SClient, service, deploymentNames);
+                        await _redisInterfaceClient.AddRelationAsync(service, location, "LOCATED_AT");
                     }
                     catch (Exception ex)
                     {
@@ -344,6 +356,7 @@ public class DeploymentService : IDeploymentService
     /// <param name="tag1"></param>
     public V1Deployment CreateStartupDeployment(string name, string tag)
     {
+        var mwConfig = _configuration.GetSection(MiddlewareConfig.ConfigName).Get<MiddlewareConfig>();
         var selector = new V1LabelSelector
         {
             MatchLabels = new Dictionary<string, string> { { "app", name } }
@@ -361,7 +374,10 @@ public class DeploymentService : IDeploymentService
             new ("REDIS_INTERFACE_ADDRESS", $"http://redis-interface-api"),
             new ("ORCHESTRATOR_ADDRESS", $"http://orchestrator-api"),
             new ("TASK_PLANNER_ADDRESS", $"http://task-planner-api"),
-            new ("RESOURCE_PLANNER_ADDRESS", $"http://resource-planner-api")
+            new ("RESOURCE_PLANNER_ADDRESS", $"http://resource-planner-api"),
+            new ("Middleware__Organization", mwConfig.Organization),
+            new ("Middleware__InstanceName", mwConfig.InstanceName),
+            new ("Middleware__InstanceType", mwConfig.InstanceType)
         };
         if (name.Contains("redis") || name == "gateway")
         {

@@ -12,6 +12,9 @@ services:
       - REDIS_PORT=${REDIS_PORT}
       - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
       - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
+      - Middleware__Organization=5G-ERA-DEV
+      - Middleware__InstanceName=MiddlewareBED 
+      - Middleware__InstanceType=Edge
     ports:
       - "5091:80"
       - "7091:443"
@@ -32,6 +35,10 @@ services:
       - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
       - REDIS_HOSTNAME=${REDIS_HOSTNAME}
       - REDIS_PORT=${REDIS_PORT}
+      - Middleware__Organization=5G-ERA-DEV
+      - Middleware__InstanceName=MiddlewareBED 
+      - Middleware__InstanceType=Edge
+
     ports:
       - "5036:80"
       - "7036:443"
@@ -49,6 +56,9 @@ services:
       - ORCHESTRATOR_ADDRESS=http://orchestrator.api
       - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
       - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
+      - Middleware__Organization=5G-ERA-DEV
+      - Middleware__InstanceName=MiddlewareBED 
+      - Middleware__InstanceType=Edge
     ports:
       - "5143:80"
       - "7094:443"
@@ -64,6 +74,9 @@ services:
       - ORCHESTRATOR_ADDRESS=http://orchestrator.api
       - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
       - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
+      - Middleware__Organization=5G-ERA-DEV
+      - Middleware__InstanceName=MiddlewareBED 
+      - Middleware__InstanceType=Edge
     ports:
       - "5263:80"
       - "7263:443"
