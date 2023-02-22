@@ -1,8 +1,10 @@
-﻿namespace Middleware.Models.Domain
+﻿using Middleware.Models.Dto.Ros;
+
+namespace Middleware.Models.Domain
 {
     public class ROSNodeModel
     {
-        public string name { get; set; }
+        public string Name { get; set; }
 
         public List<RosTopicModel> Publications { get; set; }
 
@@ -30,6 +32,18 @@
             }
 
             return topics;
+        }
+
+        public RosNode ToDto()
+        {
+            var domain = this;
+            return new RosNode()
+            {
+                Name = domain.Name,
+                Publications = domain.Publications.Select(x => x.ToDto()).ToList(),
+                Subscriptions = domain.Subscriptions.Select(x => x.ToDto()).ToList(),
+                Services = domain.Services.Select(x => x.ToDto()).ToList()
+            };
         }
     }
 }

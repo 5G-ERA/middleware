@@ -1,4 +1,5 @@
 ﻿using Middleware.Models.Domain;
+using Middleware.Models.Dto.Hardware;
 using Redis.OM.Modeling;
 using Middleware.Models.Dto.Ros;
 
@@ -38,12 +39,9 @@ public class InstanceDto : Dto
     [Indexed(Sortable = true)]
     public int SuccessRate { get; set; } = default!;
     [Indexed]
-    public string ServiceStatus { get; set; } = default!;    
-    
-    [Indexed(Sortable = true)]
-    public int MinimumRam { get; set; } = default!;
-    [Indexed(Sortable = true)]
-    public int MinimumNumCores { get; set; } = default!;
+    public string ServiceStatus { get; set; } = default!;
+    [Indexed]
+    public HardwareRequirements HardwareRequirements { get; set; } = new();
 
     [Indexed(Sortable = true)]
     public DateTimeOffset OnboardedTime { get; set; }
@@ -68,8 +66,8 @@ public class InstanceDto : Dto
             InstanceFamily = dto.InstanceFamily,
             SuccessRate = dto.SuccessRate,
             ServiceStatus = dto.ServiceStatus,
-            MinimumRam = dto.MinimumRam,
-            MinimumNumCores = dto.MinimumNumCores,
+            MinimumRam = dto.HardwareRequirements.MinimumRam,
+            MinimumNumCores = dto.HardwareRequirements.MinimumNumCores,
             OnboardedTime = dto.OnboardedTime.DateTime
         };
     }

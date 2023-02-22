@@ -17,7 +17,7 @@ public class ContainerImageDto : Dto
     [Indexed]
     public string Name { get; set; } = default!;
     [Indexed(Sortable = true)]
-    public DateTimeOffset Timestamp { get; set; } = default!;
+    public DateTimeOffset Timestamp { get; set; } = DateTimeOffset.Now;
     [Indexed]
     public string Description { get; set; } = default!;
     [Indexed]

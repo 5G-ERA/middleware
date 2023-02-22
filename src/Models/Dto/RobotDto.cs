@@ -14,15 +14,8 @@ public class RobotDto : Dto
     public override string Id { get; set; }
     [Indexed]
     public string? Name { get; set; }
-
-    [Indexed]
-    public int RosVersion { get; set; }
-
-    [Indexed]
-    public string RosDistro { get; set; }
-
     [Indexed(JsonPath = "$.RosDistro")]
-    public RosInfo Ros { get; set; } = new();
+    public RosInfo Ros { get; init; } = new();
 
     [Indexed(Sortable = true)]
     public DateTimeOffset LastUpdatedTime { get; set; }
@@ -38,13 +31,6 @@ public class RobotDto : Dto
     public long MaximumPayload { get; set; }
     [Indexed]
     public long MaximumTranslationalVelocity { get; set; }
-
-    [Indexed]
-    public Uri ROSRepo { get; set; }
-
-    [Indexed]
-    public List<ROSNodeModel> ROSNodes { get; set; }
-
     [Indexed]
     public string CurrentTaskId { get; set; }
 
@@ -72,28 +58,16 @@ public class RobotDto : Dto
     public List<Actuator> Actuators { get; set; } = new();
     [Indexed]
     public List<Manipulator> Manipulators { get; set; } = new();
+    
+    [Indexed]
+    public List<DialogueModel> Questions { get; init; } = new();
 
     [Indexed]
-    public long Cpu { get; set; }
-
-    [Indexed]
-    public long Ram { get; set; }
-
-    [Indexed]
-    public long StorageDisk { get; set; }
-
-    [Indexed]
-    public long NumberCores { get; set; }
-
-    [Indexed]
-    public List<DialogueModel> Questions { get; set; }
-
-    [Indexed]
-    public DateTimeOffset OnboardedTime { get; set; }
+    public DateTimeOffset OnboardedTime { get; init; } = DateTimeOffset.Now;
 
     [Indexed]
     public List<string> QuestionIds { get; set; } = new();
-    public HardwareSpec HardwareSpec { get; set; } = new();
+    public HardwareSpec HardwareSpec { get; init; } = new();
 
     public override BaseModel ToModel()
     {
@@ -121,6 +95,7 @@ public class RobotDto : Dto
             LocomotionTypes = dto.LocomotionType,
             RosDistro = dto.Ros.RosDistro,
             RosVersion = dto.Ros.RosVersion,
+            
             //TODO: fill remaining specification of the robot
         };
     }

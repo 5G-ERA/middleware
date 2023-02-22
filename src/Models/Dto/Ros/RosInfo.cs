@@ -10,6 +10,7 @@ public class RosInfo
     public string? RosDistro { get; set; }
     [Indexed]
     public Uri? RosRepo { get; set; }
+    
     [Indexed(JsonPath = "$.Name")]
     public List<RosNode> RosNodes { get; set; } = new();
 }

@@ -1,5 +1,6 @@
 ﻿using System.Text.Json.Serialization;
 using Middleware.Models.Dto;
+using Middleware.Models.Dto.Hardware;
 using Middleware.Models.Enums;
 
 namespace Middleware.Models.Domain;
@@ -105,8 +106,11 @@ public class InstanceModel : BaseModel
             InstanceFamily = domain.InstanceFamily,
             SuccessRate = domain.SuccessRate,
             ServiceStatus = domain.ServiceStatus,
-            MinimumRam = domain.MinimumRam,
-            MinimumNumCores = domain.MinimumNumCores,
+            HardwareRequirements = new HardwareRequirements()
+            {
+                MinimumRam = domain.MinimumRam,
+                MinimumNumCores = domain.MinimumRam
+            },
             OnboardedTime = domain.OnboardedTime
         };
     }

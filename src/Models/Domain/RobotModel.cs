@@ -1,6 +1,8 @@
 ﻿using System.Text.Json.Serialization;
 using System.Xml.Linq;
 using Middleware.Models.Dto;
+using Middleware.Models.Dto.Hardware;
+using Middleware.Models.Dto.Ros;
 using Middleware.Models.Enums;
 
 namespace Middleware.Models.Domain;
@@ -78,7 +80,7 @@ public class RobotModel : BaseModel
     public List<ManipulatorModel> Manipulators { get; set; }
 
     [JsonPropertyName("CPU")]
-    public long Cpu { get; set; }
+    public int Cpu { get; set; }
 
     [JsonPropertyName("RAM")] // Compulsory field
     public long Ram { get; set; }
@@ -90,7 +92,7 @@ public class RobotModel : BaseModel
     public long StorageDisk { get; set; }
 
     [JsonPropertyName("NumberCores")] // Compulsory field
-    public long NumberCores { get; set; }
+    public int NumberCores { get; set; }
 
     [JsonPropertyName("Questions")]
     public List<DialogueModel> Questions { get; set; }
@@ -207,14 +209,17 @@ public class RobotModel : BaseModel
         {
             Id = domain.Id.ToString(),
             Name = domain.Name,
-            RosVersion = domain.RosVersion,
-            RosDistro = domain.RosDistro,
+            Ros = new RosInfo()
+            {
+                RosDistro = domain.RosDistro,
+                RosNodes = domain.ROSNodes.Select(x=>x.ToDto()).ToList(),
+                RosRepo = domain.ROSRepo,
+                RosVersion = domain.RosVersion
+            },
             MaximumPayload = domain.MaximumPayload,
             MaximumTranslationalVelocity = domain.MaximumTranslationalVelocity,
             MaximumRotationalVelocity = domain.MaximumRotationalVelocity,
             RobotWeight = domain.RobotWeight,
-            ROSRepo = domain.ROSRepo,
-            ROSNodes = domain.ROSNodes,
             Manufacturer = domain.Manufacturer,
             ManufacturerUrl = domain.ManufacturerUrl,
             RobotModelName = domain.RobotModelName,
@@ -228,10 +233,13 @@ public class RobotModel : BaseModel
             Sensors = domain.Sensors.Select(x => x.ToDto()).ToList(),
             Actuators = domain.Actuators.Select(x => x.ToDto()).ToList(),
             Manipulators = domain.Manipulators.Select(x => x.ToDto()).ToList(),
-            Cpu = domain.Cpu,
-            Ram = domain.Ram,
-            StorageDisk = domain.StorageDisk,
-            NumberCores = domain.NumberCores,
+            HardwareSpec = new HardwareSpec()
+            {
+              Cpu  = domain.Cpu,
+              Ram = domain.Ram,
+              NumberCores = domain.NumberCores,
+              StorageDisk = domain.StorageDisk
+            },
             Questions = domain.Questions,
             LastUpdatedTime = domain.LastUpdatedTime,
             OnboardedTime = domain.OnboardedTime
