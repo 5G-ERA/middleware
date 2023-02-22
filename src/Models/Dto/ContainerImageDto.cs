@@ -17,7 +17,7 @@ public class ContainerImageDto : Dto
     [Indexed]
     public string Name { get; set; } = default!;
     [Indexed(Sortable = true)]
-    public DateTime Timestamp { get; set; } = default!;
+    public DateTimeOffset Timestamp { get; set; } = default!;
     [Indexed]
     public string Description { get; set; } = default!;
     [Indexed]
@@ -32,7 +32,7 @@ public class ContainerImageDto : Dto
         {
             Id = Guid.Parse(dto.Id!.Replace(Prefix, "")),
             Name = dto.Name,
-            Timestamp = dto.Timestamp,
+            Timestamp = dto.Timestamp.DateTime,
             Description = dto.Description,
             K8SDeployment = dto.K8SDeployment,
             K8SService = dto.K8SService

@@ -73,13 +73,13 @@ namespace Middleware.DataAccess.Repositories.Redis
             {
                 currentModel.Name = patch.Name;
             }
+            if (!string.IsNullOrEmpty(patch.Type))
+            {
+                currentModel.Type = patch.Type;
+            }
             if (!string.IsNullOrEmpty(patch.Timestamp.ToString()))
             {
                 currentModel.Timestamp = patch.Timestamp;
-            }
-            if (!string.IsNullOrEmpty(patch.IsExclusiveWithinType.ToString()))
-            {
-                currentModel.IsExclusiveWithinType = patch.IsExclusiveWithinType;
             }
             if (patch.IsActive != null)
             {
@@ -95,6 +95,10 @@ namespace Middleware.DataAccess.Repositories.Redis
             if (!string.IsNullOrEmpty(patch.Description))
             {
                 currentModel.Description = patch.Description;
+            }
+            if (!string.IsNullOrEmpty(patch.IsExclusiveWithinType.ToString()))
+            {
+                currentModel.IsExclusiveWithinType = patch.IsExclusiveWithinType;
             }
             await UpdateAsync(currentModel);
             return currentModel;

@@ -89,7 +89,7 @@ public class RobotDto : Dto
     public List<DialogueModel> Questions { get; set; }
 
     [Indexed]
-    public DateTime OnboardedTime { get; set; }
+    public DateTimeOffset OnboardedTime { get; set; }
 
     [Indexed]
     public List<string> QuestionIds { get; set; } = new();

@@ -32,7 +32,7 @@ public class CloudDto : Dto
     [Indexed]
     public string MacAddress { get; set; }
     [Indexed(Sortable = true)]
-    public DateTime LastUpdatedTime { get; set; }
+    public DateTimeOffset LastUpdatedTime { get; set; }
     [Indexed]
     public bool IsOnline { get; set; }
 
@@ -52,7 +52,7 @@ public class CloudDto : Dto
             Cpu = dto.Cpu,
             Ram = dto.Ram,
             MacAddress = dto.MacAddress,
-            LastUpdatedTime = dto.LastUpdatedTime,
+            LastUpdatedTime = dto.LastUpdatedTime.DateTime,
             IsOnline = dto.IsOnline
         };
     }

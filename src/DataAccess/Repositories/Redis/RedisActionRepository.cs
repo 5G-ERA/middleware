@@ -26,7 +26,10 @@ public class RedisActionRepository : RedisRepository<ActionModel, ActionDto>, IA
         {
             currentModel.Name = patch.Name;
         }
-
+        if (patch.Tags != null)
+        {
+            currentModel.Tags = patch.Tags;
+        }
         if (!string.IsNullOrEmpty(patch.Order.ToString()))
         {
             currentModel.Order = patch.Order;
@@ -35,9 +38,29 @@ public class RedisActionRepository : RedisRepository<ActionModel, ActionDto>, IA
         {
             currentModel.Placement = patch.Placement;
         }
+        if (!string.IsNullOrEmpty(patch.PlacementType))
+        {
+            currentModel.PlacementType = patch.PlacementType;
+        }
         if (!string.IsNullOrEmpty(patch.ActionPriority))
         {
             currentModel.ActionPriority = patch.ActionPriority;
+        }
+        if (!string.IsNullOrEmpty(patch.ActionStatus))
+        {
+            currentModel.ActionStatus = patch.ActionStatus;
+        }
+        if (patch.Services != null)
+        {
+            currentModel.Services = patch.Services;
+        }
+        if (!string.IsNullOrEmpty(patch.MinimumRam.ToString()))
+        {
+            currentModel.MinimumRam = patch.MinimumRam;
+        }
+        if (!string.IsNullOrEmpty(patch.MinimumNumCores.ToString()))
+        {
+            currentModel.MinimumNumCores = patch.MinimumNumCores;
         }
         await UpdateAsync(currentModel);
         return currentModel;

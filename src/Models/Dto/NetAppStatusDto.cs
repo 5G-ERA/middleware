@@ -23,7 +23,7 @@ namespace Middleware.Models.Dto
         [Indexed]
         public int? CurrentRobotsCount { get; set; }
 
-        [Indexed]
+        [Indexed(Sortable = true)]
         public DateTimeOffset Timestamp { get; set; }
 
         public override BaseModel ToModel()
@@ -36,7 +36,7 @@ namespace Middleware.Models.Dto
                 HardLimit = dto.HardLimit,
                 OptimalLimit = dto.OptimalLimit,
                 CurrentRobotsCount = dto.CurrentRobotsCount,
-                Timestamp = dto.Timestamp
+                Timestamp = dto.Timestamp.DateTime
             };
         }
 

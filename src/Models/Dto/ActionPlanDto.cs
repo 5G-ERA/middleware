@@ -20,13 +20,13 @@ public class ActionPlanDto : Dto
     [Indexed]
     public bool IsReplan { get; set; }
     [Indexed(Sortable = true)]
-    public DateTime LastStatusChange { get; set; }
+    public DateTimeOffset LastStatusChange { get; set; }
     [Indexed]
     public List<ActionModel> ActionSequence { get; set; }
     [Indexed]
     public string RobotId { get; set; }
     [Indexed(Sortable = true)]
-    public DateTime? TaskStartedAt { get; set; }
+    public DateTimeOffset TaskStartedAt { get; set; }
     
     public override BaseModel ToModel()
     {
@@ -38,10 +38,10 @@ public class ActionPlanDto : Dto
             Name = dto.Name,
             Status = dto.Status,
             IsReplan = dto.IsReplan,
-            LastStatusChange = dto.LastStatusChange,
+            LastStatusChange = dto.LastStatusChange.DateTime,
             ActionSequence = (List<ActionModel>)dto.ActionSequence,
             RobotId = Guid.Parse(dto.RobotId),
-            TaskStartedAt = (DateTime)dto.TaskStartedAt
+            TaskStartedAt = dto.TaskStartedAt.DateTime
         };
     }
 }

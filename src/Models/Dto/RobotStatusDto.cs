@@ -28,7 +28,7 @@ namespace Middleware.Models.Dto
         [Indexed]
         public int BatteryLevel { get; set; }
 
-        [Indexed]
+        [Indexed(Sortable = true)]
         public DateTimeOffset Timestamp { get; set; }
 
 
@@ -43,7 +43,7 @@ namespace Middleware.Models.Dto
                 ActionSequenceId = Guid.Parse(dto.ActionSequenceId!),
                 CurrentlyExecutedActionIndex = dto.CurrentlyExecutedActionIndex,
                 BatteryLevel = dto.BatteryLevel,
-                Timestamp = dto.Timestamp
+                Timestamp = dto.Timestamp.DateTime
             };
         }
     }
