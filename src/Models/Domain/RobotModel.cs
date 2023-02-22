@@ -230,9 +230,9 @@ public class RobotModel : BaseModel
             MacAddress = domain.MacAddress,
             LocomotionSystem = domain.LocomotionSystem,
             LocomotionTypes = domain.LocomotionTypes,
-            Sensors = domain.Sensors.Select(x => x.ToDto()).ToList(),
-            Actuators = domain.Actuators.Select(x => x.ToDto()).ToList(),
-            Manipulators = domain.Manipulators.Select(x => x.ToDto()).ToList(),
+            Sensors = domain.Sensors?.Select(x => x.ToDto()).ToList(),
+            Actuators = domain.Actuators?.Select(x => x.ToDto()).ToList(),
+            Manipulators = domain.Manipulators?.Select(x => x.ToDto()).ToList(),
             HardwareSpec = new HardwareSpec()
             {
               Cpu  = domain.Cpu,
@@ -241,8 +241,8 @@ public class RobotModel : BaseModel
               StorageDisk = domain.StorageDisk
             },
             Questions = domain.Questions,
-            LastUpdatedTime = domain.LastUpdatedTime,
-            OnboardedTime = domain.OnboardedTime
+            LastUpdatedTime = domain.LastUpdatedTime == default ? DateTimeOffset.Now : domain.LastUpdatedTime,
+            OnboardedTime = domain.OnboardedTime == default ? DateTimeOffset.Now : domain.OnboardedTime
         };
     }
 }
