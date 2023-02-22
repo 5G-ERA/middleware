@@ -322,7 +322,7 @@ namespace Middleware.DataAccess.Repositories
         /// <returns></returns>
         public virtual async Task<Dictionary<string, List<RedisGraphResult>>> GetAllRelations()
         {
-            string query = "MATCH (n) OPTIONAL MATCH (n)-[r]-(m) RETURN n, type(r) as r, m";
+            string query = "MATCH (n) OPTIONAL MATCH (n)-[r]->(m) RETURN n, type(r) as r, m";
             ResultSet resultSet = await RedisGraph.Query(GraphName, query);
             
             return resultSet?.Results;
