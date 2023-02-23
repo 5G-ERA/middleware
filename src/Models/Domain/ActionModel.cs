@@ -14,26 +14,26 @@ public class ActionModel : BaseModel
     
 
     [JsonPropertyName("Tags")]
-    public List<string> Tags { get; set; }
+    public List<string>? Tags { get; set; }
 
     [JsonPropertyName("Order")]
     public int Order { get; set; }
 
     [JsonPropertyName("Placement")]
-    public string Placement { get; set; }
+    public string? Placement { get; set; }
 
     [JsonPropertyName("PlacementType")]
-    public string PlacementType { get; set; } // Either edge or cloud. 
+    public string? PlacementType { get; set; } // Either edge or cloud. 
 
     [JsonPropertyName("ActionPriority")]
-    public string ActionPriority { get; set; }
+    public string? ActionPriority { get; set; }
 
     [JsonPropertyName("ActionStatus")]
-    public string ActionStatus { get; set; }
+    public string? ActionStatus { get; set; }
 
     [JsonPropertyName("Services")]
     //[JsonIgnore]
-    public List<InstanceModel> Services { get; set; }
+    public List<InstanceModel>? Services { get; set; }
 
     [JsonPropertyName("MinimumRam")]
     public int MinimumRam { get; set; }

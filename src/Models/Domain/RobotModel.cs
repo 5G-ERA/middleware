@@ -19,7 +19,7 @@ public class RobotModel : BaseModel
     public int RosVersion { get; set; } // Compulsory field
 
     [JsonPropertyName("RosDistro")]
-    public string RosDistro { get; set; }
+    public string? RosDistro { get; set; }
 
     [JsonPropertyName("MaximumPayload")]
     public long MaximumPayload { get; set; }
@@ -34,50 +34,50 @@ public class RobotModel : BaseModel
     public long RobotWeight { get; set; }
 
     [JsonPropertyName("ROSRepo")]
-    public Uri ROSRepo { get; set; }
+    public Uri? ROSRepo { get; set; }
 
     [JsonPropertyName("ROSNodes")]
 
-    public List<ROSNodeModel> ROSNodes { get; set; }
+    public List<ROSNodeModel>? ROSNodes { get; set; }
 
     [JsonPropertyName("Manufacturer")]
-    public string Manufacturer { get; set; }
+    public string? Manufacturer { get; set; }
 
     [JsonPropertyName("ManufacturerUrl")]
-    public Uri ManufacturerUrl { get; set; }
+    public Uri? ManufacturerUrl { get; set; }
 
     [JsonPropertyName("RobotModelName")]
-    public string RobotModelName { get; set; }
+    public string? RobotModelName { get; set; }
 
     [JsonPropertyName("RobotStatus")]
-    public string RobotStatus { get; set; }
+    public string? RobotStatus { get; set; }
 
     //[JsonPropertyName("CurrentTaskID")]
     public Guid CurrentTaskId { get; set; }
 
     [JsonPropertyName("TaskList")]
-    public List<string> TaskList { get; set; }
+    public List<string>? TaskList { get; set; }
 
     [JsonPropertyName("BatteryStatus")]
     public long BatteryStatus { get; set; }
 
     [JsonPropertyName("MacAddress")]
-    public string MacAddress { get; set; }
+    public string? MacAddress { get; set; }
 
     [JsonPropertyName("LocomotionSystem")] // Compulsory field
-    public string LocomotionSystem { get; set; }
+    public string? LocomotionSystem { get; set; }
 
     [JsonPropertyName("LocomotionTypes")]
-    public string LocomotionTypes { get; set; } // Compulsory field
+    public string? LocomotionTypes { get; set; } // Compulsory field
 
     [JsonPropertyName("Sensors")]
-    public List<SensorModel> Sensors { get; set; }
+    public List<SensorModel>? Sensors { get; set; }
 
     [JsonPropertyName("Actuators")]
-    public List<ActuatorModel> Actuators { get; set; }
+    public List<ActuatorModel>? Actuators { get; set; }
 
     [JsonPropertyName("Manipulators")]
-    public List<ManipulatorModel> Manipulators { get; set; }
+    public List<ManipulatorModel>? Manipulators { get; set; }
 
     [JsonPropertyName("CPU")]
     public int Cpu { get; set; }
@@ -95,7 +95,7 @@ public class RobotModel : BaseModel
     public int NumberCores { get; set; }
 
     [JsonPropertyName("Questions")]
-    public List<DialogueModel> Questions { get; set; }
+    public List<DialogueModel>? Questions { get; set; }
 
     [JsonPropertyName("LastUpdatedTime")]
     public DateTime LastUpdatedTime { get; set; }

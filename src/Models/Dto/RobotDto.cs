@@ -95,6 +95,7 @@ public class RobotDto : Dto
             LocomotionTypes = dto.LocomotionType,
             RosDistro = dto.Ros.RosDistro,
             RosVersion = dto.Ros.RosVersion,
+            ROSRepo = dto.Ros.RosRepo,
             
             //TODO: fill remaining specification of the robot
         };

@@ -7,6 +7,7 @@ using Middleware.Models.Domain;
 using Middleware.Common.Services;
 using Middleware.ResourcePlanner.ApiReference;
 using KeyValuePair = Middleware.Models.Domain.KeyValuePair;
+using Middleware.Common.Config;
 
 namespace Middleware.ResourcePlanner;
 
@@ -24,10 +25,12 @@ public class ResourcePlanner : IResourcePlanner
     private readonly IEnvironment _env;
     private readonly ILogger _logger;
     private readonly IRedisInterfaceClientService _redisInterfaceClient;
+    private readonly MiddlewareConfig _mwConfig;
 
     public ResourcePlanner(IApiClientBuilder apiClientBuilder, IMapper mapper, IEnvironment env,
         ILogger<ResourcePlanner> logger,
-        IRedisInterfaceClientService redisInterfaceClient)
+        IRedisInterfaceClientService redisInterfaceClient,
+        IConfiguration configuration)
 
     {
         _apiClientBuilder = apiClientBuilder;
@@ -35,6 +38,7 @@ public class ResourcePlanner : IResourcePlanner
         _env = env;
         _logger = logger;
         _redisInterfaceClient = redisInterfaceClient;
+        _mwConfig = configuration.GetSection(MiddlewareConfig.ConfigName).Get<MiddlewareConfig>(); 
     }
 
     public async Task<TaskModel> Plan(TaskModel taskModel, RobotModel robot)
@@ -67,9 +71,10 @@ public class ResourcePlanner : IResourcePlanner
                 // add instance to actions
                 action.Services.Add(instance);
             }
+
             //Choose placement based on policy
             // TODO: deploy only in the local MW
-            action.Placement = "local";//await InferResource(action, robot,false, new());
+            action.Placement = _mwConfig.InstanceName; //"local";//await InferResource(action, robot,false, new());
         }
 
         return taskModel;
