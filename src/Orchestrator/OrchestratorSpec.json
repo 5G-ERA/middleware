@@ -1067,13 +1067,11 @@
         "properties": {
           "statusCode": {
             "type": "integer",
-            "format": "int32",
-            "readOnly": true
+            "format": "int32"
           },
           "message": {
             "type": "string",
-            "nullable": true,
-            "readOnly": true
+            "nullable": true
           },
           "timeStamp": {
             "type": "string",
@@ -1101,7 +1099,7 @@
             "type": "string",
             "format": "uuid"
           },
-          "Name": {
+          "Question": {
             "type": "string",
             "nullable": true
           },
@@ -1243,24 +1241,6 @@
         },
         "additionalProperties": false
       },
-      "ManipulatorModel": {
-        "type": "object",
-        "properties": {
-          "actuatorName": {
-            "type": "string",
-            "nullable": true
-          },
-          "dof": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "number": {
-            "type": "integer",
-            "format": "int32"
-          }
-        },
-        "additionalProperties": false
-      },
       "NetAppStatusModel": {
         "required": [
           "currentRobotsCount"
@@ -1340,51 +1320,6 @@
         },
         "additionalProperties": { }
       },
-      "ROSNodeModel": {
-        "type": "object",
-        "properties": {
-          "name": {
-            "type": "string",
-            "nullable": true
-          },
-          "publications": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/RosTopicModel"
-            },
-            "nullable": true
-          },
-          "subscriptions": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/RosTopicModel"
-            },
-            "nullable": true
-          },
-          "services": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/ROSServiceModel"
-            },
-            "nullable": true
-          }
-        },
-        "additionalProperties": false
-      },
-      "ROSServiceModel": {
-        "type": "object",
-        "properties": {
-          "name": {
-            "type": "string",
-            "nullable": true
-          },
-          "description": {
-            "type": "string",
-            "nullable": true
-          }
-        },
-        "additionalProperties": false
-      },
       "RelationModel": {
         "type": "object",
         "properties": {
@@ -1404,6 +1339,24 @@
           },
           "pointsTo": {
             "$ref": "#/components/schemas/GraphEntityModel"
+          }
+        },
+        "additionalProperties": false
+      },
+      "RobotManipulatorModel": {
+        "type": "object",
+        "properties": {
+          "actuatorName": {
+            "type": "string",
+            "nullable": true
+          },
+          "dof": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "number": {
+            "type": "integer",
+            "format": "int32"
           }
         },
         "additionalProperties": false
@@ -1471,7 +1424,7 @@
             "format": "uri",
             "nullable": true
           },
-          "RobotModelName": {
+          "RobotModel": {
             "type": "string",
             "nullable": true
           },
@@ -1513,7 +1466,7 @@
             },
             "nullable": true
           },
-          "Actuators": {
+          "Actuator": {
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/ActuatorModel"
@@ -1523,13 +1476,13 @@
           "Manipulators": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/ManipulatorModel"
+              "$ref": "#/components/schemas/RobotManipulatorModel"
             },
             "nullable": true
           },
           "CPU": {
             "type": "integer",
-            "format": "int32"
+            "format": "int64"
           },
           "RAM": {
             "type": "integer",
@@ -1541,7 +1494,7 @@
           },
           "NumberCores": {
             "type": "integer",
-            "format": "int32"
+            "format": "int64"
           },
           "Questions": {
             "type": "array",
@@ -1599,6 +1552,51 @@
           "timestamp": {
             "type": "string",
             "format": "date-time"
+          }
+        },
+        "additionalProperties": false
+      },
+      "ROSNodeModel": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "nullable": true
+          },
+          "publications": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/RosTopicModel"
+            },
+            "nullable": true
+          },
+          "subscriptions": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/RosTopicModel"
+            },
+            "nullable": true
+          },
+          "services": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ROSServiceModel"
+            },
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "ROSServiceModel": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "nullable": true
+          },
+          "description": {
+            "type": "string",
+            "nullable": true
           }
         },
         "additionalProperties": false

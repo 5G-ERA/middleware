@@ -67,135 +67,17 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/CreatePlanRequest"
+                "$ref": "#/components/schemas/TaskPlannerInputModel"
               }
             },
             "text/json": {
               "schema": {
-                "$ref": "#/components/schemas/CreatePlanRequest"
+                "$ref": "#/components/schemas/TaskPlannerInputModel"
               }
             },
             "application/*+json": {
               "schema": {
-                "$ref": "#/components/schemas/CreatePlanRequest"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "Success",
-            "content": {
-              "text/plain": {
-                "schema": {
-                  "$ref": "#/components/schemas/TaskModel"
-                }
-              },
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/TaskModel"
-                }
-              },
-              "text/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/TaskModel"
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "Not Found",
-            "content": {
-              "text/plain": {
-                "schema": {
-                  "$ref": "#/components/schemas/ApiResponse"
-                }
-              },
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ApiResponse"
-                }
-              },
-              "text/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ApiResponse"
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Bad Request",
-            "content": {
-              "text/plain": {
-                "schema": {
-                  "$ref": "#/components/schemas/ApiResponse"
-                }
-              },
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ApiResponse"
-                }
-              },
-              "text/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ApiResponse"
-                }
-              }
-            }
-          },
-          "500": {
-            "description": "Server Error",
-            "content": {
-              "text/plain": {
-                "schema": {
-                  "$ref": "#/components/schemas/ApiResponse"
-                }
-              },
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ApiResponse"
-                }
-              },
-              "text/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ApiResponse"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/api/v1/Plan/semantic": {
-      "post": {
-        "tags": [
-          "Plan"
-        ],
-        "parameters": [
-          {
-            "name": "dryRun",
-            "in": "query",
-            "schema": {
-              "type": "boolean",
-              "default": false
-            }
-          }
-        ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/CreatePlanRequest"
-              }
-            },
-            "text/json": {
-              "schema": {
-                "$ref": "#/components/schemas/CreatePlanRequest"
-              }
-            },
-            "application/*+json": {
-              "schema": {
-                "$ref": "#/components/schemas/CreatePlanRequest"
+                "$ref": "#/components/schemas/TaskPlannerInputModel"
               }
             }
           }
@@ -303,17 +185,17 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/CreateRePlanRequest"
+                "$ref": "#/components/schemas/TaskReplanInputModel"
               }
             },
             "text/json": {
               "schema": {
-                "$ref": "#/components/schemas/CreateRePlanRequest"
+                "$ref": "#/components/schemas/TaskReplanInputModel"
               }
             },
             "application/*+json": {
               "schema": {
-                "$ref": "#/components/schemas/CreateRePlanRequest"
+                "$ref": "#/components/schemas/TaskReplanInputModel"
               }
             }
           }
@@ -413,13 +295,11 @@
         "properties": {
           "statusCode": {
             "type": "integer",
-            "format": "int32",
-            "readOnly": true
+            "format": "int32"
           },
           "message": {
             "type": "string",
-            "nullable": true,
-            "readOnly": true
+            "nullable": true
           },
           "timeStamp": {
             "type": "string",
@@ -429,70 +309,6 @@
           "isError": {
             "type": "boolean",
             "readOnly": true
-          }
-        },
-        "additionalProperties": false
-      },
-      "CreatePlanRequest": {
-        "type": "object",
-        "properties": {
-          "RobotId": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "LockResourceReUse": {
-            "type": "boolean"
-          },
-          "ReplanActionPlannerLocked": {
-            "type": "boolean"
-          },
-          "TaskId": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "TaskDescription": {
-            "type": "string",
-            "nullable": true
-          },
-          "ContextKnown": {
-            "type": "boolean"
-          },
-          "Questions": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/DialogueModel"
-            },
-            "nullable": true
-          }
-        },
-        "additionalProperties": false
-      },
-      "CreateRePlanRequest": {
-        "type": "object",
-        "properties": {
-          "RobotId": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "LockResourceReUse": {
-            "type": "boolean"
-          },
-          "ContextKnown": {
-            "type": "boolean"
-          },
-          "CompleteReplan": {
-            "type": "boolean"
-          },
-          "TaskID": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "Questions": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/DialogueModel"
-            },
-            "nullable": true
           }
         },
         "additionalProperties": false
@@ -511,7 +327,7 @@
             "type": "string",
             "format": "uuid"
           },
-          "Name": {
+          "Question": {
             "type": "string",
             "nullable": true
           },
@@ -752,6 +568,70 @@
             "type": "array",
             "items": {
               "type": "string"
+            },
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "TaskPlannerInputModel": {
+        "type": "object",
+        "properties": {
+          "RobotId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "LockResourceReUse": {
+            "type": "boolean"
+          },
+          "ReplanActionPlannerLocked": {
+            "type": "boolean"
+          },
+          "TaskId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "TaskDescription": {
+            "type": "string",
+            "nullable": true
+          },
+          "ContextKnown": {
+            "type": "boolean"
+          },
+          "Questions": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/DialogueModel"
+            },
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "TaskReplanInputModel": {
+        "type": "object",
+        "properties": {
+          "RobotId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "LockResourceReUse": {
+            "type": "boolean"
+          },
+          "ContextKnown": {
+            "type": "boolean"
+          },
+          "CompleteReplan": {
+            "type": "boolean"
+          },
+          "TaskID": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "Questions": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/DialogueModel"
             },
             "nullable": true
           }
