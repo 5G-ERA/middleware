@@ -6,7 +6,7 @@
 
         public abstract string Name { get; set; }
 
-        public List<RelationModel> Relations { get; set; } = new List<RelationModel>();
+        public List<RelationModel>? Relations { get; set; } //= new List<RelationModel>();
 
         public abstract Dto.Dto ToDto();
     }

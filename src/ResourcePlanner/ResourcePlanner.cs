@@ -43,7 +43,7 @@ public class ResourcePlanner : IResourcePlanner
 
     public async Task<TaskModel> Plan(TaskModel taskModel, RobotModel robot)
     {
-        var redisApiClient = _apiClientBuilder.CreateRedisApiClient();
+        
         var orchestratorApiClient = _apiClientBuilder.CreateOrchestratorApiClient();
         // actionPlanner will give resource planner the actionSequence. 
 
