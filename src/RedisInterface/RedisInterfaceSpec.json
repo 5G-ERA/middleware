@@ -8972,7 +8972,8 @@
           },
           "VirtualRam": {
             "type": "integer",
-            "format": "int32"
+            "format": "int64",
+            "nullable": true
           },
           "CPU": {
             "type": "integer",
@@ -8980,7 +8981,7 @@
           },
           "RAM": {
             "type": "integer",
-            "format": "int32"
+            "format": "int64"
           },
           "MacAddress": {
             "type": "string",
@@ -9047,7 +9048,7 @@
             "type": "string",
             "format": "uuid"
           },
-          "Question": {
+          "Name": {
             "type": "string",
             "nullable": true
           },
@@ -9105,11 +9106,12 @@
           },
           "RAM": {
             "type": "integer",
-            "format": "int32"
+            "format": "int64"
           },
           "VirtualRam": {
             "type": "integer",
-            "format": "int32"
+            "format": "int64",
+            "nullable": true
           },
           "DiskStorage": {
             "type": "integer",
@@ -9366,6 +9368,24 @@
         },
         "additionalProperties": false
       },
+      "ManipulatorModel": {
+        "type": "object",
+        "properties": {
+          "actuatorName": {
+            "type": "string",
+            "nullable": true
+          },
+          "dof": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "number": {
+            "type": "integer",
+            "format": "int32"
+          }
+        },
+        "additionalProperties": false
+      },
       "NetAppsDetailsResponse": {
         "type": "object",
         "properties": {
@@ -9480,8 +9500,7 @@
           },
           "Timestamp": {
             "type": "string",
-            "format": "date-time",
-            "nullable": true
+            "format": "date-time"
           },
           "IsActive": {
             "type": "boolean",
@@ -9566,24 +9585,6 @@
         },
         "additionalProperties": false
       },
-      "RobotManipulatorModel": {
-        "type": "object",
-        "properties": {
-          "actuatorName": {
-            "type": "string",
-            "nullable": true
-          },
-          "dof": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "number": {
-            "type": "integer",
-            "format": "int32"
-          }
-        },
-        "additionalProperties": false
-      },
       "RobotModel": {
         "type": "object",
         "properties": {
@@ -9647,7 +9648,7 @@
             "format": "uri",
             "nullable": true
           },
-          "RobotModel": {
+          "RobotModelName": {
             "type": "string",
             "nullable": true
           },
@@ -9689,7 +9690,7 @@
             },
             "nullable": true
           },
-          "Actuator": {
+          "Actuators": {
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/ActuatorModel"
@@ -9699,13 +9700,13 @@
           "Manipulators": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/RobotManipulatorModel"
+              "$ref": "#/components/schemas/ManipulatorModel"
             },
             "nullable": true
           },
           "CPU": {
             "type": "integer",
-            "format": "int64"
+            "format": "int32"
           },
           "RAM": {
             "type": "integer",
@@ -9717,7 +9718,7 @@
           },
           "NumberCores": {
             "type": "integer",
-            "format": "int64"
+            "format": "int32"
           },
           "Questions": {
             "type": "array",
