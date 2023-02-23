@@ -71,10 +71,10 @@ public class DeploymentService : IDeploymentService
 
             foreach (var seq in task.ActionSequence)
             {
-                BaseModel location;
-                location = seq.PlacementType.ToLower().Contains("cloud")
-                    ? await _redisInterfaceClient.GetCloudByNameAsync(seq.Placement)
-                    : await _redisInterfaceClient.GetEdgeByNameAsync(seq.Placement);
+                //BaseModel location;
+                //location = seq.PlacementType.ToLower().Contains("cloud")
+                //    ? await _redisInterfaceClient.GetCloudByNameAsync(seq.Placement)
+                //    : await _redisInterfaceClient.GetEdgeByNameAsync(seq.Placement);
                 foreach (var service in seq.Services)
                 {
                     try
@@ -84,7 +84,8 @@ public class DeploymentService : IDeploymentService
                             continue;
 
                         await DeployService(k8SClient, service, deploymentNames);
-                        await _redisInterfaceClient.AddRelationAsync(service, location, "LOCATED_AT");
+                        // TODO: add relation between actual cloud / edge definition and instance
+                        //await _redisInterfaceClient.AddRelationAsync(service, location, "LOCATED_AT");
                     }
                     catch (Exception ex)
                     {
