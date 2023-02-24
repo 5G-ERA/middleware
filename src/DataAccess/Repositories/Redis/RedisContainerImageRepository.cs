@@ -6,6 +6,7 @@ using Middleware.Models.Domain;
 using Middleware.Models.Dto;
 using Middleware.Models.Enums;
 using NReJSON;
+using Redis.OM;
 using Redis.OM.Contracts;
 using RedisGraphDotNet.Client;
 using StackExchange.Redis;
@@ -73,11 +74,14 @@ namespace Middleware.DataAccess.Repositories
             //TODO: extract this method to Container Image Service
             List<RelationModel> imageRelations = await _instanceRepository.GetRelation(instanceId, "needs");
 
-            List<string> containerIds = imageRelations.Select(i => i.PointsTo.Id.ToString()).ToList();
+            List<Guid> containerIds = imageRelations.Select(i => i.PointsTo.Id).ToList();
             List<ContainerImageModel> images = new();
             foreach (var item in containerIds)
             {
-                images.AddRange(await FindAsync(i => i.Id == item));
+                var list = await GetByIdAsync(item);
+                if (list is null )
+                    continue;
+                images.Add(list);
             }
 
              //= await FindAsync(c => containerIds.Contains(c.Id));
