@@ -32,7 +32,7 @@ public static class ServiceCollectionExtensions
                     ec.ConfigureConsumeTopology = false;
                     ec.Bind(nameof(DeployPlanMessage), b =>
                     {
-                        b.RoutingKey = mwConfig.InstanceName;
+                        b.RoutingKey = $"{mwConfig.InstanceName}-{mwConfig.InstanceType}";
                         b.ExchangeType = ExchangeType.Direct;
                     });
 

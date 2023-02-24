@@ -167,7 +167,7 @@ public class OrchestrateController : Controller
                 RelationModel tempRelationModel = new RelationModel();
                 tempRelationModel.RelationName = "LOCATED_AT";
 
-                if (action.Placement!.Contains("CLOUD"))
+                if (action.Placement!.ToUpper().Contains("CLOUD"))
                 {
                     placement =
                         await _redisInterfaceClient.GetCloudByNameAsync(action.Placement);
