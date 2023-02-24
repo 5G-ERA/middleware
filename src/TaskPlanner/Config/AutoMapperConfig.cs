@@ -33,7 +33,7 @@ public static class AutoMapperConfig
             cfg.CreateMap<ROSServiceModel, ResourcePlanner.ROSServiceModel>().ReverseMap();
             cfg.CreateMap<SensorModel, ResourcePlanner.SensorModel>().ReverseMap();
             cfg.CreateMap<ActuatorModel, ResourcePlanner.ActuatorModel>().ReverseMap();
-            cfg.CreateMap<ManipulatorModel, ResourcePlanner.RobotManipulatorModel>().ReverseMap();
+            //cfg.CreateMap<ManipulatorModel, ResourcePlanner.RobotManipulatorModel>().ReverseMap();
             cfg.CreateMap<DialogueModel, ResourcePlanner.DialogueModel>().ReverseMap();
             cfg.CreateMap<Models.Domain.KeyValuePair, ResourcePlanner.KeyValuePair>().ReverseMap();
             cfg.CreateMap<RelationModel, ResourcePlanner.RelationModel>().ReverseMap();
