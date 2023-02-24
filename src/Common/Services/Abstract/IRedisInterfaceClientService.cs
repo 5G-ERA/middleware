@@ -18,6 +18,14 @@ public interface IRedisInterfaceClientService
     /// <param name="token">Cancellation token</param>
     /// <returns>Complete action plan</returns>
     Task<ActionPlanModel> ActionPlanGetByIdAsync(Guid id, CancellationToken token);
+    
+    Task<List<ActionPlanModel>> ActionPlanGetAllAsync();
+    Task<List<ActionPlanModel>> ActionPlanGetAllAsync(CancellationToken token);
+
+    Task<bool> ActionPlanAddAsync(ActionPlanModel actionPlan);
+    Task<bool> ActionPlanAddAsync(ActionPlanModel actionPlan, CancellationToken token);
+    Task<bool> ActionPlanDeleteAsync(Guid id);
+    Task<bool> ActionPlanDeleteAsync(Guid id, CancellationToken token);
 
     /// <summary>
     /// Gets robot data by id
@@ -72,6 +80,9 @@ public interface IRedisInterfaceClientService
     /// <typeparam name="TDirection">Object that derives from <see cref="BaseModel"/></typeparam>
     /// <returns>Have relation been created</returns>
     Task<bool> AddRelationAsync<TSource, TDirection>(TSource source, TDirection direction, string name)
+        where TSource : BaseModel where TDirection : BaseModel;
+    
+    Task<bool> DeleteRelationAsync<TSource, TDirection>(TSource source, TDirection direction, string name)
         where TSource : BaseModel where TDirection : BaseModel;
 
     /// <summary>
@@ -154,4 +165,7 @@ public interface IRedisInterfaceClientService
     /// <param name="token"></param>
     /// <returns></returns>
     Task<InstanceModel> InstanceGetByIdAsync(Guid id, CancellationToken token);
+
+    Task<List<ContainerImageModel>> ContainerImageGetForInstanceAsync(Guid id);
+    Task<List<ContainerImageModel>> ContainerImageGetForInstanceAsync(Guid id, CancellationToken token);
 }

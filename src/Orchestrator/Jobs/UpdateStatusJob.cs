@@ -5,8 +5,8 @@ using k8s.Models;
 using Middleware.Common.Config;
 using Middleware.Common.Enums;
 using Middleware.Common.ExtensionMethods;
+using Middleware.Common.Services;
 using Middleware.Models.Domain;
-using Middleware.Orchestrator.ApiReference;
 using Middleware.Orchestrator.Deployment;
 using Quartz;
 
@@ -17,14 +17,18 @@ public class UpdateStatusJob : BaseJob<UpdateStatusJob>
 {
     private readonly IKubernetesBuilder _kubeBuilder;
     private readonly IMapper _mapper;
-    private readonly RedisInterface.RedisApiClient _redisApiClient;
+    private readonly IRedisInterfaceClientService _redisInterfaceClient;
     private readonly MiddlewareConfig _middlewareConfig;
 
-    public UpdateStatusJob(IKubernetesBuilder kubeBuilder, IApiClientBuilder apiBuilder, IMapper mapper, ILogger<UpdateStatusJob> logger, IConfiguration configuration) : base(logger)
+    public UpdateStatusJob(IKubernetesBuilder kubeBuilder,
+        IMapper mapper,
+        ILogger<UpdateStatusJob> logger,
+        IConfiguration configuration,
+        IRedisInterfaceClientService redisInterfaceClient) : base(logger)
     {
         _kubeBuilder = kubeBuilder;
         _mapper = mapper;
-        _redisApiClient = apiBuilder.CreateRedisApiClient();
+        _redisInterfaceClient = redisInterfaceClient;
         _middlewareConfig = configuration.GetSection(MiddlewareConfig.ConfigName).Get<MiddlewareConfig>();
     }
 
@@ -32,8 +36,7 @@ public class UpdateStatusJob : BaseJob<UpdateStatusJob>
     {
         try
         {
-            ICollection<RedisInterface.ActionPlanModel> riSequences = await _redisApiClient.ActionPlanGetAllAsync();
-            var sequences = _mapper.Map<List<ActionPlanModel>>(riSequences);
+            var sequences= await _redisInterfaceClient.ActionPlanGetAllAsync();
             var kubeClient = _kubeBuilder.CreateKubernetesClient();
             foreach (var seq in sequences)
             {
@@ -51,8 +54,7 @@ public class UpdateStatusJob : BaseJob<UpdateStatusJob>
                     if (updatedSeq is null)
                         continue;
                     
-                    var riSeq = _mapper.Map<RedisInterface.ActionPlanModel>(updatedSeq);
-                    await _redisApiClient.ActionPlanAddAsync(riSeq);
+                    await _redisInterfaceClient.ActionPlanAddAsync(updatedSeq);
                 }
                 catch (Exception ex)
                 {

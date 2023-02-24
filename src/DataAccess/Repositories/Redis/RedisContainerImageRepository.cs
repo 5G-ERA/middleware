@@ -73,9 +73,14 @@ namespace Middleware.DataAccess.Repositories
             //TODO: extract this method to Container Image Service
             List<RelationModel> imageRelations = await _instanceRepository.GetRelation(instanceId, "needs");
 
-            List<Guid> containerIds = imageRelations.Select(i => i.PointsTo.Id).ToList();
+            List<string> containerIds = imageRelations.Select(i => i.PointsTo.Id.ToString()).ToList();
+            List<ContainerImageModel> images = new();
+            foreach (var item in containerIds)
+            {
+                images.AddRange(await FindAsync(i => i.Id == item));
+            }
 
-            List<ContainerImageModel> images = await FindAsync(c => containerIds.Contains(Guid.Parse(c.Id)));
+             //= await FindAsync(c => containerIds.Contains(c.Id));
             //List<ContainerImageModel> images = new();
             //foreach (var id in actionIds)
             //{

@@ -1,12 +1,10 @@
 ﻿using System.Net;
-using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
+using Middleware.Common.Responses;
+using Middleware.Common.Services;
 using Middleware.DataAccess.Repositories.Abstract;
 using Middleware.Models.Domain;
-using Middleware.Orchestrator.ApiReference;
-using Middleware.Orchestrator.RedisInterface;
-using ActionPlanModel = Middleware.Models.Domain.ActionPlanModel;
-using ApiResponse = Middleware.Common.Responses.ApiResponse;
+
 
 namespace Middleware.Orchestrator.Controllers;
 
@@ -16,17 +14,19 @@ public class StatusController : Controller
 {
     private readonly INetAppStatusRepository _netAppStatusRepository;
     private readonly IRobotStatusRepository _robotStatusRepository;
-    private readonly IApiClientBuilder _clientBuilder;
     private readonly ILogger _logger;
-    private readonly IMapper _mapper;
+    private readonly IRedisInterfaceClientService _redisInterfaceClient;
 
-    public StatusController(INetAppStatusRepository netAppStatusRepository, IRobotStatusRepository robotStatusRepository, IApiClientBuilder clientBuilder, ILogger<StatusController> logger, IMapper mapper)
+    public StatusController(INetAppStatusRepository netAppStatusRepository,
+        IRobotStatusRepository robotStatusRepository,
+        ILogger<StatusController> logger,
+        IRedisInterfaceClientService redisInterfaceClient
+        )
     {
         _netAppStatusRepository = netAppStatusRepository;
         _robotStatusRepository = robotStatusRepository;
-        _clientBuilder = clientBuilder;
         _logger = logger;
-        _mapper = mapper;
+        _redisInterfaceClient = redisInterfaceClient;
     }
     /// <summary>
     /// Get the robot status
@@ -177,9 +177,9 @@ public class StatusController : Controller
         try
         {
             //TODO: put behind service
-            var redisClient = _clientBuilder.CreateRedisApiClient();
-            var riDeployedActionPlans = await redisClient.ActionPlanGetAllAsync();
-            var instanceIds = _mapper.Map<List<ActionPlanModel>>(riDeployedActionPlans) 
+            
+            var allActionPlans = await _redisInterfaceClient.ActionPlanGetAllAsync();
+            var instanceIds = allActionPlans 
                 .SelectMany(a => a.ActionSequence.SelectMany(x => x.Services))
                 .Where(i => i.Id == id)
                 .Select(i => i.ServiceInstanceId)
@@ -201,11 +201,6 @@ public class StatusController : Controller
                 }
             }
             return Ok(statuses);
-        }
-        catch (ApiException<RedisInterface.ApiResponse> apiEx)
-        {
-            _logger.LogError(apiEx, "An error occurred:");
-            return StatusCode(apiEx.StatusCode, apiEx.Result);
         }
         catch (Exception ex)
         {

@@ -2,7 +2,6 @@
 using System.Web;
 using Microsoft.Extensions.Logging;
 using Middleware.Common.Config;
-using Middleware.Common.ExtensionMethods;
 using Middleware.Models.Domain;
 using Middleware.Models.ExtensionMethods;
 using Newtonsoft.Json;
@@ -13,11 +12,14 @@ namespace Middleware.Common.Services
     {
         private readonly HttpClient _httpClient;
         private readonly ILogger<RedisInterfaceClientService> _logger;
-        public RedisInterfaceClientService(IHttpClientFactory httpClientFactory, ILogger<RedisInterfaceClientService> logger)
+
+        public RedisInterfaceClientService(IHttpClientFactory httpClientFactory,
+            ILogger<RedisInterfaceClientService> logger)
         {
             _logger = logger;
             _httpClient = httpClientFactory.CreateClient(AppConfig.RedisApiClientName);
         }
+
         public async Task<bool> AddRelationAsync<TSource, TDirection>(TSource source, TDirection direction, string name)
             where TSource : BaseModel where TDirection : BaseModel
         {
@@ -42,6 +44,36 @@ namespace Middleware.Common.Services
             }
         }
 
+        public async Task<bool> DeleteRelationAsync<TSource, TDirection>(TSource source, TDirection direction,
+            string name) where TSource : BaseModel where TDirection : BaseModel
+        {
+            if (source is null) throw new ArgumentNullException(nameof(source));
+            if (direction is null) throw new ArgumentNullException(nameof(direction));
+            if (name is null) throw new ArgumentNullException(nameof(name));
+
+            try
+            {
+                var relation = CreateRelation(source, direction, name);
+
+                string url = $"/api/v1/{source.GetType().GetModelName()}/DeleteRelation";
+
+                HttpRequestMessage request = new HttpRequestMessage
+                {
+                    Content = JsonContent.Create(JsonConvert.SerializeObject(relation)),
+                    Method = HttpMethod.Delete,
+                    RequestUri = new Uri(url, UriKind.Relative)
+                };
+                var result = await _httpClient.SendAsync(request);
+
+                return result.IsSuccessStatusCode;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "There was an error while creating a relation");
+                throw;
+            }
+        }
+
         private RelationModel CreateRelation<TSource, TDirection>(TSource source, TDirection direction, string name)
             where TSource : BaseModel
             where TDirection : BaseModel
@@ -55,6 +87,7 @@ namespace Middleware.Common.Services
         {
             return ActionPlanGetByIdAsync(id, CancellationToken.None);
         }
+
         public async Task<ActionPlanModel> ActionPlanGetByIdAsync(Guid id, CancellationToken token)
         {
             if (id == default)
@@ -69,6 +102,7 @@ namespace Middleware.Common.Services
                 {
                     throw new InvalidOperationException();
                 }
+
                 var body = await result.Content.ReadAsStringAsync(token);
                 ActionPlanModel actionPlan = JsonConvert.DeserializeObject<ActionPlanModel>(body);
                 return actionPlan;
@@ -76,6 +110,82 @@ namespace Middleware.Common.Services
             catch (Exception ex)
             {
                 _logger.LogError(ex, "There was en error while calling for the action plan with id: {id}", id);
+                throw;
+            }
+        }
+
+        public async Task<List<ActionPlanModel>> ActionPlanGetAllAsync()
+        {
+            return await ActionPlanGetAllAsync(CancellationToken.None);
+        }
+
+        public async Task<List<ActionPlanModel>> ActionPlanGetAllAsync(CancellationToken token)
+        {
+            string url = $"/api/v1/Action/plan";
+            try
+            {
+                var result = await _httpClient.GetAsync(url, token);
+
+                if (result.IsSuccessStatusCode == false)
+                {
+                    throw new InvalidOperationException();
+                }
+
+                var body = await result.Content.ReadAsStringAsync(token);
+                List<ActionPlanModel> actionPlan = JsonConvert.DeserializeObject<List<ActionPlanModel>>(body);
+                return actionPlan;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "There was en error while calling for all action plans");
+                throw;
+            }
+        }
+
+        public async Task<bool> ActionPlanAddAsync(ActionPlanModel actionPlan)
+        {
+            return await ActionPlanAddAsync(actionPlan, CancellationToken.None);
+        }
+
+        public async Task<bool> ActionPlanAddAsync(ActionPlanModel actionPlan, CancellationToken token)
+        {
+            if (actionPlan is null)
+                throw new ArgumentNullException(nameof(actionPlan));
+
+            string url = $"/api/v1/Action/plan";
+            try
+            {
+                var result = await _httpClient.PostAsJsonAsync(url, JsonConvert.SerializeObject(actionPlan));
+
+                return result.IsSuccessStatusCode;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "There was en error while creating action plan: {plan}", actionPlan);
+                throw;
+            }
+        }
+
+        public async Task<bool> ActionPlanDeleteAsync(Guid id)
+        {
+            return await ActionPlanDeleteAsync(id, CancellationToken.None);
+        }
+
+        public async Task<bool> ActionPlanDeleteAsync(Guid id, CancellationToken token)
+        {
+            if (id == default) throw new ArgumentNullException(nameof(id));
+
+            try
+            {
+                string url = $"/api/v1/Action/plan/{id}";
+
+                var result = await _httpClient.DeleteAsync(url, token);
+
+                return result.IsSuccessStatusCode;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "There was an error while deleting action plan with id: {id}", id);
                 throw;
             }
         }
@@ -99,6 +209,7 @@ namespace Middleware.Common.Services
                 {
                     throw new InvalidOperationException();
                 }
+
                 var body = await result.Content.ReadAsStringAsync(token);
                 RobotModel robot = JsonConvert.DeserializeObject<RobotModel>(body);
                 return robot;
@@ -114,6 +225,7 @@ namespace Middleware.Common.Services
         {
             return await TaskGetByIdAsync(id, CancellationToken.None);
         }
+
         public async Task<TaskModel> TaskGetByIdAsync(Guid taskId, CancellationToken token)
         {
             if (taskId == default)
@@ -128,6 +240,7 @@ namespace Middleware.Common.Services
                 {
                     throw new InvalidOperationException();
                 }
+
                 var body = await result.Content.ReadAsStringAsync(token);
                 var task = JsonConvert.DeserializeObject<TaskModel>(body);
                 return task;
@@ -158,13 +271,16 @@ namespace Middleware.Common.Services
                 {
                     throw new InvalidOperationException();
                 }
+
                 var body = await result.Content.ReadAsStringAsync(token);
                 var instance = JsonConvert.DeserializeObject<InstanceModel>(body);
                 return instance;
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "There was en error while calling for the instance alternative with instanceId: {instanceId}", instanceId);
+                _logger.LogError(ex,
+                    "There was en error while calling for the instance alternative with instanceId: {instanceId}",
+                    instanceId);
                 throw;
             }
         }
@@ -175,7 +291,8 @@ namespace Middleware.Common.Services
             return await GetRelationAsync(action, relationName);
         }
 
-        public async Task<List<RelationModel>> GetRelationAsync<TSource>(TSource source, string relationName) where TSource : BaseModel
+        public async Task<List<RelationModel>> GetRelationAsync<TSource>(TSource source, string relationName)
+            where TSource : BaseModel
         {
             if (source is null)
                 throw new ArgumentNullException(nameof(source));
@@ -184,7 +301,9 @@ namespace Middleware.Common.Services
 
             try
             {
-                var builder = new UriBuilder($"{_httpClient.BaseAddress!.ToString().TrimEnd('/')}/api/v1/{source.GetType().GetModelName()}/relation/{relationName}");
+                var builder =
+                    new UriBuilder(
+                        $"{_httpClient.BaseAddress!.ToString().TrimEnd('/')}/api/v1/{source.GetType().GetModelName()}/relation/{relationName}");
                 builder.Port = -1;
                 var query = HttpUtility.ParseQueryString(builder.Query);
                 query["id"] = $"{source.Id}";
@@ -196,6 +315,7 @@ namespace Middleware.Common.Services
                 {
                     throw new InvalidOperationException();
                 }
+
                 var body = await result.Content.ReadAsStringAsync();
                 var relations = JsonConvert.DeserializeObject<List<RelationModel>>(body);
                 return relations;
@@ -225,8 +345,39 @@ namespace Middleware.Common.Services
                 {
                     throw new InvalidOperationException();
                 }
+
                 var body = await result.Content.ReadAsStringAsync(token);
                 var instance = JsonConvert.DeserializeObject<InstanceModel>(body);
+                return instance;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "There was en error while calling for the instance with id: {id}", id);
+                throw;
+            }
+        }
+
+        public async Task<List<ContainerImageModel>> ContainerImageGetForInstanceAsync(Guid id)
+        {
+            return await ContainerImageGetForInstanceAsync(id, CancellationToken.None);
+        }
+
+        public async Task<List<ContainerImageModel>> ContainerImageGetForInstanceAsync(Guid id, CancellationToken token)
+        {
+            if (id == default)
+                throw new ArgumentNullException(nameof(id));
+            string url = $"/api/v1/containerImage/instance/{id}";
+            try
+            {
+                var result = await _httpClient.GetAsync(url, token);
+
+                if (result.IsSuccessStatusCode == false)
+                {
+                    throw new InvalidOperationException();
+                }
+
+                var body = await result.Content.ReadAsStringAsync(token);
+                var instance = JsonConvert.DeserializeObject<List<ContainerImageModel>>(body);
                 return instance;
             }
             catch (Exception ex)
@@ -256,6 +407,7 @@ namespace Middleware.Common.Services
                 {
                     throw new InvalidOperationException();
                 }
+
                 var body = await result.Content.ReadAsStringAsync(token);
                 var action = JsonConvert.DeserializeObject<ActionModel>(body);
                 return action;
@@ -286,13 +438,15 @@ namespace Middleware.Common.Services
                 {
                     throw new InvalidOperationException();
                 }
+
                 var body = await result.Content.ReadAsStringAsync(token);
                 var actionPlan = JsonConvert.DeserializeObject<ActionPlanModel>(body);
                 return actionPlan;
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "There was en error while calling for the latest action plan with robotId: {robotId}", robotId);
+                _logger.LogError(ex,
+                    "There was en error while calling for the latest action plan with robotId: {robotId}", robotId);
                 throw;
             }
         }
@@ -316,6 +470,7 @@ namespace Middleware.Common.Services
                 {
                     throw new InvalidOperationException();
                 }
+
                 var body = await result.Content.ReadAsStringAsync(token);
                 var edge = JsonConvert.DeserializeObject<EdgeModel>(body);
                 return edge;
@@ -346,6 +501,7 @@ namespace Middleware.Common.Services
                 {
                     throw new InvalidOperationException();
                 }
+
                 var body = await result.Content.ReadAsStringAsync(token);
                 var cloud = JsonConvert.DeserializeObject<CloudModel>(body);
                 return cloud;

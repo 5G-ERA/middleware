@@ -32,6 +32,17 @@ public static class AutoMapperConfig
             cfg.CreateMap<GraphEntityModel, RedisInterface.GraphEntityModel>().ReverseMap();
             cfg.CreateMap<ActionPlanModel, RedisInterface.ActionPlanModel>().ReverseMap();
             cfg.CreateMap<ApiResponse, RedisInterface.ApiResponse>().ReverseMap();
+
+            cfg.CreateMap<ROSNodeModel, RedisInterface.ROSNodeModel>().ReverseMap();
+            cfg.CreateMap<RosTopicModel, RedisInterface.RosTopicModel>().ReverseMap();
+            cfg.CreateMap<ROSServiceModel, RedisInterface.ROSServiceModel>().ReverseMap();
+            cfg.CreateMap<SensorModel, RedisInterface.SensorModel>().ReverseMap();
+            cfg.CreateMap<ActuatorModel, RedisInterface.ActuatorModel>().ReverseMap();
+            //cfg.CreateMap<ManipulatorModel, RedisInterface.>().ReverseMap();
+            cfg.CreateMap<DialogueModel, RedisInterface.DialogueModel>().ReverseMap();
+            cfg.CreateMap<KeyValuePair, RedisInterface.KeyValuePair>().ReverseMap();
+            cfg.CreateMap<RelationModel, RedisInterface.RelationModel>().ReverseMap();
+            cfg.CreateMap<GraphEntityModel, RedisInterface.GraphEntityModel>().ReverseMap();
         });
         return services;
     }

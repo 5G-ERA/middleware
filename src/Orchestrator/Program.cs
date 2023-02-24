@@ -31,7 +31,7 @@ builder.Host.ConfigureAppConfiguration((hostingContext, _) =>
     ServicePointManager.EnableDnsRoundRobin = true;
 });
 // Add services to the container.
-
+builder.Services.RegisterCommonServices();
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
@@ -45,7 +45,6 @@ builder.Services.RegisterRabbitMqConsumers(rabbitmqConfig, mwConfig)
     .ConfigureAutoMapper();
 
 builder.Services.AddHttpClient(AppConfig.OsmApiClientName);
-builder.Services.RegisterCommonServices();
 builder.Services.AddScoped<IApiClientBuilder, ApiClientBuilder>();
 builder.Services.AddScoped<IKubernetesBuilder, KubernetesBuilder>();
 builder.Services.AddScoped<IDeploymentService, DeploymentService>();
