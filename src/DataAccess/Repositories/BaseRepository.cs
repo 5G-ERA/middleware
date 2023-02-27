@@ -150,6 +150,13 @@ namespace Middleware.DataAccess.Repositories
             return success;
         }
 
+        public async Task UpdateAsync(T model)
+        {
+            await Db.JsonDeleteAsync(model.Id.ToString());
+
+            await Db.JsonSetAsync(model.Id.ToString(), JsonSerializer.Serialize(model));
+        }
+
         /// <summary>
         /// Execute the given Lua query against the redis data store
         /// </summary>

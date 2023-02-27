@@ -1,4 +1,5 @@
 ﻿using System.Net;
+using System.Net.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Middleware.RedisInterface.Controllers

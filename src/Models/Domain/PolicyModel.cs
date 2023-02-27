@@ -1,7 +1,7 @@
 ﻿using System.Text.Json.Serialization;
-using Middleware.Common.Enums;
 using Middleware.Models.Dto.Hardware;
 using Middleware.Models.Dto;
+using Middleware.Models.Enums;
 
 namespace Middleware.Models.Domain;
 

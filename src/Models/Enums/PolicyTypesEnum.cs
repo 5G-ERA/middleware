@@ -1,4 +1,4 @@
-﻿namespace Middleware.Common.Enums
+﻿namespace Middleware.Models.Enums
 {
     public enum PolicyTypesEnum
     {

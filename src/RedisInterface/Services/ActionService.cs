@@ -1,5 +1,4 @@
 ﻿using Middleware.DataAccess.Repositories.Abstract;
-using Middleware.DataAccess.Repositories.Redis;
 using Middleware.Models.Domain;
 using Middleware.RedisInterface.Services.Abstract;
 
@@ -16,6 +15,16 @@ public class ActionService : IActionService
     {
         var action = await _actionRepository.AddAsync(model);
         return action;
+    }
+
+    public async Task UpdateAsync(ActionModel model)
+    {
+        await _actionRepository.UpdateAsync(model);
+    }
+
+    public async Task<bool> DeleteAsync(Guid id)
+    {
+        return await _actionRepository.DeleteByIdAsync(id);
     }
 
     public async Task<ActionModel> GetByIdAsync(Guid id)

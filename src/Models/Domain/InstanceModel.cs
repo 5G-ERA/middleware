@@ -57,10 +57,10 @@ public class InstanceModel : BaseModel
     public ContainerImageModel? ContainerImage { get; set; }
 
     [JsonPropertyName("MinimumRam")]
-    public int MinimumRam { get; set; } // Compulsory field
+    public long? MinimumRam { get; set; } // Compulsory field
 
     [JsonPropertyName("MinimumNumCores")]
-    public int MinimumNumCores { get; set; } // Compulsory field
+    public int? MinimumNumCores { get; set; } // Compulsory field
 
     [JsonPropertyName("OnboardedTime")]
     public DateTime OnboardedTime { get; set; } // Compulsory field
@@ -109,7 +109,7 @@ public class InstanceModel : BaseModel
             HardwareRequirements = new HardwareRequirements()
             {
                 MinimumRam = domain.MinimumRam,
-                MinimumNumCores = domain.MinimumRam
+                MinimumNumCores = domain.MinimumNumCores
             },
             OnboardedTime = domain.OnboardedTime == default ? DateTimeOffset.Now : domain.OnboardedTime
         };

@@ -133,7 +133,7 @@ public class ActionPlanner : IActionPlanner
     protected List<ActionModel> SortActionSequence(List<ActionModel> unsortedActionSequence)
     {
         List<ActionModel> SortedList = new List<ActionModel>();
-        Dictionary<ActionModel, int> myDict = new Dictionary<ActionModel, int>();
+        Dictionary<ActionModel, int?> myDict = new Dictionary<ActionModel, int?>();
 
         foreach (ActionModel action in unsortedActionSequence)
         {
@@ -143,7 +143,7 @@ public class ActionPlanner : IActionPlanner
         //sort diccionary by decending order of action attribute order.
         var sortedDict = from entry in myDict orderby entry.Value descending select entry;
 
-        foreach (KeyValuePair<ActionModel, int> entry in sortedDict)
+        foreach (KeyValuePair<ActionModel, int?> entry in sortedDict)
         {
             SortedList.Add(entry.Key);
         }

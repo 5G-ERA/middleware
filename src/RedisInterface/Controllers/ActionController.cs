@@ -1,8 +1,12 @@
 ﻿using System.Net;
 using Microsoft.AspNetCore.Mvc;
+using Middleware.Common.Attributes;
 using Middleware.Common.Responses;
 using Middleware.DataAccess.Repositories.Abstract;
 using Middleware.Models.Domain;
+using Middleware.RedisInterface.Contracts.Requests;
+using Middleware.RedisInterface.Contracts.Responses;
+using Middleware.RedisInterface.Mappings;
 using Middleware.RedisInterface.Services.Abstract;
 
 namespace Middleware.RedisInterface.Controllers;
@@ -28,24 +32,23 @@ public class ActionController : ControllerBase
     }
 
     /// <summary>
-    /// Get all the ActionModel entities
+    /// Get all the actions
     /// </summary>
     /// <returns> the list of ActionModel entities </returns>
     [HttpGet(Name = "ActionGetAll")]
-    [ProducesResponseType(typeof(List<ActionModel>), (int)HttpStatusCode.OK)]
+    [ProducesResponseType(typeof(GetAllActionsResponse), (int)HttpStatusCode.OK)]
     [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.NotFound)]
     [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.InternalServerError)]
     public async Task<ActionResult<IEnumerable<ActionModel>>> GetAllAsync()
     {
         try
         {
-
             List<ActionModel> models = await _actionRepository.GetAllAsync();
             if (models.Any() == false)
             {
                 return NotFound(new ApiResponse((int)HttpStatusCode.NotFound, "No actions were found."));
             }
-            return Ok(models);
+            return Ok(models.ToActionsResponse());
         }
         catch (Exception ex)
         {
@@ -54,17 +57,15 @@ public class ActionController : ControllerBase
             return StatusCode(statusCode, new ApiResponse(statusCode, $"An error has occurred: {ex.Message}"));
         }
     }
-
-    //New end points for depends_on property for actions.
-
+    
     /// <summary>
-    /// Get an ActionModel entity by id
+    /// Get an action entity by id
     /// </summary>
     /// <param name="id"></param>
     /// <returns> the ActionModel entity for the specified id </returns>
     [HttpGet]
     [Route("{id}", Name = "ActionGetById")]
-    [ProducesResponseType(typeof(ActionModel), (int)HttpStatusCode.OK)]
+    [ProducesResponseType(typeof(ActionResponse), (int)HttpStatusCode.OK)]
     [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.NotFound)]
     [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.InternalServerError)]
     public async Task<IActionResult> GetByIdAsync(Guid id)
@@ -76,7 +77,7 @@ public class ActionController : ControllerBase
             {
                 return NotFound(new ApiResponse((int)HttpStatusCode.NotFound, $"Action with id: '{id}' was not found."));
             }
-            return Ok(model);
+            return Ok(model.ToActionResponse());
         }
         catch (Exception ex)
         {
@@ -87,23 +88,20 @@ public class ActionController : ControllerBase
     }
 
     /// <summary>
-    /// Add a new ActionModel entity
+    /// Add a new action entity
     /// </summary>
-    /// <param name="model"></param>
+    /// <param name="request"></param>
     /// <returns> the newly created ActionModel entity </returns>
     [HttpPost(Name = "ActionAdd")]
-    [ProducesResponseType(typeof(ActionModel), (int)HttpStatusCode.OK)]
+    [ProducesResponseType(typeof(ActionResponse), (int)HttpStatusCode.OK)]
     [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.BadRequest)]
     [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.InternalServerError)]
-    public async Task<ActionResult<ActionModel>> AddAsync([FromBody] ActionModel model)
+    public async Task<ActionResult<ActionModel>> AddAsync([FromBody] ActionRequest request)
     {
-        if (model == null)
-        {
-            return BadRequest(new ApiResponse((int)HttpStatusCode.BadRequest, "Parameters were not specified."));
-        }
         try
         {
-            model = await _actionService.AddAsync(model);
+            var action  = await _actionService.AddAsync(request.ToAction());
+            return Ok(action.ToActionResponse());
         }
         catch (Exception ex)
         {
@@ -111,30 +109,32 @@ public class ActionController : ControllerBase
             _logger.LogError(ex, "An error occurred:");
             return StatusCode(statusCode, new ApiResponse(statusCode, $"An error has occurred: {ex.Message}"));
         }
-        return Ok(model);
     }
 
     /// <summary>
-    /// Partially update an existing ActionModel entity
+    /// Update an existing action entity
     /// </summary>
-    /// <param name="patch"></param>
-    /// <param name="id"></param>
     /// <returns> the modified ActionModel entity </returns>
-    [HttpPatch]
-    [Route("{id}", Name = "ActionPatch")]
+    [HttpPut]
+    [Route("{id}", Name = "ActionUpdate")]
     [ProducesResponseType(typeof(ActionModel), (int)HttpStatusCode.OK)]
     [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.NotFound)]
     [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.InternalServerError)]
-    public async Task<IActionResult> PatchActionAsync([FromBody] ActionModel patch, [FromRoute] Guid id)
+    public async Task<IActionResult> UpdateActionAsync([FromMultiSource] UpdateActionRequest request)
     {
         try
         {
-            ActionModel model = await _actionRepository.PatchActionAsync(id, patch);
-            if (model == null)
+            var existingAction = await _actionService.GetByIdAsync(request.Id);
+            if (existingAction is null)
             {
                 return NotFound(new ApiResponse((int)HttpStatusCode.NotFound, "Object to be updated was not found."));
             }
-            return Ok(model);
+
+            var action = request.ToAction();
+            await _actionService.UpdateAsync(action);
+            
+            var response = action.ToActionResponse();
+            return Ok(response);
         }
         catch (Exception ex)
         {
@@ -144,9 +144,8 @@ public class ActionController : ControllerBase
         }
     }
 
-
     /// <summary>
-    /// Delete an ActionModel entity for the given id
+    /// Delete an action entity with the given id
     /// </summary>
     /// <param name="id"></param>
     /// <returns> no return </returns>
@@ -159,7 +158,7 @@ public class ActionController : ControllerBase
     {
         try
         {
-            var deleted = await _actionRepository.DeleteByIdAsync(id);
+            var deleted = await _actionService.DeleteAsync(id);
             if (deleted == false)
             {
                 return NotFound(new ApiResponse((int)HttpStatusCode.NotFound, "The specified Action has not been found."));

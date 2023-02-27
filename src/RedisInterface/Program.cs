@@ -1,9 +1,12 @@
+using FluentValidation;
+using FluentValidation.AspNetCore;
 using Middleware.Common.ExtensionMethods;
 using Middleware.RedisInterface;
 using Middleware.RedisInterface.Services;
 using Middleware.DataAccess.ExtensionMethods;
 using Middleware.RedisInterface.Services.Abstract;
 using Middleware.DataAccess.HostedServices;
+using Middleware.RedisInterface.Validation;
 using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -23,6 +26,9 @@ builder.Services.AddControllers(options =>
 {
     x.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore;
 });
+builder.Services.AddFluentValidationAutoValidation();
+builder.Services.AddFluentValidationClientsideAdapters();
+builder.Services.AddValidatorsFromAssemblyContaining(typeof(Program));
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 
@@ -46,6 +52,7 @@ if (app.Environment.IsDevelopment())
 }
 app.UseSerilogRequestLogging();
 
+app.UseMiddleware<ValidationExceptionMiddleware>();
 //app.UseHttpsRedirection();
 
 app.UseAuthorization();
