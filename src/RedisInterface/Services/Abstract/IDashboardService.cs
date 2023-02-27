@@ -1,5 +1,5 @@
 ﻿using Middleware.Common;
-using Middleware.RedisInterface.Responses;
+using Middleware.RedisInterface.Contracts.Responses;
 
 namespace Middleware.RedisInterface.Services
 {

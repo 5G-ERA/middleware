@@ -47,4 +47,8 @@
     <None Remove="LuaQueries\GetSameFamilyAction.lua" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Mappings" />
+  </ItemGroup>
+
 </Project>

@@ -1,12 +1,12 @@
 ﻿using Middleware.Common;
 using Middleware.Common.Enums;
 using Middleware.DataAccess.Repositories.Abstract;
-using Middleware.RedisInterface.Responses;
 using Middleware.Common.ExtensionMethods;
 using Microsoft.AspNetCore.Http;
 using StackExchange.Redis;
 using System.Reflection.Metadata.Ecma335;
 using Middleware.Models.Domain;
+using Middleware.RedisInterface.Contracts.Responses;
 
 namespace Middleware.RedisInterface.Services
 {

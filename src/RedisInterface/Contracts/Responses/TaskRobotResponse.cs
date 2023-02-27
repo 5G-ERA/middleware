@@ -1,6 +1,6 @@
 ﻿using System.Text.Json.Serialization;
 
-namespace Middleware.RedisInterface.Responses
+namespace Middleware.RedisInterface.Contracts.Responses
 {
     public record TaskRobotResponse
     {

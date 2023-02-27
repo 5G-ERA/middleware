@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Middleware.Common;
 using Middleware.Common.Helpers;
 using Middleware.Common.Responses;
-using Middleware.RedisInterface.Responses;
+using Middleware.RedisInterface.Contracts.Responses;
 using Middleware.RedisInterface.Services;
 
 namespace Middleware.RedisInterface.Controllers

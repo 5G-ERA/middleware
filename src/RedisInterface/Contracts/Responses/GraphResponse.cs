@@ -1,7 +1,7 @@
 ﻿
 using Middleware.Models.Domain;
 
-namespace Middleware.RedisInterface.Responses;
+namespace Middleware.RedisInterface.Contracts.Responses;
 
 public class GraphResponse
 {

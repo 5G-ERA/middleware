@@ -1,4 +1,4 @@
-﻿namespace Middleware.RedisInterface.Responses;
+﻿namespace Middleware.RedisInterface.Contracts.Responses;
 
 public class SimpleRelation
 {
