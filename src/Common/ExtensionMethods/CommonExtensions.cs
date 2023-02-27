@@ -1,13 +1,13 @@
 ﻿using System.Net.Http.Headers;
 using Amazon;
+using FluentValidation;
+using FluentValidation.AspNetCore;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Middleware.Common.Config;
 using Middleware.Common.Services;
-using RedisGraphDotNet.Client;
-using StackExchange.Redis;
 
 namespace Middleware.Common.ExtensionMethods;
 
@@ -26,6 +26,14 @@ public static class CommonExtensions
         services.AddScoped<IRedisInterfaceClientService, RedisInterfaceClientService>();
 
 
+        return services;
+    }
+
+    public static IServiceCollection AddFluentValidation(this IServiceCollection services, Type assemblyType)
+    {
+        services.AddFluentValidationAutoValidation();
+        services.AddFluentValidationClientsideAdapters();
+        services.AddValidatorsFromAssemblyContaining(assemblyType);
         return services;
     }
     /// <summary>
