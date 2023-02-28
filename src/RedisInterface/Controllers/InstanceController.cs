@@ -1,8 +1,12 @@
 ﻿using System.Net;
 using Microsoft.AspNetCore.Mvc;
+using Middleware.Common.Attributes;
 using Middleware.Common.Responses;
 using Middleware.DataAccess.Repositories.Abstract;
 using Middleware.Models.Domain;
+using Middleware.RedisInterface.Contracts.Requests;
+using Middleware.RedisInterface.Contracts.Responses;
+using Middleware.RedisInterface.Mappings;
 
 namespace Middleware.RedisInterface.Controllers
 {
@@ -24,10 +28,10 @@ namespace Middleware.RedisInterface.Controllers
         /// </summary>
         /// <returns> the list of InstanceModel entities </returns>
         [HttpGet(Name = "InstanceGetAll")]
-        [ProducesResponseType(typeof(InstanceModel), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(GetAllInstancesResponse), (int)HttpStatusCode.OK)]
         [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.NotFound)]
         [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.InternalServerError)]
-        public async Task<ActionResult<IEnumerable<InstanceModel>>> GetAllAsync()
+        public async Task<IActionResult> GetAllAsync()
         {
             try
             {
@@ -36,7 +40,9 @@ namespace Middleware.RedisInterface.Controllers
                 {
                     return NotFound(new ApiResponse((int)HttpStatusCode.NotFound, "Objects were not found."));
                 }
-                return Ok(models);
+
+                var response = models.ToInstancesResponse();
+                return Ok(response);
             }
             catch (Exception ex) 
             {
@@ -53,7 +59,7 @@ namespace Middleware.RedisInterface.Controllers
         /// <returns> the InstanceModel entity for the specified id </returns>
         [HttpGet]
         [Route("{id}", Name = "InstanceGetById")]
-        [ProducesResponseType(typeof(InstanceModel), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(InstanceResponse), (int)HttpStatusCode.OK)]
         [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.NotFound)]
         [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.InternalServerError)]
         public async Task<IActionResult> GetByIdAsync(Guid id)
@@ -65,7 +71,9 @@ namespace Middleware.RedisInterface.Controllers
                 {
                     return NotFound(new ApiResponse((int)HttpStatusCode.NotFound, "Object was not found."));
                 }
-                return Ok(model);
+
+                var response = model.ToInstanceResponse();
+                return Ok(response);
             }
             catch (Exception ex) 
             {
@@ -81,21 +89,18 @@ namespace Middleware.RedisInterface.Controllers
         /// <param name="model"></param>
         /// <returns> the newly created InstanceModel entity </returns>
         [HttpPost(Name = "InstanceAdd")]
-        [ProducesResponseType(typeof(InstanceModel), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(InstanceResponse), (int)HttpStatusCode.OK)]
         [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.BadRequest)]
         [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.InternalServerError)]
-        public async Task<ActionResult<InstanceModel>> AddAsync([FromBody] InstanceModel model)
+        public async Task<ActionResult<InstanceModel>> AddAsync([FromBody] InstanceRequest request)
         {
-            if (model == null)
+            if (request == null)
             {
                 return BadRequest("Parameters were not specified.");
             }
-            if (model.IsValid() == false)
+            try
             {
-                return BadRequest(new ApiResponse((int)HttpStatusCode.BadRequest, "Parameters were not specified or wrongly specified."));
-            }
-            try 
-            { 
+                var model = request.ToInstance();
                 InstanceModel instance = await _instanceRepository.AddAsync(model);
                 if (instance is null)
                 {
@@ -103,6 +108,9 @@ namespace Middleware.RedisInterface.Controllers
                         new ApiResponse((int) HttpStatusCode.InternalServerError,
                             "Could not add the instance to the data store"));
                 }
+
+                var response = instance.ToInstanceResponse();
+                return Ok(response);    
             }
             catch (Exception ex)
             {
@@ -110,7 +118,6 @@ namespace Middleware.RedisInterface.Controllers
                 _logger.LogError(ex, "An error occurred:");
                 return StatusCode(statusCode, new ApiResponse(statusCode, $"An error has occurred: {ex.Message}"));
             }
-            return Ok(model);
         }
 
         /// <summary>
@@ -119,25 +126,24 @@ namespace Middleware.RedisInterface.Controllers
         /// <param name="patch"></param>
         /// <param name="id"></param>
         /// <returns> the modified InstanceModel entity </returns>
-        [HttpPatch]
+        [HttpPut]
         [Route("{id}", Name = "InstancePatch")]
-        [ProducesResponseType(typeof(InstanceModel), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(InstanceResponse), (int)HttpStatusCode.OK)]
         [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.NotFound)]
         [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.InternalServerError)]
-        public async Task<IActionResult> PatchInstanceAsync([FromBody] InstanceModel patch, [FromRoute] Guid id)
+        public async Task<IActionResult> PatchInstanceAsync([FromMultiSource] UpdateInstanceRequest request)
         {
-            if (patch.IsValid() == false)
-            {
-                return BadRequest(new ApiResponse((int)HttpStatusCode.BadRequest, "Parameters were not specified or wrongly specified."));
-            }
             try
             {
-                InstanceModel model = await _instanceRepository.PatchInstanceAsync(id, patch);
-                if (model == null)
+                var model = request.ToInstance();
+                var exists = await _instanceRepository.GetByIdAsync(model.Id);
+                if (exists is null)
                 {
                     return NotFound(new ApiResponse((int)HttpStatusCode.NotFound, "Object to be updated was not found."));
                 }
-                return Ok(model);
+                await _instanceRepository.UpdateAsync(model);
+                var response = model.ToInstanceResponse();                
+                return Ok(response);
             }
             catch (Exception ex) 
             {
@@ -161,11 +167,12 @@ namespace Middleware.RedisInterface.Controllers
         {
             try
             {
-                var deleted = await _instanceRepository.DeleteByIdAsync(id);
-                if (deleted == false)
+                var exists = await _instanceRepository.GetByIdAsync(id);
+                if (exists is null)
                 {
                     return NotFound(new ApiResponse((int)HttpStatusCode.NotFound, "The specified Instance has not been found."));
                 }
+                await _instanceRepository.DeleteByIdAsync(id);
                 return Ok();
             }
             catch (Exception ex) 
@@ -312,11 +319,15 @@ namespace Middleware.RedisInterface.Controllers
         /// <returns>InstanceModel</returns>
         [HttpGet]
         [Route("alternative/{id}", Name = "InstanceGetAlternative")]
-        [ProducesResponseType(typeof(InstanceModel), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(InstanceResponse), (int)HttpStatusCode.OK)]
         [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.NotFound)]
         [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.InternalServerError)]
         public async Task<IActionResult> FindAlternativeInstance(Guid id)
         {
+            if (id == Guid.Empty)
+            {
+                return BadRequest(new ApiResponse((int)HttpStatusCode.BadRequest, "Parameters were not specified."));
+            }
             try
             {
                 var alternativeInstance = await _instanceRepository.FindAlternativeInstance(id);
@@ -324,7 +335,9 @@ namespace Middleware.RedisInterface.Controllers
                 {
                     return NotFound(new ApiResponse((int)HttpStatusCode.NotFound, "Object to be updated was not found."));
                 }
-                return Ok(alternativeInstance);
+
+                var response = alternativeInstance.ToInstanceResponse();
+                return Ok(response);
             }
             catch (Exception ex)
             {
