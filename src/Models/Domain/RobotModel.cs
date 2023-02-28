@@ -80,19 +80,19 @@ public class RobotModel : BaseModel
     public List<ManipulatorModel>? Manipulators { get; set; }
 
     [JsonPropertyName("CPU")]
-    public int Cpu { get; set; }
+    public int? Cpu { get; set; }
 
     [JsonPropertyName("RAM")] // Compulsory field
-    public long Ram { get; set; }
+    public long? Ram { get; set; }
 
     //  [JsonPropertyName("VirtualRam")]
     //  public long VirtualRam { get; set; }
 
     [JsonPropertyName("StorageDisk")] // Compulsory field
-    public long StorageDisk { get; set; }
+    public long? StorageDisk { get; set; }
 
     [JsonPropertyName("NumberCores")] // Compulsory field
-    public int NumberCores { get; set; }
+    public int? NumberCores { get; set; }
 
     [JsonPropertyName("Questions")]
     public List<DialogueModel>? Questions { get; set; }

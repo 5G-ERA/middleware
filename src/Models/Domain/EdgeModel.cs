@@ -25,19 +25,19 @@ public class EdgeModel : BaseModel
     public string MacAddress { get; set; }
 
     [JsonPropertyName("CPU")]
-    public int Cpu { get; set; }
+    public int? Cpu { get; set; }
 
     [JsonPropertyName("RAM")]
-    public long Ram { get; set; }
+    public long? Ram { get; set; }
 
     [JsonPropertyName("VirtualRam")]
     public long? VirtualRam { get; set; }
 
     [JsonPropertyName("DiskStorage")]
-    public long DiskStorage { get; set; }
+    public long? DiskStorage { get; set; }
 
     [JsonPropertyName("NumberOfCores")]
-    public int NumberOfCores { get; set; }
+    public int? NumberOfCores { get; set; }
 
     [JsonPropertyName("LastUpdatedTime")]
     public DateTime LastUpdatedTime { get; set; }

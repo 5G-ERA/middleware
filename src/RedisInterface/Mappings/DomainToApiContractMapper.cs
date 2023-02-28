@@ -22,16 +22,33 @@ public static  class DomainToApiContractMapper
     {
         return new GetAllActionsResponse()
         {
-            Actions = actions.Select(x => new ActionResponse
-            {
-                Id = x.Id,
-                Name = x.Name,
-                Order = x.Order,
-                MinimumRam = x.MinimumRam,
-                MinimumNumCores = x.MinimumNumCores,
-                Tags = x.Tags
-            })
+            Actions = actions.Select(x => x.ToActionResponse())
         };
     }
 
+    public static CloudResponse ToCloudResponse(this CloudModel x)
+    {
+        return new CloudResponse()
+        {
+            Id = x.Id,
+            Name = x.Name,
+            Type = x.Type,
+            IpAddress = x.CloudIp,
+            MacAddress = x.MacAddress,
+            Status = x.CloudStatus,
+            Cpu = x.Cpu,
+            NumberOfCores = x.NumberOfCores,
+            Ram = x.Ram,
+            VirtualRam = x.VirtualRam,
+            DiskStorage = x.DiskStorage,
+            LastUpdatedTime = x.LastUpdatedTime
+        };
+    } 
+    public static GetAllCloudsResponse ToCloudsResponse(this IEnumerable<CloudModel> clouds)
+    {
+        return new GetAllCloudsResponse()
+        {
+            Clouds = clouds.Select(x => x.ToCloudResponse())
+        };
+    } 
 }

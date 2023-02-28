@@ -28,4 +28,40 @@ public static class ApiContractToDomainMapper
             Tags = x.Action.Tags.ToList()
         };
     }
+
+    public static CloudModel ToCloud(this CloudRequest x)
+    {
+        return new CloudModel()
+        {
+            Name = x.Name,
+            Type = x.Type,
+            CloudIp = x.IpAddress,
+            MacAddress = x.MacAddress,
+            CloudStatus = x.Status,
+            Cpu = x.Cpu,
+            NumberOfCores = x.NumberOfCores,
+            Ram = x.Ram,
+            VirtualRam = x.VirtualRam,
+            DiskStorage = x.DiskStorage,
+            LastUpdatedTime = DateTime.Now
+        };
+    }
+    public static CloudModel ToCloud(this UpdateCloudRequest x)
+    {
+        return new CloudModel()
+        {
+            Id = x.Id,
+            Name = x.Cloud.Name,
+            Type = x.Cloud.Type,
+            CloudIp = x.Cloud.IpAddress,
+            MacAddress = x.Cloud.MacAddress,
+            CloudStatus = x.Cloud.Status,
+            Cpu = x.Cloud.Cpu,
+            NumberOfCores = x.Cloud.NumberOfCores,
+            Ram = x.Cloud.Ram,
+            VirtualRam = x.Cloud.VirtualRam,
+            DiskStorage = x.Cloud.DiskStorage,
+            LastUpdatedTime = DateTime.Now
+        };
+    }
 }

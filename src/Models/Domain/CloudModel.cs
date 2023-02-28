@@ -6,7 +6,7 @@ namespace Middleware.Models.Domain;
 public class CloudModel : BaseModel
 {
     [JsonPropertyName("Id")]
-    public override Guid Id { get; set; }
+    public override Guid Id { get; set; } = Guid.NewGuid();
 
     [JsonPropertyName("Name")]
     public override string Name { get; set; }
@@ -22,19 +22,19 @@ public class CloudModel : BaseModel
     public Uri CloudIp { get; set; }
 
     [JsonPropertyName("NumberOfCores")]
-    public int NumberOfCores { get; set; }
+    public int? NumberOfCores { get; set; }
 
     [JsonPropertyName("DiskStorage")]
-    public long DiskStorage { get; set; }
+    public long? DiskStorage { get; set; }
 
     [JsonPropertyName("VirtualRam")]
     public long? VirtualRam { get; set; }
 
     [JsonPropertyName("CPU")]
-    public int Cpu { get; set; }
+    public int? Cpu { get; set; }
 
     [JsonPropertyName("RAM")]
-    public long Ram { get; set; }
+    public long? Ram { get; set; }
 
     [JsonPropertyName("MacAddress")]
     public string MacAddress { get; set; }
