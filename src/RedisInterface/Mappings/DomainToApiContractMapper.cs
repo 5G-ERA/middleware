@@ -50,5 +50,25 @@ public static  class DomainToApiContractMapper
         {
             Clouds = clouds.Select(x => x.ToCloudResponse())
         };
-    } 
+    }
+
+    public static ContainerResponse ToContainerResponse(this ContainerImageModel x)
+    {
+        return new ContainerResponse()
+        {
+            Id = x.Id,
+            Name = x.Name,
+            Description = x.Description,
+            K8sDeployment = x.K8SDeployment,
+            K8sService = x.K8SService,
+            LastUpdateTime = x.Timestamp
+        };
+    }
+    public static GetAllContainersResponse ToContainersResponse(this IEnumerable<ContainerImageModel> contaiers)
+    {
+        return new GetAllContainersResponse()
+        {
+            Containers = contaiers.Select(x => x.ToContainerResponse())
+        };
+    }
 }

@@ -64,4 +64,29 @@ public static class ApiContractToDomainMapper
             LastUpdatedTime = DateTime.Now
         };
     }
+
+    public static ContainerImageModel ToContainer(this ContainerRequest x)
+    {
+        return new ContainerImageModel()
+        {
+            Name = x.Name,
+            Description = x.Description,
+            K8SDeployment = x.K8SDeployment,
+            K8SService = x.K8SService,
+            Timestamp = DateTime.Now
+        };
+    }
+    
+    public static ContainerImageModel ToContainer(this UpdateContainerRequest x)
+    {
+        return new ContainerImageModel()
+        {
+            Id = x.Id,
+            Name = x.Container.Name,
+            Description = x.Container.Description,
+            K8SDeployment = x.Container.K8SDeployment,
+            K8SService = x.Container.K8SService,
+            Timestamp = DateTime.Now
+        };
+    } 
 }

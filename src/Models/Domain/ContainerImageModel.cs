@@ -7,23 +7,23 @@ namespace Middleware.Models.Domain;
 public class ContainerImageModel : BaseModel
 {
     [JsonPropertyName("Id")]
-    public override Guid Id { get; set; }
+    public override Guid Id { get; set; } = Guid.NewGuid();
 
     [JsonPropertyName("Name")]
-    public override string Name { get; set; }
+    public override string Name { get; set; } = default!;
     
 
     [JsonPropertyName("Timestamp")]
     public DateTime Timestamp { get; set; }
 
     [JsonPropertyName("Description")]
-    public string Description { get; set; }
+    public string? Description { get; set; }
 
     [JsonPropertyName("K8SDeployment")]
-    public string K8SDeployment { get; set; }
+    public string K8SDeployment { get; set; } = default!;
 
     [JsonPropertyName("K8SService")]
-    public string K8SService { get; set; }
+    public string? K8SService { get; set; }
 
     public override Dto.Dto ToDto()
     {
