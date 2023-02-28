@@ -7,7 +7,7 @@ public interface IBaseRepository<T> where T : class
     /// </summary>
     /// <param name="model">Model of an object to be added</param>
     /// <returns></returns>
-    Task<T> AddAsync(T model);
+    Task<T?> AddAsync(T model);
 
     /// <summary>
     /// Adds a new object to the data store and specify the <see cref="Guid"/> generation method
