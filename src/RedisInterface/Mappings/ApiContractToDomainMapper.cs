@@ -163,4 +163,31 @@ public static class ApiContractToDomainMapper
             RosTopicsSub = x.Instance.RosTopicSubscribers.ToList()
         };
     }
+
+    public static PolicyModel ToPolicy(this PolicyRequest x)
+    {
+        return new PolicyModel()
+        {
+            Name = x.Name,
+            Description = x.Description,
+            Type = x.Type,
+            IsActive = x.IsActive,
+            IsExclusiveWithinType = x.IsExclusiveWithinType,
+            Timestamp = x.LastTimeUpdated
+        };
+    }
+
+    public static PolicyModel ToPolicy(this UpdatePolicyRequest x)
+    {
+        return new PolicyModel()
+        {
+            Id = x.Id,
+            Name = x.Policy.Name,
+            Description = x.Policy.Description,
+            Type = x.Policy.Type,
+            IsActive = x.Policy.IsActive,
+            IsExclusiveWithinType = x.Policy.IsExclusiveWithinType,
+            Timestamp = x.Policy.LastTimeUpdated
+        };
+    }
 }

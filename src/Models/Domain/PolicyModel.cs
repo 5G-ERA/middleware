@@ -8,7 +8,7 @@ namespace Middleware.Models.Domain;
 public class PolicyModel : BaseModel
 {
     [JsonPropertyName("Id")]
-    public override Guid Id { get; set; }
+    public override Guid Id { get; set; } = Guid.NewGuid();
 
     [JsonPropertyName("Name")] // Compulsory field
     public override string Name { get; set; }
@@ -20,7 +20,7 @@ public class PolicyModel : BaseModel
     public DateTime Timestamp { get; set; }
 
     [JsonPropertyName("IsActive")]
-    public bool? IsActive { get; set; }
+    public bool IsActive { get; set; }
 
     [JsonPropertyName("Description")]
     public string Description { get; set; }

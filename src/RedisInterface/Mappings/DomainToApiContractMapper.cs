@@ -127,4 +127,26 @@ public static class DomainToApiContractMapper
             Instances = instances.Select(x => x.ToInstanceResponse())
         };
     }
+
+    public static PolicyResponse ToPolicyResponse(this PolicyModel x)
+    {
+        return new PolicyResponse()
+        {
+            Id = x.Id,
+            Name = x.Name,
+            Description = x.Description,
+            Type = x.Type,
+            IsActive = x.IsActive,
+            IsExclusiveWithinType = x.IsExclusiveWithinType,
+            LastTimeUpdated = x.Timestamp
+        };
+    }
+
+    public static GetAllPoliciesResponse ToPoliciesResponse(this IEnumerable<PolicyModel> policies)
+    {
+        return new GetAllPoliciesResponse()
+        {
+            Policies = policies.Select(x => x.ToPolicyResponse())
+        };
+    }
 }
