@@ -1,8 +1,12 @@
 ﻿using System.Net;
 using Microsoft.AspNetCore.Mvc;
+using Middleware.Common.Attributes;
 using Middleware.Common.Responses;
 using Middleware.DataAccess.Repositories.Abstract;
 using Middleware.Models.Domain;
+using Middleware.RedisInterface.Contracts.Requests;
+using Middleware.RedisInterface.Contracts.Responses;
+using Middleware.RedisInterface.Mappings;
 
 namespace Middleware.RedisInterface.Controllers
 {
@@ -24,10 +28,10 @@ namespace Middleware.RedisInterface.Controllers
         /// </summary>
         /// <returns> the list of EdgeModel entities </returns>
         [HttpGet(Name = "EdgeGetAll")]
-        [ProducesResponseType(typeof(EdgeModel), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(GetAllEdgesResponse), (int)HttpStatusCode.OK)]
         [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.NotFound)]
         [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.InternalServerError)]
-        public async Task<ActionResult<IEnumerable<EdgeModel>>> GetAllAsync()
+        public async Task<IActionResult> GetAllAsync()
         {
             try
             {
@@ -36,7 +40,9 @@ namespace Middleware.RedisInterface.Controllers
                 {
                     return NotFound(new ApiResponse((int)HttpStatusCode.NotFound, "Objects were not found."));
                 }
-                return Ok(models);
+
+                var response = models.ToEdgesResponse();
+                return Ok(response);
             }
             catch (Exception ex)
             {
@@ -53,7 +59,7 @@ namespace Middleware.RedisInterface.Controllers
         /// <returns> the EdgeModel entity for the specified id </returns>
         [HttpGet]
         [Route("{id}", Name = "EdgeGetById")]
-        [ProducesResponseType(typeof(EdgeModel), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(EdgeResponse), (int)HttpStatusCode.OK)]
         [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.NotFound)]
         [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.InternalServerError)]
         public async Task<IActionResult> GetByIdAsync(Guid id)
@@ -65,7 +71,9 @@ namespace Middleware.RedisInterface.Controllers
                 {
                     return NotFound(new ApiResponse((int)HttpStatusCode.NotFound, "Object was not found."));
                 }
-                return Ok(model);
+
+                var response = model.ToEdgeResponse();
+                return Ok(response);
             }
             catch (Exception ex)
             {
@@ -78,24 +86,22 @@ namespace Middleware.RedisInterface.Controllers
         /// <summary>
         /// Add a new EdgeModel entity
         /// </summary>
-        /// <param name="model"></param>
+        /// <param name="request"></param>
         /// <returns> the newly created EdgeModel entity </returns>
         [HttpPost(Name = "EdgeAdd")]
-        [ProducesResponseType(typeof(EdgeModel), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(EdgeResponse), (int)HttpStatusCode.OK)]
         [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.BadRequest)]
         [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.InternalServerError)]
-        public async Task<ActionResult<EdgeModel>> AddAsync([FromBody] EdgeModel model)
+        public async Task<IActionResult> AddAsync([FromBody] EdgeRequest request)
         {
-            if (model == null)
+            if (request == null)
             {
                 return BadRequest(new ApiResponse((int)HttpStatusCode.BadRequest, "Parameters were not specified."));
             }
-            if (model.IsValid() == false)
-            {
-                return BadRequest(new ApiResponse((int)HttpStatusCode.BadRequest, "Parameters were not specified or wrongly specified."));
-            }
+
             try
             {
+                var model = request.ToEdge();
                 EdgeModel edge = await _edgeRepository.AddAsync(model);
                 if (edge is null)
                 {
@@ -103,6 +109,9 @@ namespace Middleware.RedisInterface.Controllers
                         new ApiResponse((int)HttpStatusCode.NotFound,
                             "Problem while adding the Edge to the data store"));
                 }
+
+                var response = edge.ToEdgeResponse();
+                return Ok(response);
             }
             catch (Exception ex)
             {
@@ -110,7 +119,6 @@ namespace Middleware.RedisInterface.Controllers
                 _logger.LogError(ex, "An error occurred:");
                 return StatusCode(statusCode, new ApiResponse(statusCode, $"An error has occurred: {ex.Message}"));
             }
-            return Ok(model);
         }
 
         /// <summary>
@@ -119,26 +127,31 @@ namespace Middleware.RedisInterface.Controllers
         /// <param name="patch"></param>
         /// <param name="id"></param>
         /// <returns> the modified InstanceModel entity </returns>
-        [HttpPatch]
+        [HttpPut]
         [Route("{id}", Name = "EdgePatch")]
         [ProducesResponseType(typeof(EdgeModel), (int)HttpStatusCode.OK)]
         [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.NotFound)]
         [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.InternalServerError)]
-        public async Task<IActionResult> PatchEdgeAsync([FromBody] EdgeModel patch, [FromRoute] Guid id)
+        public async Task<IActionResult> PatchEdgeAsync([FromMultiSource] UpdateEdgeRequest request)
         {
-            if (patch.IsValid() == false)
+            if (request is null)
             {
-                return BadRequest(new ApiResponse((int)HttpStatusCode.BadRequest, "Parameters were not specified or wrongly specified."));
+                return BadRequest(new ApiResponse((int)HttpStatusCode.BadRequest,
+                    "Parameters were not specified or wrongly specified."));
             }
 
             try
             {
-                EdgeModel model = await _edgeRepository.PatchEdgeAsync(id, patch);
-                if (model == null)
+                var edge = request.ToEdge();
+                var exists = await _edgeRepository.GetByIdAsync(edge.Id);
+                if (exists is null)
                 {
-                    return NotFound(new ApiResponse((int)HttpStatusCode.NotFound, "Object to be updated was not found."));
+                    return NotFound(
+                        new ApiResponse((int)HttpStatusCode.NotFound, "Object to be updated was not found."));
                 }
-                return Ok(model);
+                await _edgeRepository.UpdateAsync(edge);
+                var response = edge.ToEdgeResponse();
+                return Ok(response);
             }
             catch (Exception ex)
             {
@@ -163,11 +176,19 @@ namespace Middleware.RedisInterface.Controllers
         {
             try
             {
-                var deleted = await _edgeRepository.DeleteByIdAsync(id);
-                if (deleted == false)
+                if (id == Guid.Empty)
                 {
-                    return NotFound(new ApiResponse((int)HttpStatusCode.NotFound, "The specified Edge has not been found."));
+                    return NotFound(new ApiResponse((int)HttpStatusCode.NotFound,
+                        "The id cannot be empty"));
                 }
+
+                var exists = await _edgeRepository.GetByIdAsync(id);
+                if (exists is null)
+                {
+                    return NotFound(new ApiResponse((int)HttpStatusCode.NotFound,
+                        "The specified Edge has not been found."));
+                }
+                await _edgeRepository.DeleteByIdAsync(id);
                 return Ok();
             }
             catch (Exception ex)
@@ -194,6 +215,7 @@ namespace Middleware.RedisInterface.Controllers
             {
                 return BadRequest(new ApiResponse((int)HttpStatusCode.BadRequest, "Parameters were not specified."));
             }
+
             try
             {
                 bool isValid = await _edgeRepository.AddRelationAsync(model);
@@ -209,6 +231,7 @@ namespace Middleware.RedisInterface.Controllers
                 _logger.LogError(ex, "An error occurred:");
                 return StatusCode(statusCode, new ApiResponse(statusCode, $"An error has occurred: {ex.Message}"));
             }
+
             return Ok(model);
         }
 
@@ -232,6 +255,7 @@ namespace Middleware.RedisInterface.Controllers
                 {
                     return NotFound(new ApiResponse((int)HttpStatusCode.NotFound, "Relations were not found."));
                 }
+
                 return Ok(relations);
             }
             catch (Exception ex)
@@ -264,6 +288,7 @@ namespace Middleware.RedisInterface.Controllers
                 {
                     return NotFound(new ApiResponse((int)HttpStatusCode.NotFound, "Relations were not found"));
                 }
+
                 return Ok(relations);
             }
             catch (Exception ex)
@@ -275,12 +300,12 @@ namespace Middleware.RedisInterface.Controllers
         }
 
         [HttpGet]
-        [Route("free", Name = "GetFreeEdgesIds")]//edges
+        [Route("free", Name = "GetFreeEdgesIds")] //edges
         [ProducesResponseType(typeof(List<EdgeModel>), (int)HttpStatusCode.OK)]
         [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.NotFound)]
         [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.BadRequest)]
         [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.InternalServerError)]
-        public async Task<ActionResult<List<EdgeModel>>> GetFreeEdgesIdsAsync(List<EdgeModel> edgesToCheck)
+        public async Task<IActionResult> GetFreeEdgesIdsAsync(List<EdgeModel> edgesToCheck)
         {
             try
             {
@@ -292,18 +317,19 @@ namespace Middleware.RedisInterface.Controllers
                 List<EdgeModel> edgeFree = await _edgeRepository.GetFreeEdgesIdsAsync(edgesToCheck);
                 if (!edgeFree.Any())
                 {
-                    return NotFound(new ApiResponse((int)HttpStatusCode.BadRequest, "There are no edges connected to the Robot"));
+                    return NotFound(new ApiResponse((int)HttpStatusCode.BadRequest,
+                        "There are no edges connected to the Robot"));
                 }
-                return Ok(edgeFree);
+
+                var response = edgeFree.ToEdgesResponse();
+                return Ok(response);
             }
             catch (Exception ex)
             {
-
                 int statusCode = (int)HttpStatusCode.InternalServerError;
                 _logger.LogError(ex, "An error occurred:");
                 return StatusCode(statusCode, new ApiResponse(statusCode, $"An error has occurred: {ex.Message}"));
             }
-
         }
 
         [HttpGet]
@@ -326,16 +352,15 @@ namespace Middleware.RedisInterface.Controllers
                 {
                     return NotFound(new ApiResponse((int)HttpStatusCode.BadRequest, "There are no busy edges"));
                 }
+
                 return Ok(lessBusyEdge);
             }
             catch (Exception ex)
             {
-
                 int statusCode = (int)HttpStatusCode.InternalServerError;
                 _logger.LogError(ex, "An error occurred:");
                 return StatusCode(statusCode, new ApiResponse(statusCode, $"An error has occurred: {ex.Message}"));
             }
-
         }
 
         [HttpGet]
@@ -348,11 +373,13 @@ namespace Middleware.RedisInterface.Controllers
             try
             {
                 EdgeModel edgeResource = await _edgeRepository.GetEdgeResourceDetailsByNameAsync(name);
-                if (edgeResource == null)
+                if (edgeResource is null)
                 {
                     return NotFound(new ApiResponse((int)HttpStatusCode.NotFound, "Object was not found."));
                 }
-                return Ok(edgeResource);
+
+                var response = edgeResource.ToEdgeResponse();
+                return Ok(response);
             }
             catch (Exception ex)
             {
@@ -368,11 +395,11 @@ namespace Middleware.RedisInterface.Controllers
         /// <param name="edgeId"></param>
         /// <returns>bool</returns>
         [HttpGet]
-        [Route("{id}/busy", Name = "isBusyEdgeById")]
+        [Route("{id}/busy", Name = "IsBusyEdgeById")]
         [ProducesResponseType(typeof(EdgeModel), (int)HttpStatusCode.OK)]
         [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.NotFound)]
         [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.InternalServerError)]
-        public async Task<ActionResult<bool>> isBusyEdgeById(Guid edgeId)
+        public async Task<ActionResult<bool>> IsBusyEdgeById(Guid edgeId)
         {
             try
             {
@@ -393,11 +420,11 @@ namespace Middleware.RedisInterface.Controllers
         /// <param name="edgeId"></param>
         /// <returns>bool</returns>
         [HttpGet]
-        [Route("{name}/busy", Name = "isBusyEdgeByName")]
+        [Route("{name}/busy", Name = "IsBusyEdgeByName")]
         [ProducesResponseType(typeof(EdgeModel), (int)HttpStatusCode.OK)]
         [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.NotFound)]
         [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.InternalServerError)]
-        public async Task<ActionResult<bool>> isBusyEdgeByName(string name)
+        public async Task<ActionResult<bool>> IsBusyEdgeByName(string name)
         {
             try
             {
@@ -428,18 +455,15 @@ namespace Middleware.RedisInterface.Controllers
         {
             try
             {
-
                 int countContainers = await _edgeRepository.GetNumContainersByIdAsync(edgeId);
                 return Ok(countContainers);
             }
             catch (Exception ex)
             {
-
                 int statusCode = (int)HttpStatusCode.InternalServerError;
                 _logger.LogError(ex, "An error occurred:");
                 return StatusCode(statusCode, new ApiResponse(statusCode, $"An error has occurred: {ex.Message}"));
             }
-
         }
 
 
@@ -458,19 +482,15 @@ namespace Middleware.RedisInterface.Controllers
         {
             try
             {
-
                 int countContainers = await _edgeRepository.GetNumContainersByNameAsync(cloudName);
                 return Ok(countContainers);
             }
             catch (Exception ex)
             {
-
                 int statusCode = (int)HttpStatusCode.InternalServerError;
                 _logger.LogError(ex, "An error occurred:");
                 return StatusCode(statusCode, new ApiResponse(statusCode, $"An error has occurred: {ex.Message}"));
             }
-
         }
-
     }
 }

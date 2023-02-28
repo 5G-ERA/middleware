@@ -155,7 +155,7 @@ namespace Middleware.DataAccess.Repositories
             return lessBusyEdges;
         }
 
-        public async Task<EdgeModel> GetEdgeResourceDetailsByNameAsync(string name)
+        public async Task<EdgeModel?> GetEdgeResourceDetailsByNameAsync(string name)
         {
             EdgeModel edge = await FindSingleAsync(dto => dto.Name == name);
             return edge;
