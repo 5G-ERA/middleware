@@ -1,8 +1,12 @@
 ﻿using System.Net;
 using Microsoft.AspNetCore.Mvc;
+using Middleware.Common.Attributes;
 using Middleware.Common.Responses;
 using Middleware.DataAccess.Repositories.Abstract;
 using Middleware.Models.Domain;
+using Middleware.RedisInterface.Contracts.Requests;
+using Middleware.RedisInterface.Contracts.Responses;
+using Middleware.RedisInterface.Mappings;
 
 namespace Middleware.RedisInterface.Controllers
 {
@@ -25,10 +29,10 @@ namespace Middleware.RedisInterface.Controllers
         /// </summary>
         /// <returns> the list of CloudModel entities </returns>
         [HttpGet(Name = "CloudGetAll")]
-        [ProducesResponseType(typeof(CloudModel), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(GetAllCloudsResponse), (int)HttpStatusCode.OK)]
         [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.NotFound)]
         [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.InternalServerError)]
-        public async Task<ActionResult<IEnumerable<CloudModel>>> GetAllAsync()
+        public async Task<IActionResult> GetAllAsync()
         {
             try
             {
@@ -37,7 +41,7 @@ namespace Middleware.RedisInterface.Controllers
                 {
                     return NotFound(new ApiResponse((int)HttpStatusCode.NotFound, "Clouds were not found."));
                 }
-                return Ok(models);
+                return Ok(models.ToCloudsResponse());
             }
             catch (Exception ex)
             {
@@ -54,19 +58,19 @@ namespace Middleware.RedisInterface.Controllers
         /// <returns> the CloudModel entity for the specified id </returns>
         [HttpGet]
         [Route("{id}", Name = "CloudGetById")]
-        [ProducesResponseType(typeof(CloudModel), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(CloudResponse), (int)HttpStatusCode.OK)]
         [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.NotFound)]
         [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.InternalServerError)]
         public async Task<IActionResult> GetByIdAsync(Guid id)
         {
             try
             {
-                CloudModel model = await _cloudRepository.GetByIdAsync(id);
-                if (model == null)
+                var model = await _cloudRepository.GetByIdAsync(id);
+                if (model is null)
                 {
                     return NotFound(new ApiResponse((int)HttpStatusCode.NotFound, $"Cloud with specified id: '{id}' was not found."));
                 }
-                return Ok(model);
+                return Ok(model.ToCloudResponse());
             }
             catch (Exception ex)
             {
@@ -83,29 +87,25 @@ namespace Middleware.RedisInterface.Controllers
         /// <param name="model"></param>
         /// <returns> the newly created CloudModel entity </returns>
         [HttpPost(Name = "CloudAdd")]
-        [ProducesResponseType(typeof(CloudModel), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(CloudResponse), (int)HttpStatusCode.OK)]
         [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.BadRequest)]
         [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.InternalServerError)]
-        public async Task<ActionResult<CloudModel>> AddAsync([FromBody] CloudModel model)
+        public async Task<IActionResult> AddAsync([FromBody] CloudRequest model)
         {
             if (model == null)
             {
                 return BadRequest("Parameters were not specified.");
             }
-            if (model.IsValid() == false)
-            {
-                return BadRequest(new ApiResponse((int)HttpStatusCode.BadRequest, "Parameters were not specified or wrongly specified."));
-            }
             try
             {
-                CloudModel cloud = await _cloudRepository.AddAsync(model);
+                CloudModel cloud = await _cloudRepository.AddAsync(model.ToCloud());
                 if (cloud is null)
                 {
                     return StatusCode((int)HttpStatusCode.InternalServerError,
                         new ApiResponse((int)HttpStatusCode.InternalServerError,
                             "Could not add the cloud to the data store"));
                 }
-                return Ok(model);
+                return Ok(cloud.ToCloudResponse());
             }
             catch (Exception ex)
             {
@@ -122,26 +122,19 @@ namespace Middleware.RedisInterface.Controllers
         /// <param name="patch"></param>
         /// <param name="id"></param>
         /// <returns> the modified CloudModel entity </returns>
-        [HttpPatch]
+        [HttpPut]
         [Route("{id}", Name = "CloudPatch")]
-        [ProducesResponseType(typeof(CloudModel), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(CloudResponse), (int)HttpStatusCode.OK)]
         [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.NotFound)]
         [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.InternalServerError)]
-        public async Task<IActionResult> PatchCloudAsync([FromBody] CloudModel patch, [FromRoute] Guid id)
+        public async Task<IActionResult> PatchCloudAsync([FromMultiSource] UpdateCloudRequest patch)
         {
-            if (patch.IsValid() == false)
-            {
-                return BadRequest(new ApiResponse((int)HttpStatusCode.BadRequest, "Parameters were not specified or wrongly specified."));
-            }
-
             try
             {
-                CloudModel model = await _cloudRepository.PatchCloudAsync(id, patch);
-                if (model == null)
-                {
-                    return NotFound(new ApiResponse((int)HttpStatusCode.NotFound, "Object to be updated was not found."));
-                }
-                return Ok(model);
+                var cloud = patch.ToCloud();
+                await _cloudRepository.UpdateAsync(cloud);
+                var response = cloud.ToCloudResponse();
+                return Ok(response);
             }
             catch (Exception ex)
             {
@@ -277,7 +270,7 @@ namespace Middleware.RedisInterface.Controllers
 
         [HttpGet]
         [Route("/name/{name}", Name = "CloudGetDataByName")]
-        [ProducesResponseType(typeof(CloudModel), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(CloudResponse), (int)HttpStatusCode.OK)]
         [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.NotFound)]
         [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.InternalServerError)]
         public async Task<ActionResult<CloudModel>> GetCloudResourceDetailsByNameAsync(string name)
@@ -285,11 +278,11 @@ namespace Middleware.RedisInterface.Controllers
             try
             {
                 CloudModel cloudResource = await _cloudRepository.GetCloudResourceDetailsByNameAsync(name);
-                if (cloudResource == null)
+                if (cloudResource is null)
                 {
                     return NotFound(new ApiResponse((int)HttpStatusCode.NotFound, "Object was not found."));
                 }
-                return Ok(cloudResource);
+                return Ok(cloudResource.ToCloudResponse());
             }
             catch (Exception ex)
             {
@@ -306,7 +299,7 @@ namespace Middleware.RedisInterface.Controllers
         /// <returns>list of cloudModel</returns>
         [HttpGet]
         [Route("free", Name = "GetFreeCloudIds")]
-        [ProducesResponseType(typeof(List<CloudModel>), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(GetAllCloudsResponse), (int)HttpStatusCode.OK)]
         [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.NotFound)]
         [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.BadRequest)]
         [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.InternalServerError)]
@@ -324,7 +317,9 @@ namespace Middleware.RedisInterface.Controllers
                 {
                     return NotFound(new ApiResponse((int)HttpStatusCode.BadRequest, "There are no busy edges"));
                 }
-                return Ok(edgeFree);
+
+                var response = edgeFree.ToCloudsResponse(); 
+                return Ok(response);
             }
             catch (Exception ex)
             {
@@ -338,11 +333,11 @@ namespace Middleware.RedisInterface.Controllers
 
         [HttpGet]
         [Route("lessBusy", Name = "GetLessBusyClouds")]
-        [ProducesResponseType(typeof(List<CloudModel>), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(GetAllCloudsResponse), (int)HttpStatusCode.OK)]
         [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.NotFound)]
         [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.BadRequest)]
         [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.InternalServerError)]
-        public async Task<ActionResult<List<CloudModel>>> GetLessBusyCloudsAsync(List<CloudModel> cloudsToCheck)
+        public async Task<IActionResult> GetLessBusyCloudsAsync(List<CloudModel> cloudsToCheck)
         {
             try
             {
@@ -356,7 +351,9 @@ namespace Middleware.RedisInterface.Controllers
                 {
                     return NotFound(new ApiResponse((int)HttpStatusCode.BadRequest, "There are no busy edges"));
                 }
-                return Ok(lessBusyCloud);
+
+                var response = lessBusyCloud.ToCloudsResponse();
+                return Ok(response);
             }
             catch (Exception ex)
             {
@@ -388,7 +385,6 @@ namespace Middleware.RedisInterface.Controllers
             }
             catch (Exception ex)
             {
-
                 int statusCode = (int)HttpStatusCode.InternalServerError;
                 _logger.LogError(ex, "An error occurred:");
                 return StatusCode(statusCode, new ApiResponse(statusCode, $"An error has occurred: {ex.Message}"));

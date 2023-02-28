@@ -6,7 +6,7 @@ namespace Middleware.DataAccess.Repositories.Abstract
     {
         Task<CloudModel> PatchCloudAsync(Guid id, CloudModel patch);
 
-        Task<CloudModel> GetCloudResourceDetailsByNameAsync(string name);
+        Task<CloudModel?> GetCloudResourceDetailsByNameAsync(string name);
 
         Task<List<CloudModel>> GetFreeCloudsIdsAsync(List<CloudModel> cloudsToCheck);
 

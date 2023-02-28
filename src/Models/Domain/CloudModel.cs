@@ -12,6 +12,7 @@ public class CloudModel : BaseModel
     public override string Name { get; set; }
     
 
+    [Obsolete]
     [JsonPropertyName("Type")]
     public string Type { get; set; }
 

@@ -94,9 +94,9 @@ namespace Middleware.DataAccess.Repositories
         }
 
 
-        public async Task<CloudModel> GetCloudResourceDetailsByNameAsync(string name)
+        public async Task<CloudModel?> GetCloudResourceDetailsByNameAsync(string name)
         {   
-            CloudModel cloud = await FindSingleAsync(dto => dto.Name == name);
+            CloudModel? cloud = await FindSingleAsync(dto => dto.Name == name);
             return cloud;
         }
 

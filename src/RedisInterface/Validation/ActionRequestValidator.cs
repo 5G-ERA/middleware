@@ -13,7 +13,8 @@ public class ActionRequestValidator : AbstractValidator<ActionRequest>
             .NotEmpty();
         RuleFor(x => x.Priority)
             .NotNull()
-            .IsEnumName(typeof(Priority));
+            .IsEnumName(typeof(Priority), caseSensitive: false)
+            .WithMessage(x=>$"{x.Priority} is not a valid option. Valid options are {string.Join(", ", Enum.GetNames<Priority>())}");
         RuleFor(x => x.Order)
             .NotNull()
             .GreaterThan(0);

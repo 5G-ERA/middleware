@@ -22,7 +22,7 @@ public interface IBaseRepository<T> where T : class
     /// </summary>
     /// <param name="id">Identifier of the object</param>
     /// <returns></returns>
-    Task<T> GetByIdAsync(Guid id);
+    Task<T?> GetByIdAsync(Guid id);
 
     /// <summary>
     /// Get all objects of the specified type from the data store
