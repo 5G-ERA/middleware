@@ -3,7 +3,7 @@ using Middleware.RedisInterface.Contracts.Responses;
 
 namespace Middleware.RedisInterface.Mappings;
 
-public static  class DomainToApiContractMapper
+public static class DomainToApiContractMapper
 {
     public static ActionResponse ToActionResponse(this ActionModel x)
     {
@@ -18,6 +18,7 @@ public static  class DomainToApiContractMapper
             Tags = x.Tags
         };
     }
+
     public static GetAllActionsResponse ToActionsResponse(this IEnumerable<ActionModel> actions)
     {
         return new GetAllActionsResponse()
@@ -43,7 +44,8 @@ public static  class DomainToApiContractMapper
             DiskStorage = x.DiskStorage,
             LastUpdatedTime = x.LastUpdatedTime
         };
-    } 
+    }
+
     public static GetAllCloudsResponse ToCloudsResponse(this IEnumerable<CloudModel> clouds)
     {
         return new GetAllCloudsResponse()
@@ -64,11 +66,38 @@ public static  class DomainToApiContractMapper
             LastUpdateTime = x.Timestamp
         };
     }
+
     public static GetAllContainersResponse ToContainersResponse(this IEnumerable<ContainerImageModel> contaiers)
     {
         return new GetAllContainersResponse()
         {
             Containers = contaiers.Select(x => x.ToContainerResponse())
+        };
+    }
+
+    public static EdgeResponse ToEdgeResponse(this EdgeModel x)
+    {
+        return new EdgeResponse()
+        {
+            Id = x.Id,
+            Name = x.Name,
+            Status = x.EdgeStatus,
+            IpAddress = x.EdgeIp,
+            MacAddress = x.MacAddress,
+            Cpu = x.Cpu,
+            NumberOfCores = x.NumberOfCores,
+            Ram = x.Ram,
+            VirtualRam = x.VirtualRam,
+            DiskStorage = x.DiskStorage,
+            LastUpdatedTime = x.LastUpdatedTime
+        };
+    }
+
+    public static GetAllEdgesResponse ToEdgesResponse(this IEnumerable<EdgeModel> edges)
+    {
+        return new GetAllEdgesResponse()
+        {
+            Edges = edges.Select(x => x.ToEdgeResponse())
         };
     }
 }

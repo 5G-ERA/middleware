@@ -11,7 +11,7 @@ public class EdgeModel : BaseModel
 
     [JsonPropertyName("Name")]
     public override string Name { get; set; }
-    
+    [Obsolete]
     [JsonPropertyName("Type")]
     public string Type { get; set; }
 
@@ -22,7 +22,7 @@ public class EdgeModel : BaseModel
     public Uri EdgeIp { get; set; }
 
     [JsonPropertyName("MacAddress")]
-    public string MacAddress { get; set; }
+    public string? MacAddress { get; set; }
 
     [JsonPropertyName("CPU")]
     public int? Cpu { get; set; }

@@ -88,5 +88,40 @@ public static class ApiContractToDomainMapper
             K8SService = x.Container.K8SService,
             Timestamp = DateTime.Now
         };
+    }
+
+    public static EdgeModel ToEdge(this EdgeRequest x)
+    {
+        return new EdgeModel()
+        {
+            Name = x.Name,
+            EdgeIp = x.IpAddress,
+            MacAddress = x.MacAddress,
+            EdgeStatus = x.Status,
+            Cpu = x.Cpu,
+            NumberOfCores = x.NumberOfCores,
+            Ram = x.Ram,
+            VirtualRam = x.VirtualRam,
+            DiskStorage = x.DiskStorage,
+            LastUpdatedTime = DateTime.Now
+        };
+    }
+    
+    public static EdgeModel ToEdge(this UpdateEdgeRequest x)
+    {
+        return new EdgeModel()
+        {
+            Id = x.Id,
+            Name = x.Edge.Name,
+            EdgeIp = x.Edge.IpAddress,
+            MacAddress = x.Edge.MacAddress,
+            EdgeStatus = x.Edge.Status,
+            Cpu = x.Edge.Cpu,
+            NumberOfCores = x.Edge.NumberOfCores,
+            Ram = x.Edge.Ram,
+            VirtualRam = x.Edge.VirtualRam,
+            DiskStorage = x.Edge.DiskStorage,
+            LastUpdatedTime = DateTime.Now
+        };
     } 
 }
