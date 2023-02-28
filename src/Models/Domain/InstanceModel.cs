@@ -8,7 +8,7 @@ namespace Middleware.Models.Domain;
 public class InstanceModel : BaseModel
 {
     [JsonPropertyName("Id")]
-    public override Guid Id { get; set; }
+    public override Guid Id { get; set; } = Guid.NewGuid();
 
     [JsonPropertyName("Name")]
     public override string Name { get; set; } // compulsory field
@@ -41,7 +41,7 @@ public class InstanceModel : BaseModel
     public string ROSDistro { get; set; } // compulsory field
 
     [JsonPropertyName("Tags")]
-    public List<string> Tags { get; set; }
+    public List<string>? Tags { get; set; }
 
     [JsonPropertyName("InstanceFamily")]
     public string InstanceFamily { get; set; } // Compulsory field

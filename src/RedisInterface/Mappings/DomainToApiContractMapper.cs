@@ -100,4 +100,31 @@ public static class DomainToApiContractMapper
             Edges = edges.Select(x => x.ToEdgeResponse())
         };
     }
+
+    public static InstanceResponse ToInstanceResponse(this InstanceModel x)
+    {
+        return new InstanceResponse()
+        {
+            Id = x.Id,
+            Name = x.Name,
+            Family = x.InstanceFamily,
+            Type = x.ServiceType,
+            IsReusable = x.IsReusable,
+            MinimumRam = x.MinimumRam,
+            MinimumNumOfCores = x.MinimumNumCores,
+            RosVersion = x.RosVersion,
+            RosDistro = x.ROSDistro,
+            RosTopicPublishers = x.RosTopicsPub,
+            RosTopicSubscribers = x.RosTopicsSub,
+            Tags = x.Tags,
+            OnboardedTime = x.OnboardedTime
+        };
+    }
+    public static GetAllInstancesResponse ToInstancesResponse(this IEnumerable<InstanceModel> instances)
+    {
+        return new GetAllInstancesResponse()
+        {
+            Instances = instances.Select(x => x.ToInstanceResponse())
+        };
+    }
 }

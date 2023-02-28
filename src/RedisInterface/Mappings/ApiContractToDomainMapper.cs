@@ -123,5 +123,44 @@ public static class ApiContractToDomainMapper
             DiskStorage = x.Edge.DiskStorage,
             LastUpdatedTime = DateTime.Now
         };
-    } 
+    }
+
+    public static InstanceModel ToInstance(this InstanceRequest x)
+    {
+        return new InstanceModel()
+        {
+            Name = x.Name,
+            InstanceFamily = x.Family,
+            Tags = x.Tags?.ToList(),
+            IsReusable = x.IsReusable,
+            ServiceType = x.Type,
+            MinimumRam = x.MinimumRam,
+            MinimumNumCores = x.MinimumNumOfCores,
+            OnboardedTime = DateTime.Now,
+            RosVersion = x.RosVersion,
+            ROSDistro = x.RosDistro,
+            RosTopicsPub = x.RosTopicPublishers.ToList(),
+            RosTopicsSub = x.RosTopicSubscribers.ToList()
+        };
+    }
+
+    public static InstanceModel ToInstance(this UpdateInstanceRequest x)
+    {
+        return new InstanceModel()
+        {
+            Id = x.Id,
+            Name = x.Instance.Name,
+            InstanceFamily = x.Instance.Family,
+            Tags = x.Instance.Tags?.ToList(),
+            IsReusable = x.Instance.IsReusable,
+            ServiceType = x.Instance.Type,
+            MinimumRam = x.Instance.MinimumRam,
+            MinimumNumCores = x.Instance.MinimumNumOfCores,
+            OnboardedTime = DateTime.Now,
+            RosVersion = x.Instance.RosVersion,
+            ROSDistro = x.Instance.RosDistro,
+            RosTopicsPub = x.Instance.RosTopicPublishers.ToList(),
+            RosTopicsSub = x.Instance.RosTopicSubscribers.ToList()
+        };
+    }
 }
