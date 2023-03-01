@@ -1,6 +1,6 @@
 ﻿namespace Middleware.Models.Enums
 {
-    public enum RobotActuatorTypesEnum
+    public enum RobotActuatorType
     {
         Prismatic,
         Rotatory,

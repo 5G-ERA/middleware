@@ -21,7 +21,7 @@ public class RobotResponse
     public Uri? ManufacturerUrl { get; init; }
     public string? MacAddress { get; init; }
     public string? LocomotionSystem { get; init; }
-    public string? LocomotionTypes { get; init; }
+    public string? LocomotionType { get; init; }
     public IEnumerable<SensorModel>? Sensors { get; init; }
     public IEnumerable<ActuatorModel>? Actuators { get; init; }
     public IEnumerable<ManipulatorModel>? Manipulators { get; init; }

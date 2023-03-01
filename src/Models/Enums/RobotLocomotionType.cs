@@ -1,6 +1,6 @@
 ﻿namespace Middleware.Models.Enums
 {
-    public enum RobotLocomotionTypes
+    public enum RobotLocomotionType
     {
         Walking,
         Rolling,

@@ -10,7 +10,7 @@ namespace Middleware.Models.Domain;
 public class RobotModel : BaseModel
 {
     [JsonPropertyName("Id")]
-    public override Guid Id { get; set; }
+    public override Guid Id { get; set; } = Guid.NewGuid();
 
     [JsonPropertyName("Name")]
     public override string Name { get; set; } // Compulsory field
@@ -67,8 +67,8 @@ public class RobotModel : BaseModel
     [JsonPropertyName("LocomotionSystem")] // Compulsory field
     public string? LocomotionSystem { get; set; }
 
-    [JsonPropertyName("LocomotionTypes")]
-    public string? LocomotionTypes { get; set; } // Compulsory field
+    [JsonPropertyName("LocomotionType")]
+    public string? LocomotionType { get; set; } // Compulsory field
 
     [JsonPropertyName("Sensors")]
     public List<SensorModel>? Sensors { get; set; }
@@ -106,8 +106,8 @@ public class RobotModel : BaseModel
     /// <returns></returns>
     public bool IsValid()
     {
-        var valLocomotionSystemsEnum = Enum.GetNames(typeof(RobotLocomotionSystemsEnum)).ToList();
-        var valLocomotionTypes = Enum.GetNames(typeof(RobotLocomotionTypes)).ToList();
+        var valLocomotionSystemsEnum = Enum.GetNames(typeof(RobotLocomotionSystem)).ToList();
+        var valLocomotionTypes = Enum.GetNames(typeof(RobotLocomotionType)).ToList();
 
         if (string.IsNullOrEmpty(NumberCores.ToString())) return false;
         if (string.IsNullOrEmpty(StorageDisk.ToString())) return false;
@@ -115,15 +115,15 @@ public class RobotModel : BaseModel
         //if (string.IsNullOrEmpty(MacAddress.ToString())) return false;
         if (string.IsNullOrEmpty(Name.ToString())) return false;
         if (string.IsNullOrEmpty(LocomotionSystem.ToString())) return false;
-        if (string.IsNullOrEmpty(LocomotionTypes.ToString())) return false;
+        if (string.IsNullOrEmpty(LocomotionType.ToString())) return false;
 
-        if (!valLocomotionTypes.Contains(LocomotionTypes)) return false;
+        if (!valLocomotionTypes.Contains(LocomotionType)) return false;
         if (!valLocomotionSystemsEnum.Contains(LocomotionSystem)) return false;
 
         //Check sensors validity
         if (Sensors.Any() == true)
         {
-            var valSensorTypeEnum = Enum.GetNames(typeof(SensorTypeEnum)).ToList();
+            var valSensorTypeEnum = Enum.GetNames(typeof(SensorType)).ToList();
             foreach (SensorModel sensor in Sensors)
             {
                 if (string.IsNullOrEmpty(sensor.Description.ToString())) return false;
@@ -138,7 +138,7 @@ public class RobotModel : BaseModel
         //Check actuators validity
         if (Actuators.Any() == true)
         {
-            var valActuatorTypesEnum = Enum.GetNames(typeof(RobotActuatorTypesEnum)).ToList();
+            var valActuatorTypesEnum = Enum.GetNames(typeof(RobotActuatorType)).ToList();
             foreach (ActuatorModel actuator in Actuators)
             {
                 if (string.IsNullOrEmpty(actuator.Name.ToString())) return false;
@@ -150,7 +150,7 @@ public class RobotModel : BaseModel
         //Check Manipulators validity
         if (Manipulators.Any() == true)
         {
-            var valActuatorTypesEnum = Enum.GetNames(typeof(RobotActuatorTypesEnum)).ToList();
+            var valActuatorTypesEnum = Enum.GetNames(typeof(RobotActuatorType)).ToList();
             foreach (ManipulatorModel manipulator in Manipulators)
             {
                 if (string.IsNullOrEmpty(manipulator.ActuatorName.ToString())) return false;
@@ -193,7 +193,7 @@ public class RobotModel : BaseModel
     /// </summary>
     /// <param name="topicName"></param>
     /// <returns></returns>
-    public RosTopicModel GetTopicModelFromRobot(string topicName)
+    public RosTopicModel? GetTopicModelFromRobot(string topicName)
     {
         return GetAllRobotTopics().Where(t => t.Name == topicName).FirstOrDefault();
     }
@@ -226,7 +226,7 @@ public class RobotModel : BaseModel
             BatteryStatus = domain.BatteryStatus,
             MacAddress = domain.MacAddress,
             LocomotionSystem = domain.LocomotionSystem,
-            LocomotionTypes = domain.LocomotionTypes,
+            LocomotionTypes = domain.LocomotionType,
             Sensors = domain.Sensors?.Select(x => x.ToDto()).ToList(),
             Actuators = domain.Actuators?.Select(x => x.ToDto()).ToList(),
             Manipulators = domain.Manipulators?.Select(x => x.ToDto()).ToList(),

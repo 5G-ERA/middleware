@@ -1,6 +1,6 @@
 ﻿namespace Middleware.Models.Enums;
 
-public enum SensorTypeEnum
+public enum SensorType
 {
     Laser,
     Ultrasonic,

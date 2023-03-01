@@ -171,7 +171,7 @@ public static class DomainToApiContractMapper
             ManufacturerUrl = x.ManufacturerUrl,
             MacAddress = x.MacAddress,
             LocomotionSystem = x.LocomotionSystem,
-            LocomotionTypes = x.LocomotionTypes,
+            LocomotionType = x.LocomotionType,
             Sensors = x.Sensors,
             Actuators = x.Actuators,
             Manipulators = x.Manipulators,

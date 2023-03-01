@@ -92,7 +92,7 @@ public class RobotDto : Dto
             Ram = dto.HardwareSpec.Ram,
             NumberCores = dto.HardwareSpec.NumberCores,
             StorageDisk = dto.HardwareSpec.StorageDisk,
-            LocomotionTypes = dto.LocomotionType,
+            LocomotionType = dto.LocomotionType,
             RosDistro = dto.Ros.RosDistro,
             RosVersion = dto.Ros.RosVersion,
             ROSRepo = dto.Ros.RosRepo,

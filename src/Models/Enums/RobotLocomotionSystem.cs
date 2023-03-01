@@ -1,6 +1,6 @@
 ﻿namespace Middleware.Models.Enums
 {
-    public enum RobotLocomotionSystemsEnum
+    public enum RobotLocomotionSystem
     {
         Bipedal,
         Hexapodal,

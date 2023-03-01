@@ -2,7 +2,11 @@ using Microsoft.AspNetCore.Mvc;
 using Middleware.Common.Responses;
 using Middleware.DataAccess.Repositories.Abstract;
 using System.Net;
+using Middleware.Common.Attributes;
 using Middleware.Models.Domain;
+using Middleware.RedisInterface.Contracts.Requests;
+using Middleware.RedisInterface.Contracts.Responses;
+using Middleware.RedisInterface.Mappings;
 
 namespace Middleware.RedisInterface.Controllers;
 
@@ -24,10 +28,10 @@ public class RobotController : ControllerBase
     /// </summary>
     /// <returns> the list of RobotModel entities </returns>
     [HttpGet(Name = "RobotGetAll")]
-    [ProducesResponseType(typeof(RobotModel), (int)HttpStatusCode.OK)]
+    [ProducesResponseType(typeof(GetAllRobotsResponse), (int)HttpStatusCode.OK)]
     [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.NotFound)]
     [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.InternalServerError)]
-    public async Task<ActionResult<IEnumerable<RobotModel>>> GetAllAsync()
+    public async Task<IActionResult> GetAllAsync()
     {
         try
         {
@@ -36,7 +40,9 @@ public class RobotController : ControllerBase
             {
                 return NotFound(new ApiResponse((int)HttpStatusCode.NotFound, "Objects were not found."));
             }
-            return Ok(models);
+
+            var response = models.ToRobotsResponse();
+            return Ok(response);
         }
         catch (Exception ex)
         {
@@ -53,7 +59,7 @@ public class RobotController : ControllerBase
     /// <returns> the RobotModel entity for the specified id </returns>
     [HttpGet]
     [Route("{id}", Name = "RobotGetById")]
-    [ProducesResponseType(typeof(RobotModel), (int)HttpStatusCode.OK)]
+    [ProducesResponseType(typeof(RobotResponse), (int)HttpStatusCode.OK)]
     [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.NotFound)]
     [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.InternalServerError)]
     public async Task<IActionResult> GetByIdAsync(Guid id)
@@ -65,7 +71,9 @@ public class RobotController : ControllerBase
             {
                 return NotFound(new ApiResponse((int)HttpStatusCode.NotFound, "Object was not found."));
             }
-            return Ok(model);
+
+            var response = model.ToRobotResponse();
+            return Ok(response);
         }
         catch (Exception ex)
         {
@@ -78,24 +86,21 @@ public class RobotController : ControllerBase
     /// <summary>
     /// Add a new RobotModel entity
     /// </summary>
-    /// <param name="model"></param>
+    /// <param name="request"></param>
     /// <returns> the newly created RobotModel entity </returns>
     [HttpPost(Name = "RobotAdd")]
-    [ProducesResponseType(typeof(RobotModel), (int)HttpStatusCode.OK)]
+    [ProducesResponseType(typeof(RobotResponse), (int)HttpStatusCode.OK)]
     [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.BadRequest)]
     [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.InternalServerError)]
-    public async Task<ActionResult<RobotModel>> AddAsync([FromBody] RobotModel model)
+    public async Task<IActionResult> AddAsync([FromBody] RobotRequest request)
     {
-        if (model == null)
+        if (request == null)
         {
             return BadRequest(new ApiResponse((int)HttpStatusCode.BadRequest, "Parameters were not specified."));
         }
-        if (model.IsValid() == false)
-        {
-            return BadRequest(new ApiResponse((int)HttpStatusCode.BadRequest, "Parameters were not specified or wrongly specified."));
-        }
         try
         {
+            var model = request.ToRobot(); 
             model.OnboardedTime = model.LastUpdatedTime;
             RobotModel robot = await _robotRepository.AddAsync(model);
             if (robot is null)
@@ -104,6 +109,9 @@ public class RobotController : ControllerBase
                     new ApiResponse((int)HttpStatusCode.InternalServerError,
                         "Could not add the robot to the data store"));
             }
+
+            var response = robot.ToRobotResponse();
+            return Ok(response);
         }
         catch (Exception ex)
         {
@@ -111,7 +119,7 @@ public class RobotController : ControllerBase
             _logger.LogError(ex, "An error occurred:");
             return StatusCode(statusCode, new ApiResponse(statusCode, $"An error has occurred: {ex.Message}"));
         }
-        return Ok(model);
+        
     }
 
     /// <summary>
@@ -120,26 +128,27 @@ public class RobotController : ControllerBase
     /// <param name="patch"></param>
     /// <param name="id"></param>
     /// <returns> the modified InstanceModel entity </returns>
-    [HttpPatch]
+    [HttpPut]
     [Route("{id}", Name = "RobotPatch")]
     [ProducesResponseType(typeof(RobotModel), (int)HttpStatusCode.OK)]
     [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.NotFound)]
     [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.InternalServerError)]
-    public async Task<IActionResult> PatchRobotAsync([FromBody] RobotModel patch, [FromRoute] Guid id)
+    public async Task<IActionResult> UpdateRobotAsync([FromMultiSource] UpdateRobotRequest request)
     {
-        if (patch.IsValid() == false)
-        {
-            return BadRequest(new ApiResponse((int)HttpStatusCode.BadRequest, "Parameters were not specified or wrongly specified."));
-        }
         try
         {
-            RobotModel model = await _robotRepository.PatchRobotAsync(id, patch);
-            //TODO: update onboardedTime
-            if (model == null)
+            var robot = request.ToRobot();
+            var exists = await _robotRepository.GetByIdAsync(robot.Id);
+            if (exists is null)
             {
-                return NotFound(new ApiResponse((int)HttpStatusCode.NotFound, "Object to be updated was not found."));
+                return NotFound(new ApiResponse((int)HttpStatusCode.NotFound, "Robot to be updated was not found."));
             }
-            return Ok(model);
+
+            robot.OnboardedTime = exists.OnboardedTime;
+            await _robotRepository.UpdateAsync(robot);
+            //TODO: update onboardedTime
+            var response = robot.ToRobotResponse();
+            return Ok(response);
         }
         catch (Exception ex)
         {
@@ -159,17 +168,17 @@ public class RobotController : ControllerBase
     [ProducesResponseType(typeof(void), (int)HttpStatusCode.OK)]
     [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.NotFound)]
     [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.InternalServerError)]
-    public async Task<ActionResult> DeleteByIdAsync(Guid id)
+    public async Task<IActionResult> DeleteByIdAsync(Guid id)
     {
         try
         {
-            var deleted = await _robotRepository.DeleteByIdAsync(id);
-            if (deleted == false)
+            var exists = await _robotRepository.GetByIdAsync(id);
+            if (exists is null)
             {
-                return NotFound(new ApiResponse((int)HttpStatusCode.NotFound, "The specified Robot has not been found."));
+                return NotFound(new ApiResponse((int)HttpStatusCode.NotFound, "Robot to be updated was not found."));
             }
+            await _robotRepository.DeleteByIdAsync(id);
             return Ok();
-
         }
         catch (Exception ex)
         {
@@ -315,11 +324,11 @@ public class RobotController : ControllerBase
 
     [HttpGet]
     [Route("{robotId}/edges/connected", Name = "RobotGetConnectedEdgesIds")]
-    [ProducesResponseType(typeof(List<EdgeModel>), (int)HttpStatusCode.OK)]
+    [ProducesResponseType(typeof(GetAllEdgesResponse), (int)HttpStatusCode.OK)]
     [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.NotFound)]
     [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.BadRequest)]
     [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.InternalServerError)]
-    public async Task<ActionResult<List<EdgeModel>>> GetConnectedEdgesIdsAsync(Guid robotId)
+    public async Task<IActionResult> GetConnectedEdgesIdsAsync(Guid robotId)
     {
         try
         {
@@ -327,12 +336,19 @@ public class RobotController : ControllerBase
             {
                 return BadRequest(new ApiResponse((int)HttpStatusCode.BadRequest, "The Robot Id was not provided"));
             }
-            List<EdgeModel> edgeIds = await _robotRepository.GetConnectedEdgesIdsAsync(robotId);
-            if (!edgeIds.Any())
+            var exists = await _robotRepository.GetByIdAsync(robotId);
+            if (exists is null)
+            {
+                return NotFound(new ApiResponse((int)HttpStatusCode.NotFound, "The specified Robot was not found."));
+            }
+            List<EdgeModel> connectedEdges = await _robotRepository.GetConnectedEdgesIdsAsync(robotId);
+            if (!connectedEdges.Any())
             {
                 return NotFound(new ApiResponse((int)HttpStatusCode.NotFound, "No connected Edges have been found."));
             }
-            return Ok(edgeIds);
+
+            var response = connectedEdges.ToEdgesResponse();
+            return Ok(response);
         }
         catch (Exception ex)
         {
@@ -350,7 +366,7 @@ public class RobotController : ControllerBase
     /// <returns>returns a list of cloudModels that have conectivity to the robot</returns>
     [HttpGet]
     [Route("{robotId}/clouds/connected", Name = "RobotGetConnectedCloudsIds")]
-    [ProducesResponseType(typeof(List<CloudModel>), (int)HttpStatusCode.OK)]
+    [ProducesResponseType(typeof(GetAllCloudsResponse), (int)HttpStatusCode.OK)]
     [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.NotFound)]
     [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.BadRequest)]
     [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.InternalServerError)]
@@ -362,12 +378,19 @@ public class RobotController : ControllerBase
             {
                 return BadRequest(new ApiResponse((int)HttpStatusCode.BadRequest, "The Robot Id was not provided"));
             }
-            List<CloudModel> cloudsIds = await _robotRepository.GetConnectedCloudsIdsAsync(robotId);
-            if (!cloudsIds.Any())
+            var exists = await _robotRepository.GetByIdAsync(robotId);
+            if (exists is null)
+            {
+                return NotFound(new ApiResponse((int)HttpStatusCode.NotFound, "The specified Robot was not found."));
+            }
+            List<CloudModel> connectedClouds = await _robotRepository.GetConnectedCloudsIdsAsync(robotId);
+            if (!connectedClouds.Any())
             {
                 return NotFound(new ApiResponse((int)HttpStatusCode.NotFound, "No connected clouds have been found."));
             }
-            return Ok(cloudsIds);
+
+            var response = connectedClouds.ToCloudsResponse();
+            return Ok(response);
         }
         catch (Exception ex)
         {
@@ -377,28 +400,38 @@ public class RobotController : ControllerBase
         }
 
     }
-    [HttpGet]
+    [HttpPut]
     [Route("{robotId}/topic", Name = "RobotChangeTopicStatus")]
-    [ProducesResponseType(typeof(RosTopicModel), (int)HttpStatusCode.OK)]
+    [ProducesResponseType(typeof(UpdateTopicResponse), (int)HttpStatusCode.OK)]
     [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.NotFound)]
     [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.BadRequest)]
     [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.InternalServerError)]
-    public async Task<ActionResult> EnableTopicAsync(Guid robotId,string topicName, bool topicEnabled)
+    public async Task<IActionResult> EnableTopicAsync([FromMultiSource] UpdateRobotTopicRequest request)
     {
         try
         {
-            RobotModel robot = await _robotRepository.GetByIdAsync(robotId);
-            RosTopicModel topicModel = robot.GetTopicModelFromRobot(topicName);
-            if (topicEnabled == true)
+            RobotModel robot = await _robotRepository.GetByIdAsync(request.Id);
+            if (robot is null)
             {
-                topicModel.Enable();
+                return NotFound(new ApiResponse((int)HttpStatusCode.NotFound, "The specified Robot was not found."));
             }
-            else
+            RosTopicModel topicModel = robot.GetTopicModelFromRobot(request.TopicName);
+            if (topicModel is null)
             {
-                topicModel.Disable();
+                return NotFound(new ApiResponse((int)HttpStatusCode.NotFound, "The specified Topic was not found."));
             }
-            await _robotRepository.AddAsync(robot, () => robot.Id);
-            return Ok(topicModel);
+            topicModel.Enabled = request.Enabled;  
+            await _robotRepository.UpdateAsync(robot);
+
+            var response = new UpdateTopicResponse()
+            {
+                RobotId = request.Id,
+                TopicName = topicModel.Name,
+                TopicType = topicModel.Type,
+                TopicDescription = topicModel.Description,
+                TopicEnabled = topicModel.Enabled
+            };
+            return Ok(response);
         }
         catch (Exception ex)
         {
