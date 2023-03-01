@@ -28,7 +28,7 @@ namespace Middleware.RedisInterface.Controllers
         /// </summary>
         /// <returns> the list of ContainerImageModel entities </returns>
         [HttpGet(Name = "ContainerImageGetAll")]
-        [ProducesResponseType(typeof(GetAllContainersResponse), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(GetContainersResponse), (int)HttpStatusCode.OK)]
         [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.NotFound)]
         [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.InternalServerError)]
         public async Task<IActionResult> GetAllAsync()
@@ -92,7 +92,7 @@ namespace Middleware.RedisInterface.Controllers
         [ProducesResponseType(typeof(ContainerResponse), (int)HttpStatusCode.OK)]
         [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.BadRequest)]
         [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.InternalServerError)]
-        public async Task<ActionResult<ContainerImageModel>> AddAsync([FromBody] ContainerRequest request)
+        public async Task<IActionResult> AddAsync([FromBody] ContainerRequest request)
         {
             try
             {
@@ -160,7 +160,7 @@ namespace Middleware.RedisInterface.Controllers
         [ProducesResponseType(typeof(void), (int)HttpStatusCode.OK)]
         [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.NotFound)]
         [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.InternalServerError)]
-        public async Task<ActionResult> DeleteByIdAsync(Guid id)
+        public async Task<IActionResult> DeleteByIdAsync(Guid id)
         {
             try
             {
@@ -283,7 +283,7 @@ namespace Middleware.RedisInterface.Controllers
         /// <returns></returns>
         [HttpGet]
         [Route("instance/{id}", Name = "ContainerImageGetForInstance")]
-        [ProducesResponseType(typeof(GetAllContainersResponse), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(GetContainersResponse), (int)HttpStatusCode.OK)]
         [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.NotFound)]
         [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.InternalServerError)]
         public async Task<IActionResult> GetImagesForInstanceAsync(Guid id)

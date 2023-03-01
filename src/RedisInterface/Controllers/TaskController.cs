@@ -35,7 +35,7 @@ namespace Middleware.RedisInterface.Controllers
         /// </summary>
         /// <returns> the list of TaskModel entities </returns>
         [HttpGet(Name = "TaskGetAll")]
-        [ProducesResponseType(typeof(GetAllTasksResponse), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(GetTasksResponse), (int)HttpStatusCode.OK)]
         [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.NotFound)]
         [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.InternalServerError)]
         public async Task<IActionResult> GetAllAsync()

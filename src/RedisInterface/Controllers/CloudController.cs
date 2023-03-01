@@ -29,7 +29,7 @@ namespace Middleware.RedisInterface.Controllers
         /// </summary>
         /// <returns> the list of CloudModel entities </returns>
         [HttpGet(Name = "CloudGetAll")]
-        [ProducesResponseType(typeof(GetAllCloudsResponse), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(GetCloudsResponse), (int)HttpStatusCode.OK)]
         [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.NotFound)]
         [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.InternalServerError)]
         public async Task<IActionResult> GetAllAsync()
@@ -273,7 +273,7 @@ namespace Middleware.RedisInterface.Controllers
         [ProducesResponseType(typeof(CloudResponse), (int)HttpStatusCode.OK)]
         [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.NotFound)]
         [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.InternalServerError)]
-        public async Task<ActionResult<CloudModel>> GetCloudResourceDetailsByNameAsync(string name)
+        public async Task<IActionResult> GetCloudResourceDetailsByNameAsync(string name)
         {
             try
             {
@@ -299,7 +299,7 @@ namespace Middleware.RedisInterface.Controllers
         /// <returns>list of cloudModel</returns>
         [HttpGet]
         [Route("free", Name = "GetFreeCloudIds")]
-        [ProducesResponseType(typeof(GetAllCloudsResponse), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(GetCloudsResponse), (int)HttpStatusCode.OK)]
         [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.NotFound)]
         [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.BadRequest)]
         [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.InternalServerError)]
@@ -333,7 +333,7 @@ namespace Middleware.RedisInterface.Controllers
 
         [HttpGet]
         [Route("lessBusy", Name = "GetLessBusyClouds")]
-        [ProducesResponseType(typeof(GetAllCloudsResponse), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(GetCloudsResponse), (int)HttpStatusCode.OK)]
         [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.NotFound)]
         [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.BadRequest)]
         [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.InternalServerError)]
@@ -375,7 +375,7 @@ namespace Middleware.RedisInterface.Controllers
         [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.NotFound)]
         [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.BadRequest)]
         [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.InternalServerError)]
-        public async Task<ActionResult<int>> GetNumCloudContainersByName(string name)
+        public async Task<IActionResult> GetNumCloudContainersByName(string name)
         {
             try
             {
@@ -403,7 +403,7 @@ namespace Middleware.RedisInterface.Controllers
         [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.NotFound)]
         [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.BadRequest)]
         [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.InternalServerError)]
-        public async Task<ActionResult<int>> GetNumCloudContainersById(Guid cloudId)
+        public async Task<IActionResult> GetNumCloudContainersById(Guid cloudId)
         {
             try
             {
@@ -431,7 +431,7 @@ namespace Middleware.RedisInterface.Controllers
         [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.NotFound)]
         [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.BadRequest)]
         [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.InternalServerError)]
-        public async Task<ActionResult<bool>> IsBusyCloudByName(string name)
+        public async Task<IActionResult> IsBusyCloudByName(string name)
         {
             try
             {
@@ -462,7 +462,7 @@ namespace Middleware.RedisInterface.Controllers
         [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.NotFound)]
         [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.BadRequest)]
         [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.InternalServerError)]
-        public async Task<ActionResult<bool>> IsBusyCloudById(Guid cloudId)
+        public async Task<IActionResult> IsBusyCloudById(Guid cloudId)
         {
             try
             {

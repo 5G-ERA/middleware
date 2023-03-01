@@ -1,6 +1,6 @@
 ﻿namespace Middleware.RedisInterface.Contracts.Responses;
 
-public class GetAllTasksResponse
+public class GetTasksResponse
 {
     public IEnumerable<TaskResponse> Tasks { get; set; } = Enumerable.Empty<TaskResponse>();
 }

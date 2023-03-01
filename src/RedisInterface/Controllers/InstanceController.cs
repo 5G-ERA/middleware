@@ -28,7 +28,7 @@ namespace Middleware.RedisInterface.Controllers
         /// </summary>
         /// <returns> the list of InstanceModel entities </returns>
         [HttpGet(Name = "InstanceGetAll")]
-        [ProducesResponseType(typeof(GetAllInstancesResponse), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(GetInstancesResponse), (int)HttpStatusCode.OK)]
         [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.NotFound)]
         [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.InternalServerError)]
         public async Task<IActionResult> GetAllAsync()
@@ -86,13 +86,13 @@ namespace Middleware.RedisInterface.Controllers
         /// <summary>
         /// Add a new InstanceModel entity
         /// </summary>
-        /// <param name="model"></param>
+        /// <param name="request"></param>
         /// <returns> the newly created InstanceModel entity </returns>
         [HttpPost(Name = "InstanceAdd")]
         [ProducesResponseType(typeof(InstanceResponse), (int)HttpStatusCode.OK)]
         [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.BadRequest)]
         [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.InternalServerError)]
-        public async Task<ActionResult<InstanceModel>> AddAsync([FromBody] InstanceRequest request)
+        public async Task<IActionResult> AddAsync([FromBody] InstanceRequest request)
         {
             if (request == null)
             {
@@ -163,7 +163,7 @@ namespace Middleware.RedisInterface.Controllers
         [ProducesResponseType(typeof(void), (int)HttpStatusCode.OK)]
         [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.NotFound)]
         [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.InternalServerError)]
-        public async Task<ActionResult> DeleteByIdAsync(Guid id)
+        public async Task<IActionResult> DeleteByIdAsync(Guid id)
         {
             try
             {
@@ -227,7 +227,7 @@ namespace Middleware.RedisInterface.Controllers
         [ProducesResponseType(typeof(RelationModel), (int)HttpStatusCode.OK)]
         [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.BadRequest)]
         [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.InternalServerError)]
-        public async Task<ActionResult> DeleteRelationAsync([FromBody] RelationModel model)
+        public async Task<IActionResult> DeleteRelationAsync([FromBody] RelationModel model)
         {
             if (model == null)
             {

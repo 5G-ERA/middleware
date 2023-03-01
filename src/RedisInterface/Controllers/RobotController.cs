@@ -28,7 +28,7 @@ public class RobotController : ControllerBase
     /// </summary>
     /// <returns> the list of RobotModel entities </returns>
     [HttpGet(Name = "RobotGetAll")]
-    [ProducesResponseType(typeof(GetAllRobotsResponse), (int)HttpStatusCode.OK)]
+    [ProducesResponseType(typeof(GetRobotsResponse), (int)HttpStatusCode.OK)]
     [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.NotFound)]
     [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.InternalServerError)]
     public async Task<IActionResult> GetAllAsync()
@@ -130,7 +130,7 @@ public class RobotController : ControllerBase
     /// <returns> the modified InstanceModel entity </returns>
     [HttpPut]
     [Route("{id}", Name = "RobotPatch")]
-    [ProducesResponseType(typeof(RobotModel), (int)HttpStatusCode.OK)]
+    [ProducesResponseType(typeof(RobotResponse), (int)HttpStatusCode.OK)]
     [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.NotFound)]
     [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.InternalServerError)]
     public async Task<IActionResult> UpdateRobotAsync([FromMultiSource] UpdateRobotRequest request)
@@ -324,7 +324,7 @@ public class RobotController : ControllerBase
 
     [HttpGet]
     [Route("{robotId}/edges/connected", Name = "RobotGetConnectedEdgesIds")]
-    [ProducesResponseType(typeof(GetAllEdgesResponse), (int)HttpStatusCode.OK)]
+    [ProducesResponseType(typeof(GetEdgesResponse), (int)HttpStatusCode.OK)]
     [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.NotFound)]
     [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.BadRequest)]
     [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.InternalServerError)]
@@ -366,11 +366,11 @@ public class RobotController : ControllerBase
     /// <returns>returns a list of cloudModels that have conectivity to the robot</returns>
     [HttpGet]
     [Route("{robotId}/clouds/connected", Name = "RobotGetConnectedCloudsIds")]
-    [ProducesResponseType(typeof(GetAllCloudsResponse), (int)HttpStatusCode.OK)]
+    [ProducesResponseType(typeof(GetCloudsResponse), (int)HttpStatusCode.OK)]
     [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.NotFound)]
     [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.BadRequest)]
     [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.InternalServerError)]
-    public async Task<ActionResult<List<CloudModel>>> GetConnectedCloudsIdsAsync(Guid robotId)
+    public async Task<IActionResult> GetConnectedCloudsIdsAsync(Guid robotId)
     {
         try
         {

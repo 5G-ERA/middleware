@@ -91,10 +91,10 @@ namespace Middleware.RedisInterface.Controllers
         /// </summary>
         /// <returns> the list of PolicyModel entities </returns>
         [HttpGet(Name = "PolicyGetAll")]
-        [ProducesResponseType(typeof(GetAllPoliciesResponse), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(GetPoliciesResponse), (int)HttpStatusCode.OK)]
         [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.NotFound)]
         [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.InternalServerError)]
-        public async Task<ActionResult<List<PolicyModel>>> GetAllPoliciesAsync()
+        public async Task<IActionResult> GetAllPoliciesAsync()
         {
             try
             {
@@ -150,10 +150,9 @@ namespace Middleware.RedisInterface.Controllers
 
 
         /// <summary>
-        /// Partially update an existing InstanceModel entity
+        /// Partially update an existing policy entity
         /// </summary>
-        /// <param name="patch"></param>
-        /// <param name="id"></param>
+        /// <param name="request"></param>
         /// <returns> the modified InstanceModel entity </returns>
         [HttpPut]
         [Route("{id}", Name = "PolicyPatch")]

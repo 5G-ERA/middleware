@@ -1,6 +1,6 @@
 ﻿namespace Middleware.RedisInterface.Contracts.Responses;
 
-public class GetAllInstancesResponse
+public class GetInstancesResponse
 {
     public IEnumerable<InstanceResponse> Instances { get; init; } = Enumerable.Empty<InstanceResponse>();
 }

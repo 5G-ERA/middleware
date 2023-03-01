@@ -36,10 +36,10 @@ public class ActionController : ControllerBase
     /// </summary>
     /// <returns> the list of ActionModel entities </returns>
     [HttpGet(Name = "ActionGetAll")]
-    [ProducesResponseType(typeof(GetAllActionsResponse), (int)HttpStatusCode.OK)]
+    [ProducesResponseType(typeof(GetActionsResponse), (int)HttpStatusCode.OK)]
     [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.NotFound)]
     [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.InternalServerError)]
-    public async Task<ActionResult<IEnumerable<ActionModel>>> GetAllAsync()
+    public async Task<IActionResult> GetAllAsync()
     {
         try
         {
@@ -96,7 +96,7 @@ public class ActionController : ControllerBase
     [ProducesResponseType(typeof(ActionResponse), (int)HttpStatusCode.OK)]
     [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.BadRequest)]
     [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.InternalServerError)]
-    public async Task<ActionResult<ActionModel>> AddAsync([FromBody] ActionRequest request)
+    public async Task<IActionResult> AddAsync([FromBody] ActionRequest request)
     {
         try
         {
@@ -117,7 +117,7 @@ public class ActionController : ControllerBase
     /// <returns> the modified ActionModel entity </returns>
     [HttpPut]
     [Route("{id}", Name = "ActionUpdate")]
-    [ProducesResponseType(typeof(ActionModel), (int)HttpStatusCode.OK)]
+    [ProducesResponseType(typeof(ActionResponse), (int)HttpStatusCode.OK)]
     [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.NotFound)]
     [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.InternalServerError)]
     public async Task<IActionResult> UpdateActionAsync([FromMultiSource] UpdateActionRequest request)
@@ -158,11 +158,12 @@ public class ActionController : ControllerBase
     {
         try
         {
-            var deleted = await _actionService.DeleteAsync(id);
-            if (deleted == false)
+            var exists = await _actionService.GetByIdAsync(id);
+            if (exists is null)
             {
                 return NotFound(new ApiResponse((int)HttpStatusCode.NotFound, "The specified Action has not been found."));
             }
+            await _actionService.DeleteAsync(id);
             return Ok();
         }
         catch (Exception ex)

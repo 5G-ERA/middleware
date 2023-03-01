@@ -28,7 +28,7 @@ namespace Middleware.RedisInterface.Controllers
         /// </summary>
         /// <returns> the list of EdgeModel entities </returns>
         [HttpGet(Name = "EdgeGetAll")]
-        [ProducesResponseType(typeof(GetAllEdgesResponse), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(GetEdgesResponse), (int)HttpStatusCode.OK)]
         [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.NotFound)]
         [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.InternalServerError)]
         public async Task<IActionResult> GetAllAsync()
@@ -124,12 +124,11 @@ namespace Middleware.RedisInterface.Controllers
         /// <summary>
         /// Partially update an existing InstanceModel entity
         /// </summary>
-        /// <param name="patch"></param>
-        /// <param name="id"></param>
+        /// <param name="request"></param>
         /// <returns> the modified InstanceModel entity </returns>
         [HttpPut]
         [Route("{id}", Name = "EdgePatch")]
-        [ProducesResponseType(typeof(EdgeModel), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(EdgeResponse), (int)HttpStatusCode.OK)]
         [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.NotFound)]
         [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.InternalServerError)]
         public async Task<IActionResult> PatchEdgeAsync([FromMultiSource] UpdateEdgeRequest request)
@@ -172,7 +171,7 @@ namespace Middleware.RedisInterface.Controllers
         [ProducesResponseType(typeof(void), (int)HttpStatusCode.OK)]
         [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.NotFound)]
         [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.InternalServerError)]
-        public async Task<ActionResult> DeleteByIdAsync(Guid id)
+        public async Task<IActionResult> DeleteByIdAsync(Guid id)
         {
             try
             {
@@ -301,7 +300,7 @@ namespace Middleware.RedisInterface.Controllers
 
         [HttpGet]
         [Route("free", Name = "GetFreeEdgesIds")] //edges
-        [ProducesResponseType(typeof(List<EdgeModel>), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(GetEdgesResponse), (int)HttpStatusCode.OK)]
         [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.NotFound)]
         [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.BadRequest)]
         [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.InternalServerError)]
@@ -334,11 +333,11 @@ namespace Middleware.RedisInterface.Controllers
 
         [HttpGet]
         [Route("lessBusy", Name = "GetLessBusyEdges")]
-        [ProducesResponseType(typeof(List<EdgeModel>), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(GetEdgesResponse), (int)HttpStatusCode.OK)]
         [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.NotFound)]
         [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.BadRequest)]
         [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.InternalServerError)]
-        public async Task<ActionResult<List<EdgeModel>>> GetLessBusyEdgesAsync(List<EdgeModel> edgesToCheck)
+        public async Task<IActionResult> GetLessBusyEdgesAsync(List<EdgeModel> edgesToCheck)
         {
             try
             {
@@ -353,7 +352,8 @@ namespace Middleware.RedisInterface.Controllers
                     return NotFound(new ApiResponse((int)HttpStatusCode.BadRequest, "There are no busy edges"));
                 }
 
-                return Ok(lessBusyEdge);
+                var response = lessBusyEdge.ToEdgesResponse();
+                return Ok(response);
             }
             catch (Exception ex)
             {
@@ -365,10 +365,10 @@ namespace Middleware.RedisInterface.Controllers
 
         [HttpGet]
         [Route("name/{name}", Name = "EdgeGetDataByName")]
-        [ProducesResponseType(typeof(EdgeModel), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(EdgeResponse), (int)HttpStatusCode.OK)]
         [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.NotFound)]
         [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.InternalServerError)]
-        public async Task<ActionResult<EdgeModel>> GetEdgeResourceDetailsByNameAsync(string name)
+        public async Task<IActionResult> GetEdgeResourceDetailsByNameAsync(string name)
         {
             try
             {
@@ -396,7 +396,7 @@ namespace Middleware.RedisInterface.Controllers
         /// <returns>bool</returns>
         [HttpGet]
         [Route("{id}/busy", Name = "IsBusyEdgeById")]
-        [ProducesResponseType(typeof(EdgeModel), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(bool), (int)HttpStatusCode.OK)]
         [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.NotFound)]
         [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.InternalServerError)]
         public async Task<ActionResult<bool>> IsBusyEdgeById(Guid edgeId)
@@ -417,14 +417,14 @@ namespace Middleware.RedisInterface.Controllers
         /// <summary>
         /// Check if a edge is busy by Name.
         /// </summary>
-        /// <param name="edgeId"></param>
+        /// <param name="name"></param>
         /// <returns>bool</returns>
         [HttpGet]
         [Route("{name}/busy", Name = "IsBusyEdgeByName")]
-        [ProducesResponseType(typeof(EdgeModel), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(bool), (int)HttpStatusCode.OK)]
         [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.NotFound)]
         [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.InternalServerError)]
-        public async Task<ActionResult<bool>> IsBusyEdgeByName(string name)
+        public async Task<IActionResult> IsBusyEdgeByName(string name)
         {
             try
             {
@@ -451,7 +451,7 @@ namespace Middleware.RedisInterface.Controllers
         [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.NotFound)]
         [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.BadRequest)]
         [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.InternalServerError)]
-        public async Task<ActionResult<int>> GetNumEdgeContainersById(Guid edgeId)
+        public async Task<IActionResult> GetNumEdgeContainersById(Guid edgeId)
         {
             try
             {
@@ -470,7 +470,7 @@ namespace Middleware.RedisInterface.Controllers
         /// <summary>
         ///  Returns the number of containers that are deployed in a cloud entity base on cloud Name. 
         /// </summary>
-        /// <param name="cloudName"></param>
+        /// <param name="edgeName"></param>
         /// <returns>int</returns>
         [HttpGet]
         [Route("{name}/containers/count", Name = "GetNumEdgeContainersByName")]
@@ -478,11 +478,11 @@ namespace Middleware.RedisInterface.Controllers
         [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.NotFound)]
         [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.BadRequest)]
         [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.InternalServerError)]
-        public async Task<ActionResult<int>> GetNumEdgeContainersByName(string cloudName)
+        public async Task<ActionResult<int>> GetNumEdgeContainersByName(string edgeName)
         {
             try
             {
-                int countContainers = await _edgeRepository.GetNumContainersByNameAsync(cloudName);
+                int countContainers = await _edgeRepository.GetNumContainersByNameAsync(edgeName);
                 return Ok(countContainers);
             }
             catch (Exception ex)
