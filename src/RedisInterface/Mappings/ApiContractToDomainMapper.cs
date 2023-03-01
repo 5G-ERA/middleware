@@ -265,7 +265,7 @@ public static class ApiContractToDomainMapper
         return new TaskModel()
         {
             Name = x.Name,
-            TaskPriority = (int)Enum.Parse<Priority>(x.Priority),
+            TaskPriority = (int)Enum.Parse<Priority>(x.Priority, true),
             DeterministicTask = x.IsDeterministic,
             Tags = x.Tags.ToList()
         };

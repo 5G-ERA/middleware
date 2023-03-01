@@ -1,10 +1,13 @@
 ﻿using System.Net;
 using Microsoft.AspNetCore.Mvc;
-using Middleware.Common.Enums;
+using Middleware.Common.Attributes;
 using Middleware.Common.Responses;
 using Middleware.DataAccess.Repositories.Abstract;
 using Middleware.Models.Domain;
 using Middleware.Models.Enums;
+using Middleware.RedisInterface.Contracts.Requests;
+using Middleware.RedisInterface.Contracts.Responses;
+using Middleware.RedisInterface.Mappings;
 
 namespace Middleware.RedisInterface.Controllers
 {
@@ -32,10 +35,10 @@ namespace Middleware.RedisInterface.Controllers
         /// </summary>
         /// <returns> the list of TaskModel entities </returns>
         [HttpGet(Name = "TaskGetAll")]
-        [ProducesResponseType(typeof(TaskModel), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(GetAllTasksResponse), (int)HttpStatusCode.OK)]
         [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.NotFound)]
         [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.InternalServerError)]
-        public async Task<ActionResult<IEnumerable<TaskModel>>> GetAllAsync()
+        public async Task<IActionResult> GetAllAsync()
         {
             try
             {
@@ -44,7 +47,9 @@ namespace Middleware.RedisInterface.Controllers
                 {
                     return NotFound(new ApiResponse((int)HttpStatusCode.NotFound, "Objects were not found."));
                 }
-                return Ok(models);
+
+                var response = models.ToTasksResponse();
+                return Ok(response);
             }
             catch (Exception ex)
             {
@@ -61,19 +66,25 @@ namespace Middleware.RedisInterface.Controllers
         /// <returns> the TaskModel entity for the specified id </returns>
         [HttpGet]
         [Route("{id}", Name = "TaskGetById")]
-        [ProducesResponseType(typeof(TaskModel), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(TaskResponse), (int)HttpStatusCode.OK)]
         [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.NotFound)]
         [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.InternalServerError)]
         public async Task<IActionResult> GetByIdAsync(Guid id)
         {
+            if (id == Guid.Empty)
+            {
+                return BadRequest(new ApiResponse((int)HttpStatusCode.BadRequest, "Parameters were not specified."));
+            }
             try
             {
-                TaskModel model = await _taskRepository.GetByIdAsync(id);
-                if (model == null)
+                TaskModel task = await _taskRepository.GetByIdAsync(id);
+                if (task == null)
                 {
                     return NotFound(new ApiResponse((int)HttpStatusCode.NotFound, "Object was not found."));
                 }
-                return Ok(model);
+
+                var response = task.ToTaskResponse();
+                return Ok(response);
             }
             catch (Exception ex)
             {
@@ -89,17 +100,18 @@ namespace Middleware.RedisInterface.Controllers
         /// <param name="model"></param>
         /// <returns> the newly created TaskModel entity </returns>
         [HttpPost(Name = "TaskAdd")]
-        [ProducesResponseType(typeof(TaskModel), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(TaskResponse), (int)HttpStatusCode.OK)]
         [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.BadRequest)]
         [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.InternalServerError)]
-        public async Task<ActionResult<TaskModel>> AddAsync([FromBody] TaskModel model)
+        public async Task<IActionResult> AddAsync([FromBody] TaskRequest request)
         {
-            if (model == null)
+            if (request == null)
             {
                 return BadRequest(new ApiResponse((int)HttpStatusCode.BadRequest, "Parameters were not specified."));
             }
             try
             {
+                var model = request.ToTask();
                 TaskModel task = await _taskRepository.AddAsync(model);
                 if (task is null)
                 {
@@ -107,6 +119,9 @@ namespace Middleware.RedisInterface.Controllers
                         new ApiResponse((int)HttpStatusCode.InternalServerError,
                             "Could not add a task to the data store"));
                 }
+
+                var response = task.ToTaskResponse();
+                return Ok(response);
             }
             catch (Exception ex)
             {
@@ -114,31 +129,31 @@ namespace Middleware.RedisInterface.Controllers
                 _logger.LogError(ex, "An error occurred:");
                 return StatusCode(statusCode, new ApiResponse(statusCode, $"An error has occurred: {ex.Message}"));
             }
-            return Ok(model);
         }
 
 
         /// <summary>
         /// Partially update an existing InstanceModel entity
         /// </summary>
-        /// <param name="patch"></param>
-        /// <param name="id"></param>
         /// <returns> the modified InstanceModel entity </returns>
-        [HttpPatch]
+        [HttpPut]
         [Route("{id}", Name = "TaskPatch")]
-        [ProducesResponseType(typeof(TaskModel), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(TaskResponse), (int)HttpStatusCode.OK)]
         [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.NotFound)]
         [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.InternalServerError)]
-        public async Task<IActionResult> PatchTaskAsync([FromBody] TaskModel patch, [FromRoute] Guid id)
+        public async Task<IActionResult> PatchTaskAsync([FromMultiSource] UpdateTaskRequest request)
         {
             try
             {
-                TaskModel model = await _taskRepository.PatchTaskAsync(id, patch);
-                if (model == null)
+                var model = request.ToTask();
+                var exists = await _taskRepository.GetByIdAsync(model.Id);
+                if (exists is null)
                 {
                     return NotFound(new ApiResponse((int)HttpStatusCode.NotFound, "Object to be updated was not found."));
                 }
-                return Ok(model);
+                await _taskRepository.UpdateAsync(model);
+                var response = model.ToTaskResponse();
+                return Ok(response);
             }
             catch (Exception ex)
             {
@@ -161,13 +176,18 @@ namespace Middleware.RedisInterface.Controllers
         [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.InternalServerError)]
         public async Task<ActionResult> DeleteByIdAsync(Guid id)
         {
+            if (id == Guid.Empty)
+            {
+                return BadRequest(new ApiResponse((int)HttpStatusCode.BadRequest, "Parameters were not specified."));
+            }
             try
             {
-                var deleted = await _taskRepository.DeleteByIdAsync(id);
-                if (deleted == false)
+                var exists = await _taskRepository.GetByIdAsync(id);
+                if (exists is null)
                 {
-                    return NotFound(new ApiResponse((int)HttpStatusCode.NotFound, "The specified Task has not been found."));
+                    return NotFound(new ApiResponse((int)HttpStatusCode.NotFound, "Object to be updated was not found."));
                 }
+                await _taskRepository.DeleteByIdAsync(id);
                 return Ok();
             }
             catch (Exception ex)
