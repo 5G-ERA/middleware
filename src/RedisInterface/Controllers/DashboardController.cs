@@ -151,7 +151,7 @@ namespace Middleware.RedisInterface.Controllers
         /// <param name="filter"></param>
         /// <returns></returns>
         [HttpGet("robots")]
-        [ProducesResponseType(typeof(PagedResponse<List<RobotResponse>>), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(PagedResponse<List<DashboardRobotResponse>>), (int)HttpStatusCode.OK)]
         [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.InternalServerError)]
         public async Task<IActionResult> GetRobotsAsync([FromQuery] PaginationFilter filter)
         {

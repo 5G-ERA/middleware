@@ -96,6 +96,7 @@ namespace Middleware.RedisInterface.Controllers
             }
             try
             {
+                model.OnboardedTime = model.LastUpdatedTime;
                 RobotModel robot = await _robotRepository.AddAsync(model);
                 if (robot is null)
                 {
@@ -133,6 +134,7 @@ namespace Middleware.RedisInterface.Controllers
             try
             {
                 RobotModel model = await _robotRepository.PatchRobotAsync(id, patch);
+                //TODO: update onboardedTime
                 if (model == null)
                 {
                     return NotFound(new ApiResponse((int)HttpStatusCode.NotFound, "Object to be updated was not found."));

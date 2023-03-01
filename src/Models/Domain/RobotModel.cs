@@ -22,16 +22,16 @@ public class RobotModel : BaseModel
     public string? RosDistro { get; set; }
 
     [JsonPropertyName("MaximumPayload")]
-    public long MaximumPayload { get; set; }
+    public long? MaximumPayload { get; set; }
 
     [JsonPropertyName("MaximumTranslationalVelocity")]
-    public long MaximumTranslationalVelocity { get; set; }
+    public long? MaximumTranslationalVelocity { get; set; }
 
     [JsonPropertyName("MaximumRotationalVelocity")]
-    public long MaximumRotationalVelocity { get; set; }
+    public long? MaximumRotationalVelocity { get; set; }
 
     [JsonPropertyName("RobotWeight")]
-    public long RobotWeight { get; set; }
+    public long? RobotWeight { get; set; }
 
     [JsonPropertyName("ROSRepo")]
     public Uri? ROSRepo { get; set; }
@@ -59,7 +59,7 @@ public class RobotModel : BaseModel
     public List<string>? TaskList { get; set; }
 
     [JsonPropertyName("BatteryStatus")]
-    public long BatteryStatus { get; set; }
+    public int BatteryStatus { get; set; }
 
     [JsonPropertyName("MacAddress")]
     public string? MacAddress { get; set; }
@@ -84,9 +84,6 @@ public class RobotModel : BaseModel
 
     [JsonPropertyName("RAM")] // Compulsory field
     public long? Ram { get; set; }
-
-    //  [JsonPropertyName("VirtualRam")]
-    //  public long VirtualRam { get; set; }
 
     [JsonPropertyName("StorageDisk")] // Compulsory field
     public long? StorageDisk { get; set; }
@@ -212,7 +209,7 @@ public class RobotModel : BaseModel
             Ros = new RosInfo()
             {
                 RosDistro = domain.RosDistro,
-                RosNodes = domain.ROSNodes.Select(x=>x.ToDto()).ToList(),
+                RosNodes = domain.ROSNodes?.Select(x=>x.ToDto()).ToList(),
                 RosRepo = domain.ROSRepo,
                 RosVersion = domain.RosVersion
             },

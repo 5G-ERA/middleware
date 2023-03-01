@@ -190,4 +190,72 @@ public static class ApiContractToDomainMapper
             Timestamp = x.Policy.LastTimeUpdated
         };
     }
+
+    public static RobotModel ToRobot(this RobotRequest x)
+    {
+        return new RobotModel()
+        {
+            Name = x.Name,
+            RobotModelName = x.ModelName,
+            RobotStatus = x.Status,
+            BatteryStatus = x.BatteryStatus,
+            RosVersion = x.RosVersion,
+            RosDistro = x.RosDistro,
+            ROSRepo = x.RosRepo,
+            ROSNodes = x.RosNodes?.ToList(),
+            MaximumPayload = x.MaximumPayload,
+            MaximumRotationalVelocity = x.MaximumRotationalVelocity,
+            MaximumTranslationalVelocity = x.MaximumTranslationalVelocity,
+            RobotWeight = x.RobotWeight,
+            Manufacturer = x.Manufacturer,
+            ManufacturerUrl = x.ManufacturerUrl,
+            MacAddress = x.MacAddress,
+            LocomotionSystem = x.LocomotionSystem,
+            LocomotionTypes = x.LocomotionTypes,
+            Sensors = x.Sensors?.ToList(),
+            Actuators = x.Actuators?.ToList(),
+            Manipulators = x.Manipulators?.ToList(),
+            Cpu = x.Cpu,
+            NumberCores = x.NumberOfCores,
+            Ram = x.Ram,
+            StorageDisk = x.StorageDisk,
+            Questions = x.Questions?.ToList(),
+            LastUpdatedTime = DateTime.Now
+        };
+    }
+
+    public static RobotModel ToRobot(this UpdateRobotRequest x)
+    {
+        return new RobotModel()
+        {
+            Id = x.Id,
+            Name = x.Robot.Name,
+            RobotModelName = x.Robot.ModelName,
+            RobotStatus = x.Robot.Status,
+            BatteryStatus = x.Robot.BatteryStatus,
+            RosVersion = x.Robot.RosVersion,
+            RosDistro = x.Robot.RosDistro,
+            ROSRepo = x.Robot.RosRepo,
+            ROSNodes = x.Robot.RosNodes?.ToList(),
+            MaximumPayload = x.Robot.MaximumPayload,
+            MaximumRotationalVelocity = x.Robot.MaximumRotationalVelocity,
+            MaximumTranslationalVelocity = x.Robot.MaximumTranslationalVelocity,
+            RobotWeight = x.Robot.RobotWeight,
+            Manufacturer = x.Robot.Manufacturer,
+            ManufacturerUrl = x.Robot.ManufacturerUrl,
+            MacAddress = x.Robot.MacAddress,
+            LocomotionSystem = x.Robot.LocomotionSystem,
+            LocomotionTypes = x.Robot.LocomotionTypes,
+            Sensors = x.Robot.Sensors?.ToList(),
+            Actuators = x.Robot.Actuators?.ToList(),
+            Manipulators = x.Robot.Manipulators?.ToList(),
+            Cpu = x.Robot.Cpu,
+            NumberCores = x.Robot.NumberOfCores,
+            Ram = x.Robot.Ram,
+            StorageDisk = x.Robot.StorageDisk,
+            Questions = x.Robot.Questions?.ToList(),
+            LastUpdatedTime = DateTime.Now,
+            OnboardedTime = DateTime.Now,
+        };
+    }
 }

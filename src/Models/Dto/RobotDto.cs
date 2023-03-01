@@ -24,28 +24,28 @@ public class RobotDto : Dto
     [Indexed]
     public string? RobotStatus { get; set; }
     [Indexed]
-    public string Manufacturer { get; set; }
+    public string? Manufacturer { get; set; }
 
-    public Uri ManufacturerUrl { get; set; }
+    public Uri? ManufacturerUrl { get; set; }
     [Indexed]
-    public long MaximumPayload { get; set; }
+    public long? MaximumPayload { get; set; }
     [Indexed]
-    public long MaximumTranslationalVelocity { get; set; }
+    public long? MaximumTranslationalVelocity { get; set; }
     [Indexed]
     public string CurrentTaskId { get; set; }
 
     [Indexed]
-    public List<string> TaskList { get; set; }
+    public List<string>? TaskList { get; set; }
 
     [Indexed]
-    public string LocomotionTypes { get; set; }
+    public string? LocomotionTypes { get; set; }
 
 
-    public long MaximumRotationalVelocity { get; set; }
+    public long? MaximumRotationalVelocity { get; set; }
 
-    public long RobotWeight { get; set; }
+    public long? RobotWeight { get; set; }
     [Indexed]
-    public long BatteryStatus { get; set; }
+    public int BatteryStatus { get; set; }
 
     public string? MacAddress { get; set; }
 
@@ -53,14 +53,14 @@ public class RobotDto : Dto
 
     public string? LocomotionType { get; set; } // Compulsory field
     [Indexed]
-    public List<Sensor> Sensors { get; set; } = new();
+    public List<Sensor>? Sensors { get; set; } = new();
     [Indexed]
-    public List<Actuator> Actuators { get; set; } = new();
+    public List<Actuator>? Actuators { get; set; } = new();
     [Indexed]
-    public List<Manipulator> Manipulators { get; set; } = new();
+    public List<Manipulator>? Manipulators { get; set; } = new();
     
     [Indexed]
-    public List<DialogueModel> Questions { get; init; } = new();
+    public List<DialogueModel>? Questions { get; init; } = new();
 
     [Indexed]
     public DateTimeOffset OnboardedTime { get; init; } = DateTimeOffset.Now;

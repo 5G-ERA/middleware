@@ -149,4 +149,46 @@ public static class DomainToApiContractMapper
             Policies = policies.Select(x => x.ToPolicyResponse())
         };
     }
+
+    public static RobotResponse ToRobotResponse(this RobotModel x)
+    {
+        return new RobotResponse()
+        {
+            Id = x.Id,
+            Name = x.Name,
+            ModelName = x.RobotModelName,
+            Status = x.RobotStatus,
+            BatteryStatus = x.BatteryStatus,
+            RosVersion = x.RosVersion,
+            RosDistro = x.RosDistro,
+            RosRepo = x.ROSRepo,
+            RosNodes = x.ROSNodes,
+            MaximumPayload = x.MaximumPayload,
+            MaximumTranslationalVelocity = x.MaximumTranslationalVelocity,
+            MaximumRotationalVelocity = x.MaximumRotationalVelocity,
+            RobotWeight = x.RobotWeight,
+            Manufacturer = x.Manufacturer,
+            ManufacturerUrl = x.ManufacturerUrl,
+            MacAddress = x.MacAddress,
+            LocomotionSystem = x.LocomotionSystem,
+            LocomotionTypes = x.LocomotionTypes,
+            Sensors = x.Sensors,
+            Actuators = x.Actuators,
+            Manipulators = x.Manipulators,
+            Cpu = x.Cpu,
+            NumberOfCores = x.NumberCores,
+            Ram = x.Ram,
+            StorageDisk = x.StorageDisk,
+            Questions = x.Questions,
+            LastUpdatedTime = x.LastUpdatedTime,
+            OnboardedTime = x.OnboardedTime
+        };
+    }
+    public static GetAllRobotsResponse ToRobotsResponse(this IEnumerable<RobotModel> robots)
+    {
+        return new GetAllRobotsResponse()
+        {
+            Robots = robots.Select(x => x.ToRobotResponse())
+        };
+    }
 }
