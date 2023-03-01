@@ -311,7 +311,6 @@ namespace Middleware.RedisInterface.Controllers
                     {
                         var tmpImage = instanceModel.ContainerImage;
                         instanceModel.ContainerImage = null;
-                        instanceModel.OnboardedTime = DateTime.UtcNow;
                         await _instanceRepository.AddAsync(instanceModel);
                         instanceModel.ContainerImage = tmpImage;
                         if (instanceModel.ContainerImage == null)

@@ -1,4 +1,5 @@
 ﻿using Middleware.Models.Domain;
+using Middleware.Models.Enums;
 using Middleware.RedisInterface.Contracts.Responses;
 
 namespace Middleware.RedisInterface.Mappings;
@@ -189,6 +190,26 @@ public static class DomainToApiContractMapper
         return new GetAllRobotsResponse()
         {
             Robots = robots.Select(x => x.ToRobotResponse())
+        };
+    }
+
+    public static TaskResponse ToTaskResponse(this TaskModel x)
+    {
+        return new TaskResponse()
+        {
+            Id = x.Id,
+            Name = x.Name,
+            IsDeterministic = x.DeterministicTask,
+            Priority = ((Priority)x.TaskPriority).ToString(),
+            Tags = x.Tags
+        };
+    }
+
+    public static GetAllTasksResponse ToTasksResponse(this IEnumerable<TaskModel> tasks)
+    {
+        return new GetAllTasksResponse()
+        {
+            Tasks = tasks.Select(x => x.ToTaskResponse())
         };
     }
 }

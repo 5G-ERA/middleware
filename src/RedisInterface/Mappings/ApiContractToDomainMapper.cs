@@ -1,4 +1,5 @@
 ﻿using Middleware.Models.Domain;
+using Middleware.Models.Enums;
 using Middleware.RedisInterface.Contracts.Requests;
 
 namespace Middleware.RedisInterface.Mappings;
@@ -256,6 +257,29 @@ public static class ApiContractToDomainMapper
             Questions = x.Robot.Questions?.ToList(),
             LastUpdatedTime = DateTime.Now,
             OnboardedTime = DateTime.Now,
+        };
+    }
+
+    public static TaskModel ToTask(this TaskRequest x)
+    {
+        return new TaskModel()
+        {
+            Name = x.Name,
+            TaskPriority = (int)Enum.Parse<Priority>(x.Priority),
+            DeterministicTask = x.IsDeterministic,
+            Tags = x.Tags.ToList()
+        };
+    }
+
+    public static TaskModel ToTask(this UpdateTaskRequest x)
+    {
+        return new TaskModel()
+        {
+            Id = x.Id,
+            Name = x.Task.Name,
+            TaskPriority = (int)Enum.Parse<Priority>(x.Task.Priority),
+            DeterministicTask = x.Task.IsDeterministic,
+            Tags = x.Task.Tags.ToList()
         };
     }
 }
