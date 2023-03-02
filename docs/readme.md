@@ -1,7 +1,7 @@
 # 5G-ERA Middleware documentation
 
 The documentation of the 5G-ERA Middleware is divided into three sections, each responsible for a different aspect.
-* [Where to start](Where_to_start\readme.md)
+* [Where to start](Where_to_start/readme.md)
 * [Administrator](Administrator/readme.md)
 * [Developer](Developer/readme.md)
 * [User](User/Readme.md)
