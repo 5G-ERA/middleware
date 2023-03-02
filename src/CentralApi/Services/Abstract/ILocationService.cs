@@ -8,7 +8,7 @@ namespace Middleware.CentralApi.Services;
 
 public interface ILocationService
 {
-    OneOf<RegistrationResult, ValidationException, NotFound> RegisterLocation();
+    Task<OneOf<Location, ValidationException, NotFound>> RegisterLocation(Location location);
     
-    Task<OneOf<List<Location>, NotFound>> GetAvailableLocations();
+    Task<OneOf<List<Location>, NotFound>> GetAvailableLocations(string organization);
 }
