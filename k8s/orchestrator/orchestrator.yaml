@@ -31,7 +31,9 @@ spec:
       automountServiceAccountToken: true
       nodeSelector:
         kubernetes.io/os: linux
-      containers:        
+      imagePullSecrets:
+        - name: awsecr-cred
+      containers:
       - name: orchestrator-api
         image: 394603622351.dkr.ecr.eu-west-1.amazonaws.com/orchestrator-api:v0.2
         imagePullPolicy: Always
@@ -42,8 +44,8 @@ spec:
         - name: REDIS_INTERFACE_ADDRESS
           value: http://redis-interface-api # to be replaced with real value
         - name: Middleware__Organization
-          value: 5G-ERA # to be replaced with real value
+          value: 5G-ERA-BED # to be replaced with real value
         - name: Middleware__InstanceName
-          value: MiddlewareBED # to be replaced with real value
+          value: Middleware-BB # to be replaced with real value
         - name: Middleware__InstanceType
           value: Edge # to be replaced with real value
