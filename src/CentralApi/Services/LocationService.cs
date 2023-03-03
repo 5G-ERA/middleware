@@ -24,29 +24,46 @@ public class LocationService : ILocationService
     public async Task<OneOf<Location, ValidationException, NotFound>> RegisterLocation(Location location)
     {
         // when location not found in db
-        
-        if (false)
+        (bool queryResultCloud, CloudModel cloud) = await _cloudRepository.checkIfNameExists(location.Name);
+        (bool queryResultEdge, EdgeModel edge) = await _edgeRepository.checkIfNameExists(location.Name);
+
+        if ((queryResultEdge == false) && (queryResultCloud == false))
         {
             return new NotFound();    
         }
-
-        BaseModel locationData = null;
+        
         // when location is not valid eg. different type than in the system etc
-        if (false)
+        if (!location.isValid())
         {
             return new ValidationException("The specified location is not valid");    
         }
-        
-        // make it online
-        var result = new Location()
+
+
+        // make it online & return info about location based on matched edge
+        if (cloud is null)
         {
-            Id = locationData.Id,
-            Name = location.Name,
-            Organization = location.Organization,
-            Type = location.Type
-        };
-        // when ok
-        return result;
+            edge.IsOnline = true;
+            var result = new Location()
+            {
+                Id = edge.Id,
+                Name = edge.Name,
+                Organization = edge.Organization,
+                Type = Enum.Parse<LocationType>(edge.Type)
+            };
+            return result;
+        }
+        else  // make it online & return info about location based on matched cloud
+        {
+            cloud.IsOnline = true;
+            var result = new Location()
+            {
+                Id = cloud.Id,
+                Name = cloud.Name,
+                Organization = cloud.Organization,
+                Type = Enum.Parse<LocationType>(cloud.Type)
+            };
+            return result;
+        }
 
     }
 

@@ -21,5 +21,9 @@ namespace Middleware.DataAccess.Repositories.Abstract
         Task<bool> IsBusyCloudByIdAsync(Guid cloudId);
         Task<List<CloudModel>> GetCloudsByOrganizationAsync(string organization);
 
+        Task<(bool, CloudModel)> checkIfNameExists(string name);
+
+        Task<(bool, CloudModel)> checkIfIdExists(string id);
+
     }
 }

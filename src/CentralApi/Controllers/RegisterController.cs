@@ -1,4 +1,5 @@
-﻿using System.Net;
+﻿using System;
+using System.Net;
 using Microsoft.AspNetCore.Mvc;
 using Middleware.CentralApi.Contracts.Requests;
 using Middleware.CentralApi.Contracts.Responses;
@@ -26,7 +27,9 @@ public class RegisterController : Controller
     [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.BadRequest)]
     public async Task<IActionResult> Register([FromBody] RegisterRequest request)
     {
+        
         var location = request.ToLocation();
+        
         var result = await _locationService.RegisterLocation(location);
 
         return result.Match<IActionResult>(

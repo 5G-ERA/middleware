@@ -231,5 +231,41 @@ namespace Middleware.DataAccess.Repositories
             List<CloudModel> matchedClouds = (List<CloudModel>)await FindQuery(dto => dto.Organization == organization).ToListAsync();
             return matchedClouds;
         }
+
+        /// <summary>
+        /// Checks if an edge exists with a particular name
+        /// </summary>
+        /// <param name="address"></param>
+        /// <returns></returns>
+        public async Task<(bool, CloudModel)> checkIfNameExists(string name)
+        {
+            CloudModel matchedCloud = await FindSingleAsync(dto => dto.Name == name);
+            if (matchedCloud is not null)
+            {
+                return (true, matchedCloud);
+            }
+            else
+            {
+                return (false, matchedCloud);
+            }
+        }
+
+        /// <summary>
+        /// Checks if an edge exists with a particular id.
+        /// </summary>
+        /// <param name="address"></param>
+        /// <returns></returns>
+        public async Task<(bool, CloudModel)> checkIfIdExists(string id)
+        {
+            CloudModel matchedCloud = await FindSingleAsync(dto => dto.Id == id);
+            if (matchedCloud is not null)
+            {
+                return (true, matchedCloud);
+            }
+            else
+            {
+                return (false, matchedCloud);
+            }
+        }
     }
 }

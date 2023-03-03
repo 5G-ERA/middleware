@@ -222,5 +222,58 @@ namespace Middleware.DataAccess.Repositories
             List<EdgeModel> matchedEdges = (List<EdgeModel>)await FindQuery(dto => dto.Organization == organization).ToListAsync();
             return matchedEdges;
         }
+
+        /// <summary>
+        /// Check if a given address is stored in redis for the edges entities. 
+        /// </summary>
+        /// <param name="address"></param>
+        /// <returns></returns>
+        public async Task<bool> checkIfAddressExists(Uri address)
+        {
+            EdgeModel matchedEdge = await FindSingleAsync(dto => dto.EdgeIp == address);
+            if (matchedEdge is not null)
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+        /// <summary>
+        /// Checks if an edge exists with a particular name
+        /// </summary>
+        /// <param name="address"></param>
+        /// <returns></returns>
+        public async Task<(bool,EdgeModel)> checkIfNameExists(string name)
+        {
+            EdgeModel matchedEdge = await FindSingleAsync(dto => dto.Name == name);
+            if (matchedEdge is not null)
+            {
+                return (true, matchedEdge);
+            }
+            else
+            {
+                return (false, matchedEdge);
+            }
+        }
+
+        /// <summary>
+        /// Checks if an edge exists with a particular id.
+        /// </summary>
+        /// <param name="address"></param>
+        /// <returns></returns>
+        public async Task<(bool, EdgeModel)> checkIfIdExists(string id)
+        {
+            EdgeModel matchedEdge = await FindSingleAsync(dto => dto.Id == id);
+            if (matchedEdge is not null)
+            {
+                return (true, matchedEdge);
+            }
+            else
+            {
+                return (false, matchedEdge);
+            }
+        }
     }
 }

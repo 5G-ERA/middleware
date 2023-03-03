@@ -19,5 +19,11 @@ namespace Middleware.DataAccess.Repositories.Abstract
         Task<int> GetNumContainersByNameAsync(string edgeName);
 
         Task<List<EdgeModel>> GetEdgesByOrganizationAsync(string organization);
+
+        Task<bool> checkIfAddressExists(Uri address);
+        Task<(bool, EdgeModel)> checkIfNameExists(string name);
+
+        Task<(bool, EdgeModel)> checkIfIdExists(string id);
+
     }
 }
