@@ -219,5 +219,17 @@ namespace Middleware.DataAccess.Repositories
             List<RelationModel> cloudRelations = await GetRelation(cloudId, "LOCATED_AT", RelationDirection.Incoming);
             return cloudRelations.Count > 0;
         }
+
+        /// <summary>
+        /// Return all the clouds of a particular organization.
+        /// </summary>
+        /// <param name="organization"></param>
+        /// <returns></returns>
+        /// <exception cref="ArgumentException"></exception>
+        public async Task<List<CloudModel>> GetCloudsByOrganizationAsync(string organization)
+        {
+            List<CloudModel> matchedClouds = (List<CloudModel>)await FindQuery(dto => dto.Organization == organization).ToListAsync();
+            return matchedClouds;
+        }
     }
 }

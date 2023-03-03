@@ -1,6 +1,7 @@
 ﻿using Middleware.CentralApi.Contracts.Requests;
 using Middleware.CentralApi.Domain;
 using Middleware.Common.Enums;
+using Middleware.Models.Domain;
 
 namespace Middleware.CentralApi.Mappings;
 

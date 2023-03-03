@@ -210,5 +210,17 @@ namespace Middleware.DataAccess.Repositories
             List<RelationModel> robotRelations = await GetRelation(edge.Id, "LOCATED_AT", RelationDirection.Incoming);
             return robotRelations.Count;
         }
+
+        /// <summary>
+        /// Return all the edges of a particular organization.
+        /// </summary>
+        /// <param name="organization"></param>
+        /// <returns></returns>
+        /// <exception cref="ArgumentException"></exception>
+        public async Task<List<EdgeModel>> GetEdgesByOrganizationAsync(string organization)
+        {
+            List<EdgeModel> matchedEdges = (List<EdgeModel>)await FindQuery(dto => dto.Organization == organization).ToListAsync();
+            return matchedEdges;
+        }
     }
 }

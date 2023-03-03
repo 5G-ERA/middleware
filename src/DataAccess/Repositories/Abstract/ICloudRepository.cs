@@ -19,5 +19,7 @@ namespace Middleware.DataAccess.Repositories.Abstract
         Task<bool> IsBusyCloudByNameAsync(string cloudName);
 
         Task<bool> IsBusyCloudByIdAsync(Guid cloudId);
+        Task<List<CloudModel>> GetCloudsByOrganizationAsync(string organization);
+
     }
 }

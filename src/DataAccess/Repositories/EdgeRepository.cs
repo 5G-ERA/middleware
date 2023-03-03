@@ -204,5 +204,7 @@ namespace Middleware.DataAccess.Repositories
             List<RelationModel> robotRelations = await GetRelation(edge.Id, "LOCATED_AT", RelationDirection.Incoming);
             return robotRelations.Count;
         }
+
+        
     }
 }

@@ -17,5 +17,7 @@ namespace Middleware.DataAccess.Repositories.Abstract
         Task<int> GetNumContainersByIdAsync(Guid edgeId);
 
         Task<int> GetNumContainersByNameAsync(string edgeName);
+
+        Task<List<EdgeModel>> GetEdgesByOrganizationAsync(string organization);
     }
 }
