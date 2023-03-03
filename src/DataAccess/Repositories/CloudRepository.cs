@@ -191,5 +191,36 @@ namespace Middleware.DataAccess.Repositories
             List<RelationModel> cloudRelations = await GetRelation(cloudId, "LOCATED_AT", RelationDirection.Incoming);
             return cloudRelations.Count > 0;
         }
+
+        /// <summary>
+        /// Return all the clouds of a particular organization.
+        /// </summary>
+        /// <param name="organization"></param>
+        /// <returns></returns>
+        /// <exception cref="ArgumentException"></exception>
+        public async Task<List<CloudModel>> GetCloudsByOrganizationAsync(string organization)
+        {
+            throw new NotImplementedException();
+        }
+
+        /// <summary>
+        /// Checks if an edge exists with a particular name
+        /// </summary>
+        /// <param name="address"></param>
+        /// <returns></returns>
+        public async Task<(bool, CloudModel)> checkIfNameExists(string name)
+        {
+            throw new NotImplementedException();
+        }
+
+        /// <summary>
+        /// Checks if an edge exists with a particular id.
+        /// </summary>
+        /// <param name="address"></param>
+        /// <returns></returns>
+        public async Task<(bool, CloudModel)> checkIfIdExists(string id)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

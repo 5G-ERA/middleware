@@ -205,6 +205,45 @@ namespace Middleware.DataAccess.Repositories
             return robotRelations.Count;
         }
 
-        
+        /// <summary>
+        /// Return all the edges of a particular organization.
+        /// </summary>
+        /// <param name="organization"></param>
+        /// <returns></returns>
+        /// <exception cref="ArgumentException"></exception>
+        public async Task<List<EdgeModel>> GetEdgesByOrganizationAsync(string organization)
+        {
+            throw new NotImplementedException();
+        }
+
+        /// <summary>
+        /// Check if a given address is stored in redis for the edges entities. 
+        /// </summary>
+        /// <param name="address"></param>
+        /// <returns></returns>
+        public async Task<bool> checkIfAddressExists(Uri address)
+        {
+            throw new NotImplementedException();
+        }
+        /// <summary>
+        /// Checks if an edge exists with a particular name
+        /// </summary>
+        /// <param name="address"></param>
+        /// <returns></returns>
+        public async Task<(bool, EdgeModel)> checkIfNameExists(string name)
+        {
+            throw new NotImplementedException();
+        }
+
+        /// <summary>
+        /// Checks if an edge exists with a particular id.
+        /// </summary>
+        /// <param name="address"></param>
+        /// <returns></returns>
+        public async Task<(bool, EdgeModel)> checkIfIdExists(string id)
+        {
+            throw new NotImplementedException();
+        }
+
     }
 }
