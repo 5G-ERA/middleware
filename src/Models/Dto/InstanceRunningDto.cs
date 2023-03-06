@@ -24,7 +24,7 @@ public class InstanceRunningDto : Dto
     public string ServiceStatus { get; set; } = default!;
 
     [Indexed(Sortable = true)]
-    public DateTime DeployedTime { get; set; }
+    public DateTimeOffset DeployedTime { get; set; }
 
     public override BaseModel ToModel()
     {
@@ -37,7 +37,7 @@ public class InstanceRunningDto : Dto
             ServiceUrl = dto.ServiceUrl,
             ServiceInstanceId = Guid.Parse(dto.ServiceInstanceId),
             ServiceStatus = dto.ServiceStatus,
-            DeployedTime = dto.DeployedTime
+            DeployedTime = dto.DeployedTime.DateTime
 
         };
     }

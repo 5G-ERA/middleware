@@ -40,7 +40,8 @@ public class InstanceRunningModel : BaseModel
             ServiceType = domain.ServiceType,
             ServiceInstanceId = domain.ServiceInstanceId.ToString(),
             ServiceUrl = domain.ServiceUrl,
-            ServiceStatus = domain.ServiceStatus
+            ServiceStatus = domain.ServiceStatus,
+            DeployedTime = domain.DeployedTime == default ? DateTimeOffset.Now : domain.DeployedTime
         };
     }
 }

@@ -55,7 +55,7 @@ public static class DataAccessExtensionMethods
         services.AddScoped<ITaskRepository, RedisTaskRepository>();
         services.AddScoped<IUserRepository, RedisUserRepository>();
         services.AddScoped<IActionRunningRepository, RedisActionRunningRepository>();
-       
+        services.AddScoped<IInstanceRunningRepository, RedisInstanceRunningRepository>();
 
         return services;
     }
