@@ -9,13 +9,13 @@
             "type": "coreclr",
             "request": "launch",
             "preLaunchTask": "bridge-to-kubernetes.compound",
-            "program": "${workspaceFolder}/src/Orchestrator/bin/Debug/net6.0/Orchestrator.dll",
+            "program": "${workspaceFolder}/src/Orchestrator/bin/Debug/net6.0/net6.0/Orchestrator.dll",
             "args": [],
             "cwd": "${workspaceFolder}",
             "stopAtEntry": false,
             "env": {
                 "ASPNETCORE_ENVIRONMENT": "Development",
-                "ASPNETCORE_URLS": "http://+:69"
+                "ASPNETCORE_URLS": "http://+:3001"
             },
             "sourceFileMap": {
                 "/Views": "${workspaceFolder}/Views"

@@ -7,7 +7,7 @@
 			"resource": "orchestrator-api",
 			"resourceType": "service",
 			"ports": [
-				69
+				3001
 			],
 			"targetCluster": "minikube",
 			"targetNamespace": "middleware",

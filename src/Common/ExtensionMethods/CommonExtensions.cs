@@ -19,7 +19,7 @@ public static class CommonExtensions
 
         services.AddHttpClient(AppConfig.RedisApiClientName, (a) =>
         {
-            a.BaseAddress = new Uri(Environment.GetEnvironmentVariable("REDIS_INTERFACE_ADDRESS"));
+            a.BaseAddress = new Uri(Environment.GetEnvironmentVariable("REDIS_INTERFACE_API_SERVICE_HOST"));
             a.DefaultRequestHeaders.Accept.Add(
                 new MediaTypeWithQualityHeaderValue("application/json"));
         });
