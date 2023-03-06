@@ -16,10 +16,14 @@ public static class CommonExtensions
     public static IServiceCollection RegisterCommonServices(this IServiceCollection services)
     {
         services.AddSingleton<IEnvironment, MiddlewareEnvironment>();
-        var address = Environment.GetEnvironmentVariable("REDIS_INTERFACE_API_PORT");
         services.AddHttpClient(AppConfig.RedisApiClientName, (a) =>
         {
-            a.BaseAddress = new Uri(address.Replace("tcp", "http", StringComparison.InvariantCultureIgnoreCase));
+            // get the value within the method to evaluate it when the service is already working 
+            // to respond to any changes in the values
+            var host = Environment.GetEnvironmentVariable("REDIS_INTERFACE_API_SERVICE_HOST");
+            var port = Environment.GetEnvironmentVariable("REDIS_INTERFACE_API_SERVICE_PORT");
+            var address = $"http://{host}:{port}";
+            a.BaseAddress = new Uri(address);
             a.DefaultRequestHeaders.Accept.Add(
                 new MediaTypeWithQualityHeaderValue("application/json"));
         });

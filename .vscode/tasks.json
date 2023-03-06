@@ -1,25 +1,61 @@
 {
-	"version": "2.0.0",
-	"tasks": [
-		{
-			"label": "bridge-to-kubernetes.resource",
-			"type": "bridge-to-kubernetes.resource",
-			"resource": "orchestrator-api",
-			"resourceType": "service",
-			"ports": [
-				3001
-			],
-			"targetCluster": "minikube",
-			"targetNamespace": "middleware",
-			"useKubernetesServiceEnvironmentVariables": true
-		},
-		{
-			"label": "bridge-to-kubernetes.compound",
-			"dependsOn": [
-				"bridge-to-kubernetes.resource",
-				"build"
-			],
-			"dependsOrder": "sequence"
-		}
-	]
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "build",
+            "command": "dotnet",
+            "type": "process",
+            "args": [
+                "build",
+                "${workspaceFolder}/src/Orchestrator/Orchestrator.csproj",
+                "/property:GenerateFullPaths=true",
+                "/consoleloggerparameters:NoSummary"
+            ],
+            "problemMatcher": "$msCompile"
+        },
+        {
+            "label": "publish",
+            "command": "dotnet",
+            "type": "process",
+            "args": [
+                "publish",
+                "${workspaceFolder}/src/Orchestrator/Orchestrator.csproj",
+                "/property:GenerateFullPaths=true",
+                "/consoleloggerparameters:NoSummary"
+            ],
+            "problemMatcher": "$msCompile"
+        },
+        {
+            "label": "watch",
+            "command": "dotnet",
+            "type": "process",
+            "args": [
+                "watch",
+                "run",
+                "--project",
+                "${workspaceFolder}/src/Orchestrator/Orchestrator.csproj"
+            ],
+            "problemMatcher": "$msCompile"
+        },
+        {
+            "label": "bridge-to-kubernetes.resource",
+            "type": "bridge-to-kubernetes.resource",
+            "resource": "orchestrator-api",
+            "resourceType": "service",
+            "ports": [
+                3001
+            ],
+            "targetCluster": "minikube",
+            "targetNamespace": "middleware",
+            "useKubernetesServiceEnvironmentVariables": true
+        },
+        {
+            "label": "bridge-to-kubernetes.compound",
+            "dependsOn": [
+                "bridge-to-kubernetes.resource",
+                "build"
+            ],
+            "dependsOrder": "sequence"
+        }
+    ]
 }
