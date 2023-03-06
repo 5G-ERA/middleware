@@ -21,10 +21,11 @@ public class ApiClientBuilder : IApiClientBuilder
     /// </summary>
     public RedisApiClient CreateRedisApiClient()
     {
-        var address = _env.GetEnvVariable("REDIS_INTERFACE_ADDRESS") ??
-                      throw new ArgumentNullException("REDIS_INTERFACE_ADDRESS", "REDIS_INTERFACE_ADDRESS environment variable not specified");
+        var address = _env.GetEnvVariable("REDIS_INTERFACE_API_SERVICE_HOST") ??
+                      throw new ArgumentNullException("REDIS_INTERFACE_API_SERVICE_HOST", "REDIS_INTERFACE_API_SERVICE_HOST environment variable not specified");
+        var url = $"http://{address}";
         var client = _httpClientFactory.CreateClient(AppConfig.RedisApiClientName);
-        return new RedisApiClient($"{address}", client);
+        return new RedisApiClient(url, client);
     }
     
     /// <summary>

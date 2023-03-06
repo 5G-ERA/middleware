@@ -7,11 +7,11 @@
 			"resource": "orchestrator-api",
 			"resourceType": "service",
 			"ports": [
-				3001
+				69
 			],
-			"targetCluster": "microk8s-cluster",
+			"targetCluster": "minikube",
 			"targetNamespace": "middleware",
-			"useKubernetesServiceEnvironmentVariables": false
+			"useKubernetesServiceEnvironmentVariables": true
 		},
 		{
 			"label": "bridge-to-kubernetes.compound",

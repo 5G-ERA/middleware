@@ -375,10 +375,10 @@ public class DeploymentService : IDeploymentService
         };
         var envList = new List<V1EnvVar>
         {
-            new("REDIS_INTERFACE_ADDRESS", $"http://redis-interface-api"),
-            new("ORCHESTRATOR_ADDRESS", $"http://orchestrator-api"),
-            new("TASK_PLANNER_ADDRESS", $"http://task-planner-api"),
-            new("RESOURCE_PLANNER_ADDRESS", $"http://resource-planner-api"),
+            // new("REDIS_INTERFACE_ADDRESS", $"http://redis-interface-api"),
+            // new("ORCHESTRATOR_ADDRESS", $"http://orchestrator-api_SERVICE_HOST"),
+            // new("TASK_PLANNER_ADDRESS", $"http://task-planner-api"),
+            // new("RESOURCE_PLANNER_ADDRESS", $"http://resource-planner-api"),
             new("Middleware__Organization", mwConfig.Organization),
             new("Middleware__InstanceName", mwConfig.InstanceName),
             new("Middleware__InstanceType", mwConfig.InstanceType)
