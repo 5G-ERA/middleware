@@ -68,13 +68,13 @@ public class DeploymentService : IDeploymentService
             var deploymentNames = deployments.Items.Select(d => d.Metadata.Name).OrderBy(d => d).ToArray();
             _logger.LogDebug("Current deployments: {deployments}", string.Join(", ", deploymentNames));
 
-            foreach (var seq in task.ActionSequence)
+            foreach (var seq in task.ActionSequence!)
             {
                 //BaseModel location;
                 //location = seq.PlacementType.ToLower().Contains("cloud")
                 //    ? await _redisInterfaceClient.GetCloudByNameAsync(seq.Placement)
                 //    : await _redisInterfaceClient.GetEdgeByNameAsync(seq.Placement);
-                foreach (var service in seq.Services)
+                foreach (var service in seq.Services!)
                 {
                     try
                     {
@@ -125,12 +125,12 @@ public class DeploymentService : IDeploymentService
     /// <returns></returns>
     private async Task<bool> SaveActionSequence(TaskModel task, Guid robotId)
     {
-        var actionPlan = new ActionPlanModel(task.ActionPlanId, task.Name, task.ActionSequence, robotId);
+        var actionPlan = new ActionPlanModel(task.ActionPlanId, task.Id, task.Name, task.ActionSequence!, robotId);
         actionPlan.SetStatus("active");
 
         var result = await _redisInterfaceClient.ActionPlanAddAsync(actionPlan);
 
-        return result != null;
+        return result;
     }
 
     private async Task DeployService(IKubernetes k8SClient, InstanceModel service, string[] deploymentNames)
@@ -160,7 +160,7 @@ public class DeploymentService : IDeploymentService
             var deployedPair = await Deploy(k8SClient, cim);
 
             service.ServiceStatus = ServiceStatus.Idle.GetStringValue();
-            service.ServiceInstanceId = Guid.Parse(deployedPair.Deployment.GetLabel("serviceId"));
+            service.ServiceInstanceId = deployedPair.InstanceId;
             _logger.LogDebug("Deployed the image {Name} with the Id {ServiceInstanceId}", service.Name,
                 service.ServiceInstanceId);
 
@@ -183,7 +183,7 @@ public class DeploymentService : IDeploymentService
         var deployment = await Deploy<V1Deployment>(k8SClient, cim.K8SDeployment, cim.Name, instanceId,
             nameof(cim.K8SDeployment));
 
-        return new DeploymentPairModel(deployment, service);
+        return new DeploymentPairModel(deployment, service, instanceId);
     }
 
     /// <summary>
@@ -292,7 +292,7 @@ public class DeploymentService : IDeploymentService
             var k8sClient = _kubernetesBuilder.CreateKubernetesClient();
             foreach (var action in actionPlan.ActionSequence)
             {
-                foreach (var srv in action.Services)
+                foreach (var srv in action.Services!)
                 {
                     retVal &= await DeleteInstance(k8sClient, srv);
                 }
