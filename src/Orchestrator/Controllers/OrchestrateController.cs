@@ -160,7 +160,7 @@ public class OrchestrateController : Controller
             var isSuccess = await _deploymentService.DeletePlanAsync(actionPlan);
 
             //Delete the LOCATED_AT relationships between instance and edge/cloud.
-            List<ActionModel> actionTempList = actionPlan.ActionSequence;
+            /*List<ActionModel> actionTempList = actionPlan.ActionSequence;
             foreach (ActionModel action in actionTempList)
             {
                 BaseModel placement;
@@ -187,7 +187,7 @@ public class OrchestrateController : Controller
                     //delete all the located_at relationships between all instances of 1 action and the resources been edge/cloud
                     await _redisInterfaceClient.DeleteRelationAsync(instance, placement, "LOCATED_AT");
                 }
-            }
+            }*/
 
             // //Delete the relationship OWNS between the robot and the task that has been completed.
             // RelationModel deleteRelationRobotOwnsTask = new RelationModel();

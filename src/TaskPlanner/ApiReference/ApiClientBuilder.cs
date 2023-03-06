@@ -20,19 +20,21 @@ public class ApiClientBuilder : IApiClientBuilder
     /// </summary>
     public ResourcePlannerApiClient CreateResourcePlannerApiClient()
     {
-        var address = _env.GetEnvVariable("RESOURCE_PLANNER_ADDRESS") ??
-                      throw new ArgumentNullException("RESOURCE_PLANNER_ADDRESS", "RESOURCE_PLANNER_ADDRESS environment variable not specified");
+        var address = _env.GetEnvVariable("RESOURCE_PLANNER_API_SERVICE_HOST") ??
+                      throw new ArgumentNullException("RESOURCE_PLANNER_API_SERVICE_HOST", "RESOURCE_PLANNER_API_SERVICE_HOST environment variable not specified");
+        var url = $"http://{address}";
         var client = _httpClientFactory.CreateClient("resourcePlannerApiClient");
-        return new ResourcePlannerApiClient(address, client);
+        return new ResourcePlannerApiClient(url, client);
     }
     
     /// <inheritdoc />
     public OrchestratorApiClient CreateOrchestratorApiClient()
     {
-        var address = _env.GetEnvVariable("ORCHESTRATOR_ADDRESS") ??
-                      throw new ArgumentNullException("ORCHESTRATOR_ADDRESS", "ORCHESTRATOR_ADDRESS environment variable not specified");
+        var address = _env.GetEnvVariable("ORCHESTRATOR_API_SERVICE_HOST") ??
+                      throw new ArgumentNullException("ORCHESTRATOR_API_SERVICE_HOST", "ORCHESTRATOR_API_SERVICE_HOST environment variable not specified");
+        var url = $"http://{address}";
         var client = _httpClientFactory.CreateClient("orchestratorApiClient");
-        return new OrchestratorApiClient(address, client);
+        return new OrchestratorApiClient(url, client);
     }
 }
 
