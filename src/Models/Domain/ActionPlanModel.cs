@@ -27,7 +27,7 @@ public sealed class ActionPlanModel : BaseModel
     public DateTime LastStatusChange { get; set; } // AL 2022-05-10: Not sure we need this one or how to use it.
 
     [JsonPropertyName("ActionSequence")]
-    public List<ActionModel> ActionSequence { get; set; }
+    public List<ActionModel> ActionSequence { get; set; } 
 
     [JsonPropertyName("RobotId")]
     public Guid RobotId { get; set; }
