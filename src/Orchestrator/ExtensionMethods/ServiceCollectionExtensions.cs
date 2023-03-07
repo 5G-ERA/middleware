@@ -30,13 +30,12 @@ public static class ServiceCollectionExtensions
                 mqBusFactoryConfigurator.ReceiveEndpoint("deployments", ec =>
                 {
                     ec.ConfigureConsumeTopology = false;
+                    ec.PrefetchCount = 1;
                     ec.Bind(nameof(DeployPlanMessage), b =>
                     {
-                        b.RoutingKey = $"{mwConfig.InstanceName}-{mwConfig.InstanceType}";
                         b.ExchangeType = ExchangeType.Direct;
+                        b.RoutingKey = $"{mwConfig.InstanceName}-{mwConfig.InstanceType}";
                     });
-
-                    ec.ConfigureConsumer<DeployPlanConsumer>(busRegistrationContext);
                 });
 
                 mqBusFactoryConfigurator.ConfigureEndpoints(busRegistrationContext);

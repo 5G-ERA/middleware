@@ -1,5 +1,6 @@
 ﻿using k8s.KubeConfigModels;
 using MassTransit;
+using MassTransit.Configuration;
 using MassTransit.RabbitMqTransport.Configuration;
 using Middleware.Common.Config;
 using Middleware.Common.MessageContracts;
@@ -29,7 +30,10 @@ public static class ServiceCollectionExtensions
                     x.UseRoutingKeyFormatter(t => t.Message.DeploymentLocation);
                 });
                 mqBusFactoryConfigurator.Message<DeployPlanMessage>(x => x.SetEntityName(nameof(DeployPlanMessage)));
-                mqBusFactoryConfigurator.Publish<DeployPlanMessage>(x => { x.ExchangeType = ExchangeType.Direct; });
+                mqBusFactoryConfigurator.Publish<DeployPlanMessage>(x =>
+                {
+                    x.ExchangeType = ExchangeType.Direct;
+                });
 
                 mqBusFactoryConfigurator.ConfigureEndpoints(busRegistrationContext);
             });
