@@ -67,7 +67,7 @@ namespace Middleware.TaskPlanner.Controllers
                     Task = tmpTaskSend
                 };
                 ResourcePlanner.TaskModel tmpFinalTask =
-                    await _resourcePlannerClient.GetResourcePlanAsync(resourceInput); //  await _resourcePlannerClient.GetResourcePlanAsync(resourceInput);
+                    await _resourcePlannerClient.ResourceAsync(resourceInput);
                 TaskModel resourcePlan = _mapper.Map<TaskModel>(tmpFinalTask);
 
                 if (dryRun)

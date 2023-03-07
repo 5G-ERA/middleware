@@ -17,9 +17,4 @@ spec:
       - name: task-planner-api
         image: 394603622351.dkr.ecr.eu-west-1.amazonaws.com/task-planner-api:latest
         imagePullPolicy: Always
-        resources: {}
-        env:
-        - name: REDIS_INTERFACE_ADDRESS
-          value: http://redis-interface-api
-        - name: ORCHESTRATOR_ADDRESS
-          value: http://orchestrator-api
+        resources: {}        

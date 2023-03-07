@@ -87,7 +87,7 @@ public class UpdateStatusJob : BaseJob<UpdateStatusJob>
         //check if all instances are down for at least half an hour, then terminate
         foreach (var action in seq.ActionSequence)
         {
-            if (action.Placement != _middlewareConfig.InstanceName)
+            if (action.Placement != $"{_middlewareConfig.InstanceName}-{_middlewareConfig.InstanceType}")
                 continue;
             
             foreach (var instance in action.Services)
