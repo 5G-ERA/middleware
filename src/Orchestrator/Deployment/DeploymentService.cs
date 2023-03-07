@@ -119,7 +119,8 @@ public class DeploymentService : IDeploymentService
     }
 
     /// <summary>
-    /// Saves the specified task to the redis as an action plan
+    /// Saves the specified task to the redis as an action plan and add the actionRunnings and InstanceRunning
+    /// with their corresponding relationships.
     /// </summary>
     /// <param name="task"></param>
     /// <returns></returns>
@@ -127,8 +128,57 @@ public class DeploymentService : IDeploymentService
     {
         var actionPlan = new ActionPlanModel(task.ActionPlanId, task.Name, task.ActionSequence, robotId);
         actionPlan.SetStatus("active");
-
+        RobotModel robot = await _redisInterfaceClient.RobotGetByIdAsync(robotId);
+        await _redisInterfaceClient.AddRelationAsync(robot, actionPlan, "OWNS");
+        
+        //Add the actionPlan to redis
         var result = await _redisInterfaceClient.ActionPlanAddAsync(actionPlan);
+
+        //Add the actionRunning to redis 
+        foreach(ActionModel action in task.ActionSequence)
+        {
+            ActionRunningModel ActionRunningTemp = new ActionRunningModel();
+            ActionRunningTemp.ActionPlanId = actionPlan.Id;
+            ActionRunningTemp.ActionParentId = action.Id;
+            ActionRunningTemp.Name = action.Name;
+            ActionRunningTemp.Tags = action.Tags;
+            ActionRunningTemp.Order = action.Order;
+            ActionRunningTemp.Placement = action.Placement;
+            ActionRunningTemp.PlacementType = action.PlacementType;
+            ActionRunningTemp.ActionPriority = action.ActionPriority;
+            ActionRunningTemp.ActionStatus = ActionStatusEnum.Running.ToString();
+            ActionRunningTemp.Services = action.Services.Select(x=> new InstanceRunningModel() { Name = x.Name, ServiceInstanceId = x.ServiceInstanceId,
+                ServiceType = x.ServiceType,
+                ServiceUrl = x.ServiceUrl,
+                ServiceStatus = x.ServiceStatus,
+                DeployedTime = DateTime.Now
+            }).ToList();
+            ActionRunningTemp.MinimumRam = action.MinimumRam;
+            ActionRunningTemp.MinimumNumCores = action.MinimumNumCores;
+            await _redisInterfaceClient.ActionRunningAddAsync(ActionRunningTemp);
+            await _redisInterfaceClient.AddRelationAsync(actionPlan, ActionRunningTemp, "CONSISTS_OF");
+
+
+            //Add the InstanceRunning to redis
+            foreach (InstanceRunningModel runningInstance in ActionRunningTemp.Services)
+            {
+                await _redisInterfaceClient.InstanceRunningAddAsync(runningInstance);
+                await _redisInterfaceClient.AddRelationAsync(ActionRunningTemp, runningInstance, "CONSISTS_OF");
+
+                if (action.PlacementType == "CLOUD")
+                {
+                    CloudModel cloud = await _redisInterfaceClient.GetCloudByNameAsync(action.Placement);
+                    await _redisInterfaceClient.AddRelationAsync(runningInstance, cloud, "LOCATED_AT");
+                }
+                if (action.PlacementType == "EDGE")
+                {
+                    EdgeModel edge = await _redisInterfaceClient.GetEdgeByNameAsync(action.Placement);
+                    await _redisInterfaceClient.AddRelationAsync(runningInstance, edge, "LOCATED_AT");
+                }
+
+            }
+            
+        }
 
         return result != null;
     }
@@ -312,7 +362,7 @@ public class DeploymentService : IDeploymentService
             _logger.LogError(ex, "The deletion of the Action Plan has failed!");
             retVal = false;
         }
-
+        //actionPlan.SetStatus("inactive");
         return retVal;
     }
 

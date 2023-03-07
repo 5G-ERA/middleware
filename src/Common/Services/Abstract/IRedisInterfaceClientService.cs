@@ -168,4 +168,8 @@ public interface IRedisInterfaceClientService
 
     Task<List<ContainerImageModel>> ContainerImageGetForInstanceAsync(Guid id);
     Task<List<ContainerImageModel>> ContainerImageGetForInstanceAsync(Guid id, CancellationToken token);
+
+    Task<bool> ActionRunningAddAsync(ActionRunningModel actionRunning);
+
+    Task<bool> InstanceRunningAddAsync(InstanceRunningModel instanceRunning);
 }

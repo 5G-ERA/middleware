@@ -73,7 +73,7 @@ namespace Middleware.TaskPlanner.Controllers
                 if (dryRun)
                     return Ok(resourcePlan);
 
-                await _redisInterfaceClient.AddRelationAsync(robot2, resourcePlan, "OWNS");
+                await _redisInterfaceClient.AddRelationAsync(robot2, resourcePlan, "WANTS_TO_RUN");
 
                 await _actionPlanner.PublishPlanAsync(resourcePlan, robot2);
 
@@ -146,7 +146,7 @@ namespace Middleware.TaskPlanner.Controllers
                 if (dryRun) // Will skip the orchestrator if true (will not deploy the actual plan.)
                     return Ok(resourcePlan);
 
-                await _redisInterfaceClient.AddRelationAsync(robot2, resourcePlan, "OWNS");
+                await _redisInterfaceClient.AddRelationAsync(robot2, resourcePlan, "WANTS_TO_RUN");
 
                 await _actionPlanner.PublishPlanAsync(resourcePlan, robot2);
 

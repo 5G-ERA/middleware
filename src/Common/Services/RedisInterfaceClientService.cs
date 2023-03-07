@@ -512,5 +512,53 @@ namespace Middleware.Common.Services
                 throw;
             }
         }
+
+        public async Task<bool> ActionRunningAddAsync(ActionRunningModel actionRunning)
+        {
+            return await ActionRunningAddAsync(actionRunning, CancellationToken.None);
+        }
+
+        public async Task<bool> ActionRunningAddAsync(ActionRunningModel actionRunning, CancellationToken token)
+        {
+            if (actionRunning is null)
+                throw new ArgumentNullException(nameof(actionRunning));
+
+            string url = $"/api/v1/ActionRunning";
+            try
+            {
+                var result = await _httpClient.PostAsJsonAsync(url, JsonConvert.SerializeObject(actionRunning));
+
+                return result.IsSuccessStatusCode;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "There was en error while creating action plan: {plan}", actionRunning);
+                throw;
+            }
+        }
+
+        public async Task<bool> InstanceRunningAddAsync(InstanceRunningModel instanceRunning)
+        {
+            return await InstanceRunningAddAsync(instanceRunning, CancellationToken.None);
+        }
+
+        public async Task<bool> InstanceRunningAddAsync(InstanceRunningModel instanceRunning, CancellationToken token)
+        {
+            if (instanceRunning is null)
+                throw new ArgumentNullException(nameof(instanceRunning));
+
+            string url = $"/api/v1/InstanceRunning";
+            try
+            {
+                var result = await _httpClient.PostAsJsonAsync(url, JsonConvert.SerializeObject(instanceRunning));
+
+                return result.IsSuccessStatusCode;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "There was en error while creating action plan: {plan}", instanceRunning);
+                throw;
+            }
+        }
     }
 }
