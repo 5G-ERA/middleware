@@ -128,14 +128,15 @@ public class DeploymentService : IDeploymentService
     {
         var actionPlan = new ActionPlanModel(task.ActionPlanId, task.Name, task.ActionSequence, robotId);
         actionPlan.SetStatus("active");
-        RobotModel robot = await _redisInterfaceClient.RobotGetByIdAsync(robotId);
-        await _redisInterfaceClient.AddRelationAsync(robot, actionPlan, "OWNS");
+        RobotModel robot = await _redisInterfaceClient.RobotGetByIdAsync(robotId);   
         
         //Add the actionPlan to redis
         var result = await _redisInterfaceClient.ActionPlanAddAsync(actionPlan);
 
+        await _redisInterfaceClient.AddRelationAsync(robot, actionPlan, "OWNS");
+
         //Add the actionRunning to redis 
-        foreach(ActionModel action in task.ActionSequence)
+        foreach (ActionModel action in task.ActionSequence)
         {
             ActionRunningModel ActionRunningTemp = new ActionRunningModel();
             ActionRunningTemp.ActionPlanId = actionPlan.Id;
