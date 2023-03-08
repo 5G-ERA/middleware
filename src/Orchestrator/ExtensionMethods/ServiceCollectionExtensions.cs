@@ -13,6 +13,7 @@ public static class ServiceCollectionExtensions
     public static IServiceCollection RegisterRabbitMqConsumers(this IServiceCollection services,
         RabbitMqConfig mqConfig, MiddlewareConfig mwConfig)
     {
+        var routingKey = QueueHelpers.ConstructRoutingKey(mwConfig.InstanceName, mwConfig.InstanceType);
         services.AddMassTransit(x =>
         {
             services.AddScoped<DeployPlanConsumer>();
@@ -33,8 +34,9 @@ public static class ServiceCollectionExtensions
                         ec.Bind(nameof(DeployPlanMessage), b =>
                         {
                             b.ExchangeType = ExchangeType.Direct;
-                            b.RoutingKey = QueueHelpers.ConstructRoutingKey(mwConfig.InstanceName, mwConfig.InstanceType);
+                            b.RoutingKey = routingKey;
                         });
+                        ec.ConfigureConsumer<DeployPlanConsumer>(busRegistrationContext);
                     });
 
                 mqBusFactoryConfigurator.ConfigureEndpoints(busRegistrationContext);
