@@ -538,6 +538,37 @@ namespace Middleware.Common.Services
             }
         }
 
+        public async Task<ActionRunningModel> ActionRunningGetByIdAsync(Guid id)
+        {
+            return await ActionRunningGetByIdAsync(id, CancellationToken.None); 
+        }
+        
+        public async Task<ActionRunningModel> ActionRunningGetByIdAsync(Guid id, CancellationToken token)
+        {
+            if (id == default)
+                throw new ArgumentNullException(nameof(id));
+
+            string url = $"/api/v1/actionRunning/{id}";
+            try
+            {
+                var result = await _httpClient.GetAsync(url, token);
+
+                if (result.IsSuccessStatusCode == false)
+                {
+                    throw new InvalidOperationException();
+                }
+
+                var body = await result.Content.ReadAsStringAsync(token);
+                var action = JsonConvert.DeserializeObject<ActionRunningModel>(body);
+                return action;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "There was en error while calling for the action plan with id: {id}", id);
+                throw;
+            }
+        }
+
         public async Task<bool> InstanceRunningAddAsync(InstanceRunningModel instanceRunning)
         {
             return await InstanceRunningAddAsync(instanceRunning, CancellationToken.None);
@@ -584,6 +615,36 @@ namespace Middleware.Common.Services
             catch (Exception ex)
             {
                 _logger.LogError(ex, "There was en error while creating action plan: {plan}", historicalActionPlan);
+                throw;
+            }
+        }
+        public async Task<InstanceRunningModel> InstanceRunningGetByIdAsync(Guid id)
+        {
+            return await InstanceRunningGetByIdAsync(id, CancellationToken.None);
+        }
+
+        public async Task<InstanceRunningModel> InstanceRunningGetByIdAsync(Guid id, CancellationToken token)
+        {
+            if (id == default)
+                throw new ArgumentNullException(nameof(id));
+
+            string url = $"/api/v1/instanceRunning/{id}";
+            try
+            {
+                var result = await _httpClient.GetAsync(url, token);
+
+                if (result.IsSuccessStatusCode == false)
+                {
+                    throw new InvalidOperationException();
+                }
+
+                var body = await result.Content.ReadAsStringAsync(token);
+                var action = JsonConvert.DeserializeObject<InstanceRunningModel>(body);
+                return action;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "There was en error while calling for the action plan with id: {id}", id);
                 throw;
             }
         }

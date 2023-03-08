@@ -180,4 +180,13 @@ public interface IRedisInterfaceClientService
     Task<bool> HistoricalActionPlanAddAsync(HistoricalActionPlanModel historicalActionPlan);
 
     Task<bool> HistoricalActionPlanAddAsync(HistoricalActionPlanModel historicalActionPlan, CancellationToken token);
+
+    Task<ActionRunningModel> ActionRunningGetByIdAsync(Guid id);
+
+    Task<ActionRunningModel> ActionRunningGetByIdAsync(Guid id, CancellationToken token);
+
+    Task<InstanceRunningModel> InstanceRunningGetByIdAsync(Guid id);
+
+    Task<InstanceRunningModel> InstanceRunningGetByIdAsync(Guid id, CancellationToken token);
+
 }

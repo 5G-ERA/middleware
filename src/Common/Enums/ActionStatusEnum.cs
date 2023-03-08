@@ -4,6 +4,7 @@
     {
         Unknown,
         Running,
+        Finished,
         Idle,
         Off
     }

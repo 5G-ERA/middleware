@@ -10,6 +10,7 @@ using Middleware.Common.Services;
 using Middleware.Models.Domain;
 using Middleware.Orchestrator.Exceptions;
 using Middleware.Orchestrator.Models;
+using System;
 using System.Threading.Tasks;
 
 namespace Middleware.Orchestrator.Deployment;
@@ -127,6 +128,7 @@ public class DeploymentService : IDeploymentService
     /// <returns></returns>
     private async Task<bool> SaveActionSequence(TaskModel task, Guid robotId)
     {
+        //List<ActionRunningModel> actionsRunning = new List<ActionRunningModel>();
         var actionPlan = new ActionPlanModel(task.ActionPlanId, task.Id, task.Name, task.ActionSequence!, robotId);
         actionPlan.SetStatus("active");
         RobotModel robot = await _redisInterfaceClient.RobotGetByIdAsync(robotId);   
@@ -157,6 +159,7 @@ public class DeploymentService : IDeploymentService
             }).ToList();
             ActionRunningTemp.MinimumRam = action.MinimumRam;
             ActionRunningTemp.MinimumNumCores = action.MinimumNumCores;
+            //actionsRunning.Add(ActionRunningTemp); //Add the runningAction to the actionPlang
             await _redisInterfaceClient.ActionRunningAddAsync(ActionRunningTemp);
             await _redisInterfaceClient.AddRelationAsync(actionPlan, ActionRunningTemp, "CONSISTS_OF");
 
@@ -347,10 +350,39 @@ public class DeploymentService : IDeploymentService
         historicalActionPlan.IsReplan = actionPlan.IsReplan;
         historicalActionPlan.Name = actionPlan.Name;
         historicalActionPlan.RobotId = actionPlan.RobotId;
-        historicalActionPlan.LastStatusChange = actionPlan.LastStatusChange;
         historicalActionPlan.TaskId = actionPlan.TaskId;
-        historicalActionPlan.Status = actionPlan.Status;
+        historicalActionPlan.Status = ActionStatusEnum.Finished.ToString();
         historicalActionPlan.TaskStartedAt = actionPlan.TaskStartedAt;
+
+        var images = await _redisInterfaceClient.GetRelationAsync(actionPlan, "CONSISTS_OF");
+        foreach (RelationModel relation in images)
+        {
+            ActionRunningModel runningAction = await _redisInterfaceClient.ActionRunningGetByIdAsync(relation.PointsTo.Id);
+            var runningIntancesImages = await _redisInterfaceClient.GetRelationAsync(runningAction, "CONSISTS_OF");
+            foreach (RelationModel instanceRelation in runningIntancesImages)
+            {
+                InstanceRunningModel runningInstance = await _redisInterfaceClient.InstanceRunningGetByIdAsync(instanceRelation.PointsTo.Id);
+                runningAction.Services.Add(runningInstance);
+            }
+            
+            historicalActionPlan.ActionSequence.Add(runningAction);
+        }
+        /*
+        
+        foreach (RelationModel relation in images)
+        {
+            InstanceModel instance = await _redisInterfaceClient.InstanceGetByIdAsync(relation.PointsTo.Id);
+
+            if (CanBeReused(instance) && taskModel.ResourceLock)
+            {
+                var reusedInstance = await GetInstanceToReuse(instance, orchestratorApiClient);
+                if (reusedInstance is not null)
+                    instance = reusedInstance;
+            }
+            // add instance to actions
+            action.Services.Add(instance);
+        }
+
         historicalActionPlan.ActionSequence = actionPlan.ActionSequence.Select(x => new ActionRunningModel()
         {
             Name = x.Name,
@@ -373,6 +405,7 @@ public class DeploymentService : IDeploymentService
             }).ToList()
 
         }).ToList();
+        */
 
         // Publish to redis the historical action plan
         await _redisInterfaceClient.HistoricalActionPlanAddAsync(historicalActionPlan);

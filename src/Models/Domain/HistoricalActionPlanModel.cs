@@ -38,6 +38,9 @@ public sealed class HistoricalActionPlanModel : BaseModel
     [JsonPropertyName("TaskStartedAt")]
     public DateTime TaskStartedAt { get; set; }
 
+    [JsonPropertyName("CreationTime")]
+    public DateTime CreationTime { get; set; }
+
 
     public void SetStatus(string status)
     {
@@ -61,6 +64,7 @@ public sealed class HistoricalActionPlanModel : BaseModel
             ActionSequence = domain.ActionSequence,
             RobotId = domain.RobotId.ToString(),
             TaskStartedAt = domain.TaskStartedAt == default ? DateTimeOffset.Now : domain.TaskStartedAt,
+            CreationTime = domain.CreationTime == default ? DateTimeOffset.Now : domain.TaskStartedAt,
             PreviousPlanId = domain.PreviousPlanId.ToString()
         }; ;
     }

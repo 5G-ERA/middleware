@@ -27,6 +27,10 @@ public class HistoricalActionPlanDto : Dto
     public string RobotId { get; set; }
     [Indexed(Sortable = true)]
     public DateTimeOffset TaskStartedAt { get; set; }
+    [Indexed(Sortable = true)]
+    public DateTimeOffset CreationTime { get; set; }
+
+    
     [Indexed]
     public string PreviousPlanId { get; set; }
 
@@ -44,6 +48,7 @@ public override BaseModel ToModel()
             ActionSequence = dto.ActionSequence,
             RobotId = Guid.Parse(dto.RobotId),
             TaskStartedAt = dto.TaskStartedAt.DateTime,
+            CreationTime = dto.CreationTime.DateTime,
             PreviousPlanId = Guid.Parse(dto.PreviousPlanId)
         };
     }

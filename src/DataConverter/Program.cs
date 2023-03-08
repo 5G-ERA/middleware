@@ -3,6 +3,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging.Abstractions;
 using Middleware.Common.Config;
 using Middleware.DataAccess.Repositories;
+using Middleware.DataAccess.Repositories.Abstract;
 using Middleware.DataAccess.Repositories.Redis;
 using Middleware.Models.Domain;
 using Middleware.RedisInterface.Responses;
@@ -188,11 +189,12 @@ foreach (var actionPlan in actionPlans)
 
 #endregion
 
+
 #region relations
 Console.WriteLine("Writing Relations...");
-
+var historicalActionPlanRepository = new RedisHistoricalActionPlanRepository(clusterConnectionProvider, redisGraphClient, Serilog.Log.Logger);
 var dashboardService = new DashboardService(robotRepository, taskRepository, actionPlanRepository, edgeRepository,
-    cloudRepository, instanceRepository, actionRepository);
+    cloudRepository, instanceRepository, actionRepository, historicalActionPlanRepository);
 
 var relations = await dashboardService.GetAllRelationModelsAsync();
 
