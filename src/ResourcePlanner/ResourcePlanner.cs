@@ -69,12 +69,11 @@ public class ResourcePlanner : IResourcePlanner
                         instance = reusedInstance;
                 }
                 // add instance to actions
-                action.Services.Add(instance);
+                action.Services.Add(instance); 
             }
 
-            //Choose placement based on policy
-            // TODO: deploy only in the local MW
-            action.Placement = $"{_mwConfig.InstanceName}-{_mwConfig.InstanceType}"; //"local";//await InferResource(action, robot,false, new());
+            action.Placement = _mwConfig.InstanceName;
+            action.PlacementType = _mwConfig.InstanceType; 
         }
 
         return taskModel;
