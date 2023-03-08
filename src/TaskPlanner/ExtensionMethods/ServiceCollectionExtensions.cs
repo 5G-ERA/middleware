@@ -1,5 +1,6 @@
 ﻿using k8s.KubeConfigModels;
 using MassTransit;
+using MassTransit.Configuration;
 using MassTransit.RabbitMqTransport.Configuration;
 using Middleware.Common.Config;
 using Middleware.Common.MessageContracts;
@@ -16,9 +17,6 @@ public static class ServiceCollectionExtensions
         {
             x.UsingRabbitMq((busRegistrationContext, mqBusFactoryConfigurator) =>
             {
-                //mqBusFactoryConfigurator.SetKebabCaseEndpointNameFormatter();
-                mqBusFactoryConfigurator.ExchangeType = "direct";
-                mqBusFactoryConfigurator.Durable = true;
                 mqBusFactoryConfigurator.Host(mqConfig.Address, "/", hostConfig =>
                 {
                     hostConfig.Username(mqConfig.User);

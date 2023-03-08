@@ -1,5 +1,6 @@
 ﻿using MassTransit;
 using Middleware.Common.Config;
+using Middleware.Common.Helpers;
 using Middleware.Common.MessageContracts;
 using Middleware.Orchestrator.Handlers;
 using RabbitMQ.Client;
@@ -18,26 +19,23 @@ public static class ServiceCollectionExtensions
             x.AddConsumer<DeployPlanConsumer>();
             x.UsingRabbitMq((busRegistrationContext, mqBusFactoryConfigurator) =>
             {
-                //mqBusFactoryConfigurator.SetKebabCaseEndpointNameFormatter();
-                mqBusFactoryConfigurator.ExchangeType = "direct";
-                mqBusFactoryConfigurator.Durable = true;
                 mqBusFactoryConfigurator.Host(mqConfig.Address, "/", hostConfig =>
                 {
                     hostConfig.Username(mqConfig.User);
                     hostConfig.Password(mqConfig.Pass);
                 });
 
-                mqBusFactoryConfigurator.ReceiveEndpoint("deployments", ec =>
-                {
-                    ec.ConfigureConsumeTopology = false;
-                    ec.Bind(nameof(DeployPlanMessage), b =>
+                mqBusFactoryConfigurator.ReceiveEndpoint(
+                    QueueHelpers.ConstructDeploymentQueueName(mwConfig.Organization, mwConfig.InstanceName),
+                    ec =>
                     {
-                        b.RoutingKey = $"{mwConfig.InstanceName}-{mwConfig.InstanceType}";
-                        b.ExchangeType = ExchangeType.Direct;
+                        ec.ConfigureConsumeTopology = false;
+                        ec.Bind(nameof(DeployPlanMessage), b =>
+                        {
+                            b.ExchangeType = ExchangeType.Direct;
+                            b.RoutingKey = QueueHelpers.ConstructRoutingKey(mwConfig.InstanceName, mwConfig.InstanceType);
+                        });
                     });
-
-                    ec.ConfigureConsumer<DeployPlanConsumer>(busRegistrationContext);
-                });
 
                 mqBusFactoryConfigurator.ConfigureEndpoints(busRegistrationContext);
             });
