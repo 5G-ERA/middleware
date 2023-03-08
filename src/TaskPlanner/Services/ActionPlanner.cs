@@ -1,3 +1,4 @@
+using Middleware.Common.Helpers;
 using Middleware.Models.Domain;
 using Middleware.TaskPlanner.Exceptions;
 using KeyValuePair = Middleware.Models.Domain.KeyValuePair;
@@ -589,7 +590,12 @@ public class ActionPlanner : IActionPlanner
 
     public async Task PublishPlanAsync(TaskModel task, RobotModel robot)
     {
-        var location = task.ActionSequence.Select(a => a.Placement).Distinct().First();
+        var action = task.ActionSequence!.FirstOrDefault();
+
+        if (action == null)
+            return;
+        
+        var location = QueueHelpers.ConstructRoutingKey(action.Placement, action.PlacementType);
         var message = new DeployPlanMessage()
         {
             Task = task,
