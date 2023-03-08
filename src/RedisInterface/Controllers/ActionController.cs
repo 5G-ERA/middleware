@@ -15,13 +15,15 @@ namespace Middleware.RedisInterface.Controllers
         private readonly IActionPlanRepository _actionPlanRepository;
         private readonly ILogger _logger;
         private readonly IActionService _actionService;
+        private readonly IHistoricalActionPlanRepository _historicalActionPlanRepository;
 
-        public ActionController(IActionRepository actionRepository, IActionPlanRepository actionPlanRepository, ILogger<ActionController> logger, IActionService actionService)
+        public ActionController(IActionRepository actionRepository, IActionPlanRepository actionPlanRepository, ILogger<ActionController> logger, IActionService actionService, IHistoricalActionPlanRepository historicalActionPlanRepository)
         {
             _actionRepository = actionRepository ?? throw new ArgumentNullException(nameof(actionRepository));
             _actionPlanRepository = actionPlanRepository ?? throw new ArgumentNullException(nameof(actionPlanRepository));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             _actionService = actionService;
+            _historicalActionPlanRepository = historicalActionPlanRepository;
         }
 
         /// <summary>
@@ -465,7 +467,7 @@ namespace Middleware.RedisInterface.Controllers
                 return StatusCode(statusCode, new ApiResponse(statusCode, $"An error has occurred: {ex.Message}"));
             }
         }
-        #endregion
+        
 
         /// <summary>
         /// Get latest action plan given robot Id.
@@ -522,6 +524,255 @@ namespace Middleware.RedisInterface.Controllers
                 return StatusCode(statusCode, new ApiResponse(statusCode, $"An error has occurred: {ex.Message}"));
             }
         }
+        #endregion
+
+        #region HistoricalActionPlan
+
+        /// <summary>
+        /// Retrieves all HistoricalActionPlans
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet]
+        [Route("historicalPlan", Name = "HistoricalActionPlanGetAll")]
+        [ProducesResponseType(typeof(List<HistoricalActionPlanModel>), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.NotFound)]
+        [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.InternalServerError)]
+        public async Task<IActionResult> GetAllHistoricalActionPlansAsync()
+        {
+            try
+            {
+                var plans = await _historicalActionPlanRepository.GetAllAsync();
+                if (plans == null || plans.Any() == false)
+                {
+                    return NotFound(new ApiResponse((int)HttpStatusCode.NotFound, "No plans have been found."));
+                }
+                return Ok(plans);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An error occurred:");
+                int statusCode = (int)HttpStatusCode.InternalServerError;
+                return StatusCode(statusCode, new ApiResponse(statusCode, ex.Message));
+            }
+        }
+
+        /// <summary>
+        /// Retrieves an HistoricalActionPlan by id
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        [HttpGet]
+        [Route("historicalPlan/{id:guid}", Name = "HistoricalActionPlanGetById")]
+        [ProducesResponseType(typeof(HistoricalActionPlanModel), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.NotFound)]
+        [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.InternalServerError)]
+        public async Task<IActionResult> GetHistoricalActionPlanByIdAsync(Guid id)
+        {
+            try
+            {
+                var plan = await _historicalActionPlanRepository.GetByIdAsync(id);
+                if (plan == null)
+                {
+                    return NotFound(new ApiResponse((int)HttpStatusCode.NotFound, "Specified plan was not found."));
+                }
+                return Ok(plan);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An error occurred:");
+                int statusCode = (int)HttpStatusCode.InternalServerError;
+                return StatusCode(statusCode, new ApiResponse(statusCode, ex.Message));
+            }
+        }
+
+        /// <summary>
+        /// Creates new HistoricalActionPlan
+        /// </summary>
+        /// <param name="historicalActionPlan"></param>
+        /// <returns></returns>
+        [HttpPost]
+        [Route("historicalPlan", Name = "HistoricalActionPlanAdd")]
+        [ProducesResponseType(typeof(HistoricalActionPlanModel), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.BadRequest)]
+        [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.InternalServerError)]
+        public async Task<IActionResult> AddHistoricalActionPlanAsync(HistoricalActionPlanModel historicalActionPlan)
+        {
+            try
+            {
+                if (historicalActionPlan == null)
+                {
+                    return BadRequest(new ApiResponse((int)HttpStatusCode.BadRequest, "Historical plan cannot be null"));
+                }
+                var plan = await _historicalActionPlanRepository.AddAsync(historicalActionPlan, () => historicalActionPlan.Id);
+                if (plan == null)
+                {
+                    return BadRequest(new ApiResponse((int)HttpStatusCode.BadRequest, "The specified historical plan has not been added."));
+                }
+                return Ok(plan);
+            }
+            catch (Exception ex)
+            {
+                int statusCode = (int)HttpStatusCode.InternalServerError;
+                _logger.LogError(ex, "An error occurred:");
+                return StatusCode(statusCode, new ApiResponse(statusCode, $"An error has occurred: {ex.Message}"));
+            }
+        }
+
+        /// <summary>
+        /// Delete HistoricalActionPlan by id
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        [HttpDelete]
+        [Route("HistoricalPlan/{id}", Name = "HistoricalActionPlanDelete")]
+        [ProducesResponseType(typeof(void), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.NotFound)]
+        [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.InternalServerError)]
+        public async Task<IActionResult> DeleteHistoricalActionPlanAsync(Guid id)
+        {
+            try
+            {
+                var deleted = await _historicalActionPlanRepository.DeleteByIdAsync(id);
+                if (deleted == false)
+                {
+                    return NotFound(new ApiResponse((int)HttpStatusCode.NotFound, "The specified historical plan has not been found."));
+                }
+                return Ok();
+            }
+            catch (Exception ex)
+            {
+                int statusCode = (int)HttpStatusCode.InternalServerError;
+                _logger.LogError(ex, "An error occurred:");
+                return StatusCode(statusCode, new ApiResponse(statusCode, $"An error has occurred: {ex.Message}"));
+            }
+        }
+
+        /// <summary>
+        /// Patches an existing ActionPlan by id
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="historicalActionPlan"></param>
+        /// <returns></returns>
+        [HttpPut]
+        [Route("plan/{id:guid}", Name = "ActionPlanPatch")]
+        [ProducesResponseType(typeof(void), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.NotFound)]
+        [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.BadRequest)]
+        [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.InternalServerError)]
+        public async Task<IActionResult> PatchHistoricalActionPlanAsync(Guid id, [FromBody] HistoricalActionPlanModel historicalActionPlan)
+        {
+            try
+            {
+                if (historicalActionPlan == null || id == Guid.Empty)
+                {
+                    return BadRequest(new ApiResponse((int)HttpStatusCode.BadRequest, "Id or updated object has not been specified"));
+                }
+                var deleted = await _historicalActionPlanRepository.DeleteByIdAsync(id);
+                if (deleted == false)
+                {
+                    return NotFound(new ApiResponse((int)HttpStatusCode.NotFound, "The specified plan has not been found."));
+                }
+
+                var updatedPlan = await _historicalActionPlanRepository.AddAsync(historicalActionPlan, () => id);
+                return Ok(updatedPlan);
+            }
+            catch (Exception ex)
+            {
+                int statusCode = (int)HttpStatusCode.InternalServerError;
+                _logger.LogError(ex, "An error occurred:");
+                return StatusCode(statusCode, new ApiResponse(statusCode, $"An error has occurred: {ex.Message}"));
+            }
+        }
+
+        /// <summary>
+        /// Get historical action plan given robot Id.
+        /// </summary>
+        /// <returns>List<historicalActionPlans></returns>
+        [HttpGet]
+        [Route("historicalPlan/robot/{robotId}", Name = "GetHistoricalActionPlanByRobotIdAsync")]
+        [ProducesResponseType(typeof(List<HistoricalActionPlanModel>), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.NotFound)]
+        [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.InternalServerError)]
+        public async Task<IActionResult> GetHistoricalActionPlanByRobotIdAsync(Guid robotId)
+        {
+            try
+            {
+                if (robotId == Guid.Empty)
+                {
+                    return BadRequest(new ApiResponse((int)HttpStatusCode.BadRequest, "Robot id has not been specified"));
+                }
+                // Get list of actionPlans from specific robotId.
+                List<HistoricalActionPlanModel> historicalActionPlans = await _historicalActionPlanRepository.GetRobotActionPlans(robotId);
+                if (historicalActionPlans == null)
+                {
+                    return NotFound(new ApiResponse((int)HttpStatusCode.NotFound, "Object was not found."));
+                }
+                return Ok(historicalActionPlans);
+            }
+            catch (Exception ex)
+            {
+                int statusCode = (int)HttpStatusCode.InternalServerError;
+                _logger.LogError(ex, "An error occurred:");
+                return StatusCode(statusCode, new ApiResponse(statusCode, $"An error has occurred: {ex.Message}"));
+            }
+        }
+
+        /// <summary>
+        /// Get latest historical action plan given robot Id.
+        /// </summary>
+        /// <returns>List<ActionPlanModel></returns>
+        [HttpGet]
+        [Route("Historicalplan/robot/{robotId}/latest", Name = "GetLatestHistoricalActionPlanByRobotIdAsync")]
+        [ProducesResponseType(typeof(HistoricalActionPlanModel), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.NotFound)]
+        [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.InternalServerError)]
+        public async Task<IActionResult> GetLatestHistoricalActionPlanByRobotIdAsync(Guid robotId)
+        {
+            try
+            {
+                if (robotId == Guid.Empty)
+                {
+                    return BadRequest(new ApiResponse((int)HttpStatusCode.BadRequest, "Robot id has not been specified"));
+                }
+                // Get list of actionPlans from specific robotId.
+                List<HistoricalActionPlanModel> actionPlans = await _historicalActionPlanRepository.GetRobotActionPlans(robotId);
+
+                //Get the newest task of robot.
+                Dictionary<HistoricalActionPlanModel, DateTime> tempDic = new Dictionary<HistoricalActionPlanModel, DateTime>();
+                Dictionary<HistoricalActionPlanModel, DateTime> OrderedTempDic = new Dictionary<HistoricalActionPlanModel, DateTime>();
+
+                // Complete tempDic
+                foreach (HistoricalActionPlanModel plan in actionPlans)
+                {
+                    DateTime d;
+                    DateTime.TryParseExact(plan.Status, "ggyyyy$dd-MMM (dddd)", System.Globalization.CultureInfo.InvariantCulture, System.Globalization.DateTimeStyles.None, out d);
+                    tempDic.Add(plan, d);
+                }
+
+                // Order a new dictionary
+                foreach (KeyValuePair<HistoricalActionPlanModel, DateTime> pair in tempDic.OrderByDescending(p => p.Value))
+                {
+                    OrderedTempDic.Add(pair.Key, pair.Value);
+                }
+
+                // Get last item which is the latest plan.
+                HistoricalActionPlanModel last = OrderedTempDic.Keys.First();
+
+                if (actionPlans == null)
+                {
+                    return NotFound(new ApiResponse((int)HttpStatusCode.NotFound, "Object was not found."));
+                }
+                return Ok(last);
+            }
+            catch (Exception ex)
+            {
+                int statusCode = (int)HttpStatusCode.InternalServerError;
+                _logger.LogError(ex, "An error occurred:");
+                return StatusCode(statusCode, new ApiResponse(statusCode, $"An error has occurred: {ex.Message}"));
+            }
+        }
+
+        #endregion
 
     }
 }

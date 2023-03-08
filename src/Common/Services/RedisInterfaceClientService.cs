@@ -561,5 +561,31 @@ namespace Middleware.Common.Services
                 throw;
             }
         }
+
+        public async Task<bool> HistoricalActionPlanAddAsync(HistoricalActionPlanModel historicalActionPlan)
+        {
+            return await HistoricalActionPlanAddAsync(historicalActionPlan, CancellationToken.None);
+        }
+
+        public async Task<bool> HistoricalActionPlanAddAsync(HistoricalActionPlanModel historicalActionPlan, CancellationToken token)
+        {
+            if (historicalActionPlan is null)
+                throw new ArgumentNullException(nameof(historicalActionPlan));
+
+            string url = $"/api/v1/Action/historicalPlan";
+            try
+            {
+                var result = await _httpClient.PostAsJsonAsync(url, historicalActionPlan);
+                //var resp = result.
+                var response = await result.Content.ReadAsStringAsync();
+                _logger.LogInformation("httpResponse: {0}", response);
+                return result.IsSuccessStatusCode;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "There was en error while creating action plan: {plan}", historicalActionPlan);
+                throw;
+            }
+        }
     }
 }

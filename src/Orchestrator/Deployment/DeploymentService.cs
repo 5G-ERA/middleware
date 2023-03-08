@@ -10,6 +10,7 @@ using Middleware.Common.Services;
 using Middleware.Models.Domain;
 using Middleware.Orchestrator.Exceptions;
 using Middleware.Orchestrator.Models;
+using System.Threading.Tasks;
 
 namespace Middleware.Orchestrator.Deployment;
 
@@ -144,7 +145,7 @@ public class DeploymentService : IDeploymentService
             ActionRunningTemp.Name = action.Name;
             ActionRunningTemp.Tags = action.Tags;
             ActionRunningTemp.Order = action.Order;
-            ActionRunningTemp.Placement = action.Placement;
+            ActionRunningTemp.Placement = action.Placement.Replace("-Edge","").Replace("-Cloud",""); // Trim to proper edge or cloud
             ActionRunningTemp.PlacementType = action.PlacementType;
             ActionRunningTemp.ActionPriority = action.ActionPriority;
             ActionRunningTemp.ActionStatus = ActionStatusEnum.Running.ToString();
@@ -337,6 +338,45 @@ public class DeploymentService : IDeploymentService
     /// <inheritdoc/>
     public async Task<bool> DeletePlanAsync(ActionPlanModel actionPlan)
     {
+        // Delete OWNS relationship between robot and actionPlan
+        RobotModel robot = await _redisInterfaceClient.RobotGetByIdAsync(actionPlan.RobotId);
+        await _redisInterfaceClient.DeleteRelationAsync(robot, actionPlan, "OWNS");
+
+        // Create historical action plan
+        HistoricalActionPlanModel historicalActionPlan = new HistoricalActionPlanModel();
+        historicalActionPlan.IsReplan = actionPlan.IsReplan;
+        historicalActionPlan.Name = actionPlan.Name;
+        historicalActionPlan.RobotId = actionPlan.RobotId;
+        historicalActionPlan.LastStatusChange = actionPlan.LastStatusChange;
+        historicalActionPlan.TaskId = actionPlan.TaskId;
+        historicalActionPlan.Status = actionPlan.Status;
+        historicalActionPlan.TaskStartedAt = actionPlan.TaskStartedAt;
+        historicalActionPlan.ActionSequence = actionPlan.ActionSequence.Select(x => new ActionRunningModel()
+        {
+            Name = x.Name,
+            ActionParentId = x.Id,
+            ActionPlanId = actionPlan.Id,
+            Tags = x.Tags,
+            Order = x.Order,
+            Placement = x.Placement,
+            PlacementType = x.PlacementType,
+            ActionPriority = x.ActionPriority,
+            ActionStatus = x.ActionStatus,
+            Services = x.Services.Select(y => new InstanceRunningModel()
+            {
+                Name = y.Name,
+                ServiceInstanceId = y.ServiceInstanceId,
+                ServiceType = y.ServiceType,
+                ServiceUrl = y.ServiceUrl,
+                ServiceStatus = y.ServiceStatus,
+                
+            }).ToList()
+
+        }).ToList();
+
+        // Publish to redis the historical action plan
+        await _redisInterfaceClient.HistoricalActionPlanAddAsync(historicalActionPlan);
+
         bool retVal = true;
         try
         {
@@ -363,7 +403,8 @@ public class DeploymentService : IDeploymentService
             _logger.LogError(ex, "The deletion of the Action Plan has failed!");
             retVal = false;
         }
-        //actionPlan.SetStatus("inactive");
+
+        //Delete actionPlan
         return retVal;
     }
 
@@ -402,7 +443,7 @@ public class DeploymentService : IDeploymentService
                 // ignored
             }
         }
-
+        // TODO: add the removing of the relationships and the bubbles.
 
         return retVal;
     }

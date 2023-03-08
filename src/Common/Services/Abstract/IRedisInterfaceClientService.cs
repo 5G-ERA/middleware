@@ -171,5 +171,13 @@ public interface IRedisInterfaceClientService
 
     Task<bool> ActionRunningAddAsync(ActionRunningModel actionRunning);
 
+    Task<bool> ActionRunningAddAsync(ActionRunningModel actionRunning, CancellationToken token);
+
     Task<bool> InstanceRunningAddAsync(InstanceRunningModel instanceRunning);
+
+    Task<bool> InstanceRunningAddAsync(InstanceRunningModel instanceRunning, CancellationToken token);
+
+    Task<bool> HistoricalActionPlanAddAsync(HistoricalActionPlanModel historicalActionPlan);
+
+    Task<bool> HistoricalActionPlanAddAsync(HistoricalActionPlanModel historicalActionPlan, CancellationToken token);
 }
