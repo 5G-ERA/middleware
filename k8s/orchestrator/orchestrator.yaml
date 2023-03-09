@@ -49,5 +49,5 @@ spec:
           value: Middleware-BB # to be replaced with real value
         - name: Middleware__InstanceType
           value: Edge # to be replaced with real value
-        - name: CENTRAL_API_ADDRESS
+        - name: CENTRAL_API_HOSTNAME
           value: central.api

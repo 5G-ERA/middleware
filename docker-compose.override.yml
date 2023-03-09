@@ -35,7 +35,7 @@ services:
       - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
       - REDIS_HOSTNAME=${REDIS_HOSTNAME}
       - REDIS_PORT=${REDIS_PORT}
-      - CENTRAL_API_ADDRESS=central.api
+      - CENTRAL_API_HOSTNAME=central.api
       - Middleware__Organization=5G-ERA-DEV
       - Middleware__InstanceName=MiddlewareBED 
       - Middleware__InstanceType=Edge
