@@ -4,16 +4,16 @@ services:
   redisinterface:
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
-      - ASPNETCORE_URLS=https://+:443;http://+:80      
+      - ASPNETCORE_URLS=https://+:443;http://+:80
       - ASPNETCORE_HTTPS_PORT=7091
       #- ASPNETCORE_Kestrel__Certificates__Default__Password=ros
       #- ASPNETCORE_Kestrel__Certificates__Default__Path=/https/aspnetapp.pfx
       - REDIS_HOSTNAME=${REDIS_HOSTNAME}
       - REDIS_PORT=${REDIS_PORT}
       - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
-      - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}      
+      - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
       - Middleware__Organization=5G-ERA-DEV
-      - Middleware__InstanceName=MiddlewareBED 
+      - Middleware__InstanceName=MiddlewareBED
       - Middleware__InstanceType=Edge
     ports:
       - "5091:80"
@@ -37,7 +37,7 @@ services:
       - REDIS_PORT=${REDIS_PORT}
       - CENTRAL_API_HOSTNAME=central.api
       - Middleware__Organization=5G-ERA-DEV
-      - Middleware__InstanceName=MiddlewareBED 
+      - Middleware__InstanceName=MiddlewareBED
       - Middleware__InstanceType=Edge
 
     ports:
@@ -58,7 +58,7 @@ services:
       - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
       - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
       - Middleware__Organization=5G-ERA-DEV
-      - Middleware__InstanceName=MiddlewareBED 
+      - Middleware__InstanceName=MiddlewareBED
       - Middleware__InstanceType=Edge
     ports:
       - "5143:80"
@@ -76,7 +76,7 @@ services:
       - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
       - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
       - Middleware__Organization=5G-ERA-DEV
-      - Middleware__InstanceName=MiddlewareBED 
+      - Middleware__InstanceName=Middleware-BB
       - Middleware__InstanceType=Edge
     ports:
       - "5263:80"
@@ -100,7 +100,7 @@ services:
     volumes:
       - ${APPDATA}/Microsoft/UserSecrets:/root/.microsoft/usersecrets:ro
       - ${APPDATA}/ASP.NET/Https:/root/.aspnet/https:ro
-        
+
   centralapi:
 
     environment:
