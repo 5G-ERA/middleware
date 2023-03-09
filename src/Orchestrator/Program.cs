@@ -1,5 +1,7 @@
 using System.Net;
 using System.Net.Http.Headers;
+using Middleware.CentralApi.Contracts.Requests;
+using Middleware.CentralApi.Sdk;
 using Middleware.Common.Config;
 using Middleware.Common.ExtensionMethods;
 using Middleware.DataAccess.ExtensionMethods;
@@ -20,7 +22,11 @@ builder.RegisterSecretsManager();
 builder.ConfigureLogger();
 
 var mwConfig = builder.Configuration.GetSection(MiddlewareConfig.ConfigName).Get<MiddlewareConfig>();
-
+var centralApiHostname = Environment.GetEnvironmentVariable("CENTRAL_API_HOSTNAME");
+if (centralApiHostname is null)
+{
+    throw new ArgumentException("Environment variable not defined: CENTRAL_API_HOSTNAME", "CENTRAL_API_HOSTNAME");
+}
 builder.Host.ConfigureAppConfiguration((hostingContext, _) =>
 {
     AppConfig.AppConfiguration = hostingContext.HostingEnvironment.EnvironmentName;
@@ -43,20 +49,34 @@ var rabbitmqConfig = builder.Configuration.GetSection(RabbitMqConfig.ConfigName)
 
 builder.Services.RegisterRabbitMqConsumers(rabbitmqConfig, mwConfig)
     .ConfigureAutoMapper();
-
 builder.Services.AddHttpClient(AppConfig.OsmApiClientName);
 builder.Services.AddScoped<IApiClientBuilder, ApiClientBuilder>();
 builder.Services.AddScoped<IKubernetesBuilder, KubernetesBuilder>();
 builder.Services.AddScoped<IDeploymentService, DeploymentService>();
 builder.Services.AddScoped<INetAppStatusRepository, RedisNetAppStatusRepository>();
 builder.Services.AddScoped<IRobotStatusRepository, RedisRobotStatusRepository>();
-
 builder.Services.AddHttpClient("healthCheckClient");
 
 builder.Services.RegisterQuartzJobs();
 
-var app = builder.Build();
+builder.Services.AddCentralApiClient(centralApiHostname, mwConfig.Organization);
 
+var app = builder.Build();
+using (var scope = app.Services.CreateScope())
+{
+    var centralApiClient = scope.ServiceProvider.GetService<ICentralApiClient>();
+    var request = new RegisterRequest()
+    {
+        Name = mwConfig.InstanceName,
+        Organization = mwConfig.Organization,
+        Type = mwConfig.InstanceType
+    };
+    var result = await centralApiClient!.RegisterLocation(request);
+    if (result is null)
+    {
+        throw new Exception("Cannot register at centralAPI");
+    }
+}
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {

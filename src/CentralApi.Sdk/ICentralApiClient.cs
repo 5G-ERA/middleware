@@ -9,14 +9,14 @@ public interface ICentralApiClient
     /// Gets all available (online) Middleware locations  
     /// </summary>
     /// <returns></returns>
-    Task<LocationsResponse> GetAvailableLocations();
+    Task<LocationsResponse?> GetAvailableLocations();
 
     /// <summary>
     /// Sets specified location available (online) to be communicated to 
     /// </summary>
     /// <param name="request"></param>
     /// <returns></returns>
-    Task<LocationResponse> RegisterLocation(RegisterRequest request);
+    Task<LocationResponse?> RegisterLocation(RegisterRequest request);
 
     /// <summary>
     /// Sets specified location unavailable (offline)

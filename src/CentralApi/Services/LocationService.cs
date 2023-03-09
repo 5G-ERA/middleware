@@ -50,6 +50,7 @@ public class LocationService : ILocationService
                 Organization = edge.Organization,
                 Type = Enum.Parse<LocationType>(edge.Type)
             };
+            await _edgeRepository.AddAsync(edge);
             return result;
         }
         else  // make it online & return info about location based on matched cloud
@@ -62,6 +63,7 @@ public class LocationService : ILocationService
                 Organization = cloud.Organization,
                 Type = Enum.Parse<LocationType>(cloud.Type)
             };
+            await _cloudRepository.AddAsync(cloud);
             return result;
         }
 
