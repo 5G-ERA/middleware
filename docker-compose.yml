@@ -9,6 +9,8 @@ services:
       dockerfile: src/RedisInterface/Dockerfile
     networks: 
       - middleware
+    depends_on:
+      - centralapi
 
   orchestrator:
     container_name: orchestrator.api
@@ -18,7 +20,8 @@ services:
       dockerfile: src/Orchestrator/Dockerfile
     networks: 
       - middleware
-
+    depends_on:
+      - centralapi
 
   taskplanner:
     container_name: taskplanner.api
@@ -28,7 +31,8 @@ services:
       dockerfile: src/TaskPlanner/Dockerfile
     networks: 
       - middleware
-
+    depends_on:
+      - centralapi
 
   resourceplanner:
     container_name: resourceplanner.api
@@ -38,7 +42,8 @@ services:
       dockerfile: src/ResourcePlanner/Dockerfile
     networks: 
       - middleware
-
+    depends_on:
+      - centralapi
 
   ocelotgateway:
     container_name: ocelotgateway.api
@@ -48,10 +53,23 @@ services:
       dockerfile: src/OcelotGateway/Dockerfile
     networks: 
       - middleware
-
-
+    depends_on:
+      - centralapi
+  
+  centralapi:
+    container_name: central.api
+    image: ${DOCKER_REGISTRY-}centralapi
+    build:
+      context: .
+      dockerfile: src/CentralApi/Dockerfile
+    networks:
+      - middleware
+    
+      
 networks:
      middleware:
        driver: bridge
        name: middleware_network
 
+
+  
