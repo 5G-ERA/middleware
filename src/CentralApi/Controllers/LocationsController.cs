@@ -29,6 +29,7 @@ public class LocationsController : Controller
         {
             return BadRequest(new ApiResponse((int)HttpStatusCode.BadRequest, $"Organization was not specified"));
         }
+
         var result = await _locationService.GetAvailableLocations(organization);
 
         return result.Match<IActionResult>(
