@@ -1,4 +1,5 @@
-﻿using System.Net.Http.Json;
+﻿using System.Net;
+using System.Net.Http.Json;
 using System.Web;
 using Microsoft.Extensions.Logging;
 using Middleware.Common.Config;
@@ -98,10 +99,8 @@ namespace Middleware.Common.Services
             {
                 var result = await _httpClient.GetAsync(url, token);
 
-                if (result.IsSuccessStatusCode == false)
-                {
-                    throw new InvalidOperationException();
-                }
+                if (result.StatusCode == HttpStatusCode.NotFound)
+                    return null;
 
                 var body = await result.Content.ReadAsStringAsync(token);
                 ActionPlanModel actionPlan = JsonConvert.DeserializeObject<ActionPlanModel>(body);
@@ -155,8 +154,10 @@ namespace Middleware.Common.Services
             string url = $"/api/v1/Action/plan";
             try
             {
-                var result = await _httpClient.PostAsJsonAsync(url, JsonConvert.SerializeObject(actionPlan));
-
+                var result = await _httpClient.PostAsJsonAsync(url, actionPlan);
+                //var resp = result.
+                var response = await result.Content.ReadAsStringAsync();
+                _logger.LogInformation("httpResponse: {0}", response);
                 return result.IsSuccessStatusCode;
             }
             catch (Exception ex)
