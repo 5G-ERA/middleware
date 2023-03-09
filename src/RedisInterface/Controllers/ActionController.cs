@@ -654,7 +654,7 @@ namespace Middleware.RedisInterface.Controllers
         /// <param name="historicalActionPlan"></param>
         /// <returns></returns>
         [HttpPut]
-        [Route("plan/{id:guid}", Name = "ActionPlanPatch")]
+        [Route("historicalPlan/{id:guid}", Name = "HistoricalActionPlanPatch")]
         [ProducesResponseType(typeof(void), (int)HttpStatusCode.OK)]
         [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.NotFound)]
         [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.BadRequest)]
@@ -722,7 +722,7 @@ namespace Middleware.RedisInterface.Controllers
         /// </summary>
         /// <returns>List<ActionPlanModel></returns>
         [HttpGet]
-        [Route("Historicalplan/robot/{robotId}/latest", Name = "GetLatestHistoricalActionPlanByRobotIdAsync")]
+        [Route("HistoricalPlan/robot/{robotId}/latest", Name = "GetLatestHistoricalActionPlanByRobotIdAsync")]
         [ProducesResponseType(typeof(HistoricalActionPlanModel), (int)HttpStatusCode.OK)]
         [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.NotFound)]
         [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.InternalServerError)]
