@@ -297,7 +297,7 @@ namespace Middleware.RedisInterface.Controllers
                 {
                     return NotFound(new ApiResponse((int)HttpStatusCode.NotFound, $"Container Image for instance with id: '{id}' has not ben found"));
                 }
-                return Ok(images);
+                return Ok(images.ToContainersResponse());
             }
             catch (Exception ex)
             {

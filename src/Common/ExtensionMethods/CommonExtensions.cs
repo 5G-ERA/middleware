@@ -7,7 +7,6 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Middleware.Common.Config;
-using Middleware.Common.Services;
 
 namespace Middleware.Common.ExtensionMethods;
 
@@ -16,15 +15,6 @@ public static class CommonExtensions
     public static IServiceCollection RegisterCommonServices(this IServiceCollection services)
     {
         services.AddSingleton<IEnvironment, MiddlewareEnvironment>();
-
-        services.AddHttpClient(AppConfig.RedisApiClientName, (a) =>
-        {
-            a.BaseAddress = new Uri(Environment.GetEnvironmentVariable("REDIS_INTERFACE_ADDRESS"));
-            a.DefaultRequestHeaders.Accept.Add(
-                new MediaTypeWithQualityHeaderValue("application/json"));
-        });
-        services.AddScoped<IRedisInterfaceClientService, RedisInterfaceClientService>();
-
 
         return services;
     }
