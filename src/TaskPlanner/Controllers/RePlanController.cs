@@ -4,7 +4,8 @@ using Microsoft.AspNetCore.Mvc;
 using Middleware.TaskPlanner.ApiReference;
 using Middleware.Common.Responses;
 using Middleware.Models.Domain;
-using Middleware.Common.Services;
+using Middleware.RedisInterface.Contracts.Mappings;
+using Middleware.RedisInterface.Sdk;
 using Middleware.TaskPlanner.Contracts.Requests;
 using Middleware.TaskPlanner.Services;
 
@@ -19,9 +20,9 @@ namespace Middleware.TaskPlanner.Controllers
         private readonly IMapper _mapper;
         private readonly ResourcePlanner.ResourcePlannerApiClient _resourcePlannerClient;
         private readonly Orchestrator.OrchestratorApiClient _orchestratorClient;
-        private readonly IRedisInterfaceClientService _redisInterfaceClient;
+        private readonly IRedisInterfaceClient _redisInterfaceClient;
 
-        public RePlanController(IActionPlanner actionPlanner, IApiClientBuilder builder, IMapper mapper, IRedisInterfaceClientService redisInterfaceClient)
+        public RePlanController(IActionPlanner actionPlanner, IApiClientBuilder builder, IMapper mapper, IRedisInterfaceClient redisInterfaceClient)
         {
             _redisInterfaceClient = redisInterfaceClient;
             _actionPlanner = actionPlanner;
@@ -45,7 +46,7 @@ namespace Middleware.TaskPlanner.Controllers
                 bool CompleteReplan = inputModel.CompleteReplan; // The robot wants a partial or complete replan.
                 List<DialogueModel> tempDialog = inputModel.Questions;
 
-                TaskModel tempOldTaskModel = await _redisInterfaceClient.TaskGetByIdAsync(oldTask);
+                TaskModel tempOldTaskModel = (await _redisInterfaceClient.TaskGetByIdAsync(oldTask)).ToTask();
 
                 //Adding the old plan to the old -tempOldTaskModel-
                 ActionPlanModel oldPlanModel = await _redisInterfaceClient.GetLatestActionPlanByRobotIdAsync(robotId);
@@ -96,8 +97,8 @@ namespace Middleware.TaskPlanner.Controllers
                     BaseModel location;
                     //TODO: recognize by type PlacementType property
                     location = action.Placement.ToLower().Contains("cloud")
-                        ? await _redisInterfaceClient.GetCloudByNameAsync(action.Placement)
-                        : await _redisInterfaceClient.GetEdgeByNameAsync(action.Placement);
+                        ? (await _redisInterfaceClient.GetCloudByNameAsync(action.Placement)).ToCloud()
+                        : (await _redisInterfaceClient.GetEdgeByNameAsync(action.Placement)).ToEdge();
 
                     foreach (InstanceModel instance in action.Services)
                     {

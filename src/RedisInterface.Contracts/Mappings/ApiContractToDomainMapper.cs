@@ -158,6 +158,25 @@ public static class ApiContractToDomainMapper
             RosTopicsSub = x.RosTopicSubscribers.ToList()
         };
     }
+    public static InstanceModel ToInstance(this InstanceResponse x)
+    {
+        return new InstanceModel()
+        {
+            Id = x.Id,
+            Name = x.Name,
+            InstanceFamily = x.Family,
+            ServiceType = x.Type,
+            IsReusable = x.IsReusable,
+            MinimumRam = x.MinimumRam,
+            MinimumNumCores = x.MinimumNumOfCores,
+            RosVersion = x.RosVersion,
+            ROSDistro = x.RosDistro,
+            RosTopicsPub = x.RosTopicPublishers.ToList(),
+            RosTopicsSub = x.RosTopicSubscribers.ToList(),
+            Tags = x.Tags?.ToList(),
+            OnboardedTime = x.OnboardedTime
+        };
+    }
 
     public static PolicyModel ToPolicy(this PolicyRequest x)
     {

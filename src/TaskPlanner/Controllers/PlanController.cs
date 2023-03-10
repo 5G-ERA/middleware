@@ -3,7 +3,7 @@ using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 using Middleware.Common.Responses;
 using Middleware.Models.Domain;
-using Middleware.Common.Services;
+using Middleware.RedisInterface.Sdk;
 using Middleware.TaskPlanner.ApiReference;
 using Middleware.TaskPlanner.Contracts.Requests;
 using Middleware.TaskPlanner.Services;
@@ -18,11 +18,11 @@ namespace Middleware.TaskPlanner.Controllers
         private readonly IMapper _mapper;
         private readonly ResourcePlanner.ResourcePlannerApiClient _resourcePlannerClient;
         private readonly Orchestrator.OrchestratorApiClient _orchestratorClient;
-        private readonly IRedisInterfaceClientService _redisInterfaceClient;
+        private readonly IRedisInterfaceClient _redisInterfaceClient;
 
 
         public PlanController(IActionPlanner actionPlanner, IApiClientBuilder builder,
-            IRedisInterfaceClientService redisInterfaceClient, IMapper mapper)
+            IRedisInterfaceClient redisInterfaceClient, IMapper mapper)
         {
             _actionPlanner = actionPlanner;
             _mapper = mapper;

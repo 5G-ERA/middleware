@@ -1,8 +1,7 @@
-using System.Net.Http.Headers;
 using Middleware.Common.Config;
 using Middleware.Common.ExtensionMethods;
 using Middleware.Common.MessageContracts;
-using Middleware.Common.Services;
+using Middleware.RedisInterface.Sdk;
 using Middleware.TaskPlanner.ApiReference;
 using Middleware.TaskPlanner.Config;
 using Middleware.TaskPlanner.ExtensionMethods;
@@ -28,6 +27,7 @@ builder.Services.AddHttpClient("healthCheckClient");
 builder.Services.AddHttpClient("resourcePlannerApiClient");
 builder.Services.AddHttpClient("orchestratorApiClient");
 builder.Services.RegisterCommonServices();
+builder.Services.AddRedisInterfaceClient();
 builder.Services.AddScoped<IApiClientBuilder, ApiClientBuilder>();
 builder.Services.AddScoped<IActionPlanner, ActionPlanner>();
 builder.Services.AddScoped<IPublisher<DeployPlanMessage>, DeployPlanMessagePublisher>();
