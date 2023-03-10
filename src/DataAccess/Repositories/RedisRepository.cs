@@ -249,7 +249,10 @@ namespace Middleware.DataAccess.Repositories
         public virtual async Task<bool> AddGraphAsync(GraphEntityModel model)
         {
             model.Type = _entityName;
-
+            if (await ObjectExistsOnGraph(model))
+            {
+                return true;
+            }
             string query = "CREATE (x: " + model.Type + " {ID: '" + model.Id + "', Type: '" + model.Type +
                            "', Name: '" + model.Name + "'})";
             ResultSet resultSet = await RedisGraph.Query(GraphName, query);
@@ -333,6 +336,13 @@ namespace Middleware.DataAccess.Repositories
         protected TModel ToTModel(TDto dto)
         {
             return dto.ToModel() as TModel ?? throw new MappingException(typeof(TDto), typeof(TModel));
+        }
+
+        private async Task<bool> ObjectExistsOnGraph(GraphEntityModel graphModel)
+        {
+            var query = "match (x:" + _entityName + " {ID: '" + graphModel.Id + "'}) return x";
+            ResultSet resultSet = await RedisGraph.Query(GraphName, query);
+            return resultSet != null && resultSet.Results.Count > 0;
         }
     }
 }
