@@ -7,6 +7,7 @@ using Middleware.Models.Domain;
 using Middleware.RedisInterface.Contracts.Requests;
 using Middleware.RedisInterface.Contracts.Responses;
 using Middleware.RedisInterface.Mappings;
+using Middleware.RedisInterface.Requests;
 
 namespace Middleware.RedisInterface.Controllers;
 

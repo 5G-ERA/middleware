@@ -35,6 +35,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DataConverter", "src\DataCo
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RedisInterface.Contracts", "src\RedisInterface.Contracts\RedisInterface.Contracts.csproj", "{D55D7EA1-7270-432A-BC9A-F8E9EA993DA8}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RedisInterface.Sdk", "src\RedisInterface.Sdk\RedisInterface.Sdk.csproj", "{EAD1B806-D7D7-440C-90D4-86DE114E0280}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -97,6 +99,10 @@ Global
 		{D55D7EA1-7270-432A-BC9A-F8E9EA993DA8}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D55D7EA1-7270-432A-BC9A-F8E9EA993DA8}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D55D7EA1-7270-432A-BC9A-F8E9EA993DA8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EAD1B806-D7D7-440C-90D4-86DE114E0280}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EAD1B806-D7D7-440C-90D4-86DE114E0280}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EAD1B806-D7D7-440C-90D4-86DE114E0280}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EAD1B806-D7D7-440C-90D4-86DE114E0280}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -115,6 +121,7 @@ Global
 		{E58576F6-8DE6-4D8E-ADF9-4D74EE51C09E} = {DC46C51D-7FF6-4D97-A265-F6AFCE56253D}
 		{A6FF43B5-A3AC-47DB-8E6F-9E7FF022E389} = {96C1E2A9-733B-49C1-966F-C3B3C8102E09}
 		{D55D7EA1-7270-432A-BC9A-F8E9EA993DA8} = {96C1E2A9-733B-49C1-966F-C3B3C8102E09}
+		{EAD1B806-D7D7-440C-90D4-86DE114E0280} = {96C1E2A9-733B-49C1-966F-C3B3C8102E09}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {A330B2DD-CDFB-4AD1-AFC0-430F33D039FB}

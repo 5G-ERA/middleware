@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 
-namespace Middleware.RedisInterface.Contracts.Requests;
+namespace Middleware.RedisInterface.Requests;
 
 public class UpdateRobotTopicRequest
 {
