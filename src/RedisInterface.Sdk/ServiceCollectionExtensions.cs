@@ -1,9 +1,9 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Middleware.Common.Exceptions;
-using RedisInterface.Sdk.Client;
+using Middleware.RedisInterface.Sdk.Client;
 using Refit;
 
-namespace RedisInterface.Sdk;
+namespace Middleware.RedisInterface.Sdk;
 
 public static class ServiceCollectionExtensions
 {

@@ -10,6 +10,7 @@ using Middleware.Orchestrator.ApiReference;
 using Middleware.Orchestrator.Config;
 using Middleware.Orchestrator.Deployment;
 using Middleware.Orchestrator.ExtensionMethods;
+using Middleware.RedisInterface.Sdk;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -50,6 +51,7 @@ builder.Services.AddScoped<IKubernetesBuilder, KubernetesBuilder>();
 builder.Services.AddScoped<IDeploymentService, DeploymentService>();
 builder.Services.AddScoped<INetAppStatusRepository, RedisNetAppStatusRepository>();
 builder.Services.AddScoped<IRobotStatusRepository, RedisRobotStatusRepository>();
+builder.Services.AddRedisInterfaceClient();
 
 builder.Services.AddHttpClient("healthCheckClient");
 

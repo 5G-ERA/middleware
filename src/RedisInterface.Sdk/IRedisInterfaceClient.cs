@@ -1,7 +1,7 @@
 using Middleware.Models.Domain;
 using Middleware.RedisInterface.Contracts.Responses;
 
-namespace RedisInterface.Sdk;
+namespace Middleware.RedisInterface.Sdk;
 
 public interface IRedisInterfaceClient
 {

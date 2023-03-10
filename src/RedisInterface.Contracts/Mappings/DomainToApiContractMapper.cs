@@ -2,7 +2,7 @@
 using Middleware.Models.Enums;
 using Middleware.RedisInterface.Contracts.Responses;
 
-namespace Middleware.RedisInterface.Mappings;
+namespace Middleware.RedisInterface.Contracts.Mappings;
 
 public static class DomainToApiContractMapper
 {

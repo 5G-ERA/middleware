@@ -5,9 +5,9 @@ using k8s.Models;
 using Middleware.Common.Config;
 using Middleware.Common.Enums;
 using Middleware.Common.ExtensionMethods;
-using Middleware.Common.Services;
 using Middleware.Models.Domain;
 using Middleware.Orchestrator.Deployment;
+using Middleware.RedisInterface.Sdk;
 using Quartz;
 
 namespace Middleware.Orchestrator.Jobs;
@@ -17,14 +17,14 @@ public class UpdateStatusJob : BaseJob<UpdateStatusJob>
 {
     private readonly IKubernetesBuilder _kubeBuilder;
     private readonly IMapper _mapper;
-    private readonly IRedisInterfaceClientService _redisInterfaceClient;
+    private readonly IRedisInterfaceClient _redisInterfaceClient;
     private readonly MiddlewareConfig _middlewareConfig;
 
     public UpdateStatusJob(IKubernetesBuilder kubeBuilder,
         IMapper mapper,
         ILogger<UpdateStatusJob> logger,
         IConfiguration configuration,
-        IRedisInterfaceClientService redisInterfaceClient) : base(logger)
+        IRedisInterfaceClient redisInterfaceClient) : base(logger)
     {
         _kubeBuilder = kubeBuilder;
         _mapper = mapper;

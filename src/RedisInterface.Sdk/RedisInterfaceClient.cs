@@ -1,13 +1,10 @@
-﻿using System.Web;
-using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Logging;
 using Middleware.Models.Domain;
 using Middleware.Models.ExtensionMethods;
 using Middleware.RedisInterface.Contracts.Responses;
-using Newtonsoft.Json;
-using RedisInterface.Sdk.Client;
-using Refit;
+using Middleware.RedisInterface.Sdk.Client;
 
-namespace RedisInterface.Sdk
+namespace Middleware.RedisInterface.Sdk
 {
     public class RedisInterfaceClient : IRedisInterfaceClient
     {

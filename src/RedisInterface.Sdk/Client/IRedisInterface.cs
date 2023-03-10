@@ -1,10 +1,8 @@
-﻿using Amazon.SecurityToken;
-using Middleware.Models.Domain;
-using Refit;
-using Middleware.RedisInterface.Contracts.Requests;
+﻿using Middleware.Models.Domain;
 using Middleware.RedisInterface.Contracts.Responses;
+using Refit;
 
-namespace RedisInterface.Sdk.Client;
+namespace Middleware.RedisInterface.Sdk.Client;
 
 public interface IRedisInterface
 {

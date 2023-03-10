@@ -6,10 +6,11 @@ using Middleware.Common.Config;
 using Middleware.Common.Enums;
 using Middleware.Common.ExtensionMethods;
 using Middleware.Common.Responses;
-using Middleware.Common.Services;
 using Middleware.Models.Domain;
 using Middleware.Orchestrator.Exceptions;
 using Middleware.Orchestrator.Models;
+using Middleware.RedisInterface.Contracts.Mappings;
+using Middleware.RedisInterface.Sdk;
 
 namespace Middleware.Orchestrator.Deployment;
 
@@ -33,7 +34,7 @@ public class DeploymentService : IDeploymentService
     /// <summary>
     /// Redis Interface API client
     /// </summary>
-    private readonly IRedisInterfaceClientService _redisInterfaceClient;
+    private readonly IRedisInterfaceClient _redisInterfaceClient;
 
     private readonly IConfiguration _configuration;
 
@@ -45,7 +46,7 @@ public class DeploymentService : IDeploymentService
     public DeploymentService(IKubernetesBuilder kubernetesBuilder,
         IEnvironment env,
         ILogger<DeploymentService> logger,
-        IRedisInterfaceClientService redisInterfaceClient,
+        IRedisInterfaceClient redisInterfaceClient,
         IConfiguration configuration)
     {
         _kubernetesBuilder = kubernetesBuilder;
@@ -122,6 +123,7 @@ public class DeploymentService : IDeploymentService
     /// Saves the specified task to the redis as an action plan
     /// </summary>
     /// <param name="task"></param>
+    /// <param name="robotId"></param>
     /// <returns></returns>
     private async Task<bool> SaveActionSequence(TaskModel task, Guid robotId)
     {
@@ -136,8 +138,9 @@ public class DeploymentService : IDeploymentService
     private async Task DeployService(IKubernetes k8SClient, InstanceModel service, string[] deploymentNames)
     {
         _logger.LogDebug("Querying for redis for service {Id}", service.Id);
-        var images = await _redisInterfaceClient.ContainerImageGetForInstanceAsync(service.Id);
+        var imagesResponse = await _redisInterfaceClient.ContainerImageGetForInstanceAsync(service.Id);
 
+        var images = imagesResponse.ToContainersList();
         if (images is null || images.Any() == false)
         {
             throw new IncorrectDataException("Image is not defined for the Instance deployment");
