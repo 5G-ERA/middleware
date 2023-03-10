@@ -4,6 +4,7 @@ using Middleware.Common.Attributes;
 using Middleware.Common.Responses;
 using Middleware.DataAccess.Repositories.Abstract;
 using Middleware.Models.Domain;
+using Middleware.RedisInterface.Contracts.Mappings;
 using Middleware.RedisInterface.Contracts.Requests;
 using Middleware.RedisInterface.Contracts.Responses;
 using Middleware.RedisInterface.Mappings;
