@@ -23,7 +23,8 @@ namespace Middleware.RedisInterface.Controllers
         /// Get all the InstanceModel entities
         /// </summary>
         /// <returns> the list of InstanceModel entities </returns>
-        [HttpGet(Name = "InstanceRunningGetAll")]
+        [HttpGet]
+        [Route("instance/running", Name = "InstanceRunningGetAll")]
         [ProducesResponseType(typeof(InstanceRunningModel), (int)HttpStatusCode.OK)]
         [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.NotFound)]
         [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.InternalServerError)]
@@ -52,7 +53,7 @@ namespace Middleware.RedisInterface.Controllers
         /// <param name="id"></param>
         /// <returns> the InstanceModel entity for the specified id </returns>
         [HttpGet]
-        [Route("{id}", Name = "InstanceRunningGetById")]
+        [Route("instance/running/{id:guid}", Name = "InstanceRunningGetById")]
         [ProducesResponseType(typeof(InstanceRunningModel), (int)HttpStatusCode.OK)]
         [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.NotFound)]
         [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.InternalServerError)]
@@ -80,7 +81,8 @@ namespace Middleware.RedisInterface.Controllers
         /// </summary>
         /// <param name="model"></param>
         /// <returns> the newly created InstanceModel entity </returns>
-        [HttpPost(Name = "InstanceRunningAdd")]
+        [HttpPost]
+        [Route("instance/running", Name = "InstanceRunningAdd")]
         [ProducesResponseType(typeof(InstanceRunningModel), (int)HttpStatusCode.OK)]
         [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.BadRequest)]
         [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.InternalServerError)]
@@ -116,7 +118,7 @@ namespace Middleware.RedisInterface.Controllers
         /// <param name="id"></param>
         /// <returns> the modified InstanceModel entity </returns>
         [HttpPatch]
-        [Route("{id}", Name = "InstanceRunningPatch")]
+        [Route("instance/running/{id:guid}", Name = "InstanceRunningPatch")]
         [ProducesResponseType(typeof(InstanceRunningModel), (int)HttpStatusCode.OK)]
         [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.NotFound)]
         [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.InternalServerError)]
@@ -145,7 +147,7 @@ namespace Middleware.RedisInterface.Controllers
         /// <param name="id"></param>
         /// <returns> no return </returns>
         [HttpDelete]
-        [Route("{id}", Name = "InstanceRunningDelete")]
+        [Route("instance/running/{id}", Name = "InstanceRunningDelete")]
         [ProducesResponseType(typeof(void), (int)HttpStatusCode.OK)]
         [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.NotFound)]
         [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.InternalServerError)]
