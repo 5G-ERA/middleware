@@ -524,7 +524,7 @@ namespace Middleware.Common.Services
             if (actionRunning is null)
                 throw new ArgumentNullException(nameof(actionRunning));
 
-            string url = $"/api/v1/ActionRunning";
+            string url = $"/api/v1/Action/running";
             try
             {
                 var result = await _httpClient.PostAsJsonAsync(url, JsonConvert.SerializeObject(actionRunning));
@@ -548,7 +548,7 @@ namespace Middleware.Common.Services
             if (id == default)
                 throw new ArgumentNullException(nameof(id));
 
-            string url = $"/api/v1/actionRunning/{id}";
+            string url = $"/api/v1/Action/running/{id}";
             try
             {
                 var result = await _httpClient.GetAsync(url, token);
@@ -579,7 +579,7 @@ namespace Middleware.Common.Services
             if (instanceRunning is null)
                 throw new ArgumentNullException(nameof(instanceRunning));
 
-            string url = $"/api/v1/InstanceRunning";
+            string url = $"/api/v1/Instance/running";
             try
             {
                 var result = await _httpClient.PostAsJsonAsync(url, JsonConvert.SerializeObject(instanceRunning));
@@ -603,7 +603,7 @@ namespace Middleware.Common.Services
             if (historicalActionPlan is null)
                 throw new ArgumentNullException(nameof(historicalActionPlan));
 
-            string url = $"/api/v1/Action/historicalPlan";
+            string url = $"/api/v1/Action/plan/historical";
             try
             {
                 var result = await _httpClient.PostAsJsonAsync(url, historicalActionPlan);
@@ -628,7 +628,7 @@ namespace Middleware.Common.Services
             if (id == default)
                 throw new ArgumentNullException(nameof(id));
 
-            string url = $"/api/v1/instanceRunning/{id}";
+            string url = $"/api/v1/Instance/running/{id}";
             try
             {
                 var result = await _httpClient.GetAsync(url, token);
