@@ -67,6 +67,12 @@ namespace Middleware.DataAccess.Repositories
             {
                 return null!;
             }
+
+            if (IsWritableToGraph)
+            {
+                var graphModel = new GraphEntityModel(model.Id, model.Name, _entityName);
+                await AddGraphAsync(graphModel);
+            }
             return ToTModel(dto);
         }
         private async Task DeleteFromGraph(Guid id)
