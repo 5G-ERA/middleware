@@ -35,7 +35,7 @@ specify the default output format for the CLI. The example is shown in the Figur
 After the Docker and the AWS CLI are installed, use the following command to authenticate your device against the AWS cloud
 
 ```console
-docker login -u AWS -p $(aws ecr get-login-password --region eu-west-1) 394603622351.dkr.ecr.eu-west-1.amazonaws.com
+aws ecr get-login-password --region eu-west-1 | docker login -u AWS -p $(aws ecr get-login-password --region eu-west-1) 394603622351.dkr.ecr.eu-west-1.amazonaws.com
 ```
 
 After executing this command, you should be able to pull the images from the private AWS registry. It
