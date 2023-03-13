@@ -258,7 +258,7 @@ http://localhost:5000/
 
 ## 10) Common errors:
 
-If after running the middleware for a couple of hours you find this error, it is because the keys need to be refresed.
+### 10.1) If after running the middleware for a couple of hours you find this error, it is because the keys need to be refresed.
 
 <p align="left">
     <img src="imgs/keys.png" alt="- aws configure command example">
@@ -280,5 +280,25 @@ Go to the following [directory](https://github.com/5G-ERA/middleware/blob/main/k
 ```
 
 
+### 10.2) Error installing microk8s:  
+
+<p align="left">
+    <img src="imgs/snap_error.png" alt="- Deployed middleware.">
+</p>
+
+If the command 
+```console
+sudo snap install microk8s --classic
+```
+
+Then update snapd by:
+
+```console
+sudo apt update
+```
+
+```console
+sudo apt upgrade snapd
+```
 
 
