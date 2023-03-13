@@ -1,4 +1,5 @@
-﻿using System.Text.Json;
+﻿using System.Collections.Immutable;
+using System.Text.Json;
 using Microsoft.Extensions.Logging;
 using Middleware.Common.Enums;
 using Middleware.DataAccess.Repositories.Abstract;
@@ -211,7 +212,7 @@ namespace Middleware.DataAccess.Repositories
         /// <param name="organization"></param>
         /// <returns></returns>
         /// <exception cref="ArgumentException"></exception>
-        public async Task<List<EdgeModel>> GetEdgesByOrganizationAsync(string organization)
+        public async Task<ImmutableList<EdgeModel>> GetEdgesByOrganizationAsync(string organization)
         {
             throw new NotImplementedException();
         }
@@ -221,7 +222,7 @@ namespace Middleware.DataAccess.Repositories
         /// </summary>
         /// <param name="address"></param>
         /// <returns></returns>
-        public async Task<bool> checkIfAddressExists(Uri address)
+        public async Task<bool> CheckIfAddressExists(Uri address)
         {
             throw new NotImplementedException();
         }
@@ -230,7 +231,7 @@ namespace Middleware.DataAccess.Repositories
         /// </summary>
         /// <param name="address"></param>
         /// <returns></returns>
-        public async Task<(bool, EdgeModel)> checkIfNameExists(string name)
+        public async Task<(bool, EdgeModel)> CheckIfNameExists(string name)
         {
             throw new NotImplementedException();
         }
@@ -238,9 +239,10 @@ namespace Middleware.DataAccess.Repositories
         /// <summary>
         /// Checks if an edge exists with a particular id.
         /// </summary>
+        /// <param name="id"></param>
         /// <param name="address"></param>
         /// <returns></returns>
-        public async Task<(bool, EdgeModel)> checkIfIdExists(string id)
+        public async Task<(bool, EdgeModel? matchedEdge)> CheckIfIdExists(string id)
         {
             throw new NotImplementedException();
         }

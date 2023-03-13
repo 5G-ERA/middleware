@@ -1,4 +1,5 @@
-﻿using FluentValidation;
+﻿using System.Collections.Immutable;
+using FluentValidation;
 using Middleware.CentralApi.Contracts.Responses;
 using Middleware.CentralApi.Domain;
 using OneOf;
@@ -10,5 +11,5 @@ public interface ILocationService
 {
     Task<OneOf<Location, ValidationException, NotFound>> RegisterLocation(Location location);
     
-    Task<OneOf<List<Location>, NotFound>> GetAvailableLocations(string organization);
+    Task<OneOf<ImmutableList<Location>, NotFound>> GetAvailableLocations(string organization);
 }

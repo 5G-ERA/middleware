@@ -1,4 +1,5 @@
-﻿using FluentValidation;
+﻿using System.Collections.Immutable;
+using FluentValidation;
 using Middleware.CentralApi.Domain;
 using Middleware.DataAccess.Repositories.Abstract;
 using Middleware.Models.Domain;
@@ -24,20 +25,13 @@ public class LocationService : ILocationService
     public async Task<OneOf<Location, ValidationException, NotFound>> RegisterLocation(Location location)
     {
         // when location not found in db
-        (bool queryResultCloud, CloudModel cloud) = await _cloudRepository.checkIfNameExists(location.Name);
-        (bool queryResultEdge, EdgeModel edge) = await _edgeRepository.checkIfNameExists(location.Name);
+        (bool queryResultCloud, CloudModel? cloud) = await _cloudRepository.CheckIfNameExists(location.Name);
+        (bool queryResultEdge, EdgeModel? edge) = await _edgeRepository.CheckIfNameExists(location.Name);
 
-        if ((queryResultEdge == false) && (queryResultCloud == false))
+        if ((queryResultEdge == false || edge is null) && (queryResultCloud == false || cloud is null))
         {
             return new NotFound();    
         }
-        
-        // when location is not valid eg. different type than in the system etc
-        if (!location.isValid())
-        {
-            return new ValidationException("The specified location is not valid");    
-        }
-
 
         // make it online & return info about location based on matched edge
         if (cloud is null)
@@ -69,13 +63,13 @@ public class LocationService : ILocationService
 
     }
 
-    public async Task<OneOf<List<Location>, NotFound>> GetAvailableLocations(string organization)
+    public async Task<OneOf<ImmutableList<Location>, NotFound>> GetAvailableLocations(string organization)
     {
         // get all online edges and clouds
         var locations = new List<Location>();
 
         // edges where organization = organization
-        List<EdgeModel> edges = await _edgeRepository.GetEdgesByOrganizationAsync(organization);
+        var edges = await _edgeRepository.GetEdgesByOrganizationAsync(organization);
 
         var locationsEdges = edges.Select(x => new Location()
         {
@@ -87,7 +81,7 @@ public class LocationService : ILocationService
         });
 
         // clouds where organization = organization
-        List<CloudModel> clouds = await _cloudRepository.GetCloudsByOrganizationAsync(organization);
+        var clouds = await _cloudRepository.GetCloudsByOrganizationAsync(organization);
 
         var locationsClouds = clouds.Select(x => new Location()
         {
@@ -106,6 +100,6 @@ public class LocationService : ILocationService
             return new NotFound();
         }
 
-        return locations;
+        return locations.ToImmutableList();
     }
 }

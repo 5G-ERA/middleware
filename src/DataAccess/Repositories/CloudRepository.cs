@@ -1,3 +1,4 @@
+using System.Collections.Immutable;
 using System.Text.Json;
 using Microsoft.Extensions.Logging;
 using Middleware.Common.Enums;
@@ -56,14 +57,14 @@ namespace Middleware.DataAccess.Repositories
         }
 
 
-        public async Task<CloudModel> GetCloudResourceDetailsByNameAsync(string name)
+        public async Task<CloudModel?> GetCloudResourceDetailsByNameAsync(string name)
         {
             // RedisValue[] testValues = new RedisValue[] { name };
 
 
             // object parameters = name;
             // List<EdgeModel> edgeData = await ExecuteLuaQueryAsync("GetResourceEdgeData", testValues);
-            CloudModel cloud = (await GetAllAsync()).Where(x => x.Name == name).FirstOrDefault();
+            CloudModel? cloud = (await GetAllAsync()).Where(x => x.Name == name).FirstOrDefault();
             return cloud;
             // return edgeData;
         }
@@ -198,7 +199,7 @@ namespace Middleware.DataAccess.Repositories
         /// <param name="organization"></param>
         /// <returns></returns>
         /// <exception cref="ArgumentException"></exception>
-        public async Task<List<CloudModel>> GetCloudsByOrganizationAsync(string organization)
+        public async Task<ImmutableList<CloudModel>> GetCloudsByOrganizationAsync(string organization)
         {
             throw new NotImplementedException();
         }
@@ -208,7 +209,7 @@ namespace Middleware.DataAccess.Repositories
         /// </summary>
         /// <param name="address"></param>
         /// <returns></returns>
-        public async Task<(bool, CloudModel)> checkIfNameExists(string name)
+        public async Task<(bool, CloudModel?)> CheckIfNameExists(string name)
         {
             throw new NotImplementedException();
         }
@@ -218,7 +219,7 @@ namespace Middleware.DataAccess.Repositories
         /// </summary>
         /// <param name="address"></param>
         /// <returns></returns>
-        public async Task<(bool, CloudModel)> checkIfIdExists(string id)
+        public async Task<(bool, CloudModel?)> CheckIfIdExists(string id)
         {
             throw new NotImplementedException();
         }

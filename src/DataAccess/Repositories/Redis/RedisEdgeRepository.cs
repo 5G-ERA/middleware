@@ -1,4 +1,5 @@
-﻿using System.Text.Json;
+﻿using System.Collections.Immutable;
+using System.Text.Json;
 using System.Xml.Linq;
 using Microsoft.Extensions.Logging;
 using Middleware.Common.Enums;
@@ -217,10 +218,10 @@ namespace Middleware.DataAccess.Repositories
         /// <param name="organization"></param>
         /// <returns></returns>
         /// <exception cref="ArgumentException"></exception>
-        public async Task<List<EdgeModel>> GetEdgesByOrganizationAsync(string organization)
+        public async Task<ImmutableList<EdgeModel>> GetEdgesByOrganizationAsync(string organization)
         {
-            List<EdgeModel> matchedEdges = (List<EdgeModel>)await FindQuery(dto => dto.Organization == organization).ToListAsync();
-            return matchedEdges;
+            var matchedEdges = await FindAsync(dto => dto.Organization == organization);
+            return matchedEdges.ToImmutableList();
         }
 
         /// <summary>
@@ -228,9 +229,9 @@ namespace Middleware.DataAccess.Repositories
         /// </summary>
         /// <param name="address"></param>
         /// <returns></returns>
-        public async Task<bool> checkIfAddressExists(Uri address)
+        public async Task<bool> CheckIfAddressExists(Uri address)
         {
-            EdgeModel matchedEdge = await FindSingleAsync(dto => dto.EdgeIp == address);
+            EdgeModel? matchedEdge = await FindSingleAsync(dto => dto.EdgeIp == address);
             if (matchedEdge is not null)
             {
                 return true;
@@ -240,14 +241,15 @@ namespace Middleware.DataAccess.Repositories
                 return false;
             }
         }
+
         /// <summary>
         /// Checks if an edge exists with a particular name
         /// </summary>
-        /// <param name="address"></param>
+        /// <param name="name"></param>
         /// <returns></returns>
-        public async Task<(bool,EdgeModel)> checkIfNameExists(string name)
+        public async Task<(bool,EdgeModel?)> CheckIfNameExists(string name)
         {
-            EdgeModel matchedEdge = await FindSingleAsync(dto => dto.Name == name);
+            var matchedEdge = await FindSingleAsync(dto => dto.Name == name);
             if (matchedEdge is not null)
             {
                 return (true, matchedEdge);
@@ -261,11 +263,11 @@ namespace Middleware.DataAccess.Repositories
         /// <summary>
         /// Checks if an edge exists with a particular id.
         /// </summary>
-        /// <param name="address"></param>
+        /// <param name="id"></param>
         /// <returns></returns>
-        public async Task<(bool, EdgeModel)> checkIfIdExists(string id)
+        public async Task<(bool, EdgeModel?)> CheckIfIdExists(string id)
         {
-            EdgeModel matchedEdge = await FindSingleAsync(dto => dto.Id == id);
+            var matchedEdge = await FindSingleAsync(dto => dto.Id == id);
             if (matchedEdge is not null)
             {
                 return (true, matchedEdge);
