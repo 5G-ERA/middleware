@@ -9,11 +9,12 @@ public static class DomainToApiContractMapper
     {
         return new LocationResponse()
         {
-            Id = x.Id.Value,
+            Id = x.Id!.Value,
             Name = x.Name,
             Organization = x.Organization,
             Type = x.Type.ToString(),
-            IsOnline = true
+            IsOnline = true,
+            Address = x.Address
         };
     }
 

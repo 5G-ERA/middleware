@@ -7,4 +7,6 @@ public class LocationResponse
     public string Name { get; init; } = default!;
     public string Type { get; init; } = default!;
     public bool IsOnline { get; init; } = true;
+    
+    public Uri? Address { get; init; }
 }
