@@ -1,0 +1,51 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: central-api
+spec:
+  type: NodePort
+  selector:
+    app: central-api
+  ports:
+    - port: 80
+      targetPort: 80
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: central-api
+spec:
+  type: ClusterIP
+  selector:
+    name: central-api
+  ports:
+    - port: 80
+      targetPort: 80
+      name: http
+    - port: 433
+      targetPort: 433
+      name: https
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: central-api
+spec:
+  selector:
+    matchLabels:
+      name: central-api
+  template:
+    metadata:
+      labels:
+        name: central-api
+    spec:
+      nodeSelector:
+        kubernetes.io/os: linux
+      imagePullSecrets:
+        - name: awsecr-cred
+      containers:
+        - name: central-api
+          image: 394603622351.dkr.ecr.eu-west-1.amazonaws.com/central-api:v0.3-rc1
+          imagePullPolicy: Always
+          resources: {}
