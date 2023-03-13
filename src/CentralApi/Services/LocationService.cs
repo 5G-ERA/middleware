@@ -42,6 +42,7 @@ public class LocationService : ILocationService
                 Id = edge.Id,
                 Name = edge.Name,
                 Organization = edge.Organization,
+                Address = edge.EdgeIp,
                 Type = Enum.Parse<LocationType>(edge.Type)
             };
             await _edgeRepository.AddAsync(edge);
@@ -55,6 +56,7 @@ public class LocationService : ILocationService
                 Id = cloud.Id,
                 Name = cloud.Name,
                 Organization = cloud.Organization,
+                Address = cloud.CloudIp,
                 Type = Enum.Parse<LocationType>(cloud.Type)
             };
             await _cloudRepository.AddAsync(cloud);
