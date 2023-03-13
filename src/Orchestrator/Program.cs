@@ -1,11 +1,10 @@
 using System.Net;
-using System.Net.Http.Headers;
+using System.Reflection;
 using Middleware.CentralApi.Contracts.Requests;
 using Middleware.CentralApi.Sdk;
 using Middleware.Common.Config;
 using Middleware.Common.ExtensionMethods;
 using Middleware.DataAccess.ExtensionMethods;
-using Middleware.DataAccess.Repositories;
 using Middleware.DataAccess.Repositories.Abstract;
 using Middleware.DataAccess.Repositories.Redis;
 using Middleware.Orchestrator.ApiReference;
@@ -15,8 +14,9 @@ using Middleware.Orchestrator.ExtensionMethods;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Configuration.AddEnvironmentVariables();
-builder.Configuration.AddUserSecrets<Program>();
+builder.Configuration
+    .AddEnvironmentVariables()
+    .AddUserSecrets(Assembly.GetExecutingAssembly(), true);
 
 builder.RegisterSecretsManager();
 
