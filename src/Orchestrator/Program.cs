@@ -16,6 +16,7 @@ using Middleware.Orchestrator.ExtensionMethods;
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Configuration.AddEnvironmentVariables();
+builder.Configuration.AddUserSecrets<Program>();
 
 builder.RegisterSecretsManager();
 
