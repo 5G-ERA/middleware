@@ -10,7 +10,7 @@ public class RegisterRequestValidator : AbstractValidator<RegisterRequest>
     {
         RuleFor(x => x.Name)
             .NotNull().NotEmpty();
-        RuleFor(x => x.Name)
+        RuleFor(x => x.Organization)
             .NotNull().NotEmpty();
         RuleFor(x => x.Type)
             .NotNull().IsEnumName(typeof(LocationType), caseSensitive: false)
