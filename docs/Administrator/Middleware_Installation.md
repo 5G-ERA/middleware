@@ -255,3 +255,30 @@ will be now accessible under the following address:
 ```console
 http://localhost:5000/
 ```
+
+## 10) Common errors:
+
+If after running the middleware for a couple of hours you find this error, it is because the keys need to be refresed.
+
+<p align="left">
+    <img src="imgs/keys.png" alt="- aws configure command example">
+</p>
+
+Go to the following [directory](https://github.com/5G-ERA/middleware/blob/main/k8s/orchestrator) and launch these scripts in order:
+
+```console
+./delete_all.sh 
+```
+
+
+```console
+./credentials.sh 
+```
+
+```console
+./deploy.sh 
+```
+
+
+
+
