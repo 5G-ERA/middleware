@@ -208,7 +208,7 @@ After all the values are set, the Middleware can be deployed. Start with the dep
 whole Orchestrator:
 
 ```console
-kubectl apply –n middleware –f orchestrator.yaml
+kubectl apply –f orchestrator.yaml –n middleware
 ```
 
 The containers will be downloaded, and the Orchestrator will deploy the rest of the Middleware
