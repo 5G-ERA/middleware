@@ -85,7 +85,7 @@ After the installation is finished copy the configuration file of the Microk8s t
 the kubectl command can communicate with the newly installed cluster.
 
 ```console
-microk8s config > ~/.kube/config
+sudo microk8s config > ~/.kube/config
 ```
 
 Afterwards, validate the connection to the cluster with the command
@@ -110,11 +110,11 @@ Afterwards, the additional modules for the microk8s must be installed:
 ```
 
 ```console
- sudo microk8s enable multus
+ sudo microk8s enable community
 ```
 
 ```console
- sudo microk8s enable community
+ sudo microk8s enable multus
 ```
 
 It enables the DNS on the cluster as well as the Load Balancer and Multus network card. During the
