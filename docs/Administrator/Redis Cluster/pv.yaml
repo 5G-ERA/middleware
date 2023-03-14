@@ -1,0 +1,42 @@
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: redis-pv0
+spec:
+  storageClassName: redis-storage
+  capacity:
+    storage: 2Gi
+  accessModes:
+    - ReadWriteOnce
+  hostPath:
+    path: "/storage/data0"
+
+---
+
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: redis-pv1
+spec:
+  storageClassName: redis-storage
+  capacity:
+    storage: 2Gi
+  accessModes:
+    - ReadWriteOnce
+  hostPath:
+    path: "/storage/data1"
+
+---
+
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: redis-pv2
+spec:
+  storageClassName: redis-storage
+  capacity:
+    storage: 2Gi
+  accessModes:
+    - ReadWriteOnce
+  hostPath:
+    path: "/storage/data2"
