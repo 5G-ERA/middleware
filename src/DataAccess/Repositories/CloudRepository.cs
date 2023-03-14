@@ -1,3 +1,4 @@
+using System.Collections.Immutable;
 using System.Text.Json;
 using Microsoft.Extensions.Logging;
 using Middleware.Common.Enums;
@@ -56,14 +57,14 @@ namespace Middleware.DataAccess.Repositories
         }
 
 
-        public async Task<CloudModel> GetCloudResourceDetailsByNameAsync(string name)
+        public async Task<CloudModel?> GetCloudResourceDetailsByNameAsync(string name)
         {
             // RedisValue[] testValues = new RedisValue[] { name };
 
 
             // object parameters = name;
             // List<EdgeModel> edgeData = await ExecuteLuaQueryAsync("GetResourceEdgeData", testValues);
-            CloudModel cloud = (await GetAllAsync()).Where(x => x.Name == name).FirstOrDefault();
+            CloudModel? cloud = (await GetAllAsync()).Where(x => x.Name == name).FirstOrDefault();
             return cloud;
             // return edgeData;
         }
@@ -190,6 +191,37 @@ namespace Middleware.DataAccess.Repositories
         {
             List<RelationModel> cloudRelations = await GetRelation(cloudId, "LOCATED_AT", RelationDirection.Incoming);
             return cloudRelations.Count > 0;
+        }
+
+        /// <summary>
+        /// Return all the clouds of a particular organization.
+        /// </summary>
+        /// <param name="organization"></param>
+        /// <returns></returns>
+        /// <exception cref="ArgumentException"></exception>
+        public async Task<ImmutableList<CloudModel>> GetCloudsByOrganizationAsync(string organization)
+        {
+            throw new NotImplementedException();
+        }
+
+        /// <summary>
+        /// Checks if an edge exists with a particular name
+        /// </summary>
+        /// <param name="address"></param>
+        /// <returns></returns>
+        public async Task<(bool, CloudModel?)> CheckIfNameExists(string name)
+        {
+            throw new NotImplementedException();
+        }
+
+        /// <summary>
+        /// Checks if an edge exists with a particular id.
+        /// </summary>
+        /// <param name="address"></param>
+        /// <returns></returns>
+        public async Task<(bool, CloudModel?)> CheckIfIdExists(string id)
+        {
+            throw new NotImplementedException();
         }
     }
 }

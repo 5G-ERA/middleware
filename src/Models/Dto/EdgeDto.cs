@@ -16,6 +16,10 @@ public class EdgeDto : Dto
     public string? Name { get; set; }
     [Indexed]
     public string Type { get; set; }
+
+    [Indexed]
+    public string Organization { get; set; }
+
     [Indexed]
     public string? EdgeStatus { get; set; }
     [Indexed]
@@ -39,6 +43,7 @@ public class EdgeDto : Dto
             Id = Guid.Parse(dto.Id!.Replace(Prefix, "")),
             Name = dto.Name,
             Type = dto.Type,
+            Organization = dto.Organization,
             EdgeStatus = dto.EdgeStatus,
             EdgeIp = dto.EdgeIp,
             NumberOfCores = dto.HardwareSpec.NumberCores,

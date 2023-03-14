@@ -17,6 +17,9 @@ public class CloudDto : Dto
     [Indexed]
     public string Type { get; set; }
     [Indexed]
+    public string Organization { get; set; }
+
+    [Indexed]
     public string? CloudStatus { get; set; }
     [Indexed]
     public Uri CloudIp { get; set; }
@@ -38,6 +41,7 @@ public class CloudDto : Dto
             Id = Guid.Parse(dto.Id!.Replace(Prefix, "")),
             Name = dto.Name,
             Type = dto.Type,
+            Organization = dto.Organization,
             CloudStatus = dto.CloudStatus,
             CloudIp = dto.CloudIp,
             NumberOfCores = dto.HardwareSpec.NumberCores,

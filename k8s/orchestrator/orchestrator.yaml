@@ -7,12 +7,12 @@ spec:
   selector:
     name: orchestrator-api
   ports:
-  - port: 80
-    targetPort: 80
-    name: http
-  - port: 433
-    targetPort: 433
-    name: https
+    - port: 80
+      targetPort: 80
+      name: http
+    - port: 433
+      targetPort: 433
+      name: https
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -51,3 +51,5 @@ spec:
           value: MiddlewareBED # to be replaced with real value
         - name: Middleware__InstanceType
           value: Edge # to be replaced with real value
+        - name: CENTRAL_API_HOSTNAME
+          value: central.api

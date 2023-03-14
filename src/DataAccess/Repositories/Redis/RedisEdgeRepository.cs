@@ -1,4 +1,5 @@
-﻿using System.Text.Json;
+﻿using System.Collections.Immutable;
+using System.Text.Json;
 using System.Xml.Linq;
 using Microsoft.Extensions.Logging;
 using Middleware.Common.Enums;
@@ -209,6 +210,72 @@ namespace Middleware.DataAccess.Repositories
                 throw new ArgumentException("Edge does not exist", nameof(edgeName));
             List<RelationModel> robotRelations = await GetRelation(edge.Id, "LOCATED_AT", RelationDirection.Incoming);
             return robotRelations.Count;
+        }
+
+        /// <summary>
+        /// Return all the edges of a particular organization.
+        /// </summary>
+        /// <param name="organization"></param>
+        /// <returns></returns>
+        /// <exception cref="ArgumentException"></exception>
+        public async Task<ImmutableList<EdgeModel>> GetEdgesByOrganizationAsync(string organization)
+        {
+            var matchedEdges = await FindAsync(dto => dto.Organization == organization);
+            return matchedEdges.ToImmutableList();
+        }
+
+        /// <summary>
+        /// Check if a given address is stored in redis for the edges entities. 
+        /// </summary>
+        /// <param name="address"></param>
+        /// <returns></returns>
+        public async Task<bool> CheckIfAddressExists(Uri address)
+        {
+            EdgeModel? matchedEdge = await FindSingleAsync(dto => dto.EdgeIp == address);
+            if (matchedEdge is not null)
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+
+        /// <summary>
+        /// Checks if an edge exists with a particular name
+        /// </summary>
+        /// <param name="name"></param>
+        /// <returns></returns>
+        public async Task<(bool,EdgeModel?)> CheckIfNameExists(string name)
+        {
+            var matchedEdge = await FindSingleAsync(dto => dto.Name == name);
+            if (matchedEdge is not null)
+            {
+                return (true, matchedEdge);
+            }
+            else
+            {
+                return (false, matchedEdge);
+            }
+        }
+
+        /// <summary>
+        /// Checks if an edge exists with a particular id.
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        public async Task<(bool, EdgeModel?)> CheckIfIdExists(string id)
+        {
+            var matchedEdge = await FindSingleAsync(dto => dto.Id == id);
+            if (matchedEdge is not null)
+            {
+                return (true, matchedEdge);
+            }
+            else
+            {
+                return (false, matchedEdge);
+            }
         }
     }
 }
