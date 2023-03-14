@@ -113,6 +113,10 @@ Afterwards, the additional modules for the microk8s must be installed:
  sudo microk8s enable multus
 ```
 
+```console
+ sudo microk8s enable community
+```
+
 It enables the DNS on the cluster as well as the Load Balancer and Multus network card. During the
 installation, the program will ask for the range of the IP addresses for the Load Balancer. Provide
 desired range, it can be a default one.
