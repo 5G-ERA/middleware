@@ -310,4 +310,30 @@ sudo apt update
 sudo apt upgrade snapd
 ```
 
+### 10.3) Cannot pull docker images:
 
+If you get an error like: "docker pull no basic auth credentials aws" when trying to launch the commdn:
+
+```console
+sudo docker pull 394603622351.dkr.ecr.eu-west-1.amazonaws.com/5g-era-redis
+```
+
+You may fix this by:
+
+```console
+cd ~/.docker/
+```
+
+```console
+nano config.json
+```
+
+Remove line --> "credsStore":
+
+```console
+docker login -u AWS -p $(aws ecr get-login-password --region eu-west-1) 394603622351.dkr.ecr.eu-west-1.amazonaws.com
+```
+
+```console
+sudo docker pull 394603622351.dkr.ecr.eu-west-1.amazonaws.com/5g-era-redis
+```
