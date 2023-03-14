@@ -100,6 +100,11 @@ Afterwards, the additional modules for the microk8s must be installed:
  sudo microk8s enable metallb
 ```
 
+
+```console
+ sudo microk8s enable dns
+```
+
 ```console
  sudo microk8s enable ingress
 ```
