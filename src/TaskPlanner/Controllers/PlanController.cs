@@ -187,11 +187,10 @@ namespace Middleware.TaskPlanner.Controllers
         {
             try
             {
-
                 await _publishService.PublishSwitchoverDeployInstance(request.ActionPlanId, request.InstanceId,
                     request.Destination, request.DestinationType);
                 await _publishService.PublishSwitchoverDeleteInstance(request.ActionPlanId, request.InstanceId);
-                
+
                 return Ok();
             }
             catch (IncorrectLocationException ex)
