@@ -316,6 +316,16 @@ public class DeploymentService : IDeploymentService
         return retVal;
     }
 
+    public async Task DeleteInstance(Guid actionPlanId, Guid instanceId)
+    {
+        throw new NotImplementedException();
+    }
+
+    public async Task DeployInstance(Guid actionPlanId, Guid instanceId)
+    {
+        throw new NotImplementedException();
+    }
+
     /// <summary>
     /// Deletes the instance specified. The deletion includes associated deployment and service
     /// </summary>

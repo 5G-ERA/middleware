@@ -33,4 +33,8 @@ public interface IDeploymentService
     /// <param name="actionPlan">Action Plan to be deleted</param>
     /// <returns>Has the operation succeeded</returns>
     Task<bool> DeletePlanAsync(ActionPlanModel actionPlan);
+
+    Task DeleteInstance(Guid actionPlanId, Guid instanceId);
+
+    Task DeployInstance(Guid actionPlanId, Guid instanceId);
 }
