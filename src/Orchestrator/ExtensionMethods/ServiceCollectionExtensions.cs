@@ -18,6 +18,13 @@ public static class ServiceCollectionExtensions
         {
             services.AddScoped<DeployPlanConsumer>();
             x.AddConsumer<DeployPlanConsumer>();
+            
+            services.AddScoped<SwitchoverDeleteInstanceConsumer>();
+            x.AddConsumer<SwitchoverDeleteInstanceConsumer>();
+            
+            services.AddScoped<SwitchoverDeployInstanceConsumer>();
+            x.AddConsumer<SwitchoverDeployInstanceConsumer>();
+            
             x.UsingRabbitMq((busRegistrationContext, mqBusFactoryConfigurator) =>
             {
                 mqBusFactoryConfigurator.Host(mqConfig.Address, "/", hostConfig =>
@@ -70,6 +77,7 @@ public static class ServiceCollectionExtensions
                 mqBusFactoryConfigurator.ConfigureEndpoints(busRegistrationContext);
             });
         });
+        
         // MassTransit-RabbitMQ Configuration
         services.AddOptions<MassTransitHostOptions>()
             .Configure(options =>
