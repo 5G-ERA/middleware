@@ -130,10 +130,13 @@ roslaunch airos_launch airos.launch
 ```
 
 On the PC side:
-
+```console
 export ROS_IP=192.168.1.36 
+```
 
+```console
 export ROS_MASTER_URI=http://192.168.1.61:11311
+```
 
 In etc/hosts you mabe need to add the route to the robot with its IP and hostname:
 
@@ -145,4 +148,12 @@ Now if we do, rostopic list we should see the topics of the robot including the 
 
 In this case, the command NETAPP_ADDRESS is the IP address of the PC in which middleware is running. NETAPP_PORT is the port in NodePort of the deployed netApp. INPUT_TOPIC is the camera topic of the robot. OUTPUT_TOPIC it can be whatever name we want. We will also set ROS_MASTER_URI so the container can access the ROS topics of the robot. The version of netApp client is 1.2.0 
 
+```console
 sudo docker run --rm --net host --env NETAPP_ADDRESS=192.168.1.5 --env NETAPP_PORT=32349 --env INPUT_TOPIC=/airos/camera/image --env OUTPUT_TOPIC=/results --env ROS_MASTER_URI=http://192.168.1.61:11311 but5gera/noetic_client:1.2.0
+```
+
+## 5. Visualice the result predictions:
+
+```console
+rosrun image_view image_view image:=/airos/camera/image
+```
