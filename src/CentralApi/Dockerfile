@@ -12,7 +12,7 @@ WORKDIR "/src/src/CentralApi"
 RUN dotnet build "CentralApi.csproj" -c Release -o /app/build
 
 FROM build AS publish
-RUN dotnet publish "CentralApi.csproj" -c Release -o /app/publish /p:UseAppHost=false
+RUN dotnet publish "CentralApi.csproj" -c Release -o /app/publish 
 
 FROM base AS final
 ARG AWS_KEY_ID
