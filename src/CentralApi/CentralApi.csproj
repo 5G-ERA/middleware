@@ -7,6 +7,8 @@
         <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
         <RootNamespace>Middleware.CentralApi</RootNamespace>
         <UserSecretsId>498ef885-a68a-44e3-91d4-aa599ad2897e</UserSecretsId>
+        <DockerfileContext>..\..</DockerfileContext>
+        <DockerComposeProjectPath>..\..\docker-compose.dcproj</DockerComposeProjectPath>
     </PropertyGroup>
 
     <ItemGroup>
