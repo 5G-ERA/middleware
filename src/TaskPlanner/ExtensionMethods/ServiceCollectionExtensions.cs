@@ -29,6 +29,21 @@ public static class ServiceCollectionExtensions
                 mqBusFactoryConfigurator.Message<DeployPlanMessage>(x => x.SetEntityName(nameof(DeployPlanMessage)));
                 mqBusFactoryConfigurator.Publish<DeployPlanMessage>(x => { x.ExchangeType = ExchangeType.Direct; });
 
+                
+                mqBusFactoryConfigurator.Send<SwitchoverDeleteInstance>(x =>
+                {
+                    x.UseRoutingKeyFormatter(t => t.Message.Location);
+                });
+                mqBusFactoryConfigurator.Message<SwitchoverDeleteInstance>(x => x.SetEntityName(nameof(SwitchoverDeleteInstance)));
+                mqBusFactoryConfigurator.Publish<SwitchoverDeleteInstance>(x => { x.ExchangeType = ExchangeType.Direct; });
+
+                mqBusFactoryConfigurator.Send<SwitchoverDeployInstance>(x =>
+                {
+                    x.UseRoutingKeyFormatter(t => t.Message.Location);
+                });
+                mqBusFactoryConfigurator.Message<SwitchoverDeployInstance>(x => x.SetEntityName(nameof(SwitchoverDeployInstance)));
+                mqBusFactoryConfigurator.Publish<SwitchoverDeployInstance>(x => { x.ExchangeType = ExchangeType.Direct; });
+                
                 mqBusFactoryConfigurator.ConfigureEndpoints(busRegistrationContext);
             });
         });
