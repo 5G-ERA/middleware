@@ -3,8 +3,8 @@ using Middleware.Common.Config;
 using Middleware.Common.Helpers;
 using Middleware.Common.MessageContracts;
 using Middleware.Orchestrator.Handlers;
+using Middleware.Orchestrator.Handlers.Switchover;
 using RabbitMQ.Client;
-using static MassTransit.Logging.OperationName;
 
 namespace Middleware.Orchestrator.ExtensionMethods;
 
@@ -26,6 +26,34 @@ public static class ServiceCollectionExtensions
                     hostConfig.Password(mqConfig.Pass);
                 });
 
+                mqBusFactoryConfigurator.ReceiveEndpoint(
+                    QueueHelpers.ConstructSwitchoverDeleteInstanceQueueName(mwConfig.Organization,
+                        mwConfig.InstanceName),
+                    ec =>
+                    {
+                        ec.ConfigureConsumeTopology = false;
+                        ec.Bind(nameof(SwitchoverDeleteInstance), b =>
+                        {
+                            b.ExchangeType = ExchangeType.Direct;
+                            b.RoutingKey = routingKey;
+                        });
+                        ec.ConfigureConsumer<SwitchoverDeleteInstanceConsumer>(busRegistrationContext);
+                    });
+                
+                mqBusFactoryConfigurator.ReceiveEndpoint(
+                    QueueHelpers.ConstructSwitchoverDeployInstanceQueueName(mwConfig.Organization,
+                        mwConfig.InstanceName),
+                    ec =>
+                    {
+                        ec.ConfigureConsumeTopology = false;
+                        ec.Bind(nameof(SwitchoverDeployInstance), b =>
+                        {
+                            b.ExchangeType = ExchangeType.Direct;
+                            b.RoutingKey = routingKey;
+                        });
+                        ec.ConfigureConsumer<SwitchoverDeployInstanceConsumer>(busRegistrationContext);
+                    });
+                
                 mqBusFactoryConfigurator.ReceiveEndpoint(
                     QueueHelpers.ConstructDeploymentQueueName(mwConfig.Organization, mwConfig.InstanceName),
                     ec =>
