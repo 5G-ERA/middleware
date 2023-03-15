@@ -56,3 +56,7 @@ Lets run image_view package with the output topic of the ROS netApp Client.
 ```console
 rosrun image_view image_view image:=/results
 ```
+
+<p align="left">
+    <img src="imgs/pred.png" alt="- ">
+</p>
