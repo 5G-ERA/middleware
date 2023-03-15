@@ -272,7 +272,7 @@ namespace Middleware.DataAccess.Repositories
                            "'}) CREATE (x)-[:" + relation.RelationName + "]->(c) ";
             ResultSet resultSet = await RedisGraph.Query(GraphName, query);
 
-            return (resultSet != null) && (resultSet.Metrics.RelationshipsCreated == 1);
+            return (resultSet != null) && (resultSet.Metrics.RelationshipsCreated >= 1);
         }
 
         /// <summary>
