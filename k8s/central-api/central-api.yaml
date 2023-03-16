@@ -5,11 +5,11 @@ metadata:
 spec:
   selector:
     matchLabels:
-      name: central-api
+      app: central-api
   template:
     metadata:
       labels:
-        name: central-api
+        app: central-api
     spec:
       nodeSelector:
         kubernetes.io/os: linux
@@ -17,7 +17,7 @@ spec:
         - name: awsecr-cred
       containers:
         - name: central-api
-          image: 394603622351.dkr.ecr.eu-west-1.amazonaws.com/central-api:v0.3-rc1
+          image: 394603622351.dkr.ecr.eu-west-1.amazonaws.com/central-api:edge
           imagePullPolicy: Always
           resources:
             limits:
