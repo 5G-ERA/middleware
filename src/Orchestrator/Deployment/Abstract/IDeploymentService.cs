@@ -34,7 +34,7 @@ public interface IDeploymentService
     /// <returns>Has the operation succeeded</returns>
     Task<bool> DeletePlanAsync(ActionPlanModel actionPlan);
 
-    Task DeleteInstanceAsync(Guid actionPlanId, Guid instanceId);
+    Task DeleteActionAsync(Guid actionPlanId, Guid actionId);
 
-    Task DeployInstanceAsync(Guid actionPlanId, Guid instanceId);
+    Task DeployActionAsync(Guid actionPlanId, Guid actionId);
 }

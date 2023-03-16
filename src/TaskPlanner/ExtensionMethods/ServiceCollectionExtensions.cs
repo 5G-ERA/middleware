@@ -30,19 +30,19 @@ public static class ServiceCollectionExtensions
                 mqBusFactoryConfigurator.Publish<DeployPlanMessage>(x => { x.ExchangeType = ExchangeType.Direct; });
 
                 
-                mqBusFactoryConfigurator.Send<SwitchoverDeleteInstance>(x =>
+                mqBusFactoryConfigurator.Send<SwitchoverDeleteAction>(x =>
                 {
                     x.UseRoutingKeyFormatter(t => t.Message.Location);
                 });
-                mqBusFactoryConfigurator.Message<SwitchoverDeleteInstance>(x => x.SetEntityName(nameof(SwitchoverDeleteInstance)));
-                mqBusFactoryConfigurator.Publish<SwitchoverDeleteInstance>(x => { x.ExchangeType = ExchangeType.Direct; });
+                mqBusFactoryConfigurator.Message<SwitchoverDeleteAction>(x => x.SetEntityName(nameof(SwitchoverDeleteAction)));
+                mqBusFactoryConfigurator.Publish<SwitchoverDeleteAction>(x => { x.ExchangeType = ExchangeType.Direct; });
 
-                mqBusFactoryConfigurator.Send<SwitchoverDeployInstance>(x =>
+                mqBusFactoryConfigurator.Send<SwitchoverDeployAction>(x =>
                 {
                     x.UseRoutingKeyFormatter(t => t.Message.Location);
                 });
-                mqBusFactoryConfigurator.Message<SwitchoverDeployInstance>(x => x.SetEntityName(nameof(SwitchoverDeployInstance)));
-                mqBusFactoryConfigurator.Publish<SwitchoverDeployInstance>(x => { x.ExchangeType = ExchangeType.Direct; });
+                mqBusFactoryConfigurator.Message<SwitchoverDeployAction>(x => x.SetEntityName(nameof(SwitchoverDeployAction)));
+                mqBusFactoryConfigurator.Publish<SwitchoverDeployAction>(x => { x.ExchangeType = ExchangeType.Direct; });
                 
                 mqBusFactoryConfigurator.ConfigureEndpoints(busRegistrationContext);
             });

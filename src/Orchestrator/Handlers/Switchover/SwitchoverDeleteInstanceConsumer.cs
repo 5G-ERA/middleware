@@ -6,7 +6,7 @@ using Middleware.Orchestrator.Deployment;
 
 namespace Middleware.Orchestrator.Handlers.Switchover;
 
-public class SwitchoverDeleteInstanceConsumer : IConsumer<SwitchoverDeleteInstance>
+public class SwitchoverDeleteInstanceConsumer : IConsumer<SwitchoverDeleteAction>
 {
     private readonly IDeploymentService _deploymentService;
     private readonly ILogger<SwitchoverDeleteInstanceConsumer> _logger;
@@ -20,13 +20,13 @@ public class SwitchoverDeleteInstanceConsumer : IConsumer<SwitchoverDeleteInstan
         _mwConfig = mwConfig;
     }
 
-    public async Task Consume(ConsumeContext<SwitchoverDeleteInstance> context)
+    public async Task Consume(ConsumeContext<SwitchoverDeleteAction> context)
     {
         _logger.LogInformation("Started processing DeployPlanMessage");
         var payload = context.Message;
         var mwConfig = _mwConfig.Value;
         _logger.LogDebug("Location {0}-{1} received message request addressed to {2}", mwConfig.InstanceName,
             mwConfig.InstanceType, payload.Location);
-        await _deploymentService.DeleteInstanceAsync(payload.ActionPlanId, payload.InstanceId);
+        await _deploymentService.DeleteActionAsync(payload.ActionPlanId, payload.ActionId);
     }
 }

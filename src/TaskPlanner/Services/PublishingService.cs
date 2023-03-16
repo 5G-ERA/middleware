@@ -12,14 +12,14 @@ namespace Middleware.TaskPlanner.Services;
 public class PublishingService : IPublishService
 {
     private readonly IPublisher<DeployPlanMessage> _deployPlanPublisher;
-    private readonly IPublisher<SwitchoverDeleteInstance> _switchoverDeleteInstancePublisher;
-    private readonly IPublisher<SwitchoverDeployInstance> _switchoverDeployInstancePublisher;
+    private readonly IPublisher<SwitchoverDeleteAction> _switchoverDeleteInstancePublisher;
+    private readonly IPublisher<SwitchoverDeployAction> _switchoverDeployInstancePublisher;
     private readonly ICentralApiClient _centralApiClient;
     private readonly MiddlewareConfig _middlewareConfig;
 
     public PublishingService(IPublisher<DeployPlanMessage> deployPlanPublisher,
-        IPublisher<SwitchoverDeleteInstance> switchoverDeleteInstancePublisher,
-        IPublisher<SwitchoverDeployInstance> switchoverDeployInstancePublisher,
+        IPublisher<SwitchoverDeleteAction> switchoverDeleteInstancePublisher,
+        IPublisher<SwitchoverDeployAction> switchoverDeployInstancePublisher,
         IOptions<MiddlewareConfig> middlewareConfig,
         ICentralApiClient centralApiClient)
     {
@@ -47,21 +47,21 @@ public class PublishingService : IPublishService
         await _deployPlanPublisher.PublishAsync(message);
     }
 
-    public async Task PublishSwitchoverDeleteInstance(Guid actionPlanId, Guid instanceId)
+    public async Task PublishSwitchoverDeleteInstance(Guid actionPlanId, Guid actionId)
     {
         var loc = QueueHelpers.ConstructRoutingKey(_middlewareConfig.InstanceName, _middlewareConfig.InstanceType);
 
-        var payload = new SwitchoverDeleteInstance()
+        var payload = new SwitchoverDeleteAction()
         {
             Location = loc,
-            InstanceId = instanceId,
+            ActionId = actionId,
             ActionPlanId = actionPlanId
         };
 
         await _switchoverDeleteInstancePublisher.PublishAsync(payload);
     }
 
-    public async Task PublishSwitchoverDeployInstance(Guid actionPlanId, Guid instanceId, string location, string locationType)
+    public async Task PublishSwitchoverDeployInstance(Guid actionPlanId, Guid actionId, string location, string locationType)
     {
         var response = await _centralApiClient.GetAvailableLocations();
         if (response is null || !response.Locations.Any(l => l.Name == location && l.Type == locationType))
@@ -71,10 +71,10 @@ public class PublishingService : IPublishService
 
         var loc = QueueHelpers.ConstructRoutingKey(location, locationType);
 
-        var payload = new SwitchoverDeployInstance()
+        var payload = new SwitchoverDeployAction()
         {
             Location = loc,
-            InstanceId = instanceId,
+            ActionId = actionId,
             ActionPlanId = actionPlanId
         };
 

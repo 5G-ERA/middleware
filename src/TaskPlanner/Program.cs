@@ -37,9 +37,10 @@ builder.Services.AddCentralApiClient(centralApiHostname, mwConfig.Organization);
 builder.Services.RegisterCommonServices();
 builder.Services.AddScoped<IApiClientBuilder, ApiClientBuilder>();
 builder.Services.AddScoped<IActionPlanner, ActionPlanner>();
+builder.Services.AddScoped<IPublishService, PublishingService>();
 builder.Services.AddScoped<IPublisher<DeployPlanMessage>, DeployPlanMessagePublisher>();
-builder.Services.AddScoped<IPublisher<SwitchoverDeleteInstance>, SwitchoverDeleteInstancePublisher>();
-builder.Services.AddScoped<IPublisher<SwitchoverDeployInstance>, SwitchoverDeployInstancePublisher>();
+builder.Services.AddScoped<IPublisher<SwitchoverDeleteAction>, SwitchoverDeleteInstancePublisher>();
+builder.Services.AddScoped<IPublisher<SwitchoverDeployAction>, SwitchoverDeployInstancePublisher>();
 
 var app = builder.Build();
 

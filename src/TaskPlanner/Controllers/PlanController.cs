@@ -187,9 +187,9 @@ namespace Middleware.TaskPlanner.Controllers
         {
             try
             {
-                await _publishService.PublishSwitchoverDeployInstance(request.ActionPlanId, request.InstanceId,
+                await _publishService.PublishSwitchoverDeployInstance(request.ActionPlanId, request.ActionId,
                     request.Destination, request.DestinationType);
-                await _publishService.PublishSwitchoverDeleteInstance(request.ActionPlanId, request.InstanceId);
+                await _publishService.PublishSwitchoverDeleteInstance(request.ActionPlanId, request.ActionId);
 
                 return Ok();
             }

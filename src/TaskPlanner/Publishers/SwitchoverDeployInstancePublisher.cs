@@ -3,7 +3,7 @@ using Middleware.Common.MessageContracts;
 
 namespace Middleware.TaskPlanner.Publishers;
 
-public class SwitchoverDeployInstancePublisher : IPublisher<SwitchoverDeployInstance>
+public class SwitchoverDeployInstancePublisher : IPublisher<SwitchoverDeployAction>
 {
     private readonly IPublishEndpoint _publish;
 
@@ -12,7 +12,7 @@ public class SwitchoverDeployInstancePublisher : IPublisher<SwitchoverDeployInst
         _publish = publish;
     }
 
-    public async Task PublishAsync(SwitchoverDeployInstance message)
+    public async Task PublishAsync(SwitchoverDeployAction message)
     {
         await _publish.Publish(message);
     }

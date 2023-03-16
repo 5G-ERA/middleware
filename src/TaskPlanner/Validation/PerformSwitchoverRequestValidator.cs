@@ -7,7 +7,7 @@ public class PerformSwitchoverRequestValidator : AbstractValidator<PerformSwitch
 {
     public PerformSwitchoverRequestValidator()
     {
-        RuleFor(x => x.InstanceId)
+        RuleFor(x => x.ActionId)
             .NotNull().NotEmpty();
         RuleFor(x => x.ActionPlanId)
             .NotNull().NotEmpty();

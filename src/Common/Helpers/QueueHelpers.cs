@@ -45,12 +45,12 @@ public static class QueueHelpers
     /// <param name="instanceName"></param>
     /// <returns></returns>
     /// <exception cref="ArgumentNullException">When parameters are not specified or contain empty or whitespace string</exception>
-    public static string ConstructSwitchoverDeleteInstanceQueueName(string organization, string instanceName)
+    public static string ConstructSwitchoverDeleteActionQueueName(string organization, string instanceName)
     {
         if (string.IsNullOrWhiteSpace(organization)) throw new ArgumentNullException(nameof(organization));
         if (string.IsNullOrWhiteSpace(organization)) throw new ArgumentNullException(nameof(instanceName));
 
-        return GetQueueName(organization, instanceName, "switchover-instance-delete");
+        return GetQueueName(organization, instanceName, "switchover-action-delete");
     }
     /// <summary>
     /// Constructs the switchover deployment queue name for this specific Middleware instance
@@ -59,11 +59,11 @@ public static class QueueHelpers
     /// <param name="instanceName"></param>
     /// <returns></returns>
     /// <exception cref="ArgumentNullException">When parameters are not specified or contain empty or whitespace string</exception>
-    public static string ConstructSwitchoverDeployInstanceQueueName(string organization, string instanceName)
+    public static string ConstructSwitchoverDeployActionQueueName(string organization, string instanceName)
     {
         if (string.IsNullOrWhiteSpace(organization)) throw new ArgumentNullException(nameof(organization));
         if (string.IsNullOrWhiteSpace(organization)) throw new ArgumentNullException(nameof(instanceName));
 
-        return GetQueueName(organization, instanceName, "switchover-instance-deploy");
+        return GetQueueName(organization, instanceName, "switchover-action-deploy");
     }
 }

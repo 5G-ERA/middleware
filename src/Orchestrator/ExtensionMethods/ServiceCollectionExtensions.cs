@@ -34,12 +34,12 @@ public static class ServiceCollectionExtensions
                 });
 
                 mqBusFactoryConfigurator.ReceiveEndpoint(
-                    QueueHelpers.ConstructSwitchoverDeleteInstanceQueueName(mwConfig.Organization,
+                    QueueHelpers.ConstructSwitchoverDeleteActionQueueName(mwConfig.Organization,
                         mwConfig.InstanceName),
                     ec =>
                     {
                         ec.ConfigureConsumeTopology = false;
-                        ec.Bind(nameof(SwitchoverDeleteInstance), b =>
+                        ec.Bind(nameof(SwitchoverDeleteAction), b =>
                         {
                             b.ExchangeType = ExchangeType.Direct;
                             b.RoutingKey = routingKey;
@@ -48,12 +48,12 @@ public static class ServiceCollectionExtensions
                     });
                 
                 mqBusFactoryConfigurator.ReceiveEndpoint(
-                    QueueHelpers.ConstructSwitchoverDeployInstanceQueueName(mwConfig.Organization,
+                    QueueHelpers.ConstructSwitchoverDeployActionQueueName(mwConfig.Organization,
                         mwConfig.InstanceName),
                     ec =>
                     {
                         ec.ConfigureConsumeTopology = false;
-                        ec.Bind(nameof(SwitchoverDeployInstance), b =>
+                        ec.Bind(nameof(SwitchoverDeployAction), b =>
                         {
                             b.ExchangeType = ExchangeType.Direct;
                             b.RoutingKey = routingKey;

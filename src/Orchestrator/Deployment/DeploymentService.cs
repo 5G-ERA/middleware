@@ -320,31 +320,40 @@ public class DeploymentService : IDeploymentService
         return retVal;
     }
 
-    public async Task DeleteInstanceAsync(Guid actionPlanId, Guid instanceId)
+    public async Task DeleteActionAsync(Guid actionPlanId, Guid actionId)
     {
+        _logger.LogTrace("Entered DeployActionAsync");
         var kubeClient = _kubernetesBuilder.CreateKubernetesClient();
-
+        _logger.LogDebug("Retrieving ActionPlan");
         var actionPlan = await _redisInterfaceClient.ActionPlanGetByIdAsync(actionPlanId);
         if (actionPlan is null)
             return;
-
-        var instance = actionPlan.ActionSequence
-            .SelectMany(x => x.Services!).FirstOrDefault(i => i.ServiceInstanceId == instanceId);
-        if (instance is null)
+        _logger.LogDebug("Retrieving Action from action plan");
+        var action = actionPlan.ActionSequence.FirstOrDefault(x => x.Id == actionId);
+        if (action is null)
             return;
 
+        _logger.LogDebug("Retrieving location details (cloud or edge)");
         BaseModel thisLocation = _mwConfig.Value.InstanceType == LocationType.Cloud.ToString()
             ? await _redisInterfaceClient.GetCloudByNameAsync(_mwConfig.Value.InstanceName)
             : await _redisInterfaceClient.GetEdgeByNameAsync(_mwConfig.Value.InstanceName);
 
-        await _redisInterfaceClient.DeleteRelationAsync(instance, thisLocation, "LOCATED_AT");
+        foreach (var instance in action.Services!)
+        {
+            _logger.LogDebug("Deleting instance '{0}', with serviceInstanceId '{1}'",
+                instance.Name, instance.ServiceInstanceId);
 
-        await DeleteInstance(kubeClient, instanceId);
+            await DeleteInstance(kubeClient, actionId);
+            _logger.LogDebug("Deleting relation between instance '{0}'and location '{1}'",
+                instance.Name, thisLocation.Name);
+
+            await _redisInterfaceClient.DeleteRelationAsync(instance, thisLocation, "LOCATED_AT");
+        }
     }
 
-    public async Task DeployInstanceAsync(Guid actionPlanId, Guid instanceId)
+    public async Task DeployActionAsync(Guid actionPlanId, Guid actionId)
     {
-        _logger.LogTrace("Entered DeployInstanceAsync");
+        _logger.LogTrace("Entered DeployActionAsync");
         var kubeClient = _kubernetesBuilder.CreateKubernetesClient();
 
         _logger.LogDebug("Retrieving ActionPlan");
@@ -352,32 +361,33 @@ public class DeploymentService : IDeploymentService
         if (actionPlan is null)
             return;
         _logger.LogDebug("Retrieving action containing desired Service");
-        var action =
-            actionPlan.ActionSequence.FirstOrDefault(a =>
-                a.Services!.Select(i => i.ServiceInstanceId).Contains(instanceId));
+        var action = actionPlan.ActionSequence.FirstOrDefault(a => a.Id == actionId);
 
-        _logger.LogDebug("Retrieving Instance");
-        var instance = action.Services.FirstOrDefault(i => i.ServiceInstanceId == instanceId);
-
-        if (instance is null)
+        if (action is null)
             return;
 
         var deployments = await kubeClient.AppsV1.ListNamespacedDeploymentAsync(AppConfig.K8SNamespaceName);
         var deploymentNames = deployments.Items.Select(d => d.Metadata.Name).OrderBy(d => d).ToArray();
-        _logger.LogDebug("Starting Service Deployment");
-        await DeployService(kubeClient, instance, deploymentNames);
+        
         _logger.LogDebug("Retrieving location details (cloud or edge)");
         BaseModel thisLocation = _mwConfig.Value.InstanceType == LocationType.Cloud.ToString()
             ? await _redisInterfaceClient.GetCloudByNameAsync(_mwConfig.Value.InstanceName)
             : await _redisInterfaceClient.GetEdgeByNameAsync(_mwConfig.Value.InstanceName);
-
-        _logger.LogDebug("Adding new relation between instance and current location");
-        await _redisInterfaceClient.AddRelationAsync(instance, thisLocation, "LOCATED_AT");
+        
+        foreach (var instance in action.Services!)
+        {
+            _logger.LogDebug("Deploying instance '{0}', with serviceInstanceId '{1}'",
+                instance.Name, instance.ServiceInstanceId);
+            await DeployService(kubeClient, instance, deploymentNames);
+            
+            _logger.LogDebug("Adding new relation between instance and current location");
+            await _redisInterfaceClient.AddRelationAsync(instance, thisLocation, "LOCATED_AT");
+        }
+        
         action.Placement = _mwConfig.Value.InstanceName;
         action.PlacementType = _mwConfig.Value.InstanceType;
-        // TODO: location is specified on Action level in the action plan,
-        // the action has to be updated but for now the system will not bat an eye
-        _logger.LogDebug("Savin updated ActionPlan");
+        
+        _logger.LogDebug("Saving updated ActionPlan");
         await _redisInterfaceClient.ActionPlanAddAsync(actionPlan);
     }
 

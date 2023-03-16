@@ -3,7 +3,7 @@ using Middleware.Common.MessageContracts;
 
 namespace Middleware.TaskPlanner.Publishers;
 
-public class SwitchoverDeleteInstancePublisher : IPublisher<SwitchoverDeleteInstance>
+public class SwitchoverDeleteInstancePublisher : IPublisher<SwitchoverDeleteAction>
 {
     private readonly IPublishEndpoint _publish;
 
@@ -12,7 +12,7 @@ public class SwitchoverDeleteInstancePublisher : IPublisher<SwitchoverDeleteInst
         _publish = publish;
     }
 
-    public async Task PublishAsync(SwitchoverDeleteInstance message)
+    public async Task PublishAsync(SwitchoverDeleteAction message)
     {
         await _publish.Publish(message);
     }
