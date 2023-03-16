@@ -43,6 +43,12 @@ rosrun image_view image_view image:=/usb_cam/image_raw
 
 ## 4. Launch NetApp ROS Client
 
+You may docker pull, the ROS net application client:
+
+```console
+docker pull but5gera/noetic_client:1.2.0
+```
+
 Check the external IP address of the pod with the netApp. This will be the input parameter to "NETAPP_ADDRESS". The port will stay the same: "5896".
 Finally, include the camera topic in "INPUT_TOPIC". The command should look like:
 
