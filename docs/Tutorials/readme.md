@@ -5,7 +5,7 @@ In this way, by using RVIZ or image_view package, the bounding boxes of predicti
 
 ## 1. Install Middleware in Ubuntu 18.04.6 LTS
 
-The following [guide](https://github.com/5G-ERA/middleware/blob/main/docs/Administrator/Middleware_Installation.md) show case the procedure.
+The following [guide](/docs/Administrator/Middleware_Installation.md) show case the procedure.
 
 ## 2. Run python script to launch reference netApp.
 
