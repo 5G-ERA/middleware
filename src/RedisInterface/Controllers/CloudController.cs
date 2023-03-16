@@ -276,7 +276,7 @@ namespace Middleware.RedisInterface.Controllers
         }
 
         [HttpGet]
-        [Route("/name/{name}", Name = "CloudGetDataByName")]
+        [Route("name/{name}", Name = "CloudGetDataByName")]
         [ProducesResponseType(typeof(CloudModel), (int)HttpStatusCode.OK)]
         [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.NotFound)]
         [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.InternalServerError)]

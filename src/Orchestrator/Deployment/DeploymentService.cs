@@ -343,7 +343,7 @@ public class DeploymentService : IDeploymentService
             _logger.LogDebug("Deleting instance '{0}', with serviceInstanceId '{1}'",
                 instance.Name, instance.ServiceInstanceId);
 
-            await DeleteInstance(kubeClient, actionId);
+            await DeleteInstance(kubeClient, instance.ServiceInstanceId);
             _logger.LogDebug("Deleting relation between instance '{0}'and location '{1}'",
                 instance.Name, thisLocation.Name);
 
