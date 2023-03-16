@@ -33,9 +33,9 @@ namespace Middleware.Common.Services
                 var relation = CreateRelation(source, direction, name);
 
                 string url = $"/api/v1/{source.GetType().GetModelName()}/AddRelation";
-
-                var result = await _httpClient.PostAsJsonAsync(url, JsonConvert.SerializeObject(relation));
-
+                
+                var result = await _httpClient.PostAsJsonAsync(url, relation);
+                
                 return result.IsSuccessStatusCode;
             }
             catch (Exception ex)

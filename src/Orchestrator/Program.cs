@@ -21,7 +21,7 @@ builder.Configuration
 builder.RegisterSecretsManager();
 
 builder.ConfigureLogger();
-
+builder.Services.Configure<MiddlewareConfig>(builder.Configuration.GetSection(MiddlewareConfig.ConfigName));
 var mwConfig = builder.Configuration.GetSection(MiddlewareConfig.ConfigName).Get<MiddlewareConfig>();
 var centralApiHostname = Environment.GetEnvironmentVariable("CENTRAL_API_HOSTNAME");
 if (centralApiHostname is null)
