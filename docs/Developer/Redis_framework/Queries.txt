@@ -1,3 +1,5 @@
+match(x) return (x)
+
 GRAPH.QUERY "RESOURCE_PLANNER" "CREATE (:ROBOT {ID: 'ROBOT_1'})"
 
 
