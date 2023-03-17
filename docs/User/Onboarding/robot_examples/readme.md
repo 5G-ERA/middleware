@@ -17,5 +17,5 @@ At the moment, these are the available pre-defined onboarding files for robots t
 
 
 
-2) [Kobuki Base](https://github.com/5G-ERA/middleware/blob/main/src/Common/Onboarding/RobotsExamples/Kobuki.json) - Yujin Robot
+2) [Kobuki Base](Kobuki.json) - Yujin Robot
   <img src="img/kobuki.png" height="100rm" align="center" />
