@@ -1,4 +1,5 @@
 ﻿using System.Collections.Immutable;
+using Amazon.Auth.AccessControlPolicy.ActionIdentifiers;
 using FluentValidation;
 using Middleware.CentralApi.Domain;
 using Middleware.DataAccess.Repositories.Abstract;
@@ -30,7 +31,7 @@ public class LocationService : ILocationService
 
         if ((queryResultEdge == false || edge is null) && (queryResultCloud == false || cloud is null))
         {
-            return new NotFound();    
+            return await RegisterNewLocation(location);
         }
 
         // make it online & return info about location based on matched edge
@@ -63,6 +64,44 @@ public class LocationService : ILocationService
             return result;
         }
 
+    }
+
+    private async Task<Location> RegisterNewLocation(Location location)
+    {
+        var id = Guid.NewGuid();
+        if (location.Type == LocationType.Cloud)
+        {
+            var cloud = new CloudModel()
+            {
+                Id = id,
+                Name = location.Name,
+                Organization = location.Organization,
+                Type = LocationType.Cloud.ToString(),
+                LastUpdatedTime = DateTimeOffset.Now.Date
+            };
+            await _cloudRepository.AddAsync(cloud);
+        }
+        else if (location.Type == LocationType.Edge)
+        {
+            var cloud = new EdgeModel()
+            {
+                Id = id,
+                Name = location.Name,
+                Organization = location.Organization,
+                Type = LocationType.Cloud.ToString(),
+                LastUpdatedTime = DateTimeOffset.Now.Date
+            };
+            await _edgeRepository.AddAsync(cloud);
+        }
+
+        var newLoc = new Location()
+        {
+            Id = id,
+            Name = location.Name,
+            Organization = location.Organization,
+            Type = location.Type
+        };
+        return newLoc;
     }
 
     public async Task<OneOf<ImmutableList<Location>, NotFound>> GetAvailableLocations(string organization)

@@ -113,7 +113,7 @@ public class LocationServiceTests
     }
 
     [Fact]
-    public async Task RegisterLocation_ShouldReturnNotFound_WhenLocationDoesNotExist()
+    public async Task RegisterLocation_ShouldRegisterNewBareLocation_WhenLocationIsNotFound()
     {
         // arrange
         var paramLocation = new Location()
@@ -127,14 +127,14 @@ public class LocationServiceTests
         // act
         var result = await _sut.RegisterLocation(paramLocation);
         // assert
-        result.IsT0.Should().BeFalse();
+        result.IsT0.Should().BeTrue();
         result.IsT1.Should().BeFalse();
-        result.IsT2.Should().BeTrue();
+        result.IsT2.Should().BeFalse();
 
-        var resultType = result.AsT2;
-        resultType.Should().BeOfType<NotFound>();
+        var resultType = result.AsT0;
+        resultType.Should().BeOfType<Location>();
 
-        await _cloudRepository.Received(0).AddAsync(Arg.Any<CloudModel>());
+        await _cloudRepository.Received(1).AddAsync(Arg.Any<CloudModel>());
         await _edgeRepository.Received(0).AddAsync(Arg.Any<EdgeModel>());
     }
 
