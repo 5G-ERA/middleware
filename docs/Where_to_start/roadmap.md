@@ -9,7 +9,7 @@ https://5g-era.eu
 For workshops demostrations and tutorials visit our [Youtube Channel](https://www.youtube.com/channel/UCFn5FI9OYLA9_jTwl2cwdFA/videos )
 
 <p align="left">
-  <img src="docs/img/logo.png" alt="Middleware architecture"/>
+  <img src="../img/MiddlewareArchitecture.png" alt="MiddlewareArchitecture"/>
 </p>
 
 ## What is 5G-ERA Middleware
@@ -32,7 +32,7 @@ The Middleware mainly operates on the Kubernetes network layer, designed as a cl
 The image below presents the conceptual architecture of the 5G-ERA Middleware and the connection between the associated services. The 5G-ERA Middleware has been designed to run in the Cloud and the Edge devices. Therefore, it can be always accessible and provide the best quality of service to the Robot by placement in the closest possible location.
  
 <p align="center">
-  <img src="docs/img/Middleware_Architecture.png" alt="Middleware architecture"/ >
+  <img src="../img/Middleware_Architecture.png" alt="Middleware architecture"/ >
 </p>
 
 The 5G-ERA Middleware connects to the Redis Cluster, which allows sharing of semantic knowledge between all the instances of the 5G-ERA Middleware running in every Cloud and Edge device.
@@ -74,14 +74,14 @@ Roadmap for continuos enhancement of the middleware.
             <td style="width: 20.0000%;">Release</td>
         </tr>
         <tr>
-            <td style="width: 19.9372%;">Robot/Cloud/Edge Data onboarding automatic middleware validation.</td>
+            <td style="width: 19.9372%;">Preparing Onboarding template for robot, cloud, instance</td>
             <td style="width: 19.9372%;">X</td>
             <td style="width: 19.9686%;"><br></td>
             <td style="width: 19.9686%;"><br>
                 <table style="width: 100%;">
                     <tbody>
                         <tr>
-                            <td style="width: 57.2585%;">October 2022</td>
+                            <td style="width: 57.2585%;">2nd March 2023</td>
                             <td style="width: 41.935%;"><span style="color: rgb(97, 189, 109);">No Delay</span></td>
                         </tr>
                     </tbody>
@@ -91,21 +91,21 @@ Roadmap for continuos enhancement of the middleware.
                 <table style="width: 98%; margin-right: calc(2%);">
                     <tbody>
                         <tr>
-                            <td style="width: 18.9953%;">v0.16</td>
+                            <td style="width: 18.9953%;">v0.3.0</td>
                         </tr>
                     </tbody>
                 </table><br>
             </td>
         </tr>
         <tr>
-            <td style="width: 19.9372%;">Replanning Endpoint for robot tasks.&nbsp;</td>
+            <td style="width: 19.9372%;">Integration of NewNetapp design with middleware and AS/AC&nbsp;</td>
             <td style="width: 19.9372%;">X</td>
             <td style="width: 19.9686%;"><br></td>
             <td style="width: 19.9686%;">
                 <table style="width: 100%;">
                     <tbody>
                         <tr>
-                            <td style="width: 10.675%;">October 2022</td>
+                            <td style="width: 10.675%;">14 March 2023</td>
                             <td style="width: 8.6343%;"><span style="color: rgb(97, 189, 109);">No Delay</span></td>
                         </tr>
                     </tbody>
@@ -115,21 +115,21 @@ Roadmap for continuos enhancement of the middleware.
                 <table style="width: 98%; margin-right: calc(2%);">
                     <tbody>
                         <tr>
-                            <td style="width: 18.9953%;">v0.16</td>
+                            <td style="width: 18.9953%;">v0.3.0</td>
                         </tr>
                     </tbody>
                 </table><br>
             </td>
         </tr>
         <tr>
-            <td style="width: 19.9372%;">Reference Robot Onboarding template</td>
+            <td style="width: 19.9372%;">Mapping of Topics that will be published by the robot and consumed by the Netapps</td>
             <td style="width: 19.9372%;">X</td>
             <td style="width: 19.9686%;"><br></td>
             <td style="width: 19.9686%;"><br>
                 <table style="width: 100%;">
                     <tbody>
                         <tr>
-                            <td style="width: 74.9996%;">October 2022</td>
+                            <td style="width: 74.9996%;">31 March 2023</td>
                             <td style="width: 24.1939%;"><span style="color: rgb(97, 189, 109);">No Delay</span></td>
                         </tr>
                     </tbody>
@@ -139,21 +139,21 @@ Roadmap for continuos enhancement of the middleware.
                 <table style="width: 98%; margin-right: calc(2%);">
                     <tbody>
                         <tr>
-                            <td style="width: 18.9953%;">v0.16</td>
+                            <td style="width: 18.9953%;">v0.4</td>
                         </tr>
                     </tbody>
                 </table><br>
             </td>
         </tr>
         <tr>
-            <td style="width: 19.9372%;">Bash script for automatic generation of onboarding files</td>
+            <td style="width: 19.9372%;">Simplified Resource Deployment</td>
             <td style="width: 19.9372%;">X</td>
             <td style="width: 19.9686%;"><br></td>
             <td style="width: 19.9686%;"><br><br>
                 <table style="width: 100%;">
                     <tbody>
                         <tr>
-                            <td style="width: 13.1868%;">November 2022</td>
+                            <td style="width: 13.1868%;">6 April 2023</td>
                             <td style="width: 6.1225%;"><span style="color: rgb(97, 189, 109);">No Delay</span></td>
                         </tr>
                     </tbody>
@@ -163,7 +163,7 @@ Roadmap for continuos enhancement of the middleware.
                 <table style="width: 98%; margin-right: calc(2%);">
                     <tbody>
                         <tr>
-                            <td style="width: 18.9953%;">v0.17</td>
+                            <td style="width: 18.9953%;">v0.4</td>
                         </tr>
                     </tbody>
                 </table><br>
