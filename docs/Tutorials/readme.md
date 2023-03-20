@@ -161,7 +161,7 @@ sudo docker run --rm --net host --env NETAPP_ADDRESS=192.168.1.5 --env NETAPP_PO
 ## 5. Visualice the result predictions:
 
 ```console
-rosrun image_view image_view image:=/airos/camera/image
+rosrun image_view image_view image:=/results
 ```
 
 <p align="left">
