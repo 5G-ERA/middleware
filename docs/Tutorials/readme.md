@@ -49,7 +49,8 @@ You may docker pull, the ROS net application client:
 docker pull but5gera/noetic_client:1.2.0
 ```
 
-Check the external IP address of the pod with the netApp. This will be the input parameter to "NETAPP_ADDRESS". The port will stay the same: "5896".
+Check the external IP address of the pod with the netApp. This will be the input parameter to "NETAPP_ADDRESS". The port will be done one of the network application.
+
 Finally, include the camera topic in "INPUT_TOPIC". The command should look like:
 
 ```console
