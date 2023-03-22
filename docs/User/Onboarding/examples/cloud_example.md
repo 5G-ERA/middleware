@@ -15,6 +15,7 @@ POST /api/v1/Cloud
   "RAM": 0,
   "MacAddress": "string",
   "LastUpdatedTime": "2009-06-15T13:45:30.0000000-07:00",
-  "IsOnline": true
+  "IsOnline": true,
+  "Organization": "Beds"
 }
 ```
