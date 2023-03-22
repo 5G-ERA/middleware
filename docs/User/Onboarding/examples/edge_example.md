@@ -16,6 +16,7 @@ POST /api/v1/Edge
   "DiskStorage": 0,
   "NumberOfCores": 0,
   "LastUpdatedTime": "2009-06-15T13:45:30.0000000-07:00",
-  "IsOnline": true
+  "IsOnline": true,
+  "Organization": "Beds"
 }
 ```
