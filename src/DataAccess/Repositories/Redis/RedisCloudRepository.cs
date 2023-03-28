@@ -1,17 +1,12 @@
-﻿using System.Text.Json;
-using System.Xml.Linq;
-using Microsoft.Extensions.Logging;
+﻿using System.Collections.Immutable;
 using Microsoft.IdentityModel.Tokens;
 using Middleware.Common.Enums;
 using Middleware.DataAccess.Repositories.Abstract;
 using Middleware.Models.Domain;
 using Middleware.Models.Dto;
-using Middleware.Models.Enums;
-using NReJSON;
 using Redis.OM.Contracts;
 using RedisGraphDotNet.Client;
-using StackExchange.Redis;
-using ILogger = Serilog.ILogger;
+using Serilog;
 
 namespace Middleware.DataAccess.Repositories
 {
@@ -20,7 +15,7 @@ namespace Middleware.DataAccess.Repositories
         /// <summary>
         /// Default constructor
         /// </summary>
-        /// <param name="redisClient"></param>
+        /// <param name="provider"></param>
         /// <param name="redisGraph"></param>
         /// <param name="logger"></param>
         public RedisCloudRepository(IRedisConnectionProvider provider, IRedisGraphClient redisGraph, ILogger logger) : base(provider, redisGraph, true, logger)
@@ -94,9 +89,9 @@ namespace Middleware.DataAccess.Repositories
         }
 
 
-        public async Task<CloudModel> GetCloudResourceDetailsByNameAsync(string name)
+        public async Task<CloudModel?> GetCloudResourceDetailsByNameAsync(string name)
         {   
-            CloudModel cloud = await FindSingleAsync(dto => dto.Name == name);
+            CloudModel? cloud = await FindSingleAsync(dto => dto.Name == name);
             return cloud;
         }
 
@@ -108,7 +103,7 @@ namespace Middleware.DataAccess.Repositories
         public async Task<List<CloudModel>> GetFreeCloudsIdsAsync(List<CloudModel> cloudsToCheck)
         {
             //get all clouds
-            List<CloudModel> TempFreeClouds = new List<CloudModel>();
+            List<CloudModel> tempFreeClouds = new List<CloudModel>();
 
             // Find all clouds that dont have a relationship of type -LOCATED_AT-
 
@@ -121,10 +116,10 @@ namespace Middleware.DataAccess.Repositories
                     RelationDirection.Incoming);
 
                 if (relations.IsNullOrEmpty()){
-                    TempFreeClouds.Add(cloud);
+                    tempFreeClouds.Add(cloud);
                 }
             }
-            return TempFreeClouds;
+            return tempFreeClouds;
         }
 
         /// <summary>
@@ -185,7 +180,7 @@ namespace Middleware.DataAccess.Repositories
         /// <summary>
         /// Return number of containers allocated in cloud with specific id
         /// </summary>
-        /// <param name="cloudName"></param>
+        /// <param name="cloudId"></param>
         /// <returns></returns>
         public async Task<int> GetNumContainersByIdAsync(Guid cloudId)
         {
@@ -200,7 +195,7 @@ namespace Middleware.DataAccess.Repositories
         /// <returns></returns>
         public async Task<bool> IsBusyCloudByNameAsync(string cloudName)
         {
-            CloudModel cloud = await FindSingleAsync(dto => dto.Name == cloudName);
+            CloudModel? cloud = await FindSingleAsync(dto => dto.Name == cloudName);
             if (cloud is null)
                 throw new ArgumentException("Cloud does not exist", nameof(cloudName));
 
@@ -212,12 +207,60 @@ namespace Middleware.DataAccess.Repositories
         /// <summary>
         /// Return bool if cloud is busy by cloud Id.
         /// </summary>
-        /// <param name="cloudName"></param>
+        /// <param name="cloudId"></param>
         /// <returns></returns>
         public async Task<bool> IsBusyCloudByIdAsync(Guid cloudId)
         {
             List<RelationModel> cloudRelations = await GetRelation(cloudId, "LOCATED_AT", RelationDirection.Incoming);
             return cloudRelations.Count > 0;
+        }
+
+        /// <summary>
+        /// Return all the clouds of a particular organization.
+        /// </summary>
+        /// <param name="organization"></param>
+        /// <returns></returns>
+        /// <exception cref="ArgumentException"></exception>
+        public async Task<ImmutableList<CloudModel>> GetCloudsByOrganizationAsync(string organization)
+        {
+            var matchedClouds = await FindQuery(dto => dto.Organization == organization).ToListAsync();
+            return matchedClouds.Select(c=>(CloudModel)c.ToModel()).ToImmutableList();
+        }
+
+        /// <summary>
+        /// Checks if an edge with a particular name exists.
+        /// </summary>
+        /// <param name="name"></param>
+        /// <returns></returns>
+        public async Task<(bool, CloudModel?)> CheckIfNameExists(string name)
+        {
+            CloudModel? matchedCloud = await FindSingleAsync(dto => dto.Name == name);
+            if (matchedCloud is not null)
+            {
+                return (true, matchedCloud);
+            }
+            else
+            {
+                return (false, matchedCloud);
+            }
+        }
+
+        /// <summary>
+        /// Checks if an edge with a particular id exists.
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        public async Task<(bool, CloudModel?)> CheckIfIdExists(string id)
+        {
+            CloudModel? matchedCloud = await FindSingleAsync(dto => dto.Id == id);
+            if (matchedCloud is not null)
+            {
+                return (true, matchedCloud);
+            }
+            else
+            {
+                return (false, matchedCloud);
+            }
         }
     }
 }

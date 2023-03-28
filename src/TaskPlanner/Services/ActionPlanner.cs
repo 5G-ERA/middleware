@@ -587,21 +587,4 @@ public class ActionPlanner : IActionPlanner
             return new Tuple<TaskModel, TaskModel, RobotModel>(task, oldTask, robot);
         }
     }
-
-    public async Task PublishPlanAsync(TaskModel task, RobotModel robot)
-    {
-        var action = task.ActionSequence!.FirstOrDefault();
-
-        if (action == null)
-            return;
-        
-        var location = QueueHelpers.ConstructRoutingKey(action.Placement, action.PlacementType);
-        var message = new DeployPlanMessage()
-        {
-            Task = task,
-            RobotId = robot.Id,
-            DeploymentLocation = location
-        };
-        await _deployPlanPublisher.PublishAsync(message);
-    }
 }

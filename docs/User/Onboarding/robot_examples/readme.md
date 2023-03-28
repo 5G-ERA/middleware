@@ -2,7 +2,7 @@
 
 At the moment, these are the available pre-defined onboarding files for robots that we have tested in the 5G-ERA project. We plan to extend this list in the future. Please, look at our roadmap for further details.
 
-1) [Aisoy Kik](https://github.com/5G-ERA/middleware/blob/main/src/Common/Onboarding/RobotsExamples/AisoyKiK.json) - From Aisoy Robotics  
+1) [Aisoy Kik](Aisoy_OnboardingV2.json) - From Aisoy Robotics  
 
   <img src="img/Aisoy.png" height="100rm" align="center" />
 
@@ -17,5 +17,5 @@ At the moment, these are the available pre-defined onboarding files for robots t
 
 
 
-2) [Kobuki Base](https://github.com/5G-ERA/middleware/blob/main/src/Common/Onboarding/RobotsExamples/Kobuki.json) - Yujin Robot
+2) [Kobuki Base](Kobuki.json) - Yujin Robot
   <img src="img/kobuki.png" height="100rm" align="center" />

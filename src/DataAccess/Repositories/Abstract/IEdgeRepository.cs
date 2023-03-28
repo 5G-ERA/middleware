@@ -1,4 +1,5 @@
-﻿using Middleware.Models.Domain;
+﻿using System.Collections.Immutable;
+using Middleware.Models.Domain;
 
 namespace Middleware.DataAccess.Repositories.Abstract
 {
@@ -17,5 +18,13 @@ namespace Middleware.DataAccess.Repositories.Abstract
         Task<int> GetNumContainersByIdAsync(Guid edgeId);
 
         Task<int> GetNumContainersByNameAsync(string edgeName);
+
+        Task<ImmutableList<EdgeModel>> GetEdgesByOrganizationAsync(string organization);
+
+        Task<bool> CheckIfAddressExists(Uri address);
+        Task<(bool, EdgeModel?)> CheckIfNameExists(string name);
+
+        Task<(bool, EdgeModel? matchedEdge)> CheckIfIdExists(string id);
+
     }
 }

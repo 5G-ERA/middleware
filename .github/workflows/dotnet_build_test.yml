@@ -5,9 +5,9 @@ on:
     inputs:
      -dummy:
   push:
-    branches: [ main, Development ]
+    branches: [ '**'  ]
   pull_request:
-    branches: [ main, Development ]
+    branches: [ '**'  ]
 
 jobs:
   build:

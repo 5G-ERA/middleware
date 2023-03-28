@@ -3,8 +3,8 @@ using Middleware.Common.Config;
 using Middleware.Common.Helpers;
 using Middleware.Common.MessageContracts;
 using Middleware.Orchestrator.Handlers;
+using Middleware.Orchestrator.Handlers.Switchover;
 using RabbitMQ.Client;
-using static MassTransit.Logging.OperationName;
 
 namespace Middleware.Orchestrator.ExtensionMethods;
 
@@ -18,6 +18,13 @@ public static class ServiceCollectionExtensions
         {
             services.AddScoped<DeployPlanConsumer>();
             x.AddConsumer<DeployPlanConsumer>();
+            
+            services.AddScoped<SwitchoverDeleteInstanceConsumer>();
+            x.AddConsumer<SwitchoverDeleteInstanceConsumer>();
+            
+            services.AddScoped<SwitchoverDeployInstanceConsumer>();
+            x.AddConsumer<SwitchoverDeployInstanceConsumer>();
+            
             x.UsingRabbitMq((busRegistrationContext, mqBusFactoryConfigurator) =>
             {
                 mqBusFactoryConfigurator.Host(mqConfig.Address, "/", hostConfig =>
@@ -26,6 +33,34 @@ public static class ServiceCollectionExtensions
                     hostConfig.Password(mqConfig.Pass);
                 });
 
+                mqBusFactoryConfigurator.ReceiveEndpoint(
+                    QueueHelpers.ConstructSwitchoverDeleteActionQueueName(mwConfig.Organization,
+                        mwConfig.InstanceName),
+                    ec =>
+                    {
+                        ec.ConfigureConsumeTopology = false;
+                        ec.Bind(nameof(SwitchoverDeleteAction), b =>
+                        {
+                            b.ExchangeType = ExchangeType.Direct;
+                            b.RoutingKey = routingKey;
+                        });
+                        ec.ConfigureConsumer<SwitchoverDeleteInstanceConsumer>(busRegistrationContext);
+                    });
+                
+                mqBusFactoryConfigurator.ReceiveEndpoint(
+                    QueueHelpers.ConstructSwitchoverDeployActionQueueName(mwConfig.Organization,
+                        mwConfig.InstanceName),
+                    ec =>
+                    {
+                        ec.ConfigureConsumeTopology = false;
+                        ec.Bind(nameof(SwitchoverDeployAction), b =>
+                        {
+                            b.ExchangeType = ExchangeType.Direct;
+                            b.RoutingKey = routingKey;
+                        });
+                        ec.ConfigureConsumer<SwitchoverDeployInstanceConsumer>(busRegistrationContext);
+                    });
+                
                 mqBusFactoryConfigurator.ReceiveEndpoint(
                     QueueHelpers.ConstructDeploymentQueueName(mwConfig.Organization, mwConfig.InstanceName),
                     ec =>
@@ -42,6 +77,7 @@ public static class ServiceCollectionExtensions
                 mqBusFactoryConfigurator.ConfigureEndpoints(busRegistrationContext);
             });
         });
+        
         // MassTransit-RabbitMQ Configuration
         services.AddOptions<MassTransitHostOptions>()
             .Configure(options =>
