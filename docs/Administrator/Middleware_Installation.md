@@ -270,7 +270,7 @@ http://localhost:5000/
 ### 10.1) If after running the middleware for a couple of hours you find this error, it is because the keys need to be refresed.
 
 <p align="left">
-    <img src="imgs/keys.png" alt="- aws configure command example">
+    <img src="imgs/keys2.png" alt="- aws configure command example">
 </p>
 
 Go to the following [directory](https://github.com/5G-ERA/middleware/blob/main/k8s/orchestrator) and launch these scripts in order:
