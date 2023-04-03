@@ -40,6 +40,9 @@
         "AllowedScopes": []
       },
       "UpstreamPathTemplate": "/Data/{all}",
+      "RouteClaimsRequirement": {
+        "Role": "admin"
+      },
       "UpstreamHttpMethod": [ "GET", "POST", "PUT", "PATCH", "DELETE" ]
     },
     //TaskPlanner API

@@ -16,6 +16,8 @@ namespace Middleware.Models.Domain
         [JsonPropertyName("UserName")]
         public override string Name { get; set; }
         public string Salt { get; set; }
+
+        public string Role { get; set; }
         public override Dto.Dto ToDto()
         {
             var domain = this;
@@ -23,7 +25,8 @@ namespace Middleware.Models.Domain
             {
                 Id = domain.Id.ToString(),
                 Password = domain.Password,
-                Salt = domain.Salt
+                Salt = domain.Salt,
+                Role = domain.Role
                 
             };
         }

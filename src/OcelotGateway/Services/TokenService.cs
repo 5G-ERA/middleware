@@ -4,30 +4,34 @@ using System.Text;
 using System.IdentityModel.Tokens.Jwt;
 using Middleware.Common.Config;
 using Middleware.Models.Domain;
+using Middleware.DataAccess.Repositories.Abstract;
 
 namespace Middleware.OcelotGateway.Services
 {
     public class TokenService
     {
         private JwtConfig _jwtConfig;
+        
 
-        public TokenService(JwtConfig jwtConfig)
-        {   
-            _jwtConfig = jwtConfig;
+        public TokenService(JwtConfig jwtconfig)
+        {
+            
+            _jwtConfig = jwtconfig ?? throw new ArgumentNullException(nameof(jwtconfig));
         }
 
-        public TokenModel GenerateToken(Guid id) 
+        public TokenModel GenerateToken(Guid id, string userRole) 
         {
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_jwtConfig.Key));
             var credentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha256Signature);
             var expirationDate = DateTime.UtcNow.AddHours(8);
-
+            
             var claims = new[]
             {
                 new Claim(ClaimTypes.Name, id.ToString()),
+                new Claim(ClaimTypes.Role, userRole),
                 new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
+                //new Claim(ClaimTypes.Role, userRole)
             };
-
 
             var token = new JwtSecurityToken(
                     audience: "redisinterfaceAudience",

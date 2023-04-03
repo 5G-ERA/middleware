@@ -3,6 +3,7 @@ using Middleware.Common.Responses;
 using Middleware.DataAccess.Repositories.Abstract;
 using System.Net;
 using Middleware.Models.Domain;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Middleware.RedisInterface.Controllers
 {
@@ -24,6 +25,8 @@ namespace Middleware.RedisInterface.Controllers
         /// </summary>
         /// <returns> the list of RobotModel entities </returns>
         [HttpGet(Name = "RobotGetAll")]
+        //[Authorize(Roles = "Admin")]
+        //[AllowAnonymous]
         [ProducesResponseType(typeof(RobotModel), (int)HttpStatusCode.OK)]
         [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.NotFound)]
         [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.InternalServerError)]

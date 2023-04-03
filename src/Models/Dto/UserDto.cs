@@ -15,6 +15,9 @@ public class UserDto : Dto
     public string Password { get; init; } = default!;
     [Indexed]
     public string Salt { get; init; } = default!;
+
+    [Indexed]
+    public string Role { get; set; }
     public override BaseModel ToModel()
     {
         var dto = this;
@@ -22,7 +25,8 @@ public class UserDto : Dto
         {
             Id = Guid.Parse(dto.Id.Replace(Prefix, "")),
             Password = dto.Password,
-            Salt = dto.Salt
+            Salt = dto.Salt,
+            Role = dto.Role
         };
     }
 

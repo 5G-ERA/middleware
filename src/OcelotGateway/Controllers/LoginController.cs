@@ -89,7 +89,7 @@ namespace Middleware.OcelotGateway.Controllers
                 if (authenticated)
                 {
                     TokenService token = new TokenService(_jwtconfig.Value);
-                    var newToken = token.GenerateToken(login.Id);
+                    var newToken = token.GenerateToken(login.Id, login.Role);
                     response = Ok(newToken);
                 }
                 return response;
