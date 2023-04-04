@@ -209,9 +209,9 @@ def parser_node_info(node_info: list):
     
     rosNode_dict = {
     "Name": str(node_name),
-    "Publications": [publishers],
-    "Subscriptions": [subscribers],
-    "Services": [services]
+    "Publications": publishers,
+    "Subscriptions": subscribers,
+    "Services": services
     }
     return rosNode_dict
 
