@@ -30,7 +30,6 @@ namespace Middleware.OcelotGateway.Services
                 new Claim(ClaimTypes.Name, id.ToString()),
                 new Claim(ClaimTypes.Role, userRole),
                 new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
-                //new Claim(ClaimTypes.Role, userRole)
             };
 
             var token = new JwtSecurityToken(

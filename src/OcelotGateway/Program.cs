@@ -16,6 +16,7 @@ using Microsoft.IdentityModel;
 using static IdentityModel.ClaimComparer;
 using Microsoft.IdentityModel.Claims;
 using Ocelot.Authentication.Middleware;
+using Middleware.OcelotGateway.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -30,31 +31,10 @@ builder.Host.ConfigureAppConfiguration((hostingContext, config) =>
 
 builder.Services.AddOcelot()
                 .AddCacheManager(settings => settings.WithDictionaryHandle());
+builder.Services.DecorateClaimAuthoriser();
 
 var config = builder.Configuration.GetSection(JwtConfig.ConfigName).Get<JwtConfig>();
 builder.Services.Configure<JwtConfig>(builder.Configuration.GetSection(JwtConfig.ConfigName));
-
-/*builder.Services.AddAuthentication(
-    options =>
-    {
-        options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
-        options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-        options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-        
-    }
-    ).AddJwtBearer("Bearer", options =>
-    {
-        options.TokenValidationParameters = new TokenValidationParameters()
-        {
-            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(config.Key)),
-            ValidAudience = "redisinterfaceAudience",
-            ValidIssuer = "redisinterfaceIssuer",
-            ValidateIssuerSigningKey = true,
-            ValidateLifetime = true,
-            ClockSkew = TimeSpan.Zero,
-            RoleClaimType = "Role"
-        };
-    });*/
 
 builder.Services.AddAuthentication(options =>
 {
@@ -67,8 +47,6 @@ builder.Services.AddAuthentication(options =>
     options.TokenValidationParameters = new TokenValidationParameters()
     {
         IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(config.Key)),
-        //NameClaimType = ClaimTypes.NameIdentifier,
-        //NameClaimType = ClaimTypes.Role,
         NameClaimType = IdentityModel.JwtClaimTypes.Name,
         RoleClaimType = IdentityModel.JwtClaimTypes.Role,
         ValidAudience = "redisinterfaceAudience",
@@ -77,10 +55,7 @@ builder.Services.AddAuthentication(options =>
         ValidateLifetime = true,
         ClockSkew = TimeSpan.Zero
     };
-    //builder.Configuration.Bind("JwtSettings", options);
-    
 });
-
 
 builder.RegisterRedis();
 
@@ -91,8 +66,6 @@ var app = builder.Build();
 app.UseRouting();
 app.UseAuthentication();
 app.UseAuthorization();
-
-
 
 app.UseEndpoints(endpoints =>
 {

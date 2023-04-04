@@ -41,7 +41,7 @@
       },
       "UpstreamPathTemplate": "/Data/{all}",
       "RouteClaimsRequirement": {
-        "Role": "Admin"
+        "http///schemas.microsoft.com/ws/2008/06/identity/claims/role": "admin"
       },
       "UpstreamHttpMethod": [ "GET", "POST", "PUT", "PATCH", "DELETE" ]
     },
