@@ -1,4 +1,4 @@
-# Environment 
+# Environment Configuration 
 This document shows the process of configuring the testing environment for running and testing the 5G-ERA Middleware. It also has the required files for the configuration of the Kubernetes cluster to accommodate the functionality needed by the middleware.
 
 The testing environment is based on the `Microk8s`, the minimal Kubernetes installation. It assumes the use of the `Ubuntu 20.04` operating system. For other Linux distributions or other operating systems, the instructions may vary, so check the official guides for installing the respective software. 
@@ -127,53 +127,3 @@ The last step to configuring the Kubernetes cluster is to bind the Cluster Role 
 ```
 $ kubectl apply -f orchestrator_cluster_role_binding.yaml
 ```
-
-## Middleware deployment
-The last step is to prepare the deployment script for the middleware. In the [orchestrator_deployment.yaml](k8s/orchestrator/orchestrator_deployment.yaml) file there are environment variables that must be set for the correct work of the Orchestrator. The needed variables are:
-1.	AWS_IMAGE_REGISTRY – contains the address of the registry in which the Middleware images are stored
-4.	REDIS_INTERFACE_ADDRESS – address on which the API client for the REDIS in the middleware operates. Defaults to http://redis-interface-api
-
-After all the values are set, the Middleware can be deployed. Start with the deployment of the service for the Orchestrator:
-```shell
-$ kubectl apply -n middleware -f orchestrator_service.yaml
-```
-Afterwards, deploy the Orchestrator Deployment:
-```shell
-$ kubectl apply -n middleware -f orchestrator_deployment.yaml
-```
-
-The containers will be downloaded, and the Orchestrator will deploy the rest of the Middleware deployments and services required to function correctly. 
-
-## Verification of Middleware Deployment
-
-To check and monitor the status of the deployment of the Middleware services use the following command 
-```shell
-$ watch -c kubectl get all -n middleware
-```
-It will monitor the status of all the services deployed in the middleware namespace. The following objects should be deployed:
-1.	Orchestrator
-2.	Redis interface
-3.	Gateway
-4.	Task planner
-5.	Resource planner
-
-Each of these services is represented by the pod, service, deployment and replica set in the Kubernetes environment. With the deployment of the Orchestrator, the other services are deployed automatically. The process of their deployment may take a while depending on the internet connection that machine has. If only the Orchestrator is visible with the status of the pod as Container Creating, it needs additional time to download the application. 
-
-After the deployment of the Orchestrator, soon the other components should begin their deployment. The result should look like the one presented below.
-
-<p align="center">
-  <img src="docs/img/DeployedMiddleware.png" />
-</p>
-
-If there are errors during the deployment of the Orchestrator, then check if you correctly configured access to the AWS registry. 
-In case there are any errors during the deployment of the Gateway and Redis interface, check if the firewall does not block access to the Redis server.
-
-After the deployment is complete the gateway should be accessible through the IP address specified in the `EXTERNAL-IP` column. 
-
-In case the IP address is not working use the following command to redirect the traffic from the specified port on the localhost to the gateway:
-```shell
-$ kubectl port-forward -n middleware service/gateway 5000:80
-```
-This command will port forward the traffic from port 5000 to port 80 in the service. The middleware will be now accessible under the following address:
-
-> http://localhost:5000
