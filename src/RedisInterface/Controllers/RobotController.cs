@@ -25,8 +25,6 @@ namespace Middleware.RedisInterface.Controllers
         /// </summary>
         /// <returns> the list of RobotModel entities </returns>
         [HttpGet(Name = "RobotGetAll")]
-        //[Authorize(Roles = "Admin")]
-        //[AllowAnonymous]
         [ProducesResponseType(typeof(RobotModel), (int)HttpStatusCode.OK)]
         [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.NotFound)]
         [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.InternalServerError)]
