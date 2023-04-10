@@ -4,7 +4,7 @@ using Refit;
 
 namespace Middleware.RedisInterface.Sdk.Client;
 
-public interface IRedisInterface
+internal interface IRedisInterface
 {
     [Get("action/{id}")]
     Task<ApiResponse<ActionResponse?>> ActionGetById(Guid id);

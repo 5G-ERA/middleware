@@ -15,18 +15,6 @@ public class ApiClientBuilder : IApiClientBuilder
         _httpClientFactory = httpClientFactory;
         _env = env;
     }
-
-    /// <summary>
-    /// <inheritdoc cref="IApiClientBuilder.CreateRedisApiClient"/>
-    /// </summary>
-    public RedisApiClient CreateRedisApiClient()
-    {
-        var address = _env.GetEnvVariable("REDIS_INTERFACE_ADDRESS") ??
-                      throw new ArgumentNullException("REDIS_INTERFACE_ADDRESS", "REDIS_INTERFACE_ADDRESS environment variable not specified");
-        var client = _httpClientFactory.CreateClient(AppConfig.RedisApiClientName);
-        return new RedisApiClient($"{address}", client);
-    }
-
     public OrchestratorApiClient CreateOrchestratorApiClient()
     {
         var address = _env.GetEnvVariable("ORCHESTRATOR_ADDRESS") ??

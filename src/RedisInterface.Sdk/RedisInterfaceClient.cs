@@ -11,7 +11,7 @@ namespace Middleware.RedisInterface.Sdk
         private readonly IRedisInterface _api;
         private readonly ILogger<RedisInterfaceClient> _logger;
 
-        public RedisInterfaceClient(IRedisInterface api, ILogger<RedisInterfaceClient> logger)
+        internal RedisInterfaceClient(IRedisInterface api, ILogger<RedisInterfaceClient> logger)
         {
             _api = api;
             _logger = logger;
@@ -195,6 +195,51 @@ namespace Middleware.RedisInterface.Sdk
         public async Task<GetContainersResponse?> ContainerImageGetForInstanceAsync(Guid id)
         {
             return await ContainerImageGetForInstanceAsync(id, CancellationToken.None);
+        }
+
+        public async Task<GetPoliciesResponse?> PolicyGetActiveAsync()
+        {
+            throw new NotImplementedException();
+        }
+
+        public async Task<GetCloudsResponse?> RobotGetConnectedCloudsAsync(Guid robotId)
+        {
+            throw new NotImplementedException();
+        }
+
+        public async Task<GetCloudsResponse?> GetFreeCloudIdsAsync(List<CloudModel> availableClouds)
+        {
+            throw new NotImplementedException();
+        }
+
+        public async Task<GetCloudsResponse?> GetLessBusyCloudsAsync(List<CloudModel> riconnectedClouds)
+        {
+            throw new NotImplementedException();
+        }
+
+        public async Task<CloudResponse?> CloudGetByNameAsync(string resourceName)
+        {
+            throw new NotImplementedException();
+        }
+
+        public async Task<GetEdgesResponse?> RobotGetConnectedEdgesIdsAsync(Guid robotId)
+        {
+            throw new NotImplementedException();
+        }
+
+        public async Task<GetEdgesResponse?> GetFreeEdgesIdsAsync(List<EdgeModel> riconnectedEdges)
+        {
+            throw new NotImplementedException();
+        }
+
+        public async Task<GetEdgesResponse?> GetLessBusyEdgesAsync(List<EdgeModel> riconnectedEdges)
+        {
+            throw new NotImplementedException();
+        }
+
+        public async Task<EdgeResponse> EdgeGetByNameAsync(string resourceName)
+        {
+            throw new NotImplementedException();
         }
 
         public async Task<GetContainersResponse?> ContainerImageGetForInstanceAsync(Guid id, CancellationToken token)

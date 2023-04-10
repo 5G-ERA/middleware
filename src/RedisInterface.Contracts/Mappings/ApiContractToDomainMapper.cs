@@ -68,6 +68,25 @@ public static class ApiContractToDomainMapper
         };
     }
 
+    public static List<CloudModel> ToCloudList(this GetCloudsResponse clouds)
+    {
+        return clouds.Clouds.Select(x =>
+            new CloudModel()
+            {
+                Id = x.Id,
+                Name = x.Name,
+                Type = x.Type,
+                CloudIp = x.IpAddress,
+                MacAddress = x.MacAddress,
+                CloudStatus = x.Status,
+                Cpu = x.Cpu,
+                NumberOfCores = x.NumberOfCores,
+                Ram = x.Ram,
+                VirtualRam = x.VirtualRam,
+                DiskStorage = x.DiskStorage,
+                LastUpdatedTime = x.LastUpdatedTime
+            }).ToList();
+    }
     public static ContainerImageModel ToContainer(this ContainerRequest x)
     {
         return new ContainerImageModel()
@@ -140,6 +159,24 @@ public static class ApiContractToDomainMapper
         };
     }
     
+    public static List<EdgeModel> ToEdgeList(this GetEdgesResponse edges)
+    {
+        return edges.Edges.Select(x=> new EdgeModel()
+        {
+            Id = x.Id,
+            Name = x.Name,
+            EdgeStatus = x.Status,
+            EdgeIp = x.IpAddress,
+            MacAddress = x.MacAddress,
+            Cpu = x.Cpu,
+            NumberOfCores = x.NumberOfCores,
+            Ram = x.Ram,
+            VirtualRam = x.VirtualRam,
+            DiskStorage = x.DiskStorage,
+            LastUpdatedTime = x.LastUpdatedTime
+        }).ToList();
+    }
+    
     public static InstanceModel ToInstance(this InstanceRequest x)
     {
         return new InstanceModel()
@@ -189,6 +226,35 @@ public static class ApiContractToDomainMapper
             IsExclusiveWithinType = x.IsExclusiveWithinType,
             Timestamp = x.LastTimeUpdated
         };
+    }
+    
+    public static PolicyModel ToPolicy(this PolicyResponse x)
+    {
+        return new PolicyModel()
+        {
+            Id = x.Id,
+            Name = x.Name,
+            Description = x.Description,
+            Type = x.Type,
+            IsActive = x.IsActive,
+            IsExclusiveWithinType = x.IsExclusiveWithinType,
+            Timestamp = x.LastTimeUpdated
+        };
+    }
+    
+    public static List<PolicyModel> ToPolicyList(this GetPoliciesResponse policies)
+    {
+        return policies.Policies.Select(x=> 
+            new PolicyModel()
+            {
+                Id = x.Id,
+                Name = x.Name,
+                Description = x.Description,
+                Type = x.Type,
+                IsActive = x.IsActive,
+                IsExclusiveWithinType = x.IsExclusiveWithinType,
+                Timestamp = x.LastTimeUpdated
+            }).ToList();
     }
 
     public static RobotModel ToRobot(this RobotRequest x)
