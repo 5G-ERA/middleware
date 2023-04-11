@@ -21,6 +21,10 @@ An Edge template looks like this. All the fields must be completed. You may use 
 }
 ```
 
-In the post request, remember to change the *localhost* to the location of your middleware. Also, the headers should look like this:
+In the post request, remember to change the *localhost* and port to the proper address location of your middleware. This is a POST request.
+```
+http://localhost:5047/data/edge
+```
+Also, the headers should look like this:
 
 ![image](img/EdgeOnboarding.png)
