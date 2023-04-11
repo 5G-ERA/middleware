@@ -1,5 +1,3 @@
-using FluentValidation;
-using FluentValidation.AspNetCore;
 using Middleware.Common.ExtensionMethods;
 using Middleware.RedisInterface;
 using Middleware.RedisInterface.Services;

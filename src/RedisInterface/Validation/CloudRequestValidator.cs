@@ -1,5 +1,4 @@
-﻿using System.Data;
-using FluentValidation;
+﻿using FluentValidation;
 using Middleware.RedisInterface.Contracts.Requests;
 
 namespace Middleware.RedisInterface.Validation;

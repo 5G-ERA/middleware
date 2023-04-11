@@ -66,6 +66,11 @@ namespace Middleware.RedisInterface.Sdk
 
             var result = await _api.ActionPlanGetById(id);
 
+            if (!result.IsSuccessStatusCode)
+            {
+                _logger.LogError(result.Error, "{} - unsuccessful API call", nameof(ActionPlanGetByIdAsync));
+            }
+
             return result.IsSuccessStatusCode ? result.Content : null;
         }
 
@@ -77,6 +82,11 @@ namespace Middleware.RedisInterface.Sdk
         public async Task<List<ActionPlanModel>?> ActionPlanGetAllAsync(CancellationToken token)
         {
             var result = await _api.ActionPlanGetAllAsync();
+
+            if (!result.IsSuccessStatusCode)
+            {
+                _logger.LogError(result.Error, "{} - unsuccessful API call", nameof(ActionPlanGetAllAsync));
+            }
 
             return result.IsSuccessStatusCode ? result.Content : null;
         }
@@ -92,6 +102,11 @@ namespace Middleware.RedisInterface.Sdk
                 throw new ArgumentNullException(nameof(actionPlan));
 
             var result = await _api.ActionPlanAddAsync(actionPlan);
+
+            if (!result.IsSuccessStatusCode)
+            {
+                _logger.LogError(result.Error, "{} - unsuccessful API call", nameof(ActionPlanAddAsync));
+            }
 
             return result.IsSuccessStatusCode;
         }
@@ -122,6 +137,11 @@ namespace Middleware.RedisInterface.Sdk
 
             var result = await _api.RobotGetById(robotId);
 
+            if (!result.IsSuccessStatusCode)
+            {
+                _logger.LogError(result.Error, "{} - unsuccessful API call", nameof(RobotGetByIdAsync));
+            }
+
             return result.IsSuccessStatusCode ? result.Content : null;
         }
 
@@ -138,6 +158,11 @@ namespace Middleware.RedisInterface.Sdk
 
             var result = await _api.TaskGetById(taskId);
 
+            if (!result.IsSuccessStatusCode)
+            {
+                _logger.LogError(result.Error, "{} - unsuccessful API call", nameof(TaskGetByIdAsync));
+            }
+
             return result.IsSuccessStatusCode ? result.Content : null;
         }
 
@@ -152,6 +177,11 @@ namespace Middleware.RedisInterface.Sdk
                 throw new ArgumentNullException(nameof(instanceId));
 
             var result = await _api.InstanceGetAlternative(instanceId);
+
+            if (!result.IsSuccessStatusCode)
+            {
+                _logger.LogError(result.Error, "{} - unsuccessful API call", nameof(GetInstanceAlternativeAsync));
+            }
 
             return result.IsSuccessStatusCode ? result.Content : null;
         }
@@ -174,6 +204,11 @@ namespace Middleware.RedisInterface.Sdk
             var entity = source.GetType().GetModelName();
             var result = await _api.RelationGet(entity, relationName, source.Id);
 
+            if (!result.IsSuccessStatusCode)
+            {
+                _logger.LogError(result.Error, "{} - unsuccessful API call", nameof(GetRelationAsync));
+            }
+
             return result.IsSuccessStatusCode ? result.Content : null;
         }
 
@@ -188,6 +223,10 @@ namespace Middleware.RedisInterface.Sdk
                 throw new ArgumentNullException(nameof(id));
 
             var result = await _api.InstanceGetById(id);
+            if (!result.IsSuccessStatusCode)
+            {
+                _logger.LogError(result.Error, "{} - unsuccessful API call", nameof(InstanceGetByIdAsync));
+            }
 
             return result.IsSuccessStatusCode ? result.Content : null;
         }
@@ -199,47 +238,132 @@ namespace Middleware.RedisInterface.Sdk
 
         public async Task<GetPoliciesResponse?> PolicyGetActiveAsync()
         {
-            throw new NotImplementedException();
+            var result = await _api.PolicyGetActive();
+
+            if (!result.IsSuccessStatusCode)
+            {
+                _logger.LogError(result.Error, "{} - unsuccessful API call", nameof(PolicyGetActiveAsync));
+            }
+
+            return result.IsSuccessStatusCode ? result.Content : null;
         }
 
+        [Obsolete("This function has little semantic sense. It should be replaced with something more meaningful ")]
         public async Task<GetCloudsResponse?> RobotGetConnectedCloudsAsync(Guid robotId)
         {
-            throw new NotImplementedException();
+            if (robotId == default)
+                throw new ArgumentNullException(nameof(robotId));
+
+            var result = await _api.RobotGetConnectedClouds(robotId);
+            if (!result.IsSuccessStatusCode)
+            {
+                _logger.LogError(result.Error, "{} - unsuccessful API call", nameof(RobotGetConnectedCloudsAsync));
+            }
+
+            return result.IsSuccessStatusCode ? result.Content : null;
         }
 
-        public async Task<GetCloudsResponse?> GetFreeCloudIdsAsync(List<CloudModel> availableClouds)
+        [Obsolete("This function has little semantic sense. It should be replaced with something more meaningful ")]
+        public async Task<GetCloudsResponse?> GetFreeCloudIdsAsync(List<CloudModel>? availableClouds)
         {
-            throw new NotImplementedException();
+            if (availableClouds is null || availableClouds.Any() == false)
+                throw new ArgumentException(nameof(availableClouds));
+
+            var result = await _api.CloudGetFree(availableClouds);
+            if (!result.IsSuccessStatusCode)
+            {
+                _logger.LogError(result.Error, "{} - unsuccessful API call", nameof(GetFreeCloudIdsAsync));
+            }
+
+            return result.IsSuccessStatusCode ? result.Content : null;
         }
 
+        [Obsolete("This function has little semantic sense. It should be replaced with something more meaningful ")]
         public async Task<GetCloudsResponse?> GetLessBusyCloudsAsync(List<CloudModel> riconnectedClouds)
         {
-            throw new NotImplementedException();
+            if (riconnectedClouds is null || riconnectedClouds.Any() == false)
+                throw new ArgumentException(nameof(riconnectedClouds));
+
+            var result = await _api.CloudGetLessBusy(riconnectedClouds);
+            if (!result.IsSuccessStatusCode)
+            {
+                _logger.LogError(result.Error, "{} - unsuccessful API call", nameof(GetLessBusyCloudsAsync));
+            }
+
+            return result.IsSuccessStatusCode ? result.Content : null;
         }
 
-        public async Task<CloudResponse?> CloudGetByNameAsync(string resourceName)
+        public async Task<CloudResponse?> CloudGetByNameAsync(string cloudName)
         {
-            throw new NotImplementedException();
+            if (string.IsNullOrWhiteSpace(cloudName))
+                throw new ArgumentException("Value cannot be null or whitespace.", nameof(cloudName));
+
+            var result = await _api.CloudGetByName(cloudName);
+            if (!result.IsSuccessStatusCode)
+            {
+                _logger.LogError(result.Error, "{} - unsuccessful API call", nameof(CloudGetByNameAsync));
+            }
+
+            return result.IsSuccessStatusCode ? result.Content : null;
         }
 
+        [Obsolete("This function has little semantic sense. It should be replaced with something more meaningful ")]
         public async Task<GetEdgesResponse?> RobotGetConnectedEdgesIdsAsync(Guid robotId)
         {
-            throw new NotImplementedException();
+            if (robotId == default)
+                throw new ArgumentNullException(nameof(robotId));
+
+            var result = await _api.RobotGetConnectedEdges(robotId);
+            if (!result.IsSuccessStatusCode)
+            {
+                _logger.LogError(result.Error, "{} - unsuccessful API call", nameof(RobotGetConnectedEdgesIdsAsync));
+            }
+
+            return result.IsSuccessStatusCode ? result.Content : null;
         }
 
-        public async Task<GetEdgesResponse?> GetFreeEdgesIdsAsync(List<EdgeModel> riconnectedEdges)
+        [Obsolete("This function has little semantic sense. It should be replaced with something more meaningful ")]
+        public async Task<GetEdgesResponse?> GetFreeEdgesIdsAsync(List<EdgeModel> connectedEdges)
         {
-            throw new NotImplementedException();
+            if (connectedEdges is null || connectedEdges.Any() == false)
+                throw new ArgumentException(nameof(connectedEdges));
+
+            var result = await _api.EdgeGetFree(connectedEdges);
+            if (!result.IsSuccessStatusCode)
+            {
+                _logger.LogError(result.Error, "{} - unsuccessful API call", nameof(GetFreeEdgesIdsAsync));
+            }
+
+            return result.IsSuccessStatusCode ? result.Content : null;
         }
 
-        public async Task<GetEdgesResponse?> GetLessBusyEdgesAsync(List<EdgeModel> riconnectedEdges)
+        [Obsolete("This function has little semantic sense. It should be replaced with something more meaningful ")]
+        public async Task<GetEdgesResponse?> GetLessBusyEdgesAsync(List<EdgeModel> connectedEdges)
         {
-            throw new NotImplementedException();
+            if (connectedEdges is null || connectedEdges.Any() == false)
+                throw new ArgumentException(nameof(connectedEdges));
+
+            var result = await _api.EdgeGetLessBusy(connectedEdges);
+            if (!result.IsSuccessStatusCode)
+            {
+                _logger.LogError(result.Error, "{} - unsuccessful API call", nameof(GetLessBusyEdgesAsync));
+            }
+
+            return result.IsSuccessStatusCode ? result.Content : null;
         }
 
-        public async Task<EdgeResponse> EdgeGetByNameAsync(string resourceName)
+        public async Task<EdgeResponse?> EdgeGetByNameAsync(string edgeName)
         {
-            throw new NotImplementedException();
+            if (string.IsNullOrWhiteSpace(edgeName))
+                throw new ArgumentException("Value cannot be null or whitespace.", nameof(edgeName));
+
+            var result = await _api.EdgeGetByName(edgeName);
+            if (!result.IsSuccessStatusCode)
+            {
+                _logger.LogError(result.Error, "{} - unsuccessful API call", nameof(EdgeGetByNameAsync));
+            }
+
+            return result.IsSuccessStatusCode ? result.Content : null;
         }
 
         public async Task<GetContainersResponse?> ContainerImageGetForInstanceAsync(Guid id, CancellationToken token)
@@ -248,6 +372,10 @@ namespace Middleware.RedisInterface.Sdk
                 throw new ArgumentNullException(nameof(id));
 
             var result = await _api.ContainerImageGetForInstance(id);
+            if (!result.IsSuccessStatusCode)
+            {
+                _logger.LogError(result.Error, "{} - unsuccessful API call", nameof(ContainerImageGetForInstanceAsync));
+            }
 
             return result.IsSuccessStatusCode ? result.Content : null;
         }
@@ -265,6 +393,11 @@ namespace Middleware.RedisInterface.Sdk
 
             var result = await _api.ActionGetById(id);
 
+            if (!result.IsSuccessStatusCode)
+            {
+                _logger.LogError(result.Error, "{} - unsuccessful API call", nameof(ActionGetByIdAsync));
+            }
+
             return result.IsSuccessStatusCode ? result.Content : null;
         }
 
@@ -279,6 +412,10 @@ namespace Middleware.RedisInterface.Sdk
                 throw new ArgumentNullException(nameof(robotId));
 
             var result = await _api.ActionPlanGetLatestByRobotId(robotId);
+            if (!result.IsSuccessStatusCode)
+            {
+                _logger.LogError(result.Error, "{} - unsuccessful API call", nameof(GetLatestActionPlanByRobotIdAsync));
+            }
 
             return result.IsSuccessStatusCode ? result.Content : null;
         }
@@ -294,6 +431,10 @@ namespace Middleware.RedisInterface.Sdk
                 throw new ArgumentNullException(nameof(name));
 
             var result = await _api.EdgeGetByName(name);
+            if (!result.IsSuccessStatusCode)
+            {
+                _logger.LogError(result.Error, "{} - unsuccessful API call", nameof(GetEdgeByNameAsync));
+            }
 
             return result.IsSuccessStatusCode ? result.Content : null;
         }
@@ -309,7 +450,11 @@ namespace Middleware.RedisInterface.Sdk
                 throw new ArgumentNullException(nameof(name));
 
             var result = await _api.CloudGetByName(name);
-            
+            if (!result.IsSuccessStatusCode)
+            {
+                _logger.LogError(result.Error, "{} - unsuccessful API call", nameof(GetCloudByNameAsync));
+            }
+
             return result.IsSuccessStatusCode ? result.Content : null;
         }
     }

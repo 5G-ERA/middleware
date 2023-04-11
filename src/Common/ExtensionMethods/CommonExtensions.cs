@@ -1,5 +1,4 @@
-﻿using System.Net.Http.Headers;
-using Amazon;
+﻿using Amazon;
 using FluentValidation;
 using FluentValidation.AspNetCore;
 using Microsoft.AspNetCore.Builder;

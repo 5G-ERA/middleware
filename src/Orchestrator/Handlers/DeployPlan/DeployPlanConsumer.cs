@@ -1,7 +1,6 @@
 ﻿using MassTransit;
 using Middleware.Common.MessageContracts;
 using Middleware.Orchestrator.Deployment;
-using Serilog;
 
 namespace Middleware.Orchestrator.Handlers;
 

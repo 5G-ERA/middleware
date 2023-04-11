@@ -1,6 +1,4 @@
-﻿using k8s.KubeConfigModels;
-using MassTransit;
-using MassTransit.RabbitMqTransport.Configuration;
+﻿using MassTransit;
 using Middleware.Common.Config;
 using Middleware.Common.MessageContracts;
 using RabbitMQ.Client;

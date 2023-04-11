@@ -1,5 +1,4 @@
-﻿using AutoMapper;
-using k8s;
+﻿using k8s;
 using k8s.Models;
 using Middleware.Common;
 using Middleware.Common.Config;

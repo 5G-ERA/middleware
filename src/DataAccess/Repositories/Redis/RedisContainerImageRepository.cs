@@ -1,15 +1,8 @@
-﻿using System.Text.Json;
-using Microsoft.Extensions.Logging;
-using Middleware.Common.Enums;
-using Middleware.DataAccess.Repositories.Abstract;
+﻿using Middleware.DataAccess.Repositories.Abstract;
 using Middleware.Models.Domain;
 using Middleware.Models.Dto;
-using Middleware.Models.Enums;
-using NReJSON;
-using Redis.OM;
 using Redis.OM.Contracts;
 using RedisGraphDotNet.Client;
-using StackExchange.Redis;
 using ILogger = Serilog.ILogger;
 
 namespace Middleware.DataAccess.Repositories

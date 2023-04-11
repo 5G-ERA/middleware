@@ -1,7 +1,5 @@
-﻿using AutoMapper;
-using Middleware.Common.Responses;
+﻿using Middleware.Common.Responses;
 using Middleware.Models.Domain;
-using KeyValuePair = Middleware.Models.Domain.KeyValuePair;
 
 namespace Middleware.ResourcePlanner.Config;
 

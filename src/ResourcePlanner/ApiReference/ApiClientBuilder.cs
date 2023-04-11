@@ -1,7 +1,6 @@
 ﻿using Middleware.Common;
 using Middleware.Common.Config;
 using Middleware.ResourcePlanner.Orchestrator;
-using Middleware.ResourcePlanner.RedisInterface;
 
 namespace Middleware.ResourcePlanner.ApiReference;
 

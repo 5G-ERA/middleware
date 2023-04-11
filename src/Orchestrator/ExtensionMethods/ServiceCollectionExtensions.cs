@@ -3,7 +3,6 @@ using Middleware.Common.Config;
 using Middleware.Common.MessageContracts;
 using Middleware.Orchestrator.Handlers;
 using RabbitMQ.Client;
-using static MassTransit.Logging.OperationName;
 
 namespace Middleware.Orchestrator.ExtensionMethods;
 

@@ -1,6 +1,4 @@
-﻿using System.Text.Json.Serialization;
-
-namespace Middleware.RedisInterface.Contracts.Responses
+﻿namespace Middleware.RedisInterface.Contracts.Responses
 {
     public record ActionSequenceResponse
     {

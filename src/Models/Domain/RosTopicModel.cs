@@ -1,6 +1,4 @@
-﻿using Middleware.Models.Dto.Hardware;
-using Middleware.Models.Dto;
-using Middleware.Models.Dto.Ros;
+﻿using Middleware.Models.Dto.Ros;
 
 namespace Middleware.Models.Domain
 {

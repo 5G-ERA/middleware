@@ -129,26 +129,46 @@ public interface IRedisInterfaceClient
     /// </summary>
     /// <param name="availableClouds"></param>
     /// <returns></returns>
-    Task<GetCloudsResponse?> GetFreeCloudIdsAsync(List<CloudModel> availableClouds);
+    Task<GetCloudsResponse?> GetFreeCloudIdsAsync(List<CloudModel>? availableClouds);
     /// <summary>
     /// Order Clouds based on the resource usage from the specified list 
     /// </summary>
     /// <param name="availableClouds"></param>
     /// <returns></returns>
     Task<GetCloudsResponse?> GetLessBusyCloudsAsync(List<CloudModel> availableClouds);
+
     /// <summary>
     /// Get Cloud by name
     /// </summary>
     /// <param name="name"></param>
     /// <returns></returns>
     Task<CloudResponse?> CloudGetByNameAsync(string name);
+
     /// <summary>
-    /// 
+    /// Get Edges available to the robot
     /// </summary>
     /// <param name="robotId"></param>
     /// <returns></returns>
     Task<GetEdgesResponse?> RobotGetConnectedEdgesIdsAsync(Guid robotId);
-    Task<GetEdgesResponse?> GetFreeEdgesIdsAsync(List<EdgeModel> availableEdges);
-    Task<GetEdgesResponse?> GetLessBusyEdgesAsync(List<EdgeModel> availableEdges);
-    Task<EdgeResponse> EdgeGetByNameAsync(string name);
+
+    /// <summary>
+    /// Get unused edges from the available list
+    /// </summary>
+    /// <param name="connectedEdges"></param>
+    /// <returns></returns>
+    Task<GetEdgesResponse?> GetFreeEdgesIdsAsync(List<EdgeModel> connectedEdges);
+
+    /// <summary>
+    /// Get Edges ordered by the least used from the given list
+    /// </summary>
+    /// <param name="connectedEdges"></param>
+    /// <returns></returns>
+    Task<GetEdgesResponse?> GetLessBusyEdgesAsync(List<EdgeModel> connectedEdges);
+
+    /// <summary>
+    /// Get Edge by name
+    /// </summary>
+    /// <param name="name"></param>
+    /// <returns></returns>
+    Task<EdgeResponse?> EdgeGetByNameAsync(string name);
 }

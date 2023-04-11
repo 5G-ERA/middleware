@@ -1,7 +1,5 @@
 ﻿using Middleware.Models.Domain;
 using Redis.OM.Modeling;
-using System;
-using System.Linq;
 
 namespace Middleware.Models.Dto;
 [Document(IndexName = "containerImage-idx", StorageType = StorageType.Json, Prefixes = new[] { ContainerImageDto.Prefix })]

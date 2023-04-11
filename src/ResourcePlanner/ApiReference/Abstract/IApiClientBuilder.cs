@@ -1,5 +1,4 @@
 ﻿using Middleware.ResourcePlanner.Orchestrator;
-using Middleware.ResourcePlanner.RedisInterface;
 
 namespace Middleware.ResourcePlanner.ApiReference;
 

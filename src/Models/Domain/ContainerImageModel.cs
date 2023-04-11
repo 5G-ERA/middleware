@@ -1,5 +1,4 @@
-﻿using Middleware.Models.Dto.Hardware;
-using Middleware.Models.Dto;
+﻿using Middleware.Models.Dto;
 using System.Text.Json.Serialization;
 
 namespace Middleware.Models.Domain;

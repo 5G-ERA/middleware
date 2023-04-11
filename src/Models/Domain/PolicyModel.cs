@@ -1,5 +1,4 @@
 ﻿using System.Text.Json.Serialization;
-using Middleware.Models.Dto.Hardware;
 using Middleware.Models.Dto;
 using Middleware.Models.Enums;
 
