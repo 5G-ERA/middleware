@@ -8,14 +8,10 @@ At the moment, these are the available pre-defined onboarding files for robots t
 
 
 
-
-
-
-
-
-
-
-
-
 2) [Kobuki Base](Kobuki.json) - Yujin Robot
+
   <img src="img/kobuki.png" height="100rm" align="center" />
+
+3) [Summit XL](summit_xl_onboaring.json) - From RobotNik
+
+<img src="img/summit-xl.jpg" height="150rm" align="center" />
