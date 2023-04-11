@@ -6,71 +6,70 @@ namespace Middleware.RedisInterface.Sdk.Client;
 
 internal interface IRedisInterface
 {
-    [Get("action/{id}")]
+    [Get("api/v1/action/{id}")]
     Task<ApiResponse<ActionResponse?>> ActionGetById(Guid id);
     
-    [Post("action/plan")]
+    [Post("api/v1/action/plan")]
     Task<ApiResponse<ActionPlanModel>> ActionPlanAddAsync([Body] ActionPlanModel payload);
-    [Get("action/plan")]
+    [Get("api/v1/action/plan")]
     Task<ApiResponse<List<ActionPlanModel>?>> ActionPlanGetAllAsync();
-    [Get("action/plan/{id}")]
+    [Get("api/v1/action/plan/{id}")]
     Task<ApiResponse<ActionPlanModel?>> ActionPlanGetById(Guid id);
-    [Delete("action/plan")]
+    [Delete("api/v1/action/plan")]
     Task ActionPlanDeleteAsync(Guid id);
 
-    [Get("action/plan/robot/{id}")]
+    [Get("api/v1/action/plan/robot/{id}")]
     Task<ApiResponse<ActionPlanModel?>> ActionPlanGetLatestByRobotId(Guid id);
     
-    [Get("cloud/name/{name}")]
+    [Get("api/v1/cloud/name/{name}")]
     Task<ApiResponse<CloudResponse?>> CloudGetByName(string name);
 
-    [Post("cloud/free")]
+    [Post("api/v1/cloud/free")]
     Task<ApiResponse<GetCloudsResponse>> CloudGetFree([Body] List<CloudModel> clouds);
     
-    [Post("cloud/lessBusy")]
+    [Post("api/v1/cloud/lessBusy")]
     Task<ApiResponse<GetCloudsResponse>> CloudGetLessBusy([Body] List<CloudModel> clouds);
     
-    [Get("containerImage/instance/{id}")]
+    [Get("api/v1/containerImage/instance/{id}")]
     Task<ApiResponse<GetContainersResponse?>> ContainerImageGetForInstance(Guid id);
     
-    [Get("edge/name/{name}")]
+    [Get("api/v1/edge/name/{name}")]
     Task<ApiResponse<EdgeResponse?>> EdgeGetByName(string name);
     
-    [Post("edge/free")]
+    [Post("api/v1/edge/free")]
     Task<ApiResponse<GetEdgesResponse>> EdgeGetFree([Body] List<EdgeModel> edges);
     
-    [Post("edge/lessBusy")]
+    [Post("api/v1/edge/lessBusy")]
     Task<ApiResponse<GetEdgesResponse>> EdgeGetLessBusy([Body] List<EdgeModel> edges);
     
-    [Get("instance/alternative/{id}")]
+    [Get("api/v1/instance/alternative/{id}")]
     Task<ApiResponse<InstanceResponse?>> InstanceGetById(Guid id);
-    [Get("instance/alternative/{id}")]
+    [Get("api/v1/instance/alternative/{id}")]
     Task<ApiResponse<InstanceResponse>> InstanceGetAlternative(Guid id);
 
-    [Get("policy/current")]
+    [Get("api/v1/policy/current")]
     Task<ApiResponse<GetPoliciesResponse>> PolicyGetActive();
     
-    
-    [Post("{entity}/AddRelation")]
+    [Post("api/v1/{entity}/AddRelation")]
     Task RelationAdd(string entity, [Body]RelationModel payload);
     
-    [Post("{entity}/relation/{name}")]
+    [Post("api/v1/{entity}/relation/{name}")]
     Task<ApiResponse<List<RelationModel>?>> RelationGet(string entity, [AliasAs("name")] string relationName, Guid id);
     
-    [Delete("{entity}/DeleteRelation")]
+    [Delete("api/v1/{entity}/DeleteRelation")]
     Task RelationDelete(string entity, [Body]RelationModel payload);
     
-    [Get("robot/{id}")]
+    [Get("api/v1/robot/{id}")]
     Task<ApiResponse<RobotResponse?>> RobotGetById(Guid id);
     
-    [Get("robot/{id}/clouds/connected")]
+    [Get("api/v1/robot/{id}/clouds/connected")]
     Task<ApiResponse<GetCloudsResponse?>> RobotGetConnectedClouds(Guid id);
     
     
-    [Get("robot/{id}/edges/connected")]
+    [Get("api/v1/robot/{id}/edges/connected")]
     Task<ApiResponse<GetEdgesResponse?>> RobotGetConnectedEdges(Guid id);
     
-    [Get("task/{id}")]
+    [Get("api/v1/task/{id}")]
     Task<ApiResponse<TaskResponse?>> TaskGetById(Guid id);
 
     

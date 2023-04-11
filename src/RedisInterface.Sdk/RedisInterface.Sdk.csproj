@@ -19,4 +19,7 @@
       <PackageReference Include="Refit.HttpClientFactory" Version="6.3.2" />
     </ItemGroup>
 
+    <ItemGroup>
+        <InternalsVisibleTo Include="RedisInterface.Sdk.Tests.Integration" />
+    </ItemGroup>
 </Project>

@@ -50,6 +50,6 @@
 
   <ItemGroup>
     <Folder Include="Contracts" />
-  </ItemGroup>
+  </ItemGroup> 
 
 </Project>
