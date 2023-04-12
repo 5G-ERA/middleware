@@ -19,7 +19,7 @@ namespace Middleware.TaskPlanner.Controllers
         private readonly IMapper _mapper;
         private readonly IPublishService _publishService;
         private readonly ResourcePlanner.ResourcePlannerApiClient _resourcePlannerClient;
-        private readonly IRedisInterfaceClientService _redisInterfaceClient;
+        private readonly IRedisInterfaceClient _redisInterfaceClient;
         private readonly ILogger<PlanController> _logger;
 
 

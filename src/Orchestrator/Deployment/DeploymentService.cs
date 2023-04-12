@@ -48,7 +48,7 @@ public class DeploymentService : IDeploymentService
         IEnvironment env,
         ILogger<DeploymentService> logger,
         IRedisInterfaceClient redisInterfaceClient,
-        IConfiguration configuration
+        IConfiguration configuration,
         IOptions<MiddlewareConfig> mwConfig)
     {
         _kubernetesBuilder = kubernetesBuilder;
@@ -337,8 +337,8 @@ public class DeploymentService : IDeploymentService
 
         _logger.LogDebug("Retrieving location details (cloud or edge)");
         BaseModel thisLocation = _mwConfig.Value.InstanceType == LocationType.Cloud.ToString()
-            ? await _redisInterfaceClient.GetCloudByNameAsync(_mwConfig.Value.InstanceName)
-            : await _redisInterfaceClient.GetEdgeByNameAsync(_mwConfig.Value.InstanceName);
+            ? (await _redisInterfaceClient.GetCloudByNameAsync(_mwConfig.Value.InstanceName)).ToCloud()
+            : (await _redisInterfaceClient.GetEdgeByNameAsync(_mwConfig.Value.InstanceName)).ToEdge();
 
         foreach (var instance in action.Services!)
         {
@@ -373,8 +373,8 @@ public class DeploymentService : IDeploymentService
         
         _logger.LogDebug("Retrieving location details (cloud or edge)");
         BaseModel thisLocation = _mwConfig.Value.InstanceType == LocationType.Cloud.ToString()
-            ? await _redisInterfaceClient.GetCloudByNameAsync(_mwConfig.Value.InstanceName)
-            : await _redisInterfaceClient.GetEdgeByNameAsync(_mwConfig.Value.InstanceName);
+            ? (await _redisInterfaceClient.GetCloudByNameAsync(_mwConfig.Value.InstanceName)).ToCloud()
+            : (await _redisInterfaceClient.GetEdgeByNameAsync(_mwConfig.Value.InstanceName)).ToEdge();
         
         foreach (var instance in action.Services!)
         {
