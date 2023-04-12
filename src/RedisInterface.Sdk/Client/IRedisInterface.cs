@@ -5,7 +5,7 @@ using Refit;
 
 namespace Middleware.RedisInterface.Sdk.Client;
 
-internal interface IRedisInterface
+public interface IRedisInterface
 {
     [Get("/api/v1/action/{id}")]
     Task<ApiResponse<ActionResponse?>> ActionGetById(Guid id);
@@ -46,7 +46,7 @@ internal interface IRedisInterface
     [Post("/api/v1/edge/lessBusy")]
     Task<ApiResponse<GetEdgesResponse>> EdgeGetLessBusy([Body] List<EdgeModel> edges);
     
-    [Get("/api/v1/instance/alternative/{id}")]
+    [Get("/api/v1/instance/{id}")]
     Task<ApiResponse<InstanceResponse?>> InstanceGetById(Guid id);
     [Get("/api/v1/instance/alternative/{id}")]
     Task<ApiResponse<InstanceResponse>> InstanceGetAlternative(Guid id);

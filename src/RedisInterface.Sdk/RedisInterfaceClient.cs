@@ -11,7 +11,7 @@ namespace Middleware.RedisInterface.Sdk
         private readonly IRedisInterface _api;
         private readonly ILogger<RedisInterfaceClient> _logger;
 
-        internal RedisInterfaceClient(IRedisInterface api, ILogger<RedisInterfaceClient> logger)
+        public RedisInterfaceClient(IRedisInterface api, ILogger<RedisInterfaceClient> logger)
         {
             _api = api;
             _logger = logger;
