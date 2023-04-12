@@ -29,7 +29,7 @@ public class RedisInterfaceClientTests : IClassFixture<RedisInterfaceApiFactory>
         _sut = new RedisInterfaceClient(api, _logger);
     }
 
-    [Fact]
+    [Fact(Skip = "Test is not yet ready")]
     public async Task GetCloudByNameAsync_ReturnsCloud_WhenCloudWithNameIsFound()
     {
         // var cloudRequest = _cloudFaker.Generate();
