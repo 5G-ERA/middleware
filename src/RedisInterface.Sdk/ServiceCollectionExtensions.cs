@@ -23,7 +23,7 @@ public static class ServiceCollectionExtensions
 
         services.AddRefitClient<IRedisInterface>()
             .ConfigureHttpClient(c => c.BaseAddress = new Uri($"http://{hostname}"));
-        services.AddScoped<IRedisInterfaceClient, IRedisInterfaceClient>();
+        services.AddScoped<IRedisInterfaceClient, RedisInterfaceClient>();
         return services;
     }
 }

@@ -57,7 +57,7 @@ internal interface IRedisInterface
     [Post("/api/v1/{entity}/AddRelation")]
     Task RelationAdd(string entity, [Body]RelationModel payload);
     
-    [Post("/api/v1/{entity}/relation/{name}")]
+    [Get("/api/v1/{entity}/relation/{name}")]
     Task<ApiResponse<List<RelationModel>?>> RelationGet(string entity, [AliasAs("name")] string relationName, Guid id);
     
     [Delete("/api/v1/{entity}/DeleteRelation")]

@@ -332,7 +332,7 @@ public static class ApiContractToDomainMapper
             Name = x.Name,
             TaskPriority = (int)Enum.Parse<Priority>(x.Priority, true),
             DeterministicTask = x.IsDeterministic,
-            Tags = x.Tags.ToList()
+            Tags = x.Tags?.ToList()
         };
     }
     public static TaskModel ToTask(this TaskResponse x)
@@ -343,7 +343,7 @@ public static class ApiContractToDomainMapper
             Name = x.Name,
             DeterministicTask = x.IsDeterministic,
             TaskPriority = (int)Enum.Parse<Priority>(x.Priority),
-            Tags = x.Tags.ToList()
+            Tags = x.Tags?.ToList()
         };
     }
 }
