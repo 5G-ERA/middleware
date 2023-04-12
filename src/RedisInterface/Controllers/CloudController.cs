@@ -271,8 +271,8 @@ namespace Middleware.RedisInterface.Controllers
         }
 
         [HttpGet]
-        [Route("/name/{name}", Name = "CloudGetDataByName")]
-        [ProducesResponseType(typeof(CloudResponse), (int)HttpStatusCode.OK)]
+        [Route("name/{name}", Name = "CloudGetDataByName")]
+        [ProducesResponseType(typeof(CloudModel), (int)HttpStatusCode.OK)]
         [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.NotFound)]
         [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.InternalServerError)]
         public async Task<IActionResult> GetCloudResourceDetailsByNameAsync(string name)

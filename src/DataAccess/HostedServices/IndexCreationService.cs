@@ -37,6 +37,11 @@ public class IndexCreationService : IHostedService
         {
             await _provider.Connection.CreateIndexAsync(typeof(CloudDto));
         }
+        else
+        {
+            await _provider.Connection.DropIndexAsync(typeof(CloudDto));
+            await _provider.Connection.CreateIndexAsync(typeof(CloudDto));
+        }
         if (info.Any(x => x == "containerImage-idx") == false)
         {
             await _provider.Connection.CreateIndexAsync(typeof(ContainerImageDto));
@@ -47,6 +52,11 @@ public class IndexCreationService : IHostedService
         }
         if (info.Any(x => x == "edge-idx") == false)
         {
+            await _provider.Connection.CreateIndexAsync(typeof(EdgeDto));
+        }
+        else
+        {
+            await _provider.Connection.DropIndexAsync(typeof(EdgeDto));
             await _provider.Connection.CreateIndexAsync(typeof(EdgeDto));
         }
         if (info.Any(x => x == "instance-idx") == false)

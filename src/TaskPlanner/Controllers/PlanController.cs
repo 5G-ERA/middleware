@@ -6,6 +6,7 @@ using Middleware.Models.Domain;
 using Middleware.RedisInterface.Sdk;
 using Middleware.TaskPlanner.ApiReference;
 using Middleware.TaskPlanner.Contracts.Requests;
+using Middleware.TaskPlanner.Exceptions;
 using Middleware.TaskPlanner.Services;
 
 namespace Middleware.TaskPlanner.Controllers
@@ -16,18 +17,21 @@ namespace Middleware.TaskPlanner.Controllers
     {
         private readonly IActionPlanner _actionPlanner;
         private readonly IMapper _mapper;
+        private readonly IPublishService _publishService;
         private readonly ResourcePlanner.ResourcePlannerApiClient _resourcePlannerClient;
-        private readonly Orchestrator.OrchestratorApiClient _orchestratorClient;
-        private readonly IRedisInterfaceClient _redisInterfaceClient;
+        private readonly IRedisInterfaceClientService _redisInterfaceClient;
+        private readonly ILogger<PlanController> _logger;
 
 
         public PlanController(IActionPlanner actionPlanner, IApiClientBuilder builder,
-            IRedisInterfaceClient redisInterfaceClient, IMapper mapper)
+            IRedisInterfaceClient redisInterfaceClient, IMapper mapper,
+            IPublishService publishService, ILogger<PlanController> logger)
         {
             _actionPlanner = actionPlanner;
             _mapper = mapper;
+            _publishService = publishService;
+            _logger = logger;
             _resourcePlannerClient = builder.CreateResourcePlannerApiClient();
-            _orchestratorClient = builder.CreateOrchestratorApiClient();
             _redisInterfaceClient = redisInterfaceClient;
         }
 
@@ -67,7 +71,7 @@ namespace Middleware.TaskPlanner.Controllers
                     Task = tmpTaskSend
                 };
                 ResourcePlanner.TaskModel tmpFinalTask =
-                    await _resourcePlannerClient.GetResourcePlanAsync(resourceInput);
+                    await _resourcePlannerClient.ResourceAsync(resourceInput);
                 TaskModel resourcePlan = _mapper.Map<TaskModel>(tmpFinalTask);
 
                 if (dryRun)
@@ -75,7 +79,7 @@ namespace Middleware.TaskPlanner.Controllers
 
                 await _redisInterfaceClient.AddRelationAsync(robot2, resourcePlan, "OWNS");
 
-                await _actionPlanner.PublishPlanAsync(resourcePlan, robot2);
+                await _publishService.PublishPlanAsync(resourcePlan, robot2);
 
                 return Ok(resourcePlan);
             }
@@ -148,7 +152,7 @@ namespace Middleware.TaskPlanner.Controllers
 
                 await _redisInterfaceClient.AddRelationAsync(robot2, resourcePlan, "OWNS");
 
-                await _actionPlanner.PublishPlanAsync(resourcePlan, robot2);
+                await _publishService.PublishPlanAsync(resourcePlan, robot2);
 
                 //TODO: orchestrator has to create the relations between the instance and the location the services are deployed in
                 /*Orchestrator.OrchestratorResourceInput tmpTaskOrchestratorSend =
@@ -173,6 +177,28 @@ namespace Middleware.TaskPlanner.Controllers
                 int statusCode = (int)HttpStatusCode.InternalServerError;
                 return StatusCode(statusCode,
                     new ApiResponse(statusCode, $"There was an error while preparing the task plan: {ex.Message}"));
+            }
+        }
+
+        [HttpPost("switchover")]
+        [ProducesResponseType(typeof(void), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.BadRequest)]
+        public async Task<IActionResult> Switchover([FromBody] PerformSwitchoverRequest request)
+        {
+            try
+            {
+                await _publishService.PublishSwitchoverDeployInstance(request.ActionPlanId, request.ActionId,
+                    request.Destination, request.DestinationType);
+                await _publishService.PublishSwitchoverDeleteInstance(request.ActionPlanId, request.ActionId);
+
+                return Ok();
+            }
+            catch (IncorrectLocationException ex)
+            {
+                _logger.LogInformation(
+                    "Attempted to obtain non existing Middleware within organization. Name: {0}, Type: {1}",
+                    ex.LocationName, ex.LocationType);
+                return BadRequest(new ApiResponse((int)HttpStatusCode.BadRequest, ex.Message));
             }
         }
     }

@@ -10,11 +10,13 @@ public class CloudModel : BaseModel
 
     [JsonPropertyName("Name")]
     public override string Name { get; set; }
-    
 
     [Obsolete]
     [JsonPropertyName("Type")]
     public string Type { get; set; }
+
+    [JsonPropertyName("Organization")]
+    public string Organization { get; set; }
 
     [JsonPropertyName("CloudStatus")]
     public string CloudStatus { get; set; }
@@ -58,6 +60,7 @@ public class CloudModel : BaseModel
         if (string.IsNullOrEmpty(DiskStorage.ToString())) return false;
         //if (string.IsNullOrEmpty(MacAddress.ToString())) return false;
         if (string.IsNullOrEmpty(Ram.ToString())) return false;
+        if (string.IsNullOrEmpty(Organization.ToString())) return false;
         return true;
     }
     public override Dto.Dto ToDto()
@@ -68,6 +71,7 @@ public class CloudModel : BaseModel
             Id = domain.Id.ToString(),
             Name = domain.Name,
             Type = domain.Type,
+            Organization = domain.Organization,
             CloudStatus = domain.CloudStatus,
             CloudIp = domain.CloudIp,
             HardwareSpec = new()

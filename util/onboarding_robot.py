@@ -6,7 +6,7 @@ __version__ = "1.0"
 __manteiner__ = "Adrian Lendinez Ibañez"
 __email__ = "adrian.lendinez@outlook.com"
 __status__ = "Testing"
-__date__ = "19/01/2023"
+__date__ = "03/04/2023"
 
 import json
 import os
@@ -15,6 +15,15 @@ import time
 from collections import OrderedDict
 import collections
 # Json file content:
+
+{
+      "name": "",
+      "type": "",
+      "description": "",
+      "nodes": [
+      ],
+      "number": 1
+    }
 
 sensor_dict = {
     "Name": "",
@@ -34,12 +43,19 @@ actuator_dict = {
 robot_onboarding_dict = [("relations", []),
 ("Id", ""),
 ("Name", ""),
+("RosVersion", ""),
+("RosDistro", ""),
+("MaximumPayload", ""),
+("MaximumTranslationalVelocity", ""),
+("MaximumRotationalVelocity", ""),
+("RobotWeight", ""),
 ("ROSRepo", ""),
 ("ROSNodes", []),
 ("Manufacturer", ""),
 ("ManufacturerUrl", ""),
 ("RobotModel", ""),
 ("RobotStatus", ""),
+("currentTaskId", ""),
 ("TaskList", ""),
 ("BatteryStatus", 0),
 ("MacAddress", ""),
@@ -193,9 +209,9 @@ def parser_node_info(node_info: list):
     
     rosNode_dict = {
     "Name": str(node_name),
-    "Publications": [publishers],
-    "Subscriptions": [subscribers],
-    "Services": [services]
+    "Publications": publishers,
+    "Subscriptions": subscribers,
+    "Services": services
     }
     return rosNode_dict
 

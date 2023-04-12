@@ -1,3 +1,4 @@
+using Middleware.Common.Helpers;
 using Middleware.Models.Domain;
 using Middleware.TaskPlanner.Exceptions;
 using KeyValuePair = Middleware.Models.Domain.KeyValuePair;
@@ -600,17 +601,5 @@ public class ActionPlanner : IActionPlanner
             task.ActionSequence = actionPlan.ActionSequence;
             return new Tuple<TaskModel, TaskModel, RobotModel>(task, oldTask, robot);
         }
-    }
-
-    public async Task PublishPlanAsync(TaskModel task, RobotModel robot)
-    {
-        var location = task.ActionSequence.Select(a => a.Placement).Distinct().First();
-        var message = new DeployPlanMessage()
-        {
-            Task = task,
-            RobotId = robot.Id,
-            DeploymentLocation = location
-        };
-        await _deployPlanPublisher.PublishAsync(message);
     }
 }

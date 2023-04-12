@@ -39,9 +39,10 @@ public sealed class ActionPlanModel : BaseModel
     {
     }
 
-    public ActionPlanModel(Guid id, string name, List<ActionModel> actionSequence, Guid robotId)
+    public ActionPlanModel(Guid id, Guid taskId, string name, List<ActionModel> actionSequence, Guid robotId)
     {
         Id = id;
+        TaskId = taskId;
         Name = name;
         ActionSequence = actionSequence;
         RobotId = robotId;

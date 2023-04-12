@@ -17,40 +17,40 @@ public class InstanceModel : BaseModel
     public Guid ServiceInstanceId { get; set; }
 
     [JsonPropertyName("ServiceType")]
-    public string ServiceType { get; set; }
+    public string? ServiceType { get; set; }
 
     [JsonPropertyName("IsReusable")]
     public bool? IsReusable { get; set; }
 
     [JsonPropertyName("DesiredStatus")]
-    public string DesiredStatus { get; set; }
+    public string? DesiredStatus { get; set; }
 
     [JsonPropertyName("ServiceUrl")]
-    public string ServiceUrl { get; set; }
+    public string? ServiceUrl { get; set; }
 
     [JsonPropertyName("RosTopicsPub")]
-    public List<RosTopicModel> RosTopicsPub { get; set; } // compulsory field
+    public List<RosTopicModel> RosTopicsPub { get; set; } = new();// compulsory field
 
     [JsonPropertyName("RosTopicsSub")]
-    public List<RosTopicModel> RosTopicsSub { get; set; } // compulsory field
+    public List<RosTopicModel> RosTopicsSub { get; set; } = new();// compulsory field
 
     [JsonPropertyName("ROSVersion")]
     public int RosVersion { get; set; } // compulsory field
 
     [JsonPropertyName("ROSDistro")]
-    public string ROSDistro { get; set; } // compulsory field
+    public string? ROSDistro { get; set; } // compulsory field
 
     [JsonPropertyName("Tags")]
     public List<string>? Tags { get; set; }
 
     [JsonPropertyName("InstanceFamily")]
-    public string InstanceFamily { get; set; } // Compulsory field
+    public string? InstanceFamily { get; set; } // Compulsory field
 
     [JsonPropertyName("SuccessRate")]
     public int SuccessRate { get; set; }
 
     [JsonPropertyName("ServiceStatus")]
-    public string ServiceStatus { get; set; } //updated every 10 sec
+    public string? ServiceStatus { get; set; } //updated every 10 sec
 
     [JsonPropertyName("ContainerImage")]
     [JsonIgnore]
@@ -78,8 +78,8 @@ public class InstanceModel : BaseModel
         if (RosVersion == 0) return false;
         if (string.IsNullOrEmpty(MinimumRam.ToString())) return false;
         if (string.IsNullOrEmpty(MinimumNumCores.ToString())) return false;
-        if (string.IsNullOrEmpty(ROSDistro.ToString())) return false;
-        if (string.IsNullOrEmpty(InstanceFamily.ToString())) return false;
+        if (string.IsNullOrEmpty(ROSDistro?.ToString())) return false;
+        if (string.IsNullOrEmpty(InstanceFamily?.ToString())) return false;
         if (!rosDistrosEnum.Contains(ROSDistro)) return false;
         //   if (string.IsNullOrEmpty(RosTopicsPub.ToString())) return false;
         //   if (string.IsNullOrEmpty(RosTopicsSub.ToString())) return false;

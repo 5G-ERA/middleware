@@ -9,13 +9,33 @@
             "type": "coreclr",
             "request": "launch",
             "preLaunchTask": "bridge-to-kubernetes.compound",
-            "program": "${workspaceFolder}/src/Orchestrator/bin/Debug/net6.0/Orchestrator.dll",
+            "program": "${workspaceFolder}/src/Orchestrator/bin/Debug/net6.0/net6.0/Orchestrator.dll",
             "args": [],
             "cwd": "${workspaceFolder}",
             "stopAtEntry": false,
             "env": {
                 "ASPNETCORE_ENVIRONMENT": "Development",
                 "ASPNETCORE_URLS": "http://+:3001"
+            },
+            "sourceFileMap": {
+                "/Views": "${workspaceFolder}/Views"
+            }
+        },
+        {
+            "name": "TaskPlanner .NET Core Launch (web)",
+            "type": "coreclr",
+            "request": "launch",
+            "preLaunchTask": "build",
+            "program": "${workspaceFolder}/src/TaskPlanner/bin/Debug/net6.0/TaskPlanner.dll",
+            "args": [],
+            "cwd": "${workspaceFolder}",
+            "stopAtEntry": false,
+            "serverReadyAction": {
+                "action": "openExternally",
+                "pattern": "\\bNow listening on:\\s+(https?://\\S+)"
+            },
+            "env": {
+                "ASPNETCORE_ENVIRONMENT": "Development"
             },
             "sourceFileMap": {
                 "/Views": "${workspaceFolder}/Views"

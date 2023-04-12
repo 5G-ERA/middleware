@@ -25,6 +25,8 @@
 	<ItemGroup>
 		<PackageReference Include="AutoMapper" Version="11.0.1" />
 		<PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="11.0.0" />
+		<PackageReference Include="FluentValidation" Version="11.5.1" />
+		<PackageReference Include="FluentValidation.DependencyInjectionExtensions" Version="11.5.1" />
 		<PackageReference Include="MassTransit.Extensions.DependencyInjection" Version="7.3.1" />
 		<PackageReference Include="MassTransit.RabbitMQ" Version="8.0.12" />
 		<PackageReference Include="Microsoft.Extensions.ApiDescription.Client" Version="3.0.0">
@@ -37,11 +39,13 @@
 			<PrivateAssets>all</PrivateAssets>
 			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
 		</PackageReference>
+		<PackageReference Include="OneOf" Version="3.0.243" />
 		<PackageReference Include="RabbitMQ.Client" Version="6.4.0" />
 		<PackageReference Include="Swashbuckle.AspNetCore" Version="6.3.0" />
 	</ItemGroup>
 
 	<ItemGroup>
+		<ProjectReference Include="..\CentralApi.Sdk\CentralApi.Sdk.csproj" />
 		<ProjectReference Include="..\Common\Common.csproj" />
 		<ProjectReference Include="..\RedisInterface.Sdk\RedisInterface.Sdk.csproj" />
 	</ItemGroup>

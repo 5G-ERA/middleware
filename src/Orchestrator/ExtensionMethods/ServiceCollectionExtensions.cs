@@ -1,7 +1,9 @@
 ﻿using MassTransit;
 using Middleware.Common.Config;
+using Middleware.Common.Helpers;
 using Middleware.Common.MessageContracts;
 using Middleware.Orchestrator.Handlers;
+using Middleware.Orchestrator.Handlers.Switchover;
 using RabbitMQ.Client;
 
 namespace Middleware.Orchestrator.ExtensionMethods;
@@ -11,36 +13,71 @@ public static class ServiceCollectionExtensions
     public static IServiceCollection RegisterRabbitMqConsumers(this IServiceCollection services,
         RabbitMqConfig mqConfig, MiddlewareConfig mwConfig)
     {
+        var routingKey = QueueHelpers.ConstructRoutingKey(mwConfig.InstanceName, mwConfig.InstanceType);
         services.AddMassTransit(x =>
         {
             services.AddScoped<DeployPlanConsumer>();
             x.AddConsumer<DeployPlanConsumer>();
+            
+            services.AddScoped<SwitchoverDeleteInstanceConsumer>();
+            x.AddConsumer<SwitchoverDeleteInstanceConsumer>();
+            
+            services.AddScoped<SwitchoverDeployInstanceConsumer>();
+            x.AddConsumer<SwitchoverDeployInstanceConsumer>();
+            
             x.UsingRabbitMq((busRegistrationContext, mqBusFactoryConfigurator) =>
             {
-                //mqBusFactoryConfigurator.SetKebabCaseEndpointNameFormatter();
-                mqBusFactoryConfigurator.ExchangeType = "direct";
-                mqBusFactoryConfigurator.Durable = true;
                 mqBusFactoryConfigurator.Host(mqConfig.Address, "/", hostConfig =>
                 {
                     hostConfig.Username(mqConfig.User);
                     hostConfig.Password(mqConfig.Pass);
                 });
 
-                mqBusFactoryConfigurator.ReceiveEndpoint("deployments", ec =>
-                {
-                    ec.ConfigureConsumeTopology = false;
-                    ec.Bind(nameof(DeployPlanMessage), b =>
+                mqBusFactoryConfigurator.ReceiveEndpoint(
+                    QueueHelpers.ConstructSwitchoverDeleteActionQueueName(mwConfig.Organization,
+                        mwConfig.InstanceName),
+                    ec =>
                     {
-                        b.RoutingKey = $"{mwConfig.InstanceName}-{mwConfig.InstanceType}";
-                        b.ExchangeType = ExchangeType.Direct;
+                        ec.ConfigureConsumeTopology = false;
+                        ec.Bind(nameof(SwitchoverDeleteAction), b =>
+                        {
+                            b.ExchangeType = ExchangeType.Direct;
+                            b.RoutingKey = routingKey;
+                        });
+                        ec.ConfigureConsumer<SwitchoverDeleteInstanceConsumer>(busRegistrationContext);
                     });
-
-                    ec.ConfigureConsumer<DeployPlanConsumer>(busRegistrationContext);
-                });
+                
+                mqBusFactoryConfigurator.ReceiveEndpoint(
+                    QueueHelpers.ConstructSwitchoverDeployActionQueueName(mwConfig.Organization,
+                        mwConfig.InstanceName),
+                    ec =>
+                    {
+                        ec.ConfigureConsumeTopology = false;
+                        ec.Bind(nameof(SwitchoverDeployAction), b =>
+                        {
+                            b.ExchangeType = ExchangeType.Direct;
+                            b.RoutingKey = routingKey;
+                        });
+                        ec.ConfigureConsumer<SwitchoverDeployInstanceConsumer>(busRegistrationContext);
+                    });
+                
+                mqBusFactoryConfigurator.ReceiveEndpoint(
+                    QueueHelpers.ConstructDeploymentQueueName(mwConfig.Organization, mwConfig.InstanceName),
+                    ec =>
+                    {
+                        ec.ConfigureConsumeTopology = false;
+                        ec.Bind(nameof(DeployPlanMessage), b =>
+                        {
+                            b.ExchangeType = ExchangeType.Direct;
+                            b.RoutingKey = routingKey;
+                        });
+                        ec.ConfigureConsumer<DeployPlanConsumer>(busRegistrationContext);
+                    });
 
                 mqBusFactoryConfigurator.ConfigureEndpoints(busRegistrationContext);
             });
         });
+        
         // MassTransit-RabbitMQ Configuration
         services.AddOptions<MassTransitHostOptions>()
             .Configure(options =>

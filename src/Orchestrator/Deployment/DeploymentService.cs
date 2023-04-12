@@ -1,5 +1,6 @@
 ﻿using k8s;
 using k8s.Models;
+using Microsoft.Extensions.Options;
 using Middleware.Common;
 using Middleware.Common.Config;
 using Middleware.Common.Enums;
@@ -36,6 +37,7 @@ public class DeploymentService : IDeploymentService
     private readonly IRedisInterfaceClient _redisInterfaceClient;
 
     private readonly IConfiguration _configuration;
+    private readonly IOptions<MiddlewareConfig> _mwConfig;
 
     /// <summary>
     /// Name of the AWS registry used 
@@ -46,13 +48,15 @@ public class DeploymentService : IDeploymentService
         IEnvironment env,
         ILogger<DeploymentService> logger,
         IRedisInterfaceClient redisInterfaceClient,
-        IConfiguration configuration)
+        IConfiguration configuration
+        IOptions<MiddlewareConfig> mwConfig)
     {
         _kubernetesBuilder = kubernetesBuilder;
         _env = env;
         _logger = logger;
         _redisInterfaceClient = redisInterfaceClient;
         _configuration = configuration;
+        _mwConfig = mwConfig;
         _awsRegistryName = _env.GetEnvVariable("AWS_IMAGE_REGISTRY");
     }
 
@@ -68,13 +72,13 @@ public class DeploymentService : IDeploymentService
             var deploymentNames = deployments.Items.Select(d => d.Metadata.Name).OrderBy(d => d).ToArray();
             _logger.LogDebug("Current deployments: {deployments}", string.Join(", ", deploymentNames));
 
-            foreach (var seq in task.ActionSequence)
+            foreach (var seq in task.ActionSequence!)
             {
                 //BaseModel location;
                 //location = seq.PlacementType.ToLower().Contains("cloud")
                 //    ? await _redisInterfaceClient.GetCloudByNameAsync(seq.Placement)
                 //    : await _redisInterfaceClient.GetEdgeByNameAsync(seq.Placement);
-                foreach (var service in seq.Services)
+                foreach (var service in seq.Services!)
                 {
                     try
                     {
@@ -126,12 +130,12 @@ public class DeploymentService : IDeploymentService
     /// <returns></returns>
     private async Task<bool> SaveActionSequence(TaskModel task, Guid robotId)
     {
-        var actionPlan = new ActionPlanModel(task.ActionPlanId, task.Name, task.ActionSequence, robotId);
+        var actionPlan = new ActionPlanModel(task.ActionPlanId, task.Id, task.Name, task.ActionSequence!, robotId);
         actionPlan.SetStatus("active");
 
         var result = await _redisInterfaceClient.ActionPlanAddAsync(actionPlan);
 
-        return result != null;
+        return result;
     }
 
     private async Task DeployService(IKubernetes k8SClient, InstanceModel service, string[] deploymentNames)
@@ -162,7 +166,7 @@ public class DeploymentService : IDeploymentService
             var deployedPair = await Deploy(k8SClient, cim);
 
             service.ServiceStatus = ServiceStatus.Idle.GetStringValue();
-            service.ServiceInstanceId = Guid.Parse(deployedPair.Deployment.GetLabel("serviceId"));
+            service.ServiceInstanceId = deployedPair.InstanceId;
             _logger.LogDebug("Deployed the image {Name} with the Id {ServiceInstanceId}", service.Name,
                 service.ServiceInstanceId);
 
@@ -185,7 +189,7 @@ public class DeploymentService : IDeploymentService
         var deployment = await Deploy<V1Deployment>(k8SClient, cim.K8SDeployment, cim.Name, instanceId,
             nameof(cim.K8SDeployment));
 
-        return new DeploymentPairModel(deployment, service);
+        return new DeploymentPairModel(deployment, service, instanceId);
     }
 
     /// <summary>
@@ -294,9 +298,9 @@ public class DeploymentService : IDeploymentService
             var k8sClient = _kubernetesBuilder.CreateKubernetesClient();
             foreach (var action in actionPlan.ActionSequence)
             {
-                foreach (var srv in action.Services)
+                foreach (var srv in action.Services!)
                 {
-                    retVal &= await DeleteInstance(k8sClient, srv);
+                    retVal &= await DeleteInstance(k8sClient, srv.ServiceInstanceId);
                 }
             }
         }
@@ -318,35 +322,106 @@ public class DeploymentService : IDeploymentService
         return retVal;
     }
 
+    public async Task DeleteActionAsync(Guid actionPlanId, Guid actionId)
+    {
+        _logger.LogTrace("Entered DeployActionAsync");
+        var kubeClient = _kubernetesBuilder.CreateKubernetesClient();
+        _logger.LogDebug("Retrieving ActionPlan");
+        var actionPlan = await _redisInterfaceClient.ActionPlanGetByIdAsync(actionPlanId);
+        if (actionPlan is null)
+            return;
+        _logger.LogDebug("Retrieving Action from action plan");
+        var action = actionPlan.ActionSequence.FirstOrDefault(x => x.Id == actionId);
+        if (action is null)
+            return;
+
+        _logger.LogDebug("Retrieving location details (cloud or edge)");
+        BaseModel thisLocation = _mwConfig.Value.InstanceType == LocationType.Cloud.ToString()
+            ? await _redisInterfaceClient.GetCloudByNameAsync(_mwConfig.Value.InstanceName)
+            : await _redisInterfaceClient.GetEdgeByNameAsync(_mwConfig.Value.InstanceName);
+
+        foreach (var instance in action.Services!)
+        {
+            _logger.LogDebug("Deleting instance '{0}', with serviceInstanceId '{1}'",
+                instance.Name, instance.ServiceInstanceId);
+
+            await DeleteInstance(kubeClient, instance.ServiceInstanceId);
+            _logger.LogDebug("Deleting relation between instance '{0}'and location '{1}'",
+                instance.Name, thisLocation.Name);
+
+            await _redisInterfaceClient.DeleteRelationAsync(instance, thisLocation, "LOCATED_AT");
+        }
+    }
+
+    public async Task DeployActionAsync(Guid actionPlanId, Guid actionId)
+    {
+        _logger.LogTrace("Entered DeployActionAsync");
+        var kubeClient = _kubernetesBuilder.CreateKubernetesClient();
+
+        _logger.LogDebug("Retrieving ActionPlan");
+        var actionPlan = await _redisInterfaceClient.ActionPlanGetByIdAsync(actionPlanId);
+        if (actionPlan is null)
+            return;
+        _logger.LogDebug("Retrieving action containing desired Service");
+        var action = actionPlan.ActionSequence.FirstOrDefault(a => a.Id == actionId);
+
+        if (action is null)
+            return;
+
+        var deployments = await kubeClient.AppsV1.ListNamespacedDeploymentAsync(AppConfig.K8SNamespaceName);
+        var deploymentNames = deployments.Items.Select(d => d.Metadata.Name).OrderBy(d => d).ToArray();
+        
+        _logger.LogDebug("Retrieving location details (cloud or edge)");
+        BaseModel thisLocation = _mwConfig.Value.InstanceType == LocationType.Cloud.ToString()
+            ? await _redisInterfaceClient.GetCloudByNameAsync(_mwConfig.Value.InstanceName)
+            : await _redisInterfaceClient.GetEdgeByNameAsync(_mwConfig.Value.InstanceName);
+        
+        foreach (var instance in action.Services!)
+        {
+            _logger.LogDebug("Deploying instance '{0}', with serviceInstanceId '{1}'",
+                instance.Name, instance.ServiceInstanceId);
+            await DeployService(kubeClient, instance, deploymentNames);
+            
+            _logger.LogDebug("Adding new relation between instance and current location");
+            await _redisInterfaceClient.AddRelationAsync(instance, thisLocation, "LOCATED_AT");
+        }
+        
+        action.Placement = _mwConfig.Value.InstanceName;
+        action.PlacementType = _mwConfig.Value.InstanceType;
+        
+        _logger.LogDebug("Saving updated ActionPlan");
+        await _redisInterfaceClient.ActionPlanAddAsync(actionPlan);
+    }
+
     /// <summary>
     /// Deletes the instance specified. The deletion includes associated deployment and service
     /// </summary>
-    /// <param name="k8sClient"></param>
-    /// <param name="instance"></param>
+    /// <param name="kubeClient"></param>
+    /// <param name="instanceId"></param>
     /// <returns></returns>
-    private async Task<bool> DeleteInstance(IKubernetes k8sClient, InstanceModel instance)
+    private async Task<bool> DeleteInstance(IKubernetes kubeClient, Guid instanceId)
     {
         const string success = "Success";
         var retVal = true;
 
-        var deployments = await k8sClient.AppsV1.ListNamespacedDeploymentAsync(AppConfig.K8SNamespaceName,
-            labelSelector: V1ObjectExtensions.GetNetAppLabelSelector(instance.ServiceInstanceId));
-        var services = await k8sClient.CoreV1.ListNamespacedServiceAsync(AppConfig.K8SNamespaceName,
-            labelSelector: V1ObjectExtensions.GetNetAppLabelSelector(instance.ServiceInstanceId));
+        var deployments = await kubeClient.AppsV1.ListNamespacedDeploymentAsync(AppConfig.K8SNamespaceName,
+            labelSelector: V1ObjectExtensions.GetNetAppLabelSelector(instanceId));
+        var services = await kubeClient.CoreV1.ListNamespacedServiceAsync(AppConfig.K8SNamespaceName,
+            labelSelector: V1ObjectExtensions.GetNetAppLabelSelector(instanceId));
 
         foreach (var deployment in deployments.Items)
         {
             var status =
-                await k8sClient.AppsV1.DeleteNamespacedDeploymentAsync(deployment.Name(), AppConfig.K8SNamespaceName);
+                await kubeClient.AppsV1.DeleteNamespacedDeploymentAsync(deployment.Name(), AppConfig.K8SNamespaceName);
             retVal &= status.Status == success;
         }
 
         foreach (var service in services.Items)
         {
-            //var version = await k8sClient.Version.GetCodeWithHttpMessagesAsync();
+            //var version = await kubeClient.Version.GetCodeWithHttpMessagesAsync();
             try
             {
-                await k8sClient.CoreV1.DeleteNamespacedServiceAsync(service.Name(), AppConfig.K8SNamespaceName);
+                await kubeClient.CoreV1.DeleteNamespacedServiceAsync(service.Name(), AppConfig.K8SNamespaceName);
             }
             catch
             {
@@ -377,13 +452,14 @@ public class DeploymentService : IDeploymentService
         };
         var envList = new List<V1EnvVar>
         {
-            new("REDIS_INTERFACE_ADDRESS", $"http://redis-interface-api"),
-            new("ORCHESTRATOR_ADDRESS", $"http://orchestrator-api"),
-            new("TASK_PLANNER_ADDRESS", $"http://task-planner-api"),
-            new("RESOURCE_PLANNER_ADDRESS", $"http://resource-planner-api"),
+            // new("REDIS_INTERFACE_ADDRESS", $"http://redis-interface-api"),
+            // new("ORCHESTRATOR_ADDRESS", $"http://orchestrator-api_SERVICE_HOST"),
+            // new("TASK_PLANNER_ADDRESS", $"http://task-planner-api"),
+            // new("RESOURCE_PLANNER_ADDRESS", $"http://resource-planner-api"),
             new("Middleware__Organization", mwConfig.Organization),
             new("Middleware__InstanceName", mwConfig.InstanceName),
-            new("Middleware__InstanceType", mwConfig.InstanceType)
+            new("Middleware__InstanceType", mwConfig.InstanceType),
+            new("CENTRAL_API_HOSTNAME", _env.GetEnvVariable("CENTRAL_API_HOSTNAME"))
         };
         if (name.Contains("redis") || name == "gateway")
         {

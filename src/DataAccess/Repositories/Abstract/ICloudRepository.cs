@@ -1,4 +1,5 @@
-﻿using Middleware.Models.Domain;
+﻿using System.Collections.Immutable;
+using Middleware.Models.Domain;
 
 namespace Middleware.DataAccess.Repositories.Abstract
 {
@@ -19,5 +20,11 @@ namespace Middleware.DataAccess.Repositories.Abstract
         Task<bool> IsBusyCloudByNameAsync(string cloudName);
 
         Task<bool> IsBusyCloudByIdAsync(Guid cloudId);
+        Task<ImmutableList<CloudModel>> GetCloudsByOrganizationAsync(string organization);
+
+        Task<(bool, CloudModel?)> CheckIfNameExists(string name);
+
+        Task<(bool, CloudModel?)> CheckIfIdExists(string id);
+
     }
 }

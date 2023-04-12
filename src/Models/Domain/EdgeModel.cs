@@ -2,6 +2,7 @@
 using Middleware.Models.Dto;
 using Middleware.Models.Dto.Hardware;
 
+
 namespace Middleware.Models.Domain;
 
 public class EdgeModel : BaseModel
@@ -15,7 +16,11 @@ public class EdgeModel : BaseModel
     [JsonPropertyName("Type")]
     public string Type { get; set; }
 
+    [JsonPropertyName("Organization")]
+    public string Organization { get; set; }
+
     [JsonPropertyName("EdgeStatus")]
+
     public string EdgeStatus { get; set; }
 
     [JsonPropertyName("EdgeIp")]
@@ -57,8 +62,10 @@ public class EdgeModel : BaseModel
         if (string.IsNullOrEmpty(DiskStorage.ToString())) return false;
         // if (string.IsNullOrEmpty(MacAddress.ToString())) return false;
         if (string.IsNullOrEmpty(Ram.ToString())) return false;
+        if (string.IsNullOrEmpty(Organization.ToString())) return false;
         return true;
     }
+
     public override Dto.Dto ToDto()
     {
         var domain = this;
@@ -67,6 +74,7 @@ public class EdgeModel : BaseModel
             Id = domain.Id.ToString(),
             Name = domain.Name,
             Type = domain.Type,
+            Organization = domain.Organization,
             EdgeStatus = domain.EdgeStatus,
             EdgeIp = domain.EdgeIp,
             MacAddress = domain.MacAddress,

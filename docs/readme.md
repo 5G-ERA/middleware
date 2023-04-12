@@ -1,10 +1,11 @@
 # 5G-ERA Middleware documentation
 
 The documentation of the 5G-ERA Middleware is divided into three sections, each responsible for a different aspect.
-* [Where to start](Where_to_start\readme.md)
+* [Where to start](Where_to_start/readme.md)
 * [Administrator](Administrator/readme.md)
 * [Developer](Developer/readme.md)
 * [User](User/Readme.md)
+* [Glossary](Where_to_start/Glosary.md)
 
 
 ## Where to start
@@ -21,4 +22,8 @@ The developer documentation covers the technical aspects of Middleware developme
 
 ## User
 
-Finally, the user documentation covers the aspects of using the 5G-ERA Middleware. How to use it and how to navigate the functionality that it proposes. 
+The user documentation covers the aspects of using the 5G-ERA Middleware. How to use it and how to navigate the functionality that it proposes. 
+
+## Glossary
+
+Vocabulary of terms usually included in this documentation. 5G-ERA terminology.

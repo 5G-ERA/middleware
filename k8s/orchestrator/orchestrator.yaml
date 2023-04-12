@@ -7,12 +7,12 @@ spec:
   selector:
     name: orchestrator-api
   ports:
-  - port: 80
-    targetPort: 80
-    name: http
-  - port: 433
-    targetPort: 433
-    name: https
+    - port: 80
+      targetPort: 80
+      name: http
+    - port: 433
+      targetPort: 433
+      name: https
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -31,19 +31,25 @@ spec:
       automountServiceAccountToken: true
       nodeSelector:
         kubernetes.io/os: linux
+      imagePullSecrets:
+      - name: awsecr-cred
       containers:        
       - name: orchestrator-api
-        image: 394603622351.dkr.ecr.eu-west-1.amazonaws.com/orchestrator-api:v0.2
+        image: 394603622351.dkr.ecr.eu-west-1.amazonaws.com/orchestrator-api:v0.2.2
         imagePullPolicy: Always
         resources: {}
         env:
         - name: AWS_IMAGE_REGISTRY
           value: 394603622351.dkr.ecr.eu-west-1.amazonaws.com # to be replaced with real value
-        - name: REDIS_INTERFACE_ADDRESS
-          value: http://redis-interface-api # to be replaced with real value
+        - name: REDIS_INTERFACE_API_SERVICE_HOST
+          value: redis-interface-api # to be replaced with real value
+        - name: REDIS_INTERFACE_API_SERVICE_PORT
+          value: "80"
         - name: Middleware__Organization
-          value: 5G-ERA # to be replaced with real value
+          value: 5G-ERA-DEV # to be replaced with real value
         - name: Middleware__InstanceName
           value: MiddlewareBED # to be replaced with real value
         - name: Middleware__InstanceType
           value: Edge # to be replaced with real value
+        - name: CENTRAL_API_HOSTNAME
+          value: central.api
