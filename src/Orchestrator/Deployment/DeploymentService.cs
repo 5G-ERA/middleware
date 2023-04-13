@@ -35,8 +35,10 @@ public class DeploymentService : IDeploymentService
     /// Redis Interface API client
     /// </summary>
     private readonly IRedisInterfaceClient _redisInterfaceClient;
+
     private readonly IConfiguration _configuration;
     private readonly IOptions<MiddlewareConfig> _mwConfig;
+
     /// <summary>
     /// Name of the container registry used 
     /// </summary>
@@ -73,7 +75,7 @@ public class DeploymentService : IDeploymentService
             BaseModel location = _mwConfig.Value.InstanceType.ToLower() == "cloud"
                 ? (await _redisInterfaceClient.GetCloudByNameAsync(_mwConfig.Value.InstanceName)).ToCloud()
                 : (await _redisInterfaceClient.GetEdgeByNameAsync(_mwConfig.Value.InstanceName)).ToEdge();
-            
+
             foreach (var seq in task.ActionSequence!)
             {
                 foreach (var service in seq.Services!)
@@ -159,6 +161,7 @@ public class DeploymentService : IDeploymentService
                 var guidSuffix = Guid.NewGuid().ToString().Split('-')[3];
                 cim.Name = $"{cim.Name}-{guidSuffix}";
             }
+
             deploymentNames.Add(cim.Name);
             var deployedPair = await Deploy(k8SClient, cim);
 
