@@ -13,7 +13,32 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v2    
+    - uses: actions/checkout@v3   
+
+    - name: Build image
+      env:
+        IMAGE_REPOSITORY: ${{ secrets.GATEWAY_REPO_NAME }}
+      run: docker build -f ./src/OcelotGateway/Dockerfile ./src --tag $IMAGE_REPOSITORY --label "runnumber=${GITHUB_RUN_ID}"
+      
+    - name: Log in to registry
+      # This is where you will update the personal access token to GITHUB_TOKEN
+      run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u $ --password-stdin
+
+    - name: Push image
+      env:
+        IMAGE_REPOSITORY: ${{ secrets.GATEWAY_REPO_NAME }}
+      run: |
+        IMAGE_ID=ghcr.io/${{ github.repository_owner }}/$IMAGE_REPOSITORY
+
+        # Change all uppercase to lowercase
+        IMAGE_ID=$(echo $IMAGE_ID | tr '[A-Z]' '[a-z]')          
+        # Use Docker `edge` tag convention
+        VERSION=edge
+        echo IMAGE_ID=$IMAGE_ID
+        echo VERSION=$VERSION
+        docker tag $IMAGE_REPOSITORY $IMAGE_ID:edge
+        docker push $IMAGE_ID:edge
+
   
     - name: Configure AWS credentials
       uses: aws-actions/configure-aws-credentials@v1
@@ -30,14 +55,14 @@ jobs:
       id: build-image
       env:
         ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-        ECR_REPOSITORY: ${{ secrets.GATEWAY_REPO_NAME }}
+        IMAGE_REPOSITORY: ${{ secrets.GATEWAY_REPO_NAME }}
         AWS_KEY_ID: ${{ secrets.AWS_APP_KEY_ID }}
         AWS_SECRET_KEY: ${{ secrets.AWS_APP_SECRET_KEY }}
         IMAGE_TAG: edge
       run: |
         # Build a docker container and push it to ECR 
-        docker build -f ./src/OcelotGateway/Dockerfile -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG \
+        docker build -f ./src/OcelotGateway/Dockerfile -t $ECR_REGISTRY/$IMAGE_REPOSITORY:$IMAGE_TAG \
          --build-arg AWS_KEY_ID=$AWS_KEY_ID --build-arg AWS_SECRET_KEY=$AWS_SECRET_KEY ./src
         echo "Pushing image to ECR..."
-        docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
-        echo "::set-output name=image::$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG"
+        docker push $ECR_REGISTRY/$IMAGE_REPOSITORY:$IMAGE_TAG
+        echo "::set-output name=image::$ECR_REGISTRY/$IMAGE_REPOSITORY:$IMAGE_TAG"
