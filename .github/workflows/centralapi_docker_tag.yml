@@ -9,7 +9,31 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
+
+      - name: Build image
+        env:
+          ECR_REPOSITORY: ${{ secrets.CENTRAL_API_REPO_NAME }}
+        run: docker build -f ./src/CentralApi/Dockerfile ./src --tag $ECR_REPOSITORY --label "runnumber=${GITHUB_RUN_ID}"
+      
+      - name: Log in to registry
+        # This is where you will update the personal access token to GITHUB_TOKEN
+        run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u $ --password-stdin
+
+      - name: Push image
+        env:
+          ECR_REPOSITORY: ${{ secrets.CENTRAL_API_REPO_NAME }}
+          IMAGE_TAG: ${{ steps.get_version.outputs.VERSION }}
+        run: |
+          IMAGE_ID=ghcr.io/${{ github.repository_owner }}/$ECR_REPOSITORY
+
+          # Change all uppercase to lowercase
+          IMAGE_ID=$(echo $IMAGE_ID | tr '[A-Z]' '[a-z]')          
+          docker tag $ECR_REPOSITORY $IMAGE_ID:$IMAGE_TAG
+          docker push $IMAGE_ID:$IMAGE_TAG
+          docker tag $IMAGE_ID:$IMAGE_TAG $IMAGE_ID:latest
+          docker push $IMAGE_ID:latest
+
 
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v1
