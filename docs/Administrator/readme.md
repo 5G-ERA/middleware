@@ -8,4 +8,5 @@ This documentation section describes the necessary steps needed to deploy and ma
 There are two key infrastructure components required to successfully start the 5G-ERA Middleware:
 * Redis Cluster
 * Central API deployment
+* Middleware deployment
 
