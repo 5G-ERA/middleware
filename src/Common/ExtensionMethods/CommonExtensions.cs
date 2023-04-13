@@ -1,13 +1,11 @@
-﻿using System.Net.Http.Headers;
-using Amazon;
+﻿using Amazon;
+using FluentValidation;
+using FluentValidation.AspNetCore;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Middleware.Common.Config;
-using Middleware.Common.Services;
-using RedisGraphDotNet.Client;
-using StackExchange.Redis;
 
 namespace Middleware.Common.ExtensionMethods;
 
@@ -16,20 +14,15 @@ public static class CommonExtensions
     public static IServiceCollection RegisterCommonServices(this IServiceCollection services)
     {
         services.AddSingleton<IEnvironment, MiddlewareEnvironment>();
-        services.AddHttpClient(AppConfig.RedisApiClientName, (a) =>
-        {
-            // get the value within the method to evaluate it when the service is already working 
-            // to respond to any changes in the values
-            var host = Environment.GetEnvironmentVariable("REDIS_INTERFACE_API_SERVICE_HOST");
-            var port = Environment.GetEnvironmentVariable("REDIS_INTERFACE_API_SERVICE_PORT");
-            var address = $"http://{host}:{port}";
-            a.BaseAddress = new Uri(address);
-            a.DefaultRequestHeaders.Accept.Add(
-                new MediaTypeWithQualityHeaderValue("application/json"));
-        });
-        services.AddScoped<IRedisInterfaceClientService, RedisInterfaceClientService>();
 
+        return services;
+    }
 
+    public static IServiceCollection AddFluentValidation(this IServiceCollection services, Type assemblyType)
+    {
+        services.AddFluentValidationAutoValidation();
+        services.AddFluentValidationClientsideAdapters();
+        services.AddValidatorsFromAssemblyContaining(assemblyType);
         return services;
     }
     /// <summary>

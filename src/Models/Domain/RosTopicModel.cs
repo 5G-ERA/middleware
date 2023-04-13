@@ -1,14 +1,12 @@
-﻿using Middleware.Models.Dto.Hardware;
-using Middleware.Models.Dto;
-using Middleware.Models.Dto.Ros;
+﻿using Middleware.Models.Dto.Ros;
 
 namespace Middleware.Models.Domain
 {
     public class RosTopicModel
     {
-        public string Name { get; set; }
-        public string Type { get; set; }
-        public string Description { get; set; }
+        public string Name { get; set; } = default!;
+        public string Type { get; set; } = default!;
+        public string? Description { get; set; } = default!;
         public bool Enabled { get; set; }
 
         /// <summary>

@@ -1,5 +1,4 @@
 ﻿using Microsoft.Extensions.Hosting;
-using Middleware.Common.Enums;
 using Middleware.Models.Dto;
 using Redis.OM;
 using Redis.OM.Contracts;

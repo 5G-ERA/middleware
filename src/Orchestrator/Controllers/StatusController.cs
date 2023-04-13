@@ -1,9 +1,9 @@
 ﻿using System.Net;
 using Microsoft.AspNetCore.Mvc;
 using Middleware.Common.Responses;
-using Middleware.Common.Services;
 using Middleware.DataAccess.Repositories.Abstract;
 using Middleware.Models.Domain;
+using Middleware.RedisInterface.Sdk;
 
 
 namespace Middleware.Orchestrator.Controllers;
@@ -15,12 +15,12 @@ public class StatusController : Controller
     private readonly INetAppStatusRepository _netAppStatusRepository;
     private readonly IRobotStatusRepository _robotStatusRepository;
     private readonly ILogger _logger;
-    private readonly IRedisInterfaceClientService _redisInterfaceClient;
+    private readonly IRedisInterfaceClient _redisInterfaceClient;
 
     public StatusController(INetAppStatusRepository netAppStatusRepository,
         IRobotStatusRepository robotStatusRepository,
         ILogger<StatusController> logger,
-        IRedisInterfaceClientService redisInterfaceClient
+        IRedisInterfaceClient redisInterfaceClient
         )
     {
         _netAppStatusRepository = netAppStatusRepository;

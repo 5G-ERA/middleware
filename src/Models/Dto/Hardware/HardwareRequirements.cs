@@ -6,9 +6,9 @@ namespace Middleware.Models.Dto.Hardware;
 public class HardwareRequirements
 {
     [Indexed]
-    public int MinimumRam { get; set; }
+    public long? MinimumRam { get; set; }
     [Indexed]
-    public int MinimumNumCores { get; set; }
+    public int? MinimumNumCores { get; set; }
 
     public HardwareRequirements()
     {

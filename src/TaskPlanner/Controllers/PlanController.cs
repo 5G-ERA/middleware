@@ -3,7 +3,7 @@ using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 using Middleware.Common.Responses;
 using Middleware.Models.Domain;
-using Middleware.Common.Services;
+using Middleware.RedisInterface.Sdk;
 using Middleware.TaskPlanner.ApiReference;
 using Middleware.TaskPlanner.Contracts.Requests;
 using Middleware.TaskPlanner.Exceptions;
@@ -19,12 +19,12 @@ namespace Middleware.TaskPlanner.Controllers
         private readonly IMapper _mapper;
         private readonly IPublishService _publishService;
         private readonly ResourcePlanner.ResourcePlannerApiClient _resourcePlannerClient;
-        private readonly IRedisInterfaceClientService _redisInterfaceClient;
+        private readonly IRedisInterfaceClient _redisInterfaceClient;
         private readonly ILogger<PlanController> _logger;
 
 
         public PlanController(IActionPlanner actionPlanner, IApiClientBuilder builder,
-            IRedisInterfaceClientService redisInterfaceClient, IMapper mapper,
+            IRedisInterfaceClient redisInterfaceClient, IMapper mapper,
             IPublishService publishService, ILogger<PlanController> logger)
         {
             _actionPlanner = actionPlanner;

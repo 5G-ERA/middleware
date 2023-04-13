@@ -1,5 +1,4 @@
 ﻿using Middleware.Models.Domain;
-using Redis.OM.Modeling;
 
 namespace Middleware.Models.Dto.Ros;
 

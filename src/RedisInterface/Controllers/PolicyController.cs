@@ -1,8 +1,14 @@
 ﻿using System.Net;
 using Microsoft.AspNetCore.Mvc;
+using Middleware.Common.Attributes;
 using Middleware.Common.Responses;
 using Middleware.DataAccess.Repositories.Abstract;
 using Middleware.Models.Domain;
+using Middleware.RedisInterface.Contracts.Mappings;
+using Middleware.RedisInterface.Contracts.Requests;
+using Middleware.RedisInterface.Contracts.Responses;
+using Middleware.RedisInterface.Mappings;
+using Middleware.RedisInterface.Requests;
 
 namespace Middleware.RedisInterface.Controllers
 {
@@ -23,25 +29,24 @@ namespace Middleware.RedisInterface.Controllers
         /// <summary>
         /// Add a new PolicyModel entity
         /// </summary>
-        /// <param name="model"></param>
+        /// <param name="request"></param>
         /// <returns> the newly created PolicyModel entity </returns>
         [HttpPost(Name = "PolicyAdd")]
-        [ProducesResponseType(typeof(PolicyModel), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(PolicyResponse), (int)HttpStatusCode.OK)]
         [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.BadRequest)]
         [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.InternalServerError)]
-        public async Task<ActionResult<PolicyModel>> PolicyAdd ([FromBody] PolicyModel model)
+        public async Task<IActionResult> PolicyAdd ([FromBody] PolicyRequest request)
         {
-            if (model == null)
+            if (request == null)
             {
                 return BadRequest(new ApiResponse((int)HttpStatusCode.BadRequest, "Parameters were not specified."));
             }
-            if (model.IsValid() == false)
-            {
-                return BadRequest(new ApiResponse((int)HttpStatusCode.BadRequest, "Parameters were not specified or wrongly specified."));
-            }
             try
             {
-                await _policyRepository.AddAsync(model);
+                var policy = request.ToPolicy();
+                policy = await _policyRepository.AddAsync(policy);
+                var response = policy.ToPolicyResponse();
+                return Ok(response);
             }
             catch (Exception ex)
             {
@@ -49,7 +54,6 @@ namespace Middleware.RedisInterface.Controllers
                 _logger.LogError(ex, "An error occurred:");
                 return StatusCode(statusCode, new ApiResponse(statusCode, $"An error has occurred: {ex.Message}"));
             }
-            return Ok(model);
         }
 
 
@@ -60,10 +64,10 @@ namespace Middleware.RedisInterface.Controllers
         /// <returns> the PolicyModel entity for the specified id </returns>
         [HttpGet]
         [Route("{id}", Name = "PolicyGetById")]
-        [ProducesResponseType(typeof(PolicyModel), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(PolicyResponse), (int)HttpStatusCode.OK)]
         [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.NotFound)]
         [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.InternalServerError)]
-        public async Task<ActionResult<PolicyModel>> GetPolicyByIdAsync(Guid id)
+        public async Task<IActionResult> GetPolicyByIdAsync(Guid id)
         {
             try
             {
@@ -72,7 +76,9 @@ namespace Middleware.RedisInterface.Controllers
                 {
                     return NotFound(new ApiResponse((int)HttpStatusCode.NotFound, "Object was not found."));
                 }
-                return Ok(model);
+
+                var response = model.ToPolicyResponse();
+                return Ok(response);
             }
             catch (Exception ex) 
             {
@@ -87,10 +93,10 @@ namespace Middleware.RedisInterface.Controllers
         /// </summary>
         /// <returns> the list of PolicyModel entities </returns>
         [HttpGet(Name = "PolicyGetAll")]
-        [ProducesResponseType(typeof(PolicyModel), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(GetPoliciesResponse), (int)HttpStatusCode.OK)]
         [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.NotFound)]
         [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.InternalServerError)]
-        public async Task<ActionResult<List<PolicyModel>>> GetAllPoliciesAsync()
+        public async Task<IActionResult> GetAllPoliciesAsync()
         {
             try
             {
@@ -99,8 +105,9 @@ namespace Middleware.RedisInterface.Controllers
                 {
                     return NotFound(new ApiResponse((int)HttpStatusCode.NotFound, "Objects were not found."));
                 }
-                return Ok(models);
-                
+
+                var response = models.ToPoliciesResponse();
+                return Ok(response);
             }
             catch (Exception ex) 
             {
@@ -128,7 +135,7 @@ namespace Middleware.RedisInterface.Controllers
             try
             {
                 List<PolicyModel> activePolicies = await _policyRepository.GetActivePoliciesAsync();
-                if (activePolicies == null)
+                if (activePolicies.Any() == false)
                 {
                     return NotFound(new ApiResponse((int)HttpStatusCode.NotFound, "Object was not found."));
                 }
@@ -145,30 +152,28 @@ namespace Middleware.RedisInterface.Controllers
 
 
         /// <summary>
-        /// Partially update an existing InstanceModel entity
+        /// Partially update an existing policy entity
         /// </summary>
-        /// <param name="patch"></param>
-        /// <param name="id"></param>
+        /// <param name="request"></param>
         /// <returns> the modified InstanceModel entity </returns>
-        [HttpPatch]
+        [HttpPut]
         [Route("{id}", Name = "PolicyPatch")]
         [ProducesResponseType(typeof(PolicyModel), (int)HttpStatusCode.OK)]
         [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.NotFound)]
         [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.InternalServerError)]
-        public async Task<IActionResult> PatchPolicyAsync([FromBody] PolicyModel patch, [FromRoute] Guid id)
+        public async Task<IActionResult> PatchPolicyAsync([FromMultiSource] UpdatePolicyRequest request)
         {
-            if (patch.IsValid() == false)
-            {
-                return BadRequest(new ApiResponse((int)HttpStatusCode.BadRequest, "Parameters were not specified or wrongly specified."));
-            }
             try
             {
-                PolicyModel model = await _policyRepository.PatchPolicyAsync(id, patch);
-                if (model == null)
+                var model = request.ToPolicy();
+                var exists = await _policyRepository.GetByIdAsync(model.Id);
+                if (exists == null)
                 {
                     return NotFound(new ApiResponse((int)HttpStatusCode.NotFound, "Object to be updated was not found."));
                 }
-                return Ok(model);
+                await _policyRepository.UpdateAsync(model);
+                var response = model.ToPolicyResponse();
+                return Ok(response);
             }
             catch (Exception ex) 
             {

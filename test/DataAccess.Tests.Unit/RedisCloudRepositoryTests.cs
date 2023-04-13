@@ -1,6 +1,5 @@
 ﻿using FluentAssertions;
 using Middleware.DataAccess.Repositories;
-using Middleware.DataAccess.Repositories.Redis;
 using Middleware.Models.Domain;
 using NSubstitute;
 using Redis.OM.Contracts;

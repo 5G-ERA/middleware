@@ -12,5 +12,5 @@ public class RosInfo
     public Uri? RosRepo { get; set; }
     
     [Indexed(JsonPath = "$.Name")]
-    public List<RosNode> RosNodes { get; set; } = new();
+    public List<RosNode>? RosNodes { get; set; } = new();
 }

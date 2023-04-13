@@ -41,7 +41,7 @@ namespace Middleware.DataAccess.Repositories
         /// </summary>
         /// <param name="model"></param>
         /// <returns></returns>
-        public async Task<TModel> AddAsync(TModel model)
+        public async Task<TModel?> AddAsync(TModel model)
         {
             TDto dto = ToTDto(model);
             

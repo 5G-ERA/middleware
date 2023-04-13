@@ -1,8 +1,14 @@
 ﻿using System.Net;
 using Microsoft.AspNetCore.Mvc;
+using Middleware.Common.Attributes;
 using Middleware.Common.Responses;
 using Middleware.DataAccess.Repositories.Abstract;
 using Middleware.Models.Domain;
+using Middleware.RedisInterface.Contracts.Mappings;
+using Middleware.RedisInterface.Contracts.Requests;
+using Middleware.RedisInterface.Contracts.Responses;
+using Middleware.RedisInterface.Mappings;
+using Middleware.RedisInterface.Requests;
 
 namespace Middleware.RedisInterface.Controllers
 {
@@ -24,10 +30,10 @@ namespace Middleware.RedisInterface.Controllers
         /// </summary>
         /// <returns> the list of ContainerImageModel entities </returns>
         [HttpGet(Name = "ContainerImageGetAll")]
-        [ProducesResponseType(typeof(ContainerImageModel), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(GetContainersResponse), (int)HttpStatusCode.OK)]
         [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.NotFound)]
         [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.InternalServerError)]
-        public async Task<ActionResult<IEnumerable<ContainerImageModel>>> GetAllAsync()
+        public async Task<IActionResult> GetAllAsync()
         {
             try
             {
@@ -36,7 +42,9 @@ namespace Middleware.RedisInterface.Controllers
                 {
                     return NotFound(new ApiResponse((int)HttpStatusCode.NotFound, "Objects were not found."));
                 }
-                return Ok(models);
+
+                var response = models.ToContainersResponse();
+                return Ok(response);
             }
             catch (Exception ex)
             {
@@ -52,8 +60,8 @@ namespace Middleware.RedisInterface.Controllers
         /// <param name="id"></param>
         /// <returns> the ContainerImageModel entity for the specified id </returns>
         [HttpGet]
-        [Route("{id}", Name = "ContainerImageGetbyId")]
-        [ProducesResponseType(typeof(ContainerImageModel), (int)HttpStatusCode.OK)]
+        [Route("{id}", Name = "ContainerImageGetById")]
+        [ProducesResponseType(typeof(ContainerResponse), (int)HttpStatusCode.OK)]
         [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.NotFound)]
         [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.InternalServerError)]
         public async Task<IActionResult> GetByIdAsync(Guid id)
@@ -65,7 +73,9 @@ namespace Middleware.RedisInterface.Controllers
                 {
                     return NotFound(new ApiResponse((int)HttpStatusCode.NotFound, "Object was not found."));
                 }
-                return Ok(model);
+
+                var response = model.ToContainerResponse();
+                return Ok(response);
             }
             catch (Exception ex)
             {
@@ -78,20 +88,17 @@ namespace Middleware.RedisInterface.Controllers
         /// <summary>
         /// Add a new ContainerImageModel entity
         /// </summary>
-        /// <param name="model"></param>
+        /// <param name="request"></param>
         /// <returns> the newly created ContainerImageModel entity </returns>
         [HttpPost(Name = "ContainerImageAdd")]
-        [ProducesResponseType(typeof(ContainerImageModel), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(ContainerResponse), (int)HttpStatusCode.OK)]
         [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.BadRequest)]
         [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.InternalServerError)]
-        public async Task<ActionResult<ContainerImageModel>> AddAsync([FromBody] ContainerImageModel model)
+        public async Task<IActionResult> AddAsync([FromBody] ContainerRequest request)
         {
-            if (model == null)
-            {
-                return BadRequest(new ApiResponse((int)HttpStatusCode.BadRequest, "Parameters were not specified."));
-            }
             try
             {
+                var model = request.ToContainer();
                 ContainerImageModel cim = await _containerImageRepository.AddAsync(model);
                 if (cim is null)
                 {
@@ -99,7 +106,9 @@ namespace Middleware.RedisInterface.Controllers
                         new ApiResponse((int) HttpStatusCode.InternalServerError,
                             "Could not add ContainerImage to the data store"));
                 }
-                return Ok(cim);
+
+                var response = cim.ToContainerResponse();
+                return Ok(response);
             }
             catch (Exception ex)
             {
@@ -112,24 +121,27 @@ namespace Middleware.RedisInterface.Controllers
         /// <summary>
         /// Partially update an existing ContainerImageModel entity
         /// </summary>
-        /// <param name="patch"></param>
+        /// <param name="request"></param>
         /// <param name="id"></param>
         /// <returns> the modified ContainerImageModel entity </returns>
-        [HttpPatch]
+        [HttpPut]
         [Route("{id}", Name = "ContainerImagePatch")]
-        [ProducesResponseType(typeof(ContainerImageModel), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(ContainerResponse), (int)HttpStatusCode.OK)]
         [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.NotFound)]
         [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.InternalServerError)]
-        public async Task<IActionResult> PatchContainerImageAsync([FromBody] ContainerImageModel patch, [FromRoute] Guid id)
+        public async Task<IActionResult> PatchContainerImageAsync([FromMultiSource] UpdateContainerRequest request)
         {
             try
             {
-                ContainerImageModel model = await _containerImageRepository.PatchContainerImageAsync(id, patch);
-                if (model == null)
+                var model = request.ToContainer();
+                var exists = await _containerImageRepository.GetByIdAsync(model.Id);
+                if (exists is null)
                 {
                     return NotFound(new ApiResponse((int)HttpStatusCode.NotFound, "Object to be updated was not found."));
                 }
-                return Ok(model);
+                await _containerImageRepository.UpdateAsync(model);
+                var response = model.ToContainerResponse();
+                return Ok(response);
             }
             catch (Exception ex)
             {
@@ -150,15 +162,16 @@ namespace Middleware.RedisInterface.Controllers
         [ProducesResponseType(typeof(void), (int)HttpStatusCode.OK)]
         [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.NotFound)]
         [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.InternalServerError)]
-        public async Task<ActionResult> DeleteByIdAsync(Guid id)
+        public async Task<IActionResult> DeleteByIdAsync(Guid id)
         {
             try
             {
-                var deleted = await _containerImageRepository.DeleteByIdAsync(id);
-                if (deleted == false)
+                var exists = await _containerImageRepository.GetByIdAsync(id);
+                if (exists is null)
                 {
                     return NotFound(new ApiResponse((int)HttpStatusCode.NotFound, "The specified ContainerImage has not been found."));
                 }
+                await _containerImageRepository.DeleteByIdAsync(id);
                 return Ok();
             }
             catch (Exception ex)
@@ -272,7 +285,7 @@ namespace Middleware.RedisInterface.Controllers
         /// <returns></returns>
         [HttpGet]
         [Route("instance/{id}", Name = "ContainerImageGetForInstance")]
-        [ProducesResponseType(typeof(List<ContainerImageModel>), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(GetContainersResponse), (int)HttpStatusCode.OK)]
         [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.NotFound)]
         [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.InternalServerError)]
         public async Task<IActionResult> GetImagesForInstanceAsync(Guid id)
@@ -284,7 +297,7 @@ namespace Middleware.RedisInterface.Controllers
                 {
                     return NotFound(new ApiResponse((int)HttpStatusCode.NotFound, $"Container Image for instance with id: '{id}' has not ben found"));
                 }
-                return Ok(images);
+                return Ok(images.ToContainersResponse());
             }
             catch (Exception ex)
             {
