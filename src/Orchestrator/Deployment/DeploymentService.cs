@@ -35,14 +35,12 @@ public class DeploymentService : IDeploymentService
     /// Redis Interface API client
     /// </summary>
     private readonly IRedisInterfaceClient _redisInterfaceClient;
-
     private readonly IConfiguration _configuration;
     private readonly IOptions<MiddlewareConfig> _mwConfig;
-
     /// <summary>
-    /// Name of the AWS registry used 
+    /// Name of the container registry used 
     /// </summary>
-    private readonly string _awsRegistryName;
+    private readonly string _containerRegistryName;
 
     public DeploymentService(IKubernetesBuilder kubernetesBuilder,
         IEnvironment env,
@@ -57,27 +55,27 @@ public class DeploymentService : IDeploymentService
         _redisInterfaceClient = redisInterfaceClient;
         _configuration = configuration;
         _mwConfig = mwConfig;
-        _awsRegistryName = _env.GetEnvVariable("AWS_IMAGE_REGISTRY");
+        _containerRegistryName = _env.GetEnvVariable("IMAGE_REGISTRY") ?? "ghcr.io/5g-era";
     }
 
     /// <inheritdoc/>
     public async Task<bool> DeployAsync(TaskModel task, Guid robotId)
     {
-        bool isSuccess = true;
+        var isSuccess = true;
         try
         {
             var k8SClient = _kubernetesBuilder.CreateKubernetesClient();
             _logger.LogDebug("Entered DeploymentService.DeployAsync");
             var deployments = await k8SClient.AppsV1.ListNamespacedDeploymentAsync(AppConfig.K8SNamespaceName);
-            var deploymentNames = deployments.Items.Select(d => d.Metadata.Name).OrderBy(d => d).ToArray();
+            var deploymentNames = deployments.Items.Select(d => d.Metadata.Name).OrderBy(d => d).ToList();
             _logger.LogDebug("Current deployments: {deployments}", string.Join(", ", deploymentNames));
 
+            BaseModel location = _mwConfig.Value.InstanceType.ToLower() == "cloud"
+                ? (await _redisInterfaceClient.GetCloudByNameAsync(_mwConfig.Value.InstanceName)).ToCloud()
+                : (await _redisInterfaceClient.GetEdgeByNameAsync(_mwConfig.Value.InstanceName)).ToEdge();
+            
             foreach (var seq in task.ActionSequence!)
             {
-                //BaseModel location;
-                //location = seq.PlacementType.ToLower().Contains("cloud")
-                //    ? await _redisInterfaceClient.GetCloudByNameAsync(seq.Placement)
-                //    : await _redisInterfaceClient.GetEdgeByNameAsync(seq.Placement);
                 foreach (var service in seq.Services!)
                 {
                     try
@@ -87,8 +85,7 @@ public class DeploymentService : IDeploymentService
                             continue;
 
                         await DeployService(k8SClient, service, deploymentNames);
-                        // TODO: add relation between actual cloud / edge definition and instance
-                        //await _redisInterfaceClient.AddRelationAsync(service, location, "LOCATED_AT");
+                        await _redisInterfaceClient.AddRelationAsync(service, location, "LOCATED_AT");
                     }
                     catch (Exception ex)
                     {
@@ -138,7 +135,7 @@ public class DeploymentService : IDeploymentService
         return result;
     }
 
-    private async Task DeployService(IKubernetes k8SClient, InstanceModel service, string[] deploymentNames)
+    private async Task DeployService(IKubernetes k8SClient, InstanceModel service, List<string> deploymentNames)
     {
         _logger.LogDebug("Querying for redis for service {Id}", service.Id);
         var imagesResponse = await _redisInterfaceClient.ContainerImageGetForInstanceAsync(service.Id);
@@ -159,18 +156,16 @@ public class DeploymentService : IDeploymentService
 
             if (deploymentNames.Contains(cim.Name))
             {
-                //TODO: handle the check if the deployment or a service already exists
-                continue;
+                var guidSuffix = Guid.NewGuid().ToString().Split('-')[3];
+                cim.Name = $"{cim.Name}-{guidSuffix}";
             }
-
+            deploymentNames.Add(cim.Name);
             var deployedPair = await Deploy(k8SClient, cim);
 
             service.ServiceStatus = ServiceStatus.Idle.GetStringValue();
             service.ServiceInstanceId = deployedPair.InstanceId;
             _logger.LogDebug("Deployed the image {Name} with the Id {ServiceInstanceId}", service.Name,
                 service.ServiceInstanceId);
-
-            //TODO: assign values to the instance data
         }
     }
 
@@ -180,7 +175,7 @@ public class DeploymentService : IDeploymentService
     /// <param name="k8SClient"></param>
     /// <param name="cim"></param>
     /// <returns></returns>
-    public async Task<DeploymentPairModel> Deploy(IKubernetes k8SClient, ContainerImageModel cim)
+    private async Task<DeploymentPairModel> Deploy(IKubernetes k8SClient, ContainerImageModel cim)
     {
         var instanceId = Guid.NewGuid();
 
@@ -222,7 +217,7 @@ public class DeploymentService : IDeploymentService
         }
 
         var sanitized = objectDefinition.SanitizeAsK8SYaml();
-        T obj = KubernetesYaml.Deserialize<T>(sanitized);
+        var obj = KubernetesYaml.Deserialize<T>(sanitized);
 
         if (obj == null)
         {
@@ -232,29 +227,30 @@ public class DeploymentService : IDeploymentService
         if (obj is V1Service srv)
         {
             srv.Metadata.SetServiceLabel(instanceId);
-
+            srv.Metadata.Name = name;
             obj = await k8SClient.CoreV1.CreateNamespacedServiceAsync(srv, AppConfig.K8SNamespaceName) as T;
             return obj;
         }
 
-        if (obj is V1Deployment depl)
+        if (obj is V1Deployment deployment)
         {
-            depl.Metadata.SetServiceLabel(instanceId);
-            depl.Metadata.AddNetAppMultusAnnotations(AppConfig.MultusNetworkName);
-            foreach (var container in depl.Spec.Template.Spec.Containers)
+            deployment.Metadata.SetServiceLabel(instanceId);
+            deployment.Metadata.AddNetAppMultusAnnotations(AppConfig.MultusNetworkName);
+            deployment.Metadata.Name = name;
+            foreach (var container in deployment.Spec.Template.Spec.Containers)
             {
-                List<V1EnvVar> envVars = container.Env is not null
+                var envVars = container.Env is not null
                     ? new List<V1EnvVar>(container.Env)
                     : new List<V1EnvVar>();
 
-                envVars.Add(new("NETAPP_ID", instanceId.ToString()));
-                envVars.Add(new("MIDDLEWARE_ADDRESS", AppConfig.GetMiddlewareAddress()));
-                envVars.Add(new("MIDDLEWARE_REPORT_INTERVAL", 5.ToString()));
+                envVars.Add(new V1EnvVar("NETAPP_ID", instanceId.ToString()));
+                envVars.Add(new V1EnvVar("MIDDLEWARE_ADDRESS", AppConfig.GetMiddlewareAddress()));
+                envVars.Add(new V1EnvVar("MIDDLEWARE_REPORT_INTERVAL", 5.ToString()));
 
                 container.Env = envVars;
             }
 
-            obj = await k8SClient.AppsV1.CreateNamespacedDeploymentAsync(depl, AppConfig.K8SNamespaceName) as T;
+            obj = await k8SClient.AppsV1.CreateNamespacedDeploymentAsync(deployment, AppConfig.K8SNamespaceName) as T;
             return obj;
         }
 
@@ -295,12 +291,12 @@ public class DeploymentService : IDeploymentService
         bool retVal = true;
         try
         {
-            var k8sClient = _kubernetesBuilder.CreateKubernetesClient();
+            var k8SClient = _kubernetesBuilder.CreateKubernetesClient();
             foreach (var action in actionPlan.ActionSequence)
             {
                 foreach (var srv in action.Services!)
                 {
-                    retVal &= await DeleteInstance(k8sClient, srv.ServiceInstanceId);
+                    retVal &= await DeleteInstance(k8SClient, srv.ServiceInstanceId);
                 }
             }
         }
@@ -369,26 +365,26 @@ public class DeploymentService : IDeploymentService
             return;
 
         var deployments = await kubeClient.AppsV1.ListNamespacedDeploymentAsync(AppConfig.K8SNamespaceName);
-        var deploymentNames = deployments.Items.Select(d => d.Metadata.Name).OrderBy(d => d).ToArray();
-        
+        var deploymentNames = deployments.Items.Select(d => d.Metadata.Name).OrderBy(d => d).ToList();
+
         _logger.LogDebug("Retrieving location details (cloud or edge)");
         BaseModel thisLocation = _mwConfig.Value.InstanceType == LocationType.Cloud.ToString()
             ? (await _redisInterfaceClient.GetCloudByNameAsync(_mwConfig.Value.InstanceName)).ToCloud()
             : (await _redisInterfaceClient.GetEdgeByNameAsync(_mwConfig.Value.InstanceName)).ToEdge();
-        
+
         foreach (var instance in action.Services!)
         {
             _logger.LogDebug("Deploying instance '{0}', with serviceInstanceId '{1}'",
                 instance.Name, instance.ServiceInstanceId);
             await DeployService(kubeClient, instance, deploymentNames);
-            
+
             _logger.LogDebug("Adding new relation between instance and current location");
             await _redisInterfaceClient.AddRelationAsync(instance, thisLocation, "LOCATED_AT");
         }
-        
+
         action.Placement = _mwConfig.Value.InstanceName;
         action.PlacementType = _mwConfig.Value.InstanceType;
-        
+
         _logger.LogDebug("Saving updated ActionPlan");
         await _redisInterfaceClient.ActionPlanAddAsync(actionPlan);
     }
@@ -434,7 +430,6 @@ public class DeploymentService : IDeploymentService
     }
 
     /// <inheritdoc/>
-    /// <param name="tag1"></param>
     public V1Deployment CreateStartupDeployment(string name, string tag)
     {
         var mwConfig = _configuration.GetSection(MiddlewareConfig.ConfigName).Get<MiddlewareConfig>();
@@ -470,7 +465,7 @@ public class DeploymentService : IDeploymentService
         var container = new V1Container()
         {
             Name = name,
-            Image = K8SImageHelper.BuildImageName(_awsRegistryName, name, tag),
+            Image = K8SImageHelper.BuildImageName(_containerRegistryName, name, tag),
             ImagePullPolicy = AppConfig.AppConfiguration == AppVersionEnum.Prod.GetStringValue()
                 ? "Always"
                 : "IfNotPresent",

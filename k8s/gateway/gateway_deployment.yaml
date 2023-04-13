@@ -13,8 +13,8 @@ spec:
     spec:
       nodeSelector:
         kubernetes.io/os: linux
-      containers:        
-      - name: gateway
-        image: 394603622351.dkr.ecr.eu-west-1.amazonaws.com/gateway:latest
-        imagePullPolicy: IfNotPresent
-        resources: {}
+      containers:
+        - name: gateway
+          image: ghcr.io/5g-era/gateway:latest
+          imagePullPolicy: IfNotPresent
+          resources: {}

@@ -41,9 +41,9 @@ public interface IRedisInterfaceClient
     /// <summary>
     /// Create graph relation between objects
     /// </summary>
-    /// <param name="source"></param>
-    /// <param name="direction"></param>
-    /// <param name="name"></param>
+    /// <param name="source">Initiating point of a relation</param>
+    /// <param name="direction">Receiving point of a relation</param>
+    /// <param name="name">Name of the relation</param>
     /// <typeparam name="TSource">Object that derives from <see cref="BaseModel"/></typeparam>
     /// <typeparam name="TDirection">Object that derives from <see cref="BaseModel"/></typeparam>
     /// <returns>Have relation been created</returns>
@@ -62,7 +62,7 @@ public interface IRedisInterfaceClient
     Task<List<RelationModel>?> GetRelationForActionAsync(Guid id, string relationName);
 
     /// <summary>
-    /// Get the relations with the specified name that are outcoming from the specified object
+    /// Get the relations with the specified name that are out-coming from the specified object
     /// </summary>
     /// <typeparam name="TSource">Type of the source object</typeparam>
     /// <param name="source">Source object that relation initiates from</param>
