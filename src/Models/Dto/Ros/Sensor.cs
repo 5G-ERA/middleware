@@ -4,10 +4,10 @@ namespace Middleware.Models.Dto.Ros;
 
 public class Sensor
 {
-    public string? Name { get; set; }
-    public string? Type { get; set; }
-    public string? Description { get; set; }
-    public List<string> Nodes { get; set; } = new();
+    public string Name { get; init; } = default!;
+    public string Type { get; init; } = default!;
+    public string? Description { get; init; }
+    public List<string> Nodes { get; init; } = new();
 
     public int Number { get; set; }
 

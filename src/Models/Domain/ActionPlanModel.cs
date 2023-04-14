@@ -5,20 +5,20 @@ namespace Middleware.Models.Domain;
 
 public sealed class ActionPlanModel : BaseModel
 {
-    [JsonPropertyName("Id")] //atuomatically generated plan id by middleware
+    [JsonPropertyName("Id")]
     public override Guid Id { get; set; }
 
-    [JsonPropertyName("TaskId")] //TaskID
+    [JsonPropertyName("TaskId")]
     public Guid TaskId { get; set; }
 
-    [JsonPropertyName("Name")] // Name of task
-    public override string Name { get; set; }
+    [JsonPropertyName("Name")]
+    public override string Name { get; set; } = default!;
 
     /// <summary>
     /// Status of the whole plan
     /// </summary>
     [JsonPropertyName("Status")]
-    public string Status { get; set; }
+    public string? Status { get; set; }
 
     [JsonPropertyName("IsReplan")] //Status of whole plan
     public bool IsReplan { get; set; }
@@ -27,7 +27,7 @@ public sealed class ActionPlanModel : BaseModel
     public DateTime LastStatusChange { get; set; } // AL 2022-05-10: Not sure we need this one or how to use it.
 
     [JsonPropertyName("ActionSequence")]
-    public List<ActionModel> ActionSequence { get; set; } 
+    public List<ActionModel> ActionSequence { get; set; } = new();
 
     [JsonPropertyName("RobotId")]
     public Guid RobotId { get; set; }
@@ -56,6 +56,7 @@ public sealed class ActionPlanModel : BaseModel
         Status = status;
         LastStatusChange = DateTime.UtcNow;
     }
+
     public override Dto.Dto ToDto()
     {
         var domain = this;
@@ -70,6 +71,6 @@ public sealed class ActionPlanModel : BaseModel
             ActionSequence = domain.ActionSequence,
             RobotId = domain.RobotId.ToString(),
             TaskStartedAt = domain.TaskStartedAt == default ? DateTimeOffset.Now : domain.TaskStartedAt,
-        }; ;
+        };
     }
 }

@@ -6,27 +6,27 @@ namespace Middleware.Models.Dto;
 [Document(IndexName = "task-idx", StorageType = StorageType.Json, Prefixes = new[] { TaskDto.Prefix })]
 public class TaskDto : Dto
 {
-    public const string Prefix = "Task";
+    private const string Prefix = "Task";
     [Indexed]
     [RedisIdField]
-    public override string Id { get; set; }
+    public override string Id { get; set; } = default!;
 
     [Indexed]
-    public string? Name { get; set; }
-   
-    
+    public string Name { get; set; } = default!;
+
     [Indexed(Sortable = true)]
     public int TaskPriority { get; set; }
-   
-    
+
+    /// <summary>
+    /// Is the result of the task always the same
+    /// </summary>
     [Indexed(Sortable = true)]
-    public bool DeterministicTask { get; set; } // The result is always the same if true.
-    
+    public bool DeterministicTask { get; set; }
+
     /*[Indexed]
     public List<ActionDto> ActionSequence { get; set; }*/
     [Indexed]
-    public List<string> Tags { get; set; }
- 
+    public List<string>? Tags { get; set; }
 
     public override BaseModel ToModel()
     {
