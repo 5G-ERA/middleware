@@ -7,6 +7,7 @@ using Middleware.Common.Enums;
 using Middleware.Common.ExtensionMethods;
 using Middleware.Common.Responses;
 using Middleware.Models.Domain;
+using Middleware.Models.Enums;
 using Middleware.Orchestrator.Exceptions;
 using Middleware.Orchestrator.Models;
 using Middleware.RedisInterface.Contracts.Mappings;
@@ -154,7 +155,7 @@ public class DeploymentService : IDeploymentService
             actionRunningTemp.Order = action.Order;
             actionRunningTemp.Placement =
                 action.Placement!.Replace("-Edge", "").Replace("-Cloud", ""); // Trim to proper edge or cloud
-            actionRunningTemp.PlacementType = action.PlacementType!;
+            actionRunningTemp.PlacementType = action.PlacementType!.Value;
             actionRunningTemp.ActionPriority = action.ActionPriority;
             actionRunningTemp.ActionStatus = ActionStatusEnum.Running.ToString();
             actionRunningTemp.Services = action.Services!.Select(x => new InstanceRunningModel()
@@ -179,13 +180,13 @@ public class DeploymentService : IDeploymentService
                 await _redisInterfaceClient.InstanceRunningAddAsync(runningInstance);
                 await _redisInterfaceClient.AddRelationAsync(actionRunningTemp, runningInstance, "CONSISTS_OF");
 
-                if (action.PlacementType == "CLOUD")
+                if (action.PlacementType == LocationType.Cloud)
                 {
                     CloudModel cloud = (await _redisInterfaceClient.GetCloudByNameAsync(action.Placement)).ToCloud();
                     await _redisInterfaceClient.AddRelationAsync(runningInstance, cloud, "LOCATED_AT");
                 }
 
-                if (action.PlacementType == "EDGE")
+                if (action.PlacementType == LocationType.Edge)
                 {
                     EdgeModel edge = (await _redisInterfaceClient.GetEdgeByNameAsync(action.Placement)).ToEdge();
                     await _redisInterfaceClient.AddRelationAsync(runningInstance, edge, "LOCATED_AT");
@@ -519,7 +520,7 @@ public class DeploymentService : IDeploymentService
         }
 
         action.Placement = _mwConfig.Value.InstanceName;
-        action.PlacementType = _mwConfig.Value.InstanceType;
+        action.PlacementType = Enum.Parse<LocationType>(_mwConfig.Value.InstanceType);
 
         _logger.LogDebug("Saving updated ActionPlan");
         await _redisInterfaceClient.ActionPlanAddAsync(actionPlan);

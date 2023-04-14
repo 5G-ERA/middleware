@@ -37,7 +37,7 @@ public class RedisActionRepository : RedisRepository<ActionModel, ActionDto>, IA
         {
             currentModel.Placement = patch.Placement;
         }
-        if (!string.IsNullOrEmpty(patch.PlacementType))
+        if (patch.PlacementType is not null)
         {
             currentModel.PlacementType = patch.PlacementType;
         }

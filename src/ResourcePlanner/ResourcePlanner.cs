@@ -7,6 +7,7 @@ using Middleware.Models.Domain;
 using Middleware.ResourcePlanner.ApiReference;
 using KeyValuePair = Middleware.Models.Domain.KeyValuePair;
 using Middleware.Common.Config;
+using Middleware.Models.Enums;
 using Middleware.RedisInterface.Contracts.Mappings;
 using Middleware.RedisInterface.Contracts.Responses;
 using Middleware.RedisInterface.Sdk;
@@ -76,7 +77,7 @@ public class ResourcePlanner : IResourcePlanner
             }
 
             action.Placement = _mwConfig.InstanceName;
-            action.PlacementType = _mwConfig.InstanceType; 
+            action.PlacementType = Enum.Parse<LocationType>(_mwConfig.InstanceType); 
         }
 
         return taskModel;

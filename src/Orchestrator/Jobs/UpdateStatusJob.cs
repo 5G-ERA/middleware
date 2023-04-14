@@ -6,6 +6,7 @@ using Middleware.Common.Config;
 using Middleware.Common.Enums;
 using Middleware.Common.ExtensionMethods;
 using Middleware.Models.Domain;
+using Middleware.Models.Enums;
 using Middleware.Orchestrator.Deployment;
 using Middleware.RedisInterface.Sdk;
 using Quartz;
@@ -87,7 +88,7 @@ public class UpdateStatusJob : BaseJob<UpdateStatusJob>
         //check if all instances are down for at least half an hour, then terminate
         foreach (var action in seq.ActionSequence)
         {
-            if (action.Placement != _middlewareConfig.InstanceName || action.PlacementType != _middlewareConfig.InstanceType)  
+            if (action.Placement != _middlewareConfig.InstanceName || action.PlacementType != Enum.Parse<LocationType>(_middlewareConfig.InstanceType))  
                 continue;
             
             foreach (var instance in action.Services)

@@ -1,7 +1,7 @@
 ﻿using Middleware.DataAccess.Repositories.Abstract;
 using Middleware.Models.Domain;
 using Middleware.Models.Dto;
-using Redis.OM;
+using Middleware.Models.Enums;
 using Redis.OM.Contracts;
 using RedisGraphDotNet.Client;
 using Serilog;
@@ -15,7 +15,7 @@ public class RedisActionRunningRepository : RedisRepository<ActionRunningModel, 
 
     }
 
-    public async Task<ActionRunningModel> PatchActionAsync(Guid id, ActionRunningModel patch)
+    public async Task<ActionRunningModel?> PatchActionAsync(Guid id, ActionRunningModel patch)
     {
         ActionRunningModel? currentModel = await GetByIdAsync(id);
         if (currentModel == null)
@@ -38,7 +38,7 @@ public class RedisActionRunningRepository : RedisRepository<ActionRunningModel, 
         {
             currentModel.Placement = patch.Placement;
         }
-        if (!string.IsNullOrEmpty(patch.PlacementType))
+        if (patch.PlacementType != LocationType.Unspecified)
         {
             currentModel.PlacementType = patch.PlacementType;
         }

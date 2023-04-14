@@ -5,6 +5,7 @@ using Middleware.CentralApi.Services;
 using Middleware.Common.Enums;
 using Middleware.DataAccess.Repositories.Abstract;
 using Middleware.Models.Domain;
+using Middleware.Models.Enums;
 using NSubstitute;
 using OneOf.Types;
 

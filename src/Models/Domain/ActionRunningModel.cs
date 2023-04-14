@@ -6,6 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
+using Middleware.Models.Enums;
 
 namespace Middleware.Models.Domain;
 
@@ -34,7 +35,7 @@ public class ActionRunningModel : BaseModel
     public string Placement { get; set; } = default!;
 
     [JsonPropertyName("PlacementType")]
-    public string PlacementType { get; set; } = default!;
+    public LocationType PlacementType { get; set; } 
 
     [JsonPropertyName("ActionPriority")]
     public string? ActionPriority { get; set; }

@@ -1,6 +1,7 @@
 ﻿using System.Text.Json.Serialization;
 using Middleware.Models.Dto;
 using Middleware.Models.Dto.Hardware;
+using Middleware.Models.Enums;
 
 namespace Middleware.Models.Domain;
 
@@ -23,7 +24,7 @@ public class ActionModel : BaseModel
     public string? Placement { get; set; }
 
     [JsonPropertyName("PlacementType")]
-    public string? PlacementType { get; set; } // Either edge or cloud. 
+    public LocationType? PlacementType { get; set; } 
 
     [JsonPropertyName("ActionPriority")]
     public string? ActionPriority { get; set; }

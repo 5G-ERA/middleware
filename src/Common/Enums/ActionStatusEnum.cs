@@ -1,11 +1,10 @@
-﻿namespace Middleware.Common.Enums
+﻿namespace Middleware.Common.Enums;
+
+public enum ActionStatusEnum
 {
-    public enum ActionStatusEnum
-    {
-        Unknown,
-        Running,
-        Finished,
-        Idle,
-        Off
-    }
+    Unknown,
+    Running,
+    Finished,
+    Idle,
+    Off
 }
