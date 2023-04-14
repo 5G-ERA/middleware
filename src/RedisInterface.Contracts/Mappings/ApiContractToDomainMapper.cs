@@ -346,4 +346,19 @@ public static class ApiContractToDomainMapper
             Tags = x.Tags?.ToList()
         };
     }
+
+    // public static ActionPlanModel ToActionPlan(this ActionPlanRequest x)
+    // {
+    //     return new ActionPlanModel()
+    //     {
+    //         Id = x.Id,
+    //         Name = x.Name,
+    //         RobotId = x.RobotId,
+    //         TaskId = x.TaskId,
+    //         IsReplan = x.IsReplan,
+    //         TaskStartedAt = x.TaskStartedAt,
+    //         Status = x.Status,
+    //         ActionSequence = x.ActionSequence.t
+    //     }
+    // }
 }

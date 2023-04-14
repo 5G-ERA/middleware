@@ -11,8 +11,7 @@ public class ActionModel : BaseModel
     public override Guid Id { get; set; } = Guid.NewGuid();
 
     [JsonPropertyName("Name")]
-    public override string Name { get; set; }
-    
+    public override string Name { get; set; } = default!;
 
     [JsonPropertyName("Tags")]
     public List<string>? Tags { get; set; }
@@ -55,7 +54,26 @@ public class ActionModel : BaseModel
                 MinimumRam = domain.MinimumRam,
                 MinimumNumCores = domain.MinimumNumCores
             },
-            Tags = domain.Tags
+            Tags = domain.Tags ?? new List<string>()
+        };
+    }
+
+    public ActionRunningModel ToActionRunningModel(Guid actionPlanId)
+    {
+        var that = this;
+        return new ActionRunningModel()
+        {
+            ActionPriority = that.ActionPriority,
+            ActionId = that.Id,
+            ActionPlanId = actionPlanId,
+            Name = that.Name,
+            ActionStatus = that.ActionStatus,
+            Placement = that.Placement!,
+            PlacementType = that.PlacementType!.Value,
+            Order = that.Order,
+            MinimumRam = that.MinimumRam,
+            MinimumNumCores = that.MinimumNumCores,
+            Tags = that.Tags
         };
     }
 }

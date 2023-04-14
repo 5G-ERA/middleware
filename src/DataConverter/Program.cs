@@ -183,7 +183,7 @@ foreach (var actionPlan in actionPlans)
 {
     actionPlan.LastStatusChange = DateTime.Now;
     actionPlan.TaskStartedAt = DateTime.Now.AddDays(-1);
-    actionPlan.ActionSequence.ForEach(a=>a.Services.ForEach(i=>i.OnboardedTime = DateTime.Today.AddDays(-10)));
+    //actionPlan.ActionSequence.ForEach(a=>a.Services.ForEach(i=>i.OnboardedTime = DateTime.Today.AddDays(-10)));
     await redisActionPlanRepository.AddAsync(actionPlan);
 }
 

@@ -149,7 +149,7 @@ public class DeploymentService : IDeploymentService
         {
             ActionRunningModel actionRunningTemp = new ActionRunningModel();
             actionRunningTemp.ActionPlanId = actionPlan.Id;
-            actionRunningTemp.ActionParentId = action.Id;
+            actionRunningTemp.ActionId = action.Id;
             actionRunningTemp.Name = action.Name;
             actionRunningTemp.Tags = action.Tags;
             actionRunningTemp.Order = action.Order;
@@ -400,7 +400,7 @@ public class DeploymentService : IDeploymentService
         historicalActionPlan.ActionSequence = actionPlan.ActionSequence.Select(x => new ActionRunningModel()
         {
             Name = x.Name,
-            ActionParentId = x.Id,
+            ActionId = x.Id,
             ActionPlanId = actionPlan.Id,
             Tags = x.Tags,
             Order = x.Order,

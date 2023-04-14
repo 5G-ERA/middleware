@@ -28,7 +28,7 @@ public interface IBaseRepository<T> where T : class
     /// Get all objects of the specified type from the data store
     /// </summary>
     /// <returns></returns>
-    Task<List<T>> GetAllAsync();
+    Task<List<T>?> GetAllAsync();
 
     /// <summary>
     /// Delete object from the data store by its id

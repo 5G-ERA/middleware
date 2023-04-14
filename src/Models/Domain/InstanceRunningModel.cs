@@ -1,7 +1,5 @@
 ﻿using System.Text.Json.Serialization;
 using Middleware.Models.Dto;
-using Middleware.Models.Dto.Hardware;
-using Middleware.Models.Enums;
 
 
 namespace Middleware.Models.Domain;
@@ -12,20 +10,20 @@ public class InstanceRunningModel : BaseModel
     public override Guid Id { get; set; }
 
     [JsonPropertyName("Name")]
-    public override string Name { get; set; }
+    public override string Name { get; set; } = default!;
 
     [JsonPropertyName("ServiceInstanceId")]
     public Guid ServiceInstanceId { get; set; }
 
     [JsonPropertyName("ServiceType")]
 
-    public string ServiceType { get; set; }
+    public string ServiceType { get; set; } = default!;
 
     [JsonPropertyName("ServiceUrl")]
-    public string ServiceUrl { get; set; }
+    public string ServiceUrl { get; set; } = default!;
 
     [JsonPropertyName("ServiceStatus")]
-    public string ServiceStatus { get; set; } //updated every 10 sec
+    public string ServiceStatus { get; set; } = default!; //updated every 10 sec
 
     [JsonPropertyName("DeployedTime")]
     public DateTime DeployedTime { get; set; } // Compulsory field

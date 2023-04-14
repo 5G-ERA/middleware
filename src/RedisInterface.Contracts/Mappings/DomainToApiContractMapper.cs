@@ -121,6 +121,7 @@ public static class DomainToApiContractMapper
             OnboardedTime = x.OnboardedTime
         };
     }
+
     public static GetInstancesResponse ToInstancesResponse(this IEnumerable<InstanceModel> instances)
     {
         return new GetInstancesResponse()
@@ -185,6 +186,7 @@ public static class DomainToApiContractMapper
             OnboardedTime = x.OnboardedTime
         };
     }
+
     public static GetRobotsResponse ToRobotsResponse(this IEnumerable<RobotModel> robots)
     {
         return new GetRobotsResponse()
@@ -210,6 +212,91 @@ public static class DomainToApiContractMapper
         return new GetTasksResponse()
         {
             Tasks = tasks.Select(x => x.ToTaskResponse())
+        };
+    }
+
+    public static IEnumerable<InstanceRunningResponse> ToInstanceRunningList(
+        this IEnumerable<InstanceRunningModel> instances)
+    {
+        return instances.Select(x => new InstanceRunningResponse()
+        {
+            Id = x.Id,
+            ServiceInstanceId = x.ServiceInstanceId,
+            Name = x.Name,
+            ServiceType = x.ServiceType,
+            ServiceStatus = x.ServiceStatus,
+            ServiceUrl = x.ServiceUrl,
+            DeployedTime = x.DeployedTime
+        });
+    }
+
+    public static IEnumerable<RunningActionResponse> ToRunningActionResponseList(
+        this IEnumerable<ActionRunningModel> actions)
+    {
+        return actions.Select(x => new RunningActionResponse()
+        {
+            Id = x.Id,
+            ActionId = x.ActionId,
+            ActionPlanId = x.ActionPlanId,
+            Name = x.Name,
+            ActionPriority = x.ActionPriority,
+            ActionStatus = x.ActionStatus,
+            Placement = x.Placement,
+            PlacementType = x.PlacementType.ToString(),
+            Order = x.Order,
+            Services = x.Services.ToInstanceRunningList(),
+            Tags = x.Tags
+        });
+    }
+
+    public static RunningActionResponse ToRunningActionResponse(this ActionRunningModel x)
+    {
+        return new RunningActionResponse()
+        {
+            Id = x.Id,
+            ActionId = x.ActionId,
+            ActionPlanId = x.ActionPlanId,
+            Name = x.Name,
+            ActionPriority = x.ActionPriority,
+            ActionStatus = x.ActionStatus,
+            Placement = x.Placement,
+            PlacementType = x.PlacementType.ToString(),
+            Order = x.Order,
+            Services = x.Services.ToInstanceRunningList(),
+            Tags = x.Tags
+        };
+    }
+
+    public static GetActionPlansResponse ToActionPlansResponse(this IEnumerable<ActionPlanModel> plans)
+    {
+        return new GetActionPlansResponse()
+        {
+            ActionPlans = plans.Select(x => new ActionPlanResponse()
+            {
+                Id = x.Id,
+                Name = x.Name,
+                RobotId = x.RobotId,
+                TaskId = x.TaskId,
+                Status = x.Status,
+                IsReplan = x.IsReplan,
+                TaskStartedAt = x.TaskStartedAt,
+                ActionSequence = x.ActionSequence.Select(a => a.ToActionRunningModel(x.Id))
+                    .ToRunningActionResponseList()
+            })
+        };
+    }
+    public static ActionPlanResponse ToActionPlanResponse(this ActionPlanModel x)
+    {
+        return new ActionPlanResponse()
+        {
+            Id = x.Id,
+            Name = x.Name,
+            RobotId = x.RobotId,
+            TaskId = x.TaskId,
+            Status = x.Status,
+            IsReplan = x.IsReplan,
+            TaskStartedAt = x.TaskStartedAt,
+            ActionSequence = x.ActionSequence.Select(a => a.ToActionRunningModel(x.Id)).ToRunningActionResponseList()
         };
     }
 }

@@ -1,5 +1,4 @@
 ﻿using Middleware.DataAccess.Repositories.Abstract;
-using Middleware.DataAccess.Repositories.Redis;
 using Middleware.Models.Domain;
 using Middleware.RedisInterface.Services.Abstract;
 

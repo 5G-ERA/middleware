@@ -12,28 +12,26 @@ public class TaskDto : Dto
     public override string Id { get; set; } = default!;
 
     [Indexed]
-    public string Name { get; set; } = default!;
+    public string Name { get; init; } = default!;
 
     [Indexed(Sortable = true)]
-    public int TaskPriority { get; set; }
+    public int TaskPriority { get; init; }
 
     /// <summary>
     /// Is the result of the task always the same
     /// </summary>
     [Indexed(Sortable = true)]
-    public bool DeterministicTask { get; set; }
+    public bool DeterministicTask { get; init; }
 
-    /*[Indexed]
-    public List<ActionDto> ActionSequence { get; set; }*/
     [Indexed]
-    public List<string>? Tags { get; set; }
+    public List<string>? Tags { get; init; }
 
     public override BaseModel ToModel()
     {
         var dto = this;
         return new TaskModel()
         {
-            Id = Guid.Parse(dto.Id!.Replace(Prefix, "")),
+            Id = Guid.Parse(dto.Id),
             Name = dto.Name,
             TaskPriority = dto.TaskPriority,
             DeterministicTask = dto.DeterministicTask,

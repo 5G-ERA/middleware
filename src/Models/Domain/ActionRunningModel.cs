@@ -1,29 +1,36 @@
-﻿using Middleware.Models.Dto.Hardware;
+﻿using System.Runtime.InteropServices;
+using Middleware.Models.Dto.Hardware;
 using Middleware.Models.Dto;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Text.Json.Serialization;
-using System.Threading.Tasks;
 using Middleware.Models.Enums;
 
 namespace Middleware.Models.Domain;
 
 public class ActionRunningModel : BaseModel
 {
+    /// <summary>
+    /// Unique identifier of a running action
+    /// </summary>
     [JsonPropertyName("Id")]
-    public override Guid Id { get; set; }
+    public override Guid Id { get; set; } = Guid.NewGuid();
 
-    [JsonPropertyName("ActionParentId")]
-    public Guid ActionParentId { get; set; } // This is the Id of normal Actio from which the running action is based.
+    /// <summary>
+    /// Identifier of the action definition
+    /// </summary>
+    [JsonPropertyName("ActionId")]
+    public Guid ActionId { get; set; } 
 
+    /// <summary>
+    /// Identifier of the ActionPlan the running action is associated with
+    /// </summary>
     [JsonPropertyName("ActionPlanId")]
     public Guid ActionPlanId { get; set; }
 
+    /// <summary>
+    /// Name of the running action
+    /// </summary>
     [JsonPropertyName("Name")]
-    public override string Name { get; set; }
-
+    public override string Name { get; set; } = default!;
 
     [JsonPropertyName("Tags")]
     public List<string>? Tags { get; set; }
@@ -61,14 +68,16 @@ public class ActionRunningModel : BaseModel
             Id = domain.Id.ToString(),
             ActionPriority = domain.ActionPriority,
             Name = domain.Name,
-            ActionParentId = domain.ActionParentId.ToString(),
+            ActionId = domain.ActionId.ToString(),
             ActionPlanId = domain.ActionPlanId.ToString(),
             HardwareRequirements = new HardwareRequirements()
             {
                 MinimumRam = domain.MinimumRam,
                 MinimumNumCores = domain.MinimumNumCores
             },
-            Tags = domain.Tags
+            Tags = domain.Tags,
+            Placement = domain.Placement,
+            PlacementType = domain.PlacementType.ToString()
         };
     }
 }
