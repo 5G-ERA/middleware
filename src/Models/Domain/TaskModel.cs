@@ -6,10 +6,10 @@ namespace Middleware.Models.Domain
     public class TaskModel : BaseModel
     {
         [JsonPropertyName("Id")]
-        public override Guid Id { get; set; }
+        public override Guid Id { get; set; } = Guid.NewGuid();
 
         [JsonPropertyName("Name")]
-        public override string Name { get; set; }
+        public override string Name { get; set; } = default!;
 
         /// <summary>
         /// //True: Dont change actions in action sequence replan
@@ -54,11 +54,11 @@ namespace Middleware.Models.Domain
 
         [JsonPropertyName("ActionSequence")]
         //[JsonIgnore]
-        public List<ActionModel>? ActionSequence { get; set; }
+        public List<ActionModel> ActionSequence { get; set; } = new();
 
         [JsonPropertyName("Tags")] //TODO: define allows tags
         //[JsonIgnore]
-        public List<string> Tags { get; set; }
+        public List<string>? Tags { get; set; }
 
 
         public TaskModel()

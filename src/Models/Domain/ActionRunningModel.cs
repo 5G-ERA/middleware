@@ -31,10 +31,10 @@ public class ActionRunningModel : BaseModel
     public int Order { get; set; }
 
     [JsonPropertyName("Placement")]
-    public string? Placement { get; set; }
+    public string Placement { get; set; } = default!;
 
     [JsonPropertyName("PlacementType")]
-    public string? PlacementType { get; set; } // Either edge or cloud. 
+    public string PlacementType { get; set; } = default!;
 
     [JsonPropertyName("ActionPriority")]
     public string? ActionPriority { get; set; }
@@ -47,10 +47,10 @@ public class ActionRunningModel : BaseModel
     public List<InstanceRunningModel>? Services { get; set; }
 
     [JsonPropertyName("MinimumRam")]
-    public int MinimumRam { get; set; }
+    public long? MinimumRam { get; set; }
 
     [JsonPropertyName("MinimumNumCores")]
-    public int MinimumNumCores { get; set; }
+    public int? MinimumNumCores { get; set; }
 
     public override Dto.Dto ToDto()
     {

@@ -112,28 +112,18 @@ public interface IRedisInterfaceClient
     /// <returns></returns>
     Task<GetContainersResponse?> ContainerImageGetForInstanceAsync(Guid id);
 
-    Task<List<ContainerImageModel>> ContainerImageGetForInstanceAsync(Guid id);
-    Task<List<ContainerImageModel>> ContainerImageGetForInstanceAsync(Guid id, CancellationToken token);
-
     Task<bool> ActionRunningAddAsync(ActionRunningModel actionRunning);
-
-    Task<bool> ActionRunningAddAsync(ActionRunningModel actionRunning, CancellationToken token);
 
     Task<bool> InstanceRunningAddAsync(InstanceRunningModel instanceRunning);
 
-    Task<bool> InstanceRunningAddAsync(InstanceRunningModel instanceRunning, CancellationToken token);
 
     Task<bool> HistoricalActionPlanAddAsync(HistoricalActionPlanModel historicalActionPlan);
 
-    Task<bool> HistoricalActionPlanAddAsync(HistoricalActionPlanModel historicalActionPlan, CancellationToken token);
 
     Task<ActionRunningModel> ActionRunningGetByIdAsync(Guid id);
 
-    Task<ActionRunningModel> ActionRunningGetByIdAsync(Guid id, CancellationToken token);
 
     Task<InstanceRunningModel> InstanceRunningGetByIdAsync(Guid id);
-
-    Task<InstanceRunningModel> InstanceRunningGetByIdAsync(Guid id, CancellationToken token);
 
     /// <summary>
     /// Get Active Global policies in the Middleware

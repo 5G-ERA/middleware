@@ -18,9 +18,9 @@ public class ActionRunningDto : Dto
     [Indexed]
     public string Name { get; init; } = default!;
     [Indexed]
-    public List<string> Tags { get; init; } = new();
+    public List<string>? Tags { get; init; } = new();
     [Indexed]
-    public string ActionPriority { get; init; } = default!;
+    public string? ActionPriority { get; init; } = default!;
 
     public HardwareRequirements HardwareRequirements { get; init; } = new();
 

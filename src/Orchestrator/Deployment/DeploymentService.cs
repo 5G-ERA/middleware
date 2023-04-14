@@ -134,7 +134,9 @@ public class DeploymentService : IDeploymentService
         //List<ActionRunningModel> actionsRunning = new List<ActionRunningModel>();
         var actionPlan = new ActionPlanModel(task.ActionPlanId, task.Id, task.Name, task.ActionSequence!, robotId);
         actionPlan.SetStatus("active");
-        RobotModel robot = await _redisInterfaceClient.RobotGetByIdAsync(robotId);
+        var robotResponse = await _redisInterfaceClient.RobotGetByIdAsync(robotId);
+
+        var robot = robotResponse.ToRobot();
 
         //Add the actionPlan to redis
         var result = await _redisInterfaceClient.ActionPlanAddAsync(actionPlan);
@@ -144,17 +146,18 @@ public class DeploymentService : IDeploymentService
         //Add the actionRunning to redis 
         foreach (ActionModel action in task.ActionSequence)
         {
-            ActionRunningModel ActionRunningTemp = new ActionRunningModel();
-            ActionRunningTemp.ActionPlanId = actionPlan.Id;
-            ActionRunningTemp.ActionParentId = action.Id;
-            ActionRunningTemp.Name = action.Name;
-            ActionRunningTemp.Tags = action.Tags;
-            ActionRunningTemp.Order = action.Order;
-            ActionRunningTemp.Placement = action.Placement.Replace("-Edge", "").Replace("-Cloud", ""); // Trim to proper edge or cloud
-            ActionRunningTemp.PlacementType = action.PlacementType;
-            ActionRunningTemp.ActionPriority = action.ActionPriority;
-            ActionRunningTemp.ActionStatus = ActionStatusEnum.Running.ToString();
-            ActionRunningTemp.Services = action.Services.Select(x => new InstanceRunningModel()
+            ActionRunningModel actionRunningTemp = new ActionRunningModel();
+            actionRunningTemp.ActionPlanId = actionPlan.Id;
+            actionRunningTemp.ActionParentId = action.Id;
+            actionRunningTemp.Name = action.Name;
+            actionRunningTemp.Tags = action.Tags;
+            actionRunningTemp.Order = action.Order;
+            actionRunningTemp.Placement =
+                action.Placement!.Replace("-Edge", "").Replace("-Cloud", ""); // Trim to proper edge or cloud
+            actionRunningTemp.PlacementType = action.PlacementType!;
+            actionRunningTemp.ActionPriority = action.ActionPriority;
+            actionRunningTemp.ActionStatus = ActionStatusEnum.Running.ToString();
+            actionRunningTemp.Services = action.Services!.Select(x => new InstanceRunningModel()
             {
                 Name = x.Name,
                 ServiceInstanceId = x.ServiceInstanceId,
@@ -163,32 +166,31 @@ public class DeploymentService : IDeploymentService
                 ServiceStatus = x.ServiceStatus,
                 DeployedTime = DateTime.Now
             }).ToList();
-            ActionRunningTemp.MinimumRam = action.MinimumRam;
-            ActionRunningTemp.MinimumNumCores = action.MinimumNumCores;
+            actionRunningTemp.MinimumRam = action.MinimumRam;
+            actionRunningTemp.MinimumNumCores = action.MinimumNumCores;
             //actionsRunning.Add(ActionRunningTemp); //Add the runningAction to the actionPlang
-            await _redisInterfaceClient.ActionRunningAddAsync(ActionRunningTemp);
-            await _redisInterfaceClient.AddRelationAsync(actionPlan, ActionRunningTemp, "CONSISTS_OF");
+            await _redisInterfaceClient.ActionRunningAddAsync(actionRunningTemp);
+            await _redisInterfaceClient.AddRelationAsync(actionPlan, actionRunningTemp, "CONSISTS_OF");
 
 
             //Add the InstanceRunning to redis
-            foreach (InstanceRunningModel runningInstance in ActionRunningTemp.Services)
+            foreach (InstanceRunningModel runningInstance in actionRunningTemp.Services)
             {
                 await _redisInterfaceClient.InstanceRunningAddAsync(runningInstance);
-                await _redisInterfaceClient.AddRelationAsync(ActionRunningTemp, runningInstance, "CONSISTS_OF");
+                await _redisInterfaceClient.AddRelationAsync(actionRunningTemp, runningInstance, "CONSISTS_OF");
 
                 if (action.PlacementType == "CLOUD")
                 {
-                    CloudModel cloud = await _redisInterfaceClient.GetCloudByNameAsync(action.Placement);
+                    CloudModel cloud = (await _redisInterfaceClient.GetCloudByNameAsync(action.Placement)).ToCloud();
                     await _redisInterfaceClient.AddRelationAsync(runningInstance, cloud, "LOCATED_AT");
                 }
+
                 if (action.PlacementType == "EDGE")
                 {
-                    EdgeModel edge = await _redisInterfaceClient.GetEdgeByNameAsync(action.Placement);
+                    EdgeModel edge = (await _redisInterfaceClient.GetEdgeByNameAsync(action.Placement)).ToEdge();
                     await _redisInterfaceClient.AddRelationAsync(runningInstance, edge, "LOCATED_AT");
                 }
-
             }
-
         }
 
         return result;
@@ -349,7 +351,9 @@ public class DeploymentService : IDeploymentService
     public async Task<bool> DeletePlanAsync(ActionPlanModel actionPlan)
     {
         // Delete OWNS relationship between robot and actionPlan
-        RobotModel robot = await _redisInterfaceClient.RobotGetByIdAsync(actionPlan.RobotId);
+        var robotResponse = await _redisInterfaceClient.RobotGetByIdAsync(actionPlan.RobotId);
+        var robot = robotResponse.ToRobot();
+        
         await _redisInterfaceClient.DeleteRelationAsync(robot, actionPlan, "OWNS");
 
         // Create historical action plan
@@ -364,11 +368,13 @@ public class DeploymentService : IDeploymentService
         var images = await _redisInterfaceClient.GetRelationAsync(actionPlan, "CONSISTS_OF");
         foreach (RelationModel relation in images)
         {
-            ActionRunningModel runningAction = await _redisInterfaceClient.ActionRunningGetByIdAsync(relation.PointsTo.Id);
+            ActionRunningModel runningAction =
+                await _redisInterfaceClient.ActionRunningGetByIdAsync(relation.PointsTo.Id);
             var runningIntancesImages = await _redisInterfaceClient.GetRelationAsync(runningAction, "CONSISTS_OF");
             foreach (RelationModel instanceRelation in runningIntancesImages)
             {
-                InstanceRunningModel runningInstance = await _redisInterfaceClient.InstanceRunningGetByIdAsync(instanceRelation.PointsTo.Id);
+                InstanceRunningModel runningInstance =
+                    await _redisInterfaceClient.InstanceRunningGetByIdAsync(instanceRelation.PointsTo.Id);
                 runningAction.Services.Add(runningInstance);
             }
 
@@ -560,7 +566,6 @@ public class DeploymentService : IDeploymentService
     }
 
     /// <inheritdoc/>
-    /// <param name="tag1"></param>
     public V1Deployment CreateStartupDeployment(string name, string tag)
     {
         var mwConfig = _configuration.GetSection(MiddlewareConfig.ConfigName).Get<MiddlewareConfig>();

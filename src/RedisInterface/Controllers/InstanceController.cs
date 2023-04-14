@@ -362,7 +362,7 @@ namespace Middleware.RedisInterface.Controllers
         [ProducesResponseType(typeof(InstanceRunningModel), (int)HttpStatusCode.OK)]
         [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.NotFound)]
         [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.InternalServerError)]
-        public async Task<ActionResult<IEnumerable<InstanceModel>>> GetAllInstanceRunningAsync()
+        public async Task<ActionResult<IEnumerable<InstanceRunningModel>>> GetAllInstanceRunningAsync()
         {
             try
             {
