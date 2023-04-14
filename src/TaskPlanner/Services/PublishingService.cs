@@ -37,7 +37,7 @@ public class PublishingService : IPublishService
         if (action == null)
             return;
 
-        var location = QueueHelpers.ConstructRoutingKey(action.Placement, action.PlacementType);
+        var location = QueueHelpers.ConstructRoutingKey(action.Placement, action.PlacementType.ToString());
         var message = new DeployPlanMessage()
         {
             Task = task,

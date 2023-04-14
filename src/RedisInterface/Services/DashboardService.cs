@@ -18,6 +18,7 @@ namespace Middleware.RedisInterface.Services
         private readonly ICloudRepository _cloudRepository;
         private readonly IInstanceRepository _instanceRepository;
         private readonly IActionRepository _actionRepository;
+        private readonly IHistoricalActionPlanRepository _historicalActionPlanRepository;
 
 
         public DashboardService(IRobotRepository robotRepository,
@@ -26,7 +27,8 @@ namespace Middleware.RedisInterface.Services
             IEdgeRepository edgeRepository,
             ICloudRepository cloudRepository,
             IInstanceRepository instanceRepository,
-            IActionRepository actionRepository)
+            IActionRepository actionRepository,
+            IHistoricalActionPlanRepository historicalActionPlanRepository)
         {
             _instanceRepository = instanceRepository;
             _cloudRepository = cloudRepository;
@@ -35,6 +37,7 @@ namespace Middleware.RedisInterface.Services
             _taskRepository = taskRepository;
             _robotRepository = robotRepository;
             _actionRepository = actionRepository;
+            _historicalActionPlanRepository = historicalActionPlanRepository;
         }
 
         /// <summary>
@@ -122,7 +125,7 @@ namespace Middleware.RedisInterface.Services
         public async Task<Tuple<List<TaskRobotResponse>, int>> GetRobotStatusListAsync(PaginationFilter filter)
         {
             var robots = await _robotRepository.GetAllAsync();
-            var actionPlans = await _actionPlanRepository.GetAllAsync();
+            var actionPlans = await _historicalActionPlanRepository.GetAllAsync();
             var tasks = await _taskRepository.GetAllAsync();
 
             var responses = new List<TaskRobotResponse>();

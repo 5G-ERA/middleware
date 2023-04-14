@@ -78,7 +78,7 @@ namespace Middleware.TaskPlanner.Controllers
                 //Delete previous plan in orchestrator and graph. --> TODO: AL 06/11/22 The replan is not shown in the graph, only in the ActionPlanModel index db. 
                 await _orchestratorClient.DeletePlanByIdAsync(oldPlan.ActionPlanId);
 
-                await _redisInterfaceClient.AddRelationAsync(robot, plan, "OWNS");
+                //await _redisInterfaceClient.AddRelationAsync(robot, plan, "OWNS");
 
                 // Deploy replan
                 Orchestrator.OrchestratorResourceInput tmpTaskOrchestratorSend = new Orchestrator.OrchestratorResourceInput()

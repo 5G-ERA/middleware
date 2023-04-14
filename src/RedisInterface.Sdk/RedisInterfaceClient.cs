@@ -236,6 +236,56 @@ namespace Middleware.RedisInterface.Sdk
             return await ContainerImageGetForInstanceAsync(id, CancellationToken.None);
         }
 
+        public async Task<bool> ActionRunningAddAsync(ActionRunningModel actionRunning)
+        {
+            throw new NotImplementedException();
+        }
+
+        public async Task<bool> ActionRunningAddAsync(ActionRunningModel actionRunning, CancellationToken token)
+        {
+            throw new NotImplementedException();
+        }
+
+        public async Task<bool> InstanceRunningAddAsync(InstanceRunningModel instanceRunning)
+        {
+            throw new NotImplementedException();
+        }
+
+        public async Task<bool> InstanceRunningAddAsync(InstanceRunningModel instanceRunning, CancellationToken token)
+        {
+            throw new NotImplementedException();
+        }
+
+        public async Task<bool> HistoricalActionPlanAddAsync(HistoricalActionPlanModel historicalActionPlan)
+        {
+            throw new NotImplementedException();
+        }
+
+        public async Task<bool> HistoricalActionPlanAddAsync(HistoricalActionPlanModel historicalActionPlan, CancellationToken token)
+        {
+            throw new NotImplementedException();
+        }
+
+        public async Task<ActionRunningModel> ActionRunningGetByIdAsync(Guid id)
+        {
+            throw new NotImplementedException();
+        }
+
+        public async Task<ActionRunningModel> ActionRunningGetByIdAsync(Guid id, CancellationToken token)
+        {
+            throw new NotImplementedException();
+        }
+
+        public async Task<InstanceRunningModel> InstanceRunningGetByIdAsync(Guid id)
+        {
+            throw new NotImplementedException();
+        }
+
+        public async Task<InstanceRunningModel> InstanceRunningGetByIdAsync(Guid id, CancellationToken token)
+        {
+            throw new NotImplementedException();
+        }
+
         public async Task<GetPoliciesResponse?> PolicyGetActiveAsync()
         {
             var result = await _api.PolicyGetActive();

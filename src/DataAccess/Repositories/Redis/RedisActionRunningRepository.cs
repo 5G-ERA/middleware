@@ -1,22 +1,23 @@
-using Middleware.DataAccess.Repositories.Abstract;
+﻿using Middleware.DataAccess.Repositories.Abstract;
 using Middleware.Models.Domain;
 using Middleware.Models.Dto;
+using Middleware.Models.Enums;
 using Redis.OM.Contracts;
 using RedisGraphDotNet.Client;
 using Serilog;
 
 namespace Middleware.DataAccess.Repositories;
 
-public class RedisActionRepository : RedisRepository<ActionModel, ActionDto>, IActionRepository
+public class RedisActionRunningRepository : RedisRepository<ActionRunningModel, ActionRunningDto>, IActionRunningRepository
 {
-    public RedisActionRepository(IRedisConnectionProvider provider, IRedisGraphClient redisGraph, ILogger logger) : base(provider, redisGraph, true, logger)
+    public RedisActionRunningRepository(IRedisConnectionProvider provider, IRedisGraphClient redisGraph, ILogger logger) : base(provider, redisGraph, true, logger)
     {
 
     }
 
-    public async Task<ActionModel> PatchActionAsync(Guid id, ActionModel patch)
+    public async Task<ActionRunningModel?> PatchActionAsync(Guid id, ActionRunningModel patch)
     {
-        ActionModel? currentModel = await GetByIdAsync(id);
+        ActionRunningModel? currentModel = await GetByIdAsync(id);
         if (currentModel == null)
         {
             return null;
@@ -37,7 +38,7 @@ public class RedisActionRepository : RedisRepository<ActionModel, ActionDto>, IA
         {
             currentModel.Placement = patch.Placement;
         }
-        if (patch.PlacementType is not null)
+        if (patch.PlacementType != LocationType.Unspecified)
         {
             currentModel.PlacementType = patch.PlacementType;
         }

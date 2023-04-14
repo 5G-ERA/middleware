@@ -4,11 +4,14 @@ namespace Middleware.Models.Domain
 {
     public class SensorModel
     {
-        public string Name { get; set; }
-        public string Type { get; set; }
+        public string Name { get; set; } = default!;
+        public string Type { get; set; } = default!;
         // public string SensorLocation  { get; set; }
-        public string Description { get; set; }
-        public List<string> Nodes { get; set; } //A sensor can publish multiple topics
+        public string? Description { get; set; }
+        /// <summary>
+        /// List of the topics published by a sensor
+        /// </summary>
+        public List<string> Nodes { get; set; } = new();
 
         public int Number { get; set; }
 

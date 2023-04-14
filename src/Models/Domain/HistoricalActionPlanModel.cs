@@ -3,31 +3,34 @@ using System.Text.Json.Serialization;
 
 namespace Middleware.Models.Domain;
 
-public sealed class ActionPlanModel : BaseModel
+public sealed class HistoricalActionPlanModel : BaseModel
 {
-    [JsonPropertyName("Id")]
+    [JsonPropertyName("Id")] //atuomatically generated plan id by middleware
     public override Guid Id { get; set; }
 
-    [JsonPropertyName("TaskId")]
+    [JsonPropertyName("TaskId")] //TaskID
     public Guid TaskId { get; set; }
 
-    [JsonPropertyName("Name")]
-    public override string Name { get; set; } = default!;
+    [JsonPropertyName("Name")] // Name of task
+    public override string Name { get; set; }
 
     /// <summary>
     /// Status of the whole plan
     /// </summary>
     [JsonPropertyName("Status")]
-    public string? Status { get; set; }
+    public string Status { get; set; }
 
     [JsonPropertyName("IsReplan")] //Status of whole plan
     public bool IsReplan { get; set; }
+
+    [JsonPropertyName("PreviousPlanId")] //If replan, this field must be set to the id of the previous created HistoricalActionPlan.
+    public Guid PreviousPlanId { get; set; }
 
     [JsonPropertyName("LastStatusChange")]
     public DateTime LastStatusChange { get; set; } // AL 2022-05-10: Not sure we need this one or how to use it.
 
     [JsonPropertyName("ActionSequence")]
-    public List<ActionModel> ActionSequence { get; set; } = new();
+    public List<ActionRunningModel> ActionSequence { get; set; }
 
     [JsonPropertyName("RobotId")]
     public Guid RobotId { get; set; }
@@ -35,18 +38,9 @@ public sealed class ActionPlanModel : BaseModel
     [JsonPropertyName("TaskStartedAt")]
     public DateTime TaskStartedAt { get; set; }
 
-    public ActionPlanModel()
-    {
-    }
+    [JsonPropertyName("CreationTime")]
+    public DateTime CreationTime { get; set; }
 
-    public ActionPlanModel(Guid id, Guid taskId, string name, List<ActionModel> actionSequence, Guid robotId)
-    {
-        Id = id;
-        TaskId = taskId;
-        Name = name;
-        ActionSequence = actionSequence;
-        RobotId = robotId;
-    }
 
     public void SetStatus(string status)
     {
@@ -56,11 +50,10 @@ public sealed class ActionPlanModel : BaseModel
         Status = status;
         LastStatusChange = DateTime.UtcNow;
     }
-
     public override Dto.Dto ToDto()
     {
         var domain = this;
-        return new ActionPlanDto()
+        return new HistoricalActionPlanDto()
         {
             Id = domain.Id.ToString(),
             TaskId = domain.TaskId.ToString(),
@@ -71,6 +64,8 @@ public sealed class ActionPlanModel : BaseModel
             ActionSequence = domain.ActionSequence,
             RobotId = domain.RobotId.ToString(),
             TaskStartedAt = domain.TaskStartedAt == default ? DateTimeOffset.Now : domain.TaskStartedAt,
-        };
+            CreationTime = domain.CreationTime == default ? DateTimeOffset.Now : domain.TaskStartedAt,
+            PreviousPlanId = domain.PreviousPlanId.ToString()
+        }; ;
     }
 }

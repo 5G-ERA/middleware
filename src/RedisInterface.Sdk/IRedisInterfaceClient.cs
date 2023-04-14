@@ -112,6 +112,19 @@ public interface IRedisInterfaceClient
     /// <returns></returns>
     Task<GetContainersResponse?> ContainerImageGetForInstanceAsync(Guid id);
 
+    Task<bool> ActionRunningAddAsync(ActionRunningModel actionRunning);
+
+    Task<bool> InstanceRunningAddAsync(InstanceRunningModel instanceRunning);
+
+
+    Task<bool> HistoricalActionPlanAddAsync(HistoricalActionPlanModel historicalActionPlan);
+
+
+    Task<ActionRunningModel> ActionRunningGetByIdAsync(Guid id);
+
+
+    Task<InstanceRunningModel> InstanceRunningGetByIdAsync(Guid id);
+
     /// <summary>
     /// Get Active Global policies in the Middleware
     /// </summary>
