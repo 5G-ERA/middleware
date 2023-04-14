@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Middleware.Common;
 using Middleware.Common.Helpers;
 using Middleware.Common.Responses;
-using Middleware.RedisInterface.Responses;
+using Middleware.RedisInterface.Contracts.Responses;
 using Middleware.RedisInterface.Services;
 
 namespace Middleware.RedisInterface.Controllers
@@ -151,7 +151,7 @@ namespace Middleware.RedisInterface.Controllers
         /// <param name="filter"></param>
         /// <returns></returns>
         [HttpGet("robots")]
-        [ProducesResponseType(typeof(PagedResponse<List<RobotResponse>>), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(PagedResponse<List<DashboardRobotResponse>>), (int)HttpStatusCode.OK)]
         [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.InternalServerError)]
         public async Task<IActionResult> GetRobotsAsync([FromQuery] PaginationFilter filter)
         {

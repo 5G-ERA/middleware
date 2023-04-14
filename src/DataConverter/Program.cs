@@ -6,7 +6,7 @@ using Middleware.DataAccess.Repositories;
 using Middleware.DataAccess.Repositories.Abstract;
 using Middleware.DataAccess.Repositories.Redis;
 using Middleware.Models.Domain;
-using Middleware.RedisInterface.Responses;
+using Middleware.RedisInterface.Contracts.Responses;
 using Middleware.RedisInterface.Services;
 using Redis.OM;
 using Redis.OM.Contracts;

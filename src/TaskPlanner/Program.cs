@@ -1,7 +1,8 @@
-using Middleware.CentralApi.Sdk;
 using Middleware.Common.Config;
 using Middleware.Common.ExtensionMethods;
 using Middleware.Common.MessageContracts;
+using Middleware.RedisInterface.Sdk;
+using Middleware.CentralApi.Sdk;
 using Middleware.TaskPlanner.ApiReference;
 using Middleware.TaskPlanner.Config;
 using Middleware.TaskPlanner.ExtensionMethods;
@@ -35,6 +36,7 @@ builder.Services.AddHttpClient("resourcePlannerApiClient");
 builder.Services.AddHttpClient("orchestratorApiClient");
 builder.Services.AddCentralApiClient(centralApiHostname, mwConfig.Organization);
 builder.Services.RegisterCommonServices();
+builder.Services.AddRedisInterfaceClient();
 builder.Services.AddScoped<IApiClientBuilder, ApiClientBuilder>();
 builder.Services.AddScoped<IActionPlanner, ActionPlanner>();
 builder.Services.AddScoped<IPublishService, PublishingService>();

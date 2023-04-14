@@ -1,14 +1,16 @@
 ﻿using Middleware.Models.Dto.Ros;
-using System.Xml.Linq;
 
 namespace Middleware.Models.Domain
 {
     public class ManipulatorModel
     {
         public string ActuatorName { get; set; }
-        public int Dof { get; set; } //degree's of freedomn
-
+        /// <summary>
+        /// Degree's of freedom
+        /// </summary>
+        public int Dof { get; set; }
         public int Number { get; set; }
+        public string Type { get; set; }
 
 
         public Manipulator ToDto()

@@ -1,4 +1,4 @@
-﻿using System.Collections.Immutable;
+using System.Collections.Immutable;
 using System.Text.Json;
 using System.Xml.Linq;
 using Microsoft.Extensions.Logging;
@@ -6,11 +6,8 @@ using Middleware.Common.Enums;
 using Middleware.DataAccess.Repositories.Abstract;
 using Middleware.Models.Domain;
 using Middleware.Models.Dto;
-using Middleware.Models.Enums;
-using NReJSON;
 using Redis.OM.Contracts;
 using RedisGraphDotNet.Client;
-using StackExchange.Redis;
 using ILogger = Serilog.ILogger;
 
 namespace Middleware.DataAccess.Repositories
@@ -156,7 +153,7 @@ namespace Middleware.DataAccess.Repositories
             return lessBusyEdges;
         }
 
-        public async Task<EdgeModel> GetEdgeResourceDetailsByNameAsync(string name)
+        public async Task<EdgeModel?> GetEdgeResourceDetailsByNameAsync(string name)
         {
             EdgeModel edge = await FindSingleAsync(dto => dto.Name == name);
             return edge;

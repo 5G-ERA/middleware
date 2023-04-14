@@ -6,6 +6,6 @@ namespace Middleware.DataAccess.Repositories.Abstract
     {
         Task<InstanceModel> PatchInstanceAsync(Guid id, InstanceModel patch);
 
-        Task<InstanceModel> FindAlternativeInstance(Guid instance);
+        Task<InstanceModel?> FindAlternativeInstance(Guid instance);
     }
 }

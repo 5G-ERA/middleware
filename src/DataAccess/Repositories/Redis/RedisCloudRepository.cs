@@ -1,4 +1,4 @@
-﻿using System.Collections.Immutable;
+using System.Collections.Immutable;
 using Microsoft.IdentityModel.Tokens;
 using Middleware.Common.Enums;
 using Middleware.DataAccess.Repositories.Abstract;

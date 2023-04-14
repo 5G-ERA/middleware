@@ -47,6 +47,7 @@
 	<ItemGroup>
 		<ProjectReference Include="..\CentralApi.Sdk\CentralApi.Sdk.csproj" />
 		<ProjectReference Include="..\Common\Common.csproj" />
+		<ProjectReference Include="..\RedisInterface.Sdk\RedisInterface.Sdk.csproj" />
 	</ItemGroup>
 
 </Project>

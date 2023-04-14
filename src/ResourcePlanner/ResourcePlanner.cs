@@ -4,10 +4,12 @@ using Middleware.Common;
 using Middleware.Common.Enums;
 using Middleware.Common.Responses;
 using Middleware.Models.Domain;
-using Middleware.Common.Services;
 using Middleware.ResourcePlanner.ApiReference;
 using KeyValuePair = Middleware.Models.Domain.KeyValuePair;
 using Middleware.Common.Config;
+using Middleware.RedisInterface.Contracts.Mappings;
+using Middleware.RedisInterface.Contracts.Responses;
+using Middleware.RedisInterface.Sdk;
 
 namespace Middleware.ResourcePlanner;
 
@@ -24,12 +26,12 @@ public class ResourcePlanner : IResourcePlanner
     private readonly IMapper _mapper;
     private readonly IEnvironment _env;
     private readonly ILogger _logger;
-    private readonly IRedisInterfaceClientService _redisInterfaceClient;
+    private readonly IRedisInterfaceClient _redisInterfaceClient;
     private readonly MiddlewareConfig _mwConfig;
 
     public ResourcePlanner(IApiClientBuilder apiClientBuilder, IMapper mapper, IEnvironment env,
         ILogger<ResourcePlanner> logger,
-        IRedisInterfaceClientService redisInterfaceClient,
+        IRedisInterfaceClient redisInterfaceClient,
         IConfiguration configuration)
 
     {
@@ -38,12 +40,11 @@ public class ResourcePlanner : IResourcePlanner
         _env = env;
         _logger = logger;
         _redisInterfaceClient = redisInterfaceClient;
-        _mwConfig = configuration.GetSection(MiddlewareConfig.ConfigName).Get<MiddlewareConfig>(); 
+        _mwConfig = configuration.GetSection(MiddlewareConfig.ConfigName).Get<MiddlewareConfig>();
     }
 
     public async Task<TaskModel> Plan(TaskModel taskModel, RobotModel robot)
     {
-        
         var orchestratorApiClient = _apiClientBuilder.CreateOrchestratorApiClient();
         // actionPlanner will give resource planner the actionSequence. 
 
@@ -60,7 +61,8 @@ public class ResourcePlanner : IResourcePlanner
             // images -> list of all relations with images for the action
             foreach (RelationModel relation in images)
             {
-                InstanceModel instance = await _redisInterfaceClient.InstanceGetByIdAsync(relation.PointsTo.Id);
+                InstanceResponse instanceResp = await _redisInterfaceClient.InstanceGetByIdAsync(relation.PointsTo.Id);
+                var instance = instanceResp.ToInstance();
 
                 if (CanBeReused(instance) && taskModel.ResourceLock)
                 {
@@ -68,6 +70,7 @@ public class ResourcePlanner : IResourcePlanner
                     if (reusedInstance is not null)
                         instance = reusedInstance;
                 }
+
                 // add instance to actions
                 action.Services.Add(instance); 
             }
@@ -78,14 +81,15 @@ public class ResourcePlanner : IResourcePlanner
 
         return taskModel;
     }
+
     private async Task NetworkPlan(RobotModel robot)
     {
-        var redisApiClient = _apiClientBuilder.CreateRedisApiClient();
-        List<RedisInterface.ActivePolicy> activePolicies = (await redisApiClient.PolicyGetActiveAsync()).ToList();
+        var activePoliciesResp = await _redisInterfaceClient.PolicyGetActiveAsync();
+        var activePolicies = activePoliciesResp.ToPolicyList();
 
-        foreach (RedisInterface.ActivePolicy policy in activePolicies)
+        foreach (var policy in activePolicies)
         {
-            if (policy.PolicyName == "Use5G")
+            if (policy.Name == "Use5G")
             {
                 //TODO: Query testbed for number of slices and types.
 
@@ -103,25 +107,24 @@ public class ResourcePlanner : IResourcePlanner
                     if (question.Name == "What type of 5G slice")
                     {
                         KeyValuePair answer = question.Answer.First();
-                        string Slice5gType = (string)answer.Value; // there is an upper limit of eight network slices that be used by a device
-                    }//Nest template
+                        string
+                            Slice5gType =
+                                (string)answer
+                                    .Value; // there is an upper limit of eight network slices that be used by a device
+                    } //Nest template
                 }
 
                 //TODO: Attach robot to slice in Redis graph
-
-
             }
-            if (policy.PolicyName == "Use4G")
+
+            if (policy.Name == "Use4G")
             {
-
             }
-            if (policy.PolicyName == "UseWifi")
+
+            if (policy.Name == "UseWifi")
             {
-
             }
-
         }
-
     }
 
     /// <summary>
@@ -132,32 +135,36 @@ public class ResourcePlanner : IResourcePlanner
     /// <param name="actionParam"></param>
     /// <param name="resourceName"></param>
     /// <returns>string</returns>
-    private async Task<string> ResourcesInCloud(bool replan, RobotModel robot, ActionModel actionParam, string resourceName)
+    private async Task<string> ResourcesInCloud(bool replan, RobotModel robot, ActionModel actionParam,
+        string resourceName)
     {
-        var redisApiClient = _apiClientBuilder.CreateRedisApiClient();
-
         //Get free clouds
-        List<RedisInterface.CloudModel> riconnectedClouds = (await redisApiClient.RobotGetConnectedCloudsIdsAsync(robot.Id)).ToList();
-        List<RedisInterface.CloudModel> rifreeClouds = (await redisApiClient.GetFreeCloudIdsAsync(riconnectedClouds)).ToList();
+        var riConnectedClouds =
+            await _redisInterfaceClient.RobotGetConnectedCloudsAsync(robot.Id);
+
+        var availableClouds = riConnectedClouds.ToCloudList();
+
+        var rifreeClouds =
+            (await _redisInterfaceClient.GetFreeCloudIdsAsync(availableClouds)).ToCloudList();
         List<CloudModel> freeClouds = _mapper.Map<List<CloudModel>>(rifreeClouds);
 
         // If all of them are busy, check which one is less busy
-        List<RedisInterface.CloudModel> rilessBusyClouds = (await redisApiClient.GetLessBusyCloudsAsync(riconnectedClouds)).ToList();
-        List<CloudModel> lessBusyClouds = _mapper.Map<List<CloudModel>>(rilessBusyClouds);
+        var riLessBusyClouds =
+            await _redisInterfaceClient.GetLessBusyCloudsAsync(availableClouds);
+        List<CloudModel> lessBusyClouds = riLessBusyClouds.ToCloudList();
 
         List<CloudModel> cloudsThatMeetNetAppRequirementsTotal = new List<CloudModel>();
 
         // If replan flag is false
         if (replan == false)
         {
-
             // There are no free clouds
             if (freeClouds.Count() == 0)
             {
                 // Remove edges that do not have minimunm NetApps HW requirements
                 var cloudsThatMeetNetAppRequirements = lessBusyClouds
                     .Where(cloud => cloud.NumberOfCores <= actionParam.MinimumNumCores &&
-                            cloud.Ram <= actionParam.MinimumRam)
+                                    cloud.Ram <= actionParam.MinimumRam)
                     .ToList();
                 CloudModel lessBusyCloud = cloudsThatMeetNetAppRequirements.FirstOrDefault();
                 if (lessBusyCloud is not null)
@@ -179,9 +186,9 @@ public class ResourcePlanner : IResourcePlanner
                 {
                     // Check with BB
                     cloudsThatMeetNetAppRequirementsTotal.AddRange(freeClouds
-                   .Where(cloud => cloud.NumberOfCores <= instance.MinimumNumCores &&
-                           cloud.Ram <= actionParam.MinimumRam)
-                   .ToList());
+                        .Where(cloud => cloud.NumberOfCores <= instance.MinimumNumCores &&
+                                        cloud.Ram <= actionParam.MinimumRam)
+                        .ToList());
                 }
 
                 CloudModel freeCloudNodes = cloudsThatMeetNetAppRequirementsTotal.FirstOrDefault();
@@ -194,15 +201,16 @@ public class ResourcePlanner : IResourcePlanner
         else
         {
             // Get current HW resources of previosly selected edge
-            RedisInterface.CloudModel riCloudData = await redisApiClient.CloudGetDataByNameAsync(resourceName);
-            CloudModel cloudCurrentData = _mapper.Map<CloudModel>(riCloudData);
+            var riCloudData = await _redisInterfaceClient.CloudGetByNameAsync(resourceName);
+            var cloudCurrentData = riCloudData.ToCloud();
 
             if (freeClouds.Count() != 0)
             {
                 //If there are free clouds, get a better cloud from the HW perspective for the netApp
                 foreach (CloudModel freeCandidateCloud in freeClouds)
                 {
-                    if ((freeCandidateCloud.NumberOfCores > cloudCurrentData.NumberOfCores) && (freeCandidateCloud.Ram > cloudCurrentData.Ram))
+                    if ((freeCandidateCloud.NumberOfCores > cloudCurrentData.NumberOfCores) &&
+                        (freeCandidateCloud.Ram > cloudCurrentData.Ram))
                     {
                         return freeCandidateCloud.Name;
                     }
@@ -214,18 +222,17 @@ public class ResourcePlanner : IResourcePlanner
                 // Get a better less busy cloud from the HW perspective for the netApp
                 foreach (CloudModel lessBusyCandidatesClouds in lessBusyClouds)
                 {
-                    if ((lessBusyCandidatesClouds.NumberOfCores > cloudCurrentData.NumberOfCores) && (lessBusyCandidatesClouds.Ram > cloudCurrentData.Ram))
+                    if ((lessBusyCandidatesClouds.NumberOfCores > cloudCurrentData.NumberOfCores) &&
+                        (lessBusyCandidatesClouds.Ram > cloudCurrentData.Ram))
                     {
                         return lessBusyCandidatesClouds.Name;
                     }
                 }
             }
-
         }
+
         return resourceName;
         //throw new InvalidOperationException("Coudnt not find a placement according to the active policies.");
-
-
     }
 
     /// <summary>
@@ -238,16 +245,18 @@ public class ResourcePlanner : IResourcePlanner
     private Task<string> ResourcesInRequestedTaskRobot(RobotModel robot, ActionModel actionParam)
     {
         //Check if the robot can handle the HW requirements of instance (NetApp's)
-        foreach (InstanceModel instance in actionParam.Services)
+        foreach (InstanceModel instance in actionParam.Services!)
         {
             if ((robot.NumberCores < actionParam.MinimumNumCores) && (robot.Ram < actionParam.MinimumRam))
             {
                 //TODO: handle this other way.
-                throw new Exception("The robot with ID " + robot.Id + "doesnt have the HW requirements to run the netApp with ID: " + actionParam.Id);
+                throw new Exception("The robot with ID " + robot.Id +
+                                    "doesnt have the HW requirements to run the netApp with ID: " + actionParam.Id);
             }
         }
+
         // Select the placement to te the robot
-        return Task.FromResult(robot.Name);//guid
+        return Task.FromResult(robot.Name); //guid
     }
 
     /// <summary>
@@ -258,20 +267,21 @@ public class ResourcePlanner : IResourcePlanner
     /// <param name="actionParam"></param>
     /// <param name="resourceName"></param>
     /// <returns>string</returns>
-    private async Task<string> ResourcesInClosestMachine(bool replan, RobotModel robot, ActionModel actionParam, string resourceName)
+    private async Task<string> ResourcesInClosestMachine(bool replan, RobotModel robot, ActionModel actionParam,
+        string resourceName)
     {
-        var redisApiClient = _apiClientBuilder.CreateRedisApiClient();
-
         // Get free edges
-        List<RedisInterface.EdgeModel> riconnectedEdges = (await redisApiClient.RobotGetConnectedEdgesIdsAsync(robot.Id)).ToList();
-        List<RedisInterface.EdgeModel> rifreeEdges = (await redisApiClient.GetFreeEdgesIdsAsync(riconnectedEdges)).ToList();
-        List<EdgeModel> freeEdges = _mapper.Map<List<EdgeModel>>(rifreeEdges);
+        var riConnectedEdges = await _redisInterfaceClient.RobotGetConnectedEdgesIdsAsync(robot.Id);
+
+        var availableEdges = riConnectedEdges.ToEdgeList();
+        var rifreeEdges = await _redisInterfaceClient.GetFreeEdgesIdsAsync(availableEdges);
+        var freeEdges = rifreeEdges.ToEdgeList();
 
         // If all of them are busy, check which one is less busy
-        List<RedisInterface.EdgeModel> rilessBusyEdges = (await redisApiClient.GetLessBusyEdgesAsync(riconnectedEdges)).ToList();
-        List<EdgeModel> lessBusyEdges = _mapper.Map<List<EdgeModel>>(rilessBusyEdges);
+        var rilessBusyEdges = await _redisInterfaceClient.GetLessBusyEdgesAsync(availableEdges);
+        var lessBusyEdges = rilessBusyEdges.ToEdgeList();
 
-        List<EdgeModel> edgesThatMeetNetAppRequirementsTotal = new List<EdgeModel>();
+        var edgesThatMeetNetAppRequirementsTotal = new List<EdgeModel>();
 
         // If replan flag is false
         if (replan == false)
@@ -282,7 +292,7 @@ public class ResourcePlanner : IResourcePlanner
                 // Remove edges that do not have minimunm NetApps HW requirements
                 var edgesThatMeetNetAppRequirements = lessBusyEdges
                     .Where(edge => edge.NumberOfCores <= actionParam.MinimumNumCores &&
-                            edge.Ram <= actionParam.MinimumRam)
+                                   edge.Ram <= actionParam.MinimumRam)
                     .ToList();
                 EdgeModel lessBusyEdge = edgesThatMeetNetAppRequirements.FirstOrDefault();
                 if (lessBusyEdge is not null)
@@ -301,31 +311,30 @@ public class ResourcePlanner : IResourcePlanner
                 foreach (InstanceModel instance in actionParam.Services)
                 {
                     edgesThatMeetNetAppRequirementsTotal.AddRange(freeEdges
-                    .Where(edge => edge.NumberOfCores <= actionParam.MinimumNumCores &&
-                            edge.Ram <= actionParam.MinimumRam)
-                    .ToList());
+                        .Where(edge => edge.NumberOfCores <= actionParam.MinimumNumCores &&
+                                       edge.Ram <= actionParam.MinimumRam)
+                        .ToList());
                 }
 
                 EdgeModel freeEdgesNodes = edgesThatMeetNetAppRequirementsTotal.FirstOrDefault();
                 if (freeEdgesNodes is not null)
                     return freeEdgesNodes.Name;
             }
-
-
         }
         // Replan flag is true
         else
         {
             // Get current HW resources of previosly selected edge
-            RedisInterface.EdgeModel riEdgeData = await redisApiClient.EdgeGetDataByNameAsync(resourceName);
-            EdgeModel edgeCurrentData = _mapper.Map<EdgeModel>(riEdgeData);
+            var riEdgeData = await _redisInterfaceClient.EdgeGetByNameAsync(resourceName);
+            EdgeModel edgeCurrentData = riEdgeData.ToEdge();
 
             if (freeEdges.Count() != 0)
             {
                 //If there are free edges, get a better edge from the HW perspective for the netApp
                 foreach (EdgeModel freeCandidateEdge in freeEdges)
                 {
-                    if ((freeCandidateEdge.NumberOfCores > edgeCurrentData.NumberOfCores) && (freeCandidateEdge.Ram > edgeCurrentData.Ram))
+                    if ((freeCandidateEdge.NumberOfCores > edgeCurrentData.NumberOfCores) &&
+                        (freeCandidateEdge.Ram > edgeCurrentData.Ram))
                     {
                         return freeCandidateEdge.Name;
                     }
@@ -336,21 +345,21 @@ public class ResourcePlanner : IResourcePlanner
                 // Get a better less busy edge from the HW perspective for the netApp
                 foreach (EdgeModel lessBusyCandidatesEdges in lessBusyEdges)
                 {
-                    if ((lessBusyCandidatesEdges.NumberOfCores > edgeCurrentData.NumberOfCores) && (lessBusyCandidatesEdges.Ram > edgeCurrentData.Ram))
+                    if ((lessBusyCandidatesEdges.NumberOfCores > edgeCurrentData.NumberOfCores) &&
+                        (lessBusyCandidatesEdges.Ram > edgeCurrentData.Ram))
                     {
                         return lessBusyCandidatesEdges.Name;
                     }
-
                 }
             }
-
         }
+
         return resourceName;
         //throw new InvalidOperationException("Coudnt not find a placement according to the active policies.");
-
     }
 
-    private async Task<string> InferResource(ActionModel actionParam, RobotModel robot, bool rePlan, List<ActionModel> candidates) //Allocate correct placement based upon policies and priority
+    private async Task<string> InferResource(ActionModel actionParam, RobotModel robot, bool rePlan,
+        List<ActionModel> candidates) //Allocate correct placement based upon policies and priority
     {
         bool ActionToConsider = false;
         // Check if this action requires infering a new placement
@@ -370,36 +379,41 @@ public class ResourcePlanner : IResourcePlanner
 
         if (ActionToConsider == true)
         {
-            var redisApiClient = _apiClientBuilder.CreateRedisApiClient();
-            List<RedisInterface.ActivePolicy> activePolicies = (await redisApiClient.PolicyGetActiveAsync()).ToList(); //TODO: Only get policies of type resource.
-
-            Dictionary<Guid, List<EdgeModel>> tempDic = new Dictionary<Guid, List<EdgeModel>>();//Diccionary of Key policy ID, values List of results after query
+            var riActivePolicies = await _redisInterfaceClient.PolicyGetActiveAsync();
+            //TODO: Only get policies of type resource.
+            var activePolicies = riActivePolicies.ToPolicyList();
+            
+            // Diccionary of Key policy ID, values List of results after query
+            var tempDic = new Dictionary<Guid, List<EdgeModel>>(); 
             string resourceName = actionParam.Placement;
 
             // Check all policies and decide placement for action.
-            foreach (RedisInterface.ActivePolicy policy in activePolicies)
+            foreach (var policy in activePolicies)
             {
                 if (policy == null)
                 {
                     throw new ArgumentException("Index policy is empty"); //This should never happend
                 }
+
                 //Store all in edge devices.
-                if (policy.PolicyName == "AllContainersInClosestMachine")
+                if (policy.Name == "AllContainersInClosestMachine")
                 {
                     actionParam.Placement = await ResourcesInClosestMachine(rePlan, robot, actionParam, resourceName);
                 }
+
                 //Store all in the robot.
-                if (policy.PolicyName == "runNetAppInRobot")
+                if (policy.Name == "runNetAppInRobot")
                 {
                     actionParam.Placement = await ResourcesInRequestedTaskRobot(robot, actionParam);
                 }
+
                 //Store all in the cloud.
-                if (policy.PolicyName == "AllContainersInCloud")
+                if (policy.Name == "AllContainersInCloud")
                 {
                     actionParam.Placement = await ResourcesInCloud(rePlan, robot, actionParam, resourceName);
                 }
-
             }
+
             // Return to the old placement - TODO: check if the placement is not fully busy.
             return actionParam.Placement;
         }
@@ -409,8 +423,6 @@ public class ResourcePlanner : IResourcePlanner
             return actionParam.Placement;
         }
     }
-
-
 
 
     public async Task<TaskModel> SemanticPlan(TaskModel taskModel, RobotModel robot)
@@ -426,12 +438,11 @@ public class ResourcePlanner : IResourcePlanner
     /// </summary>
     /// <param name="taskModel"></param>
     /// <param name="robot"></param>
+    /// <param name="actionCandidates"></param>
     /// <returns></returns>
     /// <exception cref="ArgumentException"></exception>
     protected async Task<TaskModel> Plan(TaskModel taskModel, RobotModel robot, List<ActionModel> actionCandidates)
-
     {
-        var redisApiClient = _apiClientBuilder.CreateRedisApiClient();
         var orchestratorApiClient = _apiClientBuilder.CreateOrchestratorApiClient();
         // actionPlanner will give resource planner the actionSequence. 
 
@@ -444,11 +455,10 @@ public class ResourcePlanner : IResourcePlanner
         // iterate throught actions in actionSequence
         foreach (ActionModel action in actionSequence)
         {
-
-            List<RedisInterface.RelationModel> imagesTmp =
-                (await redisApiClient.ActionGetRelationByNameAsync(action.Id, "NEEDS")).ToList();
+            List<RelationModel> imagesTmp =
+                await _redisInterfaceClient.GetRelationForActionAsync(action.Id, "NEEDS");
             List<RelationModel> images = new List<RelationModel>();
-            foreach (RedisInterface.RelationModel imgTmp in imagesTmp)
+            foreach (var imgTmp in imagesTmp)
             {
                 RelationModel relation = _mapper.Map<RelationModel>(imgTmp);
                 images.Add(relation);
@@ -457,9 +467,8 @@ public class ResourcePlanner : IResourcePlanner
             // images -> list of all relations with images for the action
             foreach (RelationModel relation in images)
             {
-                RedisInterface.InstanceModel instanceTmp = await redisApiClient.InstanceGetByIdAsync(relation.PointsTo.Id); //Get instance values
-
-                InstanceModel instance = _mapper.Map<InstanceModel>(instanceTmp);
+                var instanceResponse = await _redisInterfaceClient.InstanceGetByIdAsync(relation.PointsTo.Id);
+                var instance = instanceResponse.ToInstance();
 
                 if (CanBeReused(instance) && taskModel.ResourceLock == true)
                 {
@@ -469,8 +478,9 @@ public class ResourcePlanner : IResourcePlanner
                 }
 
                 // add instance to actions
-                action.Services.Add(instance);
+                action.Services!.Add(instance);
             }
+
             // Choose placement based on policy
             action.Placement = await InferResource(action, robot, false, actionCandidates);
         }
@@ -522,10 +532,10 @@ public class ResourcePlanner : IResourcePlanner
                         // Action planner did no change to the failed action.
                         ActionsCandidates.Add(failedAction);
                     }
-
                 }
             }
         }
+
         // If full replan was requested by robot.
         if (fullReplan == true)
         {
@@ -533,6 +543,7 @@ public class ResourcePlanner : IResourcePlanner
             taskModel = await Plan(taskModel, robot, ActionsCandidates);
             taskModel.FullReplan = true;
         }
+
         // If full replan is neccesary because all actions in action sequence have failed.
         if (FailedActions.Count == oldActionSequence.Count)
         {
@@ -547,10 +558,12 @@ public class ResourcePlanner : IResourcePlanner
             taskModel = await Plan(taskModel, robot, ActionsCandidates);
             taskModel.PartialRePlan = true;
         }
+
         return taskModel;
     }
 
-    private async Task<InstanceModel> GetInstanceToReuse(InstanceModel instance, Orchestrator.OrchestratorApiClient orchestratorApi)
+    private async Task<InstanceModel> GetInstanceToReuse(InstanceModel instance,
+        Orchestrator.OrchestratorApiClient orchestratorApi)
 
     {
         try

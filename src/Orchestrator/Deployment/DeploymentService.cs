@@ -1,5 +1,4 @@
-﻿using AutoMapper;
-using k8s;
+﻿using k8s;
 using k8s.Models;
 using Microsoft.Extensions.Options;
 using Middleware.Common;
@@ -7,12 +6,11 @@ using Middleware.Common.Config;
 using Middleware.Common.Enums;
 using Middleware.Common.ExtensionMethods;
 using Middleware.Common.Responses;
-using Middleware.Common.Services;
 using Middleware.Models.Domain;
 using Middleware.Orchestrator.Exceptions;
 using Middleware.Orchestrator.Models;
-using System;
-using System.Threading.Tasks;
+using Middleware.RedisInterface.Contracts.Mappings;
+using Middleware.RedisInterface.Sdk;
 
 namespace Middleware.Orchestrator.Deployment;
 
@@ -36,7 +34,7 @@ public class DeploymentService : IDeploymentService
     /// <summary>
     /// Redis Interface API client
     /// </summary>
-    private readonly IRedisInterfaceClientService _redisInterfaceClient;
+    private readonly IRedisInterfaceClient _redisInterfaceClient;
 
     private readonly IConfiguration _configuration;
     private readonly IOptions<MiddlewareConfig> _mwConfig;
@@ -49,7 +47,7 @@ public class DeploymentService : IDeploymentService
     public DeploymentService(IKubernetesBuilder kubernetesBuilder,
         IEnvironment env,
         ILogger<DeploymentService> logger,
-        IRedisInterfaceClientService redisInterfaceClient,
+        IRedisInterfaceClient redisInterfaceClient,
         IConfiguration configuration,
         IOptions<MiddlewareConfig> mwConfig)
     {
@@ -129,14 +127,15 @@ public class DeploymentService : IDeploymentService
     /// with their corresponding relationships.
     /// </summary>
     /// <param name="task"></param>
+    /// <param name="robotId"></param>
     /// <returns></returns>
     private async Task<bool> SaveActionSequence(TaskModel task, Guid robotId)
     {
         //List<ActionRunningModel> actionsRunning = new List<ActionRunningModel>();
         var actionPlan = new ActionPlanModel(task.ActionPlanId, task.Id, task.Name, task.ActionSequence!, robotId);
         actionPlan.SetStatus("active");
-        RobotModel robot = await _redisInterfaceClient.RobotGetByIdAsync(robotId);   
-        
+        RobotModel robot = await _redisInterfaceClient.RobotGetByIdAsync(robotId);
+
         //Add the actionPlan to redis
         var result = await _redisInterfaceClient.ActionPlanAddAsync(actionPlan);
 
@@ -151,11 +150,14 @@ public class DeploymentService : IDeploymentService
             ActionRunningTemp.Name = action.Name;
             ActionRunningTemp.Tags = action.Tags;
             ActionRunningTemp.Order = action.Order;
-            ActionRunningTemp.Placement = action.Placement.Replace("-Edge","").Replace("-Cloud",""); // Trim to proper edge or cloud
+            ActionRunningTemp.Placement = action.Placement.Replace("-Edge", "").Replace("-Cloud", ""); // Trim to proper edge or cloud
             ActionRunningTemp.PlacementType = action.PlacementType;
             ActionRunningTemp.ActionPriority = action.ActionPriority;
             ActionRunningTemp.ActionStatus = ActionStatusEnum.Running.ToString();
-            ActionRunningTemp.Services = action.Services.Select(x=> new InstanceRunningModel() { Name = x.Name, ServiceInstanceId = x.ServiceInstanceId,
+            ActionRunningTemp.Services = action.Services.Select(x => new InstanceRunningModel()
+            {
+                Name = x.Name,
+                ServiceInstanceId = x.ServiceInstanceId,
                 ServiceType = x.ServiceType,
                 ServiceUrl = x.ServiceUrl,
                 ServiceStatus = x.ServiceStatus,
@@ -186,7 +188,7 @@ public class DeploymentService : IDeploymentService
                 }
 
             }
-            
+
         }
 
         return result;
@@ -195,8 +197,9 @@ public class DeploymentService : IDeploymentService
     private async Task DeployService(IKubernetes k8SClient, InstanceModel service, string[] deploymentNames)
     {
         _logger.LogDebug("Querying for redis for service {Id}", service.Id);
-        var images = await _redisInterfaceClient.ContainerImageGetForInstanceAsync(service.Id);
+        var imagesResponse = await _redisInterfaceClient.ContainerImageGetForInstanceAsync(service.Id);
 
+        var images = imagesResponse.ToContainersList();
         if (images is null || images.Any() == false)
         {
             throw new IncorrectDataException("Image is not defined for the Instance deployment");
@@ -368,7 +371,7 @@ public class DeploymentService : IDeploymentService
                 InstanceRunningModel runningInstance = await _redisInterfaceClient.InstanceRunningGetByIdAsync(instanceRelation.PointsTo.Id);
                 runningAction.Services.Add(runningInstance);
             }
-            
+
             historicalActionPlan.ActionSequence.Add(runningAction);
         }
         /*
@@ -460,8 +463,8 @@ public class DeploymentService : IDeploymentService
 
         _logger.LogDebug("Retrieving location details (cloud or edge)");
         BaseModel thisLocation = _mwConfig.Value.InstanceType == LocationType.Cloud.ToString()
-            ? await _redisInterfaceClient.GetCloudByNameAsync(_mwConfig.Value.InstanceName)
-            : await _redisInterfaceClient.GetEdgeByNameAsync(_mwConfig.Value.InstanceName);
+            ? (await _redisInterfaceClient.GetCloudByNameAsync(_mwConfig.Value.InstanceName)).ToCloud()
+            : (await _redisInterfaceClient.GetEdgeByNameAsync(_mwConfig.Value.InstanceName)).ToEdge();
 
         foreach (var instance in action.Services!)
         {
@@ -493,25 +496,25 @@ public class DeploymentService : IDeploymentService
 
         var deployments = await kubeClient.AppsV1.ListNamespacedDeploymentAsync(AppConfig.K8SNamespaceName);
         var deploymentNames = deployments.Items.Select(d => d.Metadata.Name).OrderBy(d => d).ToArray();
-        
+
         _logger.LogDebug("Retrieving location details (cloud or edge)");
         BaseModel thisLocation = _mwConfig.Value.InstanceType == LocationType.Cloud.ToString()
-            ? await _redisInterfaceClient.GetCloudByNameAsync(_mwConfig.Value.InstanceName)
-            : await _redisInterfaceClient.GetEdgeByNameAsync(_mwConfig.Value.InstanceName);
-        
+            ? (await _redisInterfaceClient.GetCloudByNameAsync(_mwConfig.Value.InstanceName)).ToCloud()
+            : (await _redisInterfaceClient.GetEdgeByNameAsync(_mwConfig.Value.InstanceName)).ToEdge();
+
         foreach (var instance in action.Services!)
         {
             _logger.LogDebug("Deploying instance '{0}', with serviceInstanceId '{1}'",
                 instance.Name, instance.ServiceInstanceId);
             await DeployService(kubeClient, instance, deploymentNames);
-            
+
             _logger.LogDebug("Adding new relation between instance and current location");
             await _redisInterfaceClient.AddRelationAsync(instance, thisLocation, "LOCATED_AT");
         }
-        
+
         action.Placement = _mwConfig.Value.InstanceName;
         action.PlacementType = _mwConfig.Value.InstanceType;
-        
+
         _logger.LogDebug("Saving updated ActionPlan");
         await _redisInterfaceClient.ActionPlanAddAsync(actionPlan);
     }

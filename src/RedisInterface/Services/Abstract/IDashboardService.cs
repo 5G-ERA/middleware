@@ -1,5 +1,5 @@
 ﻿using Middleware.Common;
-using Middleware.RedisInterface.Responses;
+using Middleware.RedisInterface.Contracts.Responses;
 
 namespace Middleware.RedisInterface.Services
 {
@@ -29,7 +29,7 @@ namespace Middleware.RedisInterface.Services
 
         Task<Tuple<List<NetAppsDetailsResponse>, int>> GetNetAppsDataListAsync(PaginationFilter filter);
 
-        Task<Tuple<List<RobotResponse>, int>> GetRobotsDataAsync(PaginationFilter filter);
+        Task<Tuple<List<DashboardRobotResponse>, int>> GetRobotsDataAsync(PaginationFilter filter);
 
         Task<GraphResponse> GetAllRelationModelsAsync();
     }

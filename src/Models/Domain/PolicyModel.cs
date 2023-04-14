@@ -1,14 +1,13 @@
 ﻿using System.Text.Json.Serialization;
-using Middleware.Common.Enums;
-using Middleware.Models.Dto.Hardware;
 using Middleware.Models.Dto;
+using Middleware.Models.Enums;
 
 namespace Middleware.Models.Domain;
 
 public class PolicyModel : BaseModel
 {
     [JsonPropertyName("Id")]
-    public override Guid Id { get; set; }
+    public override Guid Id { get; set; } = Guid.NewGuid();
 
     [JsonPropertyName("Name")] // Compulsory field
     public override string Name { get; set; }
@@ -20,7 +19,7 @@ public class PolicyModel : BaseModel
     public DateTime Timestamp { get; set; }
 
     [JsonPropertyName("IsActive")]
-    public bool? IsActive { get; set; }
+    public bool IsActive { get; set; }
 
     [JsonPropertyName("Description")]
     public string Description { get; set; }
@@ -35,7 +34,7 @@ public class PolicyModel : BaseModel
     /// <returns>bool</returns>
     public bool IsValid()
     {
-        var policyTypesEnum = Enum.GetNames(typeof(PolicyTypesEnum)).ToList();
+        var policyTypesEnum = Enum.GetNames(typeof(PolicyType)).ToList();
 
         if (string.IsNullOrEmpty(Name.ToString())) return false;
         if (string.IsNullOrEmpty(IsActive.ToString())) return false;

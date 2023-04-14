@@ -1,12 +1,11 @@
 ﻿using Middleware.Common;
 using Middleware.Common.Enums;
 using Middleware.DataAccess.Repositories.Abstract;
-using Middleware.RedisInterface.Responses;
 using Middleware.Common.ExtensionMethods;
-using Microsoft.AspNetCore.Http;
+
 using StackExchange.Redis;
-using System.Reflection.Metadata.Ecma335;
 using Middleware.Models.Domain;
+using Middleware.RedisInterface.Contracts.Responses;
 
 namespace Middleware.RedisInterface.Services
 {
@@ -195,13 +194,13 @@ namespace Middleware.RedisInterface.Services
         /// Gets a list of robots with some of their data.
         /// </summary>
         /// <returns></returns>
-        public async Task<Tuple<List<RobotResponse>, int>> GetRobotsDataAsync(PaginationFilter filter)
+        public async Task<Tuple<List<DashboardRobotResponse>, int>> GetRobotsDataAsync(PaginationFilter filter)
         {
             var robots = await _robotRepository.GetAllAsync();
-            var robotsResponse = new List<RobotResponse>();
+            var robotsResponse = new List<DashboardRobotResponse>();
             foreach (var robot in robots)
             {
-                var netAppTemp = new RobotResponse(robot.Id,
+                var netAppTemp = new DashboardRobotResponse(robot.Id,
                 robot.Name,
                                    robot.RobotStatus,
                                    robot.OnboardedTime,

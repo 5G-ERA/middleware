@@ -6,4 +6,6 @@ public interface IActionService
 {
     Task<ActionModel> GetByIdAsync(Guid id);
     Task<ActionModel> AddAsync(ActionModel model);
+    Task UpdateAsync(ActionModel model);
+    Task<bool> DeleteAsync(Guid id);
 }
