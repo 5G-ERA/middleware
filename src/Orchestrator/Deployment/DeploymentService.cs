@@ -158,7 +158,7 @@ public class DeploymentService : IDeploymentService
 
             if (deploymentNames.Contains(cim.Name))
             {
-                var guidSuffix = Guid.NewGuid().ToString().Split('-')[3];
+                var guidSuffix = Guid.NewGuid().ToString().Split('-')[0];
                 cim.Name = $"{cim.Name}-{guidSuffix}";
             }
 
