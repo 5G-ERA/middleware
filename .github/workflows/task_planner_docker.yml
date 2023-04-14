@@ -18,7 +18,7 @@ jobs:
     - name: Build image
       env:
         IMAGE_REPOSITORY: ${{ secrets.TASK_PLANNER_REPO_NAME }}
-      run: docker build -f ./src/TaskPlanner/Dockerfile ./src --tag $_REPOSITORY --label "runnumber=${GITHUB_RUN_ID}"
+      run: docker build -f ./src/TaskPlanner/Dockerfile ./src --tag $IMAGE_REPOSITORY --label "runnumber=${GITHUB_RUN_ID}"
     
     - name: Log in to registry
       # This is where you will update the personal access token to GITHUB_TOKEN
@@ -28,7 +28,7 @@ jobs:
       env:
         IMAGE_REPOSITORY: ${{ secrets.TASK_PLANNER_REPO_NAME }}
       run: |
-        IMAGEIMAGE_ID=ghcr.io/${{ github.repository_owner }}/$_REPOSITORY
+        IMAGEIMAGE_ID=ghcr.io/${{ github.repository_owner }}/$IMAGE_REPOSITORY
 
         # Change all uppercase to lowercase
         IMAGE_ID=$(echo $IMAGE_ID | tr '[A-Z]' '[a-z]')          
@@ -36,7 +36,7 @@ jobs:
         VERSION=edge
         echo IMAGE_ID=$IMAGE_ID
         echo VERSION=$VERSION
-        IMAGEdocker tag $_REPOSITORY $IMAGE_ID:edge
+        IMAGEdocker tag $IMAGE_REPOSITORY $IMAGE_ID:edge
         docker push $IMAGE_ID:edge
   
     - name: Configure AWS credentials
@@ -60,8 +60,8 @@ jobs:
         IMAGE_TAG: edge
       run: |
         # Build a docker container and push it to ECR 
-        IMAGEdocker build -f ./src/TaskPlanner/Dockerfile -t $ECR_REGISTRY/$_REPOSITORY:$IMAGE_TAG \
+        IMAGEdocker build -f ./src/TaskPlanner/Dockerfile -t $ECR_REGISTRY/$IMAGE_REPOSITORY:$IMAGE_TAG \
          --build-arg AWS_KEY_ID=$AWS_KEY_ID --build-arg AWS_SECRET_KEY=$AWS_SECRET_KEY ./src
         echo "Pushing image to ECR..."
-        IMAGEdocker push $ECR_REGISTRY/$_REPOSITORY:$IMAGE_TAG
-        IMAGEecho "::set-output name=image::$ECR_REGISTRY/$_REPOSITORY:$IMAGE_TAG"
+        IMAGEdocker push $ECR_REGISTRY/$IMAGE_REPOSITORY:$IMAGE_TAG
+        IMAGEecho "::set-output name=image::$ECR_REGISTRY/$IMAGE_REPOSITORY:$IMAGE_TAG"
