@@ -6,7 +6,7 @@ https://5g-era.eu
 
 *The 5G-ERA project was developed by the following partners under the [consortium](https://5g-era.eu/consortium/) with funding of the European Union's Horizon 2020 Research and Innovation programme under grant agreement No. 101016681.*
 
-For workshops demostrations and tutorials visit our [Youtube Channel](https://www.youtube.com/channel/UCFn5FI9OYLA9_jTwl2cwdFA/videos )
+For workshops demonstrations and tutorials visit our [Youtube Channel](https://www.youtube.com/channel/UCFn5FI9OYLA9_jTwl2cwdFA/videos )
 
 <p align="left">
   <img src="../img/MiddlewareArchitecture.png" alt="MiddlewareArchitecture"/>
@@ -24,15 +24,15 @@ Please, for the very initial description, setup and configuration, [follow](http
 The 5G-ERA Middleware is designed to connect three layers of application networks. First, it combines the ROS network on which the Robot specific application runs with the resource layer network. The Kubernetes network is managed by the OSM and the SDN Controllers that are part of the resource enablement network.
 The Middleware mainly operates on the Kubernetes network layer, designed as a cloud-native application. The Middleware is built on the microservices architecture and consists of several components:
 *	Gateway – It redirects the traffic across the Middleware system meaning rerouteing to the microservices within the system. It also handles the authentication and authorization process. 
-* Action Planner – Integrating the semantic knowledge of the vertical into resource planning. It is part of the vertical level life cycle management implemented by the middleware. 
+* Action Planner – Integrating the semantic knowledge of the vertical into resource planning. It is part of the vertical-level life cycle management implemented by the middleware. 
 * Resource Planner – The resource Planner is responsible for assigning the placement example, on the cloud, Edge to the tasks. 
-* Orchestrator – It orchestrates the process of the deployment of the resources. It is responsible for the vertical level lifecycle management of the deployed services 
+* Orchestrator – It orchestrates the process of the deployment of the resources. It is responsible for the vertical-level lifecycle management of the deployed services 
 * Redis Interface – Redis Interface allows the users to retrieve, insert and update data from/into the Redis-Server 
 
 The image below presents the conceptual architecture of the 5G-ERA Middleware and the connection between the associated services. The 5G-ERA Middleware has been designed to run in the Cloud and the Edge devices. Therefore, it can be always accessible and provide the best quality of service to the Robot by placement in the closest possible location.
  
 <p align="center">
-  <img src="../img/Middleware_Architecture.png" alt="Middleware architecture"/ >
+  <img src="../img/Middleware_Architecture.png" alt="Middleware architecture" >
 </p>
 
 The 5G-ERA Middleware connects to the Redis Cluster, which allows sharing of semantic knowledge between all the instances of the 5G-ERA Middleware running in every Cloud and Edge device.
