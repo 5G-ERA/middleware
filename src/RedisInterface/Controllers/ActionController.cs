@@ -837,7 +837,7 @@ public class ActionController : ControllerBase
     /// <returns> the list of ActionModel entities </returns>
     [HttpGet]
     [Route("running", Name = "ActionRunningGetAll")]
-    [ProducesResponseType(typeof(List<ActionRunningModel>), (int)HttpStatusCode.OK)]
+    [ProducesResponseType(typeof(GetRunningActionsResponse), (int)HttpStatusCode.OK)]
     [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.NotFound)]
     [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.InternalServerError)]
     public async Task<ActionResult<IEnumerable<ActionModel>>> GetAllActionRunningAsync()
@@ -845,12 +845,12 @@ public class ActionController : ControllerBase
         try
         {
             List<ActionRunningModel> models = await _actionRunningRepository.GetAllAsync();
-            if (models.Any() == false)
+            if (models != null && models.Any() == false)
             {
                 return NotFound(new ApiResponse((int)HttpStatusCode.NotFound, "No actions were found."));
             }
 
-            return Ok(models);
+            return Ok(models.ToRunningActionsResponse());
         }
         catch (Exception ex)
         {
@@ -869,7 +869,7 @@ public class ActionController : ControllerBase
     /// <returns> the ActionRunningModel entity for the specified id </returns>
     [HttpGet]
     [Route("running/{id:guid}", Name = "ActionRunningGetById")]
-    [ProducesResponseType(typeof(ActionRunningModel), (int)HttpStatusCode.OK)]
+    [ProducesResponseType(typeof(RunningActionResponse), (int)HttpStatusCode.OK)]
     [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.NotFound)]
     [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.InternalServerError)]
     public async Task<IActionResult> GetActionRunningByIdAsync(Guid id)
@@ -883,7 +883,7 @@ public class ActionController : ControllerBase
                     $"Action with id: '{id}' was not found."));
             }
 
-            return Ok(model);
+            return Ok(model.ToRunningActionResponse());
         }
         catch (Exception ex)
         {
@@ -900,7 +900,7 @@ public class ActionController : ControllerBase
     /// <returns> the newly created ActionModel entity </returns>
     [HttpPost]
     [Route("running", Name = "ActionRunningAdd")]
-    [ProducesResponseType(typeof(ActionRunningModel), (int)HttpStatusCode.OK)]
+    [ProducesResponseType(typeof(RunningActionResponse), (int)HttpStatusCode.OK)]
     [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.BadRequest)]
     [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.InternalServerError)]
     public async Task<ActionResult<ActionRunningModel>> AddActionRunningAsync([FromBody] ActionRunningModel model)
@@ -921,7 +921,7 @@ public class ActionController : ControllerBase
             return StatusCode(statusCode, new ApiResponse(statusCode, $"An error has occurred: {ex.Message}"));
         }
 
-        return Ok(model);
+        return Ok(model.ToRunningActionResponse());
     }
 
     /// <summary>
@@ -932,7 +932,7 @@ public class ActionController : ControllerBase
     /// <returns> the modified ActionModel entity </returns>
     [HttpPatch]
     [Route("running/{id:guid}", Name = "ActionRunningPatch")]
-    [ProducesResponseType(typeof(ActionRunningModel), (int)HttpStatusCode.OK)]
+    [ProducesResponseType(typeof(RunningActionResponse), (int)HttpStatusCode.OK)]
     [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.NotFound)]
     [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.InternalServerError)]
     public async Task<IActionResult> PatchActionRunningAsync([FromBody] ActionRunningModel patch, [FromRoute] Guid id)
@@ -945,7 +945,7 @@ public class ActionController : ControllerBase
                 return NotFound(new ApiResponse((int)HttpStatusCode.NotFound, "Object to be updated was not found."));
             }
 
-            return Ok(model);
+            return Ok(model.ToRunningActionResponse());
         }
         catch (Exception ex)
         {

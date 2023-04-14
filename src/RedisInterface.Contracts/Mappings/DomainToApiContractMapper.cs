@@ -262,8 +262,29 @@ public static class DomainToApiContractMapper
             Placement = x.Placement,
             PlacementType = x.PlacementType.ToString(),
             Order = x.Order,
-            Services = x.Services.ToInstanceRunningList(),
+            Services = x.Services?.ToInstanceRunningList() ?? new List<InstanceRunningResponse>(),
             Tags = x.Tags
+        };
+    }
+
+    public static GetRunningActionsResponse ToRunningActionsResponse(this IEnumerable<ActionRunningModel> actions)
+    {
+        return new GetRunningActionsResponse()
+        {
+            RunningActions = actions.Select(x => new RunningActionResponse()
+            {
+                Id = x.Id,
+                ActionId = x.ActionId,
+                ActionPlanId = x.ActionPlanId,
+                Name = x.Name,
+                ActionPriority = x.ActionPriority,
+                ActionStatus = x.ActionStatus,
+                Placement = x.Placement,
+                PlacementType = x.PlacementType.ToString(),
+                Order = x.Order,
+                Services = x.Services?.ToInstanceRunningList() ?? new List<InstanceRunningResponse>(),
+                Tags = x.Tags
+            })
         };
     }
 
