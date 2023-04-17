@@ -2,7 +2,6 @@
 using FluentAssertions;
 using Middleware.CentralApi.Domain;
 using Middleware.CentralApi.Services;
-using Middleware.Common.Enums;
 using Middleware.DataAccess.Repositories.Abstract;
 using Middleware.Models.Domain;
 using Middleware.Models.Enums;
@@ -39,8 +38,7 @@ public class LocationServiceTests
             Id = id,
             Name = "TestEdge",
             Organization = "MiddlewareTesting",
-            EdgeIp = new Uri("https://xkcd.com/927/"),
-            Type = LocationType.Edge.ToString()
+            EdgeIp = new Uri("https://xkcd.com/927/")
         };
         var expectedLocation = new Location()
         {
@@ -84,8 +82,7 @@ public class LocationServiceTests
             Id = id,
             Name = "TestCloud",
             Organization = "MiddlewareTesting",
-            CloudIp = new Uri("https://xkcd.com/927/"),
-            Type = LocationType.Cloud.ToString()
+            CloudIp = new Uri("https://xkcd.com/927/")
         };
         var expectedLocation = new Location()
         {
@@ -150,14 +147,12 @@ public class LocationServiceTests
             Id = Guid.NewGuid(),
             Name = "TestEdge",
             Organization = org,
-            Type = "Edge"
         };
         var cloud = new CloudModel()
         {
             Id = Guid.NewGuid(),
             Name = "TestCloud",
-            Organization = org,
-            Type = "Cloud"
+            Organization = org
         };
         var locations = new List<Location>()
         {

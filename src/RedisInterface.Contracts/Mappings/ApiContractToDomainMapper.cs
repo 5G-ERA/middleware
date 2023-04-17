@@ -37,7 +37,6 @@ public static class ApiContractToDomainMapper
         return new CloudModel()
         {
             Name = x.Name,
-            Type = x.Type,
             CloudIp = x.IpAddress,
             MacAddress = x.MacAddress,
             CloudStatus = x.Status,
@@ -55,7 +54,6 @@ public static class ApiContractToDomainMapper
         {
             Id = x.Id,
             Name = x.Name,
-            Type = x.Type,
             CloudIp = x.IpAddress,
             MacAddress = x.MacAddress,
             CloudStatus = x.Status,
@@ -75,7 +73,6 @@ public static class ApiContractToDomainMapper
             {
                 Id = x.Id,
                 Name = x.Name,
-                Type = x.Type,
                 CloudIp = x.IpAddress,
                 MacAddress = x.MacAddress,
                 CloudStatus = x.Status,
@@ -332,7 +329,7 @@ public static class ApiContractToDomainMapper
             Name = x.Name,
             TaskPriority = (int)Enum.Parse<Priority>(x.Priority, true),
             DeterministicTask = x.IsDeterministic,
-            Tags = x.Tags?.ToList()
+            Tags = x.Tags?.ToList() ?? new List<string>()
         };
     }
     public static TaskModel ToTask(this TaskResponse x)
@@ -343,7 +340,7 @@ public static class ApiContractToDomainMapper
             Name = x.Name,
             DeterministicTask = x.IsDeterministic,
             TaskPriority = (int)Enum.Parse<Priority>(x.Priority),
-            Tags = x.Tags?.ToList()
+            Tags = x.Tags?.ToList() ?? new List<string>()
         };
     }
 }

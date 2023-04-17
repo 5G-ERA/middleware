@@ -25,7 +25,6 @@ public static class ApiContractToDomainMapper
         {
             Id = x.Id,
             Name = x.Cloud.Name,
-            Type = x.Cloud.Type,
             CloudIp = x.Cloud.IpAddress,
             MacAddress = x.Cloud.MacAddress,
             CloudStatus = x.Cloud.Status,

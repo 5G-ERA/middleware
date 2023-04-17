@@ -74,7 +74,7 @@ public class EdgeModel : BaseModel
         {
             Id = domain.Id.ToString(),
             Name = domain.Name,
-            Type = domain.Type.ToString(),
+            Type = LocationType.Edge.ToString(),
             Organization = domain.Organization,
             EdgeStatus = domain.EdgeStatus,
             EdgeIp = domain.EdgeIp,
