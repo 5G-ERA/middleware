@@ -36,7 +36,7 @@ jobs:
         VERSION=edge
         echo IMAGE_ID=$IMAGE_ID
         echo VERSION=$VERSION
-        IMAGEdocker tag $IMAGE_REPOSITORY $IMAGE_ID:edge
+        docker tag $IMAGE_REPOSITORY $IMAGE_ID:edge
         docker push $IMAGE_ID:edge
   
     - name: Configure AWS credentials
