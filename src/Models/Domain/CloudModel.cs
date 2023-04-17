@@ -1,5 +1,6 @@
 ﻿using Middleware.Models.Dto;
 using System.Text.Json.Serialization;
+using Middleware.Models.Enums;
 
 namespace Middleware.Models.Domain;
 
@@ -13,7 +14,7 @@ public class CloudModel : BaseModel
 
     [Obsolete]
     [JsonPropertyName("Type")]
-    public string Type { get; set; }
+    public LocationType Type { get; set; } = LocationType.Cloud;
 
     [JsonPropertyName("Organization")]
     public string Organization { get; set; }
@@ -54,13 +55,13 @@ public class CloudModel : BaseModel
     /// <returns></returns>
     public bool IsValid()
     {
-        if (string.IsNullOrEmpty(Name.ToString())) return false;
+        if (string.IsNullOrEmpty(Name)) return false;
         if (string.IsNullOrEmpty(CloudIp.ToString())) return false;
         if (string.IsNullOrEmpty(NumberOfCores.ToString())) return false;
         if (string.IsNullOrEmpty(DiskStorage.ToString())) return false;
         //if (string.IsNullOrEmpty(MacAddress.ToString())) return false;
         if (string.IsNullOrEmpty(Ram.ToString())) return false;
-        if (string.IsNullOrEmpty(Organization.ToString())) return false;
+        if (string.IsNullOrEmpty(Organization)) return false;
         return true;
     }
     public override Dto.Dto ToDto()
@@ -70,7 +71,7 @@ public class CloudModel : BaseModel
         {
             Id = domain.Id.ToString(),
             Name = domain.Name,
-            Type = domain.Type,
+            Type = domain.Type.ToString(),
             Organization = domain.Organization,
             CloudStatus = domain.CloudStatus,
             CloudIp = domain.CloudIp,

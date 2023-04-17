@@ -34,7 +34,8 @@ public static class DomainToApiContractMapper
         {
             Id = x.Id,
             Name = x.Name,
-            Type = x.Type,
+            Organization = x.Organization,
+            Type = LocationType.Cloud.ToString(),
             IpAddress = x.CloudIp,
             MacAddress = x.MacAddress,
             Status = x.CloudStatus,
@@ -68,11 +69,11 @@ public static class DomainToApiContractMapper
         };
     }
 
-    public static GetContainersResponse ToContainersResponse(this IEnumerable<ContainerImageModel> contaiers)
+    public static GetContainersResponse ToContainersResponse(this IEnumerable<ContainerImageModel> containers)
     {
         return new GetContainersResponse()
         {
-            Containers = contaiers.Select(x => x.ToContainerResponse())
+            Containers = containers.Select(x => x.ToContainerResponse())
         };
     }
 
@@ -82,6 +83,8 @@ public static class DomainToApiContractMapper
         {
             Id = x.Id,
             Name = x.Name,
+            Organization = x.Organization,
+            Type = LocationType.Edge.ToString(),
             Status = x.EdgeStatus,
             IpAddress = x.EdgeIp,
             MacAddress = x.MacAddress,

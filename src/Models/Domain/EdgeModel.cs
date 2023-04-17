@@ -1,6 +1,7 @@
 ﻿using System.Text.Json.Serialization;
 using Middleware.Models.Dto;
 using Middleware.Models.Dto.Hardware;
+using Middleware.Models.Enums;
 
 
 namespace Middleware.Models.Domain;
@@ -14,7 +15,7 @@ public class EdgeModel : BaseModel
     public override string Name { get; set; }
     [Obsolete]
     [JsonPropertyName("Type")]
-    public string Type { get; set; }
+    public LocationType Type { get; set; } = LocationType.Edge;
 
     [JsonPropertyName("Organization")]
     public string Organization { get; set; }
@@ -73,7 +74,7 @@ public class EdgeModel : BaseModel
         {
             Id = domain.Id.ToString(),
             Name = domain.Name,
-            Type = domain.Type,
+            Type = LocationType.Edge.ToString(),
             Organization = domain.Organization,
             EdgeStatus = domain.EdgeStatus,
             EdgeIp = domain.EdgeIp,

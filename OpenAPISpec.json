@@ -933,9 +933,11 @@
                         "nullable": true
                     },
                     "Type": {
+                        "$ref": "#/components/schemas/LocationType"
+                    },
+                    "Organization": {
                         "type": "string",
-                        "nullable": true,
-                        "deprecated": true
+                        "nullable": true
                     },
                     "CloudStatus": {
                         "type": "string",
@@ -992,6 +994,10 @@
                         "type": "string",
                         "nullable": true
                     },
+                    "organization": {
+                        "type": "string",
+                        "nullable": true
+                    },
                     "type": {
                         "type": "string",
                         "nullable": true
@@ -1045,6 +1051,10 @@
                         "format": "uuid"
                     },
                     "name": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "organization": {
                         "type": "string",
                         "nullable": true
                     },
@@ -1266,9 +1276,11 @@
                         "nullable": true
                     },
                     "Type": {
+                        "$ref": "#/components/schemas/LocationType"
+                    },
+                    "Organization": {
                         "type": "string",
-                        "nullable": true,
-                        "deprecated": true
+                        "nullable": true
                     },
                     "EdgeStatus": {
                         "type": "string",
@@ -1325,6 +1337,10 @@
                         "type": "string",
                         "nullable": true
                     },
+                    "organization": {
+                        "type": "string",
+                        "nullable": true
+                    },
                     "status": {
                         "type": "string",
                         "nullable": true
@@ -1374,6 +1390,14 @@
                         "format": "uuid"
                     },
                     "name": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "type": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "organization": {
                         "type": "string",
                         "nullable": true
                     },
@@ -1766,6 +1790,14 @@
                     }
                 },
                 "additionalProperties": false
+            },
+            "LocationType": {
+                "enum": [
+                    0,
+                    1
+                ],
+                "type": "integer",
+                "format": "int32"
             },
             "NetAppsDetailsResponse": {
                 "type": "object",
@@ -5419,6 +5451,86 @@
                                     "items": {
                                         "$ref": "#/components/schemas/RelationModel"
                                     }
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "content": {
+                            "text/plain": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                }
+                            },
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                }
+                            },
+                            "text/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Server Error",
+                        "content": {
+                            "text/plain": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                }
+                            },
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                }
+                            },
+                            "text/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/data/cloud/name/{name}": {
+            "get": {
+                "tags": [
+                    "Cloud"
+                ],
+                "operationId": "CloudGetDataByName",
+                "parameters": [
+                    {
+                        "name": "name",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Success",
+                        "content": {
+                            "text/plain": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/CloudModel"
+                                }
+                            },
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/CloudModel"
+                                }
+                            },
+                            "text/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/CloudModel"
                                 }
                             }
                         }

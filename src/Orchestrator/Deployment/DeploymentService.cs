@@ -7,6 +7,7 @@ using Middleware.Common.Enums;
 using Middleware.Common.ExtensionMethods;
 using Middleware.Common.Responses;
 using Middleware.Models.Domain;
+using Middleware.Models.Enums;
 using Middleware.Orchestrator.Exceptions;
 using Middleware.Orchestrator.Models;
 using Middleware.RedisInterface.Contracts.Mappings;

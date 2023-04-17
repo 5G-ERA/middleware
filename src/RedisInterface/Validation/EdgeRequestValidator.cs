@@ -10,6 +10,9 @@ public class EdgeRequestValidator : AbstractValidator<EdgeRequest>
         RuleFor(x => x.Name)
             .NotNull()
             .NotEmpty();
+        RuleFor(x => x.Organization)
+            .NotNull()
+            .NotEmpty();
         RuleFor(x => x.IpAddress)
             .NotNull();
         RuleFor(x => x.Status)

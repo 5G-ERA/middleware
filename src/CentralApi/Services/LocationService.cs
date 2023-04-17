@@ -1,13 +1,11 @@
 ﻿using System.Collections.Immutable;
-using Amazon.Auth.AccessControlPolicy.ActionIdentifiers;
 using FluentValidation;
 using Middleware.CentralApi.Domain;
 using Middleware.DataAccess.Repositories.Abstract;
 using Middleware.Models.Domain;
 using OneOf;
 using OneOf.Types;
-using Middleware.CentralApi.Mappings;
-using Middleware.Common.Enums;
+using Middleware.Models.Enums;
 
 namespace Middleware.CentralApi.Services;
 
@@ -26,8 +24,8 @@ public class LocationService : ILocationService
     public async Task<OneOf<Location, ValidationException, NotFound>> RegisterLocation(Location location)
     {
         // when location not found in db
-        (bool queryResultCloud, CloudModel? cloud) = await _cloudRepository.CheckIfNameExists(location.Name);
-        (bool queryResultEdge, EdgeModel? edge) = await _edgeRepository.CheckIfNameExists(location.Name);
+        var (queryResultCloud, cloud) = await _cloudRepository.CheckIfNameExists(location.Name);
+        var (queryResultEdge, edge) = await _edgeRepository.CheckIfNameExists(location.Name);
 
         if ((queryResultEdge == false || edge is null) && (queryResultCloud == false || cloud is null))
         {
@@ -37,14 +35,14 @@ public class LocationService : ILocationService
         // make it online & return info about location based on matched edge
         if (cloud is null)
         {
-            edge.IsOnline = true;
+            edge!.IsOnline = true;
             var result = new Location()
             {
                 Id = edge.Id,
                 Name = edge.Name,
                 Organization = edge.Organization,
                 Address = edge.EdgeIp,
-                Type = Enum.Parse<LocationType>(edge.Type)
+                Type = edge.Type
             };
             await _edgeRepository.AddAsync(edge);
             return result;
@@ -58,7 +56,7 @@ public class LocationService : ILocationService
                 Name = cloud.Name,
                 Organization = cloud.Organization,
                 Address = cloud.CloudIp,
-                Type = Enum.Parse<LocationType>(cloud.Type)
+                Type = cloud.Type
             };
             await _cloudRepository.AddAsync(cloud);
             return result;
@@ -76,7 +74,6 @@ public class LocationService : ILocationService
                 Id = id,
                 Name = location.Name,
                 Organization = location.Organization,
-                Type = LocationType.Cloud.ToString(),
                 LastUpdatedTime = DateTimeOffset.Now.Date
             };
             await _cloudRepository.AddAsync(cloud);
@@ -88,7 +85,6 @@ public class LocationService : ILocationService
                 Id = id,
                 Name = location.Name,
                 Organization = location.Organization,
-                Type = LocationType.Cloud.ToString(),
                 LastUpdatedTime = DateTimeOffset.Now.Date
             };
             await _edgeRepository.AddAsync(cloud);
@@ -115,7 +111,7 @@ public class LocationService : ILocationService
         var locationsEdges = edges.Select(x => new Location()
         {
             Id = x.Id,
-            Type = Enum.Parse<LocationType>(x.Type),
+            Type = LocationType.Edge,
             Name = x.Name,
             Address = x.EdgeIp,
             Organization = x.Organization
@@ -127,7 +123,7 @@ public class LocationService : ILocationService
         var locationsClouds = clouds.Select(x => new Location()
         {
             Id = x.Id,
-            Type = Enum.Parse<LocationType>(x.Type),
+            Type = LocationType.Cloud,
             Name = x.Name,
             Address = x.CloudIp,
             Organization = x.Organization
