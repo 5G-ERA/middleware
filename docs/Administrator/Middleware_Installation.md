@@ -119,7 +119,7 @@ The last step is to prepare the deployment script for the middleware. It can be 
 `orchestrator_deployment.yaml` file there are environment variables that must be set for the correct
 work of the Orchestrator. The needed variables are:
 
-1. AWS_IMAGE_REGISTRY – contains the address of the registry in which the Middleware
+1. IMAGE_REGISTRY – contains the address of the registry in which the Middleware
 images are stored
 2. REDIS_INTERFACE_API_SERVICE_HOST – hostname of the REDIS server that has the Middleware data
 3. REDIS_INTERFACE_API_SERVICE_PORT – port on which REDIS operates
