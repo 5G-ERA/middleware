@@ -2,6 +2,7 @@
 using Middleware.CentralApi.Domain;
 using Middleware.Common.Enums;
 using Middleware.Models.Domain;
+using Middleware.Models.Enums;
 
 namespace Middleware.CentralApi.Mappings;
 

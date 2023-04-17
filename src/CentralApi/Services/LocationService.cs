@@ -8,6 +8,7 @@ using OneOf;
 using OneOf.Types;
 using Middleware.CentralApi.Mappings;
 using Middleware.Common.Enums;
+using Middleware.Models.Enums;
 
 namespace Middleware.CentralApi.Services;
 

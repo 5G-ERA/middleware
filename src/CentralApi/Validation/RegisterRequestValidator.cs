@@ -1,6 +1,7 @@
 ﻿using FluentValidation;
 using Middleware.CentralApi.Contracts.Requests;
 using Middleware.Common.Enums;
+using Middleware.Models.Enums;
 
 namespace Middleware.CentralApi.Validation;
 
