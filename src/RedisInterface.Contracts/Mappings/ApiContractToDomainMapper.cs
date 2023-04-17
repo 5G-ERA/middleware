@@ -45,7 +45,8 @@ public static class ApiContractToDomainMapper
             Ram = x.Ram,
             VirtualRam = x.VirtualRam,
             DiskStorage = x.DiskStorage,
-            LastUpdatedTime = DateTime.Now
+            LastUpdatedTime = DateTime.Now,
+            Organization = x.Organization
         };
     }
     public static CloudModel ToCloud(this CloudResponse x)
@@ -134,7 +135,8 @@ public static class ApiContractToDomainMapper
             Ram = x.Ram,
             VirtualRam = x.VirtualRam,
             DiskStorage = x.DiskStorage,
-            LastUpdatedTime = DateTime.Now
+            LastUpdatedTime = DateTime.Now,
+            Organization = x.Organization
         };
     }
     

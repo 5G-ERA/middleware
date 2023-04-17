@@ -34,6 +34,7 @@ public static class DomainToApiContractMapper
         {
             Id = x.Id,
             Name = x.Name,
+            Organization = x.Organization,
             Type = LocationType.Cloud.ToString(),
             IpAddress = x.CloudIp,
             MacAddress = x.MacAddress,
@@ -82,6 +83,7 @@ public static class DomainToApiContractMapper
         {
             Id = x.Id,
             Name = x.Name,
+            Organization = x.Organization,
             Type = LocationType.Edge.ToString(),
             Status = x.EdgeStatus,
             IpAddress = x.EdgeIp,

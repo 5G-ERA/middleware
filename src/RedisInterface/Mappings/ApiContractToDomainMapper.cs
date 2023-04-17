@@ -33,7 +33,8 @@ public static class ApiContractToDomainMapper
             Ram = x.Cloud.Ram,
             VirtualRam = x.Cloud.VirtualRam,
             DiskStorage = x.Cloud.DiskStorage,
-            LastUpdatedTime = DateTime.Now
+            LastUpdatedTime = DateTime.Now,
+            Organization = x.Cloud.Organization
         };
     }
 
@@ -64,7 +65,8 @@ public static class ApiContractToDomainMapper
             Ram = x.Edge.Ram,
             VirtualRam = x.Edge.VirtualRam,
             DiskStorage = x.Edge.DiskStorage,
-            LastUpdatedTime = DateTime.Now
+            LastUpdatedTime = DateTime.Now,
+            Organization = x.Edge.Organization
         };
     }
 
