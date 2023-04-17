@@ -1,4 +1,4 @@
-# 1) Onboarding a new Cloud to the middleware system:
+# Onboarding a new Cloud to the middleware system:
 
 For the middleware to plan network applications placement, it is important to load the network topology inside the system. In this section, we will learn how to create a new Cloud entity in the Redis backend of the middleware.
 
