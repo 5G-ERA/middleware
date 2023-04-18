@@ -1,29 +1,18 @@
-# Onboarding a new Cloud to the middleware system:
+# Onboarding a new Cloud to the Middleware system:
 
-For the middleware to plan network applications placement, it is important to load the network topology inside the system. In this section, we will learn how to create a new Cloud entity in the Redis backend of the middleware.
+For the middleware to plan optimal network application placement, it is important to import the network topology into the system. In this section, we will learn how to create a new Cloud entity in the Redis backend of the Middleware.
 
-A cloud template looks like this. All the fields must be completed. You may use automatically generated GUID for the id field. 
+Adding a new entry in the Middleware topology allows Middleware to better optimize the resource and task planning to provide the best network capabilities to the Robot. Thanks to this, the Network Application placement can be adjusted to specific needs like low latency network thanks to the closer placement from the Robot or specific `network slice` requirement (upcoming!).
 
-## Step 1 :  
-User needs to be registered with the Middleware system. After Registeration, a token will be generated which will be used to create Robot, Onboarding Edge/Cloud, shown below; 
+## Step 1 :  Authentication in Middleware
+
+The user needs to be registered with the Middleware system. After Registeration, a token will be generated which will be used to create Robot, Onboarding Edge/Cloud, shown below; 
 
 ![image](img/tokengenerated.jpg)
 
 ## Step 2 : Cloud Template
 
-a. Run Guid Generator https://www.uuidgenerator.net/guid for the new Guid ID.
-
-b. Complete all the fields including, 
-Type should be always Cloud for onboarding cloud, 
-
-Cloud status should be (Unknown, Active, Idle, Off)
-
-Cloud Ip; if you running your system on windows 
-                     ifconfig -->windows
-                  
-         if you running your system on linux ifconfig-->linux
-
-The Cloud template should look like this; 
+The full Cloud import template should look like this; 
 
 ```
 {
@@ -43,32 +32,41 @@ The Cloud template should look like this;
   "Organization": "Beds"
 }
 ```
-Change your Organization accordingly; 
+The properties should contain the values as explained below:
 
-![image](img/cloud%20template.png)
+* name - a unique name of the Edge within an Organization
+* organization - the name of the group of middleware's cooperating together
+* status - status of an Edge. One of `Active`, `Idle`, `Off`
+* ipAddress - a public IP address on which the Middleware running on this Edge is accessible
+* macAddress - mac address of a machine the Middleware is running on
+* cpu - the number of the CPUs the machine has
+* number of cores - the number of cores the machine consists of
+* ram - the amount of memory the machine has at its disposal, expressed in GB
+* virtual ram - the amount of virtual ram the machine has at its disposal, expressed in GB
+* disk storage - the amount of storage available expressed in GB
 
-## Step 3 : 
-Change the Local host to Ip address for the Postman.
 
-In the post request, remember to change the *localhost* and port to the proper address location of your middleware. This is a POST request.
-```
-http://localhost:5047/data/cloud 
-```
-Also, the headers should look like this:
+![image](img/cloud%20templatev2.png)
 
-## Step 4 :
+## Step 3: Configuration of the preferred REST API client
 
-Add/Change the content-type to application/json and auth to bearer token as shown below; 
+As part of the configuration of the preferred REST API client like `Postman` or `Insomnia` the following properties have to be set.
+
+* The IP address of the Middleware
+* Path of a request `/data/cloud`
+* Request method is set to `POST`
+* `Content-Type` header value set to `application/json`
+
+
+## Step 4 : Importing the Cloud definition
+
+Before sending a POST request ensure that you have added the token obtained in [Step 1](#step-1-authentication-in-middleware).
 
 ![image](img/Content-type.jpg)
 
-![image](img/Auth.jpg)
+After providing the correct token, execute the request. The Edge should be accepted and a new `ID` should be given by the Middleware.
 
-## Step 5: 
 
-Change the name to Create Cloud and send as shown in the image below; 
-
-![image](img/Cloud%20send%20request.png)
 
 
 
