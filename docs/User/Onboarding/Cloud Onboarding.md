@@ -43,6 +43,18 @@ The Cloud template should look like this;
   "Organization": "Beds"
 }
 ```
+The properties should contain the values as explained below:
+
+* name - a unique name of the Edge within an Organization
+* organization - the name of the group of middleware's cooperating together
+* status - status of an Edge. One of `Active`, `Idle`, `Off`
+* ipAddress - a public IP address on which the Middleware running on this Edge is accessible
+* macAddress - mac address of a machine the Middleware is running on
+* cpu - the number of the CPUs the machine has
+* number of cores - the number of cores the machine consists of
+* ram - the amount of memory the machine has at its disposal, expressed in GB
+* virtual ram - the amount of virtual ram the machine has at its disposal, expressed in GB
+* disk storage - the amount of storage available expressed in GB
 Change your Organization accordingly; 
 
 ![image](img/cloud%20template.png)
