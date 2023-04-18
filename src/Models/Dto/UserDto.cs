@@ -12,6 +12,8 @@ public class UserDto : Dto
     [RedisIdField]
     public override string Id { get; set; } = default!;
     [Indexed]
+    public string UserName { get; set; }
+    [Indexed]
     public string Password { get; init; } = default!;
     [Indexed]
     public string Salt { get; init; } = default!;
@@ -26,7 +28,8 @@ public class UserDto : Dto
             Id = Guid.Parse(dto.Id.Replace(Prefix, "")),
             Password = dto.Password,
             Salt = dto.Salt,
-            Role = dto.Role
+            Role = dto.Role,
+            Name = dto.UserName
         };
     }
 

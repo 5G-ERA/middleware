@@ -23,7 +23,7 @@ namespace Middleware.OcelotGateway.Services
         {
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_jwtConfig.Key));
             var credentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha256Signature);
-            var expirationDate = DateTime.UtcNow.AddHours(8);
+            var expirationDate = DateTime.UtcNow.AddHours(4);
             
             var claims = new[]
             {

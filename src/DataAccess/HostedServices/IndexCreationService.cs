@@ -76,6 +76,11 @@ public class IndexCreationService : IHostedService
         {
             await _provider.Connection.CreateIndexAsync(typeof(UserDto));
         }
+        else
+        {
+            await _provider.Connection.DropIndexAsync(typeof(UserDto));
+            await _provider.Connection.CreateIndexAsync(typeof(UserDto));
+        }
         if (info.Any(x => x == "robotStatus-idx") == false)
         {
             await _provider.Connection.CreateIndexAsync(typeof(RobotStatusDto));

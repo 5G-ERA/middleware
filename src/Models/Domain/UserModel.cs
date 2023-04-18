@@ -8,7 +8,7 @@ namespace Middleware.Models.Domain
     public class UserModel : BaseModel
     {
         [Required]
-        public override Guid Id { get; set; }
+        public override Guid Id { get; set; } = Guid.NewGuid();
 
         [Required]
         public string Password { get; set; }
@@ -26,8 +26,8 @@ namespace Middleware.Models.Domain
                 Id = domain.Id.ToString(),
                 Password = domain.Password,
                 Salt = domain.Salt,
-                Role = domain.Role
-                
+                Role = domain.Role,
+                UserName = domain.Name
             };
         }
     }

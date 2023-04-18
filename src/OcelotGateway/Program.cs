@@ -61,6 +61,14 @@ builder.RegisterRedis();
 
 builder.Services.AddScoped<IUserRepository, RedisUserRepository>();
 
+var ocelotConfig = new OcelotPipelineConfiguration
+{
+    AuthorizationMiddleware = async (httpContext, next) =>
+    {
+        await OcelotAuthorizationMiddleware.Authorize(httpContext, next);
+    }
+};
+
 var app = builder.Build();
 
 app.UseRouting();
@@ -72,7 +80,7 @@ app.UseEndpoints(endpoints =>
     endpoints.MapControllers();
 });
 
-await app.UseOcelot();
+await app.UseOcelot(ocelotConfig);
 
 app.MapGet("/", () => "OcelotGateway is functional!");
 
