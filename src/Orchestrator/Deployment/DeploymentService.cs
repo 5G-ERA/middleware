@@ -451,14 +451,12 @@ public class DeploymentService : IDeploymentService
         };
         var envList = new List<V1EnvVar>
         {
-            // new("REDIS_INTERFACE_ADDRESS", $"http://redis-interface-api"),
-            // new("ORCHESTRATOR_ADDRESS", $"http://orchestrator-api_SERVICE_HOST"),
-            // new("TASK_PLANNER_ADDRESS", $"http://task-planner-api"),
-            // new("RESOURCE_PLANNER_ADDRESS", $"http://resource-planner-api"),
             new("Middleware__Organization", mwConfig.Organization),
             new("Middleware__InstanceName", mwConfig.InstanceName),
             new("Middleware__InstanceType", mwConfig.InstanceType),
-            new("CENTRAL_API_HOSTNAME", _env.GetEnvVariable("CENTRAL_API_HOSTNAME"))
+            new("CENTRAL_API_HOSTNAME", _env.GetEnvVariable("CENTRAL_API_HOSTNAME")),
+            new("AWS_ACCESS_KEY_ID", _env.GetEnvVariable("AWS_ACCESS_KEY_ID")),
+            new("AWS_SECRET_ACCESS_KEY", _env.GetEnvVariable("AWS_SECRET_ACCESS_KEY"))
         };
         if (name.Contains("redis") || name == "gateway")
         {
