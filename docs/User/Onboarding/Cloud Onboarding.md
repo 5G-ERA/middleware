@@ -34,9 +34,9 @@ The full Cloud import template should look like this;
 ```
 The properties should contain the values as explained below:
 
-* name - a unique name of the Edge within an Organization
+* name - a unique name of the Cloud within an Organization
 * organization - the name of the group of middleware's cooperating together
-* status - status of an Edge. One of `Active`, `Idle`, `Off`
+* status - status of a Cloud. One of `Active`, `Idle`, `Off`
 * ipAddress - a public IP address on which the Middleware running on this Edge is accessible
 * macAddress - mac address of a machine the Middleware is running on
 * cpu - the number of the CPUs the machine has
