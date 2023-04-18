@@ -53,3 +53,7 @@ spec:
               value: Edge # to be replaced with real value
             - name: CENTRAL_API_HOSTNAME
               value: central.api
+            - name: AWS_ACCESS_KEY_ID
+              value: my_aws_secret_key
+            - name: AWS_SECRET_ACCESS_KEY
+              value: my_aws_access_key
