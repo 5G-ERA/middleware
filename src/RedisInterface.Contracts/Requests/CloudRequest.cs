@@ -3,6 +3,7 @@
 public class CloudRequest
 {
     public string Name { get; init; }
+    public string Organization { get; set; }
     public string Type { get; init; }
     public string Status { get; init; }
     public Uri IpAddress { get; init; }

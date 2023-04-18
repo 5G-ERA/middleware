@@ -2004,7 +2004,7 @@
         }
       }
     },
-    "/name/{name}": {
+    "/api/v1/Cloud/name/{name}": {
       "get": {
         "tags": [
           "Cloud"
@@ -2026,17 +2026,17 @@
             "content": {
               "text/plain": {
                 "schema": {
-                  "$ref": "#/components/schemas/CloudResponse"
+                  "$ref": "#/components/schemas/CloudModel"
                 }
               },
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/CloudResponse"
+                  "$ref": "#/components/schemas/CloudModel"
                 }
               },
               "text/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/CloudResponse"
+                  "$ref": "#/components/schemas/CloudModel"
                 }
               }
             }
@@ -8962,9 +8962,11 @@
             "nullable": true
           },
           "Type": {
+            "$ref": "#/components/schemas/LocationType"
+          },
+          "Organization": {
             "type": "string",
-            "nullable": true,
-            "deprecated": true
+            "nullable": true
           },
           "CloudStatus": {
             "type": "string",
@@ -9021,6 +9023,10 @@
             "type": "string",
             "nullable": true
           },
+          "organization": {
+            "type": "string",
+            "nullable": true
+          },
           "type": {
             "type": "string",
             "nullable": true
@@ -9074,6 +9080,10 @@
             "format": "uuid"
           },
           "name": {
+            "type": "string",
+            "nullable": true
+          },
+          "organization": {
             "type": "string",
             "nullable": true
           },
@@ -9326,9 +9336,11 @@
             "nullable": true
           },
           "Type": {
+            "$ref": "#/components/schemas/LocationType"
+          },
+          "Organization": {
             "type": "string",
-            "nullable": true,
-            "deprecated": true
+            "nullable": true
           },
           "EdgeStatus": {
             "type": "string",
@@ -9385,6 +9397,10 @@
             "type": "string",
             "nullable": true
           },
+          "organization": {
+            "type": "string",
+            "nullable": true
+          },
           "status": {
             "type": "string",
             "nullable": true
@@ -9434,6 +9450,14 @@
             "format": "uuid"
           },
           "name": {
+            "type": "string",
+            "nullable": true
+          },
+          "type": {
+            "type": "string",
+            "nullable": true
+          },
+          "organization": {
             "type": "string",
             "nullable": true
           },
@@ -9953,6 +9977,14 @@
           }
         },
         "additionalProperties": false
+      },
+      "LocationType": {
+        "enum": [
+          0,
+          1
+        ],
+        "type": "integer",
+        "format": "int32"
       },
       "ManipulatorModel": {
         "type": "object",

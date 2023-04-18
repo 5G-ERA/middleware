@@ -1,5 +1,6 @@
 ﻿using Middleware.Models.Domain;
 using Middleware.Models.Dto.Hardware;
+using Middleware.Models.Enums;
 using Redis.OM.Modeling;
 
 namespace Middleware.Models.Dto;
@@ -42,7 +43,6 @@ public class EdgeDto : Dto
         {
             Id = Guid.Parse(dto.Id!.Replace(Prefix, "")),
             Name = dto.Name,
-            Type = dto.Type,
             Organization = dto.Organization,
             EdgeStatus = dto.EdgeStatus,
             EdgeIp = dto.EdgeIp,

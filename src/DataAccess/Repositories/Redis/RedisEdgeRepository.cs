@@ -42,10 +42,6 @@ namespace Middleware.DataAccess.Repositories
             {
                 currentModel.Name = patch.Name;
             }
-            if (!string.IsNullOrEmpty(patch.Type))
-            {
-                currentModel.Type = patch.Type;
-            }
             if (!string.IsNullOrEmpty(patch.EdgeStatus))
             {
                 currentModel.EdgeStatus = patch.EdgeStatus;
