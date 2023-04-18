@@ -1,4 +1,4 @@
-#  Onboarding a new Edge to the middleware system:
+#  Onboarding a new Edge to the Middleware system:
 
 
 For the middleware to plan optimal network application placement, it is important to import the network topology into the system. In this section, we will learn how to create a new Edge entity in the Redis backend of the Middleware.
@@ -72,3 +72,4 @@ After providing the correct token, execute the request. The Edge should be accep
 ## Closing
 
 Onboarding of a new Edge allows for the easy integration of the Middleware with other running instances. Thanks to this multiple Edges and Clouds can cooperate with each other.
+image.pngimage.pngimage.png
