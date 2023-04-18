@@ -67,9 +67,11 @@ Before sending a POST request ensure that you have added the token obtained in [
 After providing the correct token, execute the request. The Edge should be accepted and a new `ID` should be given by the Middleware.
 
 
+![image](img/Cloud%20Onboardingimage.png)
 
+## Closing
 
-
+Onboarding of a new Cloud allows for the easy integration of the Middleware with other running instances.
 
 
 
