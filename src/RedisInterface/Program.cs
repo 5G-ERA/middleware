@@ -51,7 +51,8 @@ app.UseSerilogRequestLogging();
 app.UseMiddleware<ValidationExceptionMiddleware>();
 //app.UseHttpsRedirection();
 
-app.UseAuthorization();
+//app.UseAuthentication();
+//app.UseAuthorization();
 
 app.MapControllers();
 

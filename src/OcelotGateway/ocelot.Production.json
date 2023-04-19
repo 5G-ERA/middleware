@@ -40,6 +40,9 @@
         "AllowedScopes": []
       },
       "UpstreamPathTemplate": "/Data/{all}",
+      "RouteClaimsRequirement": {
+        "http///schemas.microsoft.com/ws/2008/06/identity/claims/role": "admin, user"
+      },
       "UpstreamHttpMethod": [ "GET", "POST", "PUT", "PATCH", "DELETE" ]
     },
     //TaskPlanner API
@@ -57,6 +60,9 @@
         "AllowedScopes": []
       },
       "UpstreamPathTemplate": "/Task/{all}",
+      "RouteClaimsRequirement": {
+        "http///schemas.microsoft.com/ws/2008/06/identity/claims/role": "admin, user, robot"
+      },
       "UpstreamHttpMethod": [ "GET", "POST", "PATCH", "DELETE" ]
     },
     //Orchestrator API
@@ -74,6 +80,9 @@
         "AllowedScopes": []
       },
       "UpstreamPathTemplate": "/Orchestrate/{all}",
+      "RouteClaimsRequirement": {
+        "http///schemas.microsoft.com/ws/2008/06/identity/claims/role": "admin, user, robot"
+      },
       "UpstreamHttpMethod": [ "GET", "POST", "PATCH", "DELETE" ]
     },
     {

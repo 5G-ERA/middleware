@@ -1,8 +1,9 @@
 ﻿using Middleware.Models.Domain;
+using Middleware.Models.Dto;
 
 namespace Middleware.DataAccess.Repositories.Abstract
 {
-    public interface IUserRepository : IBaseRepository<UserModel>, IRelationRepository
+    public interface IUserRepository : IRedisRepository<UserModel, UserDto>, IRelationRepository
     {
     }
 }

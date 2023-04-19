@@ -8,6 +8,7 @@ using Middleware.Common.Config;
 using Middleware.Common.Responses;
 using Middleware.DataAccess.Repositories.Abstract;
 using Middleware.Models.Domain;
+using Middleware.OcelotGateway.Contracts;
 using Middleware.OcelotGateway.Services;
 
 namespace Middleware.OcelotGateway.Controllers
@@ -32,36 +33,38 @@ namespace Middleware.OcelotGateway.Controllers
         /// <summary>
         /// Register a new user into the system
         /// </summary>
-        /// <param name="register"></param>
+        /// <param name="user"></param>
         /// <returns> HttpStatusCode Created </returns>
         [AllowAnonymous]
         [HttpPost]
         [Route("register", Name = "Register")]
-        [ProducesResponseType(typeof(UserModel), (int)HttpStatusCode.Created)]
+        [ProducesResponseType(typeof(RegisterResponse), (int)HttpStatusCode.OK)]
         [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.BadRequest)]
         [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.InternalServerError)]
-        public async Task<ActionResult<UserModel>> Register([FromBody] UserModel register)
+        public async Task<ActionResult<UserModel>> Register([FromBody] RegisterRequest request)
         {
-            if (register == null)
+            if (request == null)
             {
                 return BadRequest(new ApiResponse((int)HttpStatusCode.BadRequest, "Please enter valid credentials"));
             }
             try
             {
+                var user = request.ToUser();
                 byte[] salt = RandomNumberGenerator.GetBytes(128 / 8);
-                register.Salt = Convert.ToBase64String(salt);
+                user.Salt = Convert.ToBase64String(salt);
 
-                register.Password = ComputeHashPassword(register.Password, salt);
+                user.Password = ComputeHashPassword(user.Password, salt);
         
-                await _userRepository.AddAsync(register, () => register.Id);
+                await _userRepository.AddAsync(user, () => user.Id);
+
+                return Ok(user.ToRegisterResponse());
             }
             catch (Exception ex)
             {
                 int statusCode = (int)HttpStatusCode.InternalServerError;
                 _logger.LogError(ex, "An error occurred:");
                 return StatusCode(statusCode, new ApiResponse(statusCode, $"An error has occurred: {ex.Message}"));
-            }
-            return StatusCode((int)HttpStatusCode.Created);
+            }            
         }
 
         /// <summary>
@@ -75,7 +78,7 @@ namespace Middleware.OcelotGateway.Controllers
         [ProducesResponseType(typeof(TokenModel), (int)HttpStatusCode.OK)]
         [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.BadRequest)]
         [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.Unauthorized)]
-        public async Task<IActionResult> Login([FromBody] UserModel login) 
+        public async Task<IActionResult> Login([FromBody] LoginRequest login) 
         {
             if (login == null)
             {
@@ -85,11 +88,12 @@ namespace Middleware.OcelotGateway.Controllers
             {
                 IActionResult response = Unauthorized();
 
-                bool authenticated = await AuthenticateUser(login);
+
+                (bool authenticated, UserModel user) = await AuthenticateUser(login);
                 if (authenticated)
                 {
                     TokenService token = new TokenService(_jwtconfig.Value);
-                    var newToken = token.GenerateToken(login.Id);
+                    var newToken = token.GenerateToken(user.Id, user.Role);
                     response = Ok(newToken);
                 }
                 return response;
@@ -109,21 +113,26 @@ namespace Middleware.OcelotGateway.Controllers
         /// </summary>
         /// <param name="login"></param>
         /// <returns> True or False according to users' credentials </returns>
-        private async Task<bool> AuthenticateUser(UserModel login) 
+        private async Task<Tuple<bool, UserModel>> AuthenticateUser(LoginRequest login)
         {
             try
             {
-                UserModel storedCredentials = await _userRepository.GetByIdAsync(login.Id);
-                byte[] salt = Convert.FromBase64String(storedCredentials.Salt);
+                UserModel user = login.UserName is null 
+                    ? await _userRepository.GetByIdAsync(login.Id.Value)
+                    : await _userRepository.FindSingleAsync(u=>u.UserName == login.UserName);
+
+                if (user == null) return new(false, null);
+
+                byte[] salt = Convert.FromBase64String(user.Salt);
 
                 string computedHashedPassword = ComputeHashPassword(login.Password, salt);
 
-                return computedHashedPassword.Equals(storedCredentials.Password) ? true : false;
+                return computedHashedPassword.Equals(user.Password) ? new (true, user) : new (false, null);
             }
             catch (Exception ex) 
             {
                 _logger.LogError(ex, "An error has occured during the authentication process");
-                return false;
+                return new (false, null);
             }
         }
 
