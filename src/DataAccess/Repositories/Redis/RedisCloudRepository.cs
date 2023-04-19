@@ -1,4 +1,4 @@
-﻿using System.Collections.Immutable;
+using System.Collections.Immutable;
 using Microsoft.IdentityModel.Tokens;
 using Middleware.Common.Enums;
 using Middleware.DataAccess.Repositories.Abstract;
@@ -39,10 +39,6 @@ namespace Middleware.DataAccess.Repositories
             if (!string.IsNullOrEmpty(patch.Name))
             {
                 currentModel.Name = patch.Name;
-            }
-            if (!string.IsNullOrEmpty(patch.Type))
-            {
-                currentModel.Type = patch.Type;
             }
             if (!string.IsNullOrEmpty(patch.CloudStatus))
             {

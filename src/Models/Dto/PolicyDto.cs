@@ -17,7 +17,7 @@ public class PolicyDto: Dto
     [Indexed(Sortable = true)]
     public DateTimeOffset Timestamp { get; set; }
     [Indexed]
-    public bool? IsActive { get; set; }
+    public bool IsActive { get; set; }
 
     [Indexed]
     public string Description { get; set; }

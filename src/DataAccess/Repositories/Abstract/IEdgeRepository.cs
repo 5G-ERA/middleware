@@ -9,7 +9,7 @@ namespace Middleware.DataAccess.Repositories.Abstract
         Task<List<EdgeModel>> GetFreeEdgesIdsAsync(List<EdgeModel> listofEdgesConnectedtoRobot);
         Task<List<EdgeModel>> GetLessBusyEdgesAsync(List<EdgeModel> busyEdgesTocheck);
 
-        Task<EdgeModel> GetEdgeResourceDetailsByNameAsync(string name);
+        Task<EdgeModel?> GetEdgeResourceDetailsByNameAsync(string name);
 
         Task<bool> IsBusyEdgeByIdAsync(Guid edgeId);
 

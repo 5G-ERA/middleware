@@ -5,8 +5,7 @@ using Middleware.DataAccess.Repositories.Abstract;
 using Middleware.Models.Domain;
 using OneOf;
 using OneOf.Types;
-using Middleware.CentralApi.Mappings;
-using Middleware.Common.Enums;
+using Middleware.Models.Enums;
 
 namespace Middleware.CentralApi.Services;
 
@@ -25,25 +24,25 @@ public class LocationService : ILocationService
     public async Task<OneOf<Location, ValidationException, NotFound>> RegisterLocation(Location location)
     {
         // when location not found in db
-        (bool queryResultCloud, CloudModel? cloud) = await _cloudRepository.CheckIfNameExists(location.Name);
-        (bool queryResultEdge, EdgeModel? edge) = await _edgeRepository.CheckIfNameExists(location.Name);
+        var (queryResultCloud, cloud) = await _cloudRepository.CheckIfNameExists(location.Name);
+        var (queryResultEdge, edge) = await _edgeRepository.CheckIfNameExists(location.Name);
 
         if ((queryResultEdge == false || edge is null) && (queryResultCloud == false || cloud is null))
         {
-            return new NotFound();    
+            return await RegisterNewLocation(location);
         }
 
         // make it online & return info about location based on matched edge
         if (cloud is null)
         {
-            edge.IsOnline = true;
+            edge!.IsOnline = true;
             var result = new Location()
             {
                 Id = edge.Id,
                 Name = edge.Name,
                 Organization = edge.Organization,
                 Address = edge.EdgeIp,
-                Type = Enum.Parse<LocationType>(edge.Type)
+                Type = edge.Type
             };
             await _edgeRepository.AddAsync(edge);
             return result;
@@ -57,12 +56,48 @@ public class LocationService : ILocationService
                 Name = cloud.Name,
                 Organization = cloud.Organization,
                 Address = cloud.CloudIp,
-                Type = Enum.Parse<LocationType>(cloud.Type)
+                Type = cloud.Type
             };
             await _cloudRepository.AddAsync(cloud);
             return result;
         }
 
+    }
+
+    private async Task<Location> RegisterNewLocation(Location location)
+    {
+        var id = Guid.NewGuid();
+        if (location.Type == LocationType.Cloud)
+        {
+            var cloud = new CloudModel()
+            {
+                Id = id,
+                Name = location.Name,
+                Organization = location.Organization,
+                LastUpdatedTime = DateTimeOffset.Now.Date
+            };
+            await _cloudRepository.AddAsync(cloud);
+        }
+        else if (location.Type == LocationType.Edge)
+        {
+            var cloud = new EdgeModel()
+            {
+                Id = id,
+                Name = location.Name,
+                Organization = location.Organization,
+                LastUpdatedTime = DateTimeOffset.Now.Date
+            };
+            await _edgeRepository.AddAsync(cloud);
+        }
+
+        var newLoc = new Location()
+        {
+            Id = id,
+            Name = location.Name,
+            Organization = location.Organization,
+            Type = location.Type
+        };
+        return newLoc;
     }
 
     public async Task<OneOf<ImmutableList<Location>, NotFound>> GetAvailableLocations(string organization)
@@ -76,7 +111,7 @@ public class LocationService : ILocationService
         var locationsEdges = edges.Select(x => new Location()
         {
             Id = x.Id,
-            Type = Enum.Parse<LocationType>(x.Type),
+            Type = LocationType.Edge,
             Name = x.Name,
             Address = x.EdgeIp,
             Organization = x.Organization
@@ -88,7 +123,7 @@ public class LocationService : ILocationService
         var locationsClouds = clouds.Select(x => new Location()
         {
             Id = x.Id,
-            Type = Enum.Parse<LocationType>(x.Type),
+            Type = LocationType.Cloud,
             Name = x.Name,
             Address = x.CloudIp,
             Organization = x.Organization

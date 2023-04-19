@@ -7,7 +7,7 @@ namespace Middleware.Models.Domain;
 public class ActionModel : BaseModel
 {
     [JsonPropertyName("Id")]
-    public override Guid Id { get; set; }
+    public override Guid Id { get; set; } = Guid.NewGuid();
 
     [JsonPropertyName("Name")]
     public override string Name { get; set; }
@@ -36,10 +36,10 @@ public class ActionModel : BaseModel
     public List<InstanceModel>? Services { get; set; }
 
     [JsonPropertyName("MinimumRam")]
-    public int MinimumRam { get; set; }
+    public long? MinimumRam { get; set; }
 
     [JsonPropertyName("MinimumNumCores")]
-    public int MinimumNumCores { get; set; }
+    public int? MinimumNumCores { get; set; }
     
     public override Dto.Dto ToDto()
     {

@@ -2,18 +2,40 @@ name: CentralAPI docker build
 
 on:
   workflow_dispatch:
-    inputs:
-      -dummy:
   schedule:
     - cron: 0 3 * * 1-5
-
+   
 jobs:
   build_and_deploy:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
 
+      - name: Build image
+        env:
+          ECR_REPOSITORY: ${{ secrets.CENTRAL_API_REPO_NAME }}
+        run: docker build -f ./src/CentralApi/Dockerfile ./src --tag $ECR_REPOSITORY --label "runnumber=${GITHUB_RUN_ID}"
+      
+      - name: Log in to registry
+        # This is where you will update the personal access token to GITHUB_TOKEN
+        run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u $ --password-stdin
+
+      - name: Push image
+        env:
+          ECR_REPOSITORY: ${{ secrets.CENTRAL_API_REPO_NAME }}
+        run: |
+          IMAGE_ID=ghcr.io/${{ github.repository_owner }}/$ECR_REPOSITORY
+
+          # Change all uppercase to lowercase
+          IMAGE_ID=$(echo $IMAGE_ID | tr '[A-Z]' '[a-z]')          
+          # Use Docker `edge` tag convention
+          VERSION=edge
+          echo IMAGE_ID=$IMAGE_ID
+          echo VERSION=$VERSION
+          docker tag $ECR_REPOSITORY $IMAGE_ID:edge
+          docker push $IMAGE_ID:edge
+      
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v1
         with:

@@ -1,6 +1,7 @@
 ﻿using System.Text.Json.Serialization;
 using Middleware.Models.Dto;
 using Middleware.Models.Dto.Hardware;
+using Middleware.Models.Enums;
 
 
 namespace Middleware.Models.Domain;
@@ -8,13 +9,13 @@ namespace Middleware.Models.Domain;
 public class EdgeModel : BaseModel
 {
     [JsonPropertyName("Id")]
-    public override Guid Id { get; set; }
+    public override Guid Id { get; set; } = Guid.NewGuid();
 
     [JsonPropertyName("Name")]
     public override string Name { get; set; }
-    
+    [Obsolete]
     [JsonPropertyName("Type")]
-    public string Type { get; set; }
+    public LocationType Type { get; set; } = LocationType.Edge;
 
     [JsonPropertyName("Organization")]
     public string Organization { get; set; }
@@ -27,22 +28,22 @@ public class EdgeModel : BaseModel
     public Uri EdgeIp { get; set; }
 
     [JsonPropertyName("MacAddress")]
-    public string MacAddress { get; set; }
+    public string? MacAddress { get; set; }
 
     [JsonPropertyName("CPU")]
-    public int Cpu { get; set; }
+    public int? Cpu { get; set; }
 
     [JsonPropertyName("RAM")]
-    public long Ram { get; set; }
+    public long? Ram { get; set; }
 
     [JsonPropertyName("VirtualRam")]
     public long? VirtualRam { get; set; }
 
     [JsonPropertyName("DiskStorage")]
-    public long DiskStorage { get; set; }
+    public long? DiskStorage { get; set; }
 
     [JsonPropertyName("NumberOfCores")]
-    public int NumberOfCores { get; set; }
+    public int? NumberOfCores { get; set; }
 
     [JsonPropertyName("LastUpdatedTime")]
     public DateTime LastUpdatedTime { get; set; }
@@ -73,7 +74,7 @@ public class EdgeModel : BaseModel
         {
             Id = domain.Id.ToString(),
             Name = domain.Name,
-            Type = domain.Type,
+            Type = LocationType.Edge.ToString(),
             Organization = domain.Organization,
             EdgeStatus = domain.EdgeStatus,
             EdgeIp = domain.EdgeIp,

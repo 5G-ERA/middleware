@@ -1,7 +1,6 @@
 using Middleware.DataAccess.Repositories.Abstract;
 using Middleware.Models.Domain;
 using Middleware.Models.Dto;
-using Redis.OM;
 using Redis.OM.Contracts;
 using RedisGraphDotNet.Client;
 using Serilog;

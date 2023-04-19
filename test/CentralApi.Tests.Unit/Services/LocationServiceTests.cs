@@ -2,9 +2,9 @@
 using FluentAssertions;
 using Middleware.CentralApi.Domain;
 using Middleware.CentralApi.Services;
-using Middleware.Common.Enums;
 using Middleware.DataAccess.Repositories.Abstract;
 using Middleware.Models.Domain;
+using Middleware.Models.Enums;
 using NSubstitute;
 using OneOf.Types;
 
@@ -38,8 +38,7 @@ public class LocationServiceTests
             Id = id,
             Name = "TestEdge",
             Organization = "MiddlewareTesting",
-            EdgeIp = new Uri("https://xkcd.com/927/"),
-            Type = LocationType.Edge.ToString()
+            EdgeIp = new Uri("https://xkcd.com/927/")
         };
         var expectedLocation = new Location()
         {
@@ -83,8 +82,7 @@ public class LocationServiceTests
             Id = id,
             Name = "TestCloud",
             Organization = "MiddlewareTesting",
-            CloudIp = new Uri("https://xkcd.com/927/"),
-            Type = LocationType.Cloud.ToString()
+            CloudIp = new Uri("https://xkcd.com/927/")
         };
         var expectedLocation = new Location()
         {
@@ -113,7 +111,7 @@ public class LocationServiceTests
     }
 
     [Fact]
-    public async Task RegisterLocation_ShouldReturnNotFound_WhenLocationDoesNotExist()
+    public async Task RegisterLocation_ShouldRegisterNewBareLocation_WhenLocationIsNotFound()
     {
         // arrange
         var paramLocation = new Location()
@@ -127,14 +125,14 @@ public class LocationServiceTests
         // act
         var result = await _sut.RegisterLocation(paramLocation);
         // assert
-        result.IsT0.Should().BeFalse();
+        result.IsT0.Should().BeTrue();
         result.IsT1.Should().BeFalse();
-        result.IsT2.Should().BeTrue();
+        result.IsT2.Should().BeFalse();
 
-        var resultType = result.AsT2;
-        resultType.Should().BeOfType<NotFound>();
+        var resultType = result.AsT0;
+        resultType.Should().BeOfType<Location>();
 
-        await _cloudRepository.Received(0).AddAsync(Arg.Any<CloudModel>());
+        await _cloudRepository.Received(1).AddAsync(Arg.Any<CloudModel>());
         await _edgeRepository.Received(0).AddAsync(Arg.Any<EdgeModel>());
     }
 
@@ -149,14 +147,12 @@ public class LocationServiceTests
             Id = Guid.NewGuid(),
             Name = "TestEdge",
             Organization = org,
-            Type = "Edge"
         };
         var cloud = new CloudModel()
         {
             Id = Guid.NewGuid(),
             Name = "TestCloud",
-            Organization = org,
-            Type = "Cloud"
+            Organization = org
         };
         var locations = new List<Location>()
         {

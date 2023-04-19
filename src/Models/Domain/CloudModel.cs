@@ -1,18 +1,20 @@
 ﻿using Middleware.Models.Dto;
 using System.Text.Json.Serialization;
+using Middleware.Models.Enums;
 
 namespace Middleware.Models.Domain;
 
 public class CloudModel : BaseModel
 {
     [JsonPropertyName("Id")]
-    public override Guid Id { get; set; }
+    public override Guid Id { get; set; } = Guid.NewGuid();
 
     [JsonPropertyName("Name")]
     public override string Name { get; set; }
 
+    [Obsolete]
     [JsonPropertyName("Type")]
-    public string Type { get; set; }
+    public LocationType Type { get; set; } = LocationType.Cloud;
 
     [JsonPropertyName("Organization")]
     public string Organization { get; set; }
@@ -24,19 +26,19 @@ public class CloudModel : BaseModel
     public Uri CloudIp { get; set; }
 
     [JsonPropertyName("NumberOfCores")]
-    public int NumberOfCores { get; set; }
+    public int? NumberOfCores { get; set; }
 
     [JsonPropertyName("DiskStorage")]
-    public long DiskStorage { get; set; }
+    public long? DiskStorage { get; set; }
 
     [JsonPropertyName("VirtualRam")]
     public long? VirtualRam { get; set; }
 
     [JsonPropertyName("CPU")]
-    public int Cpu { get; set; }
+    public int? Cpu { get; set; }
 
     [JsonPropertyName("RAM")]
-    public long Ram { get; set; }
+    public long? Ram { get; set; }
 
     [JsonPropertyName("MacAddress")]
     public string MacAddress { get; set; }
@@ -53,13 +55,13 @@ public class CloudModel : BaseModel
     /// <returns></returns>
     public bool IsValid()
     {
-        if (string.IsNullOrEmpty(Name.ToString())) return false;
+        if (string.IsNullOrEmpty(Name)) return false;
         if (string.IsNullOrEmpty(CloudIp.ToString())) return false;
         if (string.IsNullOrEmpty(NumberOfCores.ToString())) return false;
         if (string.IsNullOrEmpty(DiskStorage.ToString())) return false;
         //if (string.IsNullOrEmpty(MacAddress.ToString())) return false;
         if (string.IsNullOrEmpty(Ram.ToString())) return false;
-        if (string.IsNullOrEmpty(Organization.ToString())) return false;
+        if (string.IsNullOrEmpty(Organization)) return false;
         return true;
     }
     public override Dto.Dto ToDto()
@@ -69,7 +71,7 @@ public class CloudModel : BaseModel
         {
             Id = domain.Id.ToString(),
             Name = domain.Name,
-            Type = domain.Type,
+            Type = domain.Type.ToString(),
             Organization = domain.Organization,
             CloudStatus = domain.CloudStatus,
             CloudIp = domain.CloudIp,

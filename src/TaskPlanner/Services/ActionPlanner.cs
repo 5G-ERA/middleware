@@ -1,16 +1,16 @@
-using Middleware.Common.Helpers;
 using Middleware.Models.Domain;
 using Middleware.TaskPlanner.Exceptions;
 using KeyValuePair = Middleware.Models.Domain.KeyValuePair;
 using Middleware.Common.MessageContracts;
-using Middleware.Common.Services;
+using Middleware.RedisInterface.Contracts.Mappings;
+using Middleware.RedisInterface.Sdk;
 using Middleware.TaskPlanner.Publishers;
 
 namespace Middleware.TaskPlanner.Services;
 
 public class ActionPlanner : IActionPlanner
 {
-    private readonly IRedisInterfaceClientService _redisInterfaceClient;
+    private readonly IRedisInterfaceClient _redisInterfaceClient;
     private readonly IPublisher<DeployPlanMessage> _deployPlanPublisher;
 
     public List<ActionModel> ActionSequence { get; set; }
@@ -19,7 +19,7 @@ public class ActionPlanner : IActionPlanner
 
     public List<KeyValuePair> Answer { get; set; }
 
-    public ActionPlanner(IRedisInterfaceClientService redisInterfaceClient,
+    public ActionPlanner(IRedisInterfaceClient redisInterfaceClient,
         IPublisher<DeployPlanMessage> deployPlanPublisher)
     {
         _redisInterfaceClient = redisInterfaceClient;
@@ -51,10 +51,12 @@ public class ActionPlanner : IActionPlanner
             throw new ArgumentException(nameof(taskId));
         if (robotId == Guid.Empty)
             throw new ArgumentException(nameof(robotId));
-        var robot = await _redisInterfaceClient.RobotGetByIdAsync(robotId);
+        var robotResponse = await _redisInterfaceClient.RobotGetByIdAsync(robotId);
+        var robot = robotResponse.ToRobot();
         if (robot is null)
             throw new ArgumentException("The specified robot is not present in the Middleware database", nameof(robot));
-        var task = await _redisInterfaceClient.TaskGetByIdAsync(taskId);
+        var taskResponse = await _redisInterfaceClient.TaskGetByIdAsync(taskId);
+        var task = taskResponse.ToTask();
         if (task is null)
             throw new ArgumentException("The specified task is not present in the Middleware database", nameof(robot));
 
@@ -64,10 +66,10 @@ public class ActionPlanner : IActionPlanner
 
         List<Guid> actionGuids = relations.Select(r => r.PointsTo.Id).ToList();
 
-        foreach (Guid actionId in
-                 actionGuids) //Iterate over the pre-defined action sequence of the knowledge redis graph.
+        //Iterate over the pre-defined action sequence of the knowledge redis graph.
+        foreach (Guid actionId in actionGuids)
         {
-            ActionModel actionItem = await _redisInterfaceClient.ActionGetByIdAsync(actionId);
+            ActionModel actionItem = (await _redisInterfaceClient.ActionGetByIdAsync(actionId)).ToAction();
             if (actionItem is null)
                 continue;
 
@@ -86,16 +88,20 @@ public class ActionPlanner : IActionPlanner
     protected async Task<ActionModel> FindAlternativeAction(ActionModel action)
     {
         //A new action entity will be created with most of the attributes from the previous one but the services.
-        ActionModel newAction = new ActionModel();
-        newAction.Id = action.Id;
-        newAction.Name = action.Name;
-        newAction.Order = action.Order;
-        newAction.ActionPriority = action.ActionPriority;
-        newAction.Relations = action.Relations;
+        ActionModel newAction = new ActionModel()
+        {
+            Id = action.Id,
+            Name = action.Name,
+            Order = action.Order,
+            ActionPriority = action.ActionPriority,
+            Relations = action.Relations,
+            Services = new List<InstanceModel>()
+        };
 
         foreach (InstanceModel instance in action.Services)
         {
-            InstanceModel candidate = await _redisInterfaceClient.GetInstanceAlternativeAsync(instance.Id);
+            var candidateResponse = await _redisInterfaceClient.GetInstanceAlternativeAsync(instance.Id);
+            InstanceModel candidate = candidateResponse.ToInstance();
             newAction.Services.Add(candidate);
         }
 
@@ -134,7 +140,7 @@ public class ActionPlanner : IActionPlanner
     protected List<ActionModel> SortActionSequence(List<ActionModel> unsortedActionSequence)
     {
         List<ActionModel> SortedList = new List<ActionModel>();
-        Dictionary<ActionModel, int> myDict = new Dictionary<ActionModel, int>();
+        Dictionary<ActionModel, int?> myDict = new Dictionary<ActionModel, int?>();
 
         foreach (ActionModel action in unsortedActionSequence)
         {
@@ -144,7 +150,7 @@ public class ActionPlanner : IActionPlanner
         //sort diccionary by decending order of action attribute order.
         var sortedDict = from entry in myDict orderby entry.Value descending select entry;
 
-        foreach (KeyValuePair<ActionModel, int> entry in sortedDict)
+        foreach (KeyValuePair<ActionModel, int?> entry in sortedDict)
         {
             SortedList.Add(entry.Key);
         }
@@ -206,7 +212,12 @@ public class ActionPlanner : IActionPlanner
         List<RelationModel> relations = await _redisInterfaceClient.GetRelationAsync(actionItem, "NEEDS");
         foreach (RelationModel tempRelation in relations)
         {
-            var instanceTemp = await _redisInterfaceClient.InstanceGetByIdAsync(tempRelation.PointsTo.Id);
+            var instanceResponse = await _redisInterfaceClient.InstanceGetByIdAsync(tempRelation.PointsTo.Id);
+            if (instanceResponse is null)
+                continue;
+
+            var instanceTemp = instanceResponse.ToInstance();
+
             instances.Add(instanceTemp);
         }
 
@@ -300,11 +311,12 @@ public class ActionPlanner : IActionPlanner
             throw new ArgumentException($"{nameof(robotId)} cannot be empty", nameof(robotId));
 
         //Load the robot asking for a plan from redis to middleware for infering action sequence.
-        RobotModel robot = await _redisInterfaceClient.RobotGetByIdAsync(robotId);
+        var robotResponse = await _redisInterfaceClient.RobotGetByIdAsync(robotId);
+        RobotModel robot = robotResponse.ToRobot();
 
         // Backup list of replanedCompleteActionSeq for removing items when processed inside this function.
-        List<ActionModel> replanedCompleteActionSeqBK = new List<ActionModel>();
-        replanedCompleteActionSeqBK.AddRange(replanedCompleteActionSeq);
+        List<ActionModel> replanedCompleteActionSeqBk = new List<ActionModel>();
+        replanedCompleteActionSeqBk.AddRange(replanedCompleteActionSeq);
 
         robot.Questions.AddRange(dialogueTemp); //Append the questions-answers to the robot
 
@@ -313,7 +325,8 @@ public class ActionPlanner : IActionPlanner
             throw new NotImplementedException();
         }
 
-        TaskModel task = await _redisInterfaceClient.TaskGetByIdAsync(currentTaskId); //Get action plan from Redis
+        var taskResponse = await _redisInterfaceClient.TaskGetByIdAsync(currentTaskId);
+        TaskModel task = taskResponse.ToTask();
         bool alreadyExist = task != null; //Check if CurrentTask is inside Redis model
         task.ActionPlanId = Guid.NewGuid(); //Generate automatic new Guid for plan ID.
 
@@ -363,8 +376,9 @@ public class ActionPlanner : IActionPlanner
                 //     REPLAN ESTRATEGY B: change the failed actions to others and add the not failed actions.
                 //     REPLAN ESTRATEGY C: only add to action sequence new alternative actions and NOT succeded actions.
                 //
-                /////////////////////////////////////////////////////////////////////////////////////////////////////////////                    
-                ActionModel actionItem = await _redisInterfaceClient.ActionGetByIdAsync(actionId);
+                /////////////////////////////////////////////////////////////////////////////////////////////////////////////
+                var actionResp = await _redisInterfaceClient.ActionGetByIdAsync(actionId);
+                ActionModel actionItem = actionResp.ToAction();
 
                 await ValidateRobotVsNetApp(robot, actionItem);
 
@@ -417,9 +431,9 @@ public class ActionPlanner : IActionPlanner
                 // Partial replan running ONLY, the failed actions but with new candidate netApp.
                 if (AllActionToConsider == true)
                 {
-                    ActionModel tempActionPr = replanedCompleteActionSeqBK.FirstOrDefault();
+                    ActionModel tempActionPr = replanedCompleteActionSeqBk.FirstOrDefault();
                     ActionSequence.Add(tempActionPr);
-                    replanedCompleteActionSeqBK.RemoveAt(0); //Remove the item for next iteration of the action loop.
+                    replanedCompleteActionSeqBk.RemoveAt(0); //Remove the item for next iteration of the action loop.
                 }
             }
 
@@ -476,8 +490,8 @@ public class ActionPlanner : IActionPlanner
         task.FullReplan = true;
 
         // Load robot
-
-        RobotModel robot = await _redisInterfaceClient.RobotGetByIdAsync(RobotId);
+        var robotResp = await _redisInterfaceClient.RobotGetByIdAsync(RobotId);
+        RobotModel robot = robotResp.ToRobot();
         robot.Questions = DialogueTemp; //Add the questions-answers to the robot
 
         //Query Redis given old plan and obtain action seq.
@@ -586,22 +600,5 @@ public class ActionPlanner : IActionPlanner
             task.ActionSequence = actionPlan.ActionSequence;
             return new Tuple<TaskModel, TaskModel, RobotModel>(task, oldTask, robot);
         }
-    }
-
-    public async Task PublishPlanAsync(TaskModel task, RobotModel robot)
-    {
-        var action = task.ActionSequence!.FirstOrDefault();
-
-        if (action == null)
-            return;
-        
-        var location = QueueHelpers.ConstructRoutingKey(action.Placement, action.PlacementType);
-        var message = new DeployPlanMessage()
-        {
-            Task = task,
-            RobotId = robot.Id,
-            DeploymentLocation = location
-        };
-        await _deployPlanPublisher.PublishAsync(message);
     }
 }

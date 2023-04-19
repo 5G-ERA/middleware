@@ -41,7 +41,7 @@ namespace Middleware.DataAccess.Repositories
         /// </summary>
         /// <param name="model"></param>
         /// <returns></returns>
-        public async Task<TModel> AddAsync(TModel model)
+        public async Task<TModel?> AddAsync(TModel model)
         {
             TDto dto = ToTDto(model);
             
@@ -66,6 +66,12 @@ namespace Middleware.DataAccess.Repositories
             if (string.IsNullOrEmpty(id))
             {
                 return null!;
+            }
+
+            if (IsWritableToGraph)
+            {
+                var graphModel = new GraphEntityModel(model.Id, model.Name, _entityName);
+                await AddGraphAsync(graphModel);
             }
             return ToTModel(dto);
         }
@@ -243,7 +249,10 @@ namespace Middleware.DataAccess.Repositories
         public virtual async Task<bool> AddGraphAsync(GraphEntityModel model)
         {
             model.Type = _entityName;
-
+            if (await ObjectExistsOnGraph(model))
+            {
+                return true;
+            }
             string query = "CREATE (x: " + model.Type + " {ID: '" + model.Id + "', Type: '" + model.Type +
                            "', Name: '" + model.Name + "'})";
             ResultSet resultSet = await RedisGraph.Query(GraphName, query);
@@ -263,7 +272,7 @@ namespace Middleware.DataAccess.Repositories
                            "'}) CREATE (x)-[:" + relation.RelationName + "]->(c) ";
             ResultSet resultSet = await RedisGraph.Query(GraphName, query);
 
-            return (resultSet != null) && (resultSet.Metrics.RelationshipsCreated == 1);
+            return (resultSet != null) && (resultSet.Metrics.RelationshipsCreated >= 1);
         }
 
         /// <summary>
@@ -327,6 +336,13 @@ namespace Middleware.DataAccess.Repositories
         protected TModel ToTModel(TDto dto)
         {
             return dto.ToModel() as TModel ?? throw new MappingException(typeof(TDto), typeof(TModel));
+        }
+
+        private async Task<bool> ObjectExistsOnGraph(GraphEntityModel graphModel)
+        {
+            var query = "match (x:" + _entityName + " {ID: '" + graphModel.Id + "'}) return x";
+            ResultSet resultSet = await RedisGraph.Query(GraphName, query);
+            return resultSet != null && resultSet.Results.Count > 0;
         }
     }
 }

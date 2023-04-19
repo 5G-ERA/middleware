@@ -8,7 +8,7 @@ WORKDIR /src
 COPY ["CentralApi/CentralApi.csproj", "CentralApi/"]
 RUN dotnet restore "CentralApi/CentralApi.csproj"
 COPY . .
-WORKDIR "/src/src/CentralApi"
+WORKDIR "/src/CentralApi"
 RUN dotnet build "CentralApi.csproj" -c Release -o /app/build
 
 FROM build AS publish

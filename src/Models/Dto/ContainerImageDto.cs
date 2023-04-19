@@ -1,7 +1,5 @@
 ﻿using Middleware.Models.Domain;
 using Redis.OM.Modeling;
-using System;
-using System.Linq;
 
 namespace Middleware.Models.Dto;
 [Document(IndexName = "containerImage-idx", StorageType = StorageType.Json, Prefixes = new[] { ContainerImageDto.Prefix })]
@@ -16,11 +14,11 @@ public class ContainerImageDto : Dto
     [Indexed(Sortable = true)]
     public DateTimeOffset Timestamp { get; set; } = DateTimeOffset.Now;
     [Indexed]
-    public string Description { get; set; } = default!;
+    public string? Description { get; set; } = default!;
     [Indexed]
     public string K8SDeployment { get; set; } = default!;
     [Indexed]
-    public string K8SService { get; set; } = default!;
+    public string? K8SService { get; set; } = default!;
 
     public override ContainerImageModel ToModel()
     {

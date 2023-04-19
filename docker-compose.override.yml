@@ -53,10 +53,11 @@ services:
       - ASPNETCORE_ENVIRONMENT=Development
       - ASPNETCORE_URLS=https://+:443;http://+:80
       - REDIS_INTERFACE_API_SERVICE_HOST=redisinterface.api
-      - RESOURCE_PLANNER_ADDRESS=resourceplanner.api
+      - RESOURCE_PLANNER_API_SERVICE_HOST=resourceplanner.api
       - ORCHESTRATOR_API_SERVICE_HOST=orchestrator.api
       - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
       - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
+      - CENTRAL_API_HOSTNAME=central.api
       - Middleware__Organization=5G-ERA-DEV
       - Middleware__InstanceName=MiddlewareBED
       - Middleware__InstanceType=Edge
@@ -90,6 +91,7 @@ services:
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
       - ASPNETCORE_URLS=https://+:443;http://+:80
+      - REDIS_INTERFACE_API_SERVICE_HOST=redisinterface.api
       - REDIS_HOSTNAME=${REDIS_HOSTNAME}
       - REDIS_PORT=${REDIS_PORT}
       - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}

@@ -110,7 +110,7 @@ namespace Middleware.DataAccess.Repositories
         /// </summary>
         /// <param name="instance"></param>
         /// <returns>InstanceModel</returns>
-        public async Task<InstanceModel> FindAlternativeInstance(Guid instanceId)
+        public async Task<InstanceModel?> FindAlternativeInstance(Guid instanceId)
         {
             InstanceModel? instance = await GetByIdAsync(instanceId);
 

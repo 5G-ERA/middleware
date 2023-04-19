@@ -8,7 +8,7 @@ namespace Middleware.Models.Domain;
 public class InstanceModel : BaseModel
 {
     [JsonPropertyName("Id")]
-    public override Guid Id { get; set; }
+    public override Guid Id { get; set; } = Guid.NewGuid();
 
     [JsonPropertyName("Name")]
     public override string Name { get; set; } // compulsory field
@@ -57,10 +57,10 @@ public class InstanceModel : BaseModel
     public ContainerImageModel? ContainerImage { get; set; }
 
     [JsonPropertyName("MinimumRam")]
-    public int MinimumRam { get; set; } // Compulsory field
+    public long? MinimumRam { get; set; } // Compulsory field
 
     [JsonPropertyName("MinimumNumCores")]
-    public int MinimumNumCores { get; set; } // Compulsory field
+    public int? MinimumNumCores { get; set; } // Compulsory field
 
     [JsonPropertyName("OnboardedTime")]
     public DateTime OnboardedTime { get; set; } // Compulsory field
@@ -71,7 +71,7 @@ public class InstanceModel : BaseModel
     /// <returns>bool</returns>
     public bool IsValid()
     {
-        var rosDistrosEnum = Enum.GetNames(typeof(ROSDistroEnum)).ToList();
+        var rosDistrosEnum = Enum.GetNames(typeof(RosDistro)).ToList();
 
         //if (string.IsNullOrWhiteSpace(Name)) return false;
         if (RosVersion > 2) return false;
@@ -109,7 +109,7 @@ public class InstanceModel : BaseModel
             HardwareRequirements = new HardwareRequirements()
             {
                 MinimumRam = domain.MinimumRam,
-                MinimumNumCores = domain.MinimumRam
+                MinimumNumCores = domain.MinimumNumCores
             },
             OnboardedTime = domain.OnboardedTime == default ? DateTimeOffset.Now : domain.OnboardedTime
         };

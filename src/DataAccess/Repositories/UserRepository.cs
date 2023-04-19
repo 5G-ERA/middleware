@@ -1,4 +1,4 @@
-﻿using System.Linq.Expressions;
+using System.Linq.Expressions;
 using Microsoft.Extensions.Logging;
 using Middleware.Common.Enums;
 using Middleware.DataAccess.Repositories.Abstract;

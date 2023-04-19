@@ -3,7 +3,6 @@ using Middleware.Common.Config;
 using Middleware.Common.MessageContracts;
 using Middleware.Orchestrator.Deployment;
 
-
 namespace Middleware.Orchestrator.Handlers;
 
 public class DeployPlanConsumer : IConsumer<DeployPlanMessage>

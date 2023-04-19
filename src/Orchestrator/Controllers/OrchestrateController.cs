@@ -1,9 +1,10 @@
 ﻿using System.Net;
 using Microsoft.AspNetCore.Mvc;
 using Middleware.Common.Responses;
-using Middleware.Common.Services;
 using Middleware.Models.Domain;
 using Middleware.Orchestrator.Deployment;
+using Middleware.RedisInterface.Sdk;
+using Middleware.RedisInterface.Contracts.Mappings;
 
 namespace Middleware.Orchestrator.Controllers;
 
@@ -13,11 +14,11 @@ public class OrchestrateController : Controller
 {
     private readonly IDeploymentService _deploymentService;
     private readonly ILogger _logger;
-    private readonly IRedisInterfaceClientService _redisInterfaceClient;
+    private readonly IRedisInterfaceClient _redisInterfaceClient;
 
     public OrchestrateController(IDeploymentService deploymentService,
         ILogger<OrchestrateController> logger,
-        IRedisInterfaceClientService redisInterfaceClient)
+        IRedisInterfaceClient redisInterfaceClient)
     {
         _deploymentService = deploymentService;
         _logger = logger;
@@ -169,12 +170,14 @@ public class OrchestrateController : Controller
 
                 if (action.Placement!.ToUpper().Contains("CLOUD"))
                 {
-                    placement =
-                        await _redisInterfaceClient.GetCloudByNameAsync(action.Placement);
+                    var cloud = (await _redisInterfaceClient.GetCloudByNameAsync(action.Placement))?.ToCloud();
+                    placement = cloud;
+
                 }
                 else
                 {
-                    placement = await _redisInterfaceClient.GetEdgeByNameAsync(action.Placement);
+                    var edge = (await _redisInterfaceClient.GetEdgeByNameAsync(action.Placement)).ToEdge(); 
+                    placement = edge;
                 }
 
                 foreach (InstanceModel instance in action.Services)
@@ -193,13 +196,13 @@ public class OrchestrateController : Controller
             // RelationModel deleteRelationRobotOwnsTask = new RelationModel();
             // deleteRelationRobotOwnsTask.RelationName = "OWNS";
 
-            RobotModel tempRobotObject = await _redisInterfaceClient.RobotGetByIdAsync(actionPlan.RobotId);
+            RobotModel tempRobotObject = (await _redisInterfaceClient.RobotGetByIdAsync(actionPlan.RobotId))?.ToRobot();
             //
             // GraphEntityModel tempRobotGraph = new GraphEntityModel();
             // tempRobotGraph.Id = tempRobotObject.Id;
             // tempRobotGraph.Name = tempRobotObject.Name;
 
-            TaskModel tempTaskObject = await _redisInterfaceClient.TaskGetByIdAsync(actionPlan.TaskId);
+            TaskModel tempTaskObject = (await _redisInterfaceClient.TaskGetByIdAsync(actionPlan.TaskId))?.ToTask();
             //
             // GraphEntityModel tempTaskGraph = new GraphEntityModel();
             // tempTaskGraph.Id = id;

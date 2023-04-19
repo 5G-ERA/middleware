@@ -1,339 +1,228 @@
 # Middleware installation guide:
 
-Last time revised: 09/03/2023
+Last time revised: 18/04/2023
 
-## 1) Docker Engine installation: 
-The first step is to install Docker Engine. Docker engine is used for the verification of the credentials
-and pulling the containers from the private AWS registry that Middleware uses.
-To install the Docker Engine, refer to [Docker's official website](https://docs.docker.com/engine/install/ubuntu/) on how to install it on the Ubuntu distro.
-For easier access to the Docker CLI execute the [post-installation steps](https://docs.docker.com/engine/install/linux-postinstall/).
+---
 
-## 2) AWS CLI installation
+## Prerequisites
 
-After the installation of the Docker, the AWS CLI must be installed. It is used to authenticate the computer and the Docker client for access to the private container registries.
+This Middleware installation tutorial assumes the Middleware is installed in the `Ubuntu` system with version `20.04` or newer.
 
-To install the AWS CLI, follow the [official guide](https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html) on the installation process.
-After finishing, the installation process of AWS CLI it is time to configure the AWS CLI with the IAM
-account that has access to the services needed to run the Middleware.
+The recommended hardware specifications for running the Middleware locally for testing purposes are:
 
-Use the following command to configure the AWS CLI:
+* CPU - 4 cores
+* RAM - 16 GB or above
+* Memory - 100 GB or more
 
-```console
-aws configure
-```
+For the production environment, the hardware specifications will differ as the minimum requirements will be based on the number of Network Applications the Middleware will be running. The more Network Applications the more hardware resources will be needed.
 
-During the execution of the command supply the AWS Access Key ID and AWS Secret Access Key and
-the default region to be used. The required container registry is in the eu-west-1 region. You can also
-specify the default output format for the CLI. The example is shown in the Figure below.
+## Troubleshooting
 
-<p align="left">
-    <img src="imgs/aws_secrets.png" alt="- aws configure command example">
-</p>
+In case of problems with the installation or deployment please see the [Possible Errors](#possible-errors) section at the bottom of the document. 
 
-## 3) Authenticate docker with AWS credentials
+If you will find any problems during the **deployment** of the Middleware, feel free to open a new [issue](https://github.com/5G-ERA/middleware/issues/new/choose).
 
-After the Docker and the AWS CLI are installed, use the following command to authenticate your device against the AWS cloud
+---
 
-```console
-docker login -u AWS -p $(aws ecr get-login-password --region eu-west-1) 394603622351.dkr.ecr.eu-west-1.amazonaws.com
-```
+## Machine configuration
 
-After executing this command, you should be able to pull the images from the private AWS registry. It
-can be verified using the following command:
+### 1) Install Kubectl
 
-```console
-sudo docker pull 394603622351.dkr.ecr.eu-west-1.amazonaws.com/5g-era-redis
-```
+The Kubectl is the command-line tool that allows communication and management of the Kubernetes cluster. To install it use the preferred way on the [official guide](https://kubernetes.io/docs/tasks/tools/install-kubectl-linux/).
 
-This will download the 5g-era-redis image that hosts the Redis cache.
+Afterward, if the `~/.kube` folder was not created:
 
-**Note!**
-The token obtained using the aws ecr get-login-password will expire after a few hours and re-running
-the command will be necessary, as Microk8s does not provide support for the credential-helpers. In
-case when errors occur during the logging into the ecr, the deletion of the .docker/config.json file
-usually helps.
-
-
-## 4) Install kubectl
-The kubectl is the command-line tool that allows communication and management of the Kubernetes
-cluster. To install it use the preferred way on the [official guide](https://kubernetes.io/docs/tasks/tools/install-kubectl-linux/). 
-
-Afterwards, if .kube file was not created:
-
-```console
+```shell
 mkdir -p ~/.kube
 ```
 
-## 5) Install Microk8s
+### 2) Install Microk8s
 
-Microk8s is the minimal Kubernetes installation that can be used on the local computer. It will be used
-to run the Middleware. Install it with the command:
+Microk8s is the minimal Kubernetes installation that can be used on the local computer. It will be used to run the Middleware. 
 
-```console
+Although this guide provides installation instructions for the `microk8s`, any Kubernetes distribution like `minikube` or `kind` can be used. The installation instructions will differ and some configuration parts may differ in case of the deployment in a public cloud environment like AWS EKS or Azure AKS.
+
+
+`microk8s` can be installed with the following command:
+
+```shell
 sudo snap install microk8s --classic
 ```
 
-```console
-sudo usermod -a -G microk8s $USER
-```
+After the installation is complete `microk8s` needs access to the `~/.kube` folder so we give it the permissions and we add the current user to the `microk8s` group, so we can use the commands without `sudo`.
 
-```console
+```shell
+sudo usermod -a -G microk8s $USER
 sudo chown -f -R $USER ~/.kube
 ```
 
-After the installation is finished copy the configuration file of the Microk8s to the .kube/config file so
-the kubectl command can communicate with the newly installed cluster.
+After the installation is finished copy the configuration file of the `microk8s` to the `.kube/config` file for the `kubectl` command to be able to access the microk8s cluster. 
 
-```console
+```shell
 sudo microk8s config > ~/.kube/config
 ```
 
-Afterwards, validate the connection to the cluster with the command
+Afterward, validate the connection to the cluster with the command
 
-```console
+```shell
 kubectl get all -n kube-system
 ```
 
-Afterwards, the additional modules for the microk8s must be installed:
+With the `kubectl` access to the cluster, the additional modules have to be installed to ensure the correct work of the Middleware.
 
-```console
+We enable `metallb` addon to enable communication with the services inside the cluster with the dedicated IP address. During the execution of this command, **you will be asked to provide the ranges of the IP addresses you wish to use** for exposing services behind a Load Balancer.
+```shell
  sudo microk8s enable metallb
 ```
 
+The DNS module is responsible for routing the DNS-based requests to be routed to the correct pods and services
 
-```console
+```shell
  sudo microk8s enable dns
 ```
 
-```console
+In the end, we enable ingress as a backup for exposing the services from the cluster. 
+
+```shell
  sudo microk8s enable ingress
 ```
 
-```console
- sudo microk8s enable community
-```
+With all the necessary programs and addons installed, we can proceed to configure the cluster itself.
 
-```console
- sudo microk8s enable multus
-```
+---
 
-It enables the DNS on the cluster as well as the Load Balancer and Multus network card. During the
-installation, the program will ask for the range of the IP addresses for the Load Balancer. Provide
-desired range, it can be a default one.
+## Cluster configuration
 
-## 6) Configure Microk8s access to Docker credentials
+After the `microk8s` is installed and the `kubectl` command has access to the cluster, it is time to configure the cluster so the middleware can be deployed and function correctly inside of it.
 
-After the successful installation of the Microk8s, it must be configured for access to the private AWS
-Registry. For this, the Microk8s must be stopped. 
+The files required for the execution of the cluster configuration are provided [here](../../k8s/cluster-config).
 
-```console
-microk8s stop
-```
 
-In the next step create the link to the Docker credentials for the Microk8s:
+**Note: To execute the provided commands, make sure you are in the same directory as the downloaded files.**
 
-```console
-sudo ln -s ~/.docker/config.json \
- /var/snap/microk8s/common/var/lib/kubelet/
-```
+For organization and segregation purposes Middleware works in a separate Kubernetes namespace. We create a new *namespace* with the following command: 
 
-Next, start the Microk8s
-
-```console
-microk8s start
-```
-
-Afterwards, Microk8s is operational and can clone the images from the private repositories.
-
-## 7) Microk8s cluster configuration
-
-After the Microk8s is installed and the kubectl command has access to the cluster, it is time to
-configure the cluster so the middleware can be deployed and function correctly inside of it.
-
-For this purpose, the Service Account with the correct permissions is needed. The Service Account will
-give the necessary permissions for the Middleware access to the Kubernetes API and to manage the
-resources as a part of its functionality.
-
-### 7.1) Middleware namespace
-
-As the whole middleware operates in the middleware k8s namespace, it is required to create it before
-the launch of the service. To do so, use the command:
-
-**Note: Make sure you are in the same directory as the downloaded files.**
-
-```console
+```shell
 kubectl create namespace middleware
 ```
 
-The files required for the execution of the cluster configuration are provided [here](https://github.com/5G-ERA/middleware/tree/main/k8s/cluster-config): 
+For this purpose, the Service Account with the correct permissions is needed. The Service Account will give the necessary permissions to the Middleware for accessing the Kubernetes API and managing the
+resources as a part of its functionality.
 
-```console
+
+To do so, use the command:
+```shell
 kubectl apply -f orchestrator_service_account.yaml 
 ```
 
-The next step is to create the Cluster Role, which specifies the permissions needed for the proper
-functioning of the Middleware. Cluster Role specifies the permissions to get, watch, list create and
-delete resources in the Middleware namespace. It affects the pods, services, deployments,
-namespaces, and replica sets in the cluster. To apply for the Cluster Role, use the following command:
+The next step is to create the Role, which specifies the permissions needed for the proper functioning of the Middleware. The `role` specifies the permissions to get, watch, list create and delete resources in the Middleware namespace. It affects the pods, services, deployments, namespaces, and replica sets in the cluster. To create the `Role`, use the following command:
 
-```console
+```shell
 kubectl apply -f orchestrator_role.yaml 
 ```
 
 The last step to configuring the Kubernetes cluster is to bind the Cluster Role to the Service Account.
-For this the Cluster Role Binding is necessary. To create it, use the following command:
 
-```console
+For this `Role Binding` is necessary. To create it, use the following command:
+
+```shell
 kubectl apply -f orchestrator_role_binding.yaml
 ```
 
-## 8) Middleware Deployment Instruction
+---
 
-The last step is to prepare the deployment script for the middleware. It can be found [here](https://github.com/5G-ERA/middleware/blob/main/k8s/orchestrator/orchestrator.yaml) and needs to be downloaded. In the
-orchestrator_deployment.yaml file there are environment variables that must be set for the correct
-work of the Orchestrator. The needed variables are:
+## Middleware deployment
 
-1. AWS_IMAGE_REGISTRY – contains the address of the registry in which the Middleware
-images are stored
-2. REDIS_INTERFACE_API_SERVICE_HOST – hostname of the REDIS server that has the Middleware data
-3. REDIS_INTERFACE_API_SERVICE_PORT – port on which REDIS operates
-4. Middleware__Organization – the organization to which this middleware belongs.
-5. Middleware__InstanceName – a **unique** name of the middleware.
+### Deployment
+
+The last step is to prepare the deployment script for the middleware. It can be found [here](../../k8s/orchestrator/orchestrator.yaml). In the `orchestrator.yaml` file there are environment variables that must be set to ensure the correct work of the Orchestrator. The needed variables are:
+
+1. IMAGE_REGISTRY – contains the address of the registry in which the Middleware images are stored. By default this value is `ghcr.io/5g-era`
+4. Middleware__Organization – the organization to which this middleware belongs. The organization is an artificial group of Middlewares that can cooperate.
+5. Middleware__InstanceName – a **unique** name of the Middleware.
 6. Middleware__InstanceType – Either Edge/Cloud
+7. CENTRAL_API_HOSTNAME - Address of the CentralAPI that is responsible for authenticating the Middleware instances during the startup. For more information refer to the [CentralAPI documentation](CentralApi)
+8. AWS_ACCESS_KEY_ID - Aws access key ID used to access the services in AWS like Secret Manager
+9. AWS_SECRET_ACCESS_KEY - Aws secret used to authenticate the access key.
 
+The most up-to-date Middleware version is `0.3.0`.
 
-The current running version is: 0.2.3 in the image of container.
+After all the values are set, the Middleware can be deployed. Start with the deployment of the Orchestrator:
 
-After all the values are set, the Middleware can be deployed. Start with the deployment of the
-whole Orchestrator:
-
-```console
+```shell
 kubectl apply –f orchestrator.yaml –n middleware
 ```
 
-The containers will be downloaded, and the Orchestrator will deploy the rest of the Middleware
-deployments and services required to function correctly. 
+Alternatively, you can use utility scripts located at [k8s/orchestrator](../../k8s/orchestrator/):
 
-## 9) Verification of Middleware Deployment
+```shell
+./deploy.sh
+```
+
+The containers will be downloaded, and the Orchestrator will deploy the rest of the Middleware deployments and services required. 
+
+### Deployment Verification
 
 To check and monitor the status of the deployment of the Middleware services use the following
 command:
 
-```console
+```shell
 watch -c kubectl get all -n middleware
 ```
 
 It will monitor the status of all the services deployed in the middleware namespace.
 
-The following
-objects should be deployed:
+The following objects should be deployed:
 
 1. Orchestrator
-2. Redis interface
-3. Gateway
-4. Task planner
-5. Resource planner
+2. Gateway
+3. Redis interface
+4. Resource planner
+5. Task planner
 
-Each of these services is represented by the pod, service, deployment and replica set in the Kubernetes
-environment. With the deployment of the Orchestrator, the other services are deployed
-automatically. The process of their deployment may take a while depending on the internet
-connection that machine has. If only the Orchestrator is visible with the status of the pod as Container
-Creating, it needs additional time to download the application. After the deployment of the
-Orchestrator, soon the other components should begin their deployment. The result should look like
-the image below - Deployed middleware.
+Each of these services is represented by the pod, service, deployment and replica set in the Kubernetes environment. With the deployment of the Orchestrator, the other services are deployed automatically. The process of their deployment may take a while depending on the internet connection that the machine has. 
+
+If only the Orchestrator is visible with the status of the pod as Container Creating, it needs additional time to download the application. After the deployment of the Orchestrator, soon the other components should begin their deployment. The result should look like the image below.
 
 <p align="left">
     <img src="imgs/deployed_middleware.png" alt="- Deployed middleware.">
 </p>
 
-If there are errors during the deployment of the orchestrator, then check if you correctly configured
-access to the AWS registry.
-In case there are any errors during the deployment of the Gateway and Redis interface, check if the
-firewall does not block access to the Redis server.
-After the deployment is complete the gateway should be accessible through the IP address specified
-in the EXTERNAL-PI column. In case the IP address is not working use the following command to
-redirect the traffic from the specified port on the localhost to the gateway:
+If there are errors during the deployment of the orchestrator, then check if you correctly configured access to the AWS registry and access keys.
 
-```console
+In case there are any errors during the deployment of the Gateway and Redis interface, check if the firewall does not block access to the Redis server.
+
+After the deployment is complete the gateway should be accessible through the IP address specified in the EXTERNAL-PI column. In case the IP address is not working use the following command to redirect the traffic from the specified port on the localhost to the gateway:
+
+```shell
 kubectl port-forward -n middleware service/gateway 5000:80
 ```
 
-This command will port forward the traffic from port 5000 to port 80 in the service. The middleware
-will be now accessible under the following address:
+This command will port forward the traffic from port 5000 to port 80 in the service. The middleware will be now accessible under the following address:
 
-```console
+```
 http://localhost:5000/
 ```
+---
 
-## 10) Common errors:
+## Possible errors:
 
-### 10.1) If after running the middleware for a couple of hours you find this error, it is because the keys need to be refresed.
+### 1) Error installing microk8s: 
 
-<p align="left">
-    <img src="imgs/keys.png" alt="- aws configure command example">
-</p>
+In this case, there are problems with installing the `microk8s` like in the image below during the exexution of the command
 
-Go to the following [directory](https://github.com/5G-ERA/middleware/blob/main/k8s/orchestrator) and launch these scripts in order:
-
-```console
-./delete_all.sh 
+```shell
+sudo snap install microk8s --classic
 ```
-
-
-```console
-./credentials.sh 
-```
-
-```console
-./deploy.sh 
-```
-
-
-### 10.2) Error installing microk8s:  
 
 <p align="left">
     <img src="imgs/snap_error.png" alt="- Deployed middleware.">
 </p>
 
-If the command 
-```console
-sudo snap install microk8s --classic
-```
 
-Then update snapd by:
+Then `snapd` package in the system must be updated. You can do it with the following commands:
 
-```console
+```shell
 sudo apt update
-```
-
-```console
 sudo apt upgrade snapd
-```
-
-### 10.3) Cannot pull docker images:
-
-If you get an error like: "docker pull no basic auth credentials aws" when trying to launch the commdn:
-
-```console
-sudo docker pull 394603622351.dkr.ecr.eu-west-1.amazonaws.com/5g-era-redis
-```
-
-You may fix this by:
-
-```console
-cd ~/.docker/
-```
-
-```console
-nano config.json
-```
-
-Remove line --> "credsStore":
-
-```console
-docker login -u AWS -p $(aws ecr get-login-password --region eu-west-1) 394603622351.dkr.ecr.eu-west-1.amazonaws.com
-```
-
-```console
-sudo docker pull 394603622351.dkr.ecr.eu-west-1.amazonaws.com/5g-era-redis
 ```

@@ -48,6 +48,7 @@
 	<ItemGroup>
 		<ProjectReference Include="..\Common\Common.csproj" />
 		<ProjectReference Include="..\DataAccess\DataAccess.csproj" />
+		<ProjectReference Include="..\RedisInterface.Sdk\RedisInterface.Sdk.csproj" />
 	</ItemGroup>
 
 </Project>

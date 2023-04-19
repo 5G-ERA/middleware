@@ -31,7 +31,7 @@ namespace Middleware.Orchestrator.Deployment
         /// <inheritdoc />
         public IKubernetes CreateKubernetesClient()
         {
-            _logger.LogDebug("Started creation of K8s client");
+            _logger.LogTrace("Started creation of K8s client");
 
             var isValidInCLusterConfig = IsValidInClusterConfig();
             if (isValidInCLusterConfig == false && _env.FileExists(KubeConfigPath) == false)
@@ -54,7 +54,7 @@ namespace Middleware.Orchestrator.Deployment
 
             var exists = _env.DirectoryExists(ServiceAccountPath);
 
-            _logger.LogDebug("K8s ServiceAccountPath exists {exists}", exists);
+            _logger.LogTrace("K8s ServiceAccountPath exists {exists}", exists);
 
             if (retVal == false)
             {
@@ -67,7 +67,7 @@ namespace Middleware.Orchestrator.Deployment
                              && fileNames.Contains(ServiceAccountRootCAKeyFileName)
                              && fileNames.Contains(ServiceAccountNamespaceFileName);
 
-            _logger.LogDebug("K8s ServiceAccount files exist {filesExist}", filesExist);
+            _logger.LogTrace("K8s ServiceAccount files exist {filesExist}", filesExist);
             retVal &= exists && filesExist;
 
             return retVal;
@@ -78,8 +78,8 @@ namespace Middleware.Orchestrator.Deployment
         {
             var host = _env.GetEnvVariable(KubernetesServiceHost);
             var port = _env.GetEnvVariable(KubernetesServicePort);
-            _logger.LogDebug("K8s {env} has value {value}", KubernetesServiceHost, host);
-            _logger.LogDebug("K8s {env} has value {value}", KubernetesServicePort, port);
+            _logger.LogTrace("K8s {env} has value {value}", KubernetesServiceHost, host);
+            _logger.LogTrace("K8s {env} has value {value}", KubernetesServicePort, port);
 
             return string.IsNullOrEmpty(host) == false && string.IsNullOrEmpty(port) == false;
         }

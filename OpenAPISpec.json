@@ -797,6 +797,80 @@
                 },
                 "additionalProperties": false
             },
+            "ActionRequest": {
+                "type": "object",
+                "properties": {
+                    "name": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "priority": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "order": {
+                        "type": "integer",
+                        "format": "int32"
+                    },
+                    "minimumNumCores": {
+                        "type": "integer",
+                        "format": "int32",
+                        "nullable": true
+                    },
+                    "minimumRam": {
+                        "type": "integer",
+                        "format": "int64",
+                        "nullable": true
+                    },
+                    "tags": {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        },
+                        "nullable": true
+                    }
+                },
+                "additionalProperties": false
+            },
+            "ActionResponse": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "string",
+                        "format": "uuid"
+                    },
+                    "name": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "priority": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "order": {
+                        "type": "integer",
+                        "format": "int32"
+                    },
+                    "minimumNumCores": {
+                        "type": "integer",
+                        "format": "int32",
+                        "nullable": true
+                    },
+                    "minimumRam": {
+                        "type": "integer",
+                        "format": "int64",
+                        "nullable": true
+                    },
+                    "tags": {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        },
+                        "nullable": true
+                    }
+                },
+                "additionalProperties": false
+            },
             "ActionResult": {
                 "type": "object",
                 "additionalProperties": false
@@ -859,6 +933,9 @@
                         "nullable": true
                     },
                     "Type": {
+                        "$ref": "#/components/schemas/LocationType"
+                    },
+                    "Organization": {
                         "type": "string",
                         "nullable": true
                     },
@@ -873,11 +950,13 @@
                     },
                     "NumberOfCores": {
                         "type": "integer",
-                        "format": "int32"
+                        "format": "int32",
+                        "nullable": true
                     },
                     "DiskStorage": {
                         "type": "integer",
-                        "format": "int64"
+                        "format": "int64",
+                        "nullable": true
                     },
                     "VirtualRam": {
                         "type": "integer",
@@ -886,11 +965,13 @@
                     },
                     "CPU": {
                         "type": "integer",
-                        "format": "int32"
+                        "format": "int32",
+                        "nullable": true
                     },
                     "RAM": {
                         "type": "integer",
-                        "format": "int64"
+                        "format": "int64",
+                        "nullable": true
                     },
                     "MacAddress": {
                         "type": "string",
@@ -906,16 +987,181 @@
                 },
                 "additionalProperties": false
             },
-            "ContainerImageModel": {
+            "CloudRequest": {
                 "type": "object",
                 "properties": {
-                    "relations": {
-                        "type": "array",
-                        "items": {
-                            "$ref": "#/components/schemas/RelationModel"
-                        },
+                    "name": {
+                        "type": "string",
                         "nullable": true
                     },
+                    "organization": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "type": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "status": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "ipAddress": {
+                        "type": "string",
+                        "format": "uri",
+                        "nullable": true
+                    },
+                    "cpu": {
+                        "type": "integer",
+                        "format": "int32",
+                        "nullable": true
+                    },
+                    "numberOfCores": {
+                        "type": "integer",
+                        "format": "int32",
+                        "nullable": true
+                    },
+                    "diskStorage": {
+                        "type": "integer",
+                        "format": "int64",
+                        "nullable": true
+                    },
+                    "ram": {
+                        "type": "integer",
+                        "format": "int64",
+                        "nullable": true
+                    },
+                    "virtualRam": {
+                        "type": "integer",
+                        "format": "int64",
+                        "nullable": true
+                    },
+                    "macAddress": {
+                        "type": "string",
+                        "nullable": true
+                    }
+                },
+                "additionalProperties": false
+            },
+            "CloudResponse": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "string",
+                        "format": "uuid"
+                    },
+                    "name": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "organization": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "type": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "status": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "ipAddress": {
+                        "type": "string",
+                        "format": "uri",
+                        "nullable": true
+                    },
+                    "cpu": {
+                        "type": "integer",
+                        "format": "int32",
+                        "nullable": true
+                    },
+                    "numberOfCores": {
+                        "type": "integer",
+                        "format": "int32",
+                        "nullable": true
+                    },
+                    "diskStorage": {
+                        "type": "integer",
+                        "format": "int64",
+                        "nullable": true
+                    },
+                    "ram": {
+                        "type": "integer",
+                        "format": "int64",
+                        "nullable": true
+                    },
+                    "virtualRam": {
+                        "type": "integer",
+                        "format": "int64",
+                        "nullable": true
+                    },
+                    "macAddress": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "lastUpdatedTime": {
+                        "type": "string",
+                        "format": "date-time"
+                    }
+                },
+                "additionalProperties": false
+            },
+            "ContainerRequest": {
+                "type": "object",
+                "properties": {
+                    "name": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "description": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "k8SDeployment": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "k8SService": {
+                        "type": "string",
+                        "nullable": true
+                    }
+                },
+                "additionalProperties": false
+            },
+            "ContainerResponse": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "string",
+                        "format": "uuid"
+                    },
+                    "name": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "lastUpdateTime": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "description": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "k8sDeployment": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "k8sService": {
+                        "type": "string",
+                        "nullable": true
+                    }
+                },
+                "additionalProperties": false
+            },
+            "DashboardRobotResponse": {
+                "type": "object",
+                "properties": {
                     "Id": {
                         "type": "string",
                         "format": "uuid"
@@ -924,20 +1170,88 @@
                         "type": "string",
                         "nullable": true
                     },
-                    "Timestamp": {
-                        "type": "string",
-                        "format": "date-time"
-                    },
-                    "Description": {
+                    "Status": {
                         "type": "string",
                         "nullable": true
                     },
-                    "K8SDeployment": {
+                    "OnboardedTime": {
+                        "type": "string",
+                        "format": "date-time",
+                        "nullable": true
+                    },
+                    "rosVersion": {
+                        "type": "integer",
+                        "format": "int32"
+                    },
+                    "rosDistro": {
                         "type": "string",
                         "nullable": true
                     },
-                    "K8SService": {
+                    "manufacturer": {
                         "type": "string",
+                        "nullable": true
+                    }
+                },
+                "additionalProperties": false
+            },
+            "DashboardRobotResponseListPagedResponse": {
+                "type": "object",
+                "properties": {
+                    "statusCode": {
+                        "type": "integer",
+                        "format": "int32",
+                        "readOnly": true
+                    },
+                    "message": {
+                        "type": "string",
+                        "nullable": true,
+                        "readOnly": true
+                    },
+                    "timeStamp": {
+                        "type": "string",
+                        "format": "date-time",
+                        "readOnly": true
+                    },
+                    "isError": {
+                        "type": "boolean",
+                        "readOnly": true
+                    },
+                    "data": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/DashboardRobotResponse"
+                        },
+                        "nullable": true
+                    },
+                    "pageNumber": {
+                        "type": "integer",
+                        "format": "int32"
+                    },
+                    "pageSize": {
+                        "type": "integer",
+                        "format": "int32"
+                    },
+                    "firstPage": {
+                        "type": "integer",
+                        "format": "int32"
+                    },
+                    "lastPage": {
+                        "type": "string",
+                        "format": "uri",
+                        "nullable": true
+                    },
+                    "totalPages": {
+                        "type": "integer",
+                        "format": "int32"
+                    },
+                    "nextPage": {
+                        "type": "string",
+                        "format": "uri",
+                        "nullable": true
+                    },
+                    "previousPage": {
+                        "type": "string",
+                        "format": "uri",
                         "nullable": true
                     }
                 },
@@ -962,6 +1276,9 @@
                         "nullable": true
                     },
                     "Type": {
+                        "$ref": "#/components/schemas/LocationType"
+                    },
+                    "Organization": {
                         "type": "string",
                         "nullable": true
                     },
@@ -980,11 +1297,13 @@
                     },
                     "CPU": {
                         "type": "integer",
-                        "format": "int32"
+                        "format": "int32",
+                        "nullable": true
                     },
                     "RAM": {
                         "type": "integer",
-                        "format": "int64"
+                        "format": "int64",
+                        "nullable": true
                     },
                     "VirtualRam": {
                         "type": "integer",
@@ -993,11 +1312,13 @@
                     },
                     "DiskStorage": {
                         "type": "integer",
-                        "format": "int64"
+                        "format": "int64",
+                        "nullable": true
                     },
                     "NumberOfCores": {
                         "type": "integer",
-                        "format": "int32"
+                        "format": "int32",
+                        "nullable": true
                     },
                     "LastUpdatedTime": {
                         "type": "string",
@@ -1005,6 +1326,226 @@
                     },
                     "IsOnline": {
                         "type": "boolean"
+                    }
+                },
+                "additionalProperties": false
+            },
+            "EdgeRequest": {
+                "type": "object",
+                "properties": {
+                    "name": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "organization": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "status": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "ipAddress": {
+                        "type": "string",
+                        "format": "uri",
+                        "nullable": true
+                    },
+                    "macAddress": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "cpu": {
+                        "type": "integer",
+                        "format": "int32",
+                        "nullable": true
+                    },
+                    "numberOfCores": {
+                        "type": "integer",
+                        "format": "int32",
+                        "nullable": true
+                    },
+                    "ram": {
+                        "type": "integer",
+                        "format": "int64",
+                        "nullable": true
+                    },
+                    "virtualRam": {
+                        "type": "integer",
+                        "format": "int64",
+                        "nullable": true
+                    },
+                    "diskStorage": {
+                        "type": "integer",
+                        "format": "int64",
+                        "nullable": true
+                    }
+                },
+                "additionalProperties": false
+            },
+            "EdgeResponse": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "string",
+                        "format": "uuid"
+                    },
+                    "name": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "type": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "organization": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "status": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "ipAddress": {
+                        "type": "string",
+                        "format": "uri",
+                        "nullable": true
+                    },
+                    "macAddress": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "cpu": {
+                        "type": "integer",
+                        "format": "int32",
+                        "nullable": true
+                    },
+                    "numberOfCores": {
+                        "type": "integer",
+                        "format": "int32",
+                        "nullable": true
+                    },
+                    "ram": {
+                        "type": "integer",
+                        "format": "int64",
+                        "nullable": true
+                    },
+                    "virtualRam": {
+                        "type": "integer",
+                        "format": "int64",
+                        "nullable": true
+                    },
+                    "diskStorage": {
+                        "type": "integer",
+                        "format": "int64",
+                        "nullable": true
+                    },
+                    "lastUpdatedTime": {
+                        "type": "string",
+                        "format": "date-time"
+                    }
+                },
+                "additionalProperties": false
+            },
+            "GetActionsResponse": {
+                "type": "object",
+                "properties": {
+                    "actions": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/ActionResponse"
+                        },
+                        "nullable": true
+                    }
+                },
+                "additionalProperties": false
+            },
+            "GetCloudsResponse": {
+                "type": "object",
+                "properties": {
+                    "clouds": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/CloudResponse"
+                        },
+                        "nullable": true
+                    }
+                },
+                "additionalProperties": false
+            },
+            "GetContainersResponse": {
+                "type": "object",
+                "properties": {
+                    "containers": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/ContainerResponse"
+                        },
+                        "nullable": true
+                    }
+                },
+                "additionalProperties": false
+            },
+            "GetEdgesResponse": {
+                "type": "object",
+                "properties": {
+                    "edges": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/EdgeResponse"
+                        },
+                        "nullable": true
+                    }
+                },
+                "additionalProperties": false
+            },
+            "GetInstancesResponse": {
+                "type": "object",
+                "properties": {
+                    "instances": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/InstanceResponse"
+                        },
+                        "nullable": true
+                    }
+                },
+                "additionalProperties": false
+            },
+            "GetPoliciesResponse": {
+                "type": "object",
+                "properties": {
+                    "policies": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/PolicyResponse"
+                        },
+                        "nullable": true
+                    }
+                },
+                "additionalProperties": false
+            },
+            "GetRobotsResponse": {
+                "type": "object",
+                "properties": {
+                    "robots": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/RobotResponse"
+                        },
+                        "nullable": true
+                    }
+                },
+                "additionalProperties": false
+            },
+            "GetTasksResponse": {
+                "type": "object",
+                "properties": {
+                    "tasks": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/TaskResponse"
+                        },
+                        "nullable": true
                     }
                 },
                 "additionalProperties": false
@@ -1023,6 +1564,135 @@
                         "type": "array",
                         "items": {
                             "$ref": "#/components/schemas/SimpleRelation"
+                        },
+                        "nullable": true
+                    }
+                },
+                "additionalProperties": false
+            },
+            "InstanceRequest": {
+                "type": "object",
+                "properties": {
+                    "name": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "type": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "isReusable": {
+                        "type": "boolean"
+                    },
+                    "rosTopicPublishers": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/RosTopicModel"
+                        },
+                        "nullable": true
+                    },
+                    "rosTopicSubscribers": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/RosTopicModel"
+                        },
+                        "nullable": true
+                    },
+                    "rosVersion": {
+                        "type": "integer",
+                        "format": "int32"
+                    },
+                    "rosDistro": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "family": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "minimumRam": {
+                        "type": "integer",
+                        "format": "int32",
+                        "nullable": true
+                    },
+                    "minimumNumOfCores": {
+                        "type": "integer",
+                        "format": "int32",
+                        "nullable": true
+                    },
+                    "tags": {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        },
+                        "nullable": true
+                    }
+                },
+                "additionalProperties": false
+            },
+            "InstanceResponse": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "string",
+                        "format": "uuid"
+                    },
+                    "name": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "type": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "isReusable": {
+                        "type": "boolean",
+                        "nullable": true
+                    },
+                    "rosTopicPublishers": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/RosTopicModel"
+                        },
+                        "nullable": true
+                    },
+                    "rosTopicSubscribers": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/RosTopicModel"
+                        },
+                        "nullable": true
+                    },
+                    "rosVersion": {
+                        "type": "integer",
+                        "format": "int32"
+                    },
+                    "rosDistro": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "family": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "minimumRam": {
+                        "type": "integer",
+                        "format": "int64",
+                        "nullable": true
+                    },
+                    "minimumNumOfCores": {
+                        "type": "integer",
+                        "format": "int32",
+                        "nullable": true
+                    },
+                    "onboardedTime": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "tags": {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
                         },
                         "nullable": true
                     }
@@ -1120,6 +1790,14 @@
                     }
                 },
                 "additionalProperties": false
+            },
+            "LocationType": {
+                "enum": [
+                    0,
+                    1
+                ],
+                "type": "integer",
+                "format": "int32"
             },
             "NetAppsDetailsResponse": {
                 "type": "object",
@@ -1238,8 +1916,7 @@
                         "format": "date-time"
                     },
                     "IsActive": {
-                        "type": "boolean",
-                        "nullable": true
+                        "type": "boolean"
                     },
                     "Description": {
                         "type": "string",
@@ -1252,25 +1929,86 @@
                 },
                 "additionalProperties": false
             },
-            "RobotResponse": {
+            "PolicyRequest": {
                 "type": "object",
                 "properties": {
-                    "Id": {
+                    "name": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "type": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "isActive": {
+                        "type": "boolean"
+                    },
+                    "description": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "isExclusiveWithinType": {
+                        "type": "integer",
+                        "format": "int32"
+                    },
+                    "lastTimeUpdated": {
+                        "type": "string",
+                        "format": "date-time"
+                    }
+                },
+                "additionalProperties": false
+            },
+            "PolicyResponse": {
+                "type": "object",
+                "properties": {
+                    "id": {
                         "type": "string",
                         "format": "uuid"
                     },
-                    "Name": {
+                    "name": {
                         "type": "string",
                         "nullable": true
                     },
-                    "Status": {
+                    "type": {
                         "type": "string",
                         "nullable": true
                     },
-                    "OnboardedTime": {
+                    "isActive": {
+                        "type": "boolean"
+                    },
+                    "description": {
                         "type": "string",
-                        "format": "date-time",
                         "nullable": true
+                    },
+                    "isExclusiveWithinType": {
+                        "type": "integer",
+                        "format": "int32"
+                    },
+                    "lastTimeUpdated": {
+                        "type": "string",
+                        "format": "date-time"
+                    }
+                },
+                "additionalProperties": false
+            },
+            "RobotRequest": {
+                "type": "object",
+                "properties": {
+                    "name": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "modelName": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "status": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "batteryStatus": {
+                        "type": "integer",
+                        "format": "int32"
                     },
                     "rosVersion": {
                         "type": "integer",
@@ -1280,72 +2018,249 @@
                         "type": "string",
                         "nullable": true
                     },
+                    "maximumPayload": {
+                        "type": "integer",
+                        "format": "int64",
+                        "nullable": true
+                    },
+                    "maximumTranslationalVelocity": {
+                        "type": "integer",
+                        "format": "int64",
+                        "nullable": true
+                    },
+                    "maximumRotationalVelocity": {
+                        "type": "integer",
+                        "format": "int64",
+                        "nullable": true
+                    },
+                    "robotWeight": {
+                        "type": "integer",
+                        "format": "int64",
+                        "nullable": true
+                    },
+                    "rosRepo": {
+                        "type": "string",
+                        "format": "uri",
+                        "nullable": true
+                    },
+                    "rosNodes": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/ROSNodeModel"
+                        },
+                        "nullable": true
+                    },
                     "manufacturer": {
                         "type": "string",
+                        "nullable": true
+                    },
+                    "manufacturerUrl": {
+                        "type": "string",
+                        "format": "uri",
+                        "nullable": true
+                    },
+                    "macAddress": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "locomotionSystem": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "locomotionType": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "sensors": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/SensorModel"
+                        },
+                        "nullable": true
+                    },
+                    "actuators": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/ActuatorModel"
+                        },
+                        "nullable": true
+                    },
+                    "manipulators": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/ManipulatorModel"
+                        },
+                        "nullable": true
+                    },
+                    "cpu": {
+                        "type": "integer",
+                        "format": "int32",
+                        "nullable": true
+                    },
+                    "numberOfCores": {
+                        "type": "integer",
+                        "format": "int32",
+                        "nullable": true
+                    },
+                    "ram": {
+                        "type": "integer",
+                        "format": "int64",
+                        "nullable": true
+                    },
+                    "storageDisk": {
+                        "type": "integer",
+                        "format": "int64",
+                        "nullable": true
+                    },
+                    "questions": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/DialogueModel"
+                        },
                         "nullable": true
                     }
                 },
                 "additionalProperties": false
             },
-            "RobotResponseListPagedResponse": {
+            "RobotResponse": {
                 "type": "object",
                 "properties": {
-                    "statusCode": {
+                    "id": {
+                        "type": "string",
+                        "format": "uuid"
+                    },
+                    "name": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "modelName": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "status": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "batteryStatus": {
                         "type": "integer",
-                        "format": "int32",
-                        "readOnly": true
+                        "format": "int32"
                     },
-                    "message": {
+                    "rosVersion": {
+                        "type": "integer",
+                        "format": "int32"
+                    },
+                    "rosDistro": {
                         "type": "string",
-                        "nullable": true,
-                        "readOnly": true
+                        "nullable": true
                     },
-                    "timeStamp": {
+                    "maximumPayload": {
+                        "type": "integer",
+                        "format": "int64",
+                        "nullable": true
+                    },
+                    "maximumTranslationalVelocity": {
+                        "type": "integer",
+                        "format": "int64",
+                        "nullable": true
+                    },
+                    "maximumRotationalVelocity": {
+                        "type": "integer",
+                        "format": "int64",
+                        "nullable": true
+                    },
+                    "robotWeight": {
+                        "type": "integer",
+                        "format": "int64",
+                        "nullable": true
+                    },
+                    "rosRepo": {
                         "type": "string",
-                        "format": "date-time",
-                        "readOnly": true
+                        "format": "uri",
+                        "nullable": true
                     },
-                    "isError": {
-                        "type": "boolean",
-                        "readOnly": true
-                    },
-                    "data": {
+                    "rosNodes": {
                         "type": "array",
                         "items": {
-                            "$ref": "#/components/schemas/RobotResponse"
+                            "$ref": "#/components/schemas/ROSNodeModel"
                         },
                         "nullable": true
                     },
-                    "pageNumber": {
-                        "type": "integer",
-                        "format": "int32"
+                    "manufacturer": {
+                        "type": "string",
+                        "nullable": true
                     },
-                    "pageSize": {
-                        "type": "integer",
-                        "format": "int32"
-                    },
-                    "firstPage": {
-                        "type": "integer",
-                        "format": "int32"
-                    },
-                    "lastPage": {
+                    "manufacturerUrl": {
                         "type": "string",
                         "format": "uri",
                         "nullable": true
                     },
-                    "totalPages": {
+                    "macAddress": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "locomotionSystem": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "locomotionType": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "sensors": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/SensorModel"
+                        },
+                        "nullable": true
+                    },
+                    "actuators": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/ActuatorModel"
+                        },
+                        "nullable": true
+                    },
+                    "manipulators": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/ManipulatorModel"
+                        },
+                        "nullable": true
+                    },
+                    "cpu": {
                         "type": "integer",
-                        "format": "int32"
-                    },
-                    "nextPage": {
-                        "type": "string",
-                        "format": "uri",
+                        "format": "int32",
                         "nullable": true
                     },
-                    "previousPage": {
-                        "type": "string",
-                        "format": "uri",
+                    "numberOfCores": {
+                        "type": "integer",
+                        "format": "int32",
                         "nullable": true
+                    },
+                    "ram": {
+                        "type": "integer",
+                        "format": "int64",
+                        "nullable": true
+                    },
+                    "storageDisk": {
+                        "type": "integer",
+                        "format": "int64",
+                        "nullable": true
+                    },
+                    "questions": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/DialogueModel"
+                        },
+                        "nullable": true
+                    },
+                    "lastUpdatedTime": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "onboardedTime": {
+                        "type": "string",
+                        "format": "date-time"
                     }
                 },
                 "additionalProperties": false
@@ -1376,6 +2291,58 @@
                     },
                     "value": {
                         "$ref": "#/components/schemas/TaskModel"
+                    }
+                },
+                "additionalProperties": false
+            },
+            "TaskRequest": {
+                "type": "object",
+                "properties": {
+                    "name": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "priority": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "isDeterministic": {
+                        "type": "boolean"
+                    },
+                    "tags": {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        },
+                        "nullable": true
+                    }
+                },
+                "additionalProperties": false
+            },
+            "TaskResponse": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "string",
+                        "format": "uuid"
+                    },
+                    "name": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "priority": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "isDeterministic": {
+                        "type": "boolean"
+                    },
+                    "tags": {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        },
+                        "nullable": true
                     }
                 },
                 "additionalProperties": false
@@ -1475,6 +2442,31 @@
                         "type": "string",
                         "format": "uri",
                         "nullable": true
+                    }
+                },
+                "additionalProperties": false
+            },
+            "UpdateTopicResponse": {
+                "type": "object",
+                "properties": {
+                    "robotId": {
+                        "type": "string",
+                        "format": "uuid"
+                    },
+                    "topicName": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "topicType": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "topicDescription": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "topicEnabled": {
+                        "type": "boolean"
                     }
                 },
                 "additionalProperties": false
@@ -2519,26 +3511,17 @@
                         "content": {
                             "text/plain": {
                                 "schema": {
-                                    "type": "array",
-                                    "items": {
-                                        "$ref": "#/components/schemas/ActionModel"
-                                    }
+                                    "$ref": "#/components/schemas/GetActionsResponse"
                                 }
                             },
                             "application/json": {
                                 "schema": {
-                                    "type": "array",
-                                    "items": {
-                                        "$ref": "#/components/schemas/ActionModel"
-                                    }
+                                    "$ref": "#/components/schemas/GetActionsResponse"
                                 }
                             },
                             "text/json": {
                                 "schema": {
-                                    "type": "array",
-                                    "items": {
-                                        "$ref": "#/components/schemas/ActionModel"
-                                    }
+                                    "$ref": "#/components/schemas/GetActionsResponse"
                                 }
                             }
                         }
@@ -2594,22 +3577,22 @@
                     "content": {
                         "application/json-patch+json": {
                             "schema": {
-                                "$ref": "#/components/schemas/ActionModel"
+                                "$ref": "#/components/schemas/ActionRequest"
                             }
                         },
                         "application/json": {
                             "schema": {
-                                "$ref": "#/components/schemas/ActionModel"
+                                "$ref": "#/components/schemas/ActionRequest"
                             }
                         },
                         "text/json": {
                             "schema": {
-                                "$ref": "#/components/schemas/ActionModel"
+                                "$ref": "#/components/schemas/ActionRequest"
                             }
                         },
                         "application/*+json": {
                             "schema": {
-                                "$ref": "#/components/schemas/ActionModel"
+                                "$ref": "#/components/schemas/ActionRequest"
                             }
                         }
                     }
@@ -2620,17 +3603,17 @@
                         "content": {
                             "text/plain": {
                                 "schema": {
-                                    "$ref": "#/components/schemas/ActionModel"
+                                    "$ref": "#/components/schemas/ActionResponse"
                                 }
                             },
                             "application/json": {
                                 "schema": {
-                                    "$ref": "#/components/schemas/ActionModel"
+                                    "$ref": "#/components/schemas/ActionResponse"
                                 }
                             },
                             "text/json": {
                                 "schema": {
-                                    "$ref": "#/components/schemas/ActionModel"
+                                    "$ref": "#/components/schemas/ActionResponse"
                                 }
                             }
                         }
@@ -2701,17 +3684,17 @@
                         "content": {
                             "text/plain": {
                                 "schema": {
-                                    "$ref": "#/components/schemas/ActionModel"
+                                    "$ref": "#/components/schemas/ActionResponse"
                                 }
                             },
                             "application/json": {
                                 "schema": {
-                                    "$ref": "#/components/schemas/ActionModel"
+                                    "$ref": "#/components/schemas/ActionResponse"
                                 }
                             },
                             "text/json": {
                                 "schema": {
-                                    "$ref": "#/components/schemas/ActionModel"
+                                    "$ref": "#/components/schemas/ActionResponse"
                                 }
                             }
                         }
@@ -2758,11 +3741,11 @@
                     }
                 }
             },
-            "patch": {
+            "put": {
                 "tags": [
                     "Action"
                 ],
-                "operationId": "ActionPatch",
+                "operationId": "ActionUpdate",
                 "parameters": [
                     {
                         "name": "id",
@@ -2778,22 +3761,22 @@
                     "content": {
                         "application/json-patch+json": {
                             "schema": {
-                                "$ref": "#/components/schemas/ActionModel"
+                                "$ref": "#/components/schemas/ActionRequest"
                             }
                         },
                         "application/json": {
                             "schema": {
-                                "$ref": "#/components/schemas/ActionModel"
+                                "$ref": "#/components/schemas/ActionRequest"
                             }
                         },
                         "text/json": {
                             "schema": {
-                                "$ref": "#/components/schemas/ActionModel"
+                                "$ref": "#/components/schemas/ActionRequest"
                             }
                         },
                         "application/*+json": {
                             "schema": {
-                                "$ref": "#/components/schemas/ActionModel"
+                                "$ref": "#/components/schemas/ActionRequest"
                             }
                         }
                     }
@@ -2804,17 +3787,17 @@
                         "content": {
                             "text/plain": {
                                 "schema": {
-                                    "$ref": "#/components/schemas/ActionModel"
+                                    "$ref": "#/components/schemas/ActionResponse"
                                 }
                             },
                             "application/json": {
                                 "schema": {
-                                    "$ref": "#/components/schemas/ActionModel"
+                                    "$ref": "#/components/schemas/ActionResponse"
                                 }
                             },
                             "text/json": {
                                 "schema": {
-                                    "$ref": "#/components/schemas/ActionModel"
+                                    "$ref": "#/components/schemas/ActionResponse"
                                 }
                             }
                         }
@@ -3823,17 +4806,17 @@
                         "content": {
                             "text/plain": {
                                 "schema": {
-                                    "$ref": "#/components/schemas/CloudModel"
+                                    "$ref": "#/components/schemas/GetCloudsResponse"
                                 }
                             },
                             "application/json": {
                                 "schema": {
-                                    "$ref": "#/components/schemas/CloudModel"
+                                    "$ref": "#/components/schemas/GetCloudsResponse"
                                 }
                             },
                             "text/json": {
                                 "schema": {
-                                    "$ref": "#/components/schemas/CloudModel"
+                                    "$ref": "#/components/schemas/GetCloudsResponse"
                                 }
                             }
                         }
@@ -3889,22 +4872,22 @@
                     "content": {
                         "application/json-patch+json": {
                             "schema": {
-                                "$ref": "#/components/schemas/CloudModel"
+                                "$ref": "#/components/schemas/CloudRequest"
                             }
                         },
                         "application/json": {
                             "schema": {
-                                "$ref": "#/components/schemas/CloudModel"
+                                "$ref": "#/components/schemas/CloudRequest"
                             }
                         },
                         "text/json": {
                             "schema": {
-                                "$ref": "#/components/schemas/CloudModel"
+                                "$ref": "#/components/schemas/CloudRequest"
                             }
                         },
                         "application/*+json": {
                             "schema": {
-                                "$ref": "#/components/schemas/CloudModel"
+                                "$ref": "#/components/schemas/CloudRequest"
                             }
                         }
                     }
@@ -3915,17 +4898,17 @@
                         "content": {
                             "text/plain": {
                                 "schema": {
-                                    "$ref": "#/components/schemas/CloudModel"
+                                    "$ref": "#/components/schemas/CloudResponse"
                                 }
                             },
                             "application/json": {
                                 "schema": {
-                                    "$ref": "#/components/schemas/CloudModel"
+                                    "$ref": "#/components/schemas/CloudResponse"
                                 }
                             },
                             "text/json": {
                                 "schema": {
-                                    "$ref": "#/components/schemas/CloudModel"
+                                    "$ref": "#/components/schemas/CloudResponse"
                                 }
                             }
                         }
@@ -3996,17 +4979,17 @@
                         "content": {
                             "text/plain": {
                                 "schema": {
-                                    "$ref": "#/components/schemas/CloudModel"
+                                    "$ref": "#/components/schemas/CloudResponse"
                                 }
                             },
                             "application/json": {
                                 "schema": {
-                                    "$ref": "#/components/schemas/CloudModel"
+                                    "$ref": "#/components/schemas/CloudResponse"
                                 }
                             },
                             "text/json": {
                                 "schema": {
-                                    "$ref": "#/components/schemas/CloudModel"
+                                    "$ref": "#/components/schemas/CloudResponse"
                                 }
                             }
                         }
@@ -4053,7 +5036,7 @@
                     }
                 }
             },
-            "patch": {
+            "put": {
                 "tags": [
                     "Cloud"
                 ],
@@ -4073,22 +5056,22 @@
                     "content": {
                         "application/json-patch+json": {
                             "schema": {
-                                "$ref": "#/components/schemas/CloudModel"
+                                "$ref": "#/components/schemas/CloudRequest"
                             }
                         },
                         "application/json": {
                             "schema": {
-                                "$ref": "#/components/schemas/CloudModel"
+                                "$ref": "#/components/schemas/CloudRequest"
                             }
                         },
                         "text/json": {
                             "schema": {
-                                "$ref": "#/components/schemas/CloudModel"
+                                "$ref": "#/components/schemas/CloudRequest"
                             }
                         },
                         "application/*+json": {
                             "schema": {
-                                "$ref": "#/components/schemas/CloudModel"
+                                "$ref": "#/components/schemas/CloudRequest"
                             }
                         }
                     }
@@ -4099,17 +5082,17 @@
                         "content": {
                             "text/plain": {
                                 "schema": {
-                                    "$ref": "#/components/schemas/CloudModel"
+                                    "$ref": "#/components/schemas/CloudResponse"
                                 }
                             },
                             "application/json": {
                                 "schema": {
-                                    "$ref": "#/components/schemas/CloudModel"
+                                    "$ref": "#/components/schemas/CloudResponse"
                                 }
                             },
                             "text/json": {
                                 "schema": {
-                                    "$ref": "#/components/schemas/CloudModel"
+                                    "$ref": "#/components/schemas/CloudResponse"
                                 }
                             }
                         }
@@ -4515,6 +5498,86 @@
                 }
             }
         },
+        "/data/cloud/name/{name}": {
+            "get": {
+                "tags": [
+                    "Cloud"
+                ],
+                "operationId": "CloudGetDataByName",
+                "parameters": [
+                    {
+                        "name": "name",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Success",
+                        "content": {
+                            "text/plain": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/CloudModel"
+                                }
+                            },
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/CloudModel"
+                                }
+                            },
+                            "text/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/CloudModel"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "content": {
+                            "text/plain": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                }
+                            },
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                }
+                            },
+                            "text/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Server Error",
+                        "content": {
+                            "text/plain": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                }
+                            },
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                }
+                            },
+                            "text/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/data/cloud/free": {
             "get": {
                 "tags": [
@@ -4563,26 +5626,17 @@
                         "content": {
                             "text/plain": {
                                 "schema": {
-                                    "type": "array",
-                                    "items": {
-                                        "$ref": "#/components/schemas/CloudModel"
-                                    }
+                                    "$ref": "#/components/schemas/GetCloudsResponse"
                                 }
                             },
                             "application/json": {
                                 "schema": {
-                                    "type": "array",
-                                    "items": {
-                                        "$ref": "#/components/schemas/CloudModel"
-                                    }
+                                    "$ref": "#/components/schemas/GetCloudsResponse"
                                 }
                             },
                             "text/json": {
                                 "schema": {
-                                    "type": "array",
-                                    "items": {
-                                        "$ref": "#/components/schemas/CloudModel"
-                                    }
+                                    "$ref": "#/components/schemas/GetCloudsResponse"
                                 }
                             }
                         }
@@ -4698,26 +5752,17 @@
                         "content": {
                             "text/plain": {
                                 "schema": {
-                                    "type": "array",
-                                    "items": {
-                                        "$ref": "#/components/schemas/CloudModel"
-                                    }
+                                    "$ref": "#/components/schemas/GetCloudsResponse"
                                 }
                             },
                             "application/json": {
                                 "schema": {
-                                    "type": "array",
-                                    "items": {
-                                        "$ref": "#/components/schemas/CloudModel"
-                                    }
+                                    "$ref": "#/components/schemas/GetCloudsResponse"
                                 }
                             },
                             "text/json": {
                                 "schema": {
-                                    "type": "array",
-                                    "items": {
-                                        "$ref": "#/components/schemas/CloudModel"
-                                    }
+                                    "$ref": "#/components/schemas/GetCloudsResponse"
                                 }
                             }
                         }
@@ -5225,17 +6270,17 @@
                         "content": {
                             "text/plain": {
                                 "schema": {
-                                    "$ref": "#/components/schemas/ContainerImageModel"
+                                    "$ref": "#/components/schemas/GetContainersResponse"
                                 }
                             },
                             "application/json": {
                                 "schema": {
-                                    "$ref": "#/components/schemas/ContainerImageModel"
+                                    "$ref": "#/components/schemas/GetContainersResponse"
                                 }
                             },
                             "text/json": {
                                 "schema": {
-                                    "$ref": "#/components/schemas/ContainerImageModel"
+                                    "$ref": "#/components/schemas/GetContainersResponse"
                                 }
                             }
                         }
@@ -5291,22 +6336,22 @@
                     "content": {
                         "application/json-patch+json": {
                             "schema": {
-                                "$ref": "#/components/schemas/ContainerImageModel"
+                                "$ref": "#/components/schemas/ContainerRequest"
                             }
                         },
                         "application/json": {
                             "schema": {
-                                "$ref": "#/components/schemas/ContainerImageModel"
+                                "$ref": "#/components/schemas/ContainerRequest"
                             }
                         },
                         "text/json": {
                             "schema": {
-                                "$ref": "#/components/schemas/ContainerImageModel"
+                                "$ref": "#/components/schemas/ContainerRequest"
                             }
                         },
                         "application/*+json": {
                             "schema": {
-                                "$ref": "#/components/schemas/ContainerImageModel"
+                                "$ref": "#/components/schemas/ContainerRequest"
                             }
                         }
                     }
@@ -5317,17 +6362,17 @@
                         "content": {
                             "text/plain": {
                                 "schema": {
-                                    "$ref": "#/components/schemas/ContainerImageModel"
+                                    "$ref": "#/components/schemas/ContainerResponse"
                                 }
                             },
                             "application/json": {
                                 "schema": {
-                                    "$ref": "#/components/schemas/ContainerImageModel"
+                                    "$ref": "#/components/schemas/ContainerResponse"
                                 }
                             },
                             "text/json": {
                                 "schema": {
-                                    "$ref": "#/components/schemas/ContainerImageModel"
+                                    "$ref": "#/components/schemas/ContainerResponse"
                                 }
                             }
                         }
@@ -5380,7 +6425,7 @@
                 "tags": [
                     "ContainerImage"
                 ],
-                "operationId": "ContainerImageGetbyId",
+                "operationId": "ContainerImageGetById",
                 "parameters": [
                     {
                         "name": "id",
@@ -5398,17 +6443,17 @@
                         "content": {
                             "text/plain": {
                                 "schema": {
-                                    "$ref": "#/components/schemas/ContainerImageModel"
+                                    "$ref": "#/components/schemas/ContainerResponse"
                                 }
                             },
                             "application/json": {
                                 "schema": {
-                                    "$ref": "#/components/schemas/ContainerImageModel"
+                                    "$ref": "#/components/schemas/ContainerResponse"
                                 }
                             },
                             "text/json": {
                                 "schema": {
-                                    "$ref": "#/components/schemas/ContainerImageModel"
+                                    "$ref": "#/components/schemas/ContainerResponse"
                                 }
                             }
                         }
@@ -5455,7 +6500,7 @@
                     }
                 }
             },
-            "patch": {
+            "put": {
                 "tags": [
                     "ContainerImage"
                 ],
@@ -5475,22 +6520,22 @@
                     "content": {
                         "application/json-patch+json": {
                             "schema": {
-                                "$ref": "#/components/schemas/ContainerImageModel"
+                                "$ref": "#/components/schemas/ContainerRequest"
                             }
                         },
                         "application/json": {
                             "schema": {
-                                "$ref": "#/components/schemas/ContainerImageModel"
+                                "$ref": "#/components/schemas/ContainerRequest"
                             }
                         },
                         "text/json": {
                             "schema": {
-                                "$ref": "#/components/schemas/ContainerImageModel"
+                                "$ref": "#/components/schemas/ContainerRequest"
                             }
                         },
                         "application/*+json": {
                             "schema": {
-                                "$ref": "#/components/schemas/ContainerImageModel"
+                                "$ref": "#/components/schemas/ContainerRequest"
                             }
                         }
                     }
@@ -5501,17 +6546,17 @@
                         "content": {
                             "text/plain": {
                                 "schema": {
-                                    "$ref": "#/components/schemas/ContainerImageModel"
+                                    "$ref": "#/components/schemas/ContainerResponse"
                                 }
                             },
                             "application/json": {
                                 "schema": {
-                                    "$ref": "#/components/schemas/ContainerImageModel"
+                                    "$ref": "#/components/schemas/ContainerResponse"
                                 }
                             },
                             "text/json": {
                                 "schema": {
-                                    "$ref": "#/components/schemas/ContainerImageModel"
+                                    "$ref": "#/components/schemas/ContainerResponse"
                                 }
                             }
                         }
@@ -5940,26 +6985,17 @@
                         "content": {
                             "text/plain": {
                                 "schema": {
-                                    "type": "array",
-                                    "items": {
-                                        "$ref": "#/components/schemas/ContainerImageModel"
-                                    }
+                                    "$ref": "#/components/schemas/GetContainersResponse"
                                 }
                             },
                             "application/json": {
                                 "schema": {
-                                    "type": "array",
-                                    "items": {
-                                        "$ref": "#/components/schemas/ContainerImageModel"
-                                    }
+                                    "$ref": "#/components/schemas/GetContainersResponse"
                                 }
                             },
                             "text/json": {
                                 "schema": {
-                                    "type": "array",
-                                    "items": {
-                                        "$ref": "#/components/schemas/ContainerImageModel"
-                                    }
+                                    "$ref": "#/components/schemas/GetContainersResponse"
                                 }
                             }
                         }
@@ -6335,17 +7371,17 @@
                         "content": {
                             "text/plain": {
                                 "schema": {
-                                    "$ref": "#/components/schemas/RobotResponseListPagedResponse"
+                                    "$ref": "#/components/schemas/DashboardRobotResponseListPagedResponse"
                                 }
                             },
                             "application/json": {
                                 "schema": {
-                                    "$ref": "#/components/schemas/RobotResponseListPagedResponse"
+                                    "$ref": "#/components/schemas/DashboardRobotResponseListPagedResponse"
                                 }
                             },
                             "text/json": {
                                 "schema": {
-                                    "$ref": "#/components/schemas/RobotResponseListPagedResponse"
+                                    "$ref": "#/components/schemas/DashboardRobotResponseListPagedResponse"
                                 }
                             }
                         }
@@ -6434,17 +7470,17 @@
                         "content": {
                             "text/plain": {
                                 "schema": {
-                                    "$ref": "#/components/schemas/EdgeModel"
+                                    "$ref": "#/components/schemas/GetEdgesResponse"
                                 }
                             },
                             "application/json": {
                                 "schema": {
-                                    "$ref": "#/components/schemas/EdgeModel"
+                                    "$ref": "#/components/schemas/GetEdgesResponse"
                                 }
                             },
                             "text/json": {
                                 "schema": {
-                                    "$ref": "#/components/schemas/EdgeModel"
+                                    "$ref": "#/components/schemas/GetEdgesResponse"
                                 }
                             }
                         }
@@ -6500,22 +7536,22 @@
                     "content": {
                         "application/json-patch+json": {
                             "schema": {
-                                "$ref": "#/components/schemas/EdgeModel"
+                                "$ref": "#/components/schemas/EdgeRequest"
                             }
                         },
                         "application/json": {
                             "schema": {
-                                "$ref": "#/components/schemas/EdgeModel"
+                                "$ref": "#/components/schemas/EdgeRequest"
                             }
                         },
                         "text/json": {
                             "schema": {
-                                "$ref": "#/components/schemas/EdgeModel"
+                                "$ref": "#/components/schemas/EdgeRequest"
                             }
                         },
                         "application/*+json": {
                             "schema": {
-                                "$ref": "#/components/schemas/EdgeModel"
+                                "$ref": "#/components/schemas/EdgeRequest"
                             }
                         }
                     }
@@ -6526,17 +7562,17 @@
                         "content": {
                             "text/plain": {
                                 "schema": {
-                                    "$ref": "#/components/schemas/EdgeModel"
+                                    "$ref": "#/components/schemas/EdgeResponse"
                                 }
                             },
                             "application/json": {
                                 "schema": {
-                                    "$ref": "#/components/schemas/EdgeModel"
+                                    "$ref": "#/components/schemas/EdgeResponse"
                                 }
                             },
                             "text/json": {
                                 "schema": {
-                                    "$ref": "#/components/schemas/EdgeModel"
+                                    "$ref": "#/components/schemas/EdgeResponse"
                                 }
                             }
                         }
@@ -6607,17 +7643,17 @@
                         "content": {
                             "text/plain": {
                                 "schema": {
-                                    "$ref": "#/components/schemas/EdgeModel"
+                                    "$ref": "#/components/schemas/EdgeResponse"
                                 }
                             },
                             "application/json": {
                                 "schema": {
-                                    "$ref": "#/components/schemas/EdgeModel"
+                                    "$ref": "#/components/schemas/EdgeResponse"
                                 }
                             },
                             "text/json": {
                                 "schema": {
-                                    "$ref": "#/components/schemas/EdgeModel"
+                                    "$ref": "#/components/schemas/EdgeResponse"
                                 }
                             }
                         }
@@ -6664,7 +7700,7 @@
                     }
                 }
             },
-            "patch": {
+            "put": {
                 "tags": [
                     "Edge"
                 ],
@@ -6684,22 +7720,22 @@
                     "content": {
                         "application/json-patch+json": {
                             "schema": {
-                                "$ref": "#/components/schemas/EdgeModel"
+                                "$ref": "#/components/schemas/EdgeRequest"
                             }
                         },
                         "application/json": {
                             "schema": {
-                                "$ref": "#/components/schemas/EdgeModel"
+                                "$ref": "#/components/schemas/EdgeRequest"
                             }
                         },
                         "text/json": {
                             "schema": {
-                                "$ref": "#/components/schemas/EdgeModel"
+                                "$ref": "#/components/schemas/EdgeRequest"
                             }
                         },
                         "application/*+json": {
                             "schema": {
-                                "$ref": "#/components/schemas/EdgeModel"
+                                "$ref": "#/components/schemas/EdgeRequest"
                             }
                         }
                     }
@@ -6710,17 +7746,17 @@
                         "content": {
                             "text/plain": {
                                 "schema": {
-                                    "$ref": "#/components/schemas/EdgeModel"
+                                    "$ref": "#/components/schemas/EdgeResponse"
                                 }
                             },
                             "application/json": {
                                 "schema": {
-                                    "$ref": "#/components/schemas/EdgeModel"
+                                    "$ref": "#/components/schemas/EdgeResponse"
                                 }
                             },
                             "text/json": {
                                 "schema": {
-                                    "$ref": "#/components/schemas/EdgeModel"
+                                    "$ref": "#/components/schemas/EdgeResponse"
                                 }
                             }
                         }
@@ -7174,26 +8210,17 @@
                         "content": {
                             "text/plain": {
                                 "schema": {
-                                    "type": "array",
-                                    "items": {
-                                        "$ref": "#/components/schemas/EdgeModel"
-                                    }
+                                    "$ref": "#/components/schemas/GetEdgesResponse"
                                 }
                             },
                             "application/json": {
                                 "schema": {
-                                    "type": "array",
-                                    "items": {
-                                        "$ref": "#/components/schemas/EdgeModel"
-                                    }
+                                    "$ref": "#/components/schemas/GetEdgesResponse"
                                 }
                             },
                             "text/json": {
                                 "schema": {
-                                    "type": "array",
-                                    "items": {
-                                        "$ref": "#/components/schemas/EdgeModel"
-                                    }
+                                    "$ref": "#/components/schemas/GetEdgesResponse"
                                 }
                             }
                         }
@@ -7309,26 +8336,17 @@
                         "content": {
                             "text/plain": {
                                 "schema": {
-                                    "type": "array",
-                                    "items": {
-                                        "$ref": "#/components/schemas/EdgeModel"
-                                    }
+                                    "$ref": "#/components/schemas/GetEdgesResponse"
                                 }
                             },
                             "application/json": {
                                 "schema": {
-                                    "type": "array",
-                                    "items": {
-                                        "$ref": "#/components/schemas/EdgeModel"
-                                    }
+                                    "$ref": "#/components/schemas/GetEdgesResponse"
                                 }
                             },
                             "text/json": {
                                 "schema": {
-                                    "type": "array",
-                                    "items": {
-                                        "$ref": "#/components/schemas/EdgeModel"
-                                    }
+                                    "$ref": "#/components/schemas/GetEdgesResponse"
                                 }
                             }
                         }
@@ -7418,17 +8436,17 @@
                         "content": {
                             "text/plain": {
                                 "schema": {
-                                    "$ref": "#/components/schemas/EdgeModel"
+                                    "$ref": "#/components/schemas/EdgeResponse"
                                 }
                             },
                             "application/json": {
                                 "schema": {
-                                    "$ref": "#/components/schemas/EdgeModel"
+                                    "$ref": "#/components/schemas/EdgeResponse"
                                 }
                             },
                             "text/json": {
                                 "schema": {
-                                    "$ref": "#/components/schemas/EdgeModel"
+                                    "$ref": "#/components/schemas/EdgeResponse"
                                 }
                             }
                         }
@@ -7481,7 +8499,7 @@
                 "tags": [
                     "Edge"
                 ],
-                "operationId": "isBusyEdgeById",
+                "operationId": "IsBusyEdgeById",
                 "parameters": [
                     {
                         "name": "edgeId",
@@ -7506,17 +8524,17 @@
                         "content": {
                             "text/plain": {
                                 "schema": {
-                                    "$ref": "#/components/schemas/EdgeModel"
+                                    "type": "boolean"
                                 }
                             },
                             "application/json": {
                                 "schema": {
-                                    "$ref": "#/components/schemas/EdgeModel"
+                                    "type": "boolean"
                                 }
                             },
                             "text/json": {
                                 "schema": {
-                                    "$ref": "#/components/schemas/EdgeModel"
+                                    "type": "boolean"
                                 }
                             }
                         }
@@ -7569,7 +8587,7 @@
                 "tags": [
                     "Edge"
                 ],
-                "operationId": "isBusyEdgeByName",
+                "operationId": "IsBusyEdgeByName",
                 "parameters": [
                     {
                         "name": "name",
@@ -7586,17 +8604,17 @@
                         "content": {
                             "text/plain": {
                                 "schema": {
-                                    "$ref": "#/components/schemas/EdgeModel"
+                                    "type": "boolean"
                                 }
                             },
                             "application/json": {
                                 "schema": {
-                                    "$ref": "#/components/schemas/EdgeModel"
+                                    "type": "boolean"
                                 }
                             },
                             "text/json": {
                                 "schema": {
-                                    "$ref": "#/components/schemas/EdgeModel"
+                                    "type": "boolean"
                                 }
                             }
                         }
@@ -7763,7 +8781,7 @@
                 "operationId": "GetNumEdgeContainersByName",
                 "parameters": [
                     {
-                        "name": "cloudName",
+                        "name": "edgeName",
                         "in": "query",
                         "schema": {
                             "type": "string"
@@ -7920,17 +8938,17 @@
                         "content": {
                             "text/plain": {
                                 "schema": {
-                                    "$ref": "#/components/schemas/InstanceModel"
+                                    "$ref": "#/components/schemas/GetInstancesResponse"
                                 }
                             },
                             "application/json": {
                                 "schema": {
-                                    "$ref": "#/components/schemas/InstanceModel"
+                                    "$ref": "#/components/schemas/GetInstancesResponse"
                                 }
                             },
                             "text/json": {
                                 "schema": {
-                                    "$ref": "#/components/schemas/InstanceModel"
+                                    "$ref": "#/components/schemas/GetInstancesResponse"
                                 }
                             }
                         }
@@ -7986,22 +9004,22 @@
                     "content": {
                         "application/json-patch+json": {
                             "schema": {
-                                "$ref": "#/components/schemas/InstanceModel"
+                                "$ref": "#/components/schemas/InstanceRequest"
                             }
                         },
                         "application/json": {
                             "schema": {
-                                "$ref": "#/components/schemas/InstanceModel"
+                                "$ref": "#/components/schemas/InstanceRequest"
                             }
                         },
                         "text/json": {
                             "schema": {
-                                "$ref": "#/components/schemas/InstanceModel"
+                                "$ref": "#/components/schemas/InstanceRequest"
                             }
                         },
                         "application/*+json": {
                             "schema": {
-                                "$ref": "#/components/schemas/InstanceModel"
+                                "$ref": "#/components/schemas/InstanceRequest"
                             }
                         }
                     }
@@ -8012,17 +9030,17 @@
                         "content": {
                             "text/plain": {
                                 "schema": {
-                                    "$ref": "#/components/schemas/InstanceModel"
+                                    "$ref": "#/components/schemas/InstanceResponse"
                                 }
                             },
                             "application/json": {
                                 "schema": {
-                                    "$ref": "#/components/schemas/InstanceModel"
+                                    "$ref": "#/components/schemas/InstanceResponse"
                                 }
                             },
                             "text/json": {
                                 "schema": {
-                                    "$ref": "#/components/schemas/InstanceModel"
+                                    "$ref": "#/components/schemas/InstanceResponse"
                                 }
                             }
                         }
@@ -8093,17 +9111,17 @@
                         "content": {
                             "text/plain": {
                                 "schema": {
-                                    "$ref": "#/components/schemas/InstanceModel"
+                                    "$ref": "#/components/schemas/InstanceResponse"
                                 }
                             },
                             "application/json": {
                                 "schema": {
-                                    "$ref": "#/components/schemas/InstanceModel"
+                                    "$ref": "#/components/schemas/InstanceResponse"
                                 }
                             },
                             "text/json": {
                                 "schema": {
-                                    "$ref": "#/components/schemas/InstanceModel"
+                                    "$ref": "#/components/schemas/InstanceResponse"
                                 }
                             }
                         }
@@ -8150,7 +9168,7 @@
                     }
                 }
             },
-            "patch": {
+            "put": {
                 "tags": [
                     "Instance"
                 ],
@@ -8170,22 +9188,22 @@
                     "content": {
                         "application/json-patch+json": {
                             "schema": {
-                                "$ref": "#/components/schemas/InstanceModel"
+                                "$ref": "#/components/schemas/InstanceRequest"
                             }
                         },
                         "application/json": {
                             "schema": {
-                                "$ref": "#/components/schemas/InstanceModel"
+                                "$ref": "#/components/schemas/InstanceRequest"
                             }
                         },
                         "text/json": {
                             "schema": {
-                                "$ref": "#/components/schemas/InstanceModel"
+                                "$ref": "#/components/schemas/InstanceRequest"
                             }
                         },
                         "application/*+json": {
                             "schema": {
-                                "$ref": "#/components/schemas/InstanceModel"
+                                "$ref": "#/components/schemas/InstanceRequest"
                             }
                         }
                     }
@@ -8196,17 +9214,17 @@
                         "content": {
                             "text/plain": {
                                 "schema": {
-                                    "$ref": "#/components/schemas/InstanceModel"
+                                    "$ref": "#/components/schemas/InstanceResponse"
                                 }
                             },
                             "application/json": {
                                 "schema": {
-                                    "$ref": "#/components/schemas/InstanceModel"
+                                    "$ref": "#/components/schemas/InstanceResponse"
                                 }
                             },
                             "text/json": {
                                 "schema": {
-                                    "$ref": "#/components/schemas/InstanceModel"
+                                    "$ref": "#/components/schemas/InstanceResponse"
                                 }
                             }
                         }
@@ -8729,17 +9747,17 @@
                         "content": {
                             "text/plain": {
                                 "schema": {
-                                    "$ref": "#/components/schemas/InstanceModel"
+                                    "$ref": "#/components/schemas/InstanceResponse"
                                 }
                             },
                             "application/json": {
                                 "schema": {
-                                    "$ref": "#/components/schemas/InstanceModel"
+                                    "$ref": "#/components/schemas/InstanceResponse"
                                 }
                             },
                             "text/json": {
                                 "schema": {
-                                    "$ref": "#/components/schemas/InstanceModel"
+                                    "$ref": "#/components/schemas/InstanceResponse"
                                 }
                             }
                         }
@@ -8797,22 +9815,22 @@
                     "content": {
                         "application/json-patch+json": {
                             "schema": {
-                                "$ref": "#/components/schemas/PolicyModel"
+                                "$ref": "#/components/schemas/PolicyRequest"
                             }
                         },
                         "application/json": {
                             "schema": {
-                                "$ref": "#/components/schemas/PolicyModel"
+                                "$ref": "#/components/schemas/PolicyRequest"
                             }
                         },
                         "text/json": {
                             "schema": {
-                                "$ref": "#/components/schemas/PolicyModel"
+                                "$ref": "#/components/schemas/PolicyRequest"
                             }
                         },
                         "application/*+json": {
                             "schema": {
-                                "$ref": "#/components/schemas/PolicyModel"
+                                "$ref": "#/components/schemas/PolicyRequest"
                             }
                         }
                     }
@@ -8823,17 +9841,17 @@
                         "content": {
                             "text/plain": {
                                 "schema": {
-                                    "$ref": "#/components/schemas/PolicyModel"
+                                    "$ref": "#/components/schemas/PolicyResponse"
                                 }
                             },
                             "application/json": {
                                 "schema": {
-                                    "$ref": "#/components/schemas/PolicyModel"
+                                    "$ref": "#/components/schemas/PolicyResponse"
                                 }
                             },
                             "text/json": {
                                 "schema": {
-                                    "$ref": "#/components/schemas/PolicyModel"
+                                    "$ref": "#/components/schemas/PolicyResponse"
                                 }
                             }
                         }
@@ -8891,17 +9909,17 @@
                         "content": {
                             "text/plain": {
                                 "schema": {
-                                    "$ref": "#/components/schemas/PolicyModel"
+                                    "$ref": "#/components/schemas/GetPoliciesResponse"
                                 }
                             },
                             "application/json": {
                                 "schema": {
-                                    "$ref": "#/components/schemas/PolicyModel"
+                                    "$ref": "#/components/schemas/GetPoliciesResponse"
                                 }
                             },
                             "text/json": {
                                 "schema": {
-                                    "$ref": "#/components/schemas/PolicyModel"
+                                    "$ref": "#/components/schemas/GetPoliciesResponse"
                                 }
                             }
                         }
@@ -8972,17 +9990,17 @@
                         "content": {
                             "text/plain": {
                                 "schema": {
-                                    "$ref": "#/components/schemas/PolicyModel"
+                                    "$ref": "#/components/schemas/PolicyResponse"
                                 }
                             },
                             "application/json": {
                                 "schema": {
-                                    "$ref": "#/components/schemas/PolicyModel"
+                                    "$ref": "#/components/schemas/PolicyResponse"
                                 }
                             },
                             "text/json": {
                                 "schema": {
-                                    "$ref": "#/components/schemas/PolicyModel"
+                                    "$ref": "#/components/schemas/PolicyResponse"
                                 }
                             }
                         }
@@ -9029,7 +10047,7 @@
                     }
                 }
             },
-            "patch": {
+            "put": {
                 "tags": [
                     "Policy"
                 ],
@@ -9049,22 +10067,22 @@
                     "content": {
                         "application/json-patch+json": {
                             "schema": {
-                                "$ref": "#/components/schemas/PolicyModel"
+                                "$ref": "#/components/schemas/PolicyRequest"
                             }
                         },
                         "application/json": {
                             "schema": {
-                                "$ref": "#/components/schemas/PolicyModel"
+                                "$ref": "#/components/schemas/PolicyRequest"
                             }
                         },
                         "text/json": {
                             "schema": {
-                                "$ref": "#/components/schemas/PolicyModel"
+                                "$ref": "#/components/schemas/PolicyRequest"
                             }
                         },
                         "application/*+json": {
                             "schema": {
-                                "$ref": "#/components/schemas/PolicyModel"
+                                "$ref": "#/components/schemas/PolicyRequest"
                             }
                         }
                     }
@@ -9224,17 +10242,17 @@
                         "content": {
                             "text/plain": {
                                 "schema": {
-                                    "$ref": "#/components/schemas/RobotModel"
+                                    "$ref": "#/components/schemas/GetRobotsResponse"
                                 }
                             },
                             "application/json": {
                                 "schema": {
-                                    "$ref": "#/components/schemas/RobotModel"
+                                    "$ref": "#/components/schemas/GetRobotsResponse"
                                 }
                             },
                             "text/json": {
                                 "schema": {
-                                    "$ref": "#/components/schemas/RobotModel"
+                                    "$ref": "#/components/schemas/GetRobotsResponse"
                                 }
                             }
                         }
@@ -9290,22 +10308,22 @@
                     "content": {
                         "application/json-patch+json": {
                             "schema": {
-                                "$ref": "#/components/schemas/RobotModel"
+                                "$ref": "#/components/schemas/RobotRequest"
                             }
                         },
                         "application/json": {
                             "schema": {
-                                "$ref": "#/components/schemas/RobotModel"
+                                "$ref": "#/components/schemas/RobotRequest"
                             }
                         },
                         "text/json": {
                             "schema": {
-                                "$ref": "#/components/schemas/RobotModel"
+                                "$ref": "#/components/schemas/RobotRequest"
                             }
                         },
                         "application/*+json": {
                             "schema": {
-                                "$ref": "#/components/schemas/RobotModel"
+                                "$ref": "#/components/schemas/RobotRequest"
                             }
                         }
                     }
@@ -9316,17 +10334,17 @@
                         "content": {
                             "text/plain": {
                                 "schema": {
-                                    "$ref": "#/components/schemas/RobotModel"
+                                    "$ref": "#/components/schemas/RobotResponse"
                                 }
                             },
                             "application/json": {
                                 "schema": {
-                                    "$ref": "#/components/schemas/RobotModel"
+                                    "$ref": "#/components/schemas/RobotResponse"
                                 }
                             },
                             "text/json": {
                                 "schema": {
-                                    "$ref": "#/components/schemas/RobotModel"
+                                    "$ref": "#/components/schemas/RobotResponse"
                                 }
                             }
                         }
@@ -9397,17 +10415,17 @@
                         "content": {
                             "text/plain": {
                                 "schema": {
-                                    "$ref": "#/components/schemas/RobotModel"
+                                    "$ref": "#/components/schemas/RobotResponse"
                                 }
                             },
                             "application/json": {
                                 "schema": {
-                                    "$ref": "#/components/schemas/RobotModel"
+                                    "$ref": "#/components/schemas/RobotResponse"
                                 }
                             },
                             "text/json": {
                                 "schema": {
-                                    "$ref": "#/components/schemas/RobotModel"
+                                    "$ref": "#/components/schemas/RobotResponse"
                                 }
                             }
                         }
@@ -9454,7 +10472,7 @@
                     }
                 }
             },
-            "patch": {
+            "put": {
                 "tags": [
                     "Robot"
                 ],
@@ -9474,22 +10492,22 @@
                     "content": {
                         "application/json-patch+json": {
                             "schema": {
-                                "$ref": "#/components/schemas/RobotModel"
+                                "$ref": "#/components/schemas/RobotRequest"
                             }
                         },
                         "application/json": {
                             "schema": {
-                                "$ref": "#/components/schemas/RobotModel"
+                                "$ref": "#/components/schemas/RobotRequest"
                             }
                         },
                         "text/json": {
                             "schema": {
-                                "$ref": "#/components/schemas/RobotModel"
+                                "$ref": "#/components/schemas/RobotRequest"
                             }
                         },
                         "application/*+json": {
                             "schema": {
-                                "$ref": "#/components/schemas/RobotModel"
+                                "$ref": "#/components/schemas/RobotRequest"
                             }
                         }
                     }
@@ -9500,17 +10518,17 @@
                         "content": {
                             "text/plain": {
                                 "schema": {
-                                    "$ref": "#/components/schemas/RobotModel"
+                                    "$ref": "#/components/schemas/RobotResponse"
                                 }
                             },
                             "application/json": {
                                 "schema": {
-                                    "$ref": "#/components/schemas/RobotModel"
+                                    "$ref": "#/components/schemas/RobotResponse"
                                 }
                             },
                             "text/json": {
                                 "schema": {
-                                    "$ref": "#/components/schemas/RobotModel"
+                                    "$ref": "#/components/schemas/RobotResponse"
                                 }
                             }
                         }
@@ -10033,26 +11051,17 @@
                         "content": {
                             "text/plain": {
                                 "schema": {
-                                    "type": "array",
-                                    "items": {
-                                        "$ref": "#/components/schemas/EdgeModel"
-                                    }
+                                    "$ref": "#/components/schemas/GetEdgesResponse"
                                 }
                             },
                             "application/json": {
                                 "schema": {
-                                    "type": "array",
-                                    "items": {
-                                        "$ref": "#/components/schemas/EdgeModel"
-                                    }
+                                    "$ref": "#/components/schemas/GetEdgesResponse"
                                 }
                             },
                             "text/json": {
                                 "schema": {
-                                    "type": "array",
-                                    "items": {
-                                        "$ref": "#/components/schemas/EdgeModel"
-                                    }
+                                    "$ref": "#/components/schemas/GetEdgesResponse"
                                 }
                             }
                         }
@@ -10143,26 +11152,17 @@
                         "content": {
                             "text/plain": {
                                 "schema": {
-                                    "type": "array",
-                                    "items": {
-                                        "$ref": "#/components/schemas/CloudModel"
-                                    }
+                                    "$ref": "#/components/schemas/GetCloudsResponse"
                                 }
                             },
                             "application/json": {
                                 "schema": {
-                                    "type": "array",
-                                    "items": {
-                                        "$ref": "#/components/schemas/CloudModel"
-                                    }
+                                    "$ref": "#/components/schemas/GetCloudsResponse"
                                 }
                             },
                             "text/json": {
                                 "schema": {
-                                    "type": "array",
-                                    "items": {
-                                        "$ref": "#/components/schemas/CloudModel"
-                                    }
+                                    "$ref": "#/components/schemas/GetCloudsResponse"
                                 }
                             }
                         }
@@ -10231,14 +11231,14 @@
             }
         },
         "/data/robot/{robotid}/topic": {
-            "get": {
+            "put": {
                 "tags": [
                     "Robot"
                 ],
                 "operationId": "RobotChangeTopicStatus",
                 "parameters": [
                     {
-                        "name": "robotId",
+                        "name": "Id",
                         "in": "path",
                         "required": true,
                         "schema": {
@@ -10247,17 +11247,25 @@
                         }
                     },
                     {
-                        "name": "topicName",
+                        "name": "TopicName",
                         "in": "query",
                         "schema": {
                             "type": "string"
                         }
                     },
                     {
-                        "name": "topicEnabled",
+                        "name": "Enabled",
                         "in": "query",
                         "schema": {
                             "type": "boolean"
+                        }
+                    },
+                    {
+                        "name": "robotId",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
                         }
                     }
                 ],
@@ -10267,17 +11275,17 @@
                         "content": {
                             "text/plain": {
                                 "schema": {
-                                    "$ref": "#/components/schemas/RosTopicModel"
+                                    "$ref": "#/components/schemas/UpdateTopicResponse"
                                 }
                             },
                             "application/json": {
                                 "schema": {
-                                    "$ref": "#/components/schemas/RosTopicModel"
+                                    "$ref": "#/components/schemas/UpdateTopicResponse"
                                 }
                             },
                             "text/json": {
                                 "schema": {
-                                    "$ref": "#/components/schemas/RosTopicModel"
+                                    "$ref": "#/components/schemas/UpdateTopicResponse"
                                 }
                             }
                         }
@@ -10357,17 +11365,17 @@
                         "content": {
                             "text/plain": {
                                 "schema": {
-                                    "$ref": "#/components/schemas/TaskModel"
+                                    "$ref": "#/components/schemas/GetTasksResponse"
                                 }
                             },
                             "application/json": {
                                 "schema": {
-                                    "$ref": "#/components/schemas/TaskModel"
+                                    "$ref": "#/components/schemas/GetTasksResponse"
                                 }
                             },
                             "text/json": {
                                 "schema": {
-                                    "$ref": "#/components/schemas/TaskModel"
+                                    "$ref": "#/components/schemas/GetTasksResponse"
                                 }
                             }
                         }
@@ -10423,22 +11431,22 @@
                     "content": {
                         "application/json-patch+json": {
                             "schema": {
-                                "$ref": "#/components/schemas/TaskModel"
+                                "$ref": "#/components/schemas/TaskRequest"
                             }
                         },
                         "application/json": {
                             "schema": {
-                                "$ref": "#/components/schemas/TaskModel"
+                                "$ref": "#/components/schemas/TaskRequest"
                             }
                         },
                         "text/json": {
                             "schema": {
-                                "$ref": "#/components/schemas/TaskModel"
+                                "$ref": "#/components/schemas/TaskRequest"
                             }
                         },
                         "application/*+json": {
                             "schema": {
-                                "$ref": "#/components/schemas/TaskModel"
+                                "$ref": "#/components/schemas/TaskRequest"
                             }
                         }
                     }
@@ -10449,17 +11457,17 @@
                         "content": {
                             "text/plain": {
                                 "schema": {
-                                    "$ref": "#/components/schemas/TaskModel"
+                                    "$ref": "#/components/schemas/TaskResponse"
                                 }
                             },
                             "application/json": {
                                 "schema": {
-                                    "$ref": "#/components/schemas/TaskModel"
+                                    "$ref": "#/components/schemas/TaskResponse"
                                 }
                             },
                             "text/json": {
                                 "schema": {
-                                    "$ref": "#/components/schemas/TaskModel"
+                                    "$ref": "#/components/schemas/TaskResponse"
                                 }
                             }
                         }
@@ -10530,17 +11538,17 @@
                         "content": {
                             "text/plain": {
                                 "schema": {
-                                    "$ref": "#/components/schemas/TaskModel"
+                                    "$ref": "#/components/schemas/TaskResponse"
                                 }
                             },
                             "application/json": {
                                 "schema": {
-                                    "$ref": "#/components/schemas/TaskModel"
+                                    "$ref": "#/components/schemas/TaskResponse"
                                 }
                             },
                             "text/json": {
                                 "schema": {
-                                    "$ref": "#/components/schemas/TaskModel"
+                                    "$ref": "#/components/schemas/TaskResponse"
                                 }
                             }
                         }
@@ -10587,7 +11595,7 @@
                     }
                 }
             },
-            "patch": {
+            "put": {
                 "tags": [
                     "Task"
                 ],
@@ -10607,22 +11615,22 @@
                     "content": {
                         "application/json-patch+json": {
                             "schema": {
-                                "$ref": "#/components/schemas/TaskModel"
+                                "$ref": "#/components/schemas/TaskRequest"
                             }
                         },
                         "application/json": {
                             "schema": {
-                                "$ref": "#/components/schemas/TaskModel"
+                                "$ref": "#/components/schemas/TaskRequest"
                             }
                         },
                         "text/json": {
                             "schema": {
-                                "$ref": "#/components/schemas/TaskModel"
+                                "$ref": "#/components/schemas/TaskRequest"
                             }
                         },
                         "application/*+json": {
                             "schema": {
-                                "$ref": "#/components/schemas/TaskModel"
+                                "$ref": "#/components/schemas/TaskRequest"
                             }
                         }
                     }
@@ -10633,17 +11641,17 @@
                         "content": {
                             "text/plain": {
                                 "schema": {
-                                    "$ref": "#/components/schemas/TaskModel"
+                                    "$ref": "#/components/schemas/TaskResponse"
                                 }
                             },
                             "application/json": {
                                 "schema": {
-                                    "$ref": "#/components/schemas/TaskModel"
+                                    "$ref": "#/components/schemas/TaskResponse"
                                 }
                             },
                             "text/json": {
                                 "schema": {
-                                    "$ref": "#/components/schemas/TaskModel"
+                                    "$ref": "#/components/schemas/TaskResponse"
                                 }
                             }
                         }
