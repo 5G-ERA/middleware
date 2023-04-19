@@ -1,10 +1,13 @@
-## Onboarding process of custom task to the system:
+## Onboarding process of custom task to the Middleware system:
 
-A task is a high level semantic representation of a real robot assignment. It consists of multiple actions that can run either in parallel or in sequence. In this section, a task with one action, deploy Nginx, will be created. 
+A task is a high level semantic representation of a real robot assignment. It consists of multiple actions that can run either in parallel or in sequence. In this section, we will learn how to create task with one action, and deploy Nginx. 
 
-It assumes that both deployment.yaml and service.yaml k8 files are ready. After this, a python utility script (**flatten_yaml_to_json_string.py**) is used to translate both k8 files into a single line estructure. This is needed for the API Endpoint call.
+## Step 1: API Endpoint Call
+
+It is assumed that both deployment.yaml and service.yaml k8 files are ready. After this, a python utility script (**flatten_yaml_to_json_string.py**) is used to translate both k8 files into a single line structure. This is needed for the API Endpoint call.
 
 In the same directory where the python script is located, paste the two k8 yaml files. This will generate new files that will be used later on in the rest call, in the body section.
+## Step 2: Add Task template
 
 Make sure to have the openAPI specs with you so it will be easy to follow from here. Check the task add template, it should be similar to the example below. Here many items are created, an action, and instance and a ContainerImage. All together make the task representation. Unique identifiers (GUID) will be required for each of the Id fields. What is important also is that in the **ContainerImage section** both **K8SDeployment** and **K8SService** need to be completed with the output of the python utility script.
 
