@@ -1,15 +1,17 @@
 ﻿using Middleware.Models.Domain;
+using Redis.OM.Modeling;
 
 namespace Middleware.Models.Dto.Ros;
 
 public class Sensor
 {
-    public string? Name { get; set; }
-    public string? Type { get; set; }
-    public string? Description { get; set; }
-    public List<string> Nodes { get; set; } = new();
+    public string? Name { get; init; }
+    public string? Type { get; init; }
+    public string? Description { get; init; }
+    [Indexed]
+    public List<string> Nodes { get; init; } = new();
 
-    public int Number { get; set; }
+    public int Number { get; init; }
 
     public SensorModel ToModel()
     {

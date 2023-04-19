@@ -10,7 +10,7 @@ namespace Middleware.Models.Domain
         public string Description { get; set; }
         public List<string> Nodes { get; set; } //A sensor can publish multiple topics
 
-        public int Number { get; set; }
+        public int Number { get; init; }
 
         public Sensor ToDto()
         {

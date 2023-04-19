@@ -96,8 +96,14 @@ public class RobotDto : Dto
             RosDistro = dto.Ros.RosDistro,
             RosVersion = dto.Ros.RosVersion,
             ROSRepo = dto.Ros.RosRepo,
-            
-            //TODO: fill remaining specification of the robot
+            Sensors = dto.Sensors?.Select(x=>x.ToModel()).ToList(),
+            Actuators = dto.Actuators?.Select(x=>x.ToModel()).ToList(),
+            Manipulators = dto.Manipulators?.Select(x=>x.ToModel()).ToList(),
+            OnboardedTime = dto.OnboardedTime.DateTime,
+            Questions = dto.Questions,
+            TaskList = dto.TaskList,
+            CurrentTaskId = Guid.Parse(dto.CurrentTaskId),
+            ROSNodes = dto.Ros.RosNodes?.Select(x=>x.ToModel()).ToList()
         };
     }
 }
