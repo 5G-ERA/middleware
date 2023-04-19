@@ -16,7 +16,7 @@ namespace Middleware.Models.Domain
         public override string Name { get; set; }
         public string Salt { get; set; }
 
-        public string Role { get; set; }
+        public string Role { get; set; } = "robot";
         public override Dto.Dto ToDto()
         {
             var domain = this;
