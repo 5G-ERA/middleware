@@ -1,51 +1,23 @@
 # 1) Onboard a new user to the middleware system:
 
-## Register New User
+## Step 1:  Register New User
 
-To create a new user in the system use the following endpoint. You will be required to enter a randomly generated GUID and a password. Remember these ones for future log in. Change localhost to the IP of your middleware if you are not working in development enviroment under visual studio. And example of the request body:
+To create a new user in the system, you will need username, password and role as shown in the picture below. Random GUID will be generated for further use. To confirm whether you have been registered or not, you will see status as 200 OK. 
 
-```
-{
-    "Id": "ef7bd354-f891-4a24-8576-4fdc6143f941",
-    "Password": "new_user"
-}
+![image](img/Newuserregister.png)
 
-```
+## Step 2: Login New User
 
-The endpoint for registration:
+You will need the username and password to login, a token will be generated which you will further use to access the endpoints in the middleware shown below;
 
-**Remeber to change localhost to the IP of your middleware. Also this is a POST request.**
+![image](img/Tokennewuser.PNG)
 
-```
-http://localhost:5047/Register
-```
+If there is any issue running the endpoints, please do check the headers of the request shown below; 
 
-![image](img/RegisterRobot.jpg)
+![image](img/newuserheaders.png)
 
-If there is any problem with running this endpoint, check the headers of the request. Hey should be as follows:
 
-![image](img/Headers_LoginEndpoint.png)
 
-# 2) Login to the middleware system:
 
-The endpoint for login:
 
-```
-http://localhost:5047/Login
-```
 
-You will need to use the information provided during  the registration in the body of the login request. Example:
-
-```
-{
-    "Id": "ef7bd354-f891-4a24-8576-4fdc6143f941",
-    "Password": "new_user"
-}
-
-```
-
-**Remeber to change localhost to the IP of your middleware. Also this is a POST request.**
-
-If there is any problem with running this endpoint, check the headers of the request. Hey should be as follows:
-
-![image](img/LoginHeaders.png)
