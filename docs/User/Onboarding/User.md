@@ -23,7 +23,7 @@ To create a new user in the Middleware system, the user needs to be registered w
 * Select JSON from the dropdown menu
 * Click the Send button
 
-![image](img/User%20Registerv2.PNG)
+![image](img/User%20Registerv3.png)
 
 
 The full User import template looks like the following: 
@@ -36,7 +36,7 @@ The full User import template looks like the following:
 }
 ```
 
-## Step 4: Login to the Middleware
+## Step 3: Login to the Middleware
 
 To login to the Middleware the user has to adjust the following changes for the call
 * Request method is set to `POST`
@@ -50,7 +50,7 @@ Once the user makes the request for the login, the response body will contain a 
 
 ![image](img/Tokennewuser.PNG)
 
-## Step 5: Using the JWT token for accessing the Middleware
+## Step 4: Using the JWT token for accessing the Middleware
 
 For attaching the JWT token when making a call to one of the endpoints of the Middleware, the user has to do the following.
 * Provide the path for to the endpoint
