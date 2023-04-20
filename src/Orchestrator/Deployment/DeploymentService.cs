@@ -215,7 +215,7 @@ public class DeploymentService : IDeploymentService
     private async Task<T> Deploy<T>(IKubernetes k8SClient, string objectDefinition, string name, Guid instanceId,
         string propName = null) where T : class
     {
-        name = name.Replace(" ", "-").Trim();
+        name = name.Replace(" ", "-").ToLower().Trim();
         var type = typeof(T);
 
         if (string.IsNullOrWhiteSpace(objectDefinition))
