@@ -4,8 +4,8 @@ namespace Middleware.Models.Domain
 {
     public class ROSServiceModel
     {
-        public string Name { get; set; }
-        public string Description { get; set; }
+        public string Name { get; set; } = default!;
+        public string? Description { get; set; }
 
         public RosService ToDto()
         {

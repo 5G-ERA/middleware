@@ -11,13 +11,13 @@ public class DialogueModel : BaseModel
     /// Question / Name
     /// </summary>
     [JsonPropertyName("Name")]
-    public override string Name { get; set; }
+    public override string? Name { get; set; }
 
     [JsonPropertyName("IsSingleAnswer")]
     public bool IsSingleAnswer { get; set; }
 
     [JsonPropertyName("Answer")]
-    public List<KeyValuePair> Answer { get; set; }
+    public List<KeyValuePair>? Answer { get; set; }
     
     public override Dto.Dto ToDto()
     {
@@ -27,7 +27,7 @@ public class DialogueModel : BaseModel
             Id = domain.Id.ToString(),
             Name = domain.Name,
             IsSingleAnswer = domain.IsSingleAnswer,
-            Answer = domain.Answer.ToList(),
+            Answer = domain.Answer?.ToList() ?? new(),
 
         };
     }

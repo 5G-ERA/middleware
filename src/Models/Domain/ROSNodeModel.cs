@@ -4,13 +4,13 @@ namespace Middleware.Models.Domain
 {
     public class ROSNodeModel
     {
-        public string Name { get; set; }
+        public string? Name { get; set; }
 
-        public List<RosTopicModel> Publications { get; set; }
+        public List<RosTopicModel> Publications { get; set; } = new();
 
-        public List<RosTopicModel> Subscriptions { get; set; }
+        public List<RosTopicModel> Subscriptions { get; set; } = new();
 
-        public List<ROSServiceModel> Services { get; set; }
+        public List<ROSServiceModel> Services { get; set; } = new();
 
         /// <summary>
         /// Put all node topics into a single list.

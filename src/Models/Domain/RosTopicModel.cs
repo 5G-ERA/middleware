@@ -5,8 +5,8 @@ namespace Middleware.Models.Domain
     public class RosTopicModel
     {
         public string Name { get; set; } = default!;
-        public string Type { get; set; } = default!;
-        public string? Description { get; set; } = default!;
+        public string? Type { get; set; }
+        public string? Description { get; set; }
         public bool Enabled { get; set; }
 
         /// <summary>
@@ -28,7 +28,7 @@ namespace Middleware.Models.Domain
         }
         public RosTopic ToDto()
         {
-            return new RosTopic()//
+            return new RosTopic()
             {
                 Name = Name,
                 Type = Type,
