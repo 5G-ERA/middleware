@@ -64,9 +64,13 @@ public class DeploymentService : IDeploymentService
     /// <inheritdoc/>
     public async Task<bool> DeployAsync(TaskModel task, Guid robotId)
     {
+        var robotResposne = await _redisInterfaceClient.RobotGetByIdAsync(robotId);
+
+        var robot = robotResposne.ToRobot();
         var isSuccess = true;
         try
         {
+            
             var k8SClient = _kubernetesBuilder.CreateKubernetesClient();
             _logger.LogDebug("Entered DeploymentService.DeployAsync");
             var deployments = await k8SClient.AppsV1.ListNamespacedDeploymentAsync(AppConfig.K8SNamespaceName);
@@ -88,7 +92,7 @@ public class DeploymentService : IDeploymentService
                             continue;
 
                         await DeployService(k8SClient, service, deploymentNames);
-                        await _redisInterfaceClient.AddRelationAsync(service, location, "LOCATED_AT");
+                        //await _redisInterfaceClient.AddRelationAsync(service, location, "LOCATED_AT");
                     }
                     catch (Exception ex)
                     {
@@ -98,7 +102,7 @@ public class DeploymentService : IDeploymentService
                 }
             }
 
-            isSuccess &= await SaveActionSequence(task, robotId); //Here saved in index 13
+            isSuccess &= await SaveActionSequence(task, robot); //Here saved in index 13
         }
         catch (RedisInterface.ApiException<ApiResponse> apiEx)
         {
@@ -114,7 +118,7 @@ public class DeploymentService : IDeploymentService
 
             if (isSuccess)
             {
-                isSuccess &= await SaveActionSequence(task, robotId);
+                isSuccess &= await SaveActionSequence(task, robot);
                 _logger.LogWarning("Deployment of the services has been skipped in the Development environment");
             }
         }
@@ -128,13 +132,13 @@ public class DeploymentService : IDeploymentService
     /// <param name="task"></param>
     /// <param name="robotId"></param>
     /// <returns></returns>
-    private async Task<bool> SaveActionSequence(TaskModel task, Guid robotId)
+    private async Task<bool> SaveActionSequence(TaskModel task, RobotModel robot)
     {
-        var actionPlan = new ActionPlanModel(task.ActionPlanId, task.Id, task.Name, task.ActionSequence!, robotId);
+        var actionPlan = new ActionPlanModel(task.ActionPlanId, task.Id, task.Name, task.ActionSequence!, robot.Id);
         actionPlan.SetStatus("active");
 
         var result = await _redisInterfaceClient.ActionPlanAddAsync(actionPlan);
-
+        //await _redisInterfaceClient.AddRelationAsync(robot, actionPlan, "OWNS");
         return result;
     }
 

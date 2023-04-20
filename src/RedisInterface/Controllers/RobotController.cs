@@ -42,7 +42,7 @@ public class RobotController : ControllerBase
             {
                 return NotFound(new ApiResponse((int)HttpStatusCode.NotFound, "Objects were not found."));
             }
-
+            
             var response = models.ToRobotsResponse();
             return Ok(response);
         }
@@ -211,8 +211,9 @@ public class RobotController : ControllerBase
             bool isValid = await _robotRepository.AddRelationAsync(model);
             if (!isValid)
             {
-                return StatusCode((int)HttpStatusCode.InternalServerError,
-                    new ApiResponse((int)HttpStatusCode.InternalServerError, "The relation was not created"));
+                _logger.LogWarning("Adding relation did not succeed");
+                return StatusCode((int)HttpStatusCode.BadRequest,
+                    new ApiResponse((int)HttpStatusCode.BadRequest, "The relation was not created"));
             }
 
         }
