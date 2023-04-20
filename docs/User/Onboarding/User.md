@@ -25,7 +25,6 @@ To create a new user in the Middleware system, the user needs to be registered w
 
 ![image](img/User%20Registerv2.PNG)
 
-## Step 3: User Template
 
 The full User import template looks like the following: 
 
@@ -36,7 +35,6 @@ The full User import template looks like the following:
     "Role":"admin"
 }
 ```
-![image](img/newusertemplate.png)
 
 ## Step 4: Login to the Middleware
 
