@@ -94,6 +94,11 @@ public class DeploymentService : IDeploymentService
                         await DeployService(k8SClient, service, deploymentNames);
                         //await _redisInterfaceClient.AddRelationAsync(service, location, "LOCATED_AT");
                     }
+                    catch (k8s.Autorest.HttpOperationException ex)                    
+                    {
+                        _logger.LogError(ex, "There was an error while deploying hte service {service} caused by {reason}", service.Name, ex.Response.Content);
+                        isSuccess = false;
+                    }
                     catch (Exception ex)
                     {
                         _logger.LogError(ex, "There was an error while deploying the service {service}", service.Name);
