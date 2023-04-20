@@ -2,13 +2,30 @@
 
 In this section, we will learn how to onboard a new user to the Middleware system. The steps are mentioned below:
 
-## Step 1:  Authentication in Middleware
+## Step 1:  Configuration of the preferred REST API Client
 
-To create a new user in the Middleware system, the user needs to be registered with a username, password and role. After registering and logging in, a token will be generated will be used to authenticate the user changes in the Middleware 
 
-![image](img/Tokennewuser.PNG)
+As part of the configuration of the preferred REST API client like `Postman` or `Insomnia` the following properties have to be set for the registration process
 
-## Step 2: User Template
+* The IP address of the Middleware
+* Path of a request `request/Register`
+* Request method is set to `POST`
+* `Content-Type` header value set to `application/json`
+
+![image](img/User%20headerv2.png)
+
+## Step 2: Registration to the Middleware 
+
+To create a new user in the Middleware system, the user needs to be registered with a username, password, and role. In the body section of the request, the registration credentials have to be provided.
+
+* Provide registration credentials using json format
+* Tick the raw button
+* Select JSON from the dropdown menu
+* Click the Send button
+
+![image](img/User%20Registerv2.PNG)
+
+## Step 3: User Template
 
 The full User import template looks like the following: 
 
@@ -21,24 +38,33 @@ The full User import template looks like the following:
 ```
 ![image](img/newusertemplate.png)
 
-## Step 3: Configuration of the preferred REST API Client
+## Step 4: Login to the Middleware
 
-As part of the configuration of the preferred REST API client like `Postman` or `Insomnia` the following properties have to be set.
-
-* The IP address of the Middleware
-* Path of a request `/data/user`
+To login to the Middleware the user has to adjust the following changes for the call
 * Request method is set to `POST`
-* `Content-Type` header value set to `application/json`
+* The IP address of the Middleware
+* Path for the `request /Login`
+* The body of the request should contain the `username` and `password`
 
-## Step 4: Importing the New User definition
+![image](img/User%20login4v2.PNG)
 
-Before sending a POST request ensure you have added the token obtained in Step 1. 
+Once the user makes the request for the login, the response body will contain a JWT token which will have to be attached to the calls in order to access the endpoints of the Middleware.
+
+![image](img/Tokennewuser.PNG)
+
+## Step 5: Using the JWT token for accessing the Middleware
+
+For attaching the JWT token when making a call to one of the endpoints of the Middleware, the user has to do the following.
+* Provide the path for to the endpoint
+* Select the `Authorization` section
+* Choose `Bearer Token` from the dropdown menu
+* Paste the `token` in the token section and make the call by clicking `Send` button
 
 ![image](img/tokengenerateuser.png)
 
-After providing the correct token, execute the request. The user should be accepted and a new ID should be given by the Middleware. 
 
-![image](img/New%20User%20generatev2.png)
+
+
 
 
 
