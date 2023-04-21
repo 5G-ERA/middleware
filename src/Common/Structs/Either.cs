@@ -35,5 +35,18 @@ public struct Either<TLeft, TRight>
     {
         return _isLeft ? left(_left) : right(_right);
     }
+
+    public void Act(Action<TLeft> left, Action<TRight> right)
+    {
+        if (_isLeft)
+        {
+            left.Invoke(_left);
+        }
+        else
+        {
+            right.Invoke(_right);
+        }
+        
+    }
 }
 
