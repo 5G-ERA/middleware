@@ -12,6 +12,10 @@ jobs:
     steps:
     - uses: actions/checkout@v3
     
+    - name: Get the version
+      id: get_version
+      run: echo ::set-output name=VERSION::${GITHUB_REF/refs\/tags\//}
+
     - name: Build image
       env:
         IMAGE_REPOSITORY: ${{ secrets.ORCHESTRATOR_REPO_NAME }}
@@ -42,10 +46,7 @@ jobs:
         aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         aws-region: eu-west-1
 
-    - name: Get the version
-      id: get_version
-      run: echo ::set-output name=VERSION::${GITHUB_REF/refs\/tags\//}
-
+    
     - name: Login to Amazon ECR
       id: login-ecr
       uses: aws-actions/amazon-ecr-login@v1

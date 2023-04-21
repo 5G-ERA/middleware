@@ -3,9 +3,6 @@
     "Docker Compose": {
       "commandName": "DockerCompose",
       "commandVersion": "1.0",
-      "composeLaunchAction": "LaunchBrowser",
-      "composeLaunchServiceName": "redisinterface",
-      "composeLaunchUrl": "{Scheme}://localhost:{ServicePort}/swagger",
       "serviceActions": {
         "centralapi": "StartDebugging",
         "ocelotgateway": "StartDebugging",

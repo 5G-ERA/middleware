@@ -173,7 +173,7 @@ public class DeploymentService : IDeploymentService
             }
 
             deploymentNames.Add(cim.Name);
-            var deployedPair = await Deploy(k8SClient, cim);
+            var deployedPair = await Deploy(k8SClient, cim, service.Name);
 
             service.ServiceStatus = ServiceStatus.Idle.GetStringValue();
             service.ServiceInstanceId = deployedPair.InstanceId;
@@ -188,13 +188,13 @@ public class DeploymentService : IDeploymentService
     /// <param name="k8SClient"></param>
     /// <param name="cim"></param>
     /// <returns></returns>
-    private async Task<DeploymentPairModel> Deploy(IKubernetes k8SClient, ContainerImageModel cim)
+    private async Task<DeploymentPairModel> Deploy(IKubernetes k8SClient, ContainerImageModel cim, string instanceName)
     {
         var instanceId = Guid.NewGuid();
 
-        var service = await Deploy<V1Service>(k8SClient, cim.K8SService, cim.Name, instanceId, nameof(cim.K8SService));
+        var service = await Deploy<V1Service>(k8SClient, cim.K8SService, instanceName, instanceId, nameof(cim.K8SService));
 
-        var deployment = await Deploy<V1Deployment>(k8SClient, cim.K8SDeployment, cim.Name, instanceId,
+        var deployment = await Deploy<V1Deployment>(k8SClient, cim.K8SDeployment, instanceName, instanceId,
             nameof(cim.K8SDeployment));
 
         return new DeploymentPairModel(deployment, service, instanceId);
@@ -215,7 +215,12 @@ public class DeploymentService : IDeploymentService
     private async Task<T> Deploy<T>(IKubernetes k8SClient, string objectDefinition, string name, Guid instanceId,
         string propName = null) where T : class
     {
-        name = name.Replace(" ", "-").ToLower().Trim();
+        name = name.Replace(" ", "-")
+            .Replace('_', '-')
+            .Replace(':', '-')
+            .Replace('.', '-')
+            .Replace('/', '-')
+            .ToLower().Trim();
         var type = typeof(T);
 
         if (string.IsNullOrWhiteSpace(objectDefinition))
