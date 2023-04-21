@@ -145,7 +145,7 @@ The last step is to prepare the deployment script for the middleware. It can be 
 8. AWS_ACCESS_KEY_ID - Aws access key ID used to access the services in AWS like Secret Manager
 9. AWS_SECRET_ACCESS_KEY - Aws secret used to authenticate the access key.
 
-The most up-to-date Middleware version is `0.3.0`.
+The most up-to-date Middleware version is `v0.4`.
 
 After all the values are set, the Middleware can be deployed. Start with the deployment of the Orchestrator:
 
