@@ -1,6 +1,6 @@
 ## Deployment of Network Application to the Middleware 
 
-For the middleware to plan optimal network application placement, it is important to import the network topology into the system. In this section, we will learn how to deploy network application to the Middleware system. 
+ In this section, we will learn how to deploy network application to the Middleware system. 
 
 ## Step 1:  Configuration of the preferred REST API Client
 
