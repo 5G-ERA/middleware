@@ -1,6 +1,6 @@
 ## Deployment of Network Application to the Middleware 
 
- In this section, we will learn how to deploy network application to the Middleware system. Essentially, this is the execution of a robotics tasks that has been previously onboarded. So, for the deployment of a network application, the taskid containing the app to be deployed is neccesary. Follow the tutorial [here](https://github.com/5G-ERA/middleware/blob/main/docs/User/Onboarding/Task.md) for onboarding a task if you havent done so.
+In this section, we will learn how to deploy a Network Application to the Middleware system. Essentially, this is the execution of a robotics tasks that has been previously onboarded. So, for the deployment of a network application, the taskid containing the app to be deployed is neccesary. Follow the tutorial [here](https://github.com/5G-ERA/middleware/blob/main/docs/User/Onboarding/Network%20Application%20Onboarding.md) for onboarding of a `Task` if you havent done so.
 
 ## Step 1:  Configuration of the preferred REST API Client
 
@@ -23,7 +23,7 @@ The headers of the http request should look like this:
 
 ![image](../User/Onboarding/img/Netapp%20Header.png)
 
-## Step 2: task deployment containing network application
+## Step 2: Task deployment containing Network Application
 
 The full NetApp template looks like this:
 
@@ -35,10 +35,13 @@ The full NetApp template looks like this:
   "ReplanActionPlannerLocked": true  
 }
 ```
+The `TaskId` property has to be adjusted with the unique identifier of an imported `Task`. Use the identifier of a `Task` that you have imported.
 
-Leave both LockResourceReUse and ReplanActionPlannerLocked as is, the first one makes sure the container cannot be reused by other robots. ReplanActionPlannerLocked will make sure to keep the semantic action sequence as is, therefore the network application will still be deployed as specified in the task definition.
+Leave both `LockResourceReUse` and `ReplanActionPlannerLocked` properties as is. The first one makes sure the container cannot be reused by other robots. `ReplanActionPlannerLocked` will make sure to keep the semantic action sequence as is, therefore the Network Application will be deployed as specified in the task definition.
 
-Before using this endpoint, make sure you are fist log in and have and access token. Visit registration [tutorial](https://github.com/5G-ERA/middleware/blob/main/docs/User/Onboarding/User.md) if you dont have a user.
+The endpoint has an optional parameter named `dryRun` with the default value `false`. When set to `true` it will request the task definition without deploying it. It can be used to make sure that the `Task` definition has been imported correctly.
+
+Before using this endpoint, make sure you are fist logged in and have and access token. Visit registration [tutorial](../User/Onboarding/User.md) if you dont have a user.
 
 For attaching the token when making a call to one of the endpoints of the Middleware, the user has to do the following.
 * Provide the path for to the endpoint
@@ -46,7 +49,6 @@ For attaching the token when making a call to one of the endpoints of the Middle
 * Choose `Bearer Token` from the dropdown menu
 * Paste the `token` in the token section and make the call by clicking `Send` button
 
-Once you have called the task endpoint, in k8s you should be able to see the services and pods of the action sequence of the task.  
+Once you have successfully requested a `Task` deployment, in k8s you should be able to see the services and deployed pods of the action sequence of the `Task`.  
 
 ![image](../User/Onboarding/img/netApp_deployed.png)
-
