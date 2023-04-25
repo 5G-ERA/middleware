@@ -48,4 +48,43 @@ In a terminal with ros and the workspace sourced, run the utility script to capt
 python3 onboarding_robot.py
 ```
 
+## 6) Finish the template manually:
+
+Copy from the newly created json file in section 5 the section rosNodes and paste it in a local copy of the [robot template](../User/Onboarding/robot_Onboarding_Template.json)
+
+To add sensors, follow this json structure:
+```
+    {
+      "name": "cameraSensor",
+      "type": "Camera",
+      "description": "RGDB camera sensor",
+      "nodes": [
+        "/camera_node"
+      ],
+      "number": 1
+    }
+```
+To add an actuator:
+```
+   {
+      "name": "RightEyebrow",
+      "type": "Rotatory",
+      "number": 1,
+      "nodes": [
+        "/actions_node"
+      ]
+    } 
+```
+To add a manipulator:
+    
+```
+   {
+      "name": "manipulator1",
+      "type": "Rotatory",
+      "number": 1,
+      "nodes": [
+        "/actions_node"
+      ]
+    } 
+```
 
