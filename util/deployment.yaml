@@ -1,0 +1,26 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: netapp-object-detection
+  labels:
+    name: netapp-object-detection
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      name: netapp-object-detection
+  template:
+    metadata:
+      labels:
+        name: netapp-object-detection
+    spec:
+      containers:
+        - name: css
+          image: but5gera/netapp_object_detection_standalone:0.1.0
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 5896
+            - containerPort: 5001
+            - containerPort: 5002
+            - containerPort: 5003
+          resources: {}
