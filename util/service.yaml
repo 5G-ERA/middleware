@@ -1,0 +1,41 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: netapp-object-detection
+spec:
+  type: LoadBalancer
+  selector:
+    name: netapp-object-detection
+  ports:
+    - protocol: TCP
+      port: 5896
+      targetPort: 5896
+      name: port1tcp
+    - protocol: UDP
+      port: 5896
+      targetPort: 5896
+      name: port1udp
+    - protocol: TCP
+      port: 5001
+      targetPort: 5001
+      name: port2tcp
+    - protocol: UDP
+      port: 5001
+      targetPort: 5001
+      name: port2udp
+    - protocol: TCP
+      port: 5002
+      targetPort: 5002
+      name: port3tcp
+    - protocol: UDP
+      port: 5002
+      targetPort: 5002
+      name: port3udp
+    - protocol: TCP
+      port: 5003
+      targetPort: 5003
+      name: port4tcp
+    - protocol: UDP
+      port: 5003
+      targetPort: 5003
+      name: port4udp

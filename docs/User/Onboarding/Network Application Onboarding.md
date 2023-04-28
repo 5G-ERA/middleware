@@ -40,6 +40,8 @@ To onboard the NetWork application the Middleware API has to be called. The REST
                     "Id": "e70c0e00-bda2-46a2-b338-f151c5a9731b",
                     "Name": "Nginx webinar",
                     "IsReusable": false,
+                    "MinimumRam":512,
+					"MinimumNumCores": 4,
                     "ContainerImage": {
                         "Id": "15889ea9-0909-4b47-8c1a-e6f7322291c9",
                         "Name": "Nginx webinar",
@@ -103,7 +105,7 @@ The `Action` takes the following structure:
     * 4 - Critical
 * Action Status - represents the combined status of all the services within an action
 * Minimum Ram - the number of RAM required to run specific action expressed in GB
-* Minimum Num Cores - the number of cores tat are required to run the application successfully 
+* Minimum Num Cores - the number of cores that are required to run the application successfully 
 * Services - a list of `Instance` definitions needed to complete the specified `Action`
 
 ### Instance
@@ -115,6 +117,8 @@ The `Instance` takes the following parameters:
 * Id - a unique identifier of an `Instance` in GUID format - has to be provided by the user
 * Name - the name that will allow easy identification of an `Instance`
 * Is reusable - can the instance be used by multiple vertical applications
+* Minimum Ram - the number of RAM required to run specific instance expressed in GB
+* Minimum Num Cores - the number of cores that are required to run the application successfully 
 * ContainerImage - a complex property used to define the deployment procedure for the `Instance`
 
 ## ContainerImage
