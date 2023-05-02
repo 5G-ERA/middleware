@@ -1,8 +1,8 @@
 # Glossary
 
 * Network application (netApp): A network application is any application running on one host providing communication to another application running on a different host.
-* Task: 
-* Action:
+* Task: Series of actions that needs to be done to complete the particular task.
+* Action: An instance of the task that is prioritized for completion of the task.
 * AWS: Amazon Web Services
 * Kubernets: Kubernetes also known as K8s, is an open source system for automating deployment, scaling and management of containerized applications. 
 * Action sequence: Action sequence is the queue for action instances that needs to complete a task according to the priority.
