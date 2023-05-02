@@ -1,1 +1,1 @@
-
+This Images Section contains the deployed middleware images and required entities. 
