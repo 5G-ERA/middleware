@@ -25,12 +25,27 @@ public class IndexCreationService : IHostedService
         {
             await _provider.Connection.CreateIndexAsync(typeof(ActionDto));
         }
+        else
+        {
+            await _provider.Connection.DropIndexAsync(typeof(ActionDto));
+            await _provider.Connection.CreateIndexAsync(typeof(ActionDto));
+        }
         if (info.Any(x => x == "robot-idx") == false)
         {
             await _provider.Connection.CreateIndexAsync(typeof(RobotDto));
         }
+        else
+        {
+            await _provider.Connection.DropIndexAsync(typeof(RobotDto));
+            await _provider.Connection.CreateIndexAsync(typeof(RobotDto));
+        }
         if (info.Any(x => x == "actionPlan-idx") == false)
         {
+            await _provider.Connection.CreateIndexAsync(typeof(ActionPlanDto));
+        }
+        else
+        {
+            await _provider.Connection.DropIndexAsync(typeof(ActionPlanDto));
             await _provider.Connection.CreateIndexAsync(typeof(ActionPlanDto));
         }
         if (info.Any(x => x == "cloud-idx") == false)
@@ -46,8 +61,18 @@ public class IndexCreationService : IHostedService
         {
             await _provider.Connection.CreateIndexAsync(typeof(ContainerImageDto));
         }
+        else
+        {
+            await _provider.Connection.DropIndexAsync(typeof(ContainerImageDto));
+            await _provider.Connection.CreateIndexAsync(typeof(ContainerImageDto));
+        }
         if (info.Any(x => x == "dialogue-idx") == false)
         {
+            await _provider.Connection.CreateIndexAsync(typeof(DialogueDto));
+        }
+        else
+        {
+            await _provider.Connection.DropIndexAsync(typeof(DialogueDto));
             await _provider.Connection.CreateIndexAsync(typeof(DialogueDto));
         }
         if (info.Any(x => x == "edge-idx") == false)
@@ -63,12 +88,27 @@ public class IndexCreationService : IHostedService
         {
             await _provider.Connection.CreateIndexAsync(typeof(InstanceDto));
         }
+        else
+        {
+            await _provider.Connection.DropIndexAsync(typeof(InstanceDto));
+            await _provider.Connection.CreateIndexAsync(typeof(InstanceDto));
+        }
         if (info.Any(x => x == "policy-idx") == false)
         {
             await _provider.Connection.CreateIndexAsync(typeof(PolicyDto));
         }
+        else
+        {
+            await _provider.Connection.DropIndexAsync(typeof(PolicyDto));
+            await _provider.Connection.CreateIndexAsync(typeof(PolicyDto));
+        }
         if (info.Any(x => x == "task-idx") == false)
         {
+            await _provider.Connection.CreateIndexAsync(typeof(TaskDto));
+        }
+        else
+        {
+            await _provider.Connection.DropIndexAsync(typeof(TaskDto));
             await _provider.Connection.CreateIndexAsync(typeof(TaskDto));
         }
         if (info.Any(x => x == "user-idx") == false)
@@ -84,8 +124,18 @@ public class IndexCreationService : IHostedService
         {
             await _provider.Connection.CreateIndexAsync(typeof(RobotStatusDto));
         }
+        else
+        {
+            await _provider.Connection.DropIndexAsync(typeof(RobotStatusDto));
+            await _provider.Connection.CreateIndexAsync(typeof(RobotStatusDto));
+        }
         if (info.Any(x => x == "netAppStatus-idx") == false) 
         {
+            await _provider.Connection.CreateIndexAsync(typeof(NetAppStatusDto));
+        }
+        else
+        {
+            await _provider.Connection.DropIndexAsync(typeof(NetAppStatusDto));
             await _provider.Connection.CreateIndexAsync(typeof(NetAppStatusDto));
         }
     }
