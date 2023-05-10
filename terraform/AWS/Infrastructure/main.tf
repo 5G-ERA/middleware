@@ -39,6 +39,7 @@ module "vpc" {
   }
 }
 
+
 module "eks" {
   source  = "terraform-aws-modules/eks/aws"
   version = "19.5.1"
@@ -50,6 +51,8 @@ module "eks" {
   subnet_ids                     = module.vpc.private_subnets
   cluster_endpoint_public_access = true
   enable_irsa                    = true
+
+
 
   eks_managed_node_group_defaults = {
     ami_type = "AL2_x86_64"
@@ -64,21 +67,11 @@ module "eks" {
       max_size     = 3
       desired_size = 2
     }
-
-    two = {
-      name = "node-group-2"
-
-      instance_types = ["t3.small"]
-
-      min_size     = 1
-      max_size     = 2
-      desired_size = 1
-    }
   }
 }
 
 data "tls_certificate" "eks_tls_certificate" {
-  url = module.eks.cluster_identity_providers[0].oidc[0].issuer
+  url = module.eks.cluster_identity_providers[0].
 }
 
 resource "aws_iam_openid_connect_provider" "connection_provider" {

@@ -21,7 +21,12 @@ output "cluster_name" {
   value       = module.eks.cluster_name
 }
 
-output "service_account_name" {
-  description = "Name of the service account for Middleware to use"
-  value       = ""
+output "middleware_role_arn" {
+  description = "ARN of the role that needs to be associated with the Service Account"
+  value       = aws_iam_role.middleware_role.arn
+}
+
+output "middleware_address" {
+  description = "Fully qualified domain name under which the Middleware is accessible"
+  value       = aws_lb.middldeware-lb.dns_name
 }
