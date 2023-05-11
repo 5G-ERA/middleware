@@ -60,7 +60,6 @@ namespace Middleware.Models.Domain
         //[JsonIgnore]
         public List<string> Tags { get; set; }
 
-
         public TaskModel()
         {
         }

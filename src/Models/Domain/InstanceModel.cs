@@ -83,9 +83,9 @@ public class InstanceModel : BaseModel
         if (!rosDistrosEnum.Contains(ROSDistro)) return false;
         //   if (string.IsNullOrEmpty(RosTopicsPub.ToString())) return false;
         //   if (string.IsNullOrEmpty(RosTopicsSub.ToString())) return false;
-
         return true;
     }
+
     public override Dto.Dto ToDto()
     {
         var domain = this;

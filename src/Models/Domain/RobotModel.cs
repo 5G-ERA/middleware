@@ -36,7 +36,6 @@ public class RobotModel : BaseModel
     public Uri? ROSRepo { get; set; }
 
     [JsonPropertyName("ROSNodes")]
-
     public List<ROSNodeModel>? ROSNodes { get; set; }
 
     [JsonPropertyName("Manufacturer")]
@@ -115,7 +114,6 @@ public class RobotModel : BaseModel
         if (string.IsNullOrEmpty(Name.ToString())) return false;
         if (string.IsNullOrEmpty(LocomotionSystem.ToString())) return false;
         if (string.IsNullOrEmpty(LocomotionType.ToString())) return false;
-
         if (!valLocomotionTypes.Contains(LocomotionType)) return false;
         if (!valLocomotionSystemsEnum.Contains(LocomotionSystem)) return false;
 
@@ -133,7 +131,6 @@ public class RobotModel : BaseModel
                 if (sensor.Number <= 0) return false;
             }
         }
-
         //Check actuators validity
         if (Actuators.Any() == true)
         {
@@ -145,7 +142,6 @@ public class RobotModel : BaseModel
                 if (!valActuatorTypesEnum.Contains(actuator.Type)) return false;
             }
         }
-
         //Check Manipulators validity
         if (Manipulators.Any() == true)
         {
@@ -158,10 +154,8 @@ public class RobotModel : BaseModel
                 if (manipulator.Number <= 0) return false;
             }
         }
-
         return true;
     }
-
 
     /// <summary>
     /// Get all topics of a robot in a single list.
@@ -177,13 +171,11 @@ public class RobotModel : BaseModel
             {
                 topics.Add(pubTopic);
             }
-
             foreach (RosTopicModel subTopic in node.Subscriptions)
             {
                 topics.Add(subTopic);
             }
         }
-
         return topics;
     }
 
@@ -199,7 +191,6 @@ public class RobotModel : BaseModel
     
     public override Dto.Dto ToDto()
     {
-
         var domain = this;
         return new RobotDto()
         {

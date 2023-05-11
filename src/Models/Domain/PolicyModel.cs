@@ -27,7 +27,6 @@ public class PolicyModel : BaseModel
     [JsonPropertyName("IsExclusiveWithinType")]
     public int IsExclusiveWithinType { get; set; } 
 
-
     /// <summary>
     /// Onboarding validation of the policy data object.
     /// </summary>
@@ -42,9 +41,9 @@ public class PolicyModel : BaseModel
         if (string.IsNullOrEmpty(IsExclusiveWithinType.ToString())) return false;
         if (!policyTypesEnum.Contains(Type)) return false;
 
-
         return true;
     }
+
     public override Dto.Dto ToDto()
     {
         var domain = this;

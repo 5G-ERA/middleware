@@ -5,6 +5,7 @@ namespace Middleware.Models.Domain
     public class ActuatorModel
     {
         public string Name { get; set; }
+
         public string Type { get; set; }
 
         public int Number { get; set; }
@@ -13,7 +14,7 @@ namespace Middleware.Models.Domain
 
         public Actuator ToDto()
         {
-            return new Actuator()//
+            return new Actuator()
             {
                 Name = Name,
                 Type = Type,

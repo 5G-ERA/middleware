@@ -8,18 +8,23 @@ namespace Middleware.Models.Dto;
 public class UserDto : Dto
 {
     public const string Prefix = "User";
+
     [Indexed]
     [RedisIdField]
     public override string Id { get; set; } = default!;
+
     [Indexed]
     public string UserName { get; set; } = default!;
+
     [Indexed]
     public string Password { get; init; } = default!;
+
     [Indexed]
     public string Salt { get; init; } = default!;
 
     [Indexed]
     public string Role { get; set; } = default!;
+
     public override BaseModel ToModel()
     {
         var dto = this;
@@ -32,6 +37,5 @@ public class UserDto : Dto
             Name = dto.UserName
         };
     }
-
 }
 

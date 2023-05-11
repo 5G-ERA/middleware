@@ -8,15 +8,19 @@ namespace Middleware.Models.Dto;
 public class ActionDto : Dto
 {
     public const string Prefix = "Action";
+
     [Indexed]
     [RedisIdField]
     public override string Id { get; set; } = default!;
+
     [Indexed]
     public string Name { get; init; } = default!;
+
     [Indexed]
     public List<string> Tags { get; init; } = new();
+
     [Indexed]
-    public string ActionPriority { get; init; } = default!;
+    public int ActionPriority { get; init; } = default!;
 
     public HardwareRequirements HardwareRequirements { get; init; } = new();
     

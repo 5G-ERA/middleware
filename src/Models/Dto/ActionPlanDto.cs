@@ -7,24 +7,32 @@ namespace Middleware.Models.Dto;
 public class ActionPlanDto : Dto
 {
     public const string Prefix = "ActionPlan";
+
     [Indexed]
     [RedisIdField]
     public override string Id { get; set; }
 
     [Indexed]
     public string? TaskId { get; set; }
+
     [Indexed]
     public string Name { get; set; }
+
     [Indexed]
     public string? Status { get; set; }
+
     [Indexed]
     public bool IsReplan { get; set; }
+
     [Indexed(Sortable = true)]
     public DateTimeOffset LastStatusChange { get; set; }
+
     [Indexed]
     public List<ActionModel> ActionSequence { get; set; }
+
     [Indexed]
     public string RobotId { get; set; }
+
     [Indexed(Sortable = true)]
     public DateTimeOffset TaskStartedAt { get; set; }
     

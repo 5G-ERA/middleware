@@ -7,20 +7,26 @@ namespace Middleware.Models.Dto;
 public class PolicyDto: Dto
 {
     public const string Prefix = "Policy";
+
     [Indexed]
     [RedisIdField]
     public override string Id { get; set; }
+
     [Indexed]
     public string? Name { get; set; }
+
     [Indexed]
     public string Type { get; set; }
+
     [Indexed(Sortable = true)]
     public DateTimeOffset Timestamp { get; set; }
+
     [Indexed]
     public bool IsActive { get; set; }
 
     [Indexed]
     public string Description { get; set; }
+
     [Indexed]
     public int IsExclusiveWithinType { get; set; }
 
