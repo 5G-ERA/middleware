@@ -23,10 +23,10 @@ output "cluster_name" {
 
 output "middleware_role_arn" {
   description = "ARN of the role that needs to be associated with the Service Account"
-  value       = aws_iam_role.middleware_role.arn
+  value       = module.iam_eks_role.iam_role_arn
 }
 
-output "middleware_address" {
-  description = "Fully qualified domain name under which the Middleware is accessible"
-  value       = aws_lb.middldeware-lb.dns_name
-}
+# output "middleware_address" {
+#   description = "Fully qualified domain name under which the Middleware is accessible"
+#   value       = aws_lb.middldeware-lb.dns_name
+# }

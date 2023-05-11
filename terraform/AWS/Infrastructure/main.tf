@@ -45,14 +45,14 @@ module "eks" {
   version = "19.5.1"
 
   cluster_name    = local.cluster_name
-  cluster_version = "1.24"
+  cluster_version = "1.26"
 
   vpc_id                         = module.vpc.vpc_id
   subnet_ids                     = module.vpc.private_subnets
   cluster_endpoint_public_access = true
   enable_irsa                    = true
 
-
+  
 
   eks_managed_node_group_defaults = {
     ami_type = "AL2_x86_64"
@@ -70,14 +70,20 @@ module "eks" {
   }
 }
 
-data "tls_certificate" "eks_tls_certificate" {
-  url = module.eks.cluster_identity_providers[0].
-}
+module "iam_eks_role" {
+  source    = "terraform-aws-modules/iam/aws//modules/iam-role-for-service-accounts-eks"
+  role_name = var.role_name
 
-resource "aws_iam_openid_connect_provider" "connection_provider" {
-  client_id_list  = ["sts.amazonaws.com"]
-  thumbprint_list = data.tls_certificate.eks_tls_certificate.certificates[*].sha1_fingerprint
-  url             = data.tls_certificate.eks_tls_certificate.url
+  role_policy_arns = {
+    policy = aws_iam_policy.middleware_iam_policy.arn
+  }
+  
+  oidc_providers = {
+    one = {
+      provider_arn               = module.eks.oidc_provider_arn
+      namespace_service_accounts = ["middleware:orchestrator"]
+    }    
+  }
 }
 
 
@@ -100,7 +106,7 @@ module "irsa-ebs-csi" {
 resource "aws_eks_addon" "ebs-csi" {
   cluster_name             = module.eks.cluster_name
   addon_name               = "aws-ebs-csi-driver"
-  addon_version            = "v1.5.2-eksbuild.1"
+  addon_version            = "v1.18.0-eksbuild.1"
   service_account_role_arn = module.irsa-ebs-csi.iam_role_arn
   tags = {
     "eks_addon" = "ebs-csi"
