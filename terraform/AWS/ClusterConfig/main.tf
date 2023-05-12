@@ -50,7 +50,7 @@ resource "kubernetes_service_account" "orchestrator" {
     namespace = local.namespace
     name      = var.service_account_name
     annotations = {
-      "eks.amazonaws.com/role-arn" = data.terraform_remote_state.middleware_role_arn
+      "eks.amazonaws.com/role-arn" = data.terraform_remote_state.eks.outputs.middleware_role_arn
     }
   }
   automount_service_account_token = true
@@ -86,7 +86,7 @@ resource "kubernetes_role_binding" "role_binding" {
   role_ref {
     api_group = "rbac.authorization.k8s.io"
     kind = "Role"
-    name = local.namespace
+    name = kubernetes_role.role.metadata[0].name
   }
   subject {
     kind = "ServiceAccount"
