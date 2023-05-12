@@ -20,7 +20,7 @@ resource "aws_lb_target_group" "middleware-tg" {
 
 resource "aws_lb_listener" "front_end" {
   load_balancer_arn = aws_lb.middldeware-lb.arn
-  port              = "80"
+  port              = 80
   protocol          = "TCP"
   #ssl_policy        = "ELBSecurityPolicy-TLS13-1-2-2021-06"
   # TODO: create certificate
@@ -31,13 +31,6 @@ resource "aws_lb_listener" "front_end" {
     target_group_arn = aws_lb_target_group.middleware-tg.arn
   }
 }
-
-# resource "aws_autoscaling_attachment" "node_groups--ELB_NAME" {
-# for_each = module.eks.eks_managed_node_groups_autoscaling_group_names
-
-# autoscaling_group_name = lookup(lookup(lookup(each.value, "resources")[0], "autoscaling_groups")[0], "name")
-# alb_target_group_arn   = aws_lb_target_group.middleware-tg.arn
-# }
 
 resource "aws_autoscaling_attachment" "middleware-asg-lb-attachment" {
   autoscaling_group_name = module.eks.eks_managed_node_groups_autoscaling_group_names[0]

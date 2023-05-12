@@ -9,6 +9,7 @@ data "aws_availability_zones" "available" {}
 
 locals {
   cluster_name = var.cluster_name
+  eks_ami_type = "AL2_x86_64"
 }
 
 
@@ -55,7 +56,7 @@ module "eks" {
   
 
   eks_managed_node_group_defaults = {
-    ami_type = "AL2_x86_64"
+    ami_type = local.eks_ami_type
   }
   eks_managed_node_groups = {
     one = {
@@ -72,7 +73,7 @@ module "eks" {
 
 module "iam_eks_role" {
   source    = "terraform-aws-modules/iam/aws//modules/iam-role-for-service-accounts-eks"
-  role_name = var.role_name
+  role_name = var.iam_role_name
 
   role_policy_arns = {
     policy = aws_iam_policy.middleware_iam_policy.arn
@@ -81,7 +82,7 @@ module "iam_eks_role" {
   oidc_providers = {
     one = {
       provider_arn               = module.eks.oidc_provider_arn
-      namespace_service_accounts = ["middleware:orchestrator"]
+      namespace_service_accounts = ["middleware:${var.kubernetes_service_account_name}"]
     }    
   }
 }

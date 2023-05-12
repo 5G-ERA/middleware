@@ -1,6 +1,3 @@
-# Copyright (c) HashiCorp, Inc.
-# SPDX-License-Identifier: MPL-2.0
-
 variable "region" {
   description = "AWS region"
   type        = string
@@ -19,13 +16,19 @@ variable "vpc_name" {
   default     = "5G-ERA"
 }
 
-### Policy
 variable "iam_policy_name" {
   type    = string
   default = "middleware-policy"
 }
 
-variable "role_name" {
+variable "iam_role_name" {
+
   type    = string
   default = "middleware-role"
+}
+
+variable "kubernetes_service_account_name" {
+  description = "Name of teh service Account that the Middleware will use in k8s"
+  type        = string
+  default     = "orchestrator"
 }
