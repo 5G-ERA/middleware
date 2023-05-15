@@ -9,6 +9,7 @@ This configuration is based on [Provision an EKS Cluster tutorial by Terraform](
 The Module configures the following aspects of the Middleware infrastructure:
 * 3 public subnets
 * 3 private subnets
+* NAT Gateway for the private subnets
 * EKS Cluster in the private subnets
 * Auto-scaling node group
 * Enables IRSA in EKS
