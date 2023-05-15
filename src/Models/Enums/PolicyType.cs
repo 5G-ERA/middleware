@@ -7,6 +7,6 @@
         Action = 2,
         Orchestration = 3,
         Gateway = 4,
-
+        LocationSelection = 5
     }
 }

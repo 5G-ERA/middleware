@@ -9,6 +9,7 @@ using Middleware.Common.Config;
 using Middleware.RedisInterface.Contracts.Mappings;
 using Middleware.RedisInterface.Contracts.Responses;
 using Middleware.RedisInterface.Sdk;
+using Middleware.ResourcePlanner.Policies;
 
 namespace Middleware.ResourcePlanner;
 
@@ -19,19 +20,21 @@ public interface IResourcePlanner
     Task<TaskModel> RePlan(TaskModel taskModel, TaskModel oldTask, RobotModel robot, bool isFullReplan);
 }
 
-public class ResourcePlanner : IResourcePlanner
+internal class ResourcePlanner : IResourcePlanner
 {
     private readonly IApiClientBuilder _apiClientBuilder;
     private readonly IMapper _mapper;
     private readonly IEnvironment _env;
     private readonly ILogger _logger;
     private readonly IRedisInterfaceClient _redisInterfaceClient;
+    private readonly IPolicyService _policyService;
     private readonly MiddlewareConfig _mwConfig;
 
     public ResourcePlanner(IApiClientBuilder apiClientBuilder, IMapper mapper, IEnvironment env,
         ILogger<ResourcePlanner> logger,
         IRedisInterfaceClient redisInterfaceClient,
-        IConfiguration configuration)
+        IConfiguration configuration,
+        IPolicyService policyService)
 
     {
         _apiClientBuilder = apiClientBuilder;
@@ -39,6 +42,7 @@ public class ResourcePlanner : IResourcePlanner
         _env = env;
         _logger = logger;
         _redisInterfaceClient = redisInterfaceClient;
+        _policyService = policyService;
         _mwConfig = configuration.GetSection(MiddlewareConfig.ConfigName).Get<MiddlewareConfig>();
     }
 
@@ -57,7 +61,10 @@ public class ResourcePlanner : IResourcePlanner
         foreach (ActionModel action in actionSequence)
         {
             var images = await _redisInterfaceClient.GetRelationAsync(action, "NEEDS");
-            // images -> list of all relations with images for the action
+            
+            if (images == null) throw new Exception("The plan is not correctly configured");
+
+            
             foreach (RelationModel relation in images)
             {
                 InstanceResponse instanceResp = await _redisInterfaceClient.InstanceGetByIdAsync(relation.PointsTo.Id);
@@ -74,8 +81,10 @@ public class ResourcePlanner : IResourcePlanner
                 action.Services.Add(instance);
             }
 
-            action.Placement = _mwConfig.InstanceName;
-            action.PlacementType = _mwConfig.InstanceType; 
+            var location = await _policyService.GetLocationAsync(action.Services);
+
+            action.Placement = location.Name;
+            action.PlacementType = location.Type;
         }
 
         return taskModel;
@@ -381,9 +390,9 @@ public class ResourcePlanner : IResourcePlanner
             var riActivePolicies = await _redisInterfaceClient.PolicyGetActiveAsync();
             //TODO: Only get policies of type resource.
             var activePolicies = riActivePolicies.ToPolicyList();
-            
+
             // Diccionary of Key policy ID, values List of results after query
-            var tempDic = new Dictionary<Guid, List<EdgeModel>>(); 
+            var tempDic = new Dictionary<Guid, List<EdgeModel>>();
             string resourceName = actionParam.Placement;
 
             // Check all policies and decide placement for action.

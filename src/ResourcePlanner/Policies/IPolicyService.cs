@@ -5,6 +5,6 @@ namespace Middleware.ResourcePlanner.Policies;
 
 internal interface IPolicyService
 {
-    Location GetLocation(IReadOnlyList<IPolicyAssignable> members);
-    void ApplyPolicies(IPolicyAssignable member);
+    Task<Location> GetLocationAsync(IReadOnlyList<IPolicyAssignable> members);
+    Task ApplyPoliciesAsync(IPolicyAssignable member);
 }

@@ -1,6 +1,17 @@
-﻿namespace Middleware.ResourcePlanner.Policies;
+﻿using Middleware.RedisInterface.Sdk;
 
-internal class PolicyBuilder
+namespace Middleware.ResourcePlanner.Policies;
+
+internal class PolicyBuilder : IPolicyBuilder
 {
-    
+    private readonly IRedisInterfaceClient _redisInterfaceClient;
+
+    public PolicyBuilder(IRedisInterfaceClient redisInterfaceClient)
+    {
+        _redisInterfaceClient = redisInterfaceClient;
+    }
+    public ILocationSelectionPolicy GetLocationPolicy(string policyName)
+    {
+        var policy = _redisInterfaceClient.GetPolicyByNameAsync(policyName);
+    }
 }

@@ -171,4 +171,10 @@ public interface IRedisInterfaceClient
     /// <param name="name"></param>
     /// <returns></returns>
     Task<EdgeResponse?> EdgeGetByNameAsync(string name);
+    /// <summary>
+    /// Get Policy data by name
+    /// </summary>
+    /// <param name="policyName">name of the policy</param>
+    /// <returns></returns>
+    Task<PolicyResponse> GetPolicyByNameAsync(string policyName);
 }

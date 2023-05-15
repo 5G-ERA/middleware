@@ -366,6 +366,13 @@ namespace Middleware.RedisInterface.Sdk
             return result.IsSuccessStatusCode ? result.Content : null;
         }
 
+        /// <inheritdoc />
+        public Task<PolicyResponse> GetPolicyByNameAsync(string policyName)
+        {
+            //TODO:
+            throw new NotImplementedException();
+        }
+
         public async Task<GetContainersResponse?> ContainerImageGetForInstanceAsync(Guid id, CancellationToken token)
         {
             if (id == default)
