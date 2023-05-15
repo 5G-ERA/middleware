@@ -10,16 +10,16 @@ public class ActionPlanDto : Dto
 
     [Indexed]
     [RedisIdField]
-    public override string Id { get; set; }
+    public override string? Id { get; set; }
 
     [Indexed]
-    public string? TaskId { get; set; }
+    public string TaskId { get; set; }
 
     [Indexed]
-    public string Name { get; set; }
+    public string? Name { get; set; }
 
     [Indexed]
-    public string? Status { get; set; }
+    public string Status { get; set; }
 
     [Indexed]
     public bool IsReplan { get; set; }
@@ -28,7 +28,7 @@ public class ActionPlanDto : Dto
     public DateTimeOffset LastStatusChange { get; set; }
 
     [Indexed]
-    public List<ActionModel> ActionSequence { get; set; }
+    public List<ActionModel>? ActionSequence { get; set; }
 
     [Indexed]
     public string RobotId { get; set; }

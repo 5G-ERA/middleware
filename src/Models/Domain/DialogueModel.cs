@@ -12,7 +12,7 @@ public class DialogueModel : BaseModel
     /// Question / Name
     /// </summary>
     [JsonPropertyName("Name")]
-    public override string? Name { get; set; }
+    public override string Name { get; set; }
 
     [JsonPropertyName("IsSingleAnswer")]
     public bool IsSingleAnswer { get; set; }

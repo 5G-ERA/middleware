@@ -10,12 +10,12 @@ namespace Middleware.Models.Domain
         public override Guid Id { get; set; } = Guid.NewGuid();
 
         [Required]
-        public string Password { get; set; }
+        public string? Password { get; set; }
 
         [JsonPropertyName("UserName")]
-        public override string Name { get; set; }
+        public override string? Name { get; set; }
 
-        public string Salt { get; set; }
+        public string? Salt { get; set; }
 
         public string Role { get; set; } = "robot";
 
