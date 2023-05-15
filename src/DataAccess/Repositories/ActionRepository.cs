@@ -48,7 +48,7 @@ namespace Middleware.DataAccess.Repositories
             {
                 currentModel.Placement = patch.Placement;
             }
-            if (!string.IsNullOrEmpty(patch.ActionPriority))
+            if (!string.IsNullOrEmpty(patch.ActionPriority.ToString()))
             {
                 currentModel.ActionPriority = patch.ActionPriority;
             }

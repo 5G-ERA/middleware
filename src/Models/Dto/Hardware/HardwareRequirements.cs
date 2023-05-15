@@ -7,6 +7,7 @@ public class HardwareRequirements
 {
     [Indexed]
     public long? MinimumRam { get; set; }
+
     [Indexed]
     public int? MinimumNumCores { get; set; }
 

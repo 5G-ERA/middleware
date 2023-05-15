@@ -9,28 +9,37 @@ namespace Middleware.Models.Dto;
 public class RobotDto : Dto
 {
     public const string Prefix = "Robot";
+
     [Indexed]
     [RedisIdField]
     public override string Id { get; set; }
+
     [Indexed]
     public string? Name { get; set; }
+
     [Indexed(JsonPath = "$.RosDistro")]
     public RosInfo Ros { get; init; } = new();
 
     [Indexed(Sortable = true)]
     public DateTimeOffset LastUpdatedTime { get; set; }
+
     [Indexed]
     public string? RobotModelName { get; set; }
+
     [Indexed]
     public string? RobotStatus { get; set; }
+
     [Indexed]
     public string? Manufacturer { get; set; }
 
     public Uri? ManufacturerUrl { get; set; }
+
     [Indexed]
     public long? MaximumPayload { get; set; }
+
     [Indexed]
     public long? MaximumTranslationalVelocity { get; set; }
+
     [Indexed]
     public string CurrentTaskId { get; set; }
 
@@ -40,10 +49,10 @@ public class RobotDto : Dto
     [Indexed]
     public string? LocomotionTypes { get; set; }
 
-
     public long? MaximumRotationalVelocity { get; set; }
 
     public long? RobotWeight { get; set; }
+
     [Indexed]
     public int BatteryStatus { get; set; }
 
@@ -52,10 +61,13 @@ public class RobotDto : Dto
     public string? LocomotionSystem { get; set; }
 
     public string? LocomotionType { get; set; } // Compulsory field
+
     [Indexed]
     public List<Sensor>? Sensors { get; set; } = new();
+
     [Indexed]
     public List<Actuator>? Actuators { get; set; } = new();
+
     [Indexed]
     public List<Manipulator>? Manipulators { get; set; } = new();
     
@@ -67,6 +79,7 @@ public class RobotDto : Dto
 
     [Indexed]
     public List<string> QuestionIds { get; set; } = new();
+
     public HardwareSpec HardwareSpec { get; init; } = new();
 
     public override BaseModel ToModel()

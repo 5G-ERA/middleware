@@ -7,12 +7,15 @@ public class RosNode
 {
     [Indexed]
     public string? Name { get; init; }
+
     [Indexed(JsonPath = "$.Name")]
     [Searchable(JsonPath = "$.Description")]
     public List<RosTopic> Publications { get; init; } = new();
+
     [Indexed(JsonPath = "$.Name")]
     [Searchable(JsonPath = "$.Description")]
     public List<RosTopic> Subscriptions { get; init; } = new();
+
     [Indexed(JsonPath = "$.Name")]
     [Searchable(JsonPath = "$.Description")]
     public List<RosService> Services { get; init; } = new();

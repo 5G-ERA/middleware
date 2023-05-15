@@ -56,6 +56,7 @@ public sealed class ActionPlanModel : BaseModel
         Status = status;
         LastStatusChange = DateTime.UtcNow;
     }
+
     public override Dto.Dto ToDto()
     {
         var domain = this;

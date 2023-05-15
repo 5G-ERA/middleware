@@ -5,6 +5,7 @@ namespace Middleware.Models.Domain
     public class ManipulatorModel
     {
         public string ActuatorName { get; set; }
+
         /// <summary>
         /// Degree's of freedom
         /// </summary>

@@ -6,8 +6,10 @@ public class RosInfo
 {
     [Indexed]
     public int RosVersion { get; set; }
+
     [Indexed]
     public string? RosDistro { get; set; }
+
     [Indexed]
     public Uri? RosRepo { get; set; }
     
