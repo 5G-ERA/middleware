@@ -48,5 +48,5 @@ module "cluster_config" {
   cluster_ca_certificate = module.infrastructure.cluster_ca_certificate
 
   service_account_name = var.kubernetes_service_account_name
-  middleware_role_arn = module.infrastructure.middleware_role_arn
+  middleware_role_arn  = module.infrastructure.middleware_role_arn
 }

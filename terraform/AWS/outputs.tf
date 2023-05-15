@@ -4,8 +4,8 @@ output "cluster_endpoint" {
 }
 
 output "cluster_ca_certificate" {
-    description = "Base64 encoded certificate data required to communicate with the cluster"
-  value = module.infrastructure.cluster_ca_certificate
+  description = "Base64 encoded certificate data required to communicate with the cluster"
+  value       = module.infrastructure.cluster_ca_certificate
 }
 
 output "cluster_name" {
