@@ -191,7 +191,8 @@ public static class ApiContractToDomainMapper
             RosVersion = x.RosVersion,
             RosDistro = x.RosDistro,
             RosTopicsPub = x.RosTopicPublishers.ToList(),
-            RosTopicsSub = x.RosTopicSubscribers.ToList()
+            RosTopicsSub = x.RosTopicSubscribers.ToList(),
+            AppliedPolicies = x.AppliedPolicies.ToList()
         };
     }
     public static InstanceModel ToInstance(this InstanceResponse x)
@@ -209,6 +210,7 @@ public static class ApiContractToDomainMapper
             RosDistro = x.RosDistro,
             RosTopicsPub = x.RosTopicPublishers.ToList(),
             RosTopicsSub = x.RosTopicSubscribers.ToList(),
+            AppliedPolicies = x.AppliedPolicies.ToList(),
             Tags = x.Tags?.ToList(),
             OnboardedTime = x.OnboardedTime
         };
@@ -224,7 +226,8 @@ public static class ApiContractToDomainMapper
             Scope = Enum.Parse<PolicyScope>(x.Scope),
             IsActive = x.IsActive,
             IsExclusiveWithinType = x.IsExclusiveWithinType,
-            Timestamp = x.LastTimeUpdated
+            Timestamp = x.LastTimeUpdated,
+            Priority = Enum.Parse<Priority>(x.Priority)
         };
     }
 
@@ -239,7 +242,8 @@ public static class ApiContractToDomainMapper
             Scope = Enum.Parse<PolicyScope>(x.Scope),
             IsActive = x.IsActive,
             IsExclusiveWithinType = x.IsExclusiveWithinType,
-            Timestamp = x.LastTimeUpdated
+            Timestamp = x.LastTimeUpdated,
+            Priority = Enum.Parse<Priority>(x.Priority)
         };
     }
 

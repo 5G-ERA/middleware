@@ -9,4 +9,5 @@ public class PolicyRequest
     public string Description { get; init; }
     public int IsExclusiveWithinType { get; init; }
     public DateTime LastTimeUpdated { get; init; }
+    public string Priority { get; init; }
 }

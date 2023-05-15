@@ -51,8 +51,4 @@
 		<ProjectReference Include="..\RedisInterface.Sdk\RedisInterface.Sdk.csproj" />
 	</ItemGroup>
 
-	<ItemGroup>
-	  <Folder Include="Policies\" />
-	</ItemGroup>
-
 </Project>

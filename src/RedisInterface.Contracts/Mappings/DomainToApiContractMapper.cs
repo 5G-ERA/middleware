@@ -121,7 +121,8 @@ public static class DomainToApiContractMapper
             RosTopicPublishers = x.RosTopicsPub,
             RosTopicSubscribers = x.RosTopicsSub,
             Tags = x.Tags,
-            OnboardedTime = x.OnboardedTime
+            OnboardedTime = x.OnboardedTime,
+            AppliedPolicies = x.AppliedPolicies
         };
     }
     public static GetInstancesResponse ToInstancesResponse(this IEnumerable<InstanceModel> instances)
@@ -143,7 +144,8 @@ public static class DomainToApiContractMapper
             Scope = x.Scope.ToString(),
             IsActive = x.IsActive,
             IsExclusiveWithinType = x.IsExclusiveWithinType,
-            LastTimeUpdated = x.Timestamp
+            LastTimeUpdated = x.Timestamp,
+            Priority = x.Priority.ToString()
         };
     }
 

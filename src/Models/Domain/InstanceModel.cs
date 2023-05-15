@@ -1,11 +1,12 @@
 ﻿using System.Text.Json.Serialization;
+using Middleware.Models.Domain.Contracts;
 using Middleware.Models.Dto;
 using Middleware.Models.Dto.Hardware;
 using Middleware.Models.Enums;
 
 namespace Middleware.Models.Domain;
 
-public class InstanceModel : BaseModel
+public class InstanceModel : BaseModel, IPolicyAssignable
 {
     [JsonPropertyName("Id")]
     public override Guid Id { get; set; } = Guid.NewGuid();
@@ -65,6 +66,9 @@ public class InstanceModel : BaseModel
     [JsonPropertyName("OnboardedTime")]
     public DateTime OnboardedTime { get; set; } // Compulsory field
 
+    /// <inheritdoc />
+    public List<string> AppliedPolicies { get; init; } = new();
+
     /// <summary>
     /// On boarding validation of the instance data object.
     /// </summary>
@@ -105,11 +109,11 @@ public class InstanceModel : BaseModel
             IsReusable = domain.IsReusable,
             DesiredStatus = domain.DesiredStatus,
             ServiceUrl = domain.ServiceUrl,
-            RosTopicsPub = domain.RosTopicsPub?.Select(x => x.ToDto()).ToList(),
-            RosTopicsSub = domain.RosTopicsSub?.Select(x => x.ToDto()).ToList(),
+            RosTopicsPub = domain.RosTopicsPub.Select(x => x.ToDto()).ToList(),
+            RosTopicsSub = domain.RosTopicsSub.Select(x => x.ToDto()).ToList(),
             RosVersion = domain.RosVersion,
             ROSDistro = domain.RosDistro,
-            Tags = domain.Tags,
+            Tags = domain.Tags ?? new List<string>(),
             InstanceFamily = domain.InstanceFamily,
             SuccessRate = domain.SuccessRate,
             ServiceStatus = domain.ServiceStatus,
@@ -118,7 +122,10 @@ public class InstanceModel : BaseModel
                 MinimumRam = domain.MinimumRam,
                 MinimumNumCores = domain.MinimumNumCores
             },
-            OnboardedTime = domain.OnboardedTime == default ? DateTimeOffset.Now : domain.OnboardedTime
+            OnboardedTime = domain.OnboardedTime == default ? DateTimeOffset.Now : domain.OnboardedTime,
+            AppliedPolicies = domain.AppliedPolicies
         };
     }
+
+    
 }

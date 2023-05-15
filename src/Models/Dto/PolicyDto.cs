@@ -30,6 +30,8 @@ public class PolicyDto : Dto
     [Indexed]
     public int IsExclusiveWithinType { get; set; }
 
+    public string Priority { get; init; } = default!;
+
     public override BaseModel ToModel()
     {
         var dto = this;
@@ -42,7 +44,8 @@ public class PolicyDto : Dto
             Timestamp = dto.Timestamp.DateTime,
             IsActive = dto.IsActive,
             Description = dto.Description,
-            IsExclusiveWithinType = dto.IsExclusiveWithinType
+            IsExclusiveWithinType = dto.IsExclusiveWithinType,
+            Priority = Enum.Parse<Priority>(dto.Priority)
         };
     }
 }

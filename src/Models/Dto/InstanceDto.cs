@@ -23,7 +23,7 @@ public class InstanceDto : Dto
     [Indexed]
     public string DesiredStatus { get; set; } = default!;
     [Indexed]
-    public string ServiceUrl { get; set; } = default!;
+    public string? ServiceUrl { get; set; } = default!;
     [Indexed]
     public List<RosTopic> RosTopicsPub { get; set; } = new();
     [Indexed]
@@ -45,6 +45,8 @@ public class InstanceDto : Dto
 
     [Indexed(Sortable = true)]
     public DateTimeOffset OnboardedTime { get; set; }
+    
+    public List<string> AppliedPolicies { get; init; } = new();
 
     public override BaseModel ToModel()
     {
@@ -68,7 +70,8 @@ public class InstanceDto : Dto
             ServiceStatus = dto.ServiceStatus,
             MinimumRam = dto.HardwareRequirements.MinimumRam,
             MinimumNumCores = dto.HardwareRequirements.MinimumNumCores,
-            OnboardedTime = dto.OnboardedTime.DateTime
+            OnboardedTime = dto.OnboardedTime.DateTime,
+            AppliedPolicies = dto.AppliedPolicies
         };
     }
 }

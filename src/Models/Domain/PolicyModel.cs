@@ -22,6 +22,10 @@ public class PolicyModel : BaseModel
     /// Defines the scope of the policy, if it is system-wide or resource specific
     /// </summary>
     public PolicyScope Scope { get; set; } = PolicyScope.System;
+    /// <summary>
+    /// Defines the priority the policy has
+    /// </summary>
+    public Priority Priority { get; set; } = Priority.Normal;
 
     [JsonPropertyName("Timestamp")]
     public DateTime Timestamp { get; set; }
@@ -46,7 +50,8 @@ public class PolicyModel : BaseModel
             Timestamp = domain.Timestamp,
             IsActive = domain.IsActive,
             Description = domain.Description,
-            IsExclusiveWithinType = domain.IsExclusiveWithinType
+            IsExclusiveWithinType = domain.IsExclusiveWithinType,
+            Priority = domain.Priority.ToString()
         };
     }
 }
