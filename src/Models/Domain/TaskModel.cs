@@ -9,7 +9,7 @@ namespace Middleware.Models.Domain
         public override Guid Id { get; set; }
 
         [JsonPropertyName("Name")]
-        public override string Name { get; set; }
+        public override string? Name { get; set; }
 
         /// <summary>
         /// //True: Dont change actions in action sequence replan
@@ -58,7 +58,7 @@ namespace Middleware.Models.Domain
 
         [JsonPropertyName("Tags")] //TODO: define allows tags
         //[JsonIgnore]
-        public List<string> Tags { get; set; }
+        public List<string>? Tags { get; set; }
 
         public TaskModel()
         {
