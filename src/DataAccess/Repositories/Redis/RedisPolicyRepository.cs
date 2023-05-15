@@ -100,5 +100,12 @@ namespace Middleware.DataAccess.Repositories
             await UpdateAsync(currentModel);
             return currentModel;
         }
+
+        /// <inheritdoc />
+        public async Task<IReadOnlyCollection<PolicyModel>> GetActiveSystemPoliciesAsync()
+        {
+            var policies = await FindAsync(p => p.IsActive && p.Scope == PolicyScope.System.ToString());
+            return policies.AsReadOnly();
+        }
     }
 }

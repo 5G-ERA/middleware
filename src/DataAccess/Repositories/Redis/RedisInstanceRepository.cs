@@ -64,9 +64,9 @@ namespace Middleware.DataAccess.Repositories
             {
                 currentModel.RosVersion = patch.RosVersion;
             }
-            if (!string.IsNullOrEmpty(patch.ROSDistro))
+            if (!string.IsNullOrEmpty(patch.RosDistro))
             {
-                currentModel.ROSDistro = patch.ROSDistro;
+                currentModel.RosDistro = patch.RosDistro;
             }
             if (patch.Tags != null)
             {
@@ -120,7 +120,7 @@ namespace Middleware.DataAccess.Repositories
             {
                 if (instanceCandidate.Id != instance.Id)
                 {
-                    if ((instanceCandidate.InstanceFamily == instance.InstanceFamily) && (instanceCandidate.ROSDistro == instance.ROSDistro) && (instanceCandidate.RosVersion == instance.RosVersion))
+                    if ((instanceCandidate.InstanceFamily == instance.InstanceFamily) && (instanceCandidate.RosDistro == instance.RosDistro) && (instanceCandidate.RosVersion == instance.RosVersion))
                     {
                         instanceCandidatesFinal.Add(instanceCandidate);
                     }

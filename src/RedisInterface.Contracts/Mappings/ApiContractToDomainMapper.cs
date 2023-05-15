@@ -189,7 +189,7 @@ public static class ApiContractToDomainMapper
             MinimumNumCores = x.MinimumNumOfCores,
             OnboardedTime = DateTime.Now,
             RosVersion = x.RosVersion,
-            ROSDistro = x.RosDistro,
+            RosDistro = x.RosDistro,
             RosTopicsPub = x.RosTopicPublishers.ToList(),
             RosTopicsSub = x.RosTopicSubscribers.ToList()
         };
@@ -206,7 +206,7 @@ public static class ApiContractToDomainMapper
             MinimumRam = x.MinimumRam,
             MinimumNumCores = x.MinimumNumOfCores,
             RosVersion = x.RosVersion,
-            ROSDistro = x.RosDistro,
+            RosDistro = x.RosDistro,
             RosTopicsPub = x.RosTopicPublishers.ToList(),
             RosTopicsSub = x.RosTopicSubscribers.ToList(),
             Tags = x.Tags?.ToList(),
@@ -230,7 +230,7 @@ public static class ApiContractToDomainMapper
 
     public static PolicyModel ToPolicy(this PolicyResponse x)
     {
-        return new PolicyModel()
+        return new PolicyModel
         {
             Id = x.Id,
             Name = x.Name,

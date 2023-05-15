@@ -117,7 +117,7 @@ public static class DomainToApiContractMapper
             MinimumRam = x.MinimumRam,
             MinimumNumOfCores = x.MinimumNumCores,
             RosVersion = x.RosVersion,
-            RosDistro = x.ROSDistro,
+            RosDistro = x.RosDistro,
             RosTopicPublishers = x.RosTopicsPub,
             RosTopicSubscribers = x.RosTopicsSub,
             Tags = x.Tags,

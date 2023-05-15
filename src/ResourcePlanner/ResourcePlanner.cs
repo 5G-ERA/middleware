@@ -5,7 +5,6 @@ using Middleware.Common.Enums;
 using Middleware.Common.Responses;
 using Middleware.Models.Domain;
 using Middleware.ResourcePlanner.ApiReference;
-using KeyValuePair = Middleware.Models.Domain.KeyValuePair;
 using Middleware.Common.Config;
 using Middleware.RedisInterface.Contracts.Mappings;
 using Middleware.RedisInterface.Contracts.Responses;
@@ -17,7 +16,7 @@ public interface IResourcePlanner
 {
     Task<TaskModel> Plan(TaskModel taskModel, RobotModel robot);
     Task<TaskModel> SemanticPlan(TaskModel taskModel, RobotModel robot);
-    Task<TaskModel> RePlan(TaskModel taskModel, TaskModel oldTaskmMdel, RobotModel robot, bool fullReplan);
+    Task<TaskModel> RePlan(TaskModel taskModel, TaskModel oldTask, RobotModel robot, bool isFullReplan);
 }
 
 public class ResourcePlanner : IResourcePlanner
@@ -54,7 +53,7 @@ public class ResourcePlanner : IResourcePlanner
             throw new ArgumentException("Action sequence cannot be empty");
 
 
-        // iterate throught actions in actionSequence
+        // iterate through actions in actionSequence
         foreach (ActionModel action in actionSequence)
         {
             var images = await _redisInterfaceClient.GetRelationAsync(action, "NEEDS");
@@ -64,7 +63,7 @@ public class ResourcePlanner : IResourcePlanner
                 InstanceResponse instanceResp = await _redisInterfaceClient.InstanceGetByIdAsync(relation.PointsTo.Id);
                 var instance = instanceResp.ToInstance();
 
-                if (CanBeReused(instance) && taskModel.ResourceLock)
+                if (instance.CanBeReused() && taskModel.ResourceLock)
                 {
                     var reusedInstance = await GetInstanceToReuse(instance, orchestratorApiClient);
                     if (reusedInstance is not null)
@@ -72,7 +71,7 @@ public class ResourcePlanner : IResourcePlanner
                 }
 
                 // add instance to actions
-                action.Services.Add(instance); 
+                action.Services.Add(instance);
             }
 
             action.Placement = _mwConfig.InstanceName;
@@ -97,7 +96,7 @@ public class ResourcePlanner : IResourcePlanner
                 {
                     if (question.Name == "StandAlone5G or NoneStandAlone5G")
                     {
-                        KeyValuePair answer = question.Answer.First();
+                        var answer = question.Answer.First();
                         bool StandAlone5GParam = (bool)answer.Value;
                     }
                 }
@@ -106,9 +105,9 @@ public class ResourcePlanner : IResourcePlanner
                 {
                     if (question.Name == "What type of 5G slice")
                     {
-                        KeyValuePair answer = question.Answer.First();
+                        var answer = question.Answer.First();
                         string
-                            Slice5gType =
+                            slice5GType =
                                 (string)answer
                                     .Value; // there is an upper limit of eight network slices that be used by a device
                     } //Nest template
@@ -434,7 +433,7 @@ public class ResourcePlanner : IResourcePlanner
 
 
     /// <summary>
-    /// SemmanticPlan from the resource level. Create relation for instancse and decide placement.
+    /// SemanticPlan from the resource level. Create relation for Instance and decide placement.
     /// </summary>
     /// <param name="taskModel"></param>
     /// <param name="robot"></param>
@@ -470,7 +469,7 @@ public class ResourcePlanner : IResourcePlanner
                 var instanceResponse = await _redisInterfaceClient.InstanceGetByIdAsync(relation.PointsTo.Id);
                 var instance = instanceResponse.ToInstance();
 
-                if (CanBeReused(instance) && taskModel.ResourceLock == true)
+                if (instance.CanBeReused() && taskModel.ResourceLock)
                 {
                     var reusedInstance = await GetInstanceToReuse(instance, orchestratorApiClient);
                     if (reusedInstance is not null)
@@ -489,20 +488,20 @@ public class ResourcePlanner : IResourcePlanner
     }
 
     /// <summary>
-    /// Replan from the resource level. Create relation for instancse and decide placement.
+    /// Replan from the resource level. Create relation for Instance and decide placement.
     /// </summary>
     /// <param name="taskModel"></param>
-    /// <param name="oldTaskmMdel"></param>
+    /// <param name="oldTask"></param>
     /// <param name="robot"></param>
     /// <returns>Updated task sequence with new placements.</returns>
     /// <exception cref="ArgumentException"></exception>
-    public async Task<TaskModel> RePlan(TaskModel taskModel, TaskModel oldTaskmMdel, RobotModel robot, bool fullReplan)
+    public async Task<TaskModel> RePlan(TaskModel taskModel, TaskModel oldTask, RobotModel robot, bool isFullReplan)
     {
         List<ActionModel> FailedActions = new List<ActionModel>();
         List<ActionModel> ActionsCandidates = new List<ActionModel>();
 
         // Get old action sequence 
-        List<ActionModel> oldActionSequence = oldTaskmMdel.ActionSequence;
+        List<ActionModel> oldActionSequence = oldTask.ActionSequence;
         if (oldActionSequence == null || oldActionSequence.Count == 0)
             throw new ArgumentException("Action sequence cannot be empty");
 
@@ -537,7 +536,7 @@ public class ResourcePlanner : IResourcePlanner
         }
 
         // If full replan was requested by robot.
-        if (fullReplan == true)
+        if (isFullReplan == true)
         {
             // Make a new plan but considering only the actionCandidates and leaving the same the other actions.
             taskModel = await Plan(taskModel, robot, ActionsCandidates);
@@ -616,10 +615,5 @@ public class ResourcePlanner : IResourcePlanner
         }
 
         return null;
-    }
-
-    private bool CanBeReused(InstanceModel instance)
-    {
-        return instance.IsReusable != null && instance.IsReusable.Value;
     }
 }

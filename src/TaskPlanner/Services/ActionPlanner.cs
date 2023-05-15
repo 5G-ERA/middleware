@@ -229,7 +229,7 @@ public class ActionPlanner : IActionPlanner
                 throw new IncorrectROSDistroException();
             }
 
-            if (instance.ROSDistro != robot.RosDistro)
+            if (instance.RosDistro != robot.RosDistro)
             {
                 throw new IncorrectROSVersionException();
             }

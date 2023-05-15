@@ -79,7 +79,7 @@ namespace Middleware.DataAccess.Repositories
             {
                 if (instanceCandidate.Id != instance.Id)
                 {
-                    if ((instanceCandidate.InstanceFamily == instance.InstanceFamily) && (instanceCandidate.ROSDistro == instance.ROSDistro) && (instanceCandidate.RosVersion == instance.RosVersion))
+                    if ((instanceCandidate.InstanceFamily == instance.InstanceFamily) && (instanceCandidate.RosDistro == instance.RosDistro) && (instanceCandidate.RosVersion == instance.RosVersion))
                     {
                         instanceCandidatesFinal.Add(instanceCandidate);
                     }

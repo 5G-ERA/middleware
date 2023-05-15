@@ -12,7 +12,6 @@ namespace Middleware.Models.Domain
         /// <summary>
         /// Set the topic to be enabled.
         /// </summary>
-        /// <param name="topic"></param>
         public void Enable()
         {
             Enabled = true;
@@ -21,14 +20,13 @@ namespace Middleware.Models.Domain
         /// <summary>
         /// Set the topic to be disabled.
         /// </summary>
-        /// <param name="topic"></param>
         public void Disable()
         {
             Enabled = false;
         }
         public RosTopic ToDto()
         {
-            return new RosTopic()
+            return new RosTopic
             {
                 Name = Name,
                 Type = Type,

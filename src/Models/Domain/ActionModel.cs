@@ -32,8 +32,7 @@ public class ActionModel : BaseModel
     public string? ActionStatus { get; set; }
 
     [JsonPropertyName("Services")]
-    //[JsonIgnore]
-    public List<InstanceModel>? Services { get; set; }
+    public List<InstanceModel> Services { get; set; } = new ();
 
     [JsonPropertyName("MinimumRam")]
     public long? MinimumRam { get; set; }

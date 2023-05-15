@@ -84,7 +84,7 @@ public static class ApiContractToDomainMapper
             MinimumNumCores = x.Instance.MinimumNumOfCores,
             OnboardedTime = DateTime.Now,
             RosVersion = x.Instance.RosVersion,
-            ROSDistro = x.Instance.RosDistro,
+            RosDistro = x.Instance.RosDistro,
             RosTopicsPub = x.Instance.RosTopicPublishers.ToList(),
             RosTopicsSub = x.Instance.RosTopicSubscribers.ToList()
         };

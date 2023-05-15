@@ -112,5 +112,11 @@ namespace Middleware.DataAccess.Repositories
             await Db.JsonSetAsync(id.ToString(), JsonSerializer.Serialize(currentModel));
             return currentModel;
         }
+
+        /// <inheritdoc />
+        public Task<IReadOnlyCollection<PolicyModel>> GetActiveSystemPoliciesAsync()
+        {
+            throw new NotImplementedException();
+        }
     }
 }
