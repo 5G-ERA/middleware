@@ -96,7 +96,7 @@ public static class ApiContractToDomainMapper
             Timestamp = DateTime.Now
         };
     }
-    
+
     public static ContainerImageModel ToContainer(this ContainerResponse x)
     {
         return new ContainerImageModel()
@@ -108,16 +108,16 @@ public static class ApiContractToDomainMapper
             Timestamp = DateTime.Now
         };
     }
-    
+
     public static List<ContainerImageModel> ToContainersList(this GetContainersResponse containers)
     {
-        return containers.Containers.Select(x=> 
+        return containers.Containers.Select(x =>
         new ContainerImageModel()
         {
             Id = x.Id,
             Name = x.Name,
             Description = x.Description,
-            K8SDeployment =  x.K8sDeployment,
+            K8SDeployment = x.K8sDeployment,
             K8SService = x.K8sService,
             Timestamp = x.LastUpdateTime
         }).ToList();
@@ -139,7 +139,7 @@ public static class ApiContractToDomainMapper
             Organization = x.Organization
         };
     }
-    
+
     public static EdgeModel ToEdge(this EdgeResponse x)
     {
         return new EdgeModel()
@@ -157,10 +157,10 @@ public static class ApiContractToDomainMapper
             LastUpdatedTime = x.LastUpdatedTime
         };
     }
-    
+
     public static List<EdgeModel> ToEdgeList(this GetEdgesResponse edges)
     {
-        return edges.Edges.Select(x=> new EdgeModel()
+        return edges.Edges.Select(x => new EdgeModel()
         {
             Id = x.Id,
             Name = x.Name,
@@ -175,7 +175,7 @@ public static class ApiContractToDomainMapper
             LastUpdatedTime = x.LastUpdatedTime
         }).ToList();
     }
-    
+
     public static InstanceModel ToInstance(this InstanceRequest x)
     {
         return new InstanceModel()
@@ -220,13 +220,14 @@ public static class ApiContractToDomainMapper
         {
             Name = x.Name,
             Description = x.Description,
-            Type = x.Type,
+            Type = Enum.Parse<PolicyType>(x.Type),
+            Scope = Enum.Parse<PolicyScope>(x.Scope),
             IsActive = x.IsActive,
             IsExclusiveWithinType = x.IsExclusiveWithinType,
             Timestamp = x.LastTimeUpdated
         };
     }
-    
+
     public static PolicyModel ToPolicy(this PolicyResponse x)
     {
         return new PolicyModel()
@@ -234,22 +235,24 @@ public static class ApiContractToDomainMapper
             Id = x.Id,
             Name = x.Name,
             Description = x.Description,
-            Type = x.Type,
+            Type = Enum.Parse<PolicyType>(x.Type),
+            Scope = Enum.Parse<PolicyScope>(x.Scope),
             IsActive = x.IsActive,
             IsExclusiveWithinType = x.IsExclusiveWithinType,
             Timestamp = x.LastTimeUpdated
         };
     }
-    
+
     public static List<PolicyModel> ToPolicyList(this GetPoliciesResponse policies)
     {
-        return policies.Policies.Select(x=> 
+        return policies.Policies.Select(x =>
             new PolicyModel()
             {
                 Id = x.Id,
                 Name = x.Name,
                 Description = x.Description,
-                Type = x.Type,
+                Type = Enum.Parse<PolicyType>(x.Type),
+                Scope = Enum.Parse<PolicyScope>(x.Scope),
                 IsActive = x.IsActive,
                 IsExclusiveWithinType = x.IsExclusiveWithinType,
                 Timestamp = x.LastTimeUpdated
@@ -288,7 +291,7 @@ public static class ApiContractToDomainMapper
             LastUpdatedTime = DateTime.Now
         };
     }
-    
+
     public static RobotModel ToRobot(this RobotResponse x)
     {
         return new RobotModel()

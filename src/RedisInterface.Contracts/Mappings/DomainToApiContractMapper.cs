@@ -139,7 +139,8 @@ public static class DomainToApiContractMapper
             Id = x.Id,
             Name = x.Name,
             Description = x.Description,
-            Type = x.Type,
+            Type = x.Type.ToString(),
+            Scope = x.Scope.ToString(),
             IsActive = x.IsActive,
             IsExclusiveWithinType = x.IsExclusiveWithinType,
             LastTimeUpdated = x.Timestamp

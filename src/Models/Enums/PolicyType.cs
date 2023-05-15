@@ -2,9 +2,11 @@
 {
     public enum PolicyType
     {
-        Resource,
-        Action,
-        Orchestration,
-        Gateway
+        None = 0,
+        Resource = 1,
+        Action = 2,
+        Orchestration = 3,
+        Gateway = 4,
+
     }
 }

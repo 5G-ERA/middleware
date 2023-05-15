@@ -96,7 +96,8 @@ public static class ApiContractToDomainMapper
             Id = x.Id,
             Name = x.Policy.Name,
             Description = x.Policy.Description,
-            Type = x.Policy.Type,
+            Type = Enum.Parse<PolicyType>(x.Policy.Type),
+            Scope = Enum.Parse<PolicyScope>(x.Policy.Scope),
             IsActive = x.Policy.IsActive,
             IsExclusiveWithinType = x.Policy.IsExclusiveWithinType,
             Timestamp = x.Policy.LastTimeUpdated

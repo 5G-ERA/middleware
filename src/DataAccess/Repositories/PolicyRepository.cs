@@ -74,10 +74,10 @@ namespace Middleware.DataAccess.Repositories
         /// <param name="id"></param>
         /// <param name="patch"></param>
         /// <returns> Patched model </returns>
-        public async Task<PolicyModel> PatchPolicyAsync(Guid id, PolicyModel patch)
+        public async Task<PolicyModel?> PatchPolicyAsync(Guid id, PolicyModel patch)
         {
             string model = (string)await Db.JsonGetAsync(id.ToString());
-            PolicyModel currentModel = JsonSerializer.Deserialize<PolicyModel>(model);
+            PolicyModel? currentModel = JsonSerializer.Deserialize<PolicyModel>(model);
             if (currentModel == null)
             {
                 return null;
