@@ -10,7 +10,7 @@ public class ActionPlanDto : Dto
 
     [Indexed]
     [RedisIdField]
-    public override string? Id { get; set; }
+    public override string Id { get; set; }
 
     [Indexed]
     public string TaskId { get; set; }
