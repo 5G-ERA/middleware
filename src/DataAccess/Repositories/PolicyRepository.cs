@@ -68,6 +68,12 @@ namespace Middleware.DataAccess.Repositories
             return activePolicies;
         }
 
+        /// <inheritdoc />
+        public Task<PolicyModel?> GetPolicyByName(string name)
+        {
+            throw new NotImplementedException();
+        }
+
         /// <summary>
         /// Patching properties for PolicyModel
         /// </summary>

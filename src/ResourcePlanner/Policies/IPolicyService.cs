@@ -5,6 +5,11 @@ namespace Middleware.ResourcePlanner.Policies;
 
 internal interface IPolicyService
 {
+    /// <summary>
+    /// Calculates the location based on the assigned policies
+    /// </summary>
+    /// <param name="members"></param>
+    /// <returns></returns>
     Task<Location> GetLocationAsync(IReadOnlyList<IPolicyAssignable> members);
     Task ApplyPoliciesAsync(IPolicyAssignable member);
 }

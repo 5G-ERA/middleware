@@ -49,6 +49,12 @@ namespace Middleware.DataAccess.Repositories
             return activePolicies;
         }
 
+        /// <inheritdoc />
+        public async Task<PolicyModel?> GetPolicyByName(string name)
+        {
+            return await FindSingleAsync(p => p.Name == name);
+        }
+
         /// <summary>
         /// Patching properties for PolicyModel
         /// </summary>

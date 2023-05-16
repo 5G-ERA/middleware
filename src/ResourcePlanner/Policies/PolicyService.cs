@@ -38,7 +38,10 @@ internal class PolicyService : IPolicyService
             }
             foreach (var policyName in member.AppliedPolicies)
             {
-                var policy = _policyBuilder.GetLocationPolicy(policyName);
+                var policy = await _policyBuilder.CreateLocationPolicy(policyName);
+                if (policy is null)
+                    continue;
+
                 var location = await policy.GetLocationAsync();
 
                 locations.Add(policy.Priority, location);

@@ -51,6 +51,9 @@ public interface IRedisInterface
     [Get("/api/v1/instance/alternative/{id}")]
     Task<ApiResponse<InstanceResponse>> InstanceGetAlternative(Guid id);
 
+    [Get("/api/v1/policy/name/{name}")]
+    Task<ApiResponse<PolicyResponse?>> PolicyGetByName(string name);
+
     [Get("/api/v1/policy/current")]
     Task<ApiResponse<GetPoliciesResponse>> PolicyGetActive();
     

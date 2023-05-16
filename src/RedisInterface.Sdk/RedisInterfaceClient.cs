@@ -367,10 +367,20 @@ namespace Middleware.RedisInterface.Sdk
         }
 
         /// <inheritdoc />
-        public Task<PolicyResponse> GetPolicyByNameAsync(string policyName)
+        public async Task<PolicyResponse?> GetPolicyByNameAsync(string policyName)
         {
+            if (string.IsNullOrWhiteSpace(policyName))
+                throw new ArgumentException("Value cannot be null or whitespace.", nameof(policyName));
             //TODO:
-            throw new NotImplementedException();
+
+            var result = await _api.PolicyGetByName(policyName);
+
+            if (!result.IsSuccessStatusCode)
+            {
+                _logger.LogError(result.Error, "{} - unsuccessful API call", nameof(ContainerImageGetForInstanceAsync));
+            }
+
+            return result.IsSuccessStatusCode ? result.Content : null;
         }
 
         public async Task<GetContainersResponse?> ContainerImageGetForInstanceAsync(Guid id, CancellationToken token)

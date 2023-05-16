@@ -176,5 +176,5 @@ public interface IRedisInterfaceClient
     /// </summary>
     /// <param name="policyName">name of the policy</param>
     /// <returns></returns>
-    Task<PolicyResponse> GetPolicyByNameAsync(string policyName);
+    Task<PolicyResponse?> GetPolicyByNameAsync(string policyName);
 }

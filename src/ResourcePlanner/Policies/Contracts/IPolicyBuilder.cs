@@ -8,6 +8,6 @@ internal interface IPolicyBuilder
     /// Gets the implementation for the Location policy
     /// </summary>
     /// <param name="policyName"></param>
-    /// <returns></returns>
-    ILocationSelectionPolicy GetLocationPolicy(string policyName);
+    /// <returns>Implementation of the Location Selection Policy or null when specified policy is of different type</returns>
+    Task<ILocationSelectionPolicy> CreateLocationPolicy(string policyName);
 }
