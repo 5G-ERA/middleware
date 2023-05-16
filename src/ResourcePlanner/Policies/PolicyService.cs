@@ -25,7 +25,6 @@ internal class PolicyService : IPolicyService
     /// <inheritdoc />
     public async Task<Location> GetLocationAsync(IReadOnlyList<IPolicyAssignable> members)
     {
-
         var locations = new Dictionary<Priority, Location>();
         foreach (var member in members)
         {

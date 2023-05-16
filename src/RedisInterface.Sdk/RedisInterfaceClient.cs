@@ -371,13 +371,12 @@ namespace Middleware.RedisInterface.Sdk
         {
             if (string.IsNullOrWhiteSpace(policyName))
                 throw new ArgumentException("Value cannot be null or whitespace.", nameof(policyName));
-            //TODO:
 
             var result = await _api.PolicyGetByName(policyName);
 
             if (!result.IsSuccessStatusCode)
             {
-                _logger.LogError(result.Error, "{} - unsuccessful API call", nameof(ContainerImageGetForInstanceAsync));
+                _logger.LogError(result.Error, "{0} - unsuccessful API call", nameof(GetPolicyByNameAsync));
             }
 
             return result.IsSuccessStatusCode ? result.Content : null;
