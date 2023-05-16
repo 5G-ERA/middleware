@@ -214,7 +214,5 @@ namespace Middleware.RedisInterface.Controllers
                 return StatusCode(statusCode, new ApiResponse(statusCode, $"An error has occurred: {ex.Message}"));
             }
         }
-
-        public async Task<IActionResult> GetActivePoliciesByTypeAsync()
     }
 }
