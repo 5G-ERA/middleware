@@ -11,7 +11,6 @@ internal class UrllcSliceLocation: ILocationSelectionPolicy
     public UrllcSliceLocation(Priority priority)
     {
         Priority = priority;
-
     }
     /// <inheritdoc />
     public Task<Location> GetLocationAsync()

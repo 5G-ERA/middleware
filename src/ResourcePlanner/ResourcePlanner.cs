@@ -1,6 +1,5 @@
 ﻿using System.Net;
 using AutoMapper;
-using Middleware.Common;
 using Middleware.Common.Config;
 using Middleware.Common.Enums;
 using Middleware.Models.Domain;
@@ -33,14 +32,12 @@ public interface IResourcePlanner
 internal class ResourcePlanner : IResourcePlanner
 {
     private readonly IApiClientBuilder _apiClientBuilder;
-    private readonly IEnvironment _env;
     private readonly ILogger _logger;
     private readonly IMapper _mapper;
-    private readonly MiddlewareConfig _mwConfig;
     private readonly IPolicyService _policyService;
     private readonly IRedisInterfaceClient _redisInterfaceClient;
 
-    public ResourcePlanner(IApiClientBuilder apiClientBuilder, IMapper mapper, IEnvironment env,
+    public ResourcePlanner(IApiClientBuilder apiClientBuilder, IMapper mapper,
         ILogger<ResourcePlanner> logger,
         IRedisInterfaceClient redisInterfaceClient,
         IConfiguration configuration,
@@ -49,11 +46,10 @@ internal class ResourcePlanner : IResourcePlanner
     {
         _apiClientBuilder = apiClientBuilder;
         _mapper = mapper;
-        _env = env;
         _logger = logger;
         _redisInterfaceClient = redisInterfaceClient;
         _policyService = policyService;
-        _mwConfig = configuration.GetSection(MiddlewareConfig.ConfigName).Get<MiddlewareConfig>();
+        configuration.GetSection(MiddlewareConfig.ConfigName).Get<MiddlewareConfig>();
     }
 
     public async Task<TaskModel> Plan(TaskModel taskModel, RobotModel robot)
@@ -109,12 +105,13 @@ internal class ResourcePlanner : IResourcePlanner
     /// <param name="taskModel"></param>
     /// <param name="oldTask"></param>
     /// <param name="robot"></param>
+    /// <param name="isFullReplan"></param>
     /// <returns>Updated task sequence with new placements.</returns>
     /// <exception cref="ArgumentException"></exception>
     public async Task<TaskModel> RePlan(TaskModel taskModel, TaskModel oldTask, RobotModel robot, bool isFullReplan)
     {
-        var FailedActions = new List<ActionModel>();
-        var ActionsCandidates = new List<ActionModel>();
+        var failedActions = new List<ActionModel>();
+        var actionsCandidates = new List<ActionModel>();
 
         // Get old action sequence 
         List<ActionModel> oldActionSequence = oldTask.ActionSequence;
@@ -126,39 +123,39 @@ internal class ResourcePlanner : IResourcePlanner
         if (actionSequence == null || actionSequence.Count == 0)
             throw new ArgumentException("Action sequence cannot be empty");
 
-        // Iterate throught old actions in actionSequence and check with have failed and add them to failed actions list.
+        // Iterate through old actions in actionSequence and check with have failed and add them to failed actions list.
         foreach (ActionModel oldAction in oldActionSequence)
             if (oldAction.ActionStatus == "Failed")
-                FailedActions.Add(oldAction);
+                failedActions.Add(oldAction);
 
         // Check in which of the failed actions action planner has not done some modifications.
-        foreach (ActionModel failedAction in FailedActions)
+        foreach (ActionModel failedAction in failedActions)
         foreach (ActionModel newAction in actionSequence)
             if (failedAction.Order == newAction.Order) //Compare old action with new one
                 if (failedAction.Id == newAction.Id)
                     // Action planner did no change to the failed action.
-                    ActionsCandidates.Add(failedAction);
+                    actionsCandidates.Add(failedAction);
 
         // If full replan was requested by robot.
         if (isFullReplan)
         {
             // Make a new plan but considering only the actionCandidates and leaving the same the other actions.
-            taskModel = await Plan(taskModel, robot, ActionsCandidates);
+            taskModel = await Plan(taskModel, robot, actionsCandidates);
             taskModel.FullReplan = true;
         }
 
-        // If full replan is neccesary because all actions in action sequence have failed.
-        if (FailedActions.Count == oldActionSequence.Count)
+        // If full replan is necessary because all actions in action sequence have failed.
+        if (failedActions.Count == oldActionSequence.Count)
         {
             // Make a new plan but considering only the actionCandidates and leaving the same the other actions.
-            taskModel = await Plan(taskModel, robot, ActionsCandidates);
+            taskModel = await Plan(taskModel, robot, actionsCandidates);
             taskModel.FullReplan = true;
         }
         // If partial replan is requested by robot.
         else
         {
             // Make a new plan but considering only the actionCandidates and leaving the same the other actions.
-            taskModel = await Plan(taskModel, robot, ActionsCandidates);
+            taskModel = await Plan(taskModel, robot, actionsCandidates);
             taskModel.PartialRePlan = true;
         }
 
@@ -172,36 +169,36 @@ internal class ResourcePlanner : IResourcePlanner
 
         foreach (PolicyModel policy in activePolicies)
         {
-            if (policy.Name == "Use5G")
+            switch (policy.Name)
             {
-                //TODO: Query testbed for number of slices and types.
+                case "Use5G":
+                {
+                    //TODO: Query testbed for number of slices and types.
 
-                foreach (DialogueModel question in robot.Questions)
-                    if (question.Name == "StandAlone5G or NoneStandAlone5G")
-                    {
-                        KeyValuePair answer = question.Answer.First();
-                        var StandAlone5GParam = (bool)answer.Value;
-                    }
+                    foreach (DialogueModel question in robot.Questions!)
+                        if (question.Name == "StandAlone5G or NoneStandAlone5G")
+                        {
+                            KeyValuePair answer = question.Answer!.First();
+                            var standAlone5GParam = (bool)answer.Value;
+                        }
 
-                foreach (DialogueModel question in robot.Questions)
-                    if (question.Name == "What type of 5G slice")
-                    {
-                        KeyValuePair answer = question.Answer.First();
-                        var
-                            slice5GType =
-                                (string)answer
-                                    .Value; // there is an upper limit of eight network slices that be used by a device
-                    } //Nest template
+                    foreach (DialogueModel question in robot.Questions)
+                        if (question.Name == "What type of 5G slice")
+                        {
+                            KeyValuePair answer = question.Answer!.First();
+                            var
+                                slice5GType =
+                                    (string)answer
+                                        .Value; // there is an upper limit of eight network slices that be used by a device
+                        } //Nest template
 
-                //TODO: Attach robot to slice in Redis graph
-            }
-
-            if (policy.Name == "Use4G")
-            {
-            }
-
-            if (policy.Name == "UseWifi")
-            {
+                    //TODO: Attach robot to slice in Redis graph
+                    break;
+                }
+                case "Use4G":
+                    break;
+                case "UseWifi":
+                    break;
             }
         }
     }
@@ -250,7 +247,7 @@ internal class ResourcePlanner : IResourcePlanner
                     return lessBusyCloud.Name;
 
                 // If list is empty, return empty string. 
-                if (cloudsThatMeetNetAppRequirements.Count() == 0)
+                if (cloudsThatMeetNetAppRequirements.Count == 0)
                     return resourceName;
                 //throw new InvalidOperationException("Coudnt not find a placement according to the active policies.");
             }
@@ -318,14 +315,14 @@ internal class ResourcePlanner : IResourcePlanner
             if (robot.NumberCores < actionParam.MinimumNumCores && robot.Ram < actionParam.MinimumRam)
                 //TODO: handle this other way.
                 throw new Exception("The robot with ID " + robot.Id +
-                                    "doesnt have the HW requirements to run the netApp with ID: " + actionParam.Id);
+                                    "doesn't have the HW requirements to run the netApp with ID: " + actionParam.Id);
 
         // Select the placement to te the robot
         return Task.FromResult(robot.Name); //guid
     }
 
     /// <summary>
-    ///     Return placement based upon AllContainersInClosestmachine policy
+    ///     Return placement based upon AllContainersInClosestMachine policy
     /// </summary>
     /// <param name="replan"></param>
     /// <param name="robot"></param>
@@ -339,12 +336,12 @@ internal class ResourcePlanner : IResourcePlanner
         GetEdgesResponse riConnectedEdges = await _redisInterfaceClient.RobotGetConnectedEdgesIdsAsync(robot.Id);
 
         List<EdgeModel> availableEdges = riConnectedEdges.ToEdgeList();
-        GetEdgesResponse rifreeEdges = await _redisInterfaceClient.GetFreeEdgesIdsAsync(availableEdges);
-        List<EdgeModel> freeEdges = rifreeEdges.ToEdgeList();
+        GetEdgesResponse riFreeEdges = await _redisInterfaceClient.GetFreeEdgesIdsAsync(availableEdges);
+        List<EdgeModel> freeEdges = riFreeEdges.ToEdgeList();
 
         // If all of them are busy, check which one is less busy
-        GetEdgesResponse rilessBusyEdges = await _redisInterfaceClient.GetLessBusyEdgesAsync(availableEdges);
-        List<EdgeModel> lessBusyEdges = rilessBusyEdges.ToEdgeList();
+        GetEdgesResponse riLessBusyEdges = await _redisInterfaceClient.GetLessBusyEdgesAsync(availableEdges);
+        List<EdgeModel> lessBusyEdges = riLessBusyEdges.ToEdgeList();
 
         var edgesThatMeetNetAppRequirementsTotal = new List<EdgeModel>();
 
@@ -352,7 +349,7 @@ internal class ResourcePlanner : IResourcePlanner
         if (replan == false)
         {
             // There are no free edges
-            if (freeEdges.Count() == 0)
+            if (!freeEdges.Any())
             {
                 // Remove edges that do not have minimunm NetApps HW requirements
                 List<EdgeModel> edgesThatMeetNetAppRequirements = lessBusyEdges
@@ -364,7 +361,7 @@ internal class ResourcePlanner : IResourcePlanner
                     return lessBusyEdge.Name;
 
                 // If list is empty, return empty string. TODO - Check with BB.
-                if (edgesThatMeetNetAppRequirements.Count() == 0)
+                if (!edgesThatMeetNetAppRequirements.Any())
                     return resourceName;
                 //throw new InvalidOperationException("Coudnt not find a placement according to the active policies.");
             }
@@ -372,7 +369,7 @@ internal class ResourcePlanner : IResourcePlanner
             //There are free edges
             else
             {
-                // Remove edges that do not have minimunm instance (NetApps) HW requirements
+                // Remove edges that do not have minimum instance (NetApps) HW requirements
                 foreach (InstanceModel instance in actionParam.Services)
                     edgesThatMeetNetAppRequirementsTotal.AddRange(freeEdges
                         .Where(edge => edge.NumberOfCores <= actionParam.MinimumNumCores &&
@@ -387,11 +384,11 @@ internal class ResourcePlanner : IResourcePlanner
         // Replan flag is true
         else
         {
-            // Get current HW resources of previosly selected edge
+            // Get current HW resources of previously selected edge
             EdgeResponse riEdgeData = await _redisInterfaceClient.EdgeGetByNameAsync(resourceName);
             EdgeModel edgeCurrentData = riEdgeData.ToEdge();
 
-            if (freeEdges.Count() != 0)
+            if (freeEdges.Count != 0)
             {
                 //If there are free edges, get a better edge from the HW perspective for the netApp
                 foreach (EdgeModel freeCandidateEdge in freeEdges)
@@ -410,28 +407,28 @@ internal class ResourcePlanner : IResourcePlanner
         }
 
         return resourceName;
-        //throw new InvalidOperationException("Coudnt not find a placement according to the active policies.");
+        //throw new InvalidOperationException("Couldn't not find a placement according to the active policies.");
     }
 
     private async Task<string> InferResource(ActionModel actionParam, RobotModel robot, bool rePlan,
         List<ActionModel> candidates) //Allocate correct placement based upon policies and priority
     {
-        var ActionToConsider = false;
-        // Check if this action requires infering a new placement
+        var actionToConsider = false;
+        // Check if this action requires inferring a new placement
         foreach (ActionModel action in candidates)
             if (actionParam.Name == action.Name && rePlan)
-                ActionToConsider = true;
+                actionToConsider = true;
 
-        // Check if this action requires infering a new placement
-        if (rePlan == false) ActionToConsider = true;
+        // Check if this action requires inferring a new placement
+        if (rePlan == false) actionToConsider = true;
 
-        if (ActionToConsider)
+        if (actionToConsider)
         {
             GetPoliciesResponse riActivePolicies = await _redisInterfaceClient.PolicyGetActiveAsync();
             //TODO: Only get policies of type resource.
             List<PolicyModel> activePolicies = riActivePolicies.ToPolicyList();
 
-            // Diccionary of Key policy ID, values List of results after query
+            // Dictionary of Key policy ID, values List of results after query
             var tempDic = new Dictionary<Guid, List<EdgeModel>>();
             var resourceName = actionParam.Placement;
 
@@ -481,12 +478,15 @@ internal class ResourcePlanner : IResourcePlanner
             throw new ArgumentException("Action sequence cannot be empty");
 
 
-        // iterate throught actions in actionSequence
+        // iterate through actions in actionSequence
         foreach (ActionModel action in actionSequence)
         {
             List<RelationModel> imagesTmp =
                 await _redisInterfaceClient.GetRelationForActionAsync(action.Id, "NEEDS");
             var images = new List<RelationModel>();
+            if (imagesTmp is null)
+                continue;
+
             foreach (RelationModel imgTmp in imagesTmp)
             {
                 var relation = _mapper.Map<RelationModel>(imgTmp);
