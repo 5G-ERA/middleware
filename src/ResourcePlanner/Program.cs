@@ -24,6 +24,7 @@ builder.Services.AddHttpClient(AppConfig.OrchestratorApiClientName);
 builder.Services.AddScoped<IResourcePlanner, ResourcePlanner>();
 builder.Services.AddScoped<IApiClientBuilder, ApiClientBuilder>();
 builder.Services.AddScoped<IPolicyService, PolicyService>();
+builder.Services.AddScoped<IPolicyBuilder, PolicyBuilder>();
 
 builder.Services.AddRedisInterfaceClient();
 

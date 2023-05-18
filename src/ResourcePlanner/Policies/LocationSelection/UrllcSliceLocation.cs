@@ -3,15 +3,16 @@ using Middleware.ResourcePlanner.Models;
 
 namespace Middleware.ResourcePlanner.Policies.LocationSelection;
 
-internal class UrllcSliceLocation: ILocationSelectionPolicy
+internal class UrllcSliceLocation : ILocationSelectionPolicy
 {
-    /// <inheritdoc />
-    public Priority Priority { get; }
-
     public UrllcSliceLocation(Priority priority)
     {
         Priority = priority;
     }
+
+    /// <inheritdoc />
+    public Priority Priority { get; }
+
     /// <inheritdoc />
     public Task<Location> GetLocationAsync()
     {
@@ -23,6 +24,12 @@ internal class UrllcSliceLocation: ILocationSelectionPolicy
          *  a. Relacja na grafie z pingiem między robotem a dostępnymi lokacjami
          * 3. Zwróć dane o lokacji
          */
+        throw new NotImplementedException();
+    }
+
+    /// <inheritdoc />
+    public Task<bool> IsLocationSatisfiedByPolicy(Location location)
+    {
         throw new NotImplementedException();
     }
 }
