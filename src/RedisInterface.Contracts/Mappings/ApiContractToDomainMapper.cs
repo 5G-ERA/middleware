@@ -369,4 +369,15 @@ public static class ApiContractToDomainMapper
             Imsi = s.Imsi.ToList()
         }).ToList();
     }
+
+    public static Location ToLocation(this LocationRequest x)
+    {
+        return new()
+        {
+            Id = x.Id,
+            Name = x.Name,
+            Organization = x.Organization,
+            Type = Enum.Parse<LocationType>(x.Type)
+        };
+    }
 }

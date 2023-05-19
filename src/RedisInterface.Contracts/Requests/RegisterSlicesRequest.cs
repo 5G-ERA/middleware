@@ -3,6 +3,15 @@
 public class RegisterSlicesRequest
 {
     public IEnumerable<SliceRequest> Slices { get; set; } = Enumerable.Empty<SliceRequest>();
+    public LocationRequest Location { get; init; }
+}
+
+public class LocationRequest
+{
+    public Guid Id { get; init; }
+    public string Type { get; init; }
+    public string Name { get; init; }
+    public string Organization { get; init; }
 }
 
 public class SliceRequest
