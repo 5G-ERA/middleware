@@ -357,7 +357,7 @@ public static class ApiContractToDomainMapper
     {
         return x.Slices.Select(s => new SliceModel
         {
-            SliceId = s.SliceId,
+            Name = s.SliceId,
             Site = s.Site,
             ExpDataRateDl = s.ExpDataRateDl,
             ExpDataRateUl = s.ExpDataRateUl,

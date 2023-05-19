@@ -1,28 +1,46 @@
-﻿using Middleware.Models.Domain.Slice;
+﻿using Middleware.Models.Domain;
+using Middleware.Models.Domain.Slice;
 using Middleware.Models.Enums;
+using Redis.OM.Modeling;
 
 namespace Middleware.Models.Dto.Slice;
 
-public class SliceDto
+[Document(IndexName = "slice-idx", StorageType = StorageType.Json, Prefixes = new[] { Prefix })]
+public class SliceDto : Dto
 {
-    public string SliceId { get; init; } = default!;
-    public string Site { get; init; } = default!;
-    public string SliceType { get; init; } = default!;
-    public int ExpDataRateUl { get; init; }
-    public int ExpDataRateDl { get; init; }
-    public int? Latency { get; init; }
-    public int? Jitter { get; init; }
-    public int? UserDensity { get; init; }
-    public int? UserSpeed { get; init; }
-    public string TrafficType { get; init; } = default!;
-    public List<string> Imsi { get; init; } = new();
+    public const string Prefix = "Slice";
 
-    public SliceModel ToModel()
+    [Indexed] [RedisIdField] public override string Id { get; set; } = default!;
+
+    [Indexed] public string Name { get; set; } = default!;
+
+    [Indexed] public string Site { get; init; } = default!;
+
+    [Indexed] public string SliceType { get; init; } = default!;
+
+    [Indexed] public int ExpDataRateUl { get; init; }
+
+    [Indexed] public int ExpDataRateDl { get; init; }
+
+    [Indexed] public int? Latency { get; init; }
+
+    [Indexed] public int? Jitter { get; init; }
+
+    [Indexed] public int? UserDensity { get; init; }
+
+    [Indexed] public int? UserSpeed { get; init; }
+
+    [Indexed] public string TrafficType { get; init; } = default!;
+
+    [Indexed] public List<string> Imsi { get; init; } = new();
+
+    public override BaseModel ToModel()
     {
         var dto = this;
-        return new()
+        return new SliceModel
         {
-            SliceId = dto.SliceId,
+            Id = Guid.Parse(dto.Id),
+            Name = dto.Name,
             Site = dto.Site,
             ExpDataRateUl = dto.ExpDataRateUl,
             ExpDataRateDl = dto.ExpDataRateDl,

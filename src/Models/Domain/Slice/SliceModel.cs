@@ -3,12 +3,14 @@ using Middleware.Models.Enums;
 
 namespace Middleware.Models.Domain.Slice;
 
-public class SliceModel
+public class SliceModel : BaseModel
 {
+    public override Guid Id { get; set; } = Guid.NewGuid();
+
     /// <summary>
     ///     Unique identifier of a Slice
     /// </summary>
-    public string SliceId { get; set; } = default!;
+    public override string Name { get; set; } = default!;
 
     /// <summary>
     ///     Site the Slice is located
@@ -69,12 +71,12 @@ public class SliceModel
     /// </summary>
     public List<string> Imsi { get; set; } = new();
 
-    public SliceDto ToDto()
+    public override Dto.Dto ToDto()
     {
         var d = this;
-        return new()
+        return new SliceDto
         {
-            SliceId = d.SliceId,
+            Id = d.Name,
             Site = d.Site,
             SliceType = d.SliceType.ToString(),
             ExpDataRateUl = d.ExpDataRateUl,
