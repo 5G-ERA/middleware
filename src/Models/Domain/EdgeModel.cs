@@ -13,6 +13,7 @@ public class EdgeModel : BaseModel
 
     [JsonPropertyName("Name")]
     public override string Name { get; set; }
+
     [Obsolete]
     [JsonPropertyName("Type")]
     public LocationType Type { get; set; } = LocationType.Edge;
@@ -21,7 +22,6 @@ public class EdgeModel : BaseModel
     public string Organization { get; set; }
 
     [JsonPropertyName("EdgeStatus")]
-
     public string EdgeStatus { get; set; }
 
     [JsonPropertyName("EdgeIp")]

@@ -10,7 +10,6 @@ public class ContainerImageModel : BaseModel
 
     [JsonPropertyName("Name")]
     public override string Name { get; set; } = default!;
-    
 
     [JsonPropertyName("Timestamp")]
     public DateTime Timestamp { get; set; }

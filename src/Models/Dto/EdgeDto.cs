@@ -9,12 +9,14 @@ namespace Middleware.Models.Dto;
 public class EdgeDto : Dto
 {
     public const string Prefix = "Edge";
+
     [Indexed]
     [RedisIdField]
     public override string Id { get; set; }
 
     [Indexed]
     public string? Name { get; set; }
+
     [Indexed]
     public string Type { get; set; }
 
@@ -23,8 +25,10 @@ public class EdgeDto : Dto
 
     [Indexed]
     public string? EdgeStatus { get; set; }
+
     [Indexed]
     public Uri EdgeIp { get; set; }
+
     [Indexed]
     public string MacAddress { get; set; }
 
@@ -33,6 +37,7 @@ public class EdgeDto : Dto
     
     [Indexed(Sortable = true)]
     public DateTimeOffset LastUpdatedTime { get; set; } = DateTimeOffset.Now;
+
     [Indexed]
     public bool IsOnline { get; set; }
 

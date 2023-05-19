@@ -7,11 +7,12 @@ public class DialogueModel : BaseModel
 {
     [JsonPropertyName("Id")]
     public override Guid Id { get; set; }
+
     /// <summary>
     /// Question / Name
     /// </summary>
     [JsonPropertyName("Name")]
-    public override string? Name { get; set; }
+    public override string Name { get; set; }
 
     [JsonPropertyName("IsSingleAnswer")]
     public bool IsSingleAnswer { get; set; }
@@ -28,7 +29,6 @@ public class DialogueModel : BaseModel
             Name = domain.Name,
             IsSingleAnswer = domain.IsSingleAnswer,
             Answer = domain.Answer?.ToList() ?? new(),
-
         };
     }
 }

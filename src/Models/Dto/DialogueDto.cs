@@ -8,14 +8,17 @@ namespace Middleware.Models.Dto
     public class DialogueDto : Dto
     {
         public const string Prefix = "Dialogue";
+
         [Indexed]
         [RedisIdField]
         public override string Id { get; set; } = default!;
+
         /// <summary>
         /// Question / Name
         /// </summary>
         [Searchable]
         public string? Name { get; set; }
+
         [Indexed]
         public bool IsSingleAnswer { get; set; }
 

@@ -64,6 +64,7 @@ public class CloudModel : BaseModel
         if (string.IsNullOrEmpty(Organization)) return false;
         return true;
     }
+
     public override Dto.Dto ToDto()
     {
         var domain = this;

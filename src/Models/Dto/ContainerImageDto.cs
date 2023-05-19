@@ -6,17 +6,23 @@ namespace Middleware.Models.Dto;
 public class ContainerImageDto : Dto
 {
     public const string Prefix = "ContainerImage";
+
     [Indexed]
     [RedisIdField]
     public override string Id { get; set; } = default!;
+
     [Indexed]
     public string Name { get; set; } = default!;
+
     [Indexed(Sortable = true)]
     public DateTimeOffset Timestamp { get; set; } = DateTimeOffset.Now;
+
     [Indexed]
     public string? Description { get; set; } = default!;
+
     [Indexed]
     public string K8SDeployment { get; set; } = default!;
+
     [Indexed]
     public string? K8SService { get; set; } = default!;
 
