@@ -1,4 +1,5 @@
 ﻿using Middleware.Models.Domain;
+using Middleware.Models.Domain.Slice;
 using Middleware.Models.Enums;
 using Middleware.RedisInterface.Contracts.Requests;
 using Middleware.RedisInterface.Contracts.Responses;
@@ -9,7 +10,7 @@ public static class ApiContractToDomainMapper
 {
     public static ActionModel ToAction(this ActionRequest x)
     {
-        return new ActionModel()
+        return new()
         {
             Name = x.Name,
             Order = x.Order,
@@ -18,9 +19,10 @@ public static class ApiContractToDomainMapper
             Tags = x.Tags.ToList()
         };
     }
+
     public static ActionModel ToAction(this ActionResponse x)
     {
-        return new ActionModel()
+        return new()
         {
             Id = x.Id,
             Name = x.Name,
@@ -34,7 +36,7 @@ public static class ApiContractToDomainMapper
 
     public static CloudModel ToCloud(this CloudRequest x)
     {
-        return new CloudModel()
+        return new()
         {
             Name = x.Name,
             CloudIp = x.IpAddress,
@@ -49,9 +51,10 @@ public static class ApiContractToDomainMapper
             Organization = x.Organization
         };
     }
+
     public static CloudModel ToCloud(this CloudResponse x)
     {
-        return new CloudModel()
+        return new()
         {
             Id = x.Id,
             Name = x.Name,
@@ -70,7 +73,7 @@ public static class ApiContractToDomainMapper
     public static List<CloudModel> ToCloudList(this GetCloudsResponse clouds)
     {
         return clouds.Clouds.Select(x =>
-            new CloudModel()
+            new CloudModel
             {
                 Id = x.Id,
                 Name = x.Name,
@@ -85,9 +88,10 @@ public static class ApiContractToDomainMapper
                 LastUpdatedTime = x.LastUpdatedTime
             }).ToList();
     }
+
     public static ContainerImageModel ToContainer(this ContainerRequest x)
     {
-        return new ContainerImageModel()
+        return new()
         {
             Name = x.Name,
             Description = x.Description,
@@ -96,10 +100,10 @@ public static class ApiContractToDomainMapper
             Timestamp = DateTime.Now
         };
     }
-    
+
     public static ContainerImageModel ToContainer(this ContainerResponse x)
     {
-        return new ContainerImageModel()
+        return new()
         {
             Name = x.Name,
             Description = x.Description,
@@ -108,23 +112,24 @@ public static class ApiContractToDomainMapper
             Timestamp = DateTime.Now
         };
     }
-    
+
     public static List<ContainerImageModel> ToContainersList(this GetContainersResponse containers)
     {
-        return containers.Containers.Select(x=> 
-        new ContainerImageModel()
-        {
-            Id = x.Id,
-            Name = x.Name,
-            Description = x.Description,
-            K8SDeployment =  x.K8sDeployment,
-            K8SService = x.K8sService,
-            Timestamp = x.LastUpdateTime
-        }).ToList();
+        return containers.Containers.Select(x =>
+            new ContainerImageModel
+            {
+                Id = x.Id,
+                Name = x.Name,
+                Description = x.Description,
+                K8SDeployment = x.K8sDeployment,
+                K8SService = x.K8sService,
+                Timestamp = x.LastUpdateTime
+            }).ToList();
     }
+
     public static EdgeModel ToEdge(this EdgeRequest x)
     {
-        return new EdgeModel()
+        return new()
         {
             Name = x.Name,
             EdgeIp = x.IpAddress,
@@ -139,10 +144,10 @@ public static class ApiContractToDomainMapper
             Organization = x.Organization
         };
     }
-    
+
     public static EdgeModel ToEdge(this EdgeResponse x)
     {
-        return new EdgeModel()
+        return new()
         {
             Id = x.Id,
             Name = x.Name,
@@ -157,10 +162,10 @@ public static class ApiContractToDomainMapper
             LastUpdatedTime = x.LastUpdatedTime
         };
     }
-    
+
     public static List<EdgeModel> ToEdgeList(this GetEdgesResponse edges)
     {
-        return edges.Edges.Select(x=> new EdgeModel()
+        return edges.Edges.Select(x => new EdgeModel
         {
             Id = x.Id,
             Name = x.Name,
@@ -175,10 +180,10 @@ public static class ApiContractToDomainMapper
             LastUpdatedTime = x.LastUpdatedTime
         }).ToList();
     }
-    
+
     public static InstanceModel ToInstance(this InstanceRequest x)
     {
-        return new InstanceModel()
+        return new()
         {
             Name = x.Name,
             InstanceFamily = x.Family,
@@ -194,9 +199,10 @@ public static class ApiContractToDomainMapper
             RosTopicsSub = x.RosTopicSubscribers.ToList()
         };
     }
+
     public static InstanceModel ToInstance(this InstanceResponse x)
     {
-        return new InstanceModel()
+        return new()
         {
             Id = x.Id,
             Name = x.Name,
@@ -216,7 +222,7 @@ public static class ApiContractToDomainMapper
 
     public static PolicyModel ToPolicy(this PolicyRequest x)
     {
-        return new PolicyModel()
+        return new()
         {
             Name = x.Name,
             Description = x.Description,
@@ -226,10 +232,10 @@ public static class ApiContractToDomainMapper
             Timestamp = x.LastTimeUpdated
         };
     }
-    
+
     public static PolicyModel ToPolicy(this PolicyResponse x)
     {
-        return new PolicyModel()
+        return new()
         {
             Id = x.Id,
             Name = x.Name,
@@ -240,11 +246,11 @@ public static class ApiContractToDomainMapper
             Timestamp = x.LastTimeUpdated
         };
     }
-    
+
     public static List<PolicyModel> ToPolicyList(this GetPoliciesResponse policies)
     {
-        return policies.Policies.Select(x=> 
-            new PolicyModel()
+        return policies.Policies.Select(x =>
+            new PolicyModel
             {
                 Id = x.Id,
                 Name = x.Name,
@@ -258,7 +264,7 @@ public static class ApiContractToDomainMapper
 
     public static RobotModel ToRobot(this RobotRequest x)
     {
-        return new RobotModel()
+        return new()
         {
             Name = x.Name,
             RobotModelName = x.ModelName,
@@ -288,10 +294,10 @@ public static class ApiContractToDomainMapper
             LastUpdatedTime = DateTime.Now
         };
     }
-    
+
     public static RobotModel ToRobot(this RobotResponse x)
     {
-        return new RobotModel()
+        return new()
         {
             Id = x.Id,
             Name = x.Name,
@@ -326,7 +332,7 @@ public static class ApiContractToDomainMapper
 
     public static TaskModel ToTask(this TaskRequest x)
     {
-        return new TaskModel()
+        return new()
         {
             Name = x.Name,
             TaskPriority = (int)Enum.Parse<Priority>(x.Priority, true),
@@ -334,9 +340,10 @@ public static class ApiContractToDomainMapper
             Tags = x.Tags?.ToList() ?? new List<string>()
         };
     }
+
     public static TaskModel ToTask(this TaskResponse x)
     {
-        return new TaskModel()
+        return new()
         {
             Id = x.Id,
             Name = x.Name,
@@ -344,5 +351,22 @@ public static class ApiContractToDomainMapper
             TaskPriority = (int)Enum.Parse<Priority>(x.Priority),
             Tags = x.Tags?.ToList() ?? new List<string>()
         };
+    }
+
+    public static List<SliceModel> ToSliceList(this RegisterSlicesRequest x)
+    {
+        return x.Slices.Select(s => new SliceModel
+        {
+            SliceId = s.SliceId,
+            Site = s.Site,
+            ExpDataRateDl = s.ExpDataRateDl,
+            ExpDataRateUl = s.ExpDataRateUl,
+            Jitter = s.Jitter,
+            Latency = s.Latency,
+            UserDensity = s.UserDensity,
+            UserSpeed = s.UserSpeed,
+            TrafficType = Enum.Parse<TrafficType>(s.TrafficType, true),
+            Imsi = s.Imsi.ToList()
+        }).ToList();
     }
 }
