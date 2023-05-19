@@ -1,16 +1,24 @@
-﻿namespace Middleware.ResourcePlanner.SliceManager
+﻿namespace Middleware.ResourcePlanner.SliceManager;
+
+public class SliceManager : ISliceManager
 {
-    public class SliceManager : ISliceManager
+    private readonly ISliceManagerApi _sliceManagerApi;
+
+    public SliceManager(ISliceManagerApi sliceManagerApi)
     {
-        public async Task RegisterUrllcSlice(string slice)
-        {
-            throw new NotImplementedException();
-        }
+        _sliceManagerApi = sliceManagerApi;
+    }
 
-
-        public async Task RegisterEmbbSlice(string slice)
+    public async Task AttachImsiToSlice(string imsi, string sliceId, int dataRateUpLink, int dataRateDownLink)
+    {
+        var request = new AttachImsiToSliceRequest
         {
-            throw new NotImplementedException();
-        }
+            Imsi = imsi,
+            SliceId = sliceId,
+            UsedDataRateDl = dataRateDownLink,
+            UsedDataRateUl = dataRateUpLink
+        };
+
+        await _sliceManagerApi.AttachImsiToSlice(request);
     }
 }
