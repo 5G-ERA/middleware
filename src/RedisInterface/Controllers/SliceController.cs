@@ -11,11 +11,13 @@ namespace Middleware.RedisInterface.Controllers;
 [ApiController]
 public class SliceController : ControllerBase
 {
+    private readonly ILogger<SliceController> _logger;
     private readonly ISliceService _sliceService;
 
-    public SliceController(ISliceService sliceService)
+    public SliceController(ISliceService sliceService, ILogger<SliceController> logger)
     {
         _sliceService = sliceService;
+        _logger = logger;
     }
 
     [HttpPost(Name = "SliceRegister")]
@@ -29,14 +31,15 @@ public class SliceController : ControllerBase
             var location = request.Location?.ToLocation();
             var slices = request.ToSliceList();
 
-            var result = await _sliceService.ReRegisterSlices(slices, location);
+            await _sliceService.ReRegisterSlices(slices, location);
 
             return StatusCode((int)HttpStatusCode.Created);
         }
         catch (Exception ex)
         {
-            Console.WriteLine(ex);
-            throw;
+            var statusCode = (int)HttpStatusCode.InternalServerError;
+            _logger.LogError(ex, "An error occurred:");
+            return StatusCode(statusCode, new ApiResponse(statusCode, $"An error has occurred: {ex.Message}"));
         }
     }
 }
