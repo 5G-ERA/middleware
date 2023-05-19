@@ -5,5 +5,5 @@ namespace Middleware.RedisInterface.Services.Abstract;
 
 public interface ISliceService
 {
-    Task<bool> ReRegisterSlices(IReadOnlyList<SliceModel> slices, Location location = null);
+    Task ReRegisterSlices(IReadOnlyList<SliceModel> slices, Location location = null);
 }
