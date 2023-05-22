@@ -1,8 +1,9 @@
 ﻿using Microsoft.Extensions.Options;
 using Middleware.Common.Config;
+using Middleware.Orchestrator.SliceManager.Contracts;
 using Refit;
 
-namespace Middleware.ResourcePlanner.SliceManager;
+namespace Middleware.Orchestrator.SliceManager;
 
 internal class SliceManagerClientFactory
 {

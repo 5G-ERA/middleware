@@ -1,4 +1,4 @@
-﻿namespace Middleware.ResourcePlanner.SliceManager;
+﻿namespace Middleware.Orchestrator.SliceManager;
 
 internal interface ISliceManager
 {

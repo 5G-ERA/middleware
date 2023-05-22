@@ -1,4 +1,6 @@
-﻿namespace Middleware.ResourcePlanner.SliceManager;
+﻿using Middleware.Orchestrator.SliceManager.Contracts;
+
+namespace Middleware.Orchestrator.SliceManager;
 
 internal class SliceManager : ISliceManager
 {

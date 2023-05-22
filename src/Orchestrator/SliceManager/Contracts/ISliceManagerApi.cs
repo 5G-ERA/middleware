@@ -1,6 +1,6 @@
 ﻿using Refit;
 
-namespace Middleware.ResourcePlanner.SliceManager;
+namespace Middleware.Orchestrator.SliceManager.Contracts;
 
 internal interface ISliceManagerApi
 {
