@@ -1,6 +1,6 @@
 ﻿namespace Middleware.ResourcePlanner.SliceManager;
 
-public interface ISliceManager
+internal interface ISliceManager
 {
     /// <summary>
     ///     Configures a slice to handle the connection of the specific SIM Card

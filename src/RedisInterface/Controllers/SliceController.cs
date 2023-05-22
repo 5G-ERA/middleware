@@ -9,7 +9,7 @@ namespace Middleware.RedisInterface.Controllers;
 
 [Route("api/v1/[controller]")]
 [ApiController]
-public class SliceController : ControllerBase
+internal class SliceController : ControllerBase
 {
     private readonly ILogger<SliceController> _logger;
     private readonly ISliceService _sliceService;

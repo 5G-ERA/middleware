@@ -1,6 +1,6 @@
 ﻿namespace Middleware.ResourcePlanner.SliceManager;
 
-public record AttachImsiToSliceRequest
+internal record AttachImsiToSliceRequest
 {
     public string Imsi { get; init; }
     public string SliceId { get; init; }

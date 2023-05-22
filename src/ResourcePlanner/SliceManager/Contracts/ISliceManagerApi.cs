@@ -2,7 +2,7 @@
 
 namespace Middleware.ResourcePlanner.SliceManager;
 
-public interface ISliceManagerApi
+internal interface ISliceManagerApi
 {
     [Post("/api/v1/sliceInventory/SB/reportSliceParameters/urllc")]
     Task RegisterUrllcSlice(string slice);

@@ -1,12 +1,14 @@
 ﻿namespace Middleware.ResourcePlanner.SliceManager;
 
-public class SliceManager : ISliceManager
+internal class SliceManager : ISliceManager
 {
+    private readonly bool _isSliceManagerAvailable;
     private readonly ISliceManagerApi _sliceManagerApi;
 
-    public SliceManager(ISliceManagerApi sliceManagerApi)
+    public SliceManager(ISliceManagerApi sliceManagerApi, bool isSliceManagerAvailable)
     {
         _sliceManagerApi = sliceManagerApi;
+        _isSliceManagerAvailable = isSliceManagerAvailable;
     }
 
     public async Task AttachImsiToSlice(string imsi, string sliceId, int dataRateUpLink, int dataRateDownLink)

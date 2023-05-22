@@ -6,12 +6,13 @@ using Refit;
 
 namespace Middleware.ResourcePlanner.ExtensionMethods;
 
-public static class ServiceCollectionExtensions
+internal static class ServiceCollectionExtensions
 {
     /// <summary>
     ///     Adds RedisInterface client tht connects internally to the RedisInterface in the k8s cluster
     /// </summary>
     /// <param name="services"></param>
+    /// <param name="config"></param>
     /// <returns></returns>
     public static IServiceCollection AddSliceManagerClient(this IServiceCollection services, SliceConfig config)
     {
