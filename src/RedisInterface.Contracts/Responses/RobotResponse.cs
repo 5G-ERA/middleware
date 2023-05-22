@@ -32,4 +32,5 @@ public class RobotResponse
     public IEnumerable<DialogueModel>? Questions { get; init; }
     public DateTime LastUpdatedTime { get; init; }
     public DateTime OnboardedTime { get; init; }
+    public string SimCardNumber { get; init; }
 }

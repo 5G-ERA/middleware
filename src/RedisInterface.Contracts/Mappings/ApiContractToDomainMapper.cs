@@ -291,7 +291,8 @@ public static class ApiContractToDomainMapper
             Ram = x.Ram,
             StorageDisk = x.StorageDisk,
             Questions = x.Questions?.ToList(),
-            LastUpdatedTime = DateTime.Now
+            LastUpdatedTime = DateTime.Now,
+            SimCardNumber = x.SimCardNumber
         };
     }
 
@@ -326,7 +327,8 @@ public static class ApiContractToDomainMapper
             StorageDisk = x.StorageDisk,
             Questions = x.Questions?.ToList(),
             LastUpdatedTime = x.LastUpdatedTime,
-            OnboardedTime = x.OnboardedTime
+            OnboardedTime = x.OnboardedTime,
+            SimCardNumber = x.SimCardNumber
         };
     }
 
