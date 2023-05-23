@@ -5,21 +5,18 @@ using Refit;
 
 namespace Middleware.Orchestrator.SliceManager;
 
-internal class SliceManagerClientFactory
+internal class SliceManagerClientFactory : ISliceManagerClientFactory
 {
-    private readonly IHttpClientFactory _httpClientFactory;
     private readonly IOptions<SliceConfig> _sliceConfig;
 
-    public SliceManagerClientFactory(IHttpClientFactory httpClientFactory, IOptions<SliceConfig> sliceConfig)
+    public SliceManagerClientFactory(IOptions<SliceConfig> sliceConfig)
     {
-        _httpClientFactory = httpClientFactory;
         _sliceConfig = sliceConfig;
     }
 
     public bool IsSlicingAvailable()
     {
-        return _sliceConfig.Value is not null
-               && string.IsNullOrWhiteSpace(_sliceConfig.Value.Hostname)
+        return string.IsNullOrWhiteSpace(_sliceConfig.Value.Hostname)
                && Uri.IsWellFormedUriString(_sliceConfig.Value.Hostname, UriKind.RelativeOrAbsolute);
     }
 

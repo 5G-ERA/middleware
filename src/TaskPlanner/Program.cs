@@ -1,8 +1,8 @@
+using Middleware.CentralApi.Sdk;
 using Middleware.Common.Config;
 using Middleware.Common.ExtensionMethods;
 using Middleware.Common.MessageContracts;
 using Middleware.RedisInterface.Sdk;
-using Middleware.CentralApi.Sdk;
 using Middleware.TaskPlanner.ApiReference;
 using Middleware.TaskPlanner.Config;
 using Middleware.TaskPlanner.ExtensionMethods;
@@ -12,9 +12,7 @@ using Middleware.TaskPlanner.Services;
 var builder = WebApplication.CreateBuilder(args);
 var centralApiHostname = Environment.GetEnvironmentVariable("CENTRAL_API_HOSTNAME");
 if (centralApiHostname is null)
-{
     throw new ArgumentException("Environment variable not defined: CENTRAL_API_HOSTNAME", "CENTRAL_API_HOSTNAME");
-}
 builder.Configuration.AddEnvironmentVariables();
 
 builder.RegisterSecretsManager();
@@ -43,6 +41,7 @@ builder.Services.AddScoped<IPublishService, PublishingService>();
 builder.Services.AddScoped<IPublisher<DeployPlanMessage>, DeployPlanMessagePublisher>();
 builder.Services.AddScoped<IPublisher<SwitchoverDeleteAction>, SwitchoverDeleteInstancePublisher>();
 builder.Services.AddScoped<IPublisher<SwitchoverDeployAction>, SwitchoverDeployInstancePublisher>();
+builder.Services.AddScoped<IPublisher<ConnectRobotToSliceMessage>, ConnectRobotToSlicePublisher>();
 
 var app = builder.Build();
 
