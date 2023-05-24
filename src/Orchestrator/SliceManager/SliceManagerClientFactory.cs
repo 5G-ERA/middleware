@@ -16,13 +16,13 @@ internal class SliceManagerClientFactory : ISliceManagerClientFactory
 
     public bool IsSlicingAvailable()
     {
-        return string.IsNullOrWhiteSpace(_sliceConfig.Value.Hostname)
+        return string.IsNullOrWhiteSpace(_sliceConfig.Value.Hostname) == false
                && Uri.IsWellFormedUriString(_sliceConfig.Value.Hostname, UriKind.RelativeOrAbsolute);
     }
 
     public ISliceManager CreateSliceManagerClient()
     {
-        if (IsSlicingAvailable())
+        if (!IsSlicingAvailable())
             return null;
 
         var client = RestService.For<ISliceManagerApi>(_sliceConfig.Value.Hostname);
