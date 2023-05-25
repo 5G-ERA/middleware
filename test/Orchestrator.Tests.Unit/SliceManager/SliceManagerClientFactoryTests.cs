@@ -43,7 +43,7 @@ public class SliceManagerClientFactoryTests
         //arrange
         _mwOptions.Value.Returns(new SliceConfig
         {
-            Hostname = "testbed.asd.gr"
+            Hostname = "http://testbed.asd.gr"
         });
         //act
         var result = _sut.CreateSliceManagerClient();
