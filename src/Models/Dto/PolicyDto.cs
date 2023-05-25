@@ -8,9 +8,11 @@ namespace Middleware.Models.Dto;
 public class PolicyDto : Dto
 {
     public const string Prefix = "Policy";
+
     [Indexed]
     [RedisIdField]
     public override string Id { get; set; }
+
     [Indexed]
     public string Name { get; set; } = default!;
     [Indexed]
@@ -21,6 +23,7 @@ public class PolicyDto : Dto
 
     [Indexed(Sortable = true)]
     public DateTimeOffset Timestamp { get; set; }
+
     [Indexed]
     public bool IsActive { get; set; }
 

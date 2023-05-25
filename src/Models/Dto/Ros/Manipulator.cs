@@ -10,6 +10,7 @@ public class Manipulator
     /// </summary>
     [Indexed]
     public string? ActuatorName { get; set; }
+
     /// <summary>
     /// Degrees of freedom
     /// </summary>
@@ -18,7 +19,6 @@ public class Manipulator
 
     [Indexed]
     public int Number { get; set; }
-
 
     public ManipulatorModel ToModel()
     {

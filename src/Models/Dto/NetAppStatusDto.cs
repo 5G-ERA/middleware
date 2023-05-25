@@ -7,6 +7,7 @@ namespace Middleware.Models.Dto
     public class NetAppStatusDto : Dto
     {
         public const string Prefix = "NetAppStatus";
+
         [Indexed]
         [RedisIdField]
         public override string Id { get; set; }

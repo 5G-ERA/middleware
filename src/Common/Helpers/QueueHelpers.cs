@@ -1,12 +1,12 @@
 ﻿namespace Middleware.Common.Helpers;
 
 /// <summary>
-/// Class responsible for handling common 
+///     Class responsible for handling common
 /// </summary>
 public static class QueueHelpers
 {
     /// <summary>
-    /// Constructs the routing key based on the deployment properties 
+    ///     Constructs the routing key based on the deployment properties
     /// </summary>
     /// <param name="instanceName"></param>
     /// <param name="instanceType"></param>
@@ -23,8 +23,9 @@ public static class QueueHelpers
     {
         return $"{organization}-{instanceName}-{queueName}";
     }
+
     /// <summary>
-    /// Constructs the deployment queue name for this specific Middleware instance
+    ///     Constructs the deployment queue name for this specific Middleware instance
     /// </summary>
     /// <param name="organization"></param>
     /// <param name="instanceName"></param>
@@ -37,9 +38,9 @@ public static class QueueHelpers
 
         return GetQueueName(organization, instanceName, "deployments");
     }
-    
+
     /// <summary>
-    /// Constructs the switchover delete queue name for this specific Middleware instance
+    ///     Constructs the switchover delete queue name for this specific Middleware instance
     /// </summary>
     /// <param name="organization"></param>
     /// <param name="instanceName"></param>
@@ -52,8 +53,9 @@ public static class QueueHelpers
 
         return GetQueueName(organization, instanceName, "switchover-action-delete");
     }
+
     /// <summary>
-    /// Constructs the switchover deployment queue name for this specific Middleware instance
+    ///     Constructs the switchover deployment queue name for this specific Middleware instance
     /// </summary>
     /// <param name="organization"></param>
     /// <param name="instanceName"></param>
@@ -65,5 +67,20 @@ public static class QueueHelpers
         if (string.IsNullOrWhiteSpace(organization)) throw new ArgumentNullException(nameof(instanceName));
 
         return GetQueueName(organization, instanceName, "switchover-action-deploy");
+    }
+
+    /// <summary>
+    ///     Constructs the switchover deployment queue name for this specific Middleware instance
+    /// </summary>
+    /// <param name="organization"></param>
+    /// <param name="instanceName"></param>
+    /// <returns></returns>
+    /// <exception cref="ArgumentNullException">When parameters are not specified or contain empty or whitespace string</exception>
+    public static string ConstructSliceImsiConnectionQueueName(string organization, string instanceName)
+    {
+        if (string.IsNullOrWhiteSpace(organization)) throw new ArgumentNullException(nameof(organization));
+        if (string.IsNullOrWhiteSpace(organization)) throw new ArgumentNullException(nameof(instanceName));
+
+        return GetQueueName(organization, instanceName, "slice-imsi-connect");
     }
 }

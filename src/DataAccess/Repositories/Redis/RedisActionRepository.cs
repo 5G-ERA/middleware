@@ -41,7 +41,7 @@ public class RedisActionRepository : RedisRepository<ActionModel, ActionDto>, IA
         {
             currentModel.PlacementType = patch.PlacementType;
         }
-        if (!string.IsNullOrEmpty(patch.ActionPriority))
+        if (!string.IsNullOrEmpty(patch.ActionPriority.ToString()))
         {
             currentModel.ActionPriority = patch.ActionPriority;
         }

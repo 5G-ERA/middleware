@@ -58,8 +58,7 @@ namespace Middleware.Models.Domain
 
         [JsonPropertyName("Tags")] //TODO: define allows tags
         //[JsonIgnore]
-        public List<string> Tags { get; set; }
-
+        public List<string>? Tags { get; set; }
 
         public TaskModel()
         {

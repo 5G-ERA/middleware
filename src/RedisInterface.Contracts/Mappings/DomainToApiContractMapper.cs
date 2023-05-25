@@ -8,7 +8,7 @@ public static class DomainToApiContractMapper
 {
     public static ActionResponse ToActionResponse(this ActionModel x)
     {
-        return new ActionResponse()
+        return new()
         {
             Id = x.Id,
             Name = x.Name,
@@ -22,7 +22,7 @@ public static class DomainToApiContractMapper
 
     public static GetActionsResponse ToActionsResponse(this IEnumerable<ActionModel> actions)
     {
-        return new GetActionsResponse()
+        return new()
         {
             Actions = actions.Select(x => x.ToActionResponse())
         };
@@ -30,7 +30,7 @@ public static class DomainToApiContractMapper
 
     public static CloudResponse ToCloudResponse(this CloudModel x)
     {
-        return new CloudResponse()
+        return new()
         {
             Id = x.Id,
             Name = x.Name,
@@ -50,7 +50,7 @@ public static class DomainToApiContractMapper
 
     public static GetCloudsResponse ToCloudsResponse(this IEnumerable<CloudModel> clouds)
     {
-        return new GetCloudsResponse()
+        return new()
         {
             Clouds = clouds.Select(x => x.ToCloudResponse())
         };
@@ -58,7 +58,7 @@ public static class DomainToApiContractMapper
 
     public static ContainerResponse ToContainerResponse(this ContainerImageModel x)
     {
-        return new ContainerResponse()
+        return new()
         {
             Id = x.Id,
             Name = x.Name,
@@ -71,7 +71,7 @@ public static class DomainToApiContractMapper
 
     public static GetContainersResponse ToContainersResponse(this IEnumerable<ContainerImageModel> containers)
     {
-        return new GetContainersResponse()
+        return new()
         {
             Containers = containers.Select(x => x.ToContainerResponse())
         };
@@ -79,7 +79,7 @@ public static class DomainToApiContractMapper
 
     public static EdgeResponse ToEdgeResponse(this EdgeModel x)
     {
-        return new EdgeResponse()
+        return new()
         {
             Id = x.Id,
             Name = x.Name,
@@ -99,7 +99,7 @@ public static class DomainToApiContractMapper
 
     public static GetEdgesResponse ToEdgesResponse(this IEnumerable<EdgeModel> edges)
     {
-        return new GetEdgesResponse()
+        return new()
         {
             Edges = edges.Select(x => x.ToEdgeResponse())
         };
@@ -107,7 +107,7 @@ public static class DomainToApiContractMapper
 
     public static InstanceResponse ToInstanceResponse(this InstanceModel x)
     {
-        return new InstanceResponse()
+        return new()
         {
             Id = x.Id,
             Name = x.Name,
@@ -125,9 +125,10 @@ public static class DomainToApiContractMapper
             AppliedPolicies = x.AppliedPolicies
         };
     }
+
     public static GetInstancesResponse ToInstancesResponse(this IEnumerable<InstanceModel> instances)
     {
-        return new GetInstancesResponse()
+        return new()
         {
             Instances = instances.Select(x => x.ToInstanceResponse())
         };
@@ -135,7 +136,7 @@ public static class DomainToApiContractMapper
 
     public static PolicyResponse ToPolicyResponse(this PolicyModel x)
     {
-        return new PolicyResponse()
+        return new()
         {
             Id = x.Id,
             Name = x.Name,
@@ -151,7 +152,7 @@ public static class DomainToApiContractMapper
 
     public static GetPoliciesResponse ToPoliciesResponse(this IEnumerable<PolicyModel> policies)
     {
-        return new GetPoliciesResponse()
+        return new()
         {
             Policies = policies.Select(x => x.ToPolicyResponse())
         };
@@ -159,7 +160,7 @@ public static class DomainToApiContractMapper
 
     public static RobotResponse ToRobotResponse(this RobotModel x)
     {
-        return new RobotResponse()
+        return new()
         {
             Id = x.Id,
             Name = x.Name,
@@ -188,12 +189,14 @@ public static class DomainToApiContractMapper
             StorageDisk = x.StorageDisk,
             Questions = x.Questions,
             LastUpdatedTime = x.LastUpdatedTime,
-            OnboardedTime = x.OnboardedTime
+            OnboardedTime = x.OnboardedTime,
+            SimCardNumber = x.SimCardNumber
         };
     }
+
     public static GetRobotsResponse ToRobotsResponse(this IEnumerable<RobotModel> robots)
     {
-        return new GetRobotsResponse()
+        return new()
         {
             Robots = robots.Select(x => x.ToRobotResponse())
         };
@@ -201,7 +204,7 @@ public static class DomainToApiContractMapper
 
     public static TaskResponse ToTaskResponse(this TaskModel x)
     {
-        return new TaskResponse()
+        return new()
         {
             Id = x.Id,
             Name = x.Name,
@@ -213,7 +216,7 @@ public static class DomainToApiContractMapper
 
     public static GetTasksResponse ToTasksResponse(this IEnumerable<TaskModel> tasks)
     {
-        return new GetTasksResponse()
+        return new()
         {
             Tasks = tasks.Select(x => x.ToTaskResponse())
         };

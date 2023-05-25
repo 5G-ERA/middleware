@@ -9,37 +9,52 @@ namespace Middleware.Models.Dto;
 public class InstanceDto : Dto
 {
     public const string Prefix = "Instance";
+
     [Indexed]
     [RedisIdField]
     public override string Id { get; set; } = default!;
+
     [Indexed]
     public string? Name { get; set; } = default!;
+
     [Indexed]
     public string? ServiceInstanceId { get; set; } = default!;
+
     [Indexed]
     public string ServiceType { get; set; } = default!;
+
     [Indexed]
     public bool? IsReusable { get; set; } = default!;
+
     [Indexed]
     public string DesiredStatus { get; set; } = default!;
+
     [Indexed]
     public string? ServiceUrl { get; set; } = default!;
     [Indexed]
     public List<RosTopic> RosTopicsPub { get; set; } = new();
+
     [Indexed]
     public List<RosTopic> RosTopicsSub { get; set; } = new();
+
     [Indexed(Sortable = true)]
     public int RosVersion { get; set; } = default!;
+
     [Indexed]
     public string ROSDistro { get; set; } = default!;
+
     [Indexed]
     public List<string> Tags { get; set; } = new();
+
     [Indexed]
     public string InstanceFamily { get; set; } = default!;
+
     [Indexed(Sortable = true)]
     public int SuccessRate { get; set; } = default!;
+
     [Indexed]
     public string ServiceStatus { get; set; } = default!;
+
     [Indexed]
     public HardwareRequirements HardwareRequirements { get; set; } = new();
 

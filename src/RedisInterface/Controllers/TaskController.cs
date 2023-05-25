@@ -312,7 +312,10 @@ namespace Middleware.RedisInterface.Controllers
             {
                 return BadRequest(new ApiResponse((int)HttpStatusCode.NotFound, "Parameters for TaskModel were not specified correctly."));
             }
-
+            if (await CheckExistingTask(model.Id) == true) 
+            {
+                return BadRequest(new ApiResponse((int)HttpStatusCode.BadRequest, "This task ID has already been used, please specify a new Task ID."));
+            }
             if (!model.ActionSequence.Any())
             {
                 return BadRequest(new ApiResponse((int)HttpStatusCode.BadRequest, "Parameters for ActionSequence were not specified."));
@@ -322,8 +325,12 @@ namespace Middleware.RedisInterface.Controllers
                 foreach (ActionModel actionModel in model.ActionSequence)
                 {
                     var tmpServices = actionModel.Services;
-                    actionModel.Services = null;
-                    await _actionRepository.AddAsync(actionModel);
+
+                    if (await CheckExistingAction(actionModel.Id) == false)
+                    {
+                        await _actionRepository.AddAsync(actionModel);
+                    }
+                    else { continue; }
                     actionModel.Services = tmpServices;
                     if (!actionModel.Services.Any())
                     {
@@ -332,15 +339,22 @@ namespace Middleware.RedisInterface.Controllers
                     foreach (InstanceModel instanceModel in actionModel.Services)
                     {
                         var tmpImage = instanceModel.ContainerImage;
-                        instanceModel.ContainerImage = null;
-                        await _instanceRepository.AddAsync(instanceModel);
+
+                        if (await CheckExistingInstance(instanceModel.Id) == false)
+                        {
+                            await _instanceRepository.AddAsync(instanceModel);
+                        }
+                        else { continue; }
                         instanceModel.ContainerImage = tmpImage;
                         if (instanceModel.ContainerImage == null)
                         {
                             return BadRequest(new ApiResponse((int)HttpStatusCode.BadRequest, "Parameters for ContainerImage were not specified."));
                         }
-                        await _containerImageRepository.AddAsync(instanceModel.ContainerImage);
-
+                        if (await CheckExistingContainerImage(instanceModel.Id) == false)
+                        {
+                            await _containerImageRepository.AddAsync(instanceModel.ContainerImage);
+                        }
+                        else { continue; }
                         //RELATIONSHIP--NEEDS (INSTANCE-IMAGE)
                         RelationModel imageRelation = CreateGraphRelation(instanceModel, RedisDbIndexEnum.Instance, instanceModel.ContainerImage, RedisDbIndexEnum.ContainerImage);
                         bool isImageValid = await _containerImageRepository.AddRelationAsync(imageRelation);
@@ -360,9 +374,7 @@ namespace Middleware.RedisInterface.Controllers
                         }
                     }
                 }
-
                 var tmpSequence = model.ActionSequence;
-                model.ActionSequence = null;
                 TaskModel importModel = await _taskRepository.AddAsync(model);
                 model.ActionSequence = tmpSequence;
                 foreach (var action in model.ActionSequence)
@@ -384,6 +396,7 @@ namespace Middleware.RedisInterface.Controllers
                 return StatusCode(statusCode, new ApiResponse(statusCode, $"An error has occurred: {ex.Message}"));
             }
         }
+
         /// <summary>
         /// Creates the new Relation between 2 objects for the import of the task
         /// </summary>
@@ -403,7 +416,57 @@ namespace Middleware.RedisInterface.Controllers
 
             return new RelationModel(initiatesFrom, pointsTo, relation);
         }
+        
+        private async Task<bool> CheckExistingAction(Guid guidToCheck)
+        {
+            var actionModel =  await _actionRepository.GetByIdAsync(guidToCheck);
+            if (actionModel == null)
+            {
+                return false;
+            }
+            else 
+            {
+                return true;
+            }
+        }
 
+        private async Task<bool> CheckExistingInstance(Guid guidToCheck)
+        {
+            var instanceModel = await _instanceRepository.GetByIdAsync(guidToCheck);
+            if (instanceModel == null)
+            {
+                return false;
+            }
+            else
+            {
+                return true;
+            }
+        }
 
+        private async Task<bool> CheckExistingContainerImage(Guid guidToCheck)
+        {
+            var containerImageModel = await _containerImageRepository.GetByIdAsync(guidToCheck);
+            if (containerImageModel == null)
+            {
+                return false;
+            }
+            else
+            {
+                return true;
+            }
+        }
+
+        private async Task<bool> CheckExistingTask(Guid guidToCheck)
+        {
+            var taskModel = await _taskRepository.GetByIdAsync(guidToCheck);
+            if (taskModel == null)
+            {
+                return false;
+            }
+            else
+            {
+                return true;
+            }
+        }
     }
 }

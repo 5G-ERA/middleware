@@ -12,7 +12,6 @@ public class ActionModel : BaseModel
     [JsonPropertyName("Name")]
     public override string Name { get; set; }
     
-
     [JsonPropertyName("Tags")]
     public List<string>? Tags { get; set; }
 
@@ -26,7 +25,7 @@ public class ActionModel : BaseModel
     public string? PlacementType { get; set; } // Either edge or cloud. 
 
     [JsonPropertyName("ActionPriority")]
-    public string? ActionPriority { get; set; }
+    public int ActionPriority { get; set; }
 
     [JsonPropertyName("ActionStatus")]
     public string? ActionStatus { get; set; }

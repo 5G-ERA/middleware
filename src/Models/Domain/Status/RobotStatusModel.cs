@@ -10,6 +10,7 @@ public class RobotStatusModel : BaseModel
     /// </summary>
     [Required]
     public override Guid Id { get; set; }
+
     /// <summary>
     /// Name of the robot
     /// </summary>
@@ -20,15 +21,18 @@ public class RobotStatusModel : BaseModel
     /// </summary>
     [Required]
     public Guid ActionSequenceId { get; set; }
+
     /// <summary>
     /// Index of the currently executed action
     /// </summary>
     [Required]
     public int? CurrentlyExecutedActionIndex { get; set; }
+
     /// <summary>
     /// Battery level in %
     /// </summary>
     public int BatteryLevel { get; set; }
+
     /// <summary>
     /// Timestamp of the update
     /// </summary>
@@ -38,6 +42,7 @@ public class RobotStatusModel : BaseModel
     {
         return Id != Guid.Empty && ActionSequenceId != Guid.Empty && CurrentlyExecutedActionIndex.HasValue;
     }
+
     public override Dto.Dto ToDto()
     {
         var domain = this;

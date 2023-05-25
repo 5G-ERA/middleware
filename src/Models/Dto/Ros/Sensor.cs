@@ -8,6 +8,7 @@ public class Sensor
     public string Name { get; init; } = default!;
     public string Type { get; init; } = default!;
     public string? Description { get; init; }
+
     [Indexed]
     public List<string> Nodes { get; init; } = new();
 

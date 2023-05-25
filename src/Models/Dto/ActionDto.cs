@@ -4,7 +4,7 @@ using Redis.OM.Modeling;
 
 namespace Middleware.Models.Dto;
 
-[Document(IndexName = "action-idx", StorageType = StorageType.Json, Prefixes = new[] { ActionDto.Prefix })]
+[Document(IndexName = "action-idx", StorageType = StorageType.Json, Prefixes = new[] { Prefix })]
 public class ActionDto : Dto
 {
     public const string Prefix = "Action";
@@ -19,11 +19,11 @@ public class ActionDto : Dto
     public string? ActionPriority { get; init; } = default!;
 
     public HardwareRequirements HardwareRequirements { get; init; } = new();
-    
+
     public override BaseModel ToModel()
     {
         var dto = this;
-        return new ActionModel()
+        return new ActionModel
         {
             Id = Guid.Parse(dto.Id.Replace(Prefix, "")),
             Name = dto.Name,

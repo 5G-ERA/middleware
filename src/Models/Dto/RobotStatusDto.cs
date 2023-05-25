@@ -7,6 +7,7 @@ namespace Middleware.Models.Dto
     public class RobotStatusDto : Dto
     {
         public const string Prefix = "RobotStatus";
+
         [Indexed]
         [RedisIdField]
         public override string Id { get; set; }

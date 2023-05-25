@@ -29,4 +29,5 @@ public class RobotRequest
     public long? Ram { get; init; }
     public long? StorageDisk { get; init; }
     public IEnumerable<DialogueModel>? Questions { get; init; }
+    public string SimCardNumber { get; init; }
 }

@@ -24,6 +24,7 @@ namespace Middleware.Models.Domain
         {
             Enabled = false;
         }
+
         public RosTopic ToDto()
         {
             return new RosTopic
