@@ -1,6 +1,5 @@
 ﻿using System.Text.Json.Serialization;
 using Middleware.Models.Dto;
-using Middleware.Models.Dto.Hardware;
 
 namespace Middleware.Models.Domain;
 
@@ -11,7 +10,7 @@ public class ActionModel : BaseModel
 
     [JsonPropertyName("Name")]
     public override string Name { get; set; }
-    
+
     [JsonPropertyName("Tags")]
     public List<string>? Tags { get; set; }
 
@@ -25,29 +24,29 @@ public class ActionModel : BaseModel
     public string? PlacementType { get; set; } // Either edge or cloud. 
 
     [JsonPropertyName("ActionPriority")]
-    public int ActionPriority { get; set; }
+    public string? ActionPriority { get; set; } = default!;
 
     [JsonPropertyName("ActionStatus")]
     public string? ActionStatus { get; set; }
 
     [JsonPropertyName("Services")]
-    public List<InstanceModel> Services { get; set; } = new ();
+    public List<InstanceModel> Services { get; set; } = new();
 
     [JsonPropertyName("MinimumRam")]
     public long? MinimumRam { get; set; }
 
     [JsonPropertyName("MinimumNumCores")]
     public int? MinimumNumCores { get; set; }
-    
+
     public override Dto.Dto ToDto()
     {
         var domain = this;
-        return new ActionDto()
+        return new ActionDto
         {
             Id = domain.Id.ToString(),
             ActionPriority = domain.ActionPriority,
             Name = domain.Name,
-            HardwareRequirements = new HardwareRequirements()
+            HardwareRequirements = new()
             {
                 MinimumRam = domain.MinimumRam,
                 MinimumNumCores = domain.MinimumNumCores
