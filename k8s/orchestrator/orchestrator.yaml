@@ -51,6 +51,22 @@ spec:
               value: MiddlewareBED # to be replaced with real value
             - name: Middleware__InstanceType
               value: Edge # to be replaced with real value
+            - name: CustomLogger__LoggerName
+              value: Loki # user can choose between Loki or Elasticsearch
+            - name: CustomLogger__Url
+              value: http://to.be.replaced.with.real.value.com # to be replaced with real value
+            - name: CustomLogger__User
+              value: myuser # to be replaced with real value
+            - name: CustomLogger__Password
+              value: mypassword # to be replaced with real value
+            - name: Slice__Hostname
+              value: http://to.be.replaced.with.real.value.com # to be replaced with real value
+            - name: RabbitMQ__Address
+              value: "amqp://" amqp_authority [ "/" vhost ] [ "?" query ] # to be replaced with real value
+            - name: RabbitMQ__User
+              value: myuser # to be replaced with real value
+            - name: RabbitMQ__Pass
+              value: mypassword # to be replaced with real value
             - name: CENTRAL_API_HOSTNAME
               value: central.api
             - name: AWS_ACCESS_KEY_ID
