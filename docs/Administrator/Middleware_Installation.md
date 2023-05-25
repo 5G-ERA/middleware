@@ -138,12 +138,13 @@ kubectl apply -f orchestrator_role_binding.yaml
 The last step is to prepare the deployment script for the middleware. It can be found [here](../../k8s/orchestrator/orchestrator.yaml). In the `orchestrator.yaml` file there are environment variables that must be set to ensure the correct work of the Orchestrator. The needed variables are:
 
 1. IMAGE_REGISTRY – contains the address of the registry in which the Middleware images are stored. By default this value is `ghcr.io/5g-era`
-4. Middleware__Organization – the organization to which this middleware belongs. The organization is an artificial group of Middlewares that can cooperate.
-5. Middleware__InstanceName – a **unique** name of the Middleware.
-6. Middleware__InstanceType – Either Edge/Cloud
-7. CENTRAL_API_HOSTNAME - Address of the CentralAPI that is responsible for authenticating the Middleware instances during the startup. For more information refer to the [CentralAPI documentation](CentralApi)
-8. AWS_ACCESS_KEY_ID - Aws access key ID used to access the services in AWS like Secret Manager
-9. AWS_SECRET_ACCESS_KEY - Aws secret used to authenticate the access key.
+2. Middleware__Organization – the organization to which this middleware belongs. The organization is an artificial group of Middlewares that can cooperate.
+3. Middleware__InstanceName – a **unique** name of the Middleware.
+4. Middleware__InstanceType – Either Edge/Cloud
+5. CENTRAL_API_HOSTNAME - Address of the CentralAPI that is responsible for authenticating the Middleware instances during the startup. For more information refer to the [CentralAPI documentation](CentralApi)
+6. AWS_ACCESS_KEY_ID - Aws access key ID used to access the services in AWS like Secret Manager
+7. AWS_SECRET_ACCESS_KEY - Aws secret used to authenticate the access key.
+8. Slice__Hostname - the hostname of the SliceManager API that allows integration of the 5G slices into the planning process of the Middleware
 
 The most up-to-date Middleware version is `v0.4`.
 

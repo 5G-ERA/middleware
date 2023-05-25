@@ -3,9 +3,9 @@ using FluentAssertions;
 using Microsoft.AspNetCore.Mvc;
 using Middleware.CentralApi.Contracts.Responses;
 using Middleware.CentralApi.Controllers;
-using Middleware.CentralApi.Domain;
 using Middleware.CentralApi.Services;
 using Middleware.Common.Responses;
+using Middleware.Models.Domain;
 using NSubstitute;
 using OneOf.Types;
 
@@ -13,12 +13,12 @@ namespace CentralApi.Tests.Unit.Controller;
 
 public class LocationsControllerTests
 {
-    private readonly LocationsController _sut;
     private readonly ILocationService _locationService = Substitute.For<ILocationService>();
+    private readonly LocationsController _sut;
 
     public LocationsControllerTests()
     {
-        _sut = new LocationsController(_locationService);
+        _sut = new(_locationService);
     }
 
     [Fact]
@@ -27,7 +27,7 @@ public class LocationsControllerTests
         // arrange
         var location = string.Empty;
         // act
-        var result = (BadRequestObjectResult) await _sut.GetAvailableLocations(location);
+        var result = (BadRequestObjectResult)await _sut.GetAvailableLocations(location);
         // assert
         result.StatusCode.Should().Be(400);
         result.Value.Should().BeOfType<ApiResponse>();
@@ -36,6 +36,7 @@ public class LocationsControllerTests
         (result.Value as ApiResponse)!.TimeStamp.Should().NotBe(default);
         (result.Value as ApiResponse)!.Message.Should().Be("Organization was not specified");
     }
+
     [Fact]
     public async Task GetAvailableLocations_ShouldReturnNotFound_WhenLocationAreNotFound()
     {
@@ -43,10 +44,11 @@ public class LocationsControllerTests
         var location = "myOrganization";
         _locationService.GetAvailableLocations(location).Returns(new NotFound());
         // act
-        var result = (NotFoundResult) await _sut.GetAvailableLocations(location);
+        var result = (NotFoundResult)await _sut.GetAvailableLocations(location);
         // assert
         result.StatusCode.Should().Be(404);
     }
+
     [Fact]
     public async Task GetAvailableLocations_ShouldReturnLocations_WhenLocationsExist()
     {
@@ -54,7 +56,7 @@ public class LocationsControllerTests
         var location = "myOrganization";
         _locationService.GetAvailableLocations(location).Returns(ImmutableList<Location>.Empty);
         // act
-        var result = (OkObjectResult) await _sut.GetAvailableLocations(location);
+        var result = (OkObjectResult)await _sut.GetAvailableLocations(location);
         // assert
         result.StatusCode.Should().Be(200);
         result.Value.Should().BeOfType<LocationsResponse>();

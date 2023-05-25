@@ -1,5 +1,5 @@
 ﻿using Middleware.CentralApi.Contracts.Responses;
-using Middleware.CentralApi.Domain;
+using Middleware.Models.Domain;
 
 namespace Middleware.CentralApi.Mappings;
 
@@ -7,7 +7,7 @@ public static class DomainToApiContractMapper
 {
     public static LocationResponse ToLocationResponse(this Location x)
     {
-        return new LocationResponse()
+        return new()
         {
             Id = x.Id!.Value,
             Name = x.Name,
@@ -20,7 +20,7 @@ public static class DomainToApiContractMapper
 
     public static LocationsResponse ToLocationsResponse(this IEnumerable<Location> locations)
     {
-        return new LocationsResponse()
+        return new()
         {
             Locations = locations.Select(x => x.ToLocationResponse())
         };

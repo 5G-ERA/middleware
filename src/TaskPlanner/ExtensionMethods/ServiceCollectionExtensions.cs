@@ -26,21 +26,41 @@ public static class ServiceCollectionExtensions
                 mqBusFactoryConfigurator.Message<DeployPlanMessage>(x => x.SetEntityName(nameof(DeployPlanMessage)));
                 mqBusFactoryConfigurator.Publish<DeployPlanMessage>(x => { x.ExchangeType = ExchangeType.Direct; });
 
-                
+
                 mqBusFactoryConfigurator.Send<SwitchoverDeleteAction>(x =>
                 {
                     x.UseRoutingKeyFormatter(t => t.Message.Location);
                 });
-                mqBusFactoryConfigurator.Message<SwitchoverDeleteAction>(x => x.SetEntityName(nameof(SwitchoverDeleteAction)));
-                mqBusFactoryConfigurator.Publish<SwitchoverDeleteAction>(x => { x.ExchangeType = ExchangeType.Direct; });
+                mqBusFactoryConfigurator.Message<SwitchoverDeleteAction>(x =>
+                    x.SetEntityName(nameof(SwitchoverDeleteAction)));
+                mqBusFactoryConfigurator.Publish<SwitchoverDeleteAction>(x =>
+                {
+                    x.ExchangeType = ExchangeType.Direct;
+                });
 
                 mqBusFactoryConfigurator.Send<SwitchoverDeployAction>(x =>
                 {
                     x.UseRoutingKeyFormatter(t => t.Message.Location);
                 });
-                mqBusFactoryConfigurator.Message<SwitchoverDeployAction>(x => x.SetEntityName(nameof(SwitchoverDeployAction)));
-                mqBusFactoryConfigurator.Publish<SwitchoverDeployAction>(x => { x.ExchangeType = ExchangeType.Direct; });
-                
+                mqBusFactoryConfigurator.Message<SwitchoverDeployAction>(x =>
+                    x.SetEntityName(nameof(SwitchoverDeployAction)));
+                mqBusFactoryConfigurator.Publish<SwitchoverDeployAction>(x =>
+                {
+                    x.ExchangeType = ExchangeType.Direct;
+                });
+
+
+                mqBusFactoryConfigurator.Send<ConnectRobotToSliceMessage>(x =>
+                {
+                    x.UseRoutingKeyFormatter(t => t.Message.Location);
+                });
+                mqBusFactoryConfigurator.Message<ConnectRobotToSliceMessage>(x =>
+                    x.SetEntityName(nameof(ConnectRobotToSliceMessage)));
+                mqBusFactoryConfigurator.Publish<ConnectRobotToSliceMessage>(x =>
+                {
+                    x.ExchangeType = ExchangeType.Direct;
+                });
+
                 mqBusFactoryConfigurator.ConfigureEndpoints(busRegistrationContext);
             });
         });

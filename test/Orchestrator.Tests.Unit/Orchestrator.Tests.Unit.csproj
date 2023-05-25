@@ -27,4 +27,8 @@
 	  <ProjectReference Include="..\..\src\Orchestrator\Orchestrator.csproj" />
 	</ItemGroup>
 
+	<ItemGroup>
+	  <Folder Include="SliceManager\" />
+	</ItemGroup>
+
 </Project>

@@ -1,7 +1,6 @@
-﻿using Middleware.Common.Enums;
-using Middleware.Models.Enums;
+﻿using Middleware.Models.Enums;
 
-namespace Middleware.CentralApi.Domain;
+namespace Middleware.Models.Domain;
 
 public class Location
 {
