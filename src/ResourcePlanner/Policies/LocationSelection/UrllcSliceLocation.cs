@@ -1,5 +1,5 @@
-﻿using Middleware.Models.Enums;
-using Middleware.ResourcePlanner.Models;
+﻿using Middleware.Models.Domain;
+using Middleware.Models.Enums;
 
 namespace Middleware.ResourcePlanner.Policies.LocationSelection;
 
@@ -14,7 +14,7 @@ internal class UrllcSliceLocation : ILocationSelectionPolicy
     public Priority Priority { get; }
 
     /// <inheritdoc />
-    public Task<Location> GetLocationAsync()
+    public Task<PlannedLocation> GetLocationAsync()
     {
         //TODO:
         /**
@@ -28,7 +28,7 @@ internal class UrllcSliceLocation : ILocationSelectionPolicy
     }
 
     /// <inheritdoc />
-    public Task<bool> IsLocationSatisfiedByPolicy(Location location)
+    public Task<bool> IsLocationSatisfiedByPolicy(PlannedLocation plannedLocation)
     {
         throw new NotImplementedException();
     }

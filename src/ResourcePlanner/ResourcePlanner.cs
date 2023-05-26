@@ -79,9 +79,8 @@ internal class ResourcePlanner : IResourcePlanner
 
             // find optimal location based on applied policies
             var location = await _policyService.GetLocationAsync(action.Services);
-            action.NetworkSlice = location.NetworkSlice;
-            action.Placement = location.Name;
-            action.PlacementType = location.Type;
+
+            action.SetNewLocationForPlan(location);
         }
 
         return taskModel;

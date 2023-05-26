@@ -18,7 +18,7 @@ internal class PolicyBuilder : IPolicyBuilder
         _middlewareConfig = middlewareConfig;
     }
 
-    public async Task<ILocationSelectionPolicy?> CreateLocationPolicy(string policyName)
+    public async Task<ILocationSelectionPolicy> CreateLocationPolicy(string policyName)
     {
         var policyResp = await _redisInterfaceClient.GetPolicyByNameAsync(policyName);
         var policy = policyResp.ToPolicy();

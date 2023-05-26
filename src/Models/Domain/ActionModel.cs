@@ -43,6 +43,19 @@ public class ActionModel : BaseModel
     /// </summary>
     public string? NetworkSlice { get; set; }
 
+    /// <summary>
+    ///     Sets new location identified during resource planning
+    /// </summary>
+    /// <param name="location"></param>
+    public void SetNewLocationForPlan(PlannedLocation location)
+    {
+        Placement = location.Name;
+        PlacementType = location.Type.ToString();
+
+        if (location.HasSlicesEnabled)
+            NetworkSlice = location.NetworkSliceName;
+    }
+
     public override Dto.Dto ToDto()
     {
         var domain = this;

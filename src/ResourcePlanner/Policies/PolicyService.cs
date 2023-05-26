@@ -1,8 +1,8 @@
 ﻿using Microsoft.Extensions.Options;
 using Middleware.Common.Config;
+using Middleware.Models.Domain;
 using Middleware.Models.Domain.Contracts;
 using Middleware.Models.Enums;
-using Middleware.ResourcePlanner.Models;
 using Middleware.ResourcePlanner.Policies.LocationSelection;
 
 namespace Middleware.ResourcePlanner.Policies;
@@ -19,10 +19,10 @@ internal class PolicyService : IPolicyService
     }
 
     /// <inheritdoc />
-    public async Task<Location> GetLocationAsync(IReadOnlyList<IPolicyAssignable> members)
+    public async Task<PlannedLocation> GetLocationAsync(IReadOnlyList<IPolicyAssignable> members)
     {
         var allAppliedPolicies = new HashSet<string>();
-        var resultLocations = new HashSet<Location>();
+        var resultLocations = new HashSet<PlannedLocation>();
         foreach (var member in members)
         {
             if (member.AppliedPolicies.Any() == false)
@@ -33,7 +33,7 @@ internal class PolicyService : IPolicyService
                 continue;
             }
 
-            var localLocations = new HashSet<Tuple<Priority, Location>>();
+            var localLocations = new HashSet<Tuple<Priority, PlannedLocation>>();
             foreach (var policyName in member.AppliedPolicies)
             {
                 allAppliedPolicies.Add(policyName);
@@ -55,7 +55,8 @@ internal class PolicyService : IPolicyService
         }
 
         // negotiate action-level location
-        var locationsTmp = resultLocations.Select(x => new Tuple<Priority, Location>(Priority.None, x)).ToHashSet();
+        var locationsTmp = resultLocations.Select(x => new Tuple<Priority, PlannedLocation>(Priority.None, x))
+            .ToHashSet();
         var negotiatedLocation = await NegotiateLocation(locationsTmp, allAppliedPolicies.ToList());
         return negotiatedLocation;
     }
@@ -66,11 +67,11 @@ internal class PolicyService : IPolicyService
     /// <param name="locations"></param>
     /// <param name="policyNames"></param>
     /// <returns></returns>
-    private async Task<Location> NegotiateLocation(IReadOnlySet<Tuple<Priority, Location>> locations,
+    private async Task<PlannedLocation> NegotiateLocation(IReadOnlySet<Tuple<Priority, PlannedLocation>> locations,
         IReadOnlyList<string> policyNames)
     {
-        Location retVal = null;
-        var locationPolicyHierarchy = new List<Tuple<int, Priority, Location>>();
+        PlannedLocation retVal = null;
+        var locationPolicyHierarchy = new List<Tuple<int, Priority, PlannedLocation>>();
         foreach (var (priority, location) in locations.OrderByDescending(x => (int)x.Item1))
         {
             var meetsAll = true;
@@ -101,7 +102,8 @@ internal class PolicyService : IPolicyService
     /// </summary>
     /// <param name="hierarchy"></param>
     /// <returns>The most applicable location in accordance to the policyNames used</returns>
-    private async Task<Location> GetDesiredLocationFromHierarchy(IEnumerable<Tuple<int, Priority, Location>> hierarchy)
+    private async Task<PlannedLocation> GetDesiredLocationFromHierarchy(
+        IEnumerable<Tuple<int, Priority, PlannedLocation>> hierarchy)
     {
         var ordered = hierarchy.OrderByDescending(x => x.Item1)
             .ThenByDescending(x => (int)x.Item2)

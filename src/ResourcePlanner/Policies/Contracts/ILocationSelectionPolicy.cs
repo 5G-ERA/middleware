@@ -1,19 +1,19 @@
-﻿using Middleware.ResourcePlanner.Models;
+﻿using Middleware.Models.Domain;
 
 namespace Middleware.ResourcePlanner.Policies;
 
 internal interface ILocationSelectionPolicy : IPolicy
 {
     /// <summary>
-    ///     Evaluates the best possible location based on the policy implementation
+    ///     Evaluates the best possible plannedLocation based on the policy implementation
     /// </summary>
     /// <returns></returns>
-    Task<Location> GetLocationAsync();
+    Task<PlannedLocation> GetLocationAsync();
 
     /// <summary>
-    ///     Checks if the specified location acceptable by the policy
+    ///     Checks if the specified plannedLocation acceptable by the policy
     /// </summary>
-    /// <param name="location"></param>
+    /// <param name="plannedLocation"></param>
     /// <returns></returns>
-    Task<bool> IsLocationSatisfiedByPolicy(Location location);
+    Task<bool> IsLocationSatisfiedByPolicy(PlannedLocation plannedLocation);
 }
