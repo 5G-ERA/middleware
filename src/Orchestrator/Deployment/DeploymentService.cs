@@ -278,15 +278,23 @@ public class DeploymentService : IDeploymentService
             new("Middleware__Organization", mwConfig.Organization),
             new("Middleware__InstanceName", mwConfig.InstanceName),
             new("Middleware__InstanceType", mwConfig.InstanceType),
+            new("CustomLogger__LoggerName", _env.GetEnvVariable("CustomLogger__LoggerName")),
+            new("CustomLogger__Url", _env.GetEnvVariable("CustomLogger__Url")),
+            new("CustomLogger__User", _env.GetEnvVariable("CustomLogger__User")),
+            new("CustomLogger__Password", _env.GetEnvVariable("CustomLogger__Password")),
             new("Slice__Hostname", _env.GetEnvVariable("Slice__Hostname")),
+            new("RabbitMQ__Address", _env.GetEnvVariable("RabbitMQ__Address")),
+            new("RabbitMQ__User", _env.GetEnvVariable("RabbitMQ__User")),
+            new("RabbitMQ__Pass", _env.GetEnvVariable("RabbitMQ__Pass")),
             new("CENTRAL_API_HOSTNAME", _env.GetEnvVariable("CENTRAL_API_HOSTNAME")),
             new("AWS_ACCESS_KEY_ID", _env.GetEnvVariable("AWS_ACCESS_KEY_ID")),
             new("AWS_SECRET_ACCESS_KEY", _env.GetEnvVariable("AWS_SECRET_ACCESS_KEY"))
         };
         if (name.Contains("redis") || name == "gateway")
         {
-            envList.Add(new("REDIS_HOSTNAME", _env.GetEnvVariable("REDIS_HOSTNAME")));
-            envList.Add(new("REDIS_PORT", _env.GetEnvVariable("REDIS_PORT")));
+            envList.Add(new("Redis__HostName", _env.GetEnvVariable("Redis__HostName")));
+            envList.Add(new("Redis__ClusterHostname", _env.GetEnvVariable("Redis__ClusterHostname")));
+            envList.Add(new("Redis__Password", _env.GetEnvVariable("Redis__Password")));
         }
 
         var container = new V1Container
