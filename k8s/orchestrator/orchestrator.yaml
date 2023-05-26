@@ -73,3 +73,7 @@ spec:
               value: my_aws_secret_key
             - name: AWS_SECRET_ACCESS_KEY
               value: my_aws_access_key
+            - name: Redis__ClusterHostname
+              value: redis.to.be.replaced.with.real.value # to be replaced with real value
+            - name: Redis__Password
+              value: mypassword # to be replaced with real value

@@ -293,8 +293,8 @@ public class DeploymentService : IDeploymentService
         if (name.Contains("redis") || name == "gateway")
         {
             envList.Add(new("Redis__HostName", _env.GetEnvVariable("Redis__HostName")));
-            envList.Add(new("Redis__Password", _env.GetEnvVariable("Redis__Password")));
             envList.Add(new("Redis__ClusterHostname", _env.GetEnvVariable("Redis__ClusterHostname")));
+            envList.Add(new("Redis__Password", _env.GetEnvVariable("Redis__Password")));
         }
 
         var container = new V1Container
