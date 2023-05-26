@@ -1,4 +1,5 @@
 ﻿using Middleware.Models.Domain;
+using Middleware.Models.Domain.Slice;
 using Middleware.Models.Enums;
 using Middleware.RedisInterface.Contracts.Responses;
 
@@ -219,6 +220,33 @@ public static class DomainToApiContractMapper
         return new()
         {
             Tasks = tasks.Select(x => x.ToTaskResponse())
+        };
+    }
+
+    public static SliceResponse ToSliceResponse(this SliceModel x)
+    {
+        return new()
+        {
+            Id = x.Id,
+            Name = x.Name,
+            Site = x.Site,
+            SliceType = x.SliceType.ToString(),
+            TrafficType = x.TrafficType.ToString(),
+            ExpDataRateDl = x.ExpDataRateDl,
+            ExpDataRateUl = x.ExpDataRateDl,
+            Jitter = x.Jitter,
+            Latency = x.Latency,
+            UserDensity = x.UserDensity,
+            UserSpeed = x.UserSpeed,
+            Imsi = x.Imsi
+        };
+    }
+
+    public static GetSlicesResponse ToSlicesResponse(this IEnumerable<SliceModel> slices)
+    {
+        return new()
+        {
+            Slices = slices.Select(x => x.ToSliceResponse())
         };
     }
 }

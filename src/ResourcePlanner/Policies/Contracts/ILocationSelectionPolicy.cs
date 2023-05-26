@@ -5,6 +5,11 @@ namespace Middleware.ResourcePlanner.Policies;
 internal interface ILocationSelectionPolicy : IPolicy
 {
     /// <summary>
+    ///     Did the location selection policy found matching location. False if the policy was not executed yet.
+    /// </summary>
+    bool FoundMatchingLocation { get; }
+
+    /// <summary>
     ///     Evaluates the best possible plannedLocation based on the policy implementation
     /// </summary>
     /// <returns></returns>

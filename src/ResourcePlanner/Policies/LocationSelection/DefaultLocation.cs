@@ -24,10 +24,15 @@ internal class DefaultLocation : ILocationSelectionPolicy
     public Priority Priority => Priority.Low;
 
     /// <inheritdoc />
+    public bool FoundMatchingLocation { get; private set; }
+
+    /// <inheritdoc />
     public Task<PlannedLocation> GetLocationAsync()
     {
         var location = new PlannedLocation(_middlewareOptions.Value.InstanceName,
             Enum.Parse<LocationType>(_middlewareOptions.Value.InstanceType));
+
+        FoundMatchingLocation = true;
 
         return Task.FromResult(location);
     }

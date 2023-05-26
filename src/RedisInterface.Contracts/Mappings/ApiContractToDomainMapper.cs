@@ -116,15 +116,15 @@ public static class ApiContractToDomainMapper
     public static List<ContainerImageModel> ToContainersList(this GetContainersResponse containers)
     {
         return containers.Containers.Select(x =>
-        new ContainerImageModel()
-        {
-            Id = x.Id,
-            Name = x.Name,
-            Description = x.Description,
-            K8SDeployment = x.K8sDeployment,
-            K8SService = x.K8sService,
-            Timestamp = x.LastUpdateTime
-        }).ToList();
+            new ContainerImageModel
+            {
+                Id = x.Id,
+                Name = x.Name,
+                Description = x.Description,
+                K8SDeployment = x.K8sDeployment,
+                K8SService = x.K8sService,
+                Timestamp = x.LastUpdateTime
+            }).ToList();
     }
 
     public static EdgeModel ToEdge(this EdgeRequest x)
@@ -165,7 +165,7 @@ public static class ApiContractToDomainMapper
 
     public static List<EdgeModel> ToEdgeList(this GetEdgesResponse edges)
     {
-        return edges.Edges.Select(x => new EdgeModel()
+        return edges.Edges.Select(x => new EdgeModel
         {
             Id = x.Id,
             Name = x.Name,
@@ -239,7 +239,7 @@ public static class ApiContractToDomainMapper
 
     public static PolicyModel ToPolicy(this PolicyResponse x)
     {
-        return new PolicyModel
+        return new()
         {
             Id = x.Id,
             Name = x.Name,
@@ -256,7 +256,7 @@ public static class ApiContractToDomainMapper
     public static List<PolicyModel> ToPolicyList(this GetPoliciesResponse policies)
     {
         return policies.Policies.Select(x =>
-            new PolicyModel()
+            new PolicyModel
             {
                 Id = x.Id,
                 Name = x.Name,
@@ -367,6 +367,24 @@ public static class ApiContractToDomainMapper
         return x.Slices.Select(s => new SliceModel
         {
             Name = s.SliceId,
+            Site = s.Site,
+            ExpDataRateDl = s.ExpDataRateDl,
+            ExpDataRateUl = s.ExpDataRateUl,
+            Jitter = s.Jitter,
+            Latency = s.Latency,
+            UserDensity = s.UserDensity,
+            UserSpeed = s.UserSpeed,
+            TrafficType = Enum.Parse<TrafficType>(s.TrafficType, true),
+            Imsi = s.Imsi.ToList()
+        }).ToList();
+    }
+
+    public static List<SliceModel> ToSliceList(this GetSlicesResponse x)
+    {
+        return x.Slices.Select(s => new SliceModel
+        {
+            Id = s.Id,
+            Name = s.Name,
             Site = s.Site,
             ExpDataRateDl = s.ExpDataRateDl,
             ExpDataRateUl = s.ExpDataRateUl,

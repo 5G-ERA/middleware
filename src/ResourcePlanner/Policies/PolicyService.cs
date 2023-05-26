@@ -42,8 +42,8 @@ internal class PolicyService : IPolicyService
                     continue;
 
                 var location = await policy.GetLocationAsync();
-
-                localLocations.Add(new(policy.Priority, location));
+                if (location is not null)
+                    localLocations.Add(new(policy.Priority, location));
             }
 
             // always 1 location will match, if more, negotiate best location for instance
@@ -79,9 +79,12 @@ internal class PolicyService : IPolicyService
             foreach (var policy in policyNames)
             {
                 var policyImpl = await _policyBuilder.CreateLocationPolicy(policy);
+
+                if (policyImpl.FoundMatchingLocation == false) continue;
+
                 var meets = await policyImpl.IsLocationSatisfiedByPolicy(location);
                 if (meets)
-                    cnt += 1;
+                    cnt++;
                 meetsAll &= meets;
             }
 

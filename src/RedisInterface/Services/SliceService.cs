@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.Options;
 using Middleware.Common.Config;
+using Middleware.Common.Enums;
 using Middleware.DataAccess.Repositories.Abstract;
 using Middleware.Models.Domain;
 using Middleware.Models.Domain.Slice;
@@ -39,6 +40,19 @@ public class SliceService : ISliceService
 
         await DeleteExistingSlices(locationData);
         await AddNewSliceDefinitions(slices, locationData);
+    }
+
+    /// <inheritdoc />
+    public Task<List<SliceModel>> GetAllSlices()
+    {
+        return _sliceRepository.GetAllAsync();
+    }
+
+    /// <inheritdoc />
+    public Task<List<RelationModel>> GetRelationAsync(Guid id, string name,
+        RelationDirection direction = RelationDirection.Outgoing)
+    {
+        return _sliceRepository.GetRelation(id, name, direction);
     }
 
     /// <summary>

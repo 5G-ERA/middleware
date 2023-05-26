@@ -9,6 +9,7 @@ namespace Middleware.ResourcePlanner.Policies;
 
 internal class PolicyBuilder : IPolicyBuilder
 {
+    private readonly Dictionary<string, IPolicy> _cachedPolicies = new();
     private readonly IOptions<MiddlewareConfig> _middlewareConfig;
     private readonly IRedisInterfaceClient _redisInterfaceClient;
 
@@ -20,6 +21,9 @@ internal class PolicyBuilder : IPolicyBuilder
 
     public async Task<ILocationSelectionPolicy> CreateLocationPolicy(string policyName)
     {
+        if (_cachedPolicies.TryGetValue(policyName, out var cachedPolicy))
+            return (ILocationSelectionPolicy)cachedPolicy;
+
         var policyResp = await _redisInterfaceClient.GetPolicyByNameAsync(policyName);
         var policy = policyResp.ToPolicy();
 
@@ -27,10 +31,10 @@ internal class PolicyBuilder : IPolicyBuilder
 
         ILocationSelectionPolicy policyImplementation = policyName switch
         {
-            nameof(UrllcSliceLocation) => new UrllcSliceLocation(policy.Priority),
+            nameof(UrllcSliceLocation) => new UrllcSliceLocation(policy.Priority, _redisInterfaceClient),
             _ => new DefaultLocation(_middlewareConfig)
         };
-
+        _cachedPolicies[policyName] = policyImplementation;
         return policyImplementation;
     }
 
