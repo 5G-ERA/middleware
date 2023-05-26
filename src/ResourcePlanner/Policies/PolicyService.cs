@@ -64,10 +64,10 @@ internal class PolicyService : IPolicyService
     ///     Checks what locations from the specified set, meet the most of the applied policies
     /// </summary>
     /// <param name="locations"></param>
-    /// <param name="policies"></param>
+    /// <param name="policyNames"></param>
     /// <returns></returns>
     private async Task<Location> NegotiateLocation(IReadOnlySet<Tuple<Priority, Location>> locations,
-        IReadOnlyList<string> policies)
+        IReadOnlyList<string> policyNames)
     {
         Location retVal = null;
         var locationPolicyHierarchy = new List<Tuple<int, Priority, Location>>();
@@ -75,7 +75,7 @@ internal class PolicyService : IPolicyService
         {
             var meetsAll = true;
             var cnt = 0;
-            foreach (var policy in policies)
+            foreach (var policy in policyNames)
             {
                 var policyImpl = await _policyBuilder.CreateLocationPolicy(policy);
                 var meets = await policyImpl.IsLocationSatisfiedByPolicy(location);
@@ -97,10 +97,10 @@ internal class PolicyService : IPolicyService
     }
 
     /// <summary>
-    ///     Resolves the hierarchy of the locations to select one that matches the most of the policies applied
+    ///     Resolves the hierarchy of the locations to select one that matches the most of the policyNames applied
     /// </summary>
     /// <param name="hierarchy"></param>
-    /// <returns>The most applicable location in accordance to the policies used</returns>
+    /// <returns>The most applicable location in accordance to the policyNames used</returns>
     private async Task<Location> GetDesiredLocationFromHierarchy(IEnumerable<Tuple<int, Priority, Location>> hierarchy)
     {
         var ordered = hierarchy.OrderByDescending(x => x.Item1)

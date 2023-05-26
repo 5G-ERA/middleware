@@ -9,7 +9,7 @@ public class ActionModel : BaseModel
     public override Guid Id { get; set; } = Guid.NewGuid();
 
     [JsonPropertyName("Name")]
-    public override string Name { get; set; }
+    public override string Name { get; set; } = default!;
 
     [JsonPropertyName("Tags")]
     public List<string>? Tags { get; set; }
@@ -37,6 +37,11 @@ public class ActionModel : BaseModel
 
     [JsonPropertyName("MinimumNumCores")]
     public int? MinimumNumCores { get; set; }
+
+    /// <summary>
+    ///     Network Slice associated for the specific action
+    /// </summary>
+    public string? NetworkSlice { get; set; }
 
     public override Dto.Dto ToDto()
     {

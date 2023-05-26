@@ -79,7 +79,7 @@ internal class ResourcePlanner : IResourcePlanner
 
             // find optimal location based on applied policies
             var location = await _policyService.GetLocationAsync(action.Services);
-
+            action.NetworkSlice = location.NetworkSlice;
             action.Placement = location.Name;
             action.PlacementType = location.Type;
         }
@@ -180,10 +180,8 @@ internal class ResourcePlanner : IResourcePlanner
                         if (question.Name == "What type of 5G slice")
                         {
                             var answer = question.Answer!.First();
-                            var
-                                slice5GType =
-                                    (string)answer
-                                        .Value; // there is an upper limit of eight network slices that be used by a device
+                            // there is an upper limit of eight network slices that be used by a device
+                            var slice5GType = (string)answer.Value;
                         } //Nest template
 
                     //TODO: Attach robot to slice in Redis graph
