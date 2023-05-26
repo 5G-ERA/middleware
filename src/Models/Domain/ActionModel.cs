@@ -56,6 +56,15 @@ public class ActionModel : BaseModel
             NetworkSlice = location.NetworkSliceName;
     }
 
+    /// <summary>
+    ///     Is Network Slice assigned to the planned deployment location
+    /// </summary>
+    /// <returns></returns>
+    public bool HasLocationWithNetWorkSliceSet()
+    {
+        return string.IsNullOrWhiteSpace(NetworkSlice) == false;
+    }
+
     public override Dto.Dto ToDto()
     {
         var domain = this;

@@ -37,8 +37,7 @@ public class PublishingService : IPublishService
     {
         var action = task.ActionSequence!.FirstOrDefault();
 
-        if (action == null)
-            return;
+        if (action == null) return;
 
         var location = QueueHelpers.ConstructRoutingKey(action.Placement, action.PlacementType);
         var message = new DeployPlanMessage
@@ -48,6 +47,16 @@ public class PublishingService : IPublishService
             DeploymentLocation = location
         };
         await _deployPlanPublisher.PublishAsync(message);
+
+        foreach (var actionTmp in task.ActionSequence)
+        {
+            if (actionTmp.HasLocationWithNetWorkSliceSet() && string.IsNullOrEmpty(robot.SimCardNumber) == false)
+            {
+                await PublishConnectImsiToSlice(task.ActionPlanId, robot.SimCardNumber, actionTmp.NetworkSlice,
+                    actionTmp.Placement,
+                    actionTmp.PlacementType);
+            }
+        }
     }
 
     public async Task PublishSwitchoverDeleteInstance(Guid actionPlanId, Guid actionId)
