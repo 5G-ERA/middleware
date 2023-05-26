@@ -21,6 +21,9 @@ internal class UrllcSliceLocation : ILocationSelectionPolicy
     public Priority Priority { get; }
 
     /// <inheritdoc />
+    public bool FoundMatchingLocation { get; private set; }
+
+    /// <inheritdoc />
     public async Task<PlannedLocation> GetLocationAsync()
     {
         var slices = await _redisInterfaceClient.SliceGetAllAsync();
@@ -35,8 +38,10 @@ internal class UrllcSliceLocation : ILocationSelectionPolicy
 
         var location = relations?.First();
 
-        if (location is null) return null;
+        if (location is null)
+            return null;
 
+        FoundMatchingLocation = true;
         var type = Enum.Parse<LocationType>(location.InitiatesFrom.Type);
         return new(location.InitiatesFrom.Name, type, bestSlice.Name);
     }
