@@ -27,8 +27,12 @@ internal class UrllcSliceLocation : ILocationSelectionPolicy
     public async Task<PlannedLocation> GetLocationAsync()
     {
         var slices = await _redisInterfaceClient.SliceGetAllAsync();
+        if (slices is null)
+            return null;
 
         var urllcSlices = slices.ToSliceList().Where(t => t.SliceType == SliceType.Urllc).ToImmutableList();
+        if (urllcSlices.Count == 0)
+            return null;
 
         //TODO: include the lowest latency to the location available to the robot
         var bestSlice = urllcSlices.MinBy(s => s.Latency);
@@ -36,7 +40,7 @@ internal class UrllcSliceLocation : ILocationSelectionPolicy
         var relations =
             await _redisInterfaceClient.GetRelationAsync(bestSlice, "OFFERS", RelationDirection.Incoming.ToString());
 
-        var location = relations?.First();
+        var location = relations?.FirstOrDefault();
 
         if (location is null)
             return null;

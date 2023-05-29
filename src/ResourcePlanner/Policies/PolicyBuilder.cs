@@ -21,12 +21,18 @@ internal class PolicyBuilder : IPolicyBuilder
 
     public async Task<ILocationSelectionPolicy> CreateLocationPolicy(string policyName)
     {
+        if (string.IsNullOrWhiteSpace(policyName))
+            throw new ArgumentException("Value cannot be null or whitespace.", nameof(policyName));
+
         if (_cachedPolicies.TryGetValue(policyName, out var cachedPolicy))
             return (ILocationSelectionPolicy)cachedPolicy;
 
         var policyResp = await _redisInterfaceClient.GetPolicyByNameAsync(policyName);
+        if (policyResp is null) return null;
+
         var policy = policyResp.ToPolicy();
 
+        if (policy.IsActive == false) return null;
         if (policy.Type != PolicyType.LocationSelection) return null;
 
         ILocationSelectionPolicy policyImplementation = policyName switch

@@ -19,6 +19,10 @@
 	</ItemGroup>
 
 	<ItemGroup>
+		<InternalsVisibleTo Include="ResourcePlanner.Tests.Unit" />
+	</ItemGroup>
+
+	<ItemGroup>
 
 
 		<OpenApiReference Include="..\Orchestrator\OrchestratorSpec.json" CodeGenerator="NSwagCSharp" Namespace="Middleware.ResourcePlanner.Orchestrator" ClassName="OrchestratorApiClient" Link="OpenAPIs\OrchestratorSpec.json" />
