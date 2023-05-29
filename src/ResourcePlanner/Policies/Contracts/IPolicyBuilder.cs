@@ -15,5 +15,5 @@ internal interface IPolicyBuilder
     ///     Build <see cref="DefaultLocation" /> policy
     /// </summary>
     /// <returns></returns>
-    DefaultLocation GetDefaultLocation();
+    DefaultLocation GetDefaultLocationPolicy();
 }

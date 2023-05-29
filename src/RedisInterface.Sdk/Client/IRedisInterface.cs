@@ -84,6 +84,9 @@ public interface IRedisInterface
     [Get("/api/v1/slice")]
     Task<ApiResponse<GetSlicesResponse?>> SliceGetAll();
 
+    [Get("/api/v1/slice/{id}")]
+    Task<ApiResponse<SliceResponse>> SliceGetById(Guid id);
+
     [Get("/api/v1/task/{id}")]
     Task<ApiResponse<TaskResponse?>> TaskGetById(Guid id);
 }

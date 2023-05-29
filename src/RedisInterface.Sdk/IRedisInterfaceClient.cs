@@ -188,4 +188,10 @@ public interface IRedisInterfaceClient
     /// </summary>
     /// <returns></returns>
     Task<GetSlicesResponse?> SliceGetAllAsync();
+
+    /// <summary>
+    ///     Get Slice by Id
+    /// </summary>
+    /// <returns></returns>
+    Task<SliceResponse?> SliceGetByIdAsync(Guid id);
 }

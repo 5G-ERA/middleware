@@ -34,7 +34,7 @@ internal class SliceController : ControllerBase
             var location = request.Location?.ToLocation();
             var slices = request.ToSliceList();
 
-            await _sliceService.ReRegisterSlices(slices, location);
+            await _sliceService.ReRegisterSlicesAsync(slices, location);
 
             return StatusCode((int)HttpStatusCode.Created);
         }
@@ -54,7 +54,7 @@ internal class SliceController : ControllerBase
     {
         try
         {
-            var slices = await _sliceService.GetAllSlices();
+            var slices = await _sliceService.GetAllSlicesAsync();
 
             var response = slices.ToSlicesResponse();
 
@@ -68,6 +68,36 @@ internal class SliceController : ControllerBase
         }
     }
 
+    [HttpGet]
+    [Route("{id}", Name = "SliceGetById")]
+    [ProducesResponseType(typeof(SliceResponse), (int)HttpStatusCode.OK)]
+    [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.NotFound)]
+    [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.BadRequest)]
+    [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.InternalServerError)]
+    public async Task<IActionResult> SliceGetById(Guid id)
+    {
+        var statusCode = HttpStatusCode.InternalServerError;
+        try
+        {
+            var slice = await _sliceService.GetByIdAsync(id);
+            if (slice is null)
+            {
+                statusCode = HttpStatusCode.NotFound;
+                return StatusCode((int)statusCode, new ApiResponse((int)statusCode, "Specified Slice was not found."));
+            }
+
+            var response = slice.ToSliceResponse();
+
+            return Ok(response);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "An error occurred:");
+            return StatusCode((int)statusCode,
+                new ApiResponse((int)statusCode, $"An error has occurred: {ex.Message}"));
+        }
+    }
+
     /// <summary>
     ///     Retrieves a single relation by name
     /// </summary>
@@ -76,7 +106,7 @@ internal class SliceController : ControllerBase
     /// <param name="direction"></param>
     /// <returns></returns>
     [HttpGet]
-    [Route("relation/{name}", Name = "ContainerImageGetRelationByName")]
+    [Route("relation/{name}", Name = "SliceGetRelationByName")]
     [ProducesResponseType(typeof(List<RelationModel>), (int)HttpStatusCode.OK)]
     [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.NotFound)]
     [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.InternalServerError)]

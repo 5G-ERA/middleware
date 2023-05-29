@@ -43,12 +43,45 @@ internal class UrllcSliceLocation : ILocationSelectionPolicy
 
         FoundMatchingLocation = true;
         var type = Enum.Parse<LocationType>(location.InitiatesFrom.Type);
-        return new(location.InitiatesFrom.Name, type, bestSlice.Name);
+        return new(location.InitiatesFrom.Id, location.InitiatesFrom.Name, type, bestSlice.Name);
     }
 
     /// <inheritdoc />
-    public Task<bool> IsLocationSatisfiedByPolicy(PlannedLocation plannedLocation)
+    public async Task<bool> IsLocationSatisfiedByPolicy(PlannedLocation plannedLocation)
     {
-        throw new NotImplementedException();
+        BaseModel location;
+        if (plannedLocation.Type == LocationType.Cloud)
+        {
+            location = new CloudModel
+            {
+                Id = plannedLocation.Id,
+                Name = plannedLocation.Name
+            };
+        }
+        else
+        {
+            location = new EdgeModel
+            {
+                Id = plannedLocation.Id,
+                Name = plannedLocation.Name
+            };
+        }
+
+        var relations = await _redisInterfaceClient.GetRelationAsync(location, "OFFERS");
+
+        if (relations is null) return false;
+
+        foreach (var relation in relations)
+        {
+            var sliceResponse = await _redisInterfaceClient.SliceGetByIdAsync(relation.PointsTo.Id);
+            if (sliceResponse is null)
+                continue;
+
+            var slice = sliceResponse.ToSlice();
+            if (slice.SliceType == SliceType.Urllc)
+                return true;
+        }
+
+        return false;
     }
 }

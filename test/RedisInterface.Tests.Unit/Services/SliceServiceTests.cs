@@ -53,7 +53,7 @@ public class SliceServiceTests
         _edgeRepository.GetRelation(Arg.Is(edge.Id), "Offers").ReturnsForAnyArgs(relationSlices);
 
         //act
-        await _sut.ReRegisterSlices(slices);
+        await _sut.ReRegisterSlicesAsync(slices);
 
         //assert
 
@@ -102,7 +102,7 @@ public class SliceServiceTests
         _edgeRepository.GetRelation(Arg.Is(edge.Id), "Offers").ReturnsForAnyArgs(relationSlices);
 
         //act
-        await _sut.ReRegisterSlices(slices, location);
+        await _sut.ReRegisterSlicesAsync(slices, location);
 
         //assert
 
@@ -144,7 +144,7 @@ public class SliceServiceTests
         _cloudRepository.GetRelation(Arg.Is(cloud.Id), "OFFERS").ReturnsForAnyArgs(relationSlices);
 
         //act
-        await _sut.ReRegisterSlices(slices);
+        await _sut.ReRegisterSlicesAsync(slices);
 
         //assert
 
@@ -193,7 +193,7 @@ public class SliceServiceTests
         _cloudRepository.GetRelation(Arg.Is(cloud.Id), "OFFERS").ReturnsForAnyArgs(relationSlices);
 
         //act
-        await _sut.ReRegisterSlices(slices, location);
+        await _sut.ReRegisterSlicesAsync(slices, location);
 
         //assert
 

@@ -3,7 +3,6 @@ using Middleware.Common.Config;
 using Middleware.Models.Domain;
 using Middleware.Models.Domain.Contracts;
 using Middleware.Models.Enums;
-using Middleware.ResourcePlanner.Policies.LocationSelection;
 
 namespace Middleware.ResourcePlanner.Policies;
 
@@ -27,7 +26,7 @@ internal class PolicyService : IPolicyService
         {
             if (member.AppliedPolicies.Any() == false)
             {
-                var policy = new DefaultLocation(_middlewareConfig);
+                var policy = _policyBuilder.GetDefaultLocationPolicy();
                 var location = await policy.GetLocationAsync();
                 resultLocations.Add(location);
                 continue;
@@ -117,7 +116,7 @@ internal class PolicyService : IPolicyService
         if (max <= 1) return ordered.First().Item3;
 
         // when no location can be selected, we return the default location
-        var defaultLocation = _policyBuilder.GetDefaultLocation();
+        var defaultLocation = _policyBuilder.GetDefaultLocationPolicy();
         return await defaultLocation.GetLocationAsync();
     }
 }

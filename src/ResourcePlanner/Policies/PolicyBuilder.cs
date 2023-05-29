@@ -32,15 +32,15 @@ internal class PolicyBuilder : IPolicyBuilder
         ILocationSelectionPolicy policyImplementation = policyName switch
         {
             nameof(UrllcSliceLocation) => new UrllcSliceLocation(policy.Priority, _redisInterfaceClient),
-            _ => new DefaultLocation(_middlewareConfig)
+            _ => new DefaultLocation(_middlewareConfig, _redisInterfaceClient)
         };
         _cachedPolicies[policyName] = policyImplementation;
         return policyImplementation;
     }
 
     /// <inheritdoc />
-    public DefaultLocation GetDefaultLocation()
+    public DefaultLocation GetDefaultLocationPolicy()
     {
-        return new(_middlewareConfig);
+        return new(_middlewareConfig, _redisInterfaceClient);
     }
 }

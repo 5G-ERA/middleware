@@ -253,6 +253,20 @@ public class RedisInterfaceClient : IRedisInterfaceClient
         return result.IsSuccessStatusCode ? result.Content : null;
     }
 
+    /// <inheritdoc />
+    public async Task<SliceResponse?> SliceGetByIdAsync(Guid id)
+    {
+        if (id == default)
+            throw new ArgumentNullException(nameof(id));
+
+        var result = await _api.SliceGetById(id);
+
+        if (!result.IsSuccessStatusCode)
+            _logger.LogError(result.Error, "{} - unsuccessful API call", nameof(SliceGetByIdAsync));
+
+        return result.IsSuccessStatusCode ? result.Content : null;
+    }
+
 
     public async Task<ActionResponse?> ActionGetByIdAsync(Guid id)
     {

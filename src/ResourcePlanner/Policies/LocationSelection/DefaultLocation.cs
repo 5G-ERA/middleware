@@ -2,6 +2,7 @@
 using Middleware.Common.Config;
 using Middleware.Models.Domain;
 using Middleware.Models.Enums;
+using Middleware.RedisInterface.Sdk;
 
 namespace Middleware.ResourcePlanner.Policies.LocationSelection;
 
@@ -14,10 +15,12 @@ namespace Middleware.ResourcePlanner.Policies.LocationSelection;
 internal class DefaultLocation : ILocationSelectionPolicy
 {
     private readonly IOptions<MiddlewareConfig> _middlewareOptions;
+    private readonly IRedisInterfaceClient _redisInterfaceClient;
 
-    public DefaultLocation(IOptions<MiddlewareConfig> middlewareOptions)
+    public DefaultLocation(IOptions<MiddlewareConfig> middlewareOptions, IRedisInterfaceClient redisInterfaceClient)
     {
         _middlewareOptions = middlewareOptions;
+        _redisInterfaceClient = redisInterfaceClient;
     }
 
     /// <inheritdoc />
@@ -27,14 +30,26 @@ internal class DefaultLocation : ILocationSelectionPolicy
     public bool FoundMatchingLocation { get; private set; }
 
     /// <inheritdoc />
-    public Task<PlannedLocation> GetLocationAsync()
+    public async Task<PlannedLocation> GetLocationAsync()
     {
-        var location = new PlannedLocation(_middlewareOptions.Value.InstanceName,
+        Guid id;
+        if (_middlewareOptions.Value.InstanceType == LocationType.Cloud.ToString())
+        {
+            var cloud = await _redisInterfaceClient.GetCloudByNameAsync(_middlewareOptions.Value.InstanceName);
+            id = cloud!.Id;
+        }
+        else
+        {
+            var edgeResponse = await _redisInterfaceClient.GetEdgeByNameAsync(_middlewareOptions.Value.InstanceName);
+            id = edgeResponse!.Id;
+        }
+
+        var location = new PlannedLocation(id, _middlewareOptions.Value.InstanceName,
             Enum.Parse<LocationType>(_middlewareOptions.Value.InstanceType));
 
         FoundMatchingLocation = true;
 
-        return Task.FromResult(location);
+        return location;
     }
 
     /// <summary>

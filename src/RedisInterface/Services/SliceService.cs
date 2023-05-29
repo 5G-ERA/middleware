@@ -32,7 +32,7 @@ public class SliceService : ISliceService
     /// <param name="slices"></param>
     /// <param name="location"></param>
     /// <returns></returns>
-    public async Task ReRegisterSlices(IReadOnlyList<SliceModel> slices, Location location = null)
+    public async Task ReRegisterSlicesAsync(IReadOnlyList<SliceModel> slices, Location location = null)
     {
         var locationData = location is null
             ? await GetCurrentLocation()
@@ -43,7 +43,7 @@ public class SliceService : ISliceService
     }
 
     /// <inheritdoc />
-    public Task<List<SliceModel>> GetAllSlices()
+    public Task<List<SliceModel>> GetAllSlicesAsync()
     {
         return _sliceRepository.GetAllAsync();
     }
@@ -53,6 +53,12 @@ public class SliceService : ISliceService
         RelationDirection direction = RelationDirection.Outgoing)
     {
         return _sliceRepository.GetRelation(id, name, direction);
+    }
+
+    /// <inheritdoc />
+    public Task<SliceModel> GetByIdAsync(Guid id)
+    {
+        return _sliceRepository.GetByIdAsync(id);
     }
 
     /// <summary>
