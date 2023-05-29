@@ -12,12 +12,14 @@ public record PlannedLocation
 
     public PlannedLocation(Guid id, string name, LocationType type)
     {
+        Id = id;
         Name = name;
         Type = type;
     }
 
     public PlannedLocation(Guid id, string name, LocationType type, string networkSliceName)
     {
+        Id = id;
         Name = name;
         Type = type;
         NetworkSliceName = networkSliceName;

@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Options;
+﻿using FluentAssertions;
+using Microsoft.Extensions.Options;
 using Middleware.Common.Config;
 using Middleware.DataAccess.Repositories.Abstract;
 using Middleware.Models.Domain;
@@ -204,6 +205,40 @@ public class SliceServiceTests
         await _sliceRepository.Received().AddAsync(urllcSlice);
         await _sliceRepository.Received().AddAsync(embbSlice);
         await _cloudRepository.Received(2).AddRelationAsync(Arg.Any<RelationModel>());
+    }
+
+    [Fact]
+    public async Task GetAllSlicesAsync_ShouldReturnSliceList_WhenSlicesExist()
+    {
+        //arrange
+        var urllcSlice = CreateUrllcSlice("slice1");
+        var embbSlice = CreateEmbbSlice("slice2");
+        var slices = new List<SliceModel>
+        {
+            urllcSlice, embbSlice
+        };
+        _sliceRepository.GetAllAsync().Returns(slices);
+        //act
+        var result = await _sut.GetAllSlicesAsync();
+        //assert
+
+        result.Should().NotBeNull();
+        result.Should().BeEquivalentTo(slices);
+    }
+
+    [Fact]
+    public async Task GetAllSlicesAsync_ShouldReturnEmptyList_WhenNoSlicesExist()
+    {
+        //arrange
+        var slices = new List<SliceModel>();
+        _sliceRepository.GetAllAsync().Returns(slices);
+
+        //act
+        var result = await _sut.GetAllSlicesAsync();
+
+        //assert
+        result.Should().NotBeNull();
+        result.Should().BeEmpty();
     }
 
     private static SliceModel CreateUrllcSlice(string name)
