@@ -110,7 +110,8 @@ public class UrllcSliceLocationPolicyTests
         var points = new GraphEntityModel(lowLatencySlice.Id, lowLatencySlice.Name, lowLatencySlice.GetType());
         var relation = new RelationModel(initiates, points, "OFFERS");
         _redisInterfaceClient.SliceGetAllAsync().Returns(slices);
-        _redisInterfaceClient.GetRelationAsync(Arg.Any<SliceModel>(), "OFFERS", RelationDirection.Incoming.ToString())
+        _redisInterfaceClient.GetRelationAsync(Arg.Is<SliceModel>(t => t.Id == lowLatencySlice.Id), "OFFERS",
+                RelationDirection.Incoming.ToString())
             .Returns(new List<RelationModel> { relation });
 
         // Act

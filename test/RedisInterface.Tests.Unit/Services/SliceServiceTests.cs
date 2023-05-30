@@ -273,7 +273,7 @@ public class SliceServiceTests
         };
     }
 
-    private List<RelationModel> GetSlicesRelatedToLocation(BaseModel location)
+    private static List<RelationModel> GetSlicesRelatedToLocation(BaseModel location)
     {
         var initiates = new GraphEntityModel(location.Id, location.Name, location.GetType());
 
