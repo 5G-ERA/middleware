@@ -1,6 +1,4 @@
-﻿using Microsoft.Extensions.Options;
-using Middleware.Common.Config;
-using Middleware.Models.Domain;
+﻿using Middleware.Models.Domain;
 using Middleware.Models.Domain.Contracts;
 using Middleware.Models.Enums;
 
@@ -8,13 +6,11 @@ namespace Middleware.ResourcePlanner.Policies;
 
 internal class PolicyService : IPolicyService
 {
-    private readonly IOptions<MiddlewareConfig> _middlewareConfig;
     private readonly IPolicyBuilder _policyBuilder;
 
-    public PolicyService(IPolicyBuilder policyBuilder, IOptions<MiddlewareConfig> middlewareConfig)
+    public PolicyService(IPolicyBuilder policyBuilder)
     {
         _policyBuilder = policyBuilder;
-        _middlewareConfig = middlewareConfig;
     }
 
     /// <inheritdoc />
@@ -52,6 +48,9 @@ internal class PolicyService : IPolicyService
 
             resultLocations.Add(desiredLocation);
         }
+
+        if (resultLocations.Count == 1)
+            return resultLocations.First();
 
         // negotiate action-level location
         var locationsTmp = resultLocations.Select(x => new Tuple<Priority, PlannedLocation>(Priority.None, x))
@@ -110,7 +109,7 @@ internal class PolicyService : IPolicyService
         var ordered = hierarchy.OrderByDescending(x => x.Item1)
             .ThenByDescending(x => (int)x.Item2)
             .ToList();
-        var max = ordered.First().Item1;
+        var max = ordered.FirstOrDefault()?.Item1;
 
         // less or equal to one because a location selected by policy will always match itself
         if (max <= 1) return ordered.First().Item3;

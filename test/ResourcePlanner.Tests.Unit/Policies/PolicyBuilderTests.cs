@@ -7,6 +7,7 @@ using Middleware.RedisInterface.Sdk;
 using Middleware.ResourcePlanner.Policies;
 using Middleware.ResourcePlanner.Policies.LocationSelection;
 using NSubstitute;
+using NSubstitute.ReturnsExtensions;
 
 namespace ResourcePlanner.Tests.Unit.Policies;
 
@@ -33,7 +34,7 @@ public class PolicyBuilderTests
             Priority = Priority.Normal.ToString(),
             Scope = PolicyScope.Resource.ToString()
         };
-        _redisInterfaceClient.GetPolicyByNameAsync(Arg.Is(policy.Name)).Returns(policy);
+        _redisInterfaceClient.GetPolicyByNameAsync(policy.Name).Returns(policy);
 
         //act
         var result = await _sut.CreateLocationPolicy(policy.Name);
@@ -53,7 +54,7 @@ public class PolicyBuilderTests
             Priority = Priority.Normal.ToString(),
             Scope = PolicyScope.Resource.ToString()
         };
-        _redisInterfaceClient.GetPolicyByNameAsync(Arg.Is(policy.Name)).Returns(policy);
+        _redisInterfaceClient.GetPolicyByNameAsync(policy.Name).Returns(policy);
 
         //act
         var result = await _sut.CreateLocationPolicy(policy.Name);
@@ -74,7 +75,7 @@ public class PolicyBuilderTests
             Scope = PolicyScope.Resource.ToString()
         };
         _redisInterfaceClient.GetPolicyByNameAsync(Arg.Any<string>())
-            .Returns(Task.FromResult<PolicyResponse?>(null!));
+            .ReturnsNull();
 
         //act
         var result = await _sut.CreateLocationPolicy(policy.Name);
@@ -104,7 +105,7 @@ public class PolicyBuilderTests
             Priority = Priority.High.ToString(),
             Scope = PolicyScope.Resource.ToString()
         };
-        _redisInterfaceClient.GetPolicyByNameAsync(Arg.Is(policy.Name)).Returns(policy);
+        _redisInterfaceClient.GetPolicyByNameAsync(policy.Name).Returns(policy);
 
         //act
         var result = await _sut.CreateLocationPolicy(policy.Name);

@@ -7,6 +7,7 @@ using Middleware.RedisInterface.Contracts.Responses;
 using Middleware.RedisInterface.Sdk;
 using Middleware.ResourcePlanner.Policies.LocationSelection;
 using NSubstitute;
+using NSubstitute.ReturnsExtensions;
 
 namespace ResourcePlanner.Tests.Unit.Policies;
 
@@ -58,8 +59,10 @@ public class UrllcSliceLocationPolicyTests
         _redisInterfaceClient.SliceGetAllAsync().Returns(slices);
 
         var result = await _sut.GetLocationAsync();
+        var found = _sut.FoundMatchingLocation;
 
         result.Should().BeNull();
+        found.Should().BeFalse();
     }
 
     [Fact]
@@ -112,6 +115,7 @@ public class UrllcSliceLocationPolicyTests
 
         // Act
         var result = await _sut.GetLocationAsync();
+        var found = _sut.FoundMatchingLocation;
 
         // Assert
         result.Should().NotBeNull();
@@ -121,20 +125,23 @@ public class UrllcSliceLocationPolicyTests
         result.Type.Should().Be(expectedLocation.Type);
         result.HasSlicesEnabled.Should().Be(true);
         result.NetworkSliceName.Should().Be(expectedLocation.NetworkSliceName);
+
+        found.Should().BeTrue();
     }
 
     [Fact]
     public async Task GetLocationAsync_ShouldReturnNull_WhenSlicesReturnedNull()
     {
         // Arrange
-        GetSlicesResponse slices = null!;
-        _redisInterfaceClient.SliceGetAllAsync().Returns(slices);
+        //GetSlicesResponse slices = null!;
+        _redisInterfaceClient.SliceGetAllAsync().ReturnsNull();
 
         // Act
         var result = await _sut.GetLocationAsync();
-
+        var found = _sut.FoundMatchingLocation;
         // Assert
         result.Should().BeNull();
+        found.Should().BeFalse();
     }
 
     [Fact]
@@ -146,8 +153,227 @@ public class UrllcSliceLocationPolicyTests
 
         // Act
         var result = await _sut.GetLocationAsync();
-
+        var found = _sut.FoundMatchingLocation;
         // Assert
         result.Should().BeNull();
+        found.Should().BeFalse();
+    }
+
+    [Fact]
+    public async Task IsLocationSatisfiedByPolicy_ShouldReturnTrue_WhenLocationHasUrllcSliceAndLocationIsCloud()
+    {
+        //arrange
+        var embbSlice = new SliceResponse
+        {
+            Id = Guid.NewGuid(),
+            Name = "embbSlice",
+            UserDensity = 10,
+            UserSpeed = 100,
+            TrafficType = TrafficType.Tcp.ToString()
+        };
+        var embbSlice2 = new SliceResponse
+        {
+            Id = Guid.NewGuid(),
+            Name = "embbSlice2",
+            UserDensity = 10,
+            UserSpeed = 100,
+            TrafficType = TrafficType.Tcp.ToString()
+        };
+        var mediumLatencySlice = new SliceResponse
+        {
+            Id = Guid.NewGuid(),
+            Name = "lowLatencySlice",
+            Latency = 5,
+            Jitter = 5,
+            TrafficType = TrafficType.Tcp.ToString()
+        };
+        var cloud = new CloudModel
+        {
+            Name = "testLocation"
+        };
+        var slices = new List<SliceResponse> { embbSlice, embbSlice2, mediumLatencySlice };
+        var plannedLocation = new PlannedLocation(cloud.Id, cloud.Name, LocationType.Cloud);
+        _redisInterfaceClient.SliceGetByIdAsync(embbSlice.Id).Returns(embbSlice);
+        _redisInterfaceClient.SliceGetByIdAsync(embbSlice2.Id).Returns(embbSlice2);
+        _redisInterfaceClient.SliceGetByIdAsync(mediumLatencySlice.Id).Returns(mediumLatencySlice);
+        var relations = new List<RelationModel>();
+        var relationName = "OFFERS";
+        var initiates = new GraphEntityModel(cloud.Id, cloud.Name, cloud.GetType());
+        foreach (var slice in slices)
+        {
+            var points = new GraphEntityModel(slice.Id, slice.Name, typeof(SliceModel));
+
+            relations.Add(new(initiates, points, relationName));
+        }
+
+        _redisInterfaceClient.GetRelationAsync(Arg.Any<CloudModel>(), relationName).Returns(relations);
+        //act
+        var result = await _sut.IsLocationSatisfiedByPolicy(plannedLocation);
+        //assert
+        result.Should().BeTrue();
+    }
+
+    [Fact]
+    public async Task IsLocationSatisfiedByPolicy_ShouldReturnTrue_WhenLocationHasUrllcSliceAndLocationIsEdge()
+    {
+        //arrange
+        var embbSlice = new SliceResponse
+        {
+            Id = Guid.NewGuid(),
+            Name = "embbSlice",
+            UserDensity = 10,
+            UserSpeed = 100,
+            TrafficType = TrafficType.Tcp.ToString()
+        };
+        var embbSlice2 = new SliceResponse
+        {
+            Id = Guid.NewGuid(),
+            Name = "embbSlice2",
+            UserDensity = 10,
+            UserSpeed = 100,
+            TrafficType = TrafficType.Tcp.ToString()
+        };
+        var mediumLatencySlice = new SliceResponse
+        {
+            Id = Guid.NewGuid(),
+            Name = "lowLatencySlice",
+            Latency = 5,
+            Jitter = 5,
+            TrafficType = TrafficType.Tcp.ToString()
+        };
+        var edge = new EdgeModel
+        {
+            Name = "testLocation"
+        };
+        var slices = new List<SliceResponse> { embbSlice, embbSlice2, mediumLatencySlice };
+        var plannedLocation = new PlannedLocation(edge.Id, edge.Name, LocationType.Edge);
+        _redisInterfaceClient.SliceGetByIdAsync(embbSlice.Id).Returns(embbSlice);
+        _redisInterfaceClient.SliceGetByIdAsync(embbSlice2.Id).Returns(embbSlice2);
+        _redisInterfaceClient.SliceGetByIdAsync(mediumLatencySlice.Id).Returns(mediumLatencySlice);
+        var relations = new List<RelationModel>();
+        var relationName = "OFFERS";
+        var initiates = new GraphEntityModel(edge.Id, edge.Name, edge.GetType());
+        foreach (var slice in slices)
+        {
+            var points = new GraphEntityModel(slice.Id, slice.Name, typeof(SliceModel));
+
+            relations.Add(new(initiates, points, relationName));
+        }
+
+        _redisInterfaceClient.GetRelationAsync(Arg.Any<EdgeModel>(), relationName).Returns(relations);
+        //act
+        var result = await _sut.IsLocationSatisfiedByPolicy(plannedLocation);
+        //assert
+        result.Should().BeTrue();
+    }
+
+    [Fact]
+    public async Task IsLocationSatisfiedByPolicy_ShouldReturnFalse_WhenRelationsAreNull()
+    {
+        //arrange
+        var edge = new EdgeModel
+        {
+            Name = "testLocation"
+        };
+        var plannedLocation = new PlannedLocation(edge.Id, edge.Name, LocationType.Edge);
+        var relationName = "OFFERS";
+        _redisInterfaceClient.GetRelationAsync(Arg.Any<EdgeModel>(), relationName)!
+            .Returns(Task.FromResult<List<RelationModel>>(null!));
+        //act
+        var result = await _sut.IsLocationSatisfiedByPolicy(plannedLocation);
+        //assert
+        result.Should().BeFalse();
+    }
+
+    [Fact]
+    public async Task IsLocationSatisfiedByPolicy_ShouldReturnFalseAndSkipNotFoundSlices_WhenSomeSlicesAreNotFound()
+    {
+        //arrange
+        var embbSlice = new SliceResponse
+        {
+            Id = Guid.NewGuid(),
+            Name = "embbSlice",
+            UserDensity = 10,
+            UserSpeed = 100,
+            TrafficType = TrafficType.Tcp.ToString()
+        };
+        var embbSlice2 = new SliceResponse
+        {
+            Id = Guid.NewGuid(),
+            Name = "embbSlice2",
+            UserDensity = 10,
+            UserSpeed = 100,
+            TrafficType = TrafficType.Tcp.ToString()
+        };
+
+        var edge = new EdgeModel
+        {
+            Name = "testLocation"
+        };
+        var slices = new List<SliceResponse> { embbSlice, embbSlice2 };
+        var plannedLocation = new PlannedLocation(edge.Id, edge.Name, LocationType.Edge);
+        _redisInterfaceClient.SliceGetByIdAsync(embbSlice.Id).Returns(embbSlice);
+        _redisInterfaceClient.SliceGetByIdAsync(embbSlice2.Id)!.Returns(Task.FromResult<SliceResponse>(null!));
+        var relations = new List<RelationModel>();
+        var relationName = "OFFERS";
+        var initiates = new GraphEntityModel(edge.Id, edge.Name, edge.GetType());
+        foreach (var slice in slices)
+        {
+            var points = new GraphEntityModel(slice.Id, slice.Name, typeof(SliceModel));
+
+            relations.Add(new(initiates, points, relationName));
+        }
+
+        _redisInterfaceClient.GetRelationAsync(Arg.Any<EdgeModel>(), relationName).Returns(relations);
+        //act
+        var result = await _sut.IsLocationSatisfiedByPolicy(plannedLocation);
+        //assert
+        result.Should().BeFalse();
+    }
+
+    [Fact]
+    public async Task IsLocationSatisfiedByPolicy_ShouldReturnFalse_WhenNoUrllcSliceFound()
+    {
+        //arrange
+        var embbSlice = new SliceResponse
+        {
+            Id = Guid.NewGuid(),
+            Name = "embbSlice",
+            UserDensity = 10,
+            UserSpeed = 100,
+            TrafficType = TrafficType.Tcp.ToString()
+        };
+        var embbSlice2 = new SliceResponse
+        {
+            Id = Guid.NewGuid(),
+            Name = "embbSlice2",
+            UserDensity = 10,
+            UserSpeed = 100,
+            TrafficType = TrafficType.Tcp.ToString()
+        };
+
+        var edge = new EdgeModel
+        {
+            Name = "testLocation"
+        };
+        var slices = new List<SliceResponse> { embbSlice, embbSlice2 };
+        var plannedLocation = new PlannedLocation(edge.Id, edge.Name, LocationType.Edge);
+        _redisInterfaceClient.SliceGetByIdAsync(embbSlice.Id).Returns(embbSlice);
+        _redisInterfaceClient.SliceGetByIdAsync(embbSlice2.Id).Returns(embbSlice2);
+        var relations = new List<RelationModel>();
+        var relationName = "OFFERS";
+        var initiates = new GraphEntityModel(edge.Id, edge.Name, edge.GetType());
+        foreach (var slice in slices)
+        {
+            var points = new GraphEntityModel(slice.Id, slice.Name, typeof(SliceModel));
+
+            relations.Add(new(initiates, points, relationName));
+        }
+
+        _redisInterfaceClient.GetRelationAsync(Arg.Any<EdgeModel>(), relationName).Returns(relations);
+        //act
+        var result = await _sut.IsLocationSatisfiedByPolicy(plannedLocation);
+        //assert
+        result.Should().BeFalse();
     }
 }
