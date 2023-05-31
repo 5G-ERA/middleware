@@ -3,9 +3,9 @@ using Middleware.Common;
 
 namespace Common.Tests.Unit;
 
+//[LogTestExecution]
 public class K8SImageHelperTests
 {
-
     [Theory]
     [InlineData("", "nginx", "", "nginx")]
     [InlineData("dev", "nginx", "", "dev/nginx")]
@@ -16,7 +16,7 @@ public class K8SImageHelperTests
     {
         // arrange
         // act
-        string imageName = K8SImageHelper.BuildImageName(registry, repositoryName, tag);
+        var imageName = K8SImageHelper.BuildImageName(registry, repositoryName, tag);
         // assess
         Assert.Equal(expected, imageName);
     }
@@ -30,19 +30,20 @@ public class K8SImageHelperTests
         var func = () => K8SImageHelper.BuildImageName(null, repositoryName, null);
 
         // assess
-        func.Should().Throw<ArgumentException>().WithMessage("Repository name not provided. (Parameter 'repositoryName')").WithParameterName(nameof(repositoryName));
+        func.Should().Throw<ArgumentException>()
+            .WithMessage("Repository name not provided. (Parameter 'repositoryName')")
+            .WithParameterName(nameof(repositoryName));
     }
 
     [Theory]
     [InlineData("redmine:latest", "latest")]
     [InlineData("orchestrator", "latest")]
     [InlineData("orchestrator:v0.1.3", "v0.1.3")]
-
     public void GetTag_ShouldReturnCorrectTag(string image, string expected)
     {
         // arrange
         // act
-        string tag = K8SImageHelper.GetTag(image);
+        var tag = K8SImageHelper.GetTag(image);
         //assess
         Assert.Equal(expected, tag);
     }

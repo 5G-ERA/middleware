@@ -10,6 +10,7 @@ using NSubstitute;
 
 namespace ResourcePlanner.Tests.Unit.Policies;
 
+//[LogTestExecution]
 public class DefaultLocationPolicyTests
 {
     private readonly IOptions<MiddlewareConfig> _mwOptions = Substitute.For<IOptions<MiddlewareConfig>>();
@@ -126,7 +127,8 @@ public class DefaultLocationPolicyTests
     [Fact]
     public async Task IsLocationSatisfiedByPolicy_ShouldAlwaysAcceptGivenLocation()
     {
-        var result = await _sut.IsLocationSatisfiedByPolicy(Arg.Any<PlannedLocation>());
+        var location = new PlannedLocation(Guid.NewGuid(), "name", LocationType.Cloud);
+        var result = await _sut.IsLocationSatisfiedByPolicy(location);
 
         result.Should().BeTrue();
     }

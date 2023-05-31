@@ -1,7 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using FluentAssertions;
-using k8s;
 using Microsoft.Extensions.Logging;
 using Middleware.Common;
 using Middleware.Orchestrator.Deployment;
@@ -11,15 +9,16 @@ using Xunit;
 
 namespace Orchestrator.Tests.Unit;
 
+//[LogTestExecution]
 public class KubernetesBuilderTests
 {
-    private readonly KubernetesBuilder _sut;
     private readonly IEnvironment _env = Substitute.For<IEnvironment>();
     private readonly ILogger<KubernetesBuilder> _logger = Substitute.For<ILogger<KubernetesBuilder>>();
+    private readonly KubernetesBuilder _sut;
 
     public KubernetesBuilderTests()
     {
-        _sut = new KubernetesBuilder(_logger, _env);
+        _sut = new(_logger, _env);
     }
 
     [Fact]
@@ -30,7 +29,7 @@ public class KubernetesBuilderTests
         _env.GetEnvVariable("KUBERNETES_SERVICE_PORT").Returns("443");
         _env.DirectoryExists(KubernetesBuilder.ServiceAccountPath).Returns(true);
         _env.GetFileNamesInDir(KubernetesBuilder.ServiceAccountPath)
-            .Returns(new List<string>()
+            .Returns(new List<string>
             {
                 KubernetesBuilder.ServiceAccountNamespaceFileName,
                 KubernetesBuilder.ServiceAccountRootCAKeyFileName,
@@ -64,8 +63,9 @@ public class KubernetesBuilderTests
         _env.GetEnvVariable("KUBERNETES_SERVICE_PORT").Returns("");
         _env.FileExists(KubernetesBuilder.KubeConfigPath).Returns(false);
         // act
-        Func<IKubernetes> act = () => _sut.CreateKubernetesClient();
+        var act = () => _sut.CreateKubernetesClient();
         // assess
-        act.Should().Throw<NotInK8SEnvironmentException>().WithMessage("The environment is not a Kubernetes environment, cannot instantiate the Middleware");
+        act.Should().Throw<NotInK8SEnvironmentException>()
+            .WithMessage("The environment is not a Kubernetes environment, cannot instantiate the Middleware");
     }
 }

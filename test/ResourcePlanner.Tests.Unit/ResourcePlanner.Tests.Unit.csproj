@@ -10,7 +10,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-	  <PackageReference Include="FluentAssertions" Version="6.10.0" />
+	  <PackageReference Include="FluentAssertions" Version="6.11.0" />
 	  <PackageReference Include="NSubstitute" Version="5.0.0" />
 	  <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.5.0" />
 	  <PackageReference Include="NSubstitute.Analyzers.CSharp" Version="1.0.16">
@@ -31,6 +31,7 @@
   <ItemGroup>
     <ProjectReference Include="..\..\src\ResourcePlanner\ResourcePlanner.csproj" />
     <ProjectReference Include="..\RedisInterface.Tests.Unit\RedisInterface.Tests.Unit.csproj" />
+    <ProjectReference Include="..\TestCommon\TestCommon.csproj" />
   </ItemGroup>
 
 </Project>

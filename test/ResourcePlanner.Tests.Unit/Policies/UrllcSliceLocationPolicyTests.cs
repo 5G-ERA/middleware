@@ -11,6 +11,7 @@ using NSubstitute.ReturnsExtensions;
 
 namespace ResourcePlanner.Tests.Unit.Policies;
 
+//[LogTestExecution]
 public class UrllcSliceLocationPolicyTests
 {
     private const Priority Priority = Middleware.Models.Enums.Priority.High;
@@ -109,10 +110,11 @@ public class UrllcSliceLocationPolicyTests
         var initiates = new GraphEntityModel(edge.Id, edge.Name, edge.GetType());
         var points = new GraphEntityModel(lowLatencySlice.Id, lowLatencySlice.Name, lowLatencySlice.GetType());
         var relation = new RelationModel(initiates, points, "OFFERS");
+        var relationList = new List<RelationModel> { relation };
         _redisInterfaceClient.SliceGetAllAsync().Returns(slices);
         _redisInterfaceClient.GetRelationAsync(Arg.Is<SliceModel>(t => t.Id == lowLatencySlice.Id), "OFFERS",
                 RelationDirection.Incoming.ToString())
-            .Returns(new List<RelationModel> { relation });
+            .Returns(relationList);
 
         // Act
         var result = await _sut.GetLocationAsync();

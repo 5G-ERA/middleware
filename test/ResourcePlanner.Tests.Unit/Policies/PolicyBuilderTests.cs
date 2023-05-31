@@ -11,6 +11,7 @@ using NSubstitute.ReturnsExtensions;
 
 namespace ResourcePlanner.Tests.Unit.Policies;
 
+//[LogTestExecution]
 public class PolicyBuilderTests
 {
     private readonly IOptions<MiddlewareConfig> _mwOptions = Substitute.For<IOptions<MiddlewareConfig>>();

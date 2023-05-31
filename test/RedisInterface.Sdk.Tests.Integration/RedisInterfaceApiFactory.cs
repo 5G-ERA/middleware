@@ -21,35 +21,31 @@ public class RedisInterfaceApiFactory : WebApplicationFactory<IApiMarker>, IAsyn
         .WithPortBinding(6379, 6379)
         .WithWaitStrategy(Wait.ForUnixContainer().UntilPortIsAvailable(6379))
         .Build();
-    
-    protected override void ConfigureWebHost(IWebHostBuilder builder)
-    {
-        builder.ConfigureLogging(logging =>
-        {
-            logging.ClearProviders();
-        });
-        builder.ConfigureTestServices(services =>
-        {
-            services.RemoveAll(typeof(IRedisConnectionProvider));
-            services.RemoveAll(typeof(IRedisGraphClient));
-            
-            var mux = ConnectionMultiplexer.Connect($"localhost:6379");
-            IRedisConnectionProvider provider = new RedisConnectionProvider(mux);
-            services.AddSingleton(provider);
-            services.AddSingleton<IConnectionMultiplexer>(mux);
-            RedisGraphClient redisGraphClient = new RedisGraphClient(mux);
-            services.AddSingleton<IRedisGraphClient>(redisGraphClient);
-        });
-    }
 
     public async Task InitializeAsync()
     {
         await _dbContainer.StartAsync();
-        
     }
 
     public new async Task DisposeAsync()
     {
         await _dbContainer.DisposeAsync();
+    }
+
+    protected override void ConfigureWebHost(IWebHostBuilder builder)
+    {
+        builder.ConfigureLogging(logging => { logging.ClearProviders(); });
+        builder.ConfigureTestServices(services =>
+        {
+            services.RemoveAll(typeof(IRedisConnectionProvider));
+            services.RemoveAll(typeof(IRedisGraphClient));
+
+            var mux = ConnectionMultiplexer.Connect("localhost:6379");
+            IRedisConnectionProvider provider = new RedisConnectionProvider(mux);
+            services.AddSingleton(provider);
+            services.AddSingleton<IConnectionMultiplexer>(mux);
+            var redisGraphClient = new RedisGraphClient(mux);
+            services.AddSingleton<IRedisGraphClient>(redisGraphClient);
+        });
     }
 }

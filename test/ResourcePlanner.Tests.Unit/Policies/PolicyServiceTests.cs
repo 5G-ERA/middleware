@@ -14,6 +14,7 @@ using NSubstitute.ReturnsExtensions;
 
 namespace ResourcePlanner.Tests.Unit.Policies;
 
+//[LogTestExecution]
 public class PolicyServiceTests
 {
     private readonly IOptions<MiddlewareConfig> _mwOptions = Options.Create(new MiddlewareConfig

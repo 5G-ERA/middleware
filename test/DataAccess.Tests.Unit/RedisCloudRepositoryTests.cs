@@ -5,21 +5,20 @@ using NSubstitute;
 using Redis.OM.Contracts;
 using RedisGraphDotNet.Client;
 using Serilog;
-using StackExchange.Redis;
 
 namespace DataAccess.Tests.Unit;
 
+//[LogTestExecution]
 public class RedisCloudRepositoryTests
 {
-    private readonly RedisCloudRepository _sut;
-
     private readonly IRedisConnectionProvider _connectionProvider = Substitute.For<IRedisConnectionProvider>();
     private readonly IRedisGraphClient _graphClient = Substitute.For<IRedisGraphClient>();
     private readonly ILogger _logger = Substitute.For<ILogger>();
+    private readonly RedisCloudRepository _sut;
 
     public RedisCloudRepositoryTests()
     {
-        _sut = new RedisCloudRepository(_connectionProvider, _graphClient, _logger);
+        _sut = new(_connectionProvider, _graphClient, _logger);
     }
 
     [Fact]
@@ -35,22 +34,22 @@ public class RedisCloudRepositoryTests
         foreach (var dict in occupiedClouds)
         {
             var resultSet = new ResultSet();
-            resultSet.Metrics = new QueryExecutionMetrics();
-            resultSet.Results = new Dictionary<string, List<RedisGraphResult>>()
+            resultSet.Metrics = new();
+            resultSet.Results = new()
             {
                 {
-                    "initiatesFrom", new List<RedisGraphResult>(new[] { dummyNode })
+                    "initiatesFrom", new(new[] { dummyNode })
                 },
                 {
-                    "PointsTo", new List<RedisGraphResult>
+                    "PointsTo", new()
                     {
                         new Node(rng.Next())
                         {
-                            Properties = new Dictionary<string, RedisValue>()
+                            Properties = new()
                             {
-                                { "ID", new RedisValue(dict.Id.ToString()) },
-                                { "Type", new RedisValue("CLOUD") },
-                                { "Name", new RedisValue(dict.Name) }
+                                { "ID", new(dict.Id.ToString()) },
+                                { "Type", new("CLOUD") },
+                                { "Name", new(dict.Name) }
                             }
                         }
                     }
@@ -64,8 +63,8 @@ public class RedisCloudRepositoryTests
         foreach (var cloud in unusedClouds)
         {
             var resultSet = new ResultSet();
-            resultSet.Metrics = new QueryExecutionMetrics();
-            resultSet.Results = new Dictionary<string, List<RedisGraphResult>>();
+            resultSet.Metrics = new();
+            resultSet.Results = new();
 
             _graphClient.Query(Arg.Any<string>(), Arg.Is<string>(t => t.Contains(cloud.Id.ToString())))
                 .Returns(resultSet);
@@ -82,17 +81,17 @@ public class RedisCloudRepositoryTests
     {
         var dummyNode = new Node(int.MaxValue)
         {
-            Properties = new Dictionary<string, RedisValue>()
+            Properties = new()
             {
-                { "ID", new RedisValue(Guid.NewGuid().ToString()) },
-                { "Type", new RedisValue("INSTANCE") },
-                { "Name", new RedisValue("Instance1") }
+                { "ID", new(Guid.NewGuid().ToString()) },
+                { "Type", new("INSTANCE") },
+                { "Name", new("Instance1") }
             }
         };
         return dummyNode;
     }
 
-    [Fact(Skip ="Skipped because it is not needed for the latest release as semantic planning is disabled")]
+    [Fact(Skip = "Skipped because it is not needed for the latest release as semantic planning is disabled")]
     public async Task GetLessBusyCloudsAsync_ShouldReturnOrderedEdgesInAscendingOrder_WhenProvidedWithListOfClouds()
     {
         // arrange
@@ -104,20 +103,20 @@ public class RedisCloudRepositoryTests
         foreach (var dict in allCloudsWithCntDict)
         {
             var resultSet = new ResultSet();
-            resultSet.Metrics = new QueryExecutionMetrics();
-            resultSet.Results = new Dictionary<string, List<RedisGraphResult>>()
+            resultSet.Metrics = new();
+            resultSet.Results = new()
             {
                 {
-                    "initiatesFrom", new List<RedisGraphResult>(Enumerable.Repeat(dummyNode, dict.Value))
+                    "initiatesFrom", new(Enumerable.Repeat(dummyNode, dict.Value))
                 },
                 {
-                    "PointsTo", new List<RedisGraphResult>(Enumerable.Repeat(new Node(rng.Next())
+                    "PointsTo", new(Enumerable.Repeat(new Node(rng.Next())
                     {
-                        Properties = new Dictionary<string, RedisValue>()
+                        Properties = new()
                         {
-                            { "ID", new RedisValue(dict.Key.Id.ToString()) },
-                            { "Type", new RedisValue("CLOUD") },
-                            { "Name", new RedisValue(dict.Key.Name) }
+                            { "ID", new(dict.Key.Id.ToString()) },
+                            { "Type", new("CLOUD") },
+                            { "Name", new(dict.Key.Name) }
                         }
                     }, dict.Value))
                 }
@@ -141,12 +140,12 @@ public class RedisCloudRepositoryTests
     private List<CloudModel> GetExampleClouds(int cnt)
     {
         var retVal = new List<CloudModel>();
-        for (int i = 0; i < cnt; i++)
+        for (var i = 0; i < cnt; i++)
         {
-            retVal.Add(new CloudModel()
+            retVal.Add(new()
             {
                 Id = Guid.NewGuid(),
-                Name = "Cloud" + (i + 1),
+                Name = "Cloud" + (i + 1)
             });
         }
 

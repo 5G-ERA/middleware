@@ -9,6 +9,7 @@ using OneOf.Types;
 
 namespace CentralApi.Tests.Unit.Services;
 
+//[LogTestExecution]
 public class LocationServiceTests
 {
     private readonly ICloudRepository _cloudRepository = Substitute.For<ICloudRepository>();
@@ -61,8 +62,8 @@ public class LocationServiceTests
         var resultType = result.AsT0;
         resultType.Should().BeEquivalentTo(expectedLocation);
 
-        await _edgeRepository.Received(1).AddAsync(Arg.Any<EdgeModel>());
-        await _cloudRepository.Received(0).AddAsync(Arg.Any<CloudModel>());
+        await _edgeRepository.ReceivedWithAnyArgs(1).AddAsync(default!);
+        await _cloudRepository.ReceivedWithAnyArgs(0).AddAsync(default!);
     }
 
     [Fact]
@@ -105,7 +106,7 @@ public class LocationServiceTests
         var resultType = result.AsT0;
         resultType.Should().BeEquivalentTo(expectedLocation);
 
-        await _cloudRepository.Received(1).AddAsync(Arg.Any<CloudModel>());
+        await _cloudRepository.ReceivedWithAnyArgs(1).AddAsync(default!);
         await _edgeRepository.Received(0).AddAsync(Arg.Any<EdgeModel>());
     }
 
@@ -131,8 +132,8 @@ public class LocationServiceTests
         var resultType = result.AsT0;
         resultType.Should().BeOfType<Location>();
 
-        await _cloudRepository.Received(1).AddAsync(Arg.Any<CloudModel>());
-        await _edgeRepository.Received(0).AddAsync(Arg.Any<EdgeModel>());
+        await _cloudRepository.ReceivedWithAnyArgs(1).AddAsync(default!);
+        await _edgeRepository.ReceivedWithAnyArgs(0).AddAsync(default!);
     }
 
     [Fact]
@@ -169,9 +170,10 @@ public class LocationServiceTests
                 Type = LocationType.Edge
             }
         }.ToImmutableList();
-
-        _cloudRepository.GetCloudsByOrganizationAsync(org).Returns(new List<CloudModel> { cloud }.ToImmutableList());
-        _edgeRepository.GetEdgesByOrganizationAsync(org).Returns(new List<EdgeModel> { edge }.ToImmutableList());
+        var clouds = new List<CloudModel> { cloud }.ToImmutableList();
+        var edges = new List<EdgeModel> { edge }.ToImmutableList();
+        _cloudRepository.GetCloudsByOrganizationAsync(org).Returns(clouds);
+        _edgeRepository.GetEdgesByOrganizationAsync(org).Returns(edges);
 
         // act
         var result = await _sut.GetAvailableLocations(org);
