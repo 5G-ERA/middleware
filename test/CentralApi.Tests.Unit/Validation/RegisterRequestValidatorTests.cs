@@ -4,14 +4,14 @@ using Middleware.CentralApi.Validation;
 
 namespace CentralApi.Tests.Unit.Validation;
 
-
+//[LogTestExecution]
 public class RegisterRequestValidatorTests
 {
     private readonly RegisterRequestValidator _sut;
 
     public RegisterRequestValidatorTests()
     {
-        _sut = new RegisterRequestValidator();
+        _sut = new();
     }
 
     [Fact]
@@ -21,6 +21,7 @@ public class RegisterRequestValidatorTests
         var result = _sut.TestValidate(model);
         result.ShouldHaveValidationErrorFor(request => request.Name);
     }
+
     [Fact]
     public void RegisterRequestValidator_ShouldHaveError_WhenLocationNameIsEmpty()
     {
@@ -28,7 +29,7 @@ public class RegisterRequestValidatorTests
         var result = _sut.TestValidate(model);
         result.ShouldHaveValidationErrorFor(request => request.Name);
     }
-    
+
     [Fact]
     public void RegisterRequestValidator_ShouldHaveError_WhenLocationOrganizationIsNull()
     {
@@ -36,6 +37,7 @@ public class RegisterRequestValidatorTests
         var result = _sut.TestValidate(model);
         result.ShouldHaveValidationErrorFor(request => request.Organization);
     }
+
     [Fact]
     public void RegisterRequestValidator_ShouldHaveError_WhenLocationOrganizationIsEmpty()
     {
@@ -43,7 +45,7 @@ public class RegisterRequestValidatorTests
         var result = _sut.TestValidate(model);
         result.ShouldHaveValidationErrorFor(request => request.Organization);
     }
-    
+
     [Fact]
     public void RegisterRequestValidator_ShouldHaveError_WhenLocationTypeIsNull()
     {
@@ -51,6 +53,7 @@ public class RegisterRequestValidatorTests
         var result = _sut.TestValidate(model);
         result.ShouldHaveValidationErrorFor(request => request.Type);
     }
+
     [Fact]
     public void RegisterRequestValidator_ShouldHaveError_WhenLocationTypeDoesNotContainRequiredValue()
     {
@@ -58,7 +61,7 @@ public class RegisterRequestValidatorTests
         var result = _sut.TestValidate(model);
         result.ShouldHaveValidationErrorFor(request => request.Type);
     }
-    
+
     [Fact]
     public void RegisterRequestValidator_ShouldNotHaveError_WhenLocationTypeIsCloud()
     {
@@ -66,6 +69,7 @@ public class RegisterRequestValidatorTests
         var result = _sut.TestValidate(model);
         result.ShouldNotHaveValidationErrorFor(request => request.Type);
     }
+
     [Fact]
     public void RegisterRequestValidator_ShouldNotHaveError_WhenLocationTypeIsEdge()
     {
@@ -73,7 +77,7 @@ public class RegisterRequestValidatorTests
         var result = _sut.TestValidate(model);
         result.ShouldNotHaveValidationErrorFor(request => request.Type);
     }
-    
+
     [Fact]
     public void RegisterRequestValidator_ShouldNotHaveError_WhenLocationTypeIsCorrectAndCaseInsensitive()
     {
@@ -81,7 +85,7 @@ public class RegisterRequestValidatorTests
         var result = _sut.TestValidate(model);
         result.ShouldNotHaveValidationErrorFor(request => request.Type);
     }
-    
+
     [Fact]
     public void RegisterRequestValidator_ShouldNotHaveError_WhenCorrectLocationIsSpecified()
     {

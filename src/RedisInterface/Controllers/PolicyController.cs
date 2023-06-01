@@ -50,7 +50,7 @@ namespace Middleware.RedisInterface.Controllers
             }
             catch (Exception ex)
             {
-                int statusCode = (int)HttpStatusCode.InternalServerError;
+                var statusCode = (int)HttpStatusCode.InternalServerError;
                 _logger.LogError(ex, "An error occurred:");
                 return StatusCode(statusCode, new ApiResponse(statusCode, $"An error has occurred: {ex.Message}"));
             }
@@ -83,6 +83,37 @@ namespace Middleware.RedisInterface.Controllers
             catch (Exception ex) 
             {
                 int statusCode = (int)HttpStatusCode.InternalServerError;
+                _logger.LogError(ex, "An error occurred:");
+                return StatusCode(statusCode, new ApiResponse(statusCode, $"An error has occurred: {ex.Message}"));
+            }
+        }
+
+        /// <summary>
+        /// Get Policy by name
+        /// </summary>
+        /// <param name="name">Name of the Policy</param>
+        /// <returns> the PolicyModel entity for the specified id </returns>
+        [HttpGet]
+        [Route("name/{name}", Name = "PolicyGetByName")]
+        [ProducesResponseType(typeof(PolicyResponse), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.NotFound)]
+        [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.InternalServerError)]
+        public async Task<IActionResult> GetPolicyByNameAsync(string name)
+        {
+            try
+            {
+                PolicyModel model = await _policyRepository.GetPolicyByName(name);
+                if (model == null)
+                {
+                    return NotFound(new ApiResponse((int)HttpStatusCode.NotFound, "Object was not found."));
+                }
+
+                var response = model.ToPolicyResponse();
+                return Ok(response);
+            }
+            catch (Exception ex)
+            {
+                var statusCode = (int)HttpStatusCode.InternalServerError;
                 _logger.LogError(ex, "An error occurred:");
                 return StatusCode(statusCode, new ApiResponse(statusCode, $"An error has occurred: {ex.Message}"));
             }
@@ -144,7 +175,7 @@ namespace Middleware.RedisInterface.Controllers
             }
             catch (Exception ex) 
             {
-                int statusCode = (int)HttpStatusCode.InternalServerError;
+                var statusCode = (int)HttpStatusCode.InternalServerError;
                 _logger.LogError(ex, "An error occurred:");
                 return StatusCode(statusCode, new ApiResponse(statusCode, $"An error has occurred: {ex.Message}"));
             }
@@ -161,6 +192,7 @@ namespace Middleware.RedisInterface.Controllers
         [ProducesResponseType(typeof(PolicyModel), (int)HttpStatusCode.OK)]
         [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.NotFound)]
         [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.InternalServerError)]
+        // ReSharper disable once RouteTemplates.MethodMissingRouteParameters
         public async Task<IActionResult> PatchPolicyAsync([FromMultiSource] UpdatePolicyRequest request)
         {
             try

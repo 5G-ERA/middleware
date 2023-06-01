@@ -14,5 +14,6 @@ public class InstanceRequest
     public string Family { get; init; }
     public int? MinimumRam { get; init; }
     public int? MinimumNumOfCores { get; init; }
-    public IEnumerable<string>? Tags { get; init; } = Enumerable.Empty<string>();
+    public IEnumerable<string> Tags { get; init; } = Enumerable.Empty<string>();
+    public IEnumerable<string> AppliedPolicies { get; init; } = Enumerable.Empty<string>();
 }

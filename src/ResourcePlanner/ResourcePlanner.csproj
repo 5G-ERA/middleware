@@ -19,6 +19,11 @@
 	</ItemGroup>
 
 	<ItemGroup>
+		<InternalsVisibleTo Include="ResourcePlanner.Tests.Unit" />
+		<InternalsVisibleTo Include="DynamicProxyGenAssembly2" />
+	</ItemGroup>
+
+	<ItemGroup>
 
 
 		<OpenApiReference Include="..\Orchestrator\OrchestratorSpec.json" CodeGenerator="NSwagCSharp" Namespace="Middleware.ResourcePlanner.Orchestrator" ClassName="OrchestratorApiClient" Link="OpenAPIs\OrchestratorSpec.json" />
@@ -49,6 +54,10 @@
 		<ProjectReference Include="..\Common\Common.csproj" />
 		<ProjectReference Include="..\DataAccess\DataAccess.csproj" />
 		<ProjectReference Include="..\RedisInterface.Sdk\RedisInterface.Sdk.csproj" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <Folder Include="Policies\LocationSelection\" />
 	</ItemGroup>
 
 </Project>

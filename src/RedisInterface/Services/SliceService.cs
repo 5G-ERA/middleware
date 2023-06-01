@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.Options;
 using Middleware.Common.Config;
+using Middleware.Common.Enums;
 using Middleware.DataAccess.Repositories.Abstract;
 using Middleware.Models.Domain;
 using Middleware.Models.Domain.Slice;
@@ -31,7 +32,7 @@ public class SliceService : ISliceService
     /// <param name="slices"></param>
     /// <param name="location"></param>
     /// <returns></returns>
-    public async Task ReRegisterSlices(IReadOnlyList<SliceModel> slices, Location location = null)
+    public async Task ReRegisterSlicesAsync(IReadOnlyList<SliceModel> slices, Location location = null)
     {
         var locationData = location is null
             ? await GetCurrentLocation()
@@ -39,6 +40,25 @@ public class SliceService : ISliceService
 
         await DeleteExistingSlices(locationData);
         await AddNewSliceDefinitions(slices, locationData);
+    }
+
+    /// <inheritdoc />
+    public Task<List<SliceModel>> GetAllSlicesAsync()
+    {
+        return _sliceRepository.GetAllAsync();
+    }
+
+    /// <inheritdoc />
+    public Task<List<RelationModel>> GetRelationAsync(Guid id, string name,
+        RelationDirection direction = RelationDirection.Outgoing)
+    {
+        return _sliceRepository.GetRelation(id, name, direction);
+    }
+
+    /// <inheritdoc />
+    public Task<SliceModel> GetByIdAsync(Guid id)
+    {
+        return _sliceRepository.GetByIdAsync(id);
     }
 
     /// <summary>

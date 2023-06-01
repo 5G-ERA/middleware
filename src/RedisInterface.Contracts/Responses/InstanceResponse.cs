@@ -17,4 +17,5 @@ public class InstanceResponse
     public int? MinimumNumOfCores { get; init; }
     public DateTime OnboardedTime { get; init; }
     public IEnumerable<string>? Tags { get; init; } = Enumerable.Empty<string>();
+    public IEnumerable<string> AppliedPolicies { get; init; } = Enumerable.Empty<string>();
 }

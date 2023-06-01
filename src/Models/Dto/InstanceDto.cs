@@ -30,8 +30,7 @@ public class InstanceDto : Dto
     public string DesiredStatus { get; set; } = default!;
 
     [Indexed]
-    public string ServiceUrl { get; set; } = default!;
-
+    public string? ServiceUrl { get; set; } = default!;
     [Indexed]
     public List<RosTopic> RosTopicsPub { get; set; } = new();
 
@@ -61,6 +60,8 @@ public class InstanceDto : Dto
 
     [Indexed(Sortable = true)]
     public DateTimeOffset OnboardedTime { get; set; }
+    
+    public List<string> AppliedPolicies { get; init; } = new();
 
     public override BaseModel ToModel()
     {
@@ -74,17 +75,18 @@ public class InstanceDto : Dto
             IsReusable = dto.IsReusable,
             DesiredStatus = dto.DesiredStatus,
             ServiceUrl = dto.ServiceUrl,
-            RosTopicsPub = dto.RosTopicsPub?.Select(x => x.ToModel()).ToList(),
-            RosTopicsSub = dto.RosTopicsSub?.Select(x => x.ToModel()).ToList(),
+            RosTopicsPub = dto.RosTopicsPub.Select(x => x.ToModel()).ToList(),
+            RosTopicsSub = dto.RosTopicsSub.Select(x => x.ToModel()).ToList(),
             RosVersion = dto.RosVersion,
-            ROSDistro = dto.ROSDistro,
+            RosDistro = dto.ROSDistro,
             Tags = dto.Tags,
             InstanceFamily = dto.InstanceFamily,
             SuccessRate = dto.SuccessRate,
             ServiceStatus = dto.ServiceStatus,
             MinimumRam = dto.HardwareRequirements.MinimumRam,
             MinimumNumCores = dto.HardwareRequirements.MinimumNumCores,
-            OnboardedTime = dto.OnboardedTime.DateTime
+            OnboardedTime = dto.OnboardedTime.DateTime,
+            AppliedPolicies = dto.AppliedPolicies
         };
     }
 }

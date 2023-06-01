@@ -1,6 +1,5 @@
 ﻿using System.Text.Json.Serialization;
 using Middleware.Models.Dto;
-using Middleware.Models.Dto.Hardware;
 
 namespace Middleware.Models.Domain;
 
@@ -10,8 +9,8 @@ public class ActionModel : BaseModel
     public override Guid Id { get; set; } = Guid.NewGuid();
 
     [JsonPropertyName("Name")]
-    public override string Name { get; set; }
-    
+    public override string Name { get; set; } = default!;
+
     [JsonPropertyName("Tags")]
     public List<string>? Tags { get; set; }
 
@@ -25,30 +24,56 @@ public class ActionModel : BaseModel
     public string? PlacementType { get; set; } // Either edge or cloud. 
 
     [JsonPropertyName("ActionPriority")]
-    public int ActionPriority { get; set; }
+    public string? ActionPriority { get; set; } = default!;
 
     [JsonPropertyName("ActionStatus")]
     public string? ActionStatus { get; set; }
 
     [JsonPropertyName("Services")]
-    //[JsonIgnore]
-    public List<InstanceModel>? Services { get; set; }
+    public List<InstanceModel> Services { get; set; } = new();
 
     [JsonPropertyName("MinimumRam")]
     public long? MinimumRam { get; set; }
 
     [JsonPropertyName("MinimumNumCores")]
     public int? MinimumNumCores { get; set; }
-    
+
+    /// <summary>
+    ///     Network Slice associated for the specific action
+    /// </summary>
+    public string? NetworkSlice { get; set; }
+
+    /// <summary>
+    ///     Sets new location identified during resource planning
+    /// </summary>
+    /// <param name="location"></param>
+    public void SetNewLocationForPlan(PlannedLocation location)
+    {
+        Placement = location.Name;
+        PlacementType = location.Type.ToString();
+
+        if (location.HasSlicesEnabled)
+            NetworkSlice = location.NetworkSliceName;
+    }
+
+    /// <summary>
+    ///     Is Network Slice assigned to the planned deployment location
+    /// </summary>
+    /// <returns></returns>
+    public bool HasLocationWithNetWorkSliceSet()
+    {
+        return string.IsNullOrWhiteSpace(NetworkSlice) == false;
+    }
+
     public override Dto.Dto ToDto()
     {
         var domain = this;
-        return new ActionDto()
+        return new ActionDto
         {
             Id = domain.Id.ToString(),
             ActionPriority = domain.ActionPriority,
             Name = domain.Name,
-            HardwareRequirements = new HardwareRequirements()
+            HardwareRequirements = new()
             {
                 MinimumRam = domain.MinimumRam,
                 MinimumNumCores = domain.MinimumNumCores

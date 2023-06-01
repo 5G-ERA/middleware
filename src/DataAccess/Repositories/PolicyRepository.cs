@@ -68,16 +68,22 @@ namespace Middleware.DataAccess.Repositories
             return activePolicies;
         }
 
+        /// <inheritdoc />
+        public Task<PolicyModel?> GetPolicyByName(string name)
+        {
+            throw new NotImplementedException();
+        }
+
         /// <summary>
         /// Patching properties for PolicyModel
         /// </summary>
         /// <param name="id"></param>
         /// <param name="patch"></param>
         /// <returns> Patched model </returns>
-        public async Task<PolicyModel> PatchPolicyAsync(Guid id, PolicyModel patch)
+        public async Task<PolicyModel?> PatchPolicyAsync(Guid id, PolicyModel patch)
         {
             string model = (string)await Db.JsonGetAsync(id.ToString());
-            PolicyModel currentModel = JsonSerializer.Deserialize<PolicyModel>(model);
+            PolicyModel? currentModel = JsonSerializer.Deserialize<PolicyModel>(model);
             if (currentModel == null)
             {
                 return null;
@@ -111,6 +117,12 @@ namespace Middleware.DataAccess.Repositories
             }
             await Db.JsonSetAsync(id.ToString(), JsonSerializer.Serialize(currentModel));
             return currentModel;
+        }
+
+        /// <inheritdoc />
+        public Task<IReadOnlyCollection<PolicyModel>> GetActiveSystemPoliciesAsync()
+        {
+            throw new NotImplementedException();
         }
     }
 }

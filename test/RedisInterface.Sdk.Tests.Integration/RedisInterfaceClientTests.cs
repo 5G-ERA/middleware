@@ -8,19 +8,20 @@ using Refit;
 
 namespace RedisInterface.Sdk.Tests.Integration;
 
+//[LogTestExecution]
 public class RedisInterfaceClientTests : IClassFixture<RedisInterfaceApiFactory>
 {
-    private readonly ILogger<RedisInterfaceClient> _logger = Substitute.For<ILogger<RedisInterfaceClient>>();
-    private IRedisInterfaceClient _sut;
-    private readonly HttpClient _httpClient;
-
     private readonly Faker<CloudRequest> _cloudFaker = new Faker<CloudRequest>()
         .RuleFor(cloud => cloud.Name, faker => faker.Company.CompanyName().Replace(" ", string.Empty))
         .RuleFor(cloud => cloud.Status, "Online")
         .RuleFor(cloud => cloud.Type, "Cloud")
         .RuleFor(cloud => cloud.Cpu, 2)
         .RuleFor(cloud => cloud.MacAddress, faker => faker.System.Version().ToString())
-        .RuleFor(cloud => cloud.IpAddress, faker => new Uri(faker.Internet.Ip(), UriKind.RelativeOrAbsolute));
+        .RuleFor(cloud => cloud.IpAddress, faker => new(faker.Internet.Ip(), UriKind.RelativeOrAbsolute));
+
+    private readonly HttpClient _httpClient;
+    private readonly ILogger<RedisInterfaceClient> _logger = Substitute.For<ILogger<RedisInterfaceClient>>();
+    private IRedisInterfaceClient _sut;
 
     public RedisInterfaceClientTests(RedisInterfaceApiFactory appFactory)
     {

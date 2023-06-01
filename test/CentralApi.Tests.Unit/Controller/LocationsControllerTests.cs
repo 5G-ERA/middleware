@@ -11,6 +11,7 @@ using OneOf.Types;
 
 namespace CentralApi.Tests.Unit.Controller;
 
+//[LogTestExecution]
 public class LocationsControllerTests
 {
     private readonly ILocationService _locationService = Substitute.For<ILocationService>();

@@ -1,22 +1,22 @@
 ﻿using Middleware.DataAccess.Repositories.Abstract;
 using Middleware.Models.Domain;
 using Middleware.Models.Dto;
+using Middleware.Models.Enums;
 using Redis.OM.Contracts;
 using RedisGraphDotNet.Client;
 using ILogger = Serilog.ILogger;
 
 
-namespace Middleware.DataAccess.Repositories.Redis
+namespace Middleware.DataAccess.Repositories
 {
     public class RedisPolicyRepository : RedisRepository<PolicyModel, PolicyDto>, IPolicyRepository
     {
         /// <summary>
         /// Default constructor
         /// </summary>
-        /// <param name="redisClient"></param>
+        /// <param name="provider"></param>
         /// <param name="redisGraph"></param>
         /// <param name="logger"></param>
-
         public RedisPolicyRepository(IRedisConnectionProvider provider, IRedisGraphClient redisGraph, ILogger logger) : base(provider, redisGraph, true, logger)
         {
         }
@@ -25,13 +25,13 @@ namespace Middleware.DataAccess.Repositories.Redis
         /// Check if a policy can coexist with already active policies
         /// </summary>
         /// <param name="newActivePolicy"></param>
-        /// <param name="ActivePolicies"></param>
-        /// <returns>boolean</returns>
-        public bool CheckPolicyCanCoexist(PolicyModel newActivePolicy, List<PolicyModel> ActivePolicies)
+        /// <param name="activePolicies"></param>
+        /// <returns>Can exclusivity be applied (bool)</returns>
+        private static bool CheckPolicyCanCoexist(PolicyModel newActivePolicy, List<PolicyModel> activePolicies)
         {
-            foreach (PolicyModel policy in ActivePolicies)
+            foreach (PolicyModel policy in activePolicies)
             {
-                if (policy.IsExclusiveWithinType == newActivePolicy.IsExclusiveWithinType)
+                if (newActivePolicy.Type == policy.Type && policy.IsExclusiveWithinType == newActivePolicy.IsExclusiveWithinType)
                 {
                     return false;
                 }
@@ -45,8 +45,14 @@ namespace Middleware.DataAccess.Repositories.Redis
         /// <returns> Active policies </returns>
         public async Task<List<PolicyModel>> GetActivePoliciesAsync()
         {
-            var activePolicies = FindQuery(Dto => Dto.IsActive == true).ToList().Select(x => ToTModel(x)).ToList();
+            List<PolicyModel> activePolicies = await Task.Run(() => FindQuery(dto => dto.IsActive == true).ToList().Select(ToTModel).ToList());
             return activePolicies;
+        }
+
+        /// <inheritdoc />
+        public async Task<PolicyModel?> GetPolicyByName(string name)
+        {
+            return await FindSingleAsync(p => p.Name == name);
         }
 
         /// <summary>
@@ -55,7 +61,7 @@ namespace Middleware.DataAccess.Repositories.Redis
         /// <param name="id"></param>
         /// <param name="patch"></param>
         /// <returns> Patched model </returns>
-        public async Task<PolicyModel> PatchPolicyAsync(Guid id, PolicyModel patch)
+        public async Task<PolicyModel?> PatchPolicyAsync(Guid id, PolicyModel patch)
         {
             PolicyModel? currentModel = await GetByIdAsync(id);
             if (currentModel == null)
@@ -66,23 +72,27 @@ namespace Middleware.DataAccess.Repositories.Redis
             {
                 currentModel.Name = patch.Name;
             }
-            if (!string.IsNullOrEmpty(patch.Type))
+            if (patch.Type != PolicyType.None)
             {
                 currentModel.Type = patch.Type;
             }
-            if (!string.IsNullOrEmpty(patch.Timestamp.ToString()))
+            if (patch.Timestamp != default)
             {
                 currentModel.Timestamp = patch.Timestamp;
             }
-            if (patch.IsActive != null)
+
+            // Some policies cannot be active at the same time. Automatic check.
+            if (patch.IsActive)
             {
-                // Some policies cannot be active at the same time. Automatic check.
-                if (patch.IsActive == true)
+                List<PolicyModel> activePolicies = await GetActivePoliciesAsync();
+                var coexistenceCheck = CheckPolicyCanCoexist(patch, activePolicies);
+                if (coexistenceCheck)
                 {
-                    List<PolicyModel> activePolicies = await GetActivePoliciesAsync();
-                    bool coexistanceCheck = CheckPolicyCanCoexist(patch, activePolicies);
-                    if (coexistanceCheck == true) { currentModel.IsActive = patch.IsActive; }
-                    else { throw new Exception("The proposed policy cannot coexists with the already active policies."); }
+                    currentModel.IsActive = patch.IsActive;
+                }
+                else
+                {
+                    throw new Exception("The proposed policy cannot coexists with the already active policies.");
                 }
             }
             if (!string.IsNullOrEmpty(patch.Description))
@@ -95,6 +105,13 @@ namespace Middleware.DataAccess.Repositories.Redis
             }
             await UpdateAsync(currentModel);
             return currentModel;
+        }
+
+        /// <inheritdoc />
+        public async Task<IReadOnlyCollection<PolicyModel>> GetActiveSystemPoliciesAsync()
+        {
+            var policies = await FindAsync(p => p.IsActive && p.Scope == PolicyScope.System.ToString());
+            return policies.AsReadOnly();
         }
     }
 }

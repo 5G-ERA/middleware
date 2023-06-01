@@ -194,9 +194,10 @@ public static class ApiContractToDomainMapper
             MinimumNumCores = x.MinimumNumOfCores,
             OnboardedTime = DateTime.Now,
             RosVersion = x.RosVersion,
-            ROSDistro = x.RosDistro,
+            RosDistro = x.RosDistro,
             RosTopicsPub = x.RosTopicPublishers.ToList(),
-            RosTopicsSub = x.RosTopicSubscribers.ToList()
+            RosTopicsSub = x.RosTopicSubscribers.ToList(),
+            AppliedPolicies = x.AppliedPolicies.ToList()
         };
     }
 
@@ -212,9 +213,10 @@ public static class ApiContractToDomainMapper
             MinimumRam = x.MinimumRam,
             MinimumNumCores = x.MinimumNumOfCores,
             RosVersion = x.RosVersion,
-            ROSDistro = x.RosDistro,
+            RosDistro = x.RosDistro,
             RosTopicsPub = x.RosTopicPublishers.ToList(),
             RosTopicsSub = x.RosTopicSubscribers.ToList(),
+            AppliedPolicies = x.AppliedPolicies.ToList(),
             Tags = x.Tags?.ToList(),
             OnboardedTime = x.OnboardedTime
         };
@@ -226,10 +228,12 @@ public static class ApiContractToDomainMapper
         {
             Name = x.Name,
             Description = x.Description,
-            Type = x.Type,
+            Type = Enum.Parse<PolicyType>(x.Type),
+            Scope = Enum.Parse<PolicyScope>(x.Scope),
             IsActive = x.IsActive,
             IsExclusiveWithinType = x.IsExclusiveWithinType,
-            Timestamp = x.LastTimeUpdated
+            Timestamp = x.LastTimeUpdated,
+            Priority = Enum.Parse<Priority>(x.Priority)
         };
     }
 
@@ -240,10 +244,12 @@ public static class ApiContractToDomainMapper
             Id = x.Id,
             Name = x.Name,
             Description = x.Description,
-            Type = x.Type,
+            Type = Enum.Parse<PolicyType>(x.Type),
+            Scope = Enum.Parse<PolicyScope>(x.Scope),
             IsActive = x.IsActive,
             IsExclusiveWithinType = x.IsExclusiveWithinType,
-            Timestamp = x.LastTimeUpdated
+            Timestamp = x.LastTimeUpdated,
+            Priority = Enum.Parse<Priority>(x.Priority)
         };
     }
 
@@ -255,7 +261,8 @@ public static class ApiContractToDomainMapper
                 Id = x.Id,
                 Name = x.Name,
                 Description = x.Description,
-                Type = x.Type,
+                Type = Enum.Parse<PolicyType>(x.Type),
+                Scope = Enum.Parse<PolicyScope>(x.Scope),
                 IsActive = x.IsActive,
                 IsExclusiveWithinType = x.IsExclusiveWithinType,
                 Timestamp = x.LastTimeUpdated
@@ -370,6 +377,42 @@ public static class ApiContractToDomainMapper
             TrafficType = Enum.Parse<TrafficType>(s.TrafficType, true),
             Imsi = s.Imsi.ToList()
         }).ToList();
+    }
+
+    public static List<SliceModel> ToSliceList(this GetSlicesResponse x)
+    {
+        return x.Slices.Select(s => new SliceModel
+        {
+            Id = s.Id,
+            Name = s.Name,
+            Site = s.Site,
+            ExpDataRateDl = s.ExpDataRateDl,
+            ExpDataRateUl = s.ExpDataRateUl,
+            Jitter = s.Jitter,
+            Latency = s.Latency,
+            UserDensity = s.UserDensity,
+            UserSpeed = s.UserSpeed,
+            TrafficType = Enum.Parse<TrafficType>(s.TrafficType, true),
+            Imsi = s.Imsi.ToList()
+        }).ToList();
+    }
+
+    public static SliceModel ToSlice(this SliceResponse x)
+    {
+        return new()
+        {
+            Id = x.Id,
+            Name = x.Name,
+            Site = x.Site,
+            ExpDataRateDl = x.ExpDataRateDl,
+            ExpDataRateUl = x.ExpDataRateUl,
+            Jitter = x.Jitter,
+            Latency = x.Latency,
+            TrafficType = Enum.Parse<TrafficType>(x.TrafficType),
+            Imsi = x.Imsi.ToList(),
+            UserDensity = x.UserDensity,
+            UserSpeed = x.UserSpeed
+        };
     }
 
     public static Location ToLocation(this LocationRequest x)

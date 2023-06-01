@@ -7,6 +7,7 @@ using Xunit;
 
 namespace Orchestrator.Tests.Unit.SliceManager;
 
+//[LogTestExecution]
 public class SliceManagerClientFactoryTests
 {
     private readonly IOptions<SliceConfig> _mwOptions = Substitute.For<IOptions<SliceConfig>>();

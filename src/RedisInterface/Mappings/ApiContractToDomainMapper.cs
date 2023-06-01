@@ -84,7 +84,7 @@ public static class ApiContractToDomainMapper
             MinimumNumCores = x.Instance.MinimumNumOfCores,
             OnboardedTime = DateTime.Now,
             RosVersion = x.Instance.RosVersion,
-            ROSDistro = x.Instance.RosDistro,
+            RosDistro = x.Instance.RosDistro,
             RosTopicsPub = x.Instance.RosTopicPublishers.ToList(),
             RosTopicsSub = x.Instance.RosTopicSubscribers.ToList()
         };
@@ -96,7 +96,8 @@ public static class ApiContractToDomainMapper
             Id = x.Id,
             Name = x.Policy.Name,
             Description = x.Policy.Description,
-            Type = x.Policy.Type,
+            Type = Enum.Parse<PolicyType>(x.Policy.Type),
+            Scope = Enum.Parse<PolicyScope>(x.Policy.Scope),
             IsActive = x.Policy.IsActive,
             IsExclusiveWithinType = x.Policy.IsExclusiveWithinType,
             Timestamp = x.Policy.LastTimeUpdated

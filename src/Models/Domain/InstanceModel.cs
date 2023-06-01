@@ -1,17 +1,18 @@
 ﻿using System.Text.Json.Serialization;
+using Middleware.Models.Domain.Contracts;
 using Middleware.Models.Dto;
 using Middleware.Models.Dto.Hardware;
 using Middleware.Models.Enums;
 
 namespace Middleware.Models.Domain;
 
-public class InstanceModel : BaseModel
+public class InstanceModel : BaseModel, IPolicyAssignable
 {
     [JsonPropertyName("Id")]
     public override Guid Id { get; set; } = Guid.NewGuid();
 
     [JsonPropertyName("Name")]
-    public override string Name { get; set; } // compulsory field
+    public override string? Name { get; set; } // compulsory field
     
     [JsonPropertyName("ServiceInstanceId")]
     public Guid ServiceInstanceId { get; set; }
@@ -38,7 +39,7 @@ public class InstanceModel : BaseModel
     public int RosVersion { get; set; } // compulsory field
 
     [JsonPropertyName("ROSDistro")]
-    public string? ROSDistro { get; set; } // compulsory field
+    public string? RosDistro { get; set; } // compulsory field
 
     [JsonPropertyName("Tags")]
     public List<string>? Tags { get; set; }
@@ -65,25 +66,35 @@ public class InstanceModel : BaseModel
     [JsonPropertyName("OnboardedTime")]
     public DateTime OnboardedTime { get; set; } // Compulsory field
 
+    /// <inheritdoc />
+    public List<string> AppliedPolicies { get; init; } = new();
+
     /// <summary>
-    /// Onboarding validation of the instance data object.
+    /// On boarding validation of the instance data object.
     /// </summary>
     /// <returns>bool</returns>
     public bool IsValid()
     {
-        var rosDistrosEnum = Enum.GetNames(typeof(RosDistro)).ToList();
+        var rosDistroNames = Enum.GetNames(typeof(RosDistro)).ToList();
 
         //if (string.IsNullOrWhiteSpace(Name)) return false;
         if (RosVersion > 2) return false;
         if (RosVersion == 0) return false;
         if (string.IsNullOrEmpty(MinimumRam.ToString())) return false;
         if (string.IsNullOrEmpty(MinimumNumCores.ToString())) return false;
-        if (string.IsNullOrEmpty(ROSDistro?.ToString())) return false;
-        if (string.IsNullOrEmpty(InstanceFamily?.ToString())) return false;
-        if (!rosDistrosEnum.Contains(ROSDistro)) return false;
-        //   if (string.IsNullOrEmpty(RosTopicsPub.ToString())) return false;
-        //   if (string.IsNullOrEmpty(RosTopicsSub.ToString())) return false;
+        if (string.IsNullOrEmpty(RosDistro)) return false;
+        if (string.IsNullOrEmpty(InstanceFamily)) return false;
+        if (!rosDistroNames.Contains(RosDistro)) return false;
+
         return true;
+    }
+    /// <summary>
+    /// Can the instance be reused by multiple consumers
+    /// </summary>
+    /// <returns></returns>
+    public bool CanBeReused()
+    {
+        return IsReusable != null && IsReusable.Value;
     }
 
     public override Dto.Dto ToDto()
@@ -98,11 +109,11 @@ public class InstanceModel : BaseModel
             IsReusable = domain.IsReusable,
             DesiredStatus = domain.DesiredStatus,
             ServiceUrl = domain.ServiceUrl,
-            RosTopicsPub = domain.RosTopicsPub?.Select(x => x.ToDto()).ToList(),
-            RosTopicsSub = domain.RosTopicsSub?.Select(x => x.ToDto()).ToList(),
+            RosTopicsPub = domain.RosTopicsPub.Select(x => x.ToDto()).ToList(),
+            RosTopicsSub = domain.RosTopicsSub.Select(x => x.ToDto()).ToList(),
             RosVersion = domain.RosVersion,
-            ROSDistro = domain.ROSDistro,
-            Tags = domain.Tags,
+            ROSDistro = domain.RosDistro,
+            Tags = domain.Tags ?? new List<string>(),
             InstanceFamily = domain.InstanceFamily,
             SuccessRate = domain.SuccessRate,
             ServiceStatus = domain.ServiceStatus,
@@ -111,7 +122,10 @@ public class InstanceModel : BaseModel
                 MinimumRam = domain.MinimumRam,
                 MinimumNumCores = domain.MinimumNumCores
             },
-            OnboardedTime = domain.OnboardedTime == default ? DateTimeOffset.Now : domain.OnboardedTime
+            OnboardedTime = domain.OnboardedTime == default ? DateTimeOffset.Now : domain.OnboardedTime,
+            AppliedPolicies = domain.AppliedPolicies
         };
     }
+
+    
 }

@@ -15,7 +15,19 @@ public class PolicyRequestValidator : AbstractValidator<PolicyRequest>
         RuleFor(x=>x.Type)
             .NotNull().IsEnumName(typeof(PolicyType), caseSensitive: false)
             .WithMessage(x =>
-                $"{x.Type} is not a validPolicy Type name. " +
+                $"{x.Type} is not a valid Policy Type name. " +
+                $"Valid options are: {string.Join(", ", Enum.GetNames<PolicyType>())}");
+
+        RuleFor(x => x.Scope)
+            .NotNull().IsEnumName(typeof(PolicyScope), caseSensitive: false)
+            .WithMessage(x =>
+                $"{x.Scope} is not a valid Policy Scope name. " +
+                $"Valid options are: {string.Join(", ", Enum.GetNames<PolicyScope>())}");
+
+        RuleFor(x => x.Priority)
+            .NotNull().IsEnumName(typeof(Priority), caseSensitive: false)
+            .WithMessage(x =>
+                $"{x.Priority} is not a valid Policy Priority name. " +
                 $"Valid options are: {string.Join(", ", Enum.GetNames<PolicyType>())}");
         //TODO: add validation if the policy can be active when it is added or activated
     }

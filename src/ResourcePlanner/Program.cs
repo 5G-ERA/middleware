@@ -4,6 +4,7 @@ using Middleware.RedisInterface.Sdk;
 using Middleware.ResourcePlanner;
 using Middleware.ResourcePlanner.ApiReference;
 using Middleware.ResourcePlanner.Config;
+using Middleware.ResourcePlanner.Policies;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -22,6 +23,9 @@ builder.Services.AddHttpClient("healthCheckClient");
 builder.Services.AddHttpClient(AppConfig.OrchestratorApiClientName);
 builder.Services.AddScoped<IResourcePlanner, ResourcePlanner>();
 builder.Services.AddScoped<IApiClientBuilder, ApiClientBuilder>();
+builder.Services.AddScoped<IPolicyService, PolicyService>();
+builder.Services.AddScoped<IPolicyBuilder, PolicyBuilder>();
+
 builder.Services.AddRedisInterfaceClient();
 
 var app = builder.Build();

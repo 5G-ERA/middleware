@@ -51,7 +51,7 @@ namespace Middleware.RedisInterface.Services
                 var netAppTemp = new NetAppsDetailsResponse(netApp.Name,
                 netApp.InstanceFamily,
                                    netApp.RosVersion,
-                                   netApp.ROSDistro,
+                                   netApp.RosDistro,
                                    netApp.OnboardedTime);
                 instanceResponse.Add(netAppTemp);
             }
