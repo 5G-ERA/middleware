@@ -1,6 +1,8 @@
-﻿using Middleware.Common.Enums;
+﻿using Microsoft.AspNetCore.Mvc;
+using Middleware.Common.Enums;
 using Middleware.Models.Domain;
 using Middleware.Models.Domain.Slice;
+using Middleware.RedisInterface.Contracts.Requests;
 
 namespace Middleware.RedisInterface.Services.Abstract;
 
@@ -14,4 +16,8 @@ internal interface ISliceService
         RelationDirection direction = RelationDirection.Outgoing);
 
     Task<SliceModel> GetByIdAsync(Guid id);
+
+    Task SliceAddEmbb(SliceModel embbSlice);
+
+    Task SliceAddUrllc(SliceModel urllcSlice);
 }

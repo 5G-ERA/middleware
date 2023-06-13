@@ -5,6 +5,7 @@ using Middleware.DataAccess.Repositories.Abstract;
 using Middleware.Models.Domain;
 using Middleware.Models.Domain.Slice;
 using Middleware.Models.Enums;
+using Middleware.RedisInterface.Contracts.Requests;
 using Middleware.RedisInterface.Services.Abstract;
 
 namespace Middleware.RedisInterface.Services;
@@ -148,5 +149,25 @@ public class SliceService : ISliceService
             locationData = await _edgeRepository.GetEdgeResourceDetailsByNameAsync(location.Name);
 
         return locationData;
+    }
+
+    /// <summary>
+    ///   Add new embb slice
+    /// </summary>
+    /// <param name="embbSlice"></param>
+    /// <returns></returns>
+    public async Task SliceAddEmbb(SliceModel embbSlice) 
+    {
+        await _sliceRepository.AddAsync(embbSlice);
+    }
+
+    /// <summary>
+    ///  Add new urllc slice
+    /// </summary>
+    /// <param name="urllcSlice"></param>
+    /// <returns></returns>
+    public async Task SliceAddUrllc(SliceModel urllcSlice) 
+    {
+        await _sliceRepository.AddAsync(urllcSlice);
     }
 }

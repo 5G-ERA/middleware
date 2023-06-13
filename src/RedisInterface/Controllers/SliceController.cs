@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Middleware.Common.Enums;
 using Middleware.Common.Responses;
 using Middleware.Models.Domain;
+using Middleware.Models.Domain.Slice;
 using Middleware.RedisInterface.Contracts.Mappings;
 using Middleware.RedisInterface.Contracts.Requests;
 using Middleware.RedisInterface.Contracts.Responses;
@@ -137,4 +138,67 @@ internal class SliceController : ControllerBase
             return StatusCode(statusCode, new ApiResponse(statusCode, $"An error has occurred: {ex.Message}"));
         }
     }
+
+    /// <summary>
+    /// Add new embb slice
+    /// </summary>
+    /// <param name="embbSlice"></param>
+    /// <returns></returns>
+    [HttpPost]
+    [Route("embb", Name = "SliceAddEmbb")]
+    [ProducesResponseType(typeof(void), (int)HttpStatusCode.Created)]
+    [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.BadRequest)]
+    [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.InternalServerError)]
+    public async Task<IActionResult> SliceAddEmbb(SliceModel embbSlice)
+    {
+        if (embbSlice == null)
+        {
+            return BadRequest("Parameters were not specified correctly.");
+        }
+        try
+        {
+            await _sliceService.SliceAddEmbb(embbSlice);
+
+            return StatusCode((int)HttpStatusCode.Created);
+        }
+        catch (Exception ex)
+        {
+            var statusCode = (int)HttpStatusCode.InternalServerError;
+            _logger.LogError(ex, "An error occurred:");
+            return StatusCode(statusCode, new ApiResponse(statusCode, $"An error has occurred: {ex.Message}"));
+        }
+
+    }
+
+    /// <summary>
+    /// Add new urllc slice
+    /// </summary>
+    /// <param name="urllcSlice"></param>
+    /// <returns></returns>
+    [HttpPost]
+    [Route("urllc", Name = "SliceAddUrllc")]
+    [ProducesResponseType(typeof(void), (int)HttpStatusCode.Created)]
+    [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.BadRequest)]
+    [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.InternalServerError)]
+    public async Task<IActionResult> SliceAddUrllc(SliceModel urllcSlice)
+    {
+        if (urllcSlice == null)
+        {
+            return BadRequest("Parameters were not specified correctly.");
+        }
+        try 
+        {
+            await _sliceService.SliceAddUrllc(urllcSlice);
+
+            return StatusCode((int)HttpStatusCode.Created);
+        }
+        catch (Exception ex)
+        {
+            var statusCode = (int)HttpStatusCode.InternalServerError;
+            _logger.LogError(ex, "An error occurred:");
+            return StatusCode(statusCode, new ApiResponse(statusCode, $"An error has occurred: {ex.Message}"));
+        }
+
+    }
+
 }
