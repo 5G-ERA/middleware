@@ -1,76 +1,77 @@
-﻿using System.Text.Json.Serialization;
-using Middleware.Models.Domain.Contracts;
+﻿using Middleware.Models.Domain.Contracts;
 using Middleware.Models.Dto;
-using Middleware.Models.Dto.Hardware;
 using Middleware.Models.Enums;
 
 namespace Middleware.Models.Domain;
 
 public class InstanceModel : BaseModel, IPolicyAssignable
 {
-    [JsonPropertyName("Id")]
     public override Guid Id { get; set; } = Guid.NewGuid();
 
-    [JsonPropertyName("Name")]
     public override string? Name { get; set; } // compulsory field
-    
-    [JsonPropertyName("ServiceInstanceId")]
+
     public Guid ServiceInstanceId { get; set; }
 
-    [JsonPropertyName("ServiceType")]
     public string? ServiceType { get; set; }
 
-    [JsonPropertyName("IsReusable")]
     public bool? IsReusable { get; set; }
 
-    [JsonPropertyName("DesiredStatus")]
     public string? DesiredStatus { get; set; }
 
-    [JsonPropertyName("ServiceUrl")]
     public string? ServiceUrl { get; set; }
 
-    [JsonPropertyName("RosTopicsPub")]
-    public List<RosTopicModel> RosTopicsPub { get; set; } = new();// compulsory field
+    public List<RosTopicModel> RosTopicsPub { get; set; } = new(); // compulsory field
 
-    [JsonPropertyName("RosTopicsSub")]
-    public List<RosTopicModel> RosTopicsSub { get; set; } = new();// compulsory field
+    public List<RosTopicModel> RosTopicsSub { get; set; } = new(); // compulsory field
 
-    [JsonPropertyName("ROSVersion")]
     public int RosVersion { get; set; } // compulsory field
 
-    [JsonPropertyName("ROSDistro")]
     public string? RosDistro { get; set; } // compulsory field
 
-    [JsonPropertyName("Tags")]
     public List<string>? Tags { get; set; }
 
-    [JsonPropertyName("InstanceFamily")]
     public string? InstanceFamily { get; set; } // Compulsory field
 
-    [JsonPropertyName("SuccessRate")]
     public int SuccessRate { get; set; }
 
-    [JsonPropertyName("ServiceStatus")]
-    public string? ServiceStatus { get; set; } //updated every 10 sec
+    public string? ServiceStatus { get; internal set; }
 
-    [JsonPropertyName("ContainerImage")]
-    [JsonIgnore]
     public ContainerImageModel? ContainerImage { get; set; }
 
-    [JsonPropertyName("MinimumRam")]
     public long? MinimumRam { get; set; } // Compulsory field
 
-    [JsonPropertyName("MinimumNumCores")]
     public int? MinimumNumCores { get; set; } // Compulsory field
 
-    [JsonPropertyName("OnboardedTime")]
     public DateTime OnboardedTime { get; set; } // Compulsory field
+
+    public DateTimeOffset? LastStatusChange { get; set; }
 
     /// <inheritdoc />
     public List<string> AppliedPolicies { get; init; } = new();
 
     /// <summary>
-    /// On boarding validation of the instance data object.
+    ///     Set the new operation status for the Instance
+    /// </summary>
+    /// <param name="status"></param>
+    public void SetStatus(ServiceStatus status)
+    {
+        ServiceStatus = status.ToString();
+        LastStatusChange = DateTimeOffset.UtcNow;
+    }
+
+    /// <summary>
+    ///     Indicates if the instance is considered terminated / down
+    /// </summary>
+    /// <returns></returns>
+    public bool CanBeDeleted()
+    {
+        return ServiceStatus == Enums.ServiceStatus.Down.ToString()
+               && DateTimeOffset.Now - LastStatusChange > new TimeSpan(1, 0, 0);
+    }
+
+
+    /// <summary>
+    ///     On boarding validation of the instance data object.
     /// </summary>
     /// <returns>bool</returns>
     public bool IsValid()
@@ -88,8 +89,9 @@ public class InstanceModel : BaseModel, IPolicyAssignable
 
         return true;
     }
+
     /// <summary>
-    /// Can the instance be reused by multiple consumers
+    ///     Can the instance be reused by multiple consumers
     /// </summary>
     /// <returns></returns>
     public bool CanBeReused()
@@ -100,7 +102,7 @@ public class InstanceModel : BaseModel, IPolicyAssignable
     public override Dto.Dto ToDto()
     {
         var domain = this;
-        return new InstanceDto()
+        return new InstanceDto
         {
             Id = domain.Id.ToString(),
             Name = domain.Name,
@@ -117,15 +119,14 @@ public class InstanceModel : BaseModel, IPolicyAssignable
             InstanceFamily = domain.InstanceFamily,
             SuccessRate = domain.SuccessRate,
             ServiceStatus = domain.ServiceStatus,
-            HardwareRequirements = new HardwareRequirements()
+            HardwareRequirements = new()
             {
                 MinimumRam = domain.MinimumRam,
                 MinimumNumCores = domain.MinimumNumCores
             },
             OnboardedTime = domain.OnboardedTime == default ? DateTimeOffset.Now : domain.OnboardedTime,
+            LastStatusChange = domain.LastStatusChange,
             AppliedPolicies = domain.AppliedPolicies
         };
     }
-
-    
 }

@@ -1,11 +1,11 @@
 ﻿using Middleware.Models.Domain;
 using Middleware.Models.Dto.Hardware;
-using Redis.OM.Modeling;
 using Middleware.Models.Dto.Ros;
+using Redis.OM.Modeling;
 
 namespace Middleware.Models.Dto;
 
-[Document(IndexName = "instance-idx", StorageType = StorageType.Json, Prefixes = new[] { InstanceDto.Prefix })]
+[Document(IndexName = "instance-idx", StorageType = StorageType.Json, Prefixes = new[] { Prefix })]
 public class InstanceDto : Dto
 {
     public const string Prefix = "Instance";
@@ -21,16 +21,17 @@ public class InstanceDto : Dto
     public string? ServiceInstanceId { get; set; } = default!;
 
     [Indexed]
-    public string ServiceType { get; set; } = default!;
+    public string? ServiceType { get; set; } = default!;
 
     [Indexed]
     public bool? IsReusable { get; set; } = default!;
 
     [Indexed]
-    public string DesiredStatus { get; set; } = default!;
+    public string? DesiredStatus { get; set; } = default!;
 
     [Indexed]
     public string? ServiceUrl { get; set; } = default!;
+
     [Indexed]
     public List<RosTopic> RosTopicsPub { get; set; } = new();
 
@@ -41,32 +42,33 @@ public class InstanceDto : Dto
     public int RosVersion { get; set; } = default!;
 
     [Indexed]
-    public string ROSDistro { get; set; } = default!;
+    public string? ROSDistro { get; set; } = default!;
 
     [Indexed]
     public List<string> Tags { get; set; } = new();
 
     [Indexed]
-    public string InstanceFamily { get; set; } = default!;
+    public string? InstanceFamily { get; set; } = default!;
 
     [Indexed(Sortable = true)]
     public int SuccessRate { get; set; } = default!;
 
     [Indexed]
-    public string ServiceStatus { get; set; } = default!;
+    public string? ServiceStatus { get; set; } = default!;
 
     [Indexed]
     public HardwareRequirements HardwareRequirements { get; set; } = new();
 
     [Indexed(Sortable = true)]
     public DateTimeOffset OnboardedTime { get; set; }
-    
+
+    public DateTimeOffset? LastStatusChange { get; set; }
     public List<string> AppliedPolicies { get; init; } = new();
 
     public override BaseModel ToModel()
     {
         var dto = this;
-        return new InstanceModel()
+        return new InstanceModel
         {
             Id = Guid.Parse(dto.Id.Replace(Prefix, "")),
             Name = dto.Name,
@@ -86,6 +88,7 @@ public class InstanceDto : Dto
             MinimumRam = dto.HardwareRequirements.MinimumRam,
             MinimumNumCores = dto.HardwareRequirements.MinimumNumCores,
             OnboardedTime = dto.OnboardedTime.DateTime,
+            LastStatusChange = dto.LastStatusChange,
             AppliedPolicies = dto.AppliedPolicies
         };
     }
