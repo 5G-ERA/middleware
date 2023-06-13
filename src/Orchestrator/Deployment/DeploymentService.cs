@@ -84,6 +84,7 @@ public class DeploymentService : IDeploymentService
 
             foreach (var seq in task.ActionSequence!)
             foreach (var service in seq.Services!)
+            {
                 try
                 {
                     // BB: service can be reused, to be decided by the resource planner
@@ -104,6 +105,7 @@ public class DeploymentService : IDeploymentService
                     _logger.LogError(ex, "There was an error while deploying the service {service}", service.Name);
                     isSuccess = false;
                 }
+            }
 
             isSuccess &= await SaveActionSequence(task, robot); //Here saved in index 13
         }
@@ -166,7 +168,9 @@ public class DeploymentService : IDeploymentService
             var k8SClient = _kubernetesBuilder.CreateKubernetesClient();
             foreach (var action in actionPlan.ActionSequence)
             foreach (var srv in action.Services!)
+            {
                 retVal &= await DeleteInstance(k8SClient, srv.ServiceInstanceId);
+            }
         }
         catch (NotInK8SEnvironmentException)
         {
@@ -365,7 +369,7 @@ public class DeploymentService : IDeploymentService
             deploymentNames.Add(cim.Name);
             var deployedPair = await Deploy(k8SClient, cim, service.Name);
 
-            service.ServiceStatus = ServiceStatus.Idle.GetStringValue();
+            service.SetStatus(ServiceStatus.Idle);
             service.ServiceInstanceId = deployedPair.InstanceId;
             _logger.LogDebug("Deployed the image {Name} with the Id {ServiceInstanceId}", service.Name,
                 service.ServiceInstanceId);
@@ -491,6 +495,7 @@ public class DeploymentService : IDeploymentService
 
         foreach (var service in services.Items)
             //var version = await kubeClient.Version.GetCodeWithHttpMessagesAsync();
+        {
             try
             {
                 await kubeClient.CoreV1.DeleteNamespacedServiceAsync(service.Name(), AppConfig.K8SNamespaceName);
@@ -499,6 +504,7 @@ public class DeploymentService : IDeploymentService
             {
                 // ignored
             }
+        }
 
 
         return retVal;
