@@ -1,12 +1,10 @@
 ﻿using Microsoft.Extensions.Options;
 using Middleware.Common.Config;
 using Middleware.Common.Enums;
-using Middleware.DataAccess.Repositories;
 using Middleware.DataAccess.Repositories.Abstract;
 using Middleware.Models.Domain;
 using Middleware.Models.Domain.Slice;
 using Middleware.Models.Enums;
-using Middleware.RedisInterface.Contracts.Requests;
 using Middleware.RedisInterface.Services.Abstract;
 
 namespace Middleware.RedisInterface.Services;
@@ -61,6 +59,48 @@ public class SliceService : ISliceService
     public Task<SliceModel> GetByIdAsync(Guid id)
     {
         return _sliceRepository.GetByIdAsync(id);
+    }
+
+    /// <summary>
+    ///     Add new slice
+    /// </summary>
+    /// <param name="embbSlice"></param>
+    /// <returns></returns>
+    public async Task SliceAddAsync(SliceModel embbSlice)
+    {
+        await _sliceRepository.AddAsync(embbSlice);
+    }
+
+    /// <summary>
+    ///     Update slice
+    /// </summary>
+    /// <param name="embbSlice"></param>
+    /// <returns></returns>
+    /// <exception cref="NotImplementedException"></exception>
+    public async Task SliceUpdateAsync(SliceModel embbSlice)
+    {
+        await _sliceRepository.UpdateAsync(embbSlice);
+    }
+
+    /// <summary>
+    ///     Delete slice
+    /// </summary>
+    /// <param name="id"></param>
+    /// <returns></returns>
+    /// <exception cref="NotImplementedException"></exception>
+    public async Task<bool> SliceDeleteAsync(Guid id)
+    {
+        return await _sliceRepository.DeleteByIdAsync(id);
+    }
+
+    /// <summary>
+    ///     Get Slice by its internal SliceId
+    /// </summary>
+    /// <param name="id"></param>
+    /// <returns></returns>
+    public async Task<SliceModel> GetBySliceIdAsync(string id)
+    {
+        return await _sliceRepository.FindSingleAsync(slice => slice.Name == id);
     }
 
     /// <summary>
@@ -150,75 +190,5 @@ public class SliceService : ISliceService
             locationData = await _edgeRepository.GetEdgeResourceDetailsByNameAsync(location.Name);
 
         return locationData;
-    }
-
-    /// <summary>
-    ///   Add new embb slice
-    /// </summary>
-    /// <param name="embbSlice"></param>
-    /// <returns></returns>
-    public async Task SliceAddEmbb(SliceModel embbSlice) 
-    {
-        await _sliceRepository.AddAsync(embbSlice);
-    }
-
-    /// <summary>
-    ///  Add new urllc slice
-    /// </summary>
-    /// <param name="urllcSlice"></param>
-    /// <returns></returns>
-    public async Task SliceAddUrllc(SliceModel urllcSlice) 
-    {
-        await _sliceRepository.AddAsync(urllcSlice);
-    }
-
-
-    /// <summary>
-    /// Update embbslice
-    /// </summary>
-    /// <param name="embbSlice"></param>
-    /// <returns></returns>
-    /// <exception cref="NotImplementedException"></exception>
-    public async Task SliceUpdateEmbb(SliceModel embbSlice) 
-    {
-        await _sliceRepository.UpdateAsync(embbSlice);
-    }
-
-    /// <summary>
-    /// Update urllc slice
-    /// </summary>
-    /// <param name="urllcSlice"></param>
-    /// <returns></returns>
-    /// <exception cref="NotImplementedException"></exception>
-    public async Task SliceUpdateUrllc(SliceModel urllcSlice) 
-    {
-        await _sliceRepository.UpdateAsync(urllcSlice);
-    }
-
-    /// <summary>
-    /// Delete embb slice
-    /// </summary>
-    /// <param name="id"></param>
-    /// <returns></returns>
-    /// <exception cref="NotImplementedException"></exception>
-    public async Task<bool> SliceDeleteEmbb(Guid id) 
-    {
-        return await _sliceRepository.DeleteByIdAsync(id);
-    }
-
-    /// <summary>
-    /// Delete urllc slice
-    /// </summary>
-    /// <param name="id"></param>
-    /// <returns></returns>
-    /// <exception cref="NotImplementedException"></exception>
-    public async Task<bool> SliceDeleteUrllc(Guid id) 
-    {
-        return await _sliceRepository.DeleteByIdAsync(id);
-    }
-
-    public async Task<SliceModel> GetBySliceIdAsync(string id) 
-    {
-        return await _sliceRepository.FindSingleAsync(slice => slice.Name == id);
     }
 }

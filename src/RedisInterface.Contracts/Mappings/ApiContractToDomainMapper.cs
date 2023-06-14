@@ -415,10 +415,11 @@ public static class ApiContractToDomainMapper
         };
     }
 
-    public static SliceModel ToSlice(this SliceRequest s)
+    public static SliceModel ToSlice(this SliceRequest s, Guid? id = null)
     {
-        return new SliceModel
+        return new()
         {
+            Id = id ?? Guid.NewGuid(),
             Name = s.SliceId,
             Site = s.Site,
             ExpDataRateDl = s.ExpDataRateDl,
