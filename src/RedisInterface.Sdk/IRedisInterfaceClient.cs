@@ -1,4 +1,6 @@
 using Middleware.Models.Domain;
+using Middleware.Models.Domain.Slice;
+using Middleware.RedisInterface.Contracts.Requests;
 using Middleware.RedisInterface.Contracts.Responses;
 
 namespace Middleware.RedisInterface.Sdk;
@@ -194,4 +196,8 @@ public interface IRedisInterfaceClient
     /// </summary>
     /// <returns></returns>
     Task<SliceResponse?> SliceGetByIdAsync(Guid id);
+
+    Task<SliceResponse?> GetBySliceIdAsync(string id);
+
+    Task<bool> SliceAddAsync(SliceRequest slice); 
 }

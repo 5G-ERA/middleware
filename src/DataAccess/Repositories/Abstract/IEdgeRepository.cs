@@ -1,9 +1,10 @@
 ﻿using System.Collections.Immutable;
 using Middleware.Models.Domain;
+using Middleware.Models.Dto;
 
 namespace Middleware.DataAccess.Repositories.Abstract
 {
-    public interface IEdgeRepository : IBaseRepository<EdgeModel>, IRelationRepository
+    public interface IEdgeRepository : IRedisRepository<EdgeModel, EdgeDto>, IRelationRepository
     {
         Task<EdgeModel> PatchEdgeAsync(Guid id, EdgeModel patch);
         Task<List<EdgeModel>> GetFreeEdgesIdsAsync(List<EdgeModel> listofEdgesConnectedtoRobot);

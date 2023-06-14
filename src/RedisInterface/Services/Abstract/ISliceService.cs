@@ -17,7 +17,17 @@ internal interface ISliceService
 
     Task<SliceModel> GetByIdAsync(Guid id);
 
+    Task<SliceModel> GetBySliceIdAsync(string id);
+
     Task SliceAddEmbb(SliceModel embbSlice);
 
     Task SliceAddUrllc(SliceModel urllcSlice);
+
+    Task SliceUpdateEmbb(SliceModel embbSlice);
+
+    Task SliceUpdateUrllc(SliceModel urllcSlice);
+
+    Task<bool> SliceDeleteEmbb(Guid id);
+
+    Task<bool> SliceDeleteUrllc(Guid id);
 }

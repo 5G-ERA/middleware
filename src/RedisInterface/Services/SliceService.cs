@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.Options;
 using Middleware.Common.Config;
 using Middleware.Common.Enums;
+using Middleware.DataAccess.Repositories;
 using Middleware.DataAccess.Repositories.Abstract;
 using Middleware.Models.Domain;
 using Middleware.Models.Domain.Slice;
@@ -169,5 +170,55 @@ public class SliceService : ISliceService
     public async Task SliceAddUrllc(SliceModel urllcSlice) 
     {
         await _sliceRepository.AddAsync(urllcSlice);
+    }
+
+
+    /// <summary>
+    /// Update embbslice
+    /// </summary>
+    /// <param name="embbSlice"></param>
+    /// <returns></returns>
+    /// <exception cref="NotImplementedException"></exception>
+    public async Task SliceUpdateEmbb(SliceModel embbSlice) 
+    {
+        await _sliceRepository.UpdateAsync(embbSlice);
+    }
+
+    /// <summary>
+    /// Update urllc slice
+    /// </summary>
+    /// <param name="urllcSlice"></param>
+    /// <returns></returns>
+    /// <exception cref="NotImplementedException"></exception>
+    public async Task SliceUpdateUrllc(SliceModel urllcSlice) 
+    {
+        await _sliceRepository.UpdateAsync(urllcSlice);
+    }
+
+    /// <summary>
+    /// Delete embb slice
+    /// </summary>
+    /// <param name="id"></param>
+    /// <returns></returns>
+    /// <exception cref="NotImplementedException"></exception>
+    public async Task<bool> SliceDeleteEmbb(Guid id) 
+    {
+        return await _sliceRepository.DeleteByIdAsync(id);
+    }
+
+    /// <summary>
+    /// Delete urllc slice
+    /// </summary>
+    /// <param name="id"></param>
+    /// <returns></returns>
+    /// <exception cref="NotImplementedException"></exception>
+    public async Task<bool> SliceDeleteUrllc(Guid id) 
+    {
+        return await _sliceRepository.DeleteByIdAsync(id);
+    }
+
+    public async Task<SliceModel> GetBySliceIdAsync(string id) 
+    {
+        return await _sliceRepository.FindSingleAsync(slice => slice.Name == id);
     }
 }
