@@ -55,17 +55,18 @@ internal class SliceManager : ISliceManager
         }
 
         // when it is connected to the correct slice already
-        if (connectedSlices.Count > 0 && connectedSlices.First().PointsTo.Name == sliceId)
+        if (connectedSlices.Count == 1 && connectedSlices.First().PointsTo.Name == sliceId)
             return;
 
         // when it is connected to a different slice[s]
-        //      add connection to a new slice
-        await ConnectRobotToSlice(robot, slice, imsi);
         //      delete connection from the previous slice[s] (should always be connected to a single slice)
         foreach (var relation in connectedSlices)
         {
             await DeleteRobotConnectionToSlice(robot, imsi, relation.PointsTo.Name);
         }
+
+        //      add connection to a new slice
+        await ConnectRobotToSlice(robot, slice, imsi);
     }
 
     private async Task DeleteRobotConnectionToSlice(RobotModel robot, string imsi, string sliceName)
