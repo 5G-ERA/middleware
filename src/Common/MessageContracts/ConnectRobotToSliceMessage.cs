@@ -2,6 +2,7 @@
 
 public record ConnectRobotToSliceMessage : Message
 {
+    public Guid RobotId { get; init; }
     public string Location { get; init; }
 
     public string Imsi { get; init; }

@@ -52,7 +52,8 @@ public class PublishingService : IPublishService
         {
             if (actionTmp.HasLocationWithNetWorkSliceSet() && string.IsNullOrEmpty(robot.SimCardNumber) == false)
             {
-                await PublishConnectImsiToSlice(task.ActionPlanId, robot.SimCardNumber, actionTmp.NetworkSlice,
+                await PublishConnectImsiToSlice(robot.Id, task.ActionPlanId, robot.SimCardNumber,
+                    actionTmp.NetworkSlice,
                     actionTmp.Placement,
                     actionTmp.PlacementType);
             }
@@ -92,7 +93,8 @@ public class PublishingService : IPublishService
         await _switchoverDeployInstancePublisher.PublishAsync(payload);
     }
 
-    public async Task PublishConnectImsiToSlice(Guid actionPlanId, string imsi, string slice, string location,
+    public async Task PublishConnectImsiToSlice(Guid robotId, Guid actionPlanId, string imsi, string slice,
+        string location,
         string locationType)
     {
         var response = await _centralApiClient.GetAvailableLocations();
@@ -104,6 +106,7 @@ public class PublishingService : IPublishService
 
         var payload = new ConnectRobotToSliceMessage
         {
+            RobotId = robotId,
             ActionPlanId = actionPlanId,
             Imsi = imsi,
             Slice = slice,

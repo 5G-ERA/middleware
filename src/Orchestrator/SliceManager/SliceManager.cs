@@ -1,6 +1,7 @@
-﻿using Middleware.Orchestrator.SliceManager.Contracts;
+﻿using Middleware.Models.Domain;
+using Middleware.Models.Domain.Slice;
+using Middleware.Orchestrator.SliceManager.Contracts;
 using Middleware.RedisInterface.Contracts.Mappings;
-using Middleware.RedisInterface.Contracts.Responses;
 using Middleware.RedisInterface.Sdk;
 
 namespace Middleware.Orchestrator.SliceManager;
@@ -8,17 +9,23 @@ namespace Middleware.Orchestrator.SliceManager;
 internal class SliceManager : ISliceManager
 {
     private readonly bool _isSliceManagerAvailable;
-    private readonly ISliceManagerApi _sliceManagerApi;
     private readonly IRedisInterfaceClient _redisInterfaceClient;
+    private readonly ISliceManagerApi _sliceManagerApi;
 
-    public SliceManager(ISliceManagerApi sliceManagerApi, bool isSliceManagerAvailable)
+    public SliceManager(ISliceManagerApi sliceManagerApi, bool isSliceManagerAvailable,
+        IRedisInterfaceClient redisInterfaceClient)
     {
         _sliceManagerApi = sliceManagerApi;
         _isSliceManagerAvailable = isSliceManagerAvailable;
+        _redisInterfaceClient = redisInterfaceClient;
     }
 
-    public async Task AttachImsiToSlice(string imsi, string sliceId, int dataRateUpLink, int dataRateDownLink)
+    public async Task AttachImsiToSlice(Guid robotId, string imsi, string sliceId, int dataRateUpLink,
+        int dataRateDownLink)
     {
+        if (!_isSliceManagerAvailable)
+            return;
+
         var request = new AttachImsiToSliceRequest
         {
             Imsi = imsi,
@@ -30,30 +37,74 @@ internal class SliceManager : ISliceManager
         await _sliceManagerApi.AttachImsiToSlice(request);
 
         //get the slice by the id
-        SliceResponse sliceResponse = await _redisInterfaceClient.GetBySliceIdAsync(sliceId);
+        var slice = await GetSlice(sliceId);
+        var robot = await GetValue(robotId);
 
-        if (sliceResponse == null) return; 
-        var slice = sliceResponse.ToSlice();
-        //attach the new imsi to the specific slice
-        
-        if (slice.Imsi != null) 
+        if (slice is null || robot is null) return;
+
+        // check robot is connected to slice
+        var connectedSlices =
+            await _redisInterfaceClient.GetRelationAsync(robot, "CONNECTED_TO");
+
+
+        if (connectedSlices is null || connectedSlices.Count == 0)
         {
-            var exists = false;
-            foreach (var item in slice.Imsi)
-            {
-                if (item == imsi) 
-                {
-                    exists = true;
-                    break;
-                }
-            }    
-            if (!exists)
-            {
-                slice.Imsi.Add(imsi);
-            }
+            //attach the new imsi to the specific slice
+            await ConnectRobotToSlice(robot, slice, imsi);
+            return;
         }
+
+        // when it is connected to the correct slice already
+        if (connectedSlices.Count > 0 && connectedSlices.First().PointsTo.Name == sliceId)
+            return;
+
+        // when it is connected to a different slice[s]
+        //      add connection to a new slice
+        await ConnectRobotToSlice(robot, slice, imsi);
+        //      delete connection from the previous slice[s] (should always be connected to a single slice)
+        foreach (var relation in connectedSlices)
+        {
+            await DeleteRobotConnectionToSlice(robot, imsi, relation.PointsTo.Name);
+        }
+    }
+
+    private async Task DeleteRobotConnectionToSlice(RobotModel robot, string imsi, string sliceName)
+    {
+        var sliceResp = await _redisInterfaceClient.GetBySliceIdAsync(sliceName);
+        if (sliceResp is null) return;
+        var slice = sliceResp.ToSlice();
+
+        slice.Imsi.Remove(imsi);
+        await UpdateSlice(slice);
+
+        await _redisInterfaceClient.DeleteRelationAsync(robot, slice, "CONNECTED_TO");
+    }
+
+    private async Task ConnectRobotToSlice(RobotModel robot, SliceModel slice, string imsi)
+    {
+        slice.Imsi.Add(imsi);
         //store this slice in redis
+        await UpdateSlice(slice);
+        await _redisInterfaceClient.AddRelationAsync(robot, slice, "CONNECTED_TO");
+    }
+
+    private async Task UpdateSlice(SliceModel slice)
+    {
         var sliceRequest = slice.ToSliceRequest();
         await _redisInterfaceClient.SliceAddAsync(sliceRequest);
+    }
+
+    private async Task<RobotModel> GetValue(Guid robotId)
+    {
+        var robotResp = await _redisInterfaceClient.RobotGetByIdAsync(robotId);
+        var robot = robotResp?.ToRobot();
+        return robot;
+    }
+
+    private async Task<SliceModel> GetSlice(string sliceId)
+    {
+        var sliceResponse = await _redisInterfaceClient.GetBySliceIdAsync(sliceId);
+        var slice = sliceResponse?.ToSlice();
+        return slice;
     }
 }

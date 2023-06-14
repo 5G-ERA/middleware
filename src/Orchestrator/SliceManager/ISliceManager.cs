@@ -10,5 +10,5 @@ internal interface ISliceManager
     /// <param name="dataRateUpLink"></param>
     /// <param name="dataRateDownLink"></param>
     /// <returns></returns>
-    Task AttachImsiToSlice(string imsi, string sliceId, int dataRateUpLink, int dataRateDownLink);
+    Task AttachImsiToSlice(Guid robotId, string imsi, string sliceId, int dataRateUpLink, int dataRateDownLink);
 }
