@@ -3,12 +3,14 @@ using AutoMapper;
 using k8s;
 using k8s.Models;
 using Middleware.Common.Config;
-using Middleware.Common.Enums;
 using Middleware.Common.ExtensionMethods;
-using Middleware.Models.Domain;
+using Middleware.Models.Enums;
 using Middleware.Orchestrator.Deployment;
+using Middleware.Orchestrator.RedisInterface;
 using Middleware.RedisInterface.Sdk;
 using Quartz;
+using ActionPlanModel = Middleware.Models.Domain.ActionPlanModel;
+using InstanceModel = Middleware.Models.Domain.InstanceModel;
 
 namespace Middleware.Orchestrator.Jobs;
 
@@ -17,8 +19,8 @@ public class UpdateStatusJob : BaseJob<UpdateStatusJob>
 {
     private readonly IKubernetesBuilder _kubeBuilder;
     private readonly IMapper _mapper;
-    private readonly IRedisInterfaceClient _redisInterfaceClient;
     private readonly MiddlewareConfig _middlewareConfig;
+    private readonly IRedisInterfaceClient _redisInterfaceClient;
 
     public UpdateStatusJob(IKubernetesBuilder kubeBuilder,
         IMapper mapper,
@@ -36,24 +38,26 @@ public class UpdateStatusJob : BaseJob<UpdateStatusJob>
     {
         try
         {
-            var sequences= await _redisInterfaceClient.ActionPlanGetAllAsync();
+            var sequences = await _redisInterfaceClient.ActionPlanGetAllAsync();
+
+            if (sequences is null) return;
+
             var kubeClient = _kubeBuilder.CreateKubernetesClient();
             foreach (var seq in sequences)
             {
                 try
                 {
-                    var updatedSeq = await ValidateSequenceStatusAsync(seq, kubeClient);
-                    // List<string> statuses = updatedSeq.ActionSequence
-                    //     .SelectMany(a => a.Services.Select(s => s.ServiceStatus)).ToList();
-                    // if (statuses.Any(s => s != ServiceStatus.Down.GetStringValue()) == false)
-                    // {
-                    //     await _redisApiClient.ActionPlanDeleteAsync(updatedSeq.Id);
-                    //     continue;
-                    // }
-
-                    if (updatedSeq is null)
+                    if (SequenceIsNotRunning(seq))
+                    {
+                        Logger.LogInformation("Deleting inactive ActionPlan");
+                        await _redisInterfaceClient.ActionPlanDeleteAsync(seq.Id);
                         continue;
-                    
+                    }
+
+                    var updatedSeq = await ValidateSequenceStatusAsync(seq, kubeClient);
+
+                    if (updatedSeq is null) continue;
+
                     await _redisInterfaceClient.ActionPlanAddAsync(updatedSeq);
                 }
                 catch (Exception ex)
@@ -64,7 +68,7 @@ public class UpdateStatusJob : BaseJob<UpdateStatusJob>
                 }
             }
         }
-        catch (RedisInterface.ApiException<RedisInterface.ApiResponse> apiEx)
+        catch (ApiException<ApiResponse> apiEx)
         {
             if (apiEx.StatusCode == (int)HttpStatusCode.NotFound)
             {
@@ -81,15 +85,24 @@ public class UpdateStatusJob : BaseJob<UpdateStatusJob>
         }
     }
 
-    private async Task<ActionPlanModel?> ValidateSequenceStatusAsync(ActionPlanModel seq, IKubernetes kubeClient)
+    private bool SequenceIsNotRunning(ActionPlanModel seq)
     {
-        bool validated = false;
+        var statuses = seq.ActionSequence
+            .SelectMany(a => a.Services.Select(s => s.CanBeDeleted())).ToList();
+
+        return statuses.All(b => b);
+    }
+
+    private async Task<ActionPlanModel> ValidateSequenceStatusAsync(ActionPlanModel seq, IKubernetes kubeClient)
+    {
+        var validated = false;
         //check if all instances are down for at least half an hour, then terminate
         foreach (var action in seq.ActionSequence)
         {
-            if (action.Placement != _middlewareConfig.InstanceName || action.PlacementType != _middlewareConfig.InstanceType)  
+            if (action.Placement != _middlewareConfig.InstanceName ||
+                action.PlacementType != _middlewareConfig.InstanceType)
                 continue;
-            
+
             foreach (var instance in action.Services)
             {
                 var instanceId = instance.ServiceInstanceId;
@@ -111,12 +124,13 @@ public class UpdateStatusJob : BaseJob<UpdateStatusJob>
 
     private void ValidateDeploymentStatus(V1DeploymentList deployments, InstanceModel instance)
     {
-        ServiceStatus tmpStatus = ServiceStatus.Down;
+        var tmpStatus = ServiceStatus.Down;
         var deployment = deployments.Items.FirstOrDefault();
 
         if (deployment is null)
         {
-            instance.ServiceStatus = tmpStatus.ToString();
+            if (instance.ServiceStatus != tmpStatus.ToString())
+                instance.SetStatus(tmpStatus);
             return;
         }
 
@@ -124,34 +138,24 @@ public class UpdateStatusJob : BaseJob<UpdateStatusJob>
 
         if (deploymentStatus.Replicas.HasValue == false)
         {
-            instance.ServiceStatus = ServiceStatus.Down.ToString();
+            instance.SetStatus(ServiceStatus.Down);
             return;
         }
 
-        if (deploymentStatus.Replicas.Value == default)
-        {
-            tmpStatus = ServiceStatus.Terminating;
-        }
+        if (deploymentStatus.Replicas.Value == default) tmpStatus = ServiceStatus.Terminating;
 
         if (deploymentStatus.Replicas == deploymentStatus.AvailableReplicas)
-        {
             tmpStatus = ServiceStatus.Active;
-        }
         else if (deploymentStatus.Replicas > deploymentStatus.AvailableReplicas)
-        {
             tmpStatus = ServiceStatus.Instantiating;
-        }
 
-        instance.ServiceStatus = tmpStatus.GetStringValue();
+        instance.SetStatus(tmpStatus);
     }
 
     private void UpdateServiceStatus(V1ServiceList services, InstanceModel instance)
     {
         var service = services.Items.FirstOrDefault();
-        if (service is null)
-        {
-            return;
-        }
+        if (service is null) return;
 
         var address = service.GetExternalAddress(Logger);
         if (string.IsNullOrEmpty(address) == false)
