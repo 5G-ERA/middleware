@@ -38,7 +38,7 @@ internal class SliceManager : ISliceManager
 
         //get the slice by the id
         var slice = await GetSlice(sliceId);
-        var robot = await GetValue(robotId);
+        var robot = await GetRobot(robotId);
 
         if (slice is null || robot is null) return;
 
@@ -95,7 +95,7 @@ internal class SliceManager : ISliceManager
         await _redisInterfaceClient.SliceAddAsync(sliceRequest);
     }
 
-    private async Task<RobotModel> GetValue(Guid robotId)
+    private async Task<RobotModel> GetRobot(Guid robotId)
     {
         var robotResp = await _redisInterfaceClient.RobotGetByIdAsync(robotId);
         var robot = robotResp?.ToRobot();

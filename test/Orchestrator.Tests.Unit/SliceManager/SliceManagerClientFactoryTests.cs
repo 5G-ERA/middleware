@@ -2,6 +2,7 @@
 using Microsoft.Extensions.Options;
 using Middleware.Common.Config;
 using Middleware.Orchestrator.SliceManager;
+using Middleware.RedisInterface.Sdk;
 using NSubstitute;
 using Xunit;
 
@@ -11,11 +12,12 @@ namespace Orchestrator.Tests.Unit.SliceManager;
 public class SliceManagerClientFactoryTests
 {
     private readonly IOptions<SliceConfig> _mwOptions = Substitute.For<IOptions<SliceConfig>>();
+    private readonly IRedisInterfaceClient _redisInterfaceClient = Substitute.For<IRedisInterfaceClient>();
     private readonly SliceManagerClientFactory _sut;
 
     public SliceManagerClientFactoryTests()
     {
-        _sut = new(_mwOptions);
+        _sut = new(_mwOptions, _redisInterfaceClient);
     }
 
     [Theory]
