@@ -1,4 +1,5 @@
 ﻿using FluentAssertions;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Middleware.Common.Config;
 using Middleware.DataAccess.Repositories.Abstract;
@@ -15,13 +16,14 @@ public class SliceServiceTests
 {
     private readonly ICloudRepository _cloudRepository = Substitute.For<ICloudRepository>();
     private readonly IEdgeRepository _edgeRepository = Substitute.For<IEdgeRepository>();
+    private readonly ILogger<SliceService> _logger = Substitute.For<ILogger<SliceService>>();
     private readonly IOptions<MiddlewareConfig> _mwOptions = Substitute.For<IOptions<MiddlewareConfig>>();
     private readonly ISliceRepository _sliceRepository = Substitute.For<ISliceRepository>();
     private readonly SliceService _sut;
 
     public SliceServiceTests()
     {
-        _sut = new(_edgeRepository, _cloudRepository, _sliceRepository, _mwOptions);
+        _sut = new(_edgeRepository, _cloudRepository, _sliceRepository, _mwOptions, _logger);
     }
 
     [Fact]

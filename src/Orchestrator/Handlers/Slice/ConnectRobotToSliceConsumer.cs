@@ -31,6 +31,6 @@ internal class ConnectRobotToSliceConsumer : IConsumer<ConnectRobotToSliceMessag
 
         var slice = _sliceManagerClientFactory.CreateSliceManagerClient();
         //TODO: select correct values for up link and down link
-        await slice.AttachImsiToSlice(message.Imsi, message.Slice, 100, 100);
+        await slice.AttachImsiToSlice(message.RobotId, message.Imsi, message.Slice, 100, 100);
     }
 }

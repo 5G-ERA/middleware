@@ -1,17 +1,20 @@
 ﻿using Microsoft.Extensions.Options;
 using Middleware.Common.Config;
 using Middleware.Orchestrator.SliceManager.Contracts;
+using Middleware.RedisInterface.Sdk;
 using Refit;
 
 namespace Middleware.Orchestrator.SliceManager;
 
 internal class SliceManagerClientFactory : ISliceManagerClientFactory
 {
+    private readonly IRedisInterfaceClient _redisInterfaceClient;
     private readonly IOptions<SliceConfig> _sliceConfig;
 
-    public SliceManagerClientFactory(IOptions<SliceConfig> sliceConfig)
+    public SliceManagerClientFactory(IOptions<SliceConfig> sliceConfig, IRedisInterfaceClient redisInterfaceClient)
     {
         _sliceConfig = sliceConfig;
+        _redisInterfaceClient = redisInterfaceClient;
     }
 
     public bool IsSlicingAvailable()
@@ -27,6 +30,6 @@ internal class SliceManagerClientFactory : ISliceManagerClientFactory
 
         var client = RestService.For<ISliceManagerApi>(_sliceConfig.Value.Hostname);
 
-        return new SliceManager(client, IsSlicingAvailable());
+        return new SliceManager(client, IsSlicingAvailable(), _redisInterfaceClient);
     }
 }

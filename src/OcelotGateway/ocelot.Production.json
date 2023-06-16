@@ -45,6 +45,18 @@
       },
       "UpstreamHttpMethod": [ "GET", "POST", "PUT", "PATCH", "DELETE" ]
     },
+    {
+      "DownstreamPathTemplate": "/api/v1/slice/{all}",
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "redisinterface.api",
+          "Port": "80"
+        }
+      ],
+      "UpstreamPathTemplate": "/api/v1/sliceInventory/SB/reportSliceParameters/{all}",
+      "UpstreamHttpMethod": [ "POST", "PUT", "DELETE" ]
+    },
     //TaskPlanner API
     {
       "DownstreamPathTemplate": "/api/v1/{all}",

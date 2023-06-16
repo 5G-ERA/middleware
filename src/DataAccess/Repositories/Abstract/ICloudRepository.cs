@@ -1,9 +1,10 @@
 ﻿using System.Collections.Immutable;
 using Middleware.Models.Domain;
+using Middleware.Models.Dto;
 
 namespace Middleware.DataAccess.Repositories.Abstract
 {
-    public interface ICloudRepository : IBaseRepository<CloudModel>, IRelationRepository
+    public interface ICloudRepository : IRedisRepository<CloudModel, CloudDto>, IRelationRepository
     {
         Task<CloudModel> PatchCloudAsync(Guid id, CloudModel patch);
 

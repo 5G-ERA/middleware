@@ -89,4 +89,10 @@ public interface IRedisInterface
 
     [Get("/api/v1/task/{id}")]
     Task<ApiResponse<TaskResponse?>> TaskGetById(Guid id);
+
+    [Get("/api/v1/slice")]
+    Task<ApiResponse<SliceResponse?>> GetBySliceIdAsync(string id);
+
+    [Post("/api/v1/slice/embb")] //doesn't matter if we add it to embb or urllc
+    Task<ApiResponse<SliceResponse?>> SliceAddAsync(SliceRequest slice);
 }

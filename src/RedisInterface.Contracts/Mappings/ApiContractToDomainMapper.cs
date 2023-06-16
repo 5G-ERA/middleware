@@ -415,6 +415,24 @@ public static class ApiContractToDomainMapper
         };
     }
 
+    public static SliceModel ToSlice(this SliceRequest s, Guid? id = null)
+    {
+        return new()
+        {
+            Id = id ?? Guid.NewGuid(),
+            Name = s.SliceId,
+            Site = s.Site,
+            ExpDataRateDl = s.ExpDataRateDl,
+            ExpDataRateUl = s.ExpDataRateUl,
+            Jitter = s.Jitter,
+            Latency = s.Latency,
+            UserDensity = s.UserDensity,
+            UserSpeed = s.UserSpeed,
+            TrafficType = Enum.Parse<TrafficType>(s.TrafficType, true),
+            Imsi = s.Imsi.ToList()
+        };
+    }
+
     public static Location ToLocation(this LocationRequest x)
     {
         return new()

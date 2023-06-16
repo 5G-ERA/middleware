@@ -1,11 +1,14 @@
 using System.Collections.Immutable;
+using System.Linq.Expressions;
 using System.Text.Json;
 using Microsoft.Extensions.Logging;
 using Middleware.Common.Enums;
 using Middleware.DataAccess.Repositories.Abstract;
 using Middleware.Models.Domain;
+using Middleware.Models.Dto;
 using Middleware.Models.Enums;
 using NReJSON;
+using Redis.OM.Searching;
 using RedisGraphDotNet.Client;
 using StackExchange.Redis;
 
@@ -220,6 +223,26 @@ namespace Middleware.DataAccess.Repositories
         /// <param name="address"></param>
         /// <returns></returns>
         public async Task<(bool, CloudModel?)> CheckIfIdExists(string id)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task DeleteAsync(CloudModel model)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<List<CloudModel>> FindAsync(Expression<Func<CloudDto, bool>> predicate)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<CloudModel?> FindSingleAsync(Expression<Func<CloudDto, bool>> predicate)
+        {
+            throw new NotImplementedException();
+        }
+
+        public IRedisCollection<CloudDto> FindQuery(Expression<Func<CloudDto, bool>> predicate)
         {
             throw new NotImplementedException();
         }
