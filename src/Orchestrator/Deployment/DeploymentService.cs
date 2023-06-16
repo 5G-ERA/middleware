@@ -2,7 +2,6 @@
 using k8s.Autorest;
 using k8s.Models;
 using Microsoft.Extensions.Options;
-using Middleware.Common;
 using Middleware.Common.Config;
 using Middleware.Common.Enums;
 using Middleware.Common.ExtensionMethods;
@@ -16,19 +15,9 @@ using Middleware.RedisInterface.Sdk;
 
 namespace Middleware.Orchestrator.Deployment;
 
-public class DeploymentService : IDeploymentService
+internal class DeploymentService : IDeploymentService
 {
-    private readonly IConfiguration _configuration;
-
-    /// <summary>
-    ///     Name of the container registry used
-    /// </summary>
-    private readonly string _containerRegistryName;
-
-    /// <summary>
-    ///     Environments access to the configuration of a pod
-    /// </summary>
-    private readonly IEnvironment _env;
+    private readonly IKubernetesObjectBuilder _kubeObjectBuilder;
 
     /// <summary>
     ///     Kubernetes client connection builder
@@ -48,27 +37,24 @@ public class DeploymentService : IDeploymentService
     private readonly IRedisInterfaceClient _redisInterfaceClient;
 
     public DeploymentService(IKubernetesBuilder kubernetesBuilder,
-        IEnvironment env,
         ILogger<DeploymentService> logger,
         IRedisInterfaceClient redisInterfaceClient,
-        IConfiguration configuration,
-        IOptions<MiddlewareConfig> mwConfig)
+        IOptions<MiddlewareConfig> mwConfig,
+        IKubernetesObjectBuilder kubeObjectBuilder)
     {
         _kubernetesBuilder = kubernetesBuilder;
-        _env = env;
         _logger = logger;
         _redisInterfaceClient = redisInterfaceClient;
-        _configuration = configuration;
         _mwConfig = mwConfig;
-        _containerRegistryName = _env.GetEnvVariable("IMAGE_REGISTRY") ?? "ghcr.io/5g-era";
+        _kubeObjectBuilder = kubeObjectBuilder;
     }
 
     /// <inheritdoc />
     public async Task<bool> DeployAsync(TaskModel task, Guid robotId)
     {
-        var robotResposne = await _redisInterfaceClient.RobotGetByIdAsync(robotId);
+        var robotResponse = await _redisInterfaceClient.RobotGetByIdAsync(robotId);
 
-        var robot = robotResposne.ToRobot();
+        var robot = robotResponse.ToRobot();
         var isSuccess = true;
         try
         {
@@ -132,31 +118,9 @@ public class DeploymentService : IDeploymentService
     }
 
     /// <inheritdoc />
-    public V1Service CreateService(string serviceImageName, K8SServiceKindEnum kind, V1ObjectMeta meta)
+    public V1Service CreateStartupService(string serviceImageName, K8SServiceKindEnum kind, V1ObjectMeta meta)
     {
-        var spec = new V1ServiceSpec
-        {
-            Ports = new List<V1ServicePort>
-            {
-                new(80, "TCP", "http", null, "TCP", 80),
-                new(443, "TCP", "https", null, "TCP", 80)
-            },
-            Selector = new Dictionary<string, string> { { "app", serviceImageName } },
-            Type = kind.GetStringValue()
-        };
-
-        var service = new V1Service
-        {
-            Metadata = new()
-            {
-                Name = meta.Name,
-                Labels = meta.Labels
-            },
-            ApiVersion = "v1",
-            Spec = spec,
-            Kind = "Service"
-        };
-        return service;
+        return _kubeObjectBuilder.CreateStartupService(serviceImageName, kind, meta);
     }
 
     /// <inheritdoc />
@@ -208,7 +172,7 @@ public class DeploymentService : IDeploymentService
             ? (await _redisInterfaceClient.GetCloudByNameAsync(_mwConfig.Value.InstanceName)).ToCloud()
             : (await _redisInterfaceClient.GetEdgeByNameAsync(_mwConfig.Value.InstanceName)).ToEdge();
 
-        foreach (var instance in action.Services!)
+        foreach (var instance in action.Services)
         {
             _logger.LogDebug("Deleting instance '{0}', with serviceInstanceId '{1}'",
                 instance.Name, instance.ServiceInstanceId);
@@ -244,9 +208,15 @@ public class DeploymentService : IDeploymentService
             ? (await _redisInterfaceClient.GetCloudByNameAsync(_mwConfig.Value.InstanceName)).ToCloud()
             : (await _redisInterfaceClient.GetEdgeByNameAsync(_mwConfig.Value.InstanceName)).ToEdge();
 
-        foreach (var instance in action.Services!)
+        var instanceNames = action.Services.Select(s => s.Name);
+        // evaluate potential addresses 
+        // pass the addresses to the deployment 
+        // always expose service through NodePort?
+        // 
+
+        foreach (var instance in action.Services)
         {
-            _logger.LogDebug("Deploying instance '{0}', with serviceInstanceId '{1}'",
+            _logger.LogDebug("Deploying instance '{Name}', with serviceInstanceId '{ServiceInstanceId}'",
                 instance.Name, instance.ServiceInstanceId);
             await DeployService(kubeClient, instance, deploymentNames);
 
@@ -264,67 +234,7 @@ public class DeploymentService : IDeploymentService
     /// <inheritdoc />
     public V1Deployment CreateStartupDeployment(string name, string tag)
     {
-        var mwConfig = _configuration.GetSection(MiddlewareConfig.ConfigName).Get<MiddlewareConfig>();
-        var selector = new V1LabelSelector
-        {
-            MatchLabels = new Dictionary<string, string> { { "app", name } }
-        };
-        var meta = new V1ObjectMeta
-        {
-            Name = name,
-            Labels = new Dictionary<string, string>
-            {
-                { "app", name }
-            }
-        };
-        var envList = new List<V1EnvVar>
-        {
-            new("Middleware__Organization", mwConfig.Organization),
-            new("Middleware__InstanceName", mwConfig.InstanceName),
-            new("Middleware__InstanceType", mwConfig.InstanceType),
-            new("CustomLogger__LoggerName", _env.GetEnvVariable("CustomLogger__LoggerName")),
-            new("CustomLogger__Url", _env.GetEnvVariable("CustomLogger__Url")),
-            new("CustomLogger__User", _env.GetEnvVariable("CustomLogger__User")),
-            new("CustomLogger__Password", _env.GetEnvVariable("CustomLogger__Password")),
-            new("Slice__Hostname", _env.GetEnvVariable("Slice__Hostname")),
-            new("RabbitMQ__Address", _env.GetEnvVariable("RabbitMQ__Address")),
-            new("RabbitMQ__User", _env.GetEnvVariable("RabbitMQ__User")),
-            new("RabbitMQ__Pass", _env.GetEnvVariable("RabbitMQ__Pass")),
-            new("CENTRAL_API_HOSTNAME", _env.GetEnvVariable("CENTRAL_API_HOSTNAME")),
-            new("AWS_ACCESS_KEY_ID", _env.GetEnvVariable("AWS_ACCESS_KEY_ID")),
-            new("AWS_SECRET_ACCESS_KEY", _env.GetEnvVariable("AWS_SECRET_ACCESS_KEY"))
-        };
-        if (name.Contains("redis") || name == "gateway")
-        {
-            envList.Add(new("Redis__HostName", _env.GetEnvVariable("Redis__HostName")));
-            envList.Add(new("Redis__ClusterHostname", _env.GetEnvVariable("Redis__ClusterHostname")));
-            envList.Add(new("Redis__Password", _env.GetEnvVariable("Redis__Password")));
-        }
-
-        var container = new V1Container
-        {
-            Name = name,
-            Image = K8SImageHelper.BuildImageName(_containerRegistryName, name, tag),
-            ImagePullPolicy = AppConfig.AppConfiguration == AppVersionEnum.Prod.GetStringValue()
-                ? "Always"
-                : "IfNotPresent",
-            Env = envList,
-            Ports = new List<V1ContainerPort> { new(80), new(433) }
-        };
-
-        var podSpec = new V1PodSpec(new List<V1Container> { container });
-
-        var template = new V1PodTemplateSpec(meta, podSpec);
-        var spec = new V1DeploymentSpec(selector, template);
-
-        var dep = new V1Deployment
-        {
-            Metadata = meta,
-            Spec = spec,
-            ApiVersion = "apps/v1",
-            Kind = "Deployment"
-        };
-        return dep;
+        return _kubeObjectBuilder.CreateStartupDeployment(name, tag);
     }
 
     /// <summary>
@@ -412,12 +322,7 @@ public class DeploymentService : IDeploymentService
     private async Task<T> Deploy<T>(IKubernetes k8SClient, string objectDefinition, string name, Guid instanceId,
         string propName = null) where T : class
     {
-        name = name.Replace(" ", "-")
-            .Replace('_', '-')
-            .Replace(':', '-')
-            .Replace('.', '-')
-            .Replace('/', '-')
-            .ToLower().Trim();
+        name = name.SanitizeAsK8sObjectName();
         var type = typeof(T);
 
         if (string.IsNullOrWhiteSpace(objectDefinition))
@@ -494,7 +399,6 @@ public class DeploymentService : IDeploymentService
         }
 
         foreach (var service in services.Items)
-            //var version = await kubeClient.Version.GetCodeWithHttpMessagesAsync();
         {
             try
             {
@@ -505,7 +409,6 @@ public class DeploymentService : IDeploymentService
                 // ignored
             }
         }
-
 
         return retVal;
     }
