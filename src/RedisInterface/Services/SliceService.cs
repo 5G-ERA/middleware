@@ -13,16 +13,18 @@ public class SliceService : ISliceService
 {
     private readonly ICloudRepository _cloudRepository;
     private readonly IEdgeRepository _edgeRepository;
+    private readonly ILogger _logger;
     private readonly IOptions<MiddlewareConfig> _middlewareConfig;
     private readonly ISliceRepository _sliceRepository;
 
     public SliceService(IEdgeRepository edgeRepository, ICloudRepository cloudRepository,
-        ISliceRepository sliceRepository, IOptions<MiddlewareConfig> middlewareConfig)
+        ISliceRepository sliceRepository, IOptions<MiddlewareConfig> middlewareConfig, ILogger<SliceService> logger)
     {
         _edgeRepository = edgeRepository;
         _cloudRepository = cloudRepository;
         _sliceRepository = sliceRepository;
         _middlewareConfig = middlewareConfig;
+        _logger = logger;
     }
 
     /// <summary>
@@ -62,13 +64,28 @@ public class SliceService : ISliceService
     }
 
     /// <summary>
-    ///     Add new slice
+    ///     Add new slice and connect it to the current Middleware location
     /// </summary>
-    /// <param name="embbSlice"></param>
+    /// <param name="slice"></param>
     /// <returns></returns>
-    public async Task SliceAddAsync(SliceModel embbSlice)
+    public async Task SliceAddAsync(SliceModel slice)
     {
-        await _sliceRepository.AddAsync(embbSlice);
+        await _sliceRepository.AddAsync(slice);
+
+        var location = await GetCurrentLocation();
+        var relation = new RelationModel
+        {
+            InitiatesFrom = new(location.Id, location.Name, location.GetType()),
+            RelationName = "OFFERS"
+        };
+        var pointsTo = new GraphEntityModel(slice.Id, slice.Name, slice.GetType());
+        relation.PointsTo = pointsTo;
+
+        await _sliceRepository.AddAsync(slice);
+        if (location.GetType() == typeof(CloudModel))
+            await _cloudRepository.AddRelationAsync(relation);
+        else if (location.GetType() == typeof(EdgeModel))
+            await _edgeRepository.AddRelationAsync(relation);
     }
 
     /// <summary>
@@ -83,14 +100,24 @@ public class SliceService : ISliceService
     }
 
     /// <summary>
-    ///     Delete slice
+    ///     Delete slice by Id
     /// </summary>
     /// <param name="id"></param>
     /// <returns></returns>
     /// <exception cref="NotImplementedException"></exception>
     public async Task<bool> SliceDeleteAsync(Guid id)
     {
-        return await _sliceRepository.DeleteByIdAsync(id);
+        try
+        {
+            var location = await GetCurrentLocation();
+            await DeleteExistingSlice(location, id);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "there was an error during the deletion of the Slice with id: {0}", id);
+        }
+
+        return true;
     }
 
     /// <summary>
@@ -101,6 +128,17 @@ public class SliceService : ISliceService
     public async Task<SliceModel> GetBySliceIdAsync(string id)
     {
         return await _sliceRepository.FindSingleAsync(slice => slice.Name == id);
+    }
+
+    public async Task<bool> DeleteBySliceId(string sliceId)
+    {
+        var location = await GetCurrentLocation();
+        var existingSlice = await GetBySliceIdAsync(sliceId);
+
+        if (existingSlice is null) return false;
+
+        await DeleteExistingSlice(location, existingSlice.Id);
+        return true;
     }
 
     /// <summary>
@@ -128,6 +166,30 @@ public class SliceService : ISliceService
                 await _edgeRepository.AddRelationAsync(relation);
 
             relation.PointsTo = null!;
+        }
+    }
+
+    private async Task DeleteExistingSlice(BaseModel location, Guid sliceId)
+    {
+        if (location.GetType() == typeof(CloudModel))
+        {
+            var relations = await _cloudRepository.GetRelation(location.Id, "OFFERS");
+            // should be only one
+            foreach (var relation in relations.Where(r => r.PointsTo.Id == sliceId))
+            {
+                await _cloudRepository.DeleteRelationAsync(relation);
+                await _sliceRepository.DeleteByIdAsync(relation.PointsTo.Id);
+            }
+        }
+        else if (location.GetType() == typeof(EdgeModel))
+        {
+            var relations = await _edgeRepository.GetRelation(location.Id, "OFFERS");
+            // should be only one
+            foreach (var relation in relations.Where(r => r.PointsTo.Id == sliceId))
+            {
+                await _edgeRepository.DeleteRelationAsync(relation);
+                await _sliceRepository.DeleteByIdAsync(relation.PointsTo.Id);
+            }
         }
     }
 

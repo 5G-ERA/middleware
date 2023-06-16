@@ -274,11 +274,11 @@ internal class SliceController : ControllerBase
     [ProducesResponseType(typeof(void), (int)HttpStatusCode.OK)]
     [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.NotFound)]
     [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.InternalServerError)]
-    public async Task<ActionResult> SliceDeleteEmbb(Guid id)
+    public async Task<ActionResult> SliceDeleteEmbb(string id)
     {
         try
         {
-            await _sliceService.SliceDeleteAsync(id);
+            await _sliceService.(id);
             return Ok();
         }
         catch (Exception ex)
@@ -295,7 +295,7 @@ internal class SliceController : ControllerBase
     [ProducesResponseType(typeof(void), (int)HttpStatusCode.OK)]
     [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.NotFound)]
     [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.InternalServerError)]
-    public async Task<ActionResult> SliceDeleteUrllc(Guid id)
+    public async Task<ActionResult> SliceDeleteUrllc(string id)
     {
         try
         {

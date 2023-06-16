@@ -10,29 +10,42 @@ public class SliceDto : Dto
 {
     public const string Prefix = "Slice";
 
-    [Indexed] [RedisIdField] public override string Id { get; set; } = default!;
+    [Indexed]
+    [RedisIdField]
+    public override string Id { get; set; } = default!;
 
-    [Indexed] public string Name { get; set; } = default!;
+    [Indexed]
+    public string Name { get; set; } = default!;
 
-    [Indexed] public string Site { get; init; } = default!;
+    [Indexed]
+    public string Site { get; init; } = default!;
 
-    [Indexed] public string SliceType { get; init; } = default!;
+    [Indexed]
+    public string SliceType { get; init; } = default!;
 
-    [Indexed] public int ExpDataRateUl { get; init; }
+    [Indexed]
+    public int ExpDataRateUl { get; init; }
 
-    [Indexed] public int ExpDataRateDl { get; init; }
+    [Indexed]
+    public int ExpDataRateDl { get; init; }
 
-    [Indexed] public int? Latency { get; init; }
+    [Indexed]
+    public int? Latency { get; init; }
 
-    [Indexed] public int? Jitter { get; init; }
+    [Indexed]
+    public int? Jitter { get; init; }
 
-    [Indexed] public int? UserDensity { get; init; }
+    [Indexed]
+    public int? UserDensity { get; init; }
 
-    [Indexed] public int? UserSpeed { get; init; }
+    [Indexed]
+    public int? UserSpeed { get; init; }
 
-    [Indexed] public string TrafficType { get; init; } = default!;
+    [Indexed]
+    public string TrafficType { get; init; } = default!;
 
-    [Indexed] public List<string> Imsi { get; init; } = new();
+    [Indexed]
+    public List<string> Imsi { get; init; } = new();
 
     public override BaseModel ToModel()
     {
