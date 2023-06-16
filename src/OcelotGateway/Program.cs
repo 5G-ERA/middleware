@@ -69,7 +69,13 @@ var ocelotConfig = new OcelotPipelineConfiguration
     }
 };
 
+builder.Services.AddReverseProxy()
+    .LoadFromConfig(builder.Configuration.GetSection("ReverseProxy"));
+
+
 var app = builder.Build();
+
+app.MapReverseProxy();
 
 app.UseRouting();
 app.UseAuthentication();
@@ -78,6 +84,7 @@ app.UseAuthorization();
 app.UseEndpoints(endpoints =>
 {
     endpoints.MapControllers();
+    //endpoints.MapReverseProxy();
 });
 
 await app.UseOcelot(ocelotConfig);
