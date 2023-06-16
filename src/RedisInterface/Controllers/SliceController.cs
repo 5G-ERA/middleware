@@ -278,7 +278,7 @@ internal class SliceController : ControllerBase
     {
         try
         {
-            await _sliceService.(id);
+            await _sliceService.DeleteBySliceId(id);
             return Ok();
         }
         catch (Exception ex)
@@ -299,7 +299,7 @@ internal class SliceController : ControllerBase
     {
         try
         {
-            await _sliceService.SliceDeleteAsync(id);
+            await _sliceService.DeleteBySliceId(id);
             return Ok();
         }
         catch (Exception ex)
