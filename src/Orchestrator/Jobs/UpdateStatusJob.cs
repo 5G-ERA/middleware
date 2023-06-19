@@ -108,12 +108,12 @@ public class UpdateStatusJob : BaseJob<UpdateStatusJob>
                 var instanceId = instance.ServiceInstanceId;
                 validated = true;
                 var deployments = await kubeClient.AppsV1.ListNamespacedDeploymentAsync(AppConfig.K8SNamespaceName,
-                    labelSelector: V1ObjectExtensions.GetNetAppLabelSelector(instance.ServiceInstanceId));
+                    labelSelector: KubernetesObjectExtensions.GetNetAppLabelSelector(instance.ServiceInstanceId));
 
                 ValidateDeploymentStatus(deployments, instance);
 
                 var services = await kubeClient.CoreV1.ListNamespacedServiceAsync(AppConfig.K8SNamespaceName,
-                    labelSelector: V1ObjectExtensions.GetNetAppLabelSelector(instance.ServiceInstanceId));
+                    labelSelector: KubernetesObjectExtensions.GetNetAppLabelSelector(instance.ServiceInstanceId));
 
                 UpdateServiceStatus(services, instance);
             }

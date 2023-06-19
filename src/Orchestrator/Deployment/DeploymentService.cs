@@ -61,7 +61,7 @@ internal class DeploymentService : IDeploymentService
             var k8SClient = _kubernetesBuilder.CreateKubernetesClient();
             _logger.LogDebug("Entered DeploymentService.DeployAsync");
             var deployments = await k8SClient.AppsV1.ListNamespacedDeploymentAsync(AppConfig.K8SNamespaceName);
-            var deploymentNames = deployments.Items.Select(d => d.Metadata.Name).OrderBy(d => d).ToList();
+            var deploymentNames = deployments.GetDeploymentNames().ToList();
             _logger.LogDebug("Current deployments: {deployments}", string.Join(", ", deploymentNames));
 
             BaseModel location = _mwConfig.Value.InstanceType.ToLower() == "cloud"
@@ -201,7 +201,7 @@ internal class DeploymentService : IDeploymentService
             return;
 
         var deployments = await kubeClient.AppsV1.ListNamespacedDeploymentAsync(AppConfig.K8SNamespaceName);
-        var deploymentNames = deployments.Items.Select(d => d.Metadata.Name).OrderBy(d => d).ToList();
+        var deploymentNames = deployments.GetDeploymentNames().ToList();
 
         _logger.LogDebug("Retrieving location details (cloud or edge)");
         BaseModel thisLocation = _mwConfig.Value.InstanceType == LocationType.Cloud.ToString()
@@ -301,7 +301,6 @@ internal class DeploymentService : IDeploymentService
         var deployment =
             _kubeObjectBuilder.SerializeAndConfigureDeployment(cim.K8SDeployment, instanceId, instanceName);
 
-
         var service = string.IsNullOrWhiteSpace(cim.K8SService)
             ? _kubeObjectBuilder.CreateDefaultService(instanceName, instanceId, deployment)
             : _kubeObjectBuilder.SerializeAndConfigureService(cim.K8SService, instanceName, instanceId);
@@ -324,9 +323,9 @@ internal class DeploymentService : IDeploymentService
         var retVal = true;
 
         var deployments = await kubeClient.AppsV1.ListNamespacedDeploymentAsync(AppConfig.K8SNamespaceName,
-            labelSelector: V1ObjectExtensions.GetNetAppLabelSelector(instanceId));
+            labelSelector: KubernetesObjectExtensions.GetNetAppLabelSelector(instanceId));
         var services = await kubeClient.CoreV1.ListNamespacedServiceAsync(AppConfig.K8SNamespaceName,
-            labelSelector: V1ObjectExtensions.GetNetAppLabelSelector(instanceId));
+            labelSelector: KubernetesObjectExtensions.GetNetAppLabelSelector(instanceId));
 
         foreach (var deployment in deployments.Items)
         {
