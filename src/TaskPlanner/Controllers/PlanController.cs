@@ -80,11 +80,11 @@ public class PlanController : ControllerBase
 
             return Ok(resourcePlan);
         }
-        catch (ResourcePlannerApiClient.ApiException<ResourcePlanner.ApiResponse> apiEx)
+        catch (Orchestrator.ResourcePlannerApiClient.ApiException<ResourcePlanner.ApiResponse> apiEx)
         {
             return StatusCode(apiEx.StatusCode, _mapper.Map<ApiResponse>(apiEx.Result));
         }
-        catch (ResourcePlannerApiClient.ApiException<ApiResponse> apiEx)
+        catch (Orchestrator.ResourcePlannerApiClient.ApiException<ApiResponse> apiEx)
         {
             return StatusCode(apiEx.StatusCode, _mapper.Map<ApiResponse>(apiEx.Result));
         }
@@ -150,7 +150,7 @@ public class PlanController : ControllerBase
             await _publishService.PublishPlanAsync(resourcePlan, robot2);
             return Ok(resourcePlan);
         }
-        catch (ResourcePlannerApiClient.ApiException<ResourcePlanner.ApiResponse> apiEx)
+        catch (Orchestrator.ResourcePlannerApiClient.ApiException<ResourcePlanner.ApiResponse> apiEx)
         {
             return StatusCode(apiEx.StatusCode, _mapper.Map<ApiResponse>(apiEx.Result));
         }

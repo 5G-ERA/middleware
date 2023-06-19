@@ -1,12 +1,12 @@
 ﻿using System.CodeDom.Compiler;
 
 // ReSharper disable once CheckNamespace
-namespace Middleware.TaskPlanner.ResourcePlanner;
+namespace Middleware.TaskPlanner.Orchestrator;
 
 /// <summary>
 ///     https://github.com/RicoSuter/NSwag/issues/2839
 /// </summary>
-public partial class ResourcePlannerApiClient
+public class ResourcePlannerApiClient
 {
     public class ApiException : Exception
     {
