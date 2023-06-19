@@ -11,6 +11,11 @@ namespace Middleware.Orchestrator.Deployment;
 
 internal class KubernetesObjectBuilder : IKubernetesObjectBuilder
 {
+    /// <summary>
+    ///     Defines an interval in which the NetApps report heartbeat to the Middleware
+    /// </summary>
+    private const int ReportIntervalInSeconds = 5;
+
     private readonly IConfiguration _config;
 
     /// <summary>
@@ -28,10 +33,10 @@ internal class KubernetesObjectBuilder : IKubernetesObjectBuilder
     }
 
     /// <inheritdoc />
-    public V1Service SerializeAndConfigureService(string service, string name, Guid serviceInstanceId)
+    public V1Service? SerializeAndConfigureService(string service, string name, Guid serviceInstanceId)
     {
         if (string.IsNullOrWhiteSpace(service))
-            throw new ArgumentException("Service definition cannot be empty.", nameof(service));
+            return null;
 
         var sanitized = service.SanitizeAsK8SYaml();
         var obj = KubernetesYaml.Deserialize<V1Service>(sanitized);
@@ -44,13 +49,7 @@ internal class KubernetesObjectBuilder : IKubernetesObjectBuilder
         throw new NotImplementedException();
     }
 
-    /// <inheritdoc />
-    public V1Service CreateDefaultService(string deploymentName, Guid serviceInstanceId)
-    {
-        throw new NotImplementedException();
-    }
-
-    public V1Service CreateStartupService(string serviceImageName, K8SServiceKindEnum kind, V1ObjectMeta meta)
+    public V1Service CreateStartupService(string serviceImageName, K8SServiceKind kind, V1ObjectMeta meta)
     {
         var spec = new V1ServiceSpec
         {
@@ -143,8 +142,81 @@ internal class KubernetesObjectBuilder : IKubernetesObjectBuilder
     }
 
     /// <inheritdoc />
-    public V1Deployment SerializeAndConfigureDeployment(string deployment, Guid serviceInstanceId)
+    public V1Deployment SerializeAndConfigureDeployment(string deploymentStr, Guid serviceInstanceId, string name)
     {
-        throw new NotImplementedException();
+        if (string.IsNullOrWhiteSpace(deploymentStr))
+            throw new ArgumentException("Service definition cannot be empty.", nameof(deploymentStr));
+
+        var sanitized = deploymentStr.SanitizeAsK8SYaml();
+        var obj = KubernetesYaml.Deserialize<V1Deployment>(sanitized);
+
+        if (obj is null) throw new UnableToParseYamlConfigException(name, nameof(ContainerImageModel.K8SService));
+
+        obj.Metadata.SetServiceLabel(serviceInstanceId);
+        //obj.Metadata.AddNetAppMultusAnnotations(AppConfig.MultusNetworkName);
+        obj.Metadata.Name = name;
+        foreach (var container in obj.Spec.Template.Spec.Containers)
+        {
+            var envVars = container.Env is not null
+                ? new(container.Env)
+                : new List<V1EnvVar>();
+
+            envVars.Add(new("NETAPP_ID", serviceInstanceId.ToString()));
+            envVars.Add(new("MIDDLEWARE_ADDRESS", AppConfig.GetMiddlewareAddress()));
+            envVars.Add(new("MIDDLEWARE_REPORT_INTERVAL", ReportIntervalInSeconds.ToString()));
+
+            container.Env = envVars;
+        }
+
+        return obj;
+    }
+
+    /// <inheritdoc />
+    public V1Service CreateDefaultService(string deploymentName, Guid serviceInstanceId, V1Deployment depl)
+    {
+        var ports = depl.Spec.Template.Spec.Containers.SelectMany(p =>
+            p.Ports.Select(pp => new CommonPort(pp.Name, pp.ContainerPort, pp.Protocol))).ToList();
+
+
+        var servicePorts = ports.Any()
+            ? MapToServicePorts(ports)
+            : CreateDefaultHttpPorts();
+
+
+        var spec = new V1ServiceSpec
+        {
+            Ports = servicePorts,
+            Selector = new Dictionary<string, string> { { "app", deploymentName } },
+            Type = K8SServiceKind.ClusterIp.GetStringValue()
+        };
+
+        var service = new V1Service
+        {
+            Metadata = new()
+            {
+                Name = depl.Metadata.Name,
+                Labels = depl.Metadata.Labels
+            },
+            ApiVersion = "v1",
+            Spec = spec,
+            Kind = "Service"
+        };
+        return service;
+    }
+
+    private static List<V1ServicePort> MapToServicePorts(IEnumerable<CommonPort> ports)
+    {
+        return ports.Select(p => new V1ServicePort(p.Port, p.Protocol, p.Name)).ToList();
+    }
+
+    private static List<V1ServicePort> CreateDefaultHttpPorts()
+    {
+        return new()
+        {
+            new(80, "TCP", "http", null, "TCP", 80),
+            new(443, "TCP", "https", null, "TCP", 80)
+        };
     }
 }
+
+internal record CommonPort(string Name, int Port, string Protocol);

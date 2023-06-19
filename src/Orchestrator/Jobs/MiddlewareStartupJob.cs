@@ -74,13 +74,15 @@ public class MiddlewareStartupJob : BaseJob<MiddlewareStartupJob>
                         shouldDryRun ? "All" : null);
                 }
 
-                var kind = service != "gateway" ? K8SServiceKindEnum.ClusterIp : K8SServiceKindEnum.LoadBalancer;
+                var kind = service != "gateway" ? K8SServiceKind.ClusterIp : K8SServiceKind.LoadBalancer;
 
                 var lbService = _deploymentService.CreateStartupService(service, kind, deployment.Metadata);
 
                 if (serviceNames.Contains(lbService.Metadata.Name) == false)
+                {
                     lbService = await kubeClient.CoreV1.CreateNamespacedServiceAsync(lbService,
                         AppConfig.K8SNamespaceName);
+                }
 
                 if (service == "gateway")
                 {

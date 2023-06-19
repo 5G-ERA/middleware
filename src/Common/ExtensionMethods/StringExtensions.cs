@@ -30,8 +30,6 @@ public static class StringExtensions
 
     public static string TrimSuffix(this string s, string suffix)
     {
-        if (s.EndsWith(suffix)) return s.Substring(0, s.Length - suffix.Length);
-
-        return s;
+        return !s.EndsWith(suffix) ? s : s.Substring(0, s.Length - suffix.Length);
     }
 }

@@ -28,7 +28,7 @@ public interface IDeploymentService
     /// <param name="kind">Kind of the service to be deployed</param>
     /// <param name="meta">Metadata for the service from the existing deployment</param>
     /// <returns>Service of the specified type. Service has not been deployed</returns>
-    V1Service CreateStartupService(string serviceImageName, K8SServiceKindEnum kind, V1ObjectMeta meta);
+    V1Service CreateStartupService(string serviceImageName, K8SServiceKind kind, V1ObjectMeta meta);
 
     /// <summary>
     ///     Deletes the resources instantiated by the specified Action Plan

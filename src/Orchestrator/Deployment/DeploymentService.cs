@@ -69,7 +69,7 @@ internal class DeploymentService : IDeploymentService
                 : (await _redisInterfaceClient.GetEdgeByNameAsync(_mwConfig.Value.InstanceName)).ToEdge();
 
             foreach (var seq in task.ActionSequence!)
-            foreach (var service in seq.Services!)
+            foreach (var service in seq.Services)
             {
                 try
                 {
@@ -77,8 +77,8 @@ internal class DeploymentService : IDeploymentService
                     if (service.ServiceInstanceId != Guid.Empty)
                         continue;
 
-                    await DeployService(k8SClient, service, deploymentNames);
-                    //await _redisInterfaceClient.AddRelationAsync(service, location, "LOCATED_AT");
+                    await DeployInstance(k8SClient, service, deploymentNames);
+                    await _redisInterfaceClient.AddRelationAsync(service, location, "LOCATED_AT");
                 }
                 catch (HttpOperationException ex)
                 {
@@ -93,7 +93,7 @@ internal class DeploymentService : IDeploymentService
                 }
             }
 
-            isSuccess &= await SaveActionSequence(task, robot); //Here saved in index 13
+            isSuccess &= await SaveActionSequence(task, robot);
         }
         catch (RedisInterface.ApiException<ApiResponse> apiEx)
         {
@@ -118,7 +118,7 @@ internal class DeploymentService : IDeploymentService
     }
 
     /// <inheritdoc />
-    public V1Service CreateStartupService(string serviceImageName, K8SServiceKindEnum kind, V1ObjectMeta meta)
+    public V1Service CreateStartupService(string serviceImageName, K8SServiceKind kind, V1ObjectMeta meta)
     {
         return _kubeObjectBuilder.CreateStartupService(serviceImageName, kind, meta);
     }
@@ -130,8 +130,8 @@ internal class DeploymentService : IDeploymentService
         try
         {
             var k8SClient = _kubernetesBuilder.CreateKubernetesClient();
-            foreach (var action in actionPlan.ActionSequence)
-            foreach (var srv in action.Services!)
+            foreach (var action in actionPlan.ActionSequence!)
+            foreach (var srv in action.Services)
             {
                 retVal &= await DeleteInstance(k8SClient, srv.ServiceInstanceId);
             }
@@ -163,7 +163,7 @@ internal class DeploymentService : IDeploymentService
         if (actionPlan is null)
             return;
         _logger.LogDebug("Retrieving Action from action plan");
-        var action = actionPlan.ActionSequence.FirstOrDefault(x => x.Id == actionId);
+        var action = actionPlan.ActionSequence!.FirstOrDefault(x => x.Id == actionId);
         if (action is null)
             return;
 
@@ -174,11 +174,11 @@ internal class DeploymentService : IDeploymentService
 
         foreach (var instance in action.Services)
         {
-            _logger.LogDebug("Deleting instance '{0}', with serviceInstanceId '{1}'",
+            _logger.LogDebug("Deleting instance '{instanceName}', with serviceInstanceId '{serviceInstanceId}'",
                 instance.Name, instance.ServiceInstanceId);
 
             await DeleteInstance(kubeClient, instance.ServiceInstanceId);
-            _logger.LogDebug("Deleting relation between instance '{0}'and location '{1}'",
+            _logger.LogDebug("Deleting relation between instance '{instanceName}'and location '{locationName}'",
                 instance.Name, thisLocation.Name);
 
             await _redisInterfaceClient.DeleteRelationAsync(instance, thisLocation, "LOCATED_AT");
@@ -195,7 +195,7 @@ internal class DeploymentService : IDeploymentService
         if (actionPlan is null)
             return;
         _logger.LogDebug("Retrieving action containing desired Service");
-        var action = actionPlan.ActionSequence.FirstOrDefault(a => a.Id == actionId);
+        var action = actionPlan.ActionSequence!.FirstOrDefault(a => a.Id == actionId);
 
         if (action is null)
             return;
@@ -208,17 +208,17 @@ internal class DeploymentService : IDeploymentService
             ? (await _redisInterfaceClient.GetCloudByNameAsync(_mwConfig.Value.InstanceName)).ToCloud()
             : (await _redisInterfaceClient.GetEdgeByNameAsync(_mwConfig.Value.InstanceName)).ToEdge();
 
-        var instanceNames = action.Services.Select(s => s.Name);
+        //var instanceNames = action.Services.Select(s => s.Name);
         // evaluate potential addresses 
+        // how the environment variables should be named?
         // pass the addresses to the deployment 
         // always expose service through NodePort?
-        // 
 
         foreach (var instance in action.Services)
         {
             _logger.LogDebug("Deploying instance '{Name}', with serviceInstanceId '{ServiceInstanceId}'",
                 instance.Name, instance.ServiceInstanceId);
-            await DeployService(kubeClient, instance, deploymentNames);
+            await DeployInstance(kubeClient, instance, deploymentNames);
 
             _logger.LogDebug("Adding new relation between instance and current location");
             await _redisInterfaceClient.AddRelationAsync(instance, thisLocation, "LOCATED_AT");
@@ -253,7 +253,7 @@ internal class DeploymentService : IDeploymentService
         return result;
     }
 
-    private async Task DeployService(IKubernetes k8SClient, InstanceModel service, List<string> deploymentNames)
+    private async Task DeployInstance(IBasicKubernetes k8SClient, InstanceModel service, List<string> deploymentNames)
     {
         _logger.LogDebug("Querying for redis for service {Id}", service.Id);
         var imagesResponse = await _redisInterfaceClient.ContainerImageGetForInstanceAsync(service.Id);
@@ -293,86 +293,23 @@ internal class DeploymentService : IDeploymentService
     /// <param name="cim"></param>
     /// <param name="instanceName"></param>
     /// <returns></returns>
-    private async Task<DeploymentPairModel> Deploy(IKubernetes k8SClient, ContainerImageModel cim, string instanceName)
+    private async Task<DeploymentPairModel> Deploy(IBasicKubernetes k8SClient, ContainerImageModel cim,
+        string instanceName)
     {
         var instanceId = Guid.NewGuid();
 
-        var service =
-            await Deploy<V1Service>(k8SClient, cim.K8SService, instanceName, instanceId, nameof(cim.K8SService));
+        var deployment =
+            _kubeObjectBuilder.SerializeAndConfigureDeployment(cim.K8SDeployment, instanceId, instanceName);
 
-        var deployment = await Deploy<V1Deployment>(k8SClient, cim.K8SDeployment, instanceName, instanceId,
-            nameof(cim.K8SDeployment));
+
+        var service = string.IsNullOrWhiteSpace(cim.K8SService)
+            ? _kubeObjectBuilder.CreateDefaultService(instanceName, instanceId, deployment)
+            : _kubeObjectBuilder.SerializeAndConfigureService(cim.K8SService, instanceName, instanceId);
+
+        service = await k8SClient.CoreV1.CreateNamespacedServiceAsync(service, AppConfig.K8SNamespaceName);
+        deployment = await k8SClient.AppsV1.CreateNamespacedDeploymentAsync(deployment, AppConfig.K8SNamespaceName);
 
         return new(deployment, service, instanceId);
-    }
-
-    /// <summary>
-    ///     Deploy the Service of the specified type. Available types are <see cref="V1Service" /> and
-    ///     <see cref="V1Deployment" />
-    /// </summary>
-    /// <typeparam name="T">Type of the service</typeparam>
-    /// <param name="k8SClient"></param>
-    /// <param name="objectDefinition">string representation of the k8s yaml object</param>
-    /// <param name="name">Name of the service to be deployed</param>
-    /// <param name="instanceId"></param>
-    /// <param name="propName"></param>
-    /// <returns></returns>
-    /// <exception cref="IncorrectDataException"></exception>
-    /// <exception cref="UnableToParseYamlConfigException"></exception>
-    private async Task<T> Deploy<T>(IKubernetes k8SClient, string objectDefinition, string name, Guid instanceId,
-        string propName = null) where T : class
-    {
-        name = name.SanitizeAsK8sObjectName();
-        var type = typeof(T);
-
-        if (string.IsNullOrWhiteSpace(objectDefinition))
-        {
-            _logger.LogInformation(
-                "Definition for {ObjectName} - {Name} has not been specified, the instantiation of the service has been skipped",
-                type.Name, name);
-
-            if (type == typeof(V1Deployment))
-                throw new IncorrectDataException($"Deployment for {name} not set");
-
-            return default;
-        }
-
-        var sanitized = objectDefinition.SanitizeAsK8SYaml();
-        var obj = KubernetesYaml.Deserialize<T>(sanitized);
-
-        if (obj == null) throw new UnableToParseYamlConfigException(name, propName);
-
-        if (obj is V1Service srv)
-        {
-            srv.Metadata.SetServiceLabel(instanceId);
-            srv.Metadata.Name = name;
-            obj = await k8SClient.CoreV1.CreateNamespacedServiceAsync(srv, AppConfig.K8SNamespaceName) as T;
-            return obj;
-        }
-
-        if (obj is V1Deployment deployment)
-        {
-            deployment.Metadata.SetServiceLabel(instanceId);
-            deployment.Metadata.AddNetAppMultusAnnotations(AppConfig.MultusNetworkName);
-            deployment.Metadata.Name = name;
-            foreach (var container in deployment.Spec.Template.Spec.Containers)
-            {
-                var envVars = container.Env is not null
-                    ? new(container.Env)
-                    : new List<V1EnvVar>();
-
-                envVars.Add(new("NETAPP_ID", instanceId.ToString()));
-                envVars.Add(new("MIDDLEWARE_ADDRESS", AppConfig.GetMiddlewareAddress()));
-                envVars.Add(new("MIDDLEWARE_REPORT_INTERVAL", 5.ToString()));
-
-                container.Env = envVars;
-            }
-
-            obj = await k8SClient.AppsV1.CreateNamespacedDeploymentAsync(deployment, AppConfig.K8SNamespaceName) as T;
-            return obj;
-        }
-
-        return default;
     }
 
     /// <summary>
@@ -381,7 +318,7 @@ internal class DeploymentService : IDeploymentService
     /// <param name="kubeClient"></param>
     /// <param name="instanceId"></param>
     /// <returns></returns>
-    private async Task<bool> DeleteInstance(IKubernetes kubeClient, Guid instanceId)
+    private async Task<bool> DeleteInstance(IBasicKubernetes kubeClient, Guid instanceId)
     {
         const string success = "Success";
         var retVal = true;
