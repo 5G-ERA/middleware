@@ -4,13 +4,12 @@ using k8s;
 using k8s.Models;
 using Middleware.Common.Config;
 using Middleware.Common.ExtensionMethods;
+using Middleware.Models.Domain;
 using Middleware.Models.Enums;
 using Middleware.Orchestrator.Deployment;
-using Middleware.Orchestrator.RedisInterface;
 using Middleware.RedisInterface.Sdk;
 using Quartz;
-using ActionPlanModel = Middleware.Models.Domain.ActionPlanModel;
-using InstanceModel = Middleware.Models.Domain.InstanceModel;
+using Refit;
 
 namespace Middleware.Orchestrator.Jobs;
 
@@ -68,9 +67,9 @@ public class UpdateStatusJob : BaseJob<UpdateStatusJob>
                 }
             }
         }
-        catch (ApiException<ApiResponse> apiEx)
+        catch (ApiException apiEx)
         {
-            if (apiEx.StatusCode == (int)HttpStatusCode.NotFound)
+            if (apiEx.StatusCode == HttpStatusCode.NotFound)
             {
                 Logger.LogInformation(apiEx, "No deployed plans have been found");
                 return;
