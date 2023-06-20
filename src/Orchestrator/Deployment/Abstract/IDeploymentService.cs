@@ -7,13 +7,6 @@ namespace Middleware.Orchestrator.Deployment;
 public interface IDeploymentService
 {
     /// <summary>
-    ///     Deploy the services for the specified task plan
-    /// </summary>
-    /// <param name="task">Task plan with the defined action sequence and needed resources</param>
-    /// <returns></returns>
-    Task<bool> DeployAsync(TaskModel task, Guid robotId);
-
-    /// <summary>
     ///     Creates startup deployment needed to instantiate the middleware.
     /// </summary>
     /// <param name="name">Name of the Middleware component to be deployed</param>
@@ -40,4 +33,5 @@ public interface IDeploymentService
     Task DeleteActionAsync(Guid actionPlanId, Guid actionId);
 
     Task DeployActionAsync(Guid actionPlanId, Guid actionId);
+    Task<bool> DeployActionPlanAsync(TaskModel task, Guid robotId);
 }

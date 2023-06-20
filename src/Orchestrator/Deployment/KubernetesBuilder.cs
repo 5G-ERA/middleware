@@ -1,6 +1,5 @@
 ﻿using k8s;
 using Middleware.Common;
-using Middleware.Orchestrator.Exceptions;
 
 namespace Middleware.Orchestrator.Deployment;
 
@@ -38,7 +37,7 @@ public class KubernetesBuilder : IKubernetesBuilder
         if (isValidInCLusterConfig == false && _env.FileExists(KubeConfigPath) == false)
         {
             _logger.LogDebug("Not in K8s environment");
-            throw new NotInK8SEnvironmentException();
+            return null;
         }
 
         var config = isValidInCLusterConfig

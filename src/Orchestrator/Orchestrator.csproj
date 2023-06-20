@@ -61,7 +61,6 @@
 
     <ItemGroup>
       <Folder Include="Handlers\Slice\" />
-      <Folder Include="Models\" />
       <Folder Include="ExtensionMethods\" />
     </ItemGroup>
 

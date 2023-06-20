@@ -7,11 +7,12 @@ namespace Middleware.Orchestrator.Handlers;
 
 public class DeployPlanConsumer : IConsumer<DeployPlanMessage>
 {
+    private readonly IConfiguration _cfg;
     private readonly IDeploymentService _deploymentService;
     private readonly ILogger _logger;
-    private readonly IConfiguration _cfg;
 
-    public DeployPlanConsumer(IDeploymentService deploymentService, ILogger<DeployPlanConsumer> logger, IConfiguration cfg)
+    public DeployPlanConsumer(IDeploymentService deploymentService, ILogger<DeployPlanConsumer> logger,
+        IConfiguration cfg)
     {
         _deploymentService = deploymentService;
         _logger = logger;
@@ -21,9 +22,10 @@ public class DeployPlanConsumer : IConsumer<DeployPlanMessage>
     public async Task Consume(ConsumeContext<DeployPlanMessage> ctx)
     {
         _logger.LogInformation("Started processing DeployPlanMessage");
-        var mwconfig = _cfg.GetSection(MiddlewareConfig.ConfigName).Get<MiddlewareConfig>();
+        var config = _cfg.GetSection(MiddlewareConfig.ConfigName).Get<MiddlewareConfig>();
         var plan = ctx.Message;
-        _logger.LogDebug("Location {0}-{1} received message request addressed to {2}", mwconfig.InstanceName, mwconfig.InstanceType, plan.DeploymentLocation);
-        var _ = await _deploymentService.DeployAsync(plan.Task, plan.RobotId);
+        _logger.LogDebug("Location {0}-{1} received message request addressed to {2}", config.InstanceName,
+            config.InstanceType, plan.DeploymentLocation);
+        var _ = await _deploymentService.DeployActionPlanAsync(plan.Task, plan.RobotId);
     }
 }
