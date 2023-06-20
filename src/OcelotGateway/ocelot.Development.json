@@ -25,6 +25,30 @@
       "UpstreamPathTemplate": "/Register",
       "UpstreamHttpMethod": [ "POST" ]
     },
+    {
+      "DownstreamPathTemplate": "/api/v1/configure",
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "ocelotgateway.api",
+          "Port": "80"
+        }
+      ],
+      "UpstreamPathTemplate": "/configure",
+      "UpstreamHttpMethod": [ "POST" ]
+    },
+    {
+      "DownstreamPathTemplate": "/api/v1/hello",
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "ocelotgateway.api",
+          "Port": "80"
+        }
+      ],
+      "UpstreamPathTemplate": "/hello",
+      "UpstreamHttpMethod": [ "GET" ]
+    },
     //RedisInterface API
     {
       "DownstreamPathTemplate": "/api/v1/{all}",
