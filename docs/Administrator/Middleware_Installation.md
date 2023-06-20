@@ -160,7 +160,7 @@ The most up-to-date Middleware version is `v0.4`.
 After all the values are set, the Middleware can be deployed. Start with the deployment of the Orchestrator:
 
 ```shell
-kubectl apply –f orchestrator.yaml –n middleware
+kubectl apply -f orchestrator.yaml -n middleware
 ```
 
 Alternatively, you can use utility scripts located at [k8s/orchestrator](../../k8s/orchestrator/):
