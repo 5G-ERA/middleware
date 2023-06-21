@@ -54,11 +54,7 @@ internal class KubernetesObjectBuilder : IKubernetesObjectBuilder
     {
         var spec = new V1ServiceSpec
         {
-            Ports = new List<V1ServicePort>
-            {
-                new(80, "TCP", "http", null, "TCP", 80),
-                new(443, "TCP", "https", null, "TCP", 80)
-            },
+            Ports = CreateDefaultHttpPorts(),
             Selector = new Dictionary<string, string> { { "app", serviceImageName } },
             Type = kind.GetStringValue()
         };
