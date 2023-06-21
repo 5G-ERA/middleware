@@ -43,6 +43,12 @@ public class UpdateStatusJob : BaseJob<UpdateStatusJob>
             if (sequences is null) return;
 
             var kubeClient = _kubeBuilder.CreateKubernetesClient();
+            if (kubeClient is null)
+            {
+                Logger.LogInformation("Skipped resource check. Kubernetes not detected.");
+                return;
+            }
+
             foreach (var seq in sequences)
             {
                 try

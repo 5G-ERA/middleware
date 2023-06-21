@@ -29,6 +29,12 @@ public class MiddlewareStartupJob : BaseJob<MiddlewareStartupJob>
         {
             var client = _kubeBuilder.CreateKubernetesClient();
 
+            if (client is null)
+            {
+                Logger.LogInformation("Skipped instantiation of the middleware. Kubernetes not detected.");
+                return;
+            }
+
             await InstantiateMiddleware(client);
         }
         catch (NotInK8SEnvironmentException ex)

@@ -3,7 +3,6 @@ using FluentAssertions;
 using Microsoft.Extensions.Logging;
 using Middleware.Common;
 using Middleware.Orchestrator.Deployment;
-using Middleware.Orchestrator.Exceptions;
 using NSubstitute;
 using Xunit;
 
@@ -56,16 +55,15 @@ public class KubernetesBuilderTests
     }
 
     [Fact]
-    public void CreateKubernetesClient_ShouldThrowException_WhenEnvVarsAreNotSetAndKubeconfigDoesNotExist()
+    public void CreateKubernetesClient_ShouldReturnNull_WhenEnvVarsAreNotSetAndKubeconfigDoesNotExist()
     {
         // arrange
         _env.GetEnvVariable("KUBERNETES_SERVICE_HOST").Returns("");
         _env.GetEnvVariable("KUBERNETES_SERVICE_PORT").Returns("");
         _env.FileExists(KubernetesBuilder.KubeConfigPath).Returns(false);
         // act
-        var act = () => _sut.CreateKubernetesClient();
+        var result = _sut.CreateKubernetesClient();
         // assess
-        act.Should().Throw<NotInK8SEnvironmentException>()
-            .WithMessage("The environment is not a Kubernetes environment, cannot instantiate the Middleware");
+        result.Should().BeNull();
     }
 }
