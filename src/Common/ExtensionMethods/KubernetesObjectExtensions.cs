@@ -18,6 +18,8 @@ public static class KubernetesObjectExtensions
         meta.Labels.Add(NetAppIdSelector, serviceId.ToString());
     }
 
+    [Obsolete(
+        "The Middleware does not use Multus for multiple Network Attachments to pods. Setting this annotation will not have any effect.")]
     public static void AddNetAppMultusAnnotations(this V1ObjectMeta meta, string networkName)
     {
         const string annotationKey = "k8s.v1.cni.cncf.io/networks";

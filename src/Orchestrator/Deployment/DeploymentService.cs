@@ -51,69 +51,6 @@ internal class DeploymentService : IDeploymentService
         _kube = kubernetesClientBuilder.CreateKubernetesClient();
     }
 
-    ///// <inheritdoc />
-    //public async Task<bool> DeployAsync(TaskModel task, Guid robotId)
-    //{
-    //    var robotResponse = await _redisInterfaceClient.RobotGetByIdAsync(robotId);
-
-    //    var robot = robotResponse.ToRobot();
-    //    var isSuccess = true;
-    //    try
-    //    {
-    //        _logger.LogDebug("Entered DeploymentService.DeployAsync");
-    //        var deploymentNames = await GetCurrentlyDeployedAppNames();
-
-    //        var location = await GetCurrentLocationAsync();
-
-    //        foreach (var seq in task.ActionSequence!)
-    //        foreach (var service in seq.Services)
-    //        {
-    //            try
-    //            {
-    //                // BB: service can be reused, to be decided by the resource planner
-    //                if (service.ServiceInstanceId != Guid.Empty)
-    //                    continue;
-
-    //                await DeployInstance(service, deploymentNames);
-    //                await _redisInterfaceClient.AddRelationAsync(service, location, "LOCATED_AT");
-    //            }
-    //            catch (HttpOperationException ex)
-    //            {
-    //                _logger.LogError(ex, "There was an error while deploying the service {service} caused by {reason}",
-    //                    service.Name, ex.Response.Content);
-    //                isSuccess = false;
-    //            }
-    //            catch (Exception ex)
-    //            {
-    //                _logger.LogError(ex, "There was an error while deploying the service {service}", service.Name);
-    //                isSuccess = false;
-    //            }
-    //        }
-
-    //        isSuccess &= await SaveActionSequence(task, robot);
-    //    }
-    //    catch (RedisInterface.ApiException<ApiResponse> apiEx)
-    //    {
-    //        _logger.LogError(apiEx, "There was an error while retrieving the information from Redis");
-    //        isSuccess = false;
-    //    }
-    //    catch (NotInK8SEnvironmentException)
-    //    {
-    //        _logger.LogInformation("The instantiation of the kubernetes client has failed in {env} environment.",
-    //            AppConfig.AppConfiguration);
-
-    //        isSuccess = AppConfig.AppConfiguration == AppVersionEnum.Dev.GetStringValue();
-
-    //        if (isSuccess)
-    //        {
-    //            isSuccess &= await SaveActionSequence(task, robot);
-    //            _logger.LogWarning("Deployment of the services has been skipped in the Development environment");
-    //        }
-    //    }
-
-    //    return isSuccess;
-    //}
-
     /// <inheritdoc />
     public V1Service CreateStartupService(string serviceImageName, K8SServiceKind kind, V1ObjectMeta meta)
     {
@@ -202,7 +139,6 @@ internal class DeploymentService : IDeploymentService
         // pass the addresses to the deployment 
         // always expose service through NodePort?
         var deploymentPairs = await ConstructDeployments(action, deploymentNames);
-        //TODO: enable communication
 
         foreach (var pair in deploymentPairs)
         {
@@ -243,7 +179,6 @@ internal class DeploymentService : IDeploymentService
             foreach (var action in task.ActionSequence!)
             {
                 var dplTmp = await ConstructDeployments(action, deploymentNames);
-                // 
                 deploymentQueue.AddRange(dplTmp);
             }
 
@@ -299,7 +234,7 @@ internal class DeploymentService : IDeploymentService
     }
 
     private async Task<IReadOnlyList<DeploymentPair>> ConstructDeployments(ActionModel action,
-        List<string> deploymentNames)
+        ICollection<string> deploymentNames)
     {
         var deployments = new List<DeploymentPair>();
         foreach (var service in action.Services)
@@ -317,6 +252,8 @@ internal class DeploymentService : IDeploymentService
                 _logger.LogError(ex, "There was an error while preparing service deployment: {service}", service.Name);
             }
         }
+
+        _kubeObjectBuilder.ConfigureCrossNetAppConnection(deployments);
 
         return deployments;
     }

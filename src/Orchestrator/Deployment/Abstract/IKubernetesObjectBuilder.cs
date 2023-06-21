@@ -1,5 +1,6 @@
 ﻿using k8s.Models;
 using Middleware.Common.Enums;
+using Middleware.Orchestrator.Models;
 
 namespace Middleware.Orchestrator.Deployment;
 
@@ -12,4 +13,5 @@ internal interface IKubernetesObjectBuilder
 
     V1Service CreateDefaultService(string deploymentName, Guid serviceInstanceId, V1Deployment depl);
     V1Service CreateStartupService(string serviceImageName, K8SServiceKind kind, V1ObjectMeta meta);
+    void ConfigureCrossNetAppConnection(IReadOnlyList<DeploymentPair> netApps);
 }

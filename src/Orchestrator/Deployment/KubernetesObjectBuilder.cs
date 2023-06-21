@@ -6,6 +6,7 @@ using Middleware.Common.Enums;
 using Middleware.Common.ExtensionMethods;
 using Middleware.Models.Domain;
 using Middleware.Orchestrator.Exceptions;
+using Middleware.Orchestrator.Models;
 
 namespace Middleware.Orchestrator.Deployment;
 
@@ -33,7 +34,7 @@ internal class KubernetesObjectBuilder : IKubernetesObjectBuilder
     }
 
     /// <inheritdoc />
-    public V1Service? SerializeAndConfigureService(string service, string name, Guid serviceInstanceId)
+    public V1Service SerializeAndConfigureService(string service, string name, Guid serviceInstanceId)
     {
         if (string.IsNullOrWhiteSpace(service))
             return null;
@@ -74,6 +75,34 @@ internal class KubernetesObjectBuilder : IKubernetesObjectBuilder
             Kind = "Service"
         };
         return service;
+    }
+
+    /// <inheritdoc />
+    public void ConfigureCrossNetAppConnection(IReadOnlyList<DeploymentPair> netApps)
+    {
+        // get environment variable names 
+        // evaluate the addresses
+        // attach environment variable to remaining deployments
+        var dict = netApps
+            .Select(n => new { NetAppName = n.Name, ServiceName = n.Service.Metadata.Name })
+            .ToList();
+
+        foreach (var netApp in netApps)
+        {
+            foreach (var kvp in dict)
+            {
+                if (kvp.NetAppName == netApp.Name)
+                    continue;
+                var container = netApp.Deployment.Spec.Template.Spec.Containers.First();
+
+                // what about multiple ports exposed by a service?
+                var envVarName = $"{kvp.NetAppName.ToUpper()}";
+                var envVarValue =
+                    $"{kvp.ServiceName.Replace('-', '_').ToUpper()}.{AppConfig.K8SNamespaceName}.svc.cluster.local";
+
+                container.Env.Add(new(envVarName, envVarValue));
+            }
+        }
     }
 
     public V1Deployment CreateStartupDeployment(string name, string tag)
@@ -153,7 +182,6 @@ internal class KubernetesObjectBuilder : IKubernetesObjectBuilder
         if (obj is null) throw new UnableToParseYamlConfigException(name, nameof(ContainerImageModel.K8SService));
 
         obj.Metadata.SetServiceLabel(serviceInstanceId);
-        //obj.Metadata.AddNetAppMultusAnnotations(AppConfig.MultusNetworkName);
         obj.Metadata.Name = name;
         foreach (var container in obj.Spec.Template.Spec.Containers)
         {
