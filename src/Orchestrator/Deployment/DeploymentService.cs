@@ -186,7 +186,6 @@ internal class DeploymentService : IDeploymentService
             {
                 _logger.LogDebug("Deploying instance '{Name}', with serviceInstanceId '{ServiceInstanceId}'",
                     pair.Instance, pair.InstanceId);
-                //await DeployInstance(instance, deploymentNames);
                 await DeployNetApp(pair);
                 _logger.LogDebug("Adding new relation between instance and current location");
                 await _redisInterfaceClient.AddRelationAsync(pair.Instance, location, "LOCATED_AT");
@@ -321,11 +320,11 @@ internal class DeploymentService : IDeploymentService
         var instanceId = Guid.NewGuid();
 
         var deployment =
-            _kubeObjectBuilder.SerializeAndConfigureDeployment(cim!.K8SDeployment, instanceId, instanceName);
+            _kubeObjectBuilder.DeserializeAndConfigureDeployment(cim!.K8SDeployment, instanceId, instanceName);
 
         var service = string.IsNullOrWhiteSpace(cim.K8SService)
             ? _kubeObjectBuilder.CreateDefaultService(instanceName, instanceId, deployment)
-            : _kubeObjectBuilder.SerializeAndConfigureService(cim.K8SService, instanceName, instanceId);
+            : _kubeObjectBuilder.DeserializeAndConfigureService(cim.K8SService, instanceName, instanceId);
 
         return new(deployment, service, instanceId, instance);
     }

@@ -34,7 +34,7 @@ internal class KubernetesObjectBuilder : IKubernetesObjectBuilder
     }
 
     /// <inheritdoc />
-    public V1Service SerializeAndConfigureService(string service, string name, Guid serviceInstanceId)
+    public V1Service DeserializeAndConfigureService(string service, string name, Guid serviceInstanceId)
     {
         if (string.IsNullOrWhiteSpace(service))
             return null;
@@ -123,6 +123,7 @@ internal class KubernetesObjectBuilder : IKubernetesObjectBuilder
         var envList = new List<V1EnvVar>
         {
             new("Middleware__Organization", mwConfig.Organization),
+            new("Middleware__Organization", mwConfig.Organization),
             new("Middleware__InstanceName", mwConfig.InstanceName),
             new("Middleware__InstanceType", mwConfig.InstanceType),
             new("CustomLogger__LoggerName", _env.GetEnvVariable("CustomLogger__LoggerName")),
@@ -171,7 +172,7 @@ internal class KubernetesObjectBuilder : IKubernetesObjectBuilder
     }
 
     /// <inheritdoc />
-    public V1Deployment SerializeAndConfigureDeployment(string deploymentStr, Guid serviceInstanceId, string name)
+    public V1Deployment DeserializeAndConfigureDeployment(string deploymentStr, Guid serviceInstanceId, string name)
     {
         if (string.IsNullOrWhiteSpace(deploymentStr))
             throw new ArgumentException("Service definition cannot be empty.", nameof(deploymentStr));
