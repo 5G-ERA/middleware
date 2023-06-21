@@ -26,7 +26,7 @@
       "UpstreamHttpMethod": [ "POST" ]
     },
     {
-      "DownstreamPathTemplate": "/api/v1/configure",
+      "DownstreamPathTemplate": "/api/v1/route/configure",
       "DownstreamScheme": "http",
       "DownstreamHostAndPorts": [
         {

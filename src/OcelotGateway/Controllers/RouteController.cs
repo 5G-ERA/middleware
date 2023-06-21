@@ -1,22 +1,17 @@
-﻿using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Yarp.ReverseProxy.Configuration;
-using Microsoft.AspNetCore.Routing;
-
 
 namespace Middleware.OcelotGateway.Controllers;
 
-
-[Route("api/v1")]
+[Route("api/v1/[controller]")]
 [ApiController]
 public class RouteController : ControllerBase
-{    
+{
     private readonly InMemoryConfigProvider _inMemoryConfigProvider;
 
     public string RouteId { get; set; }
 
     public string ClusterId { get; set; }
-
 
 
     public RouteController(IProxyConfigProvider inMemoryConfigProvider)
@@ -41,22 +36,23 @@ public class RouteController : ControllerBase
 
         var clusterList = config.Clusters.ToList();
         var routeList = config.Routes.ToList();
-        
-        ClusterConfig clusterCfg = new ClusterConfig
+
+        var clusterCfg = new ClusterConfig
         {
             ClusterId = "testCluster",
-            Destinations = new Dictionary<string, DestinationConfig> 
-            { 
-                { "testdest1", new DestinationConfig{Address = "http://localhost/api/v1/hello"} }
+            Destinations = new Dictionary<string, DestinationConfig>
+            {
+                { "testdest1", new DestinationConfig { Address = "http://taskplanner.api/api/v1/test" } }
             }
         };
-        RouteConfig routecfg = new RouteConfig()
+        var routecfg = new RouteConfig
         {
             RouteId = "test",
-            Match = new RouteMatch
+            Match = new()
             {
-                Path = "my/test/endpoint"
-            }
+                Path = "hello"
+            },
+            ClusterId = "testCluster" //
         };
         clusterList.Add(clusterCfg);
         routeList.Add(routecfg);
@@ -65,5 +61,4 @@ public class RouteController : ControllerBase
 
         return Ok();
     }
-
 }

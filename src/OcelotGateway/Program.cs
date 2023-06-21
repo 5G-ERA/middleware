@@ -1,22 +1,17 @@
-using System.Configuration;
 using System.Text;
+using IdentityModel;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using Middleware.Common.Config;
 using Middleware.Common.ExtensionMethods;
 using Middleware.DataAccess.ExtensionMethods;
 using Middleware.DataAccess.Repositories;
 using Middleware.DataAccess.Repositories.Abstract;
+using Middleware.OcelotGateway.Services;
 using Ocelot.Cache.CacheManager;
 using Ocelot.DependencyInjection;
 using Ocelot.Middleware;
-using Ocelot.Values;
-using Microsoft.IdentityModel;
-using static IdentityModel.ClaimComparer;
-using Microsoft.IdentityModel.Claims;
-using Ocelot.Authentication.Middleware;
-using Middleware.OcelotGateway.Services;
+using Yarp.ReverseProxy.Configuration;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -30,25 +25,25 @@ builder.Host.ConfigureAppConfiguration((hostingContext, config) =>
 });
 
 builder.Services.AddOcelot()
-                .AddCacheManager(settings => settings.WithDictionaryHandle());
+    .AddCacheManager(settings => settings.WithDictionaryHandle());
 builder.Services.DecorateClaimAuthoriser();
 
 var config = builder.Configuration.GetSection(JwtConfig.ConfigName).Get<JwtConfig>();
 builder.Services.Configure<JwtConfig>(builder.Configuration.GetSection(JwtConfig.ConfigName));
 
 builder.Services.AddAuthentication(options =>
-{
-    options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
-    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-}
+    {
+        options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
+        options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+        options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+    }
 ).AddJwtBearer("Bearer", options =>
 {
-    options.TokenValidationParameters = new TokenValidationParameters()
+    options.TokenValidationParameters = new()
     {
         IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(config.Key)),
-        NameClaimType = IdentityModel.JwtClaimTypes.Name,
-        RoleClaimType = IdentityModel.JwtClaimTypes.Role,
+        NameClaimType = JwtClaimTypes.Name,
+        RoleClaimType = JwtClaimTypes.Role,
         ValidAudience = "redisinterfaceAudience",
         ValidIssuer = "redisinterfaceIssuer",
         ValidateIssuerSigningKey = true,
@@ -70,7 +65,8 @@ var ocelotConfig = new OcelotPipelineConfiguration
 };
 
 builder.Services.AddReverseProxy()
-    .LoadFromConfig(builder.Configuration.GetSection("ReverseProxy"));
+    .LoadFromConfig(builder.Configuration.GetSection("ReverseProxy"))
+    .LoadFromMemory(new List<RouteConfig>(), new List<ClusterConfig>());
 
 
 var app = builder.Build();
