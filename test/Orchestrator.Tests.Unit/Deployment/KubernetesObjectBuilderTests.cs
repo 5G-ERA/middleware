@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using FluentAssertions;
 using k8s.Models;
 using Microsoft.Extensions.Configuration;
@@ -73,13 +74,35 @@ public class KubernetesObjectBuilderTests
         //act
         _sut.ConfigureCrossNetAppConnection(deployments);
         //assert
+        deployments.Should().AllSatisfy(d => d.Deployment.Spec.Template.Spec.Containers.SelectMany(c => c.Env).Any());
     }
 
 
     private DeploymentPair CreateFromInstance(InstanceModel instance)
     {
         //TODO:
-        var deployment = new V1Deployment();
+        var deployment = new V1Deployment
+        {
+            ApiVersion = "apps/v1",
+            Spec = new()
+            {
+                Template = new()
+                {
+                    Spec = new()
+                    {
+                        Containers = new List<V1Container>
+                        {
+                            new()
+                            {
+                                Name = instance.Name,
+                                Image = instance.Name,
+                                Env = new List<V1EnvVar>()
+                            }
+                        }
+                    }
+                }
+            }
+        };
         var service = new V1Service
         {
             Metadata = new()
