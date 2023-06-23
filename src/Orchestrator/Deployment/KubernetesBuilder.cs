@@ -1,87 +1,82 @@
 ﻿using k8s;
 using Middleware.Common;
-using Middleware.Orchestrator.Exceptions;
 
-namespace Middleware.Orchestrator.Deployment
+namespace Middleware.Orchestrator.Deployment;
+
+public class KubernetesBuilder : IKubernetesBuilder
 {
-    public class KubernetesBuilder : IKubernetesBuilder
+    internal const string ServiceAccountTokenKeyFileName = "token";
+    internal const string ServiceAccountRootCAKeyFileName = "ca.crt";
+    internal const string ServiceAccountNamespaceFileName = "namespace";
+
+    private const string KubernetesServiceHost = "KUBERNETES_SERVICE_HOST";
+    private const string KubernetesServicePort = "KUBERNETES_SERVICE_PORT";
+
+    public static string ServiceAccountPath =
+        Path.Combine($"{Path.DirectorySeparatorChar}var", "run", "secrets", "kubernetes.io", "serviceaccount");
+
+    internal static string KubeConfigPath =
+        Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), ".kube", "config");
+
+    private readonly IEnvironment _env;
+
+    private readonly ILogger<KubernetesBuilder> _logger;
+
+    public KubernetesBuilder(ILogger<KubernetesBuilder> logger, IEnvironment env)
     {
-        public static string ServiceAccountPath =
-            Path.Combine(new string[]
-            {
-                $"{Path.DirectorySeparatorChar}var", "run", "secrets", "kubernetes.io", "serviceaccount",
-            });
-        internal static string KubeConfigPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), ".kube", "config");
-        internal const string ServiceAccountTokenKeyFileName = "token";
-        internal const string ServiceAccountRootCAKeyFileName = "ca.crt";
-        internal const string ServiceAccountNamespaceFileName = "namespace";
+        _logger = logger;
+        _env = env;
+    }
 
-        private const string KubernetesServiceHost = "KUBERNETES_SERVICE_HOST";
-        private const string KubernetesServicePort = "KUBERNETES_SERVICE_PORT";
+    /// <inheritdoc />
+    public IKubernetes CreateKubernetesClient()
+    {
+        _logger.LogTrace("Started creation of K8s client");
 
-        private readonly ILogger<KubernetesBuilder> _logger;
-        private readonly IEnvironment _env;
-
-        public KubernetesBuilder(ILogger<KubernetesBuilder> logger, IEnvironment env)
+        var isValidInCLusterConfig = IsValidInClusterConfig();
+        if (isValidInCLusterConfig == false && _env.FileExists(KubeConfigPath) == false)
         {
-            _logger = logger;
-            _env = env;
+            _logger.LogDebug("Not in K8s environment");
+            return null;
         }
 
-        /// <inheritdoc />
-        public IKubernetes CreateKubernetesClient()
-        {
-            _logger.LogTrace("Started creation of K8s client");
+        var config = isValidInCLusterConfig
+            ? KubernetesClientConfiguration.InClusterConfig()
+            : KubernetesClientConfiguration.BuildConfigFromConfigFile(KubeConfigPath);
 
-            var isValidInCLusterConfig = IsValidInClusterConfig();
-            if (isValidInCLusterConfig == false && _env.FileExists(KubeConfigPath) == false)
-            {
-                _logger.LogDebug("Not in K8s environment");
-                throw new NotInK8SEnvironmentException();
-            }
+        return new Kubernetes(config);
+    }
 
-            var config = isValidInCLusterConfig
-                ? KubernetesClientConfiguration.InClusterConfig()
-                : KubernetesClientConfiguration.BuildConfigFromConfigFile(KubeConfigPath);
+    /// <inheritdoc />
+    public bool IsValidInClusterConfig()
+    {
+        var retVal = IsK8SEnv();
 
-            return new Kubernetes(config);
-        }
+        var exists = _env.DirectoryExists(ServiceAccountPath);
 
-        /// <inheritdoc />
-        public bool IsValidInClusterConfig()
-        {
-            var retVal = IsK8SEnv();
+        _logger.LogTrace("K8s ServiceAccountPath exists {exists}", exists);
 
-            var exists = _env.DirectoryExists(ServiceAccountPath);
+        if (retVal == false) return false;
 
-            _logger.LogTrace("K8s ServiceAccountPath exists {exists}", exists);
+        var fileNames = _env.GetFileNamesInDir(ServiceAccountPath);
 
-            if (retVal == false)
-            {
-                return false;
-            }
+        var filesExist = fileNames.Contains(ServiceAccountTokenKeyFileName)
+                         && fileNames.Contains(ServiceAccountRootCAKeyFileName)
+                         && fileNames.Contains(ServiceAccountNamespaceFileName);
 
-            var fileNames = _env.GetFileNamesInDir(ServiceAccountPath);
+        _logger.LogTrace("K8s ServiceAccount files exist {filesExist}", filesExist);
+        retVal &= exists && filesExist;
 
-            var filesExist = fileNames.Contains(ServiceAccountTokenKeyFileName)
-                             && fileNames.Contains(ServiceAccountRootCAKeyFileName)
-                             && fileNames.Contains(ServiceAccountNamespaceFileName);
+        return retVal;
+    }
 
-            _logger.LogTrace("K8s ServiceAccount files exist {filesExist}", filesExist);
-            retVal &= exists && filesExist;
+    private bool IsK8SEnv()
+    {
+        var host = _env.GetEnvVariable(KubernetesServiceHost);
+        var port = _env.GetEnvVariable(KubernetesServicePort);
+        _logger.LogTrace("K8s {env} has value {value}", KubernetesServiceHost, host);
+        _logger.LogTrace("K8s {env} has value {value}", KubernetesServicePort, port);
 
-            return retVal;
-
-        }
-
-        private bool IsK8SEnv()
-        {
-            var host = _env.GetEnvVariable(KubernetesServiceHost);
-            var port = _env.GetEnvVariable(KubernetesServicePort);
-            _logger.LogTrace("K8s {env} has value {value}", KubernetesServiceHost, host);
-            _logger.LogTrace("K8s {env} has value {value}", KubernetesServicePort, port);
-
-            return string.IsNullOrEmpty(host) == false && string.IsNullOrEmpty(port) == false;
-        }
+        return string.IsNullOrEmpty(host) == false && string.IsNullOrEmpty(port) == false;
     }
 }

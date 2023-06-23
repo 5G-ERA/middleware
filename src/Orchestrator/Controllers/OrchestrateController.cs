@@ -3,8 +3,8 @@ using Microsoft.AspNetCore.Mvc;
 using Middleware.Common.Responses;
 using Middleware.Models.Domain;
 using Middleware.Orchestrator.Deployment;
-using Middleware.RedisInterface.Sdk;
 using Middleware.RedisInterface.Contracts.Mappings;
+using Middleware.RedisInterface.Sdk;
 
 namespace Middleware.Orchestrator.Controllers;
 
@@ -25,10 +25,8 @@ public class OrchestrateController : Controller
         _redisInterfaceClient = redisInterfaceClient;
     }
 
-    public record OrchestratorResourceInput(TaskModel Task, RobotModel Robot);
-
     /// <summary>
-    /// Request orchestration of the resources defied in the plan
+    ///     Request orchestration of the resources defied in the plan
     /// </summary>
     /// <param name="task"></param>
     /// <returns></returns>
@@ -38,16 +36,13 @@ public class OrchestrateController : Controller
     [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.InternalServerError)]
     public async Task<IActionResult> InstantiateNewPlan([FromBody] OrchestratorResourceInput task)
     {
-        int statusCode = (int)HttpStatusCode.BadRequest;
-        if (task is null)
-        {
-            return BadRequest("Plan is not specified");
-        }
+        var statusCode = (int)HttpStatusCode.BadRequest;
+        if (task is null) return BadRequest("Plan is not specified");
 
         try
         {
             statusCode = (int)HttpStatusCode.OK;
-            var result = await _deploymentService.DeployAsync(task.Task, task.Robot.Id);
+            var result = await _deploymentService.DeployActionPlanAsync(task.Task, task.Robot.Id);
             if (result == false)
             {
                 statusCode = (int)HttpStatusCode.InternalServerError;
@@ -68,7 +63,7 @@ public class OrchestrateController : Controller
     }
 
     /// <summary>
-    /// Get the action plan by the ActionPlanId identifier 
+    ///     Get the action plan by the ActionPlanId identifier
     /// </summary>
     /// <param name="id">Identifier of the created ActionPlan</param>
     /// <returns></returns>
@@ -82,7 +77,7 @@ public class OrchestrateController : Controller
         int statusCode;
         try
         {
-            ActionPlanModel actionPlan = await _redisInterfaceClient.ActionPlanGetByIdAsync(id);
+            var actionPlan = await _redisInterfaceClient.ActionPlanGetByIdAsync(id);
             if (actionPlan is null)
             {
                 statusCode = (int)HttpStatusCode.NotFound;
@@ -103,7 +98,7 @@ public class OrchestrateController : Controller
     }
 
     /// <summary>
-    /// Request orchestration of the resources defied in the plan
+    ///     Request orchestration of the resources defied in the plan
     /// </summary>
     /// <param name="task"></param>
     /// <returns></returns>
@@ -117,7 +112,7 @@ public class OrchestrateController : Controller
     }
 
     /// <summary>
-    /// Deletes the instances instantiated with the specified action 
+    ///     Deletes the instances instantiated with the specified action
     /// </summary>
     /// <param name="id"></param>
     /// <returns></returns>
@@ -132,7 +127,7 @@ public class OrchestrateController : Controller
     }
 
     /// <summary>
-    /// Delete plan by its id
+    ///     Delete plan by its id
     /// </summary>
     /// <param name="id"></param>
     /// <returns></returns>
@@ -145,13 +140,11 @@ public class OrchestrateController : Controller
     public async Task<ActionResult> DeletePlanById(Guid id)
     {
         if (id == Guid.Empty)
-        {
             return BadRequest(new ApiResponse((int)HttpStatusCode.BadRequest, "Id of the plan  has to be specified"));
-        }
 
         try
         {
-            ActionPlanModel actionPlan = await _redisInterfaceClient.ActionPlanGetByIdAsync(id);
+            var actionPlan = await _redisInterfaceClient.ActionPlanGetByIdAsync(id);
             if (actionPlan is null)
             {
                 return NotFound(new ApiResponse((int)HttpStatusCode.NotFound,
@@ -196,13 +189,13 @@ public class OrchestrateController : Controller
             // RelationModel deleteRelationRobotOwnsTask = new RelationModel();
             // deleteRelationRobotOwnsTask.RelationName = "OWNS";
 
-            RobotModel tempRobotObject = (await _redisInterfaceClient.RobotGetByIdAsync(actionPlan.RobotId))?.ToRobot();
+            var tempRobotObject = (await _redisInterfaceClient.RobotGetByIdAsync(actionPlan.RobotId)).ToRobot();
             //
             // GraphEntityModel tempRobotGraph = new GraphEntityModel();
             // tempRobotGraph.Id = tempRobotObject.Id;
             // tempRobotGraph.Name = tempRobotObject.Name;
 
-            TaskModel tempTaskObject = (await _redisInterfaceClient.TaskGetByIdAsync(actionPlan.TaskId))?.ToTask();
+            var tempTaskObject = (await _redisInterfaceClient.TaskGetByIdAsync(actionPlan.TaskId)).ToTask();
             //
             // GraphEntityModel tempTaskGraph = new GraphEntityModel();
             // tempTaskGraph.Id = id;
@@ -215,7 +208,7 @@ public class OrchestrateController : Controller
 
             if (isSuccess == false)
             {
-                int statusCode = (int)HttpStatusCode.InternalServerError;
+                var statusCode = (int)HttpStatusCode.InternalServerError;
                 return StatusCode(statusCode,
                     new ApiResponse(statusCode, $"Unable to delete the services for the action plan with id {id}"));
             }
@@ -226,7 +219,7 @@ public class OrchestrateController : Controller
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error while deleting the specified action plan with id {id}", id);
-            int statusCode = (int)HttpStatusCode.InternalServerError;
+            var statusCode = (int)HttpStatusCode.InternalServerError;
             return StatusCode(statusCode,
                 new ApiResponse(statusCode, $"Could not delete the action plan with id: {id}"));
         }
@@ -234,7 +227,7 @@ public class OrchestrateController : Controller
 
 
     /// <summary>
-    /// Instantiate the resources for specified actions
+    ///     Instantiate the resources for specified actions
     /// </summary>
     /// <param name="actions">List of actions to be instantiated</param>
     /// <returns>Http Status code and List of instantiated services</returns>
@@ -246,4 +239,6 @@ public class OrchestrateController : Controller
         //TODO: instantiate services for action
         return Ok(new List<InstanceModel>());
     }
+
+    public record OrchestratorResourceInput(TaskModel Task, RobotModel Robot);
 }

@@ -58,6 +58,7 @@ builder.Services.AddScoped<IDeploymentService, DeploymentService>();
 builder.Services.AddScoped<INetAppStatusRepository, RedisNetAppStatusRepository>();
 builder.Services.AddScoped<IRobotStatusRepository, RedisRobotStatusRepository>();
 builder.Services.AddScoped<ISliceManagerClientFactory, SliceManagerClientFactory>();
+builder.Services.AddScoped<IKubernetesObjectBuilder, KubernetesObjectBuilder>();
 builder.Services.AddRedisInterfaceClient();
 
 builder.Services.AddHttpClient("healthCheckClient");

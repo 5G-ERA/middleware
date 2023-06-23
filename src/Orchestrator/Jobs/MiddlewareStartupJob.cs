@@ -28,6 +28,11 @@ public class MiddlewareStartupJob : BaseJob<MiddlewareStartupJob>
         try
         {
             var client = _kubeBuilder.CreateKubernetesClient();
+            if (client is null)
+            {
+                Logger.LogInformation("Skipped instantiation of the middleware. Kubernetes not detected.");
+                return;
+            }
 
             await InstantiateMiddleware(client);
         }
@@ -75,10 +80,9 @@ public class MiddlewareStartupJob : BaseJob<MiddlewareStartupJob>
                         shouldDryRun ? "All" : null);
                 }
 
-                var kind = service != "gateway" ? K8SServiceKindEnum.ClusterIp : K8SServiceKindEnum.LoadBalancer;
+                var kind = service != "gateway" ? K8SServiceKind.ClusterIp : K8SServiceKind.LoadBalancer;
 
-                var lbService = _deploymentService.CreateService(service, kind, deployment.Metadata);
-
+                var lbService = _deploymentService.CreateStartupService(service, kind, deployment.Metadata);
                 if (serviceNames.Contains(lbService.Metadata.Name) == false)
                 {
                     lbService = await kubeClient.CoreV1.CreateNamespacedServiceAsync(lbService,

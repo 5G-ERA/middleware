@@ -3,7 +3,23 @@
 public static class StringExtensions
 {
     /// <summary>
-    /// Sanitizes the yaml string saved in Redis to the proper yaml format
+    ///     Removes the not allowed characters so the name matches the correct k8s name format
+    /// </summary>
+    /// <param name="s"></param>
+    /// <returns></returns>
+    // ReSharper disable once InconsistentNaming
+    public static string SanitizeAsK8sObjectName(this string s)
+    {
+        return s.Replace(" ", "-")
+            .Replace('_', '-')
+            .Replace(':', '-')
+            .Replace('.', '-')
+            .Replace('/', '-')
+            .ToLower().Trim();
+    }
+
+    /// <summary>
+    ///     Sanitizes the yaml string saved in Redis to the proper yaml format
     /// </summary>
     /// <param name="str"></param>
     /// <returns></returns>
@@ -14,11 +30,6 @@ public static class StringExtensions
 
     public static string TrimSuffix(this string s, string suffix)
     {
-        if (s.EndsWith(suffix))
-        {
-            return s.Substring(0, s.Length - suffix.Length);
-        }
-
-        return s;
+        return !s.EndsWith(suffix) ? s : s.Substring(0, s.Length - suffix.Length);
     }
 }
