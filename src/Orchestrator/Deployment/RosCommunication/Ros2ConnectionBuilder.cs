@@ -10,7 +10,15 @@ internal class Ros2ConnectionBuilder : IRosConnectionBuilder
     public Ros2ConnectionBuilder(RosDistro distro)
     {
         _distro = distro;
+        RosVersion = (int)distro;
+        RosDistro = distro.ToString();
     }
+
+    /// <inheritdoc />
+    public int RosVersion { get; }
+
+    /// <inheritdoc />
+    public string RosDistro { get; }
 
     /// <inheritdoc />
     public V1Deployment EnableRosCommunication(V1Deployment dpl)

@@ -10,8 +10,16 @@ internal class Ros1ConnectionBuilder : IRosConnectionBuilder
     public Ros1ConnectionBuilder(RosDistro distro)
     {
         _distro = distro;
+        RosVersion = (int)distro;
+        RosDistro = distro.ToString();
     }
 
+    public int RosVersion { get; }
+
+    /// <inheritdoc />
+    public string RosDistro { get; }
+
+    /// <inheritdoc />
     /// <inheritdoc />
     public V1Deployment EnableRosCommunication(V1Deployment dpl)
     {
@@ -29,6 +37,7 @@ internal class Ros1ConnectionBuilder : IRosConnectionBuilder
                 new(11311, name: "ros-master")
             }
         };
+        //BB 2023.06.23: containers within single pod communicate over loopback (localhost) interface 
         var rosMasterEnv = new V1EnvVar("ROS_MASTER_URI", "http://127.0.0.1:11311");
         var rosIpEnv = new V1EnvVar("ROS_IP", "127.0.0.1");
         foreach (var cont in dpl.Spec.Template.Spec.Containers)
