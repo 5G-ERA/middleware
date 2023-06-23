@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Yarp.ReverseProxy.Configuration;
+using Yarp.ReverseProxy.Transforms;
 
 namespace Middleware.OcelotGateway.Controllers;
 
@@ -8,11 +9,6 @@ namespace Middleware.OcelotGateway.Controllers;
 public class RouteController : ControllerBase
 {
     private readonly InMemoryConfigProvider _inMemoryConfigProvider;
-
-    public string RouteId { get; set; }
-
-    public string ClusterId { get; set; }
-
 
     public RouteController(IProxyConfigProvider inMemoryConfigProvider)
     {
@@ -42,10 +38,10 @@ public class RouteController : ControllerBase
             ClusterId = "testCluster",
             Destinations = new Dictionary<string, DestinationConfig>
             {
-                { "testdest1", new DestinationConfig { Address = "http://taskplanner.api/api/v1/test" } }
+                { "testdest1", new DestinationConfig { Address = "http://taskplanner.api/api/v1/test/hello" } }
             }
         };
-        var routecfg = new RouteConfig
+        var routeCfg = new RouteConfig
         {
             RouteId = "test",
             Match = new()
@@ -54,8 +50,11 @@ public class RouteController : ControllerBase
             },
             ClusterId = "testCluster" //
         };
+        // transforms allow us to change the path that is requested like below to replace direct forwarding
+        routeCfg = routeCfg.WithTransformPathSet("/");
+
         clusterList.Add(clusterCfg);
-        routeList.Add(routecfg);
+        routeList.Add(routeCfg);
 
         _inMemoryConfigProvider.Update(routeList, clusterList);
 
