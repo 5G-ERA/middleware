@@ -131,12 +131,6 @@ internal class DeploymentService : IDeploymentService
 
         var thisLocation = await GetCurrentLocationAsync();
 
-        //TODO:
-        //var instanceNames = action.Services.Select(s => s.Name);
-        // evaluate potential addresses 
-        // how the environment variables should be named?
-        // pass the addresses to the deployment 
-        // always expose service through NodePort?
         var deploymentPairs = await ConstructDeployments(action, deploymentNames);
 
         foreach (var pair in deploymentPairs)
@@ -192,11 +186,6 @@ internal class DeploymentService : IDeploymentService
 
             isSuccess &= await SaveActionSequence(task, robot);
         }
-        catch (RedisInterface.ApiException<ApiResponse> apiEx)
-        {
-            _logger.LogError(apiEx, "There was an error while retrieving the information from Redis");
-            isSuccess = false;
-        }
         catch (NotInK8SEnvironmentException)
         {
             _logger.LogInformation("The instantiation of the kubernetes client has failed in {env} environment.",
@@ -209,6 +198,11 @@ internal class DeploymentService : IDeploymentService
                 isSuccess &= await SaveActionSequence(task, robot);
                 _logger.LogWarning("Deployment of the services has been skipped in the Development environment");
             }
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "The deployment of the Action Plan has failed!");
+            isSuccess = false;
         }
 
         return isSuccess;
