@@ -11,3 +11,7 @@ When Middleware deploys an `Action` that consists of multiple `Instances` each o
 The environment variables are named exactly as the Network Applications they reference, but in uppercase and `_` instead of `-`. Each environment variable points to the Kubernetes Service that exposes the deployment. 
 
 When the Network Application is configured by the user not to be exposed by a service, Middleware will create a default Kubernetes Service of type `ClusterIP` to enable communication using default `http` and `https` ports.
+
+## Communication of ROS-based Network Applications
+
+To be done with [#158](https://github.com/5G-ERA/middleware/issues/158)
