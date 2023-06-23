@@ -6,7 +6,6 @@ using Middleware.Common;
 using Middleware.Common.Config;
 using Middleware.Common.Enums;
 using Middleware.Common.ExtensionMethods;
-using Middleware.Common.Responses;
 using Middleware.Models.Domain;
 using Middleware.Models.Enums;
 using Middleware.Orchestrator.Exceptions;
@@ -108,11 +107,6 @@ public class DeploymentService : IDeploymentService
             }
 
             isSuccess &= await SaveActionSequence(task, robot); //Here saved in index 13
-        }
-        catch (RedisInterface.ApiException<ApiResponse> apiEx)
-        {
-            _logger.LogError(apiEx, "There was an error while retrieving the information from Redis");
-            isSuccess = false;
         }
         catch (NotInK8SEnvironmentException)
         {

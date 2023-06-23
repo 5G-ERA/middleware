@@ -27,11 +27,6 @@
 
 
 		<OpenApiReference Include="..\Orchestrator\OrchestratorSpec.json" CodeGenerator="NSwagCSharp" Namespace="Middleware.ResourcePlanner.Orchestrator" ClassName="OrchestratorApiClient" Link="OpenAPIs\OrchestratorSpec.json" />
-
-		<OpenApiReference Include="..\RedisInterface\RedisInterfaceSpec.json" ClassName="RedisApiClient" Link="OpenAPIs\RedisInterfaceSpec.json" CodeGenerator="NSwagCSharp">
-			<Namespace>Middleware.ResourcePlanner.RedisInterface</Namespace>
-			<Options>/AdditionalNamespaceUsages:Middleware.ResourcePlanner.Orchestrator</Options>
-		</OpenApiReference>
 	</ItemGroup>
 
 	<ItemGroup>

@@ -7,7 +7,6 @@ using Middleware.Common.ExtensionMethods;
 using Middleware.DataAccess.ExtensionMethods;
 using Middleware.DataAccess.Repositories.Abstract;
 using Middleware.DataAccess.Repositories.Redis;
-using Middleware.Orchestrator.ApiReference;
 using Middleware.Orchestrator.Config;
 using Middleware.Orchestrator.Deployment;
 using Middleware.Orchestrator.ExtensionMethods;
@@ -54,7 +53,6 @@ var rabbitmqConfig = builder.Configuration.GetSection(RabbitMqConfig.ConfigName)
 builder.Services.RegisterRabbitMqConsumers(rabbitmqConfig, mwConfig)
     .ConfigureAutoMapper();
 builder.Services.AddHttpClient(AppConfig.OsmApiClientName);
-builder.Services.AddScoped<IApiClientBuilder, ApiClientBuilder>();
 builder.Services.AddScoped<IKubernetesBuilder, KubernetesBuilder>();
 builder.Services.AddScoped<IDeploymentService, DeploymentService>();
 builder.Services.AddScoped<INetAppStatusRepository, RedisNetAppStatusRepository>();
