@@ -1,12 +1,13 @@
 ﻿using Middleware.Common.Responses;
 using Middleware.Models.Domain;
+using KeyValuePair = Middleware.Models.Domain.KeyValuePair;
 
 namespace Middleware.TaskPlanner.Config;
 
 public static class AutoMapperConfig
 {
     /// <summary>
-    /// Configures AutoMapper for project and maps the models for other APIs
+    ///     Configures AutoMapper for project and maps the models for other APIs
     /// </summary>
     /// <param name="services"></param>
     /// <returns></returns>
@@ -15,19 +16,13 @@ public static class AutoMapperConfig
         services.AddAutoMapper(cfg =>
         {
             cfg.CreateMap<DateTimeOffset, DateTime>().ConstructUsing(x => x.DateTime);
-            // Orchestrator
-            cfg.CreateMap<ActionModel, Orchestrator.ActionModel>().ReverseMap();
-            cfg.CreateMap<InstanceModel, Orchestrator.InstanceModel>().ReverseMap();
-            cfg.CreateMap<TaskModel, Orchestrator.TaskModel>().ReverseMap();
-            cfg.CreateMap<ApiResponse, Orchestrator.ApiResponse>().ReverseMap();
-
             // Resource Planner
             cfg.CreateMap<TaskModel, ResourcePlanner.TaskModel>().ReverseMap();
             cfg.CreateMap<ApiResponse, ResourcePlanner.ApiResponse>().ReverseMap();
             cfg.CreateMap<ActionModel, ResourcePlanner.ActionModel>().ReverseMap();
             cfg.CreateMap<InstanceModel, ResourcePlanner.InstanceModel>().ReverseMap();
             cfg.CreateMap<RobotModel, ResourcePlanner.RobotModel>().ReverseMap();
-            
+
             cfg.CreateMap<ROSNodeModel, ResourcePlanner.ROSNodeModel>().ReverseMap();
             cfg.CreateMap<RosTopicModel, ResourcePlanner.RosTopicModel>().ReverseMap();
             cfg.CreateMap<ROSServiceModel, ResourcePlanner.ROSServiceModel>().ReverseMap();
@@ -35,10 +30,9 @@ public static class AutoMapperConfig
             cfg.CreateMap<ActuatorModel, ResourcePlanner.ActuatorModel>().ReverseMap();
             //cfg.CreateMap<ManipulatorModel, ResourcePlanner.RobotManipulatorModel>().ReverseMap();
             cfg.CreateMap<DialogueModel, ResourcePlanner.DialogueModel>().ReverseMap();
-            cfg.CreateMap<Models.Domain.KeyValuePair, ResourcePlanner.KeyValuePair>().ReverseMap();
+            cfg.CreateMap<KeyValuePair, ResourcePlanner.KeyValuePair>().ReverseMap();
             cfg.CreateMap<RelationModel, ResourcePlanner.RelationModel>().ReverseMap();
             cfg.CreateMap<GraphEntityModel, ResourcePlanner.GraphEntityModel>().ReverseMap();
-
         });
         return services;
     }

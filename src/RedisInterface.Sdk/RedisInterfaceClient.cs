@@ -1,5 +1,4 @@
-﻿using System.Xml.Linq;
-using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Logging;
 using Middleware.Models.Domain;
 using Middleware.Models.ExtensionMethods;
 using Middleware.RedisInterface.Contracts.Requests;
@@ -290,6 +289,31 @@ public class RedisInterfaceClient : IRedisInterfaceClient
         return GetCloudByNameAsync(name, CancellationToken.None);
     }
 
+    public async Task<SliceResponse?> GetBySliceIdAsync(string id)
+    {
+        if (string.IsNullOrWhiteSpace(id))
+            throw new ArgumentNullException(nameof(id));
+
+        var result = await _api.GetBySliceIdAsync(id);
+        if (!result.IsSuccessStatusCode)
+            _logger.LogError(result.Error, "{} - unsuccessful API call", nameof(GetBySliceIdAsync));
+
+        return result.IsSuccessStatusCode ? result.Content : null;
+    }
+
+    public async Task<bool> SliceAddAsync(SliceRequest slice)
+    {
+        if (slice is null)
+            throw new ArgumentNullException(nameof(slice));
+
+        var result = await _api.SliceAddAsync(slice);
+
+        if (!result.IsSuccessStatusCode)
+            _logger.LogError(result.Error, "{} - unsuccessful API call", nameof(ActionPlanAddAsync));
+
+        return result.IsSuccessStatusCode;
+    }
+
     private RelationModel CreateRelation<TSource, TDirection>(TSource source, TDirection direction, string name)
         where TSource : BaseModel
         where TDirection : BaseModel
@@ -454,30 +478,5 @@ public class RedisInterfaceClient : IRedisInterfaceClient
             _logger.LogError(result.Error, "{} - unsuccessful API call", nameof(GetCloudByNameAsync));
 
         return result.IsSuccessStatusCode ? result.Content : null;
-    }
-
-    public async Task<SliceResponse?> GetBySliceIdAsync(string id)
-    {
-        if (string.IsNullOrWhiteSpace(id))
-            throw new ArgumentNullException(nameof(id));
-
-        var result = await _api.GetBySliceIdAsync(id);
-        if (!result.IsSuccessStatusCode)
-            _logger.LogError(result.Error, "{} - unsuccessful API call", nameof(GetBySliceIdAsync));
-
-        return result.IsSuccessStatusCode ? result.Content : null;
-    }
-
-    public async Task<bool> SliceAddAsync(SliceRequest slice) 
-    {
-        if (slice is null)
-            throw new ArgumentNullException(nameof(slice));
-
-        var result = await _api.SliceAddAsync(slice);
-
-        if (!result.IsSuccessStatusCode)
-            _logger.LogError(result.Error, "{} - unsuccessful API call", nameof(ActionPlanAddAsync));
-
-        return result.IsSuccessStatusCode;
     }
 }

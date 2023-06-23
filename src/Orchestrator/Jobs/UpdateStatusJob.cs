@@ -1,16 +1,13 @@
-﻿using System.Net;
-using AutoMapper;
+﻿using AutoMapper;
 using k8s;
 using k8s.Models;
 using Middleware.Common.Config;
 using Middleware.Common.ExtensionMethods;
+using Middleware.Models.Domain;
 using Middleware.Models.Enums;
 using Middleware.Orchestrator.Deployment;
-using Middleware.Orchestrator.RedisInterface;
 using Middleware.RedisInterface.Sdk;
 using Quartz;
-using ActionPlanModel = Middleware.Models.Domain.ActionPlanModel;
-using InstanceModel = Middleware.Models.Domain.InstanceModel;
 
 namespace Middleware.Orchestrator.Jobs;
 
@@ -73,16 +70,6 @@ public class UpdateStatusJob : BaseJob<UpdateStatusJob>
                         seq.Id, seq);
                 }
             }
-        }
-        catch (ApiException<ApiResponse> apiEx)
-        {
-            if (apiEx.StatusCode == (int)HttpStatusCode.NotFound)
-            {
-                Logger.LogInformation(apiEx, "No deployed plans have been found");
-                return;
-            }
-
-            Logger.LogError(apiEx, "There was a problem during the operation on the data");
         }
         catch (Exception ex)
         {

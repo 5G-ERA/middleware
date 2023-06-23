@@ -28,7 +28,6 @@ public class MiddlewareStartupJob : BaseJob<MiddlewareStartupJob>
         try
         {
             var client = _kubeBuilder.CreateKubernetesClient();
-
             if (client is null)
             {
                 Logger.LogInformation("Skipped instantiation of the middleware. Kubernetes not detected.");
@@ -63,7 +62,8 @@ public class MiddlewareStartupJob : BaseJob<MiddlewareStartupJob>
                 { "gateway", "redis-interface-api", "resource-planner-api", "task-planner-api" };
 
             var orchestratorImage = deployments.Items
-                .First(d => d.Metadata.Name == "orchestrator-api").Spec.Template.Spec.Containers.FirstOrDefault().Image;
+                .First(d => d.Metadata.Name == "orchestrator-api").Spec.Template.Spec.Containers.FirstOrDefault()
+                !.Image;
 
             var tag = K8SImageHelper.GetTag(orchestratorImage);
 
@@ -83,7 +83,6 @@ public class MiddlewareStartupJob : BaseJob<MiddlewareStartupJob>
                 var kind = service != "gateway" ? K8SServiceKind.ClusterIp : K8SServiceKind.LoadBalancer;
 
                 var lbService = _deploymentService.CreateStartupService(service, kind, deployment.Metadata);
-
                 if (serviceNames.Contains(lbService.Metadata.Name) == false)
                 {
                     lbService = await kubeClient.CoreV1.CreateNamespacedServiceAsync(lbService,

@@ -1,201 +1,186 @@
 ﻿using System.Net;
 using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
-using Middleware.Common.Responses;
-using Middleware.Models.Domain;
-using Middleware.RedisInterface.Sdk;
 using Middleware.TaskPlanner.ApiReference;
 using Middleware.TaskPlanner.Contracts.Requests;
 using Middleware.TaskPlanner.Exceptions;
+using Middleware.TaskPlanner.ResourcePlanner;
 using Middleware.TaskPlanner.Services;
+using ApiResponse = Middleware.Common.Responses.ApiResponse;
+using TaskModel = Middleware.Models.Domain.TaskModel;
 
-namespace Middleware.TaskPlanner.Controllers
+namespace Middleware.TaskPlanner.Controllers;
+
+[ApiController]
+[Route("api/v1/[controller]")]
+public class PlanController : ControllerBase
 {
-    [ApiController]
-    [Route("api/v1/[controller]")]
-    public class PlanController : ControllerBase
+    private readonly IActionPlanner _actionPlanner;
+    private readonly ILogger<PlanController> _logger;
+    private readonly IMapper _mapper;
+    private readonly IPublishService _publishService;
+    private readonly ResourcePlannerApiClient _resourcePlannerClient;
+
+
+    public PlanController(IActionPlanner actionPlanner, IApiClientBuilder builder, IMapper mapper,
+        IPublishService publishService, ILogger<PlanController> logger)
     {
-        private readonly IActionPlanner _actionPlanner;
-        private readonly IMapper _mapper;
-        private readonly IPublishService _publishService;
-        private readonly ResourcePlanner.ResourcePlannerApiClient _resourcePlannerClient;
-        private readonly IRedisInterfaceClient _redisInterfaceClient;
-        private readonly ILogger<PlanController> _logger;
+        _actionPlanner = actionPlanner;
+        _mapper = mapper;
+        _publishService = publishService;
+        _logger = logger;
+        _resourcePlannerClient = builder.CreateResourcePlannerApiClient();
+    }
 
+    [HttpPost]
+    [ProducesResponseType(typeof(TaskModel), (int)HttpStatusCode.OK)]
+    [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.NotFound)]
+    [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.BadRequest)]
+    [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.InternalServerError)]
+    public async Task<ActionResult<TaskModel>> GetPlan([FromBody] CreatePlanRequest inputModel,
+        bool dryRun = false)
+    {
+        if (inputModel == null)
+            return BadRequest("Parameters were not specified.");
 
-        public PlanController(IActionPlanner actionPlanner, IApiClientBuilder builder,
-            IRedisInterfaceClient redisInterfaceClient, IMapper mapper,
-            IPublishService publishService, ILogger<PlanController> logger)
+        if (inputModel.IsValid() == false)
         {
-            _actionPlanner = actionPlanner;
-            _mapper = mapper;
-            _publishService = publishService;
-            _logger = logger;
-            _resourcePlannerClient = builder.CreateResourcePlannerApiClient();
-            _redisInterfaceClient = redisInterfaceClient;
+            return BadRequest(new ApiResponse((int)HttpStatusCode.BadRequest,
+                "Parameters were not specified or wrongly specified."));
         }
 
-        [HttpPost]
-        [ProducesResponseType(typeof(TaskModel), (int)HttpStatusCode.OK)]
-        [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.NotFound)]
-        [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.BadRequest)]
-        [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.InternalServerError)]
-        public async Task<ActionResult<TaskModel>> GetPlan([FromBody] CreatePlanRequest inputModel,
-            bool dryRun = false)
+        var id = inputModel.Id;
+        var lockResource = inputModel.LockResourceReUse;
+        var robotId = inputModel.RobotId;
+
+        try
         {
-            if (inputModel == null)
-                return BadRequest("Parameters were not specified.");
+            _actionPlanner.Initialize(new(), DateTime.Now);
 
-            if (inputModel.IsValid() == false)
-                return BadRequest(new ApiResponse((int)HttpStatusCode.BadRequest,
-                    "Parameters were not specified or wrongly specified."));
+            var (plan, robot2) =
+                await _actionPlanner.Plan(id, robotId);
+            plan.ResourceLock = lockResource;
 
-            Guid id = inputModel.Id;
-            bool lockResource = inputModel.LockResourceReUse;
-            Guid robotId = inputModel.RobotId;
-
-            try
+            // call resource planner for resources
+            var tmpTaskSend = _mapper.Map<ResourcePlanner.TaskModel>(plan);
+            var tmpRobotSend = _mapper.Map<RobotModel>(robot2);
+            var resourceInput = new ResourceInput
             {
-                _actionPlanner.Initialize(new List<ActionModel>(), DateTime.Now);
+                Robot = tmpRobotSend,
+                Task = tmpTaskSend
+            };
+            var tmpFinalTask =
+                await _resourcePlannerClient.ResourceAsync(resourceInput);
+            var resourcePlan = _mapper.Map<TaskModel>(tmpFinalTask);
 
-                var (plan, robot2) =
-                    await _actionPlanner.Plan(id, robotId);
-                plan.ResourceLock = lockResource;
-
-                // call resource planner for resources
-                ResourcePlanner.TaskModel tmpTaskSend = _mapper.Map<ResourcePlanner.TaskModel>(plan);
-                ResourcePlanner.RobotModel tmpRobotSend = _mapper.Map<ResourcePlanner.RobotModel>(robot2);
-                ResourcePlanner.ResourceInput resourceInput = new ResourcePlanner.ResourceInput
-                {
-                    Robot = tmpRobotSend,
-                    Task = tmpTaskSend
-                };
-                ResourcePlanner.TaskModel tmpFinalTask =
-                    await _resourcePlannerClient.ResourceAsync(resourceInput);
-                TaskModel resourcePlan = _mapper.Map<TaskModel>(tmpFinalTask);
-
-                if (dryRun)
-                    return Ok(resourcePlan);
-
-                await _publishService.PublishPlanAsync(resourcePlan, robot2);
-
+            if (dryRun)
                 return Ok(resourcePlan);
-            }
-            catch (Orchestrator.ApiException<ResourcePlanner.ApiResponse> apiEx)
-            {
-                return StatusCode(apiEx.StatusCode, _mapper.Map<ApiResponse>(apiEx.Result));
-            }
-            catch (Orchestrator.ApiException<Orchestrator.ApiResponse> apiEx)
-            {
-                return StatusCode(apiEx.StatusCode, _mapper.Map<ApiResponse>(apiEx.Result));
-            }
-            catch (Exception ex)
-            {
-                int statusCode = (int)HttpStatusCode.InternalServerError;
-                return StatusCode(statusCode,
-                    new ApiResponse(statusCode, $"There was an error while preparing the task plan: {ex.Message}"));
-            }
+
+            await _publishService.PublishPlanAsync(resourcePlan, robot2);
+
+            return Ok(resourcePlan);
+        }
+        catch (Orchestrator.ResourcePlannerApiClient.ApiException<ResourcePlanner.ApiResponse> apiEx)
+        {
+            return StatusCode(apiEx.StatusCode, _mapper.Map<ApiResponse>(apiEx.Result));
+        }
+        catch (Orchestrator.ResourcePlannerApiClient.ApiException<ApiResponse> apiEx)
+        {
+            return StatusCode(apiEx.StatusCode, _mapper.Map<ApiResponse>(apiEx.Result));
+        }
+        catch (Exception ex)
+        {
+            var statusCode = (int)HttpStatusCode.InternalServerError;
+            return StatusCode(statusCode,
+                new ApiResponse(statusCode, $"There was an error while preparing the task plan: {ex.Message}"));
+        }
+    }
+
+    [HttpPost("semantic")]
+    [ProducesResponseType(typeof(TaskModel), (int)HttpStatusCode.OK)]
+    [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.NotFound)]
+    [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.BadRequest)]
+    [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.InternalServerError)]
+    public async Task<ActionResult<TaskModel>> GetSemanticPlan([FromBody] CreatePlanRequest inputModel,
+        bool dryRun = false)
+    {
+        if (inputModel == null)
+            return BadRequest("Parameters were not specified.");
+
+        if (inputModel.ContextKnown == false)
+        {
+            return BadRequest(new ApiResponse((int)HttpStatusCode.BadRequest,
+                "Semmantic planning is not yet available."));
         }
 
-        [HttpPost("semantic")]
-        [ProducesResponseType(typeof(TaskModel), (int)HttpStatusCode.OK)]
-        [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.NotFound)]
-        [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.BadRequest)]
-        [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.InternalServerError)]
-        public async Task<ActionResult<TaskModel>> GetSemanticPlan([FromBody] CreatePlanRequest inputModel,
-            bool dryRun = false)
+        if (inputModel.IsValid() == false)
         {
-            if (inputModel == null)
-                return BadRequest("Parameters were not specified.");
+            return BadRequest(new ApiResponse((int)HttpStatusCode.BadRequest,
+                "Parameters were not specified or wrongly specified."));
+        }
 
-            if (inputModel.ContextKnown == false)
+        var id = inputModel.Id; //task id
+        var lockResource = inputModel.LockResourceReUse;
+        var robotId = inputModel.RobotId; //robot id
+        var contextKnown = inputModel.ContextKnown;
+        var dialogueTemp = inputModel.Questions;
+
+        try
+        {
+            _actionPlanner.Initialize(new(), DateTime.Now);
+            // INFER ACTION SEQUENCE PROCESS
+            var (plan, robot2) =
+                await _actionPlanner.InferActionSequence(id, contextKnown, lockResource, dialogueTemp, robotId);
+
+            // call resource planner for resources
+            var tmpTaskSend = _mapper.Map<ResourcePlanner.TaskModel>(plan);
+            var tmpRobotSend = _mapper.Map<RobotModel>(robot2);
+            var resourceInput = new ResourceInput
             {
-                return BadRequest(new ApiResponse((int)HttpStatusCode.BadRequest,
-                    "Semmantic planning is not yet available."));
-            }
+                Robot = tmpRobotSend,
+                Task = tmpTaskSend
+            };
+            var tmpFinalTask =
+                await _resourcePlannerClient.GetResourcePlanAsync(resourceInput);
+            var resourcePlan = _mapper.Map<TaskModel>(tmpFinalTask);
 
-            if (inputModel.IsValid() == false)
-            {
-                return BadRequest(new ApiResponse((int)HttpStatusCode.BadRequest,
-                    "Parameters were not specified or wrongly specified."));
-            }
-
-            Guid id = inputModel.Id; //task id
-            bool lockResource = inputModel.LockResourceReUse;
-            Guid robotId = inputModel.RobotId; //robot id
-            bool contextKnown = inputModel.ContextKnown;
-            List<DialogueModel> dialogueTemp = inputModel.Questions;
-
-            try
-            {
-                _actionPlanner.Initialize(new List<ActionModel>(), DateTime.Now);
-                // INFER ACTION SEQUENCE PROCESS
-                var (plan, robot2) =
-                    await _actionPlanner.InferActionSequence(id, contextKnown, lockResource, dialogueTemp, robotId);
-
-                // call resource planner for resources
-                ResourcePlanner.TaskModel tmpTaskSend = _mapper.Map<ResourcePlanner.TaskModel>(plan);
-                ResourcePlanner.RobotModel tmpRobotSend = _mapper.Map<ResourcePlanner.RobotModel>(robot2);
-                ResourcePlanner.ResourceInput resourceInput = new ResourcePlanner.ResourceInput
-                {
-                    Robot = tmpRobotSend,
-                    Task = tmpTaskSend
-                };
-                ResourcePlanner.TaskModel tmpFinalTask =
-                    await _resourcePlannerClient.GetResourcePlanAsync(resourceInput);
-                TaskModel resourcePlan = _mapper.Map<TaskModel>(tmpFinalTask);
-
-                if (dryRun) // Will skip the orchestrator if true (will not deploy the actual plan.)
-                    return Ok(resourcePlan);
-
-                await _publishService.PublishPlanAsync(resourcePlan, robot2);
-
-                //TODO: orchestrator has to create the relations between the instance and the location the services are deployed in
-                /*Orchestrator.OrchestratorResourceInput tmpTaskOrchestratorSend =
-                    _mapper.Map<Orchestrator.OrchestratorResourceInput>(resourcePlan);
-                Orchestrator.TaskModel tmpFinalOrchestratorTask =
-                    await _orchestratorClient.InstantiateNewPlanAsync(tmpTaskOrchestratorSend);
-                TaskModel finalPlan = _mapper.Map<TaskModel>(tmpFinalOrchestratorTask);
-         
-                */
+            if (dryRun) // Will skip the orchestrator if true (will not deploy the actual plan.)
                 return Ok(resourcePlan);
-            }
-            catch (Orchestrator.ApiException<ResourcePlanner.ApiResponse> apiEx)
-            {
-                return StatusCode(apiEx.StatusCode, _mapper.Map<ApiResponse>(apiEx.Result));
-            }
-            catch (Orchestrator.ApiException<Orchestrator.ApiResponse> apiEx)
-            {
-                return StatusCode(apiEx.StatusCode, _mapper.Map<ApiResponse>(apiEx.Result));
-            }
-            catch (Exception ex)
-            {
-                int statusCode = (int)HttpStatusCode.InternalServerError;
-                return StatusCode(statusCode,
-                    new ApiResponse(statusCode, $"There was an error while preparing the task plan: {ex.Message}"));
-            }
+
+            await _publishService.PublishPlanAsync(resourcePlan, robot2);
+            return Ok(resourcePlan);
         }
-
-        [HttpPost("switchover")]
-        [ProducesResponseType(typeof(void), (int)HttpStatusCode.OK)]
-        [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.BadRequest)]
-        public async Task<IActionResult> Switchover([FromBody] PerformSwitchoverRequest request)
+        catch (Orchestrator.ResourcePlannerApiClient.ApiException<ResourcePlanner.ApiResponse> apiEx)
         {
-            try
-            {
-                await _publishService.PublishSwitchoverDeployInstance(request.ActionPlanId, request.ActionId,
-                    request.Destination, request.DestinationType);
-                await _publishService.PublishSwitchoverDeleteInstance(request.ActionPlanId, request.ActionId);
+            return StatusCode(apiEx.StatusCode, _mapper.Map<ApiResponse>(apiEx.Result));
+        }
+        catch (Exception ex)
+        {
+            var statusCode = (int)HttpStatusCode.InternalServerError;
+            return StatusCode(statusCode,
+                new ApiResponse(statusCode, $"There was an error while preparing the task plan: {ex.Message}"));
+        }
+    }
 
-                return Ok();
-            }
-            catch (IncorrectLocationException ex)
-            {
-                _logger.LogInformation(
-                    "Attempted to obtain non existing Middleware within organization. Name: {0}, Type: {1}",
-                    ex.LocationName, ex.LocationType);
-                return BadRequest(new ApiResponse((int)HttpStatusCode.BadRequest, ex.Message));
-            }
+    [HttpPost("switchover")]
+    [ProducesResponseType(typeof(void), (int)HttpStatusCode.OK)]
+    [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.BadRequest)]
+    public async Task<IActionResult> Switchover([FromBody] PerformSwitchoverRequest request)
+    {
+        try
+        {
+            await _publishService.PublishSwitchoverDeployInstance(request.ActionPlanId, request.ActionId,
+                request.Destination, request.DestinationType);
+            await _publishService.PublishSwitchoverDeleteInstance(request.ActionPlanId, request.ActionId);
+
+            return Ok();
+        }
+        catch (IncorrectLocationException ex)
+        {
+            _logger.LogInformation(
+                "Attempted to obtain non existing Middleware within organization. Name: {0}, Type: {1}",
+                ex.LocationName, ex.LocationType);
+            return BadRequest(new ApiResponse((int)HttpStatusCode.BadRequest, ex.Message));
         }
     }
 }
