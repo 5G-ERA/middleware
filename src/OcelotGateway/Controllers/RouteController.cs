@@ -38,7 +38,7 @@ public class RouteController : ControllerBase
             ClusterId = "testCluster",
             Destinations = new Dictionary<string, DestinationConfig>
             {
-                { "testdest1", new DestinationConfig { Address = "http://taskplanner.api/api/v1/test/hello" } }
+                { "testdest1", new DestinationConfig { Address = "http://websocketserver" } }
             }
         };
         var routeCfg = new RouteConfig
@@ -51,7 +51,7 @@ public class RouteController : ControllerBase
             ClusterId = "testCluster" //
         };
         // transforms allow us to change the path that is requested like below to replace direct forwarding
-        routeCfg = routeCfg.WithTransformPathSet("/");
+        routeCfg = routeCfg.WithTransformPathSet("/send");
 
         clusterList.Add(clusterCfg);
         routeList.Add(routeCfg);

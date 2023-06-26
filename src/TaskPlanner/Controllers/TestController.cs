@@ -12,4 +12,13 @@ public class TestController : ControllerBase
     {
         return Ok("hello there");
     }
+
+
+
+    [HttpPost]
+    [Route("send", Name = "send")]
+    public IActionResult Send()
+    {
+        return Ok("websocket test");
+    }
 }
