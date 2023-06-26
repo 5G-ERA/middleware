@@ -5,10 +5,17 @@ namespace Middleware.Orchestrator.Deployment.RosCommunication;
 
 internal class Ros1ConnectionBuilder : IRosConnectionBuilder
 {
+    private const short Ros1 = 1;
     private readonly RosDistro _distro;
 
     public Ros1ConnectionBuilder(RosDistro distro)
     {
+        if ((int)distro != Ros1)
+        {
+            throw new ArgumentException(
+                "Ros1ConnectionBuilder cannot provide connectivity for ROs version other than 1", nameof(distro));
+        }
+
         _distro = distro;
         RosVersion = (int)distro;
         RosDistro = distro.ToString();
@@ -42,6 +49,7 @@ internal class Ros1ConnectionBuilder : IRosConnectionBuilder
         var rosIpEnv = new V1EnvVar("ROS_IP", "127.0.0.1");
         foreach (var cont in dpl.Spec.Template.Spec.Containers)
         {
+            cont.Env ??= new List<V1EnvVar>();
             cont.Env.Add(rosMasterEnv);
             cont.Env.Add(rosIpEnv);
         }

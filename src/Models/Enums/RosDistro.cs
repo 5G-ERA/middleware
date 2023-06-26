@@ -1,5 +1,8 @@
-﻿namespace Middleware.Models.Enums;
+﻿using Middleware.Models.Domain;
 
+namespace Middleware.Models.Enums;
+
+[Obsolete($"Causes problems with keeping the names. Use {nameof(RosDistroHelper)} instead")]
 public enum RosDistro
 {
     Foxy = 2, //ROS 2
