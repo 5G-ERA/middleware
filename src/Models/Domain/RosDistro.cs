@@ -2,24 +2,6 @@
 
 public struct RosDistro
 {
-    public RosDistro(string name, short rosVersion)
-    {
-        Name = name;
-        RosVersion = rosVersion;
-    }
-
-    public string Name { get; }
-    public short RosVersion { get; set; }
-}
-
-public static class RosDistroHelper
-{
-    private static List<RosDistro> _distros = new()
-    {
-        Electric, Groovy, Fuerte, Hydro, Indigo, Kinetic, Lunar, Noetic, Ardent, Dashing, Crystal, Humble, Foxy,
-        Melodic, Bouncy, Eloquent, Galactic
-    };
-
     public static RosDistro Electric { get; } = new("Electric", 1);
     public static RosDistro Groovy { get; } = new("Groovy", 1);
     public static RosDistro Fuerte { get; } = new("Fuerte", 1);
@@ -38,7 +20,44 @@ public static class RosDistroHelper
     public static RosDistro Galactic { get; } = new("Galactic", 2);
     public static RosDistro Foxy { get; } = new("Foxy", 2);
 
-    public static RosDistro FromName(string name)
+    public RosDistro(string name, short rosVersion)
     {
+        Name = name;
+        RosVersion = rosVersion;
+    }
+
+    public string Name { get; }
+    public short RosVersion { get; set; }
+}
+
+public static class RosDistroHelper
+{
+    private static readonly List<RosDistro> Distros = new()
+    {
+        RosDistro.Electric,
+        RosDistro.Groovy,
+        RosDistro.Fuerte,
+        RosDistro.Hydro,
+        RosDistro.Indigo,
+        RosDistro.Kinetic,
+        RosDistro.Lunar,
+        RosDistro.Noetic,
+        RosDistro.Ardent,
+        RosDistro.Dashing,
+        RosDistro.Crystal,
+        RosDistro.Humble,
+        RosDistro.Foxy,
+        RosDistro.Melodic,
+        RosDistro.Bouncy,
+        RosDistro.Eloquent,
+        RosDistro.Galactic
+    };
+
+
+    public static RosDistro? FromName(string name)
+    {
+        var sanName = name.ToLower();
+        var distro = Distros.FirstOrDefault(d => d.Name.ToLower() == sanName);
+        return distro;
     }
 }
