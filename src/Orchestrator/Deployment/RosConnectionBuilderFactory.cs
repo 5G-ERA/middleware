@@ -1,4 +1,4 @@
-﻿using Middleware.Models.Enums;
+﻿using Middleware.Models.Domain;
 using Middleware.Orchestrator.Deployment.RosCommunication;
 
 namespace Middleware.Orchestrator.Deployment;
@@ -8,16 +8,12 @@ internal class RosConnectionBuilderFactory : IRosConnectionBuilderFactory
     /// <inheritdoc />
     public IRosConnectionBuilder CreateConnectionBuilder(RosDistro distro)
     {
-        IRosConnectionBuilder retVal = null;
-        switch ((int)distro)
+        IRosConnectionBuilder retVal = distro.RosVersion switch
         {
-            case 1:
-                retVal = new Ros1ConnectionBuilder(distro);
-                break;
-            case 2:
-                retVal = new Ros2ConnectionBuilder(distro);
-                break;
-        }
+            RosVersion.Ros1 => new Ros1ConnectionBuilder(distro),
+            RosVersion.Ros2 => new Ros2ConnectionBuilder(distro),
+            _ => null
+        };
 
         return retVal;
     }

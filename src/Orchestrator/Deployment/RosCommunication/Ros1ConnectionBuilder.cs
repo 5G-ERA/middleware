@@ -1,24 +1,24 @@
 ﻿using k8s.Models;
-using Middleware.Models.Enums;
+using Middleware.Models.Domain;
 
 namespace Middleware.Orchestrator.Deployment.RosCommunication;
 
 internal class Ros1ConnectionBuilder : IRosConnectionBuilder
 {
-    private const short Ros1 = 1;
+    private const RosVersion Ros1 = Middleware.Models.Domain.RosVersion.Ros1;
     private readonly RosDistro _distro;
 
     public Ros1ConnectionBuilder(RosDistro distro)
     {
-        if ((int)distro != Ros1)
+        if (distro.RosVersion != Ros1)
         {
             throw new ArgumentException(
                 "Ros1ConnectionBuilder cannot provide connectivity for ROs version other than 1", nameof(distro));
         }
 
         _distro = distro;
-        RosVersion = (int)distro;
-        RosDistro = distro.ToString();
+        RosVersion = distro.RosVersionInt;
+        RosDistro = distro.Name;
     }
 
     public int RosVersion { get; }
@@ -33,7 +33,7 @@ internal class Ros1ConnectionBuilder : IRosConnectionBuilder
         if (dpl.Spec?.Template?.Spec?.Containers is null || dpl.Spec.Template.Spec.Containers.Any() == false)
             throw new ArgumentException("Missing Deployment container configuration.", nameof(dpl));
 
-        var imageName = $"ros:{_distro.ToString().ToLower()}-ros-core";
+        var imageName = $"ros:{_distro.Name.ToLower()}-ros-core";
 
         var rosContainer = new V1Container
         {

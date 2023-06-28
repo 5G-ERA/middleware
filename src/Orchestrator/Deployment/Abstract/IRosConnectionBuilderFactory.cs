@@ -1,4 +1,4 @@
-﻿using Middleware.Models.Enums;
+﻿using Middleware.Models.Domain;
 
 namespace Middleware.Orchestrator.Deployment;
 

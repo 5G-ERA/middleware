@@ -320,7 +320,7 @@ internal class DeploymentService : IDeploymentService
 
         if (instance.RosDistro is not null)
         {
-            var distroEnum = Enum.Parse<RosDistro>(instance.RosDistro);
+            var distroEnum = RosDistroHelper.FromName(instance.RosDistro);
             var builder = _rosConnectionBuilderFactory.CreateConnectionBuilder(distroEnum);
 
             deployment = builder.EnableRosCommunication(deployment);

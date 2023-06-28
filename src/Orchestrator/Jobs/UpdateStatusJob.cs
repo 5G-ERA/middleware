@@ -1,5 +1,4 @@
-﻿using AutoMapper;
-using k8s;
+﻿using k8s;
 using k8s.Models;
 using Middleware.Common.Config;
 using Middleware.Common.ExtensionMethods;
@@ -15,18 +14,15 @@ namespace Middleware.Orchestrator.Jobs;
 public class UpdateStatusJob : BaseJob<UpdateStatusJob>
 {
     private readonly IKubernetesBuilder _kubeBuilder;
-    private readonly IMapper _mapper;
     private readonly MiddlewareConfig _middlewareConfig;
     private readonly IRedisInterfaceClient _redisInterfaceClient;
 
     public UpdateStatusJob(IKubernetesBuilder kubeBuilder,
-        IMapper mapper,
         ILogger<UpdateStatusJob> logger,
         IConfiguration configuration,
         IRedisInterfaceClient redisInterfaceClient) : base(logger)
     {
         _kubeBuilder = kubeBuilder;
-        _mapper = mapper;
         _redisInterfaceClient = redisInterfaceClient;
         _middlewareConfig = configuration.GetSection(MiddlewareConfig.ConfigName).Get<MiddlewareConfig>();
     }
@@ -80,7 +76,7 @@ public class UpdateStatusJob : BaseJob<UpdateStatusJob>
 
     private bool SequenceIsNotRunning(ActionPlanModel seq)
     {
-        var statuses = seq.ActionSequence
+        var statuses = seq.ActionSequence!
             .SelectMany(a => a.Services.Select(s => s.CanBeDeleted())).ToList();
 
         return statuses.All(b => b);
@@ -90,7 +86,7 @@ public class UpdateStatusJob : BaseJob<UpdateStatusJob>
     {
         var validated = false;
         //check if all instances are down for at least half an hour, then terminate
-        foreach (var action in seq.ActionSequence)
+        foreach (var action in seq.ActionSequence!)
         {
             if (action.Placement != _middlewareConfig.InstanceName ||
                 action.PlacementType != _middlewareConfig.InstanceType)
@@ -98,7 +94,6 @@ public class UpdateStatusJob : BaseJob<UpdateStatusJob>
 
             foreach (var instance in action.Services)
             {
-                var instanceId = instance.ServiceInstanceId;
                 validated = true;
                 var deployments = await kubeClient.AppsV1.ListNamespacedDeploymentAsync(AppConfig.K8SNamespaceName,
                     labelSelector: KubernetesObjectExtensions.GetNetAppLabelSelector(instance.ServiceInstanceId));

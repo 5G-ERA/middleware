@@ -1,6 +1,5 @@
-﻿using System;
-using FluentAssertions;
-using Middleware.Models.Enums;
+﻿using FluentAssertions;
+using Middleware.Models.Domain;
 using Middleware.Orchestrator.Deployment;
 using Middleware.Orchestrator.Deployment.RosCommunication;
 using Xunit;
@@ -16,19 +15,35 @@ public class RosConnectionBuilderFactoryTests
         _sut = new();
     }
 
-    [Theory]
-    [InlineData(RosDistro.Noetic, typeof(Ros1ConnectionBuilder))]
-    [InlineData(RosDistro.Foxy, typeof(Ros2ConnectionBuilder))]
-    public void CreateConnectionBuilder_ShouldReturnCorrectRosVersionBuilder(RosDistro distro, Type expectedBuilderType)
+    [Fact]
+    //[InlineData(RosDistro.Noetic, typeof(Ros1ConnectionBuilder))]
+    //[InlineData(RosDistro.Foxy, typeof(Ros2ConnectionBuilder))]
+    public void CreateConnectionBuilder_ShouldReturnCorrectRos1VersionBuilder()
     {
         //arrange
+        var distro = RosDistro.Noetic;
         //act
         var result = _sut.CreateConnectionBuilder(distro);
         //assert
 
         result.Should().NotBeNull();
-        result.Should().BeOfType(expectedBuilderType);
-        result.RosDistro.Should().Be(distro.ToString());
-        result.RosVersion.Should().Be((int)distro);
+        result.Should().BeOfType(typeof(Ros1ConnectionBuilder));
+        result.RosDistro.Should().Be(distro.Name);
+        result.RosVersion.Should().Be(distro.RosVersionInt);
+    }
+
+    [Fact]
+    public void CreateConnectionBuilder_ShouldReturnCorrectRos2VersionBuilder()
+    {
+        //arrange
+        var distro = RosDistro.Foxy;
+        //act
+        var result = _sut.CreateConnectionBuilder(distro);
+        //assert
+
+        result.Should().NotBeNull();
+        result.Should().BeOfType(typeof(Ros2ConnectionBuilder));
+        result.RosDistro.Should().Be(distro.Name);
+        result.RosVersion.Should().Be(distro.RosVersionInt);
     }
 }
