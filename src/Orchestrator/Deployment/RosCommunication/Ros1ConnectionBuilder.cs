@@ -13,7 +13,7 @@ internal class Ros1ConnectionBuilder : IRosConnectionBuilder
         if (distro.RosVersion != Ros1)
         {
             throw new ArgumentException(
-                "Ros1ConnectionBuilder cannot provide connectivity for ROs version other than 1", nameof(distro));
+                "Ros1ConnectionBuilder cannot provide connectivity for ROS version other than 1", nameof(distro));
         }
 
         _distro = distro;

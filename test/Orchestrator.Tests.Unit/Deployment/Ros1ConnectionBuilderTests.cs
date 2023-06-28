@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using FluentAssertions;
 using k8s.Models;
@@ -10,6 +11,19 @@ namespace Orchestrator.Tests.Unit.Deployment;
 
 public class Ros1ConnectionBuilderTests
 {
+    [Fact]
+    public void Ros1ConnectionBuilder_ShouldThrowArgumentExceptionWhenGivenRos2Distro()
+    {
+        //arrange
+        var ros2Distro = RosDistro.Foxy;
+        //act
+        var act = () => new Ros1ConnectionBuilder(ros2Distro);
+        //assert
+        act.Should().Throw<ArgumentException>()
+            .WithMessage(
+                "Ros1ConnectionBuilder cannot provide connectivity for ROS version other than 1 (Parameter 'distro')");
+    }
+
     [Fact]
     public void EnableRosCommunication_ShouldConfigureDeploymentWithNewContainer()
     {
