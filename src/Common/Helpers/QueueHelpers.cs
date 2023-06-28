@@ -55,6 +55,37 @@ public static class QueueHelpers
     }
 
     /// <summary>
+    ///     Constructs the name of the queue that will be used to create a new YARP dynamic route
+    /// </summary>
+    /// <param name="organization"></param>
+    /// <param name="instanceName"></param>
+    /// <returns></returns>
+    /// <exception cref="ArgumentNullException">When parameters are not specified or contain empty or whitespace string</exception>
+    public static string ConstructGatewayAddNetAppEntryMessageQueueName(string organization, string instanceName)
+    {
+        if (string.IsNullOrWhiteSpace(organization)) throw new ArgumentNullException(nameof(organization));
+        if (string.IsNullOrWhiteSpace(organization)) throw new ArgumentNullException(nameof(instanceName));
+
+        return GetQueueName(organization, instanceName, "gateway-add-entry");
+    }
+
+
+    /// <summary>
+    ///     Constructs the name of the queue that will be used to delete the YARP dynamic route
+    /// </summary>
+    /// <param name="organization"></param>
+    /// <param name="instanceName"></param>
+    /// <returns></returns>
+    /// <exception cref="ArgumentNullException">When parameters are not specified or contain empty or whitespace string</exception>
+    public static string ConstructGatewayDeleteNetAppEntryMessageQueueName(string organization, string instanceName)
+    {
+        if (string.IsNullOrWhiteSpace(organization)) throw new ArgumentNullException(nameof(organization));
+        if (string.IsNullOrWhiteSpace(organization)) throw new ArgumentNullException(nameof(instanceName));
+
+        return GetQueueName(organization, instanceName, "gateway-delete-entry");
+    }
+
+    /// <summary>
     ///     Constructs the switchover deployment queue name for this specific Middleware instance
     /// </summary>
     /// <param name="organization"></param>

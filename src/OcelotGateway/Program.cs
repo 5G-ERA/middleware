@@ -55,6 +55,7 @@ builder.Services.AddAuthentication(options =>
 builder.RegisterRedis();
 
 builder.Services.AddScoped<IUserRepository, RedisUserRepository>();
+builder.Services.AddScoped<GatewayConfigurationService>();
 
 var ocelotConfig = new OcelotPipelineConfiguration
 {
