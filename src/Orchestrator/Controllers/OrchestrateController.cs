@@ -105,10 +105,10 @@ public class OrchestrateController : Controller
     [HttpPatch]
     [Route("plan", Name = "UpdatePlan")]
     [ProducesResponseType(typeof(TaskModel), (int)HttpStatusCode.OK)]
-    public async Task<IActionResult> UpdatePlan([FromBody] TaskModel task)
+    public Task<IActionResult> UpdatePlan([FromBody] TaskModel task)
     {
         //TODO: redeploy services for new plan
-        return Ok(task);
+        return Task.FromResult<IActionResult>(Ok(task));
     }
 
     /// <summary>
@@ -120,10 +120,10 @@ public class OrchestrateController : Controller
     [Route("action/{id}", Name = "DeleteActionById")]
     [ProducesResponseType((int)HttpStatusCode.OK)]
     [ProducesResponseType((int)HttpStatusCode.NotFound)]
-    public async Task<IActionResult> DeleteActionById(Guid id)
+    public Task<IActionResult> DeleteActionById(Guid id)
     {
         // TODO: Delete action with specified Id
-        return Ok();
+        return Task.FromResult<IActionResult>(Ok());
     }
 
     /// <summary>
@@ -234,10 +234,10 @@ public class OrchestrateController : Controller
     [HttpPost]
     [Route("execute")]
     [ProducesResponseType(typeof(List<InstanceModel>), (int)HttpStatusCode.OK)]
-    public async Task<IActionResult> InstantiateResources([FromBody] List<ActionModel> actions)
+    public Task<IActionResult> InstantiateResources([FromBody] List<ActionModel> actions)
     {
         //TODO: instantiate services for action
-        return Ok(new List<InstanceModel>());
+        return Task.FromResult<IActionResult>(Ok(new List<InstanceModel>()));
     }
 
     public record OrchestratorResourceInput(TaskModel Task, RobotModel Robot);

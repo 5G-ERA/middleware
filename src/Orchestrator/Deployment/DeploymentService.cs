@@ -37,16 +37,19 @@ internal class DeploymentService : IDeploymentService
     /// </summary>
     private readonly IRedisInterfaceClient _redisInterfaceClient;
 
+    private readonly IRosConnectionBuilderFactory _rosConnectionBuilderFactory;
+
     public DeploymentService(IKubernetesBuilder kubernetesClientBuilder,
         ILogger<DeploymentService> logger,
         IRedisInterfaceClient redisInterfaceClient,
         IOptions<MiddlewareConfig> mwConfig,
-        IKubernetesObjectBuilder kubeObjectBuilder)
+        IKubernetesObjectBuilder kubeObjectBuilder, IRosConnectionBuilderFactory rosConnectionBuilderFactory)
     {
         _logger = logger;
         _redisInterfaceClient = redisInterfaceClient;
         _mwConfig = mwConfig;
         _kubeObjectBuilder = kubeObjectBuilder;
+        _rosConnectionBuilderFactory = rosConnectionBuilderFactory;
         _kube = kubernetesClientBuilder.CreateKubernetesClient();
     }
 
@@ -314,6 +317,14 @@ internal class DeploymentService : IDeploymentService
 
         var deployment =
             _kubeObjectBuilder.DeserializeAndConfigureDeployment(cim!.K8SDeployment, instanceId, instanceName);
+
+        if (instance.RosDistro is not null)
+        {
+            var distroEnum = RosDistroHelper.FromName(instance.RosDistro);
+            var builder = _rosConnectionBuilderFactory.CreateConnectionBuilder(distroEnum);
+
+            deployment = builder.EnableRosCommunication(deployment);
+        }
 
         var service = string.IsNullOrWhiteSpace(cim.K8SService)
             ? _kubeObjectBuilder.CreateDefaultService(instanceName, instanceId, deployment)

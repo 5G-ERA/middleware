@@ -1,0 +1,36 @@
+{
+    "Id": "6077c8c0-d354-487d-b81e-fe187826c6ec",
+    "Name": "Teleoperation task",
+    "TaskPriority": 1,
+    "ActionSequence": [
+        {
+            "Id": "6a1232e4-9d44-487e-b5b4-b46dc5878ca5",
+            "Name": "Teleoperation",
+            "Order": 1,
+            "ActionPriority": "Normal",
+            "ActionStatus": "None",
+            "MinimumRam": 0,
+            "MinimumNumCores": 0,
+            "Services": [
+                {
+                    "Id": "26cf305a-e84c-4c40-aac2-f3a714bbd479",
+                    "Name": "Teleoperation",
+                    "IsReusable": false,
+                    "MinimumRam": 512,
+                    "MinimumNumCores": 2,
+                    "ContainerImage": {
+                        "Id": "cbb48148-1e61-4af9-b11e-a1b9dc8db23c",
+                        "Name": "Teleoperation",
+                        "Description": "The example network application onboarding for the webinar",
+                        "K8SDeployment": "apiVersion: apps/v1\nkind: Deployment\nmetadata:\n  name: teleoperation\nspec:\n  selector:\n    matchLabels:\n      app: teleoperation\n  replicas: 1\n  template:\n    metadata:\n      labels:\n        app: teleoperation\n    spec:\n      containers:\n        - name: teleoperation\n          resources: {}\n          image: alenrobots/5gera_teleop          \n",
+                        "K8SService": "apiVersion: v1\nkind: Service\nmetadata:\n  name: teleoperation\nspec:\n  selector:\n    app: teleoperation\n  type: LoadBalancer\n  ports:\n    - protocol: TCP\n      port: 5896\n      targetPort: 5896\n      name: teleop\n      \n"
+                    }
+                }
+            ]
+        }
+    ],
+    "Tags": [
+        "5G-ERA",
+        "teleoperation"
+    ]
+}

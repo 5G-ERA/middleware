@@ -47,7 +47,8 @@ internal class KubernetesObjectBuilder : IKubernetesObjectBuilder
         obj.Validate();
         obj.Metadata.SetServiceLabel(serviceInstanceId);
         obj.Metadata.Name = name;
-        throw new NotImplementedException();
+
+        return obj;
     }
 
     public V1Service CreateStartupService(string serviceImageName, K8SServiceKind kind, V1ObjectMeta meta)
