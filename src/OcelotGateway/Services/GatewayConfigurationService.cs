@@ -41,7 +41,7 @@ public class GatewayConfigurationService
             ClusterId = clusterCfg.ClusterId //
         };
         // transforms allow us to change the path that is requested like below to replace direct forwarding
-        routeCfg = routeCfg.WithTransformPathSet("/");
+        routeCfg = routeCfg.WithTransformPathRemovePrefix($"/{msg.NetAppName}");
 
         clusterList.Add(clusterCfg);
         routeList.Add(routeCfg);
