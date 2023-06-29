@@ -78,6 +78,7 @@ public static class RosDistroHelper
     /// <returns></returns>
     public static RosDistro FromName(string name)
     {
+        if (name == null) throw new ArgumentNullException(nameof(name));
         var sanName = name.ToLower();
         var distro = Distros.FirstOrDefault(d => d.Name.ToLower() == sanName);
         return distro;

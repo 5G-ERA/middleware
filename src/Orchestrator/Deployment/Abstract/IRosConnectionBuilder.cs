@@ -20,4 +20,11 @@ internal interface IRosConnectionBuilder
     /// <param name="dpl"></param>
     /// <returns></returns>
     V1Deployment EnableRosCommunication(V1Deployment dpl);
+
+    /// <summary>
+    ///     Enables the communication with the service to the Relay NetApp
+    /// </summary>
+    /// <param name="service"></param>
+    /// <returns></returns>
+    V1Service EnableRelayNetAppCommunication(V1Service service);
 }

@@ -318,17 +318,21 @@ internal class DeploymentService : IDeploymentService
         var deployment =
             _kubeObjectBuilder.DeserializeAndConfigureDeployment(cim!.K8SDeployment, instanceId, instanceName);
 
+        IRosConnectionBuilder builder = null;
+
         if (instance.RosDistro is not null)
         {
             var distroEnum = RosDistroHelper.FromName(instance.RosDistro);
-            var builder = _rosConnectionBuilderFactory.CreateConnectionBuilder(distroEnum);
-
-            deployment = builder.EnableRosCommunication(deployment);
+            builder = _rosConnectionBuilderFactory.CreateConnectionBuilder(distroEnum);
         }
+
+        if (builder is not null) deployment = builder.EnableRosCommunication(deployment);
 
         var service = string.IsNullOrWhiteSpace(cim.K8SService)
             ? _kubeObjectBuilder.CreateDefaultService(instanceName, instanceId, deployment)
             : _kubeObjectBuilder.DeserializeAndConfigureService(cim.K8SService, instanceName, instanceId);
+
+        if (builder is not null) service = builder.EnableRelayNetAppCommunication(service);
 
         return new(deployment, service, instanceId, instance);
     }
