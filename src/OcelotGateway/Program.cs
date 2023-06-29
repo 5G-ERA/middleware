@@ -66,7 +66,6 @@ var ocelotConfig = new OcelotPipelineConfiguration
 };
 
 builder.Services.AddReverseProxy()
-    .LoadFromConfig(builder.Configuration.GetSection("ReverseProxy"))
     .LoadFromMemory(new List<RouteConfig>(), new List<ClusterConfig>());
 
 
