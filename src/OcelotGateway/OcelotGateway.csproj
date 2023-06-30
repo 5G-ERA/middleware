@@ -14,6 +14,8 @@
   <ItemGroup>
     <PackageReference Include="AutoMapper" Version="12.0.0" />
     <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="12.0.0" />
+    <PackageReference Include="MassTransit" Version="8.0.16" />
+	<PackageReference Include="MassTransit.RabbitMQ" Version="8.0.12" />  
     <PackageReference Include="Microsoft.AspNetCore.Authentication" Version="2.2.0" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="6.0.3" />
     <PackageReference Include="Microsoft.IdentityModel" Version="7.0.0" />
@@ -23,6 +25,7 @@
     <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="6.28.1" />
 	<PackageReference Include="Swashbuckle.AspNetCore" Version="6.4.0" />
 	<PackageReference Include="Serilog.Extensions.Logging" Version="3.1.0" />
+	<PackageReference Include="Yarp.ReverseProxy" Version="2.0.0" />
   </ItemGroup>
 
   <ItemGroup>
