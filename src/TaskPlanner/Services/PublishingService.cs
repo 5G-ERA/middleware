@@ -1,11 +1,11 @@
 ﻿using Microsoft.Extensions.Options;
 using Middleware.CentralApi.Sdk;
+using Middleware.Common;
 using Middleware.Common.Config;
 using Middleware.Common.Helpers;
 using Middleware.Common.MessageContracts;
 using Middleware.Models.Domain;
 using Middleware.TaskPlanner.Exceptions;
-using Middleware.TaskPlanner.Publishers;
 
 namespace Middleware.TaskPlanner.Services;
 

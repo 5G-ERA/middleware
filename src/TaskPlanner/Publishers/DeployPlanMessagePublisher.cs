@@ -1,9 +1,10 @@
 ﻿using MassTransit;
+using Middleware.Common;
 using Middleware.Common.MessageContracts;
 
 namespace Middleware.TaskPlanner.Publishers;
 
-public class DeployPlanMessagePublisher  : IPublisher<DeployPlanMessage>
+public class DeployPlanMessagePublisher : IPublisher<DeployPlanMessage>
 {
     private readonly IPublishEndpoint _publish;
 
@@ -11,7 +12,7 @@ public class DeployPlanMessagePublisher  : IPublisher<DeployPlanMessage>
     {
         _publish = publish;
     }
-    
+
     public async Task PublishAsync(DeployPlanMessage message)
     {
         await _publish.Publish(message);
