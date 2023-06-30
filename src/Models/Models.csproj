@@ -9,10 +9,12 @@
 
     <ItemGroup>
       <PackageReference Include="Redis.OM" Version="0.4.0" />
+      <PackageReference Include="ValueOf" Version="2.0.31" />
     </ItemGroup>
 
     <ItemGroup>
       <Folder Include="Domain\Contracts\" />
+      <Folder Include="Domain\ValueObjects\" />
     </ItemGroup>
 
 </Project>

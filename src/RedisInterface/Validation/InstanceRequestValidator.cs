@@ -16,9 +16,9 @@ public class InstanceRequestValidator : AbstractValidator<InstanceRequest>
         RuleFor(x => x.IsReusable)
             .NotNull();
         RuleForEach(x => x.RosTopicPublishers)
-            .NotNull().NotEmpty().SetValidator(new RosTopicModelValidator());
+            .NotNull().NotEmpty().SetValidator(new RosTopicValidator());
         RuleForEach(x => x.RosTopicSubscribers)
-            .NotNull().NotEmpty().SetValidator(new RosTopicModelValidator());
+            .NotNull().NotEmpty().SetValidator(new RosTopicValidator());
         RuleFor(x => x.RosVersion)
             .NotNull().InclusiveBetween(1, 2);
         RuleFor(x => x.RosDistro)

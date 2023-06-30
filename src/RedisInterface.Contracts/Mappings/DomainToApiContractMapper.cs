@@ -120,8 +120,8 @@ public static class DomainToApiContractMapper
             MinimumNumOfCores = x.MinimumNumCores,
             RosVersion = x.RosVersion,
             RosDistro = x.RosDistro,
-            RosTopicPublishers = x.RosTopicsPub,
-            RosTopicSubscribers = x.RosTopicsSub,
+            RosTopicPublishers = x.RosTopicsPub.Select(t => t.ToRosTopicResponse()),
+            RosTopicSubscribers = x.RosTopicsSub.Select(t => t.ToRosTopicResponse()),
             Tags = x.Tags,
             OnboardedTime = x.OnboardedTime,
             AppliedPolicies = x.AppliedPolicies
@@ -250,9 +250,10 @@ public static class DomainToApiContractMapper
             Slices = slices.Select(x => x.ToSliceResponse())
         };
     }
+
     public static SliceRequest ToSliceRequest(this SliceModel x)
     {
-        return new SliceRequest
+        return new()
         {
             SliceId = x.Name,
             Site = x.Site,
@@ -264,6 +265,28 @@ public static class DomainToApiContractMapper
             UserDensity = x.UserDensity,
             UserSpeed = x.UserSpeed,
             Imsi = x.Imsi
+        };
+    }
+
+    public static RosTopicResponse ToRosTopicResponse(this RosTopicModel x)
+    {
+        return new()
+        {
+            Name = x.Name.Value,
+            Type = x.Type,
+            Description = x.Description,
+            Enabled = x.Enabled
+        };
+    }
+
+    public static RosTopicRequest ToRosTopicRequest(this RosTopicModel x)
+    {
+        return new()
+        {
+            Name = x.Name.Value,
+            Type = x.Type,
+            Description = x.Description,
+            Enabled = x.Enabled
         };
     }
 }

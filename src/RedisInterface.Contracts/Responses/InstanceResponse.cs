@@ -1,6 +1,4 @@
-﻿using Middleware.Models.Domain;
-
-namespace Middleware.RedisInterface.Contracts.Responses;
+﻿namespace Middleware.RedisInterface.Contracts.Responses;
 
 public class InstanceResponse
 {
@@ -8,8 +6,8 @@ public class InstanceResponse
     public string Name { get; init; }
     public string Type { get; init; }
     public bool? IsReusable { get; init; }
-    public IEnumerable<RosTopicModel> RosTopicPublishers { get; init; } = Enumerable.Empty<RosTopicModel>();
-    public IEnumerable<RosTopicModel> RosTopicSubscribers { get; init; } = Enumerable.Empty<RosTopicModel>();
+    public IEnumerable<RosTopicResponse> RosTopicPublishers { get; init; } = Enumerable.Empty<RosTopicResponse>();
+    public IEnumerable<RosTopicResponse> RosTopicSubscribers { get; init; } = Enumerable.Empty<RosTopicResponse>();
     public int RosVersion { get; init; }
     public string RosDistro { get; init; } = default!;
     public string Family { get; init; }

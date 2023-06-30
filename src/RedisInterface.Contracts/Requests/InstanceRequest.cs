@@ -1,14 +1,12 @@
-﻿using Middleware.Models.Domain;
-
-namespace Middleware.RedisInterface.Contracts.Requests;
+﻿namespace Middleware.RedisInterface.Contracts.Requests;
 
 public class InstanceRequest
 {
     public string Name { get; init; }
     public string Type { get; init; }
     public bool IsReusable { get; init; }
-    public IEnumerable<RosTopicModel> RosTopicPublishers { get; init; } = Enumerable.Empty<RosTopicModel>();
-    public IEnumerable<RosTopicModel> RosTopicSubscribers { get; init; } = Enumerable.Empty<RosTopicModel>();
+    public IEnumerable<RosTopicRequest> RosTopicPublishers { get; init; } = Enumerable.Empty<RosTopicRequest>();
+    public IEnumerable<RosTopicRequest> RosTopicSubscribers { get; init; } = Enumerable.Empty<RosTopicRequest>();
     public int RosVersion { get; init; }
     public string RosDistro { get; init; } = default!;
     public string Family { get; init; }
