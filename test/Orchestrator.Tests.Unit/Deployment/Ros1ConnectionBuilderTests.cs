@@ -27,12 +27,13 @@ public class Ros1ConnectionBuilderTests
     [Fact]
     public void EnableRosCommunication_ShouldConfigureDeploymentWithNewContainers()
     {
-        var distro = RosDistro.Noetic;
         //arrange
+        var distro = RosDistro.Noetic;
         var depl = CreateExampleDeployment();
         var sut = new Ros1ConnectionBuilder(distro);
+        var topics = new List<RosTopicModel>();
         //act
-        var result = sut.EnableRosCommunication(depl);
+        var result = sut.EnableRosCommunication(depl, topics);
         //assert
         result.Spec.Template.Spec.Containers.Should()
             .HaveCount(3, "We need three containers, one RelayNetApp, one ROS core and NetApp itself");

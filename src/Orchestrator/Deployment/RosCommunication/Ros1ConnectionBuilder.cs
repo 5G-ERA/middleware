@@ -1,4 +1,5 @@
-﻿using k8s.Models;
+﻿using System.Text.Json;
+using k8s.Models;
 using Middleware.Common.ExtensionMethods;
 using Middleware.Models.Domain;
 
@@ -27,9 +28,21 @@ internal class Ros1ConnectionBuilder : IRosConnectionBuilder
     /// <inheritdoc />
     public string RosDistro { get; }
 
-    /// <inheritdoc />
-    public V1Deployment EnableRosCommunication(V1Deployment dpl)
+    public V1Service EnableRelayNetAppCommunication(V1Service service)
     {
+        if (service is null) throw new ArgumentNullException(nameof(service));
+        if (service.Spec?.Ports is null) throw new ArgumentNullException(nameof(service), "Ports list cannot be null");
+
+        if (service.ContainsWebsocketCompatiblePort() == false)
+            service.AddWebsocketCompatiblePort();
+
+        return service;
+    }
+
+    /// <inheritdoc />
+    public V1Deployment EnableRosCommunication(V1Deployment dpl, IReadOnlyList<RosTopicModel> rosTopics)
+    {
+        if (rosTopics is null) throw new ArgumentNullException(nameof(rosTopics));
         if (dpl.Spec?.Template?.Spec?.Containers is null || dpl.Spec.Template.Spec.Containers.Any() == false)
             throw new ArgumentException("Missing Deployment container configuration.", nameof(dpl));
 
@@ -44,20 +57,9 @@ internal class Ros1ConnectionBuilder : IRosConnectionBuilder
         }
 
         dpl.Spec.Template.Spec.Containers.Add(GetRosContainer());
-        dpl.Spec.Template.Spec.Containers.Add(GetRelayNetAppContainer());
+        dpl.Spec.Template.Spec.Containers.Add(GetRelayNetAppContainer(rosTopics));
 
         return dpl;
-    }
-
-    public V1Service EnableRelayNetAppCommunication(V1Service service)
-    {
-        if (service is null) throw new ArgumentNullException(nameof(service));
-        if (service?.Spec?.Ports is null) throw new ArgumentNullException(nameof(service), "Ports list cannot be null");
-
-        if (service.ContainsWebsocketCompatiblePort() == false)
-            service.AddWebsocketCompatiblePort();
-
-        return service;
     }
 
     private V1Container GetRosContainer()
@@ -74,8 +76,9 @@ internal class Ros1ConnectionBuilder : IRosConnectionBuilder
         return rosContainer;
     }
 
-    private V1Container GetRelayNetAppContainer()
+    private V1Container GetRelayNetAppContainer(IReadOnlyList<RosTopicModel> rosTopics)
     {
+        var topicsString = JsonSerializer.Serialize(rosTopics);
         var container = new V1Container
         {
             Name = "relayNetApp",
@@ -85,7 +88,8 @@ internal class Ros1ConnectionBuilder : IRosConnectionBuilder
             },
             Env = new List<V1EnvVar>
             {
-                new("ROS_MASTER_URI", "http://127.0.0.1:11311")
+                new("ROS_MASTER_URI", "http://127.0.0.1:11311"),
+                new("TOPIC_LIST", topicsString)
             },
             Image = "but5gera/relay_network_application:0.1.0"
         };

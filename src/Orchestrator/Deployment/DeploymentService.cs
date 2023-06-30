@@ -326,7 +326,12 @@ internal class DeploymentService : IDeploymentService
             builder = _rosConnectionBuilderFactory.CreateConnectionBuilder(distroEnum);
         }
 
-        if (builder is not null) deployment = builder.EnableRosCommunication(deployment);
+        if (builder is not null)
+        {
+            var topics = instance.RosTopicsSub.CreateCopy();
+            topics.AddRange(instance.RosTopicsPub);
+            deployment = builder.EnableRosCommunication(deployment, topics);
+        }
 
         var service = string.IsNullOrWhiteSpace(cim.K8SService)
             ? _kubeObjectBuilder.CreateDefaultService(instanceName, instanceId, deployment)
