@@ -11,7 +11,10 @@ public class RosTopicModel
     [JsonPropertyName("topic_type")]
     public string? Type { get; set; }
 
+    [JsonIgnore]
     public string? Description { get; set; }
+
+    [JsonIgnore]
     public bool Enabled { get; set; }
 
     /// <summary>

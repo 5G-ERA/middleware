@@ -53,6 +53,39 @@ public class Ros1ConnectionBuilderTests
     }
 
     [Fact]
+    public void EnableRosCommunication_ShouldParseTopicListToTheDesiredFormatAndSetItAsEnvVariableOfRelayNetApp()
+    {
+        //arrange
+        var distro = RosDistro.Noetic;
+        var depl = CreateExampleDeployment();
+        var sut = new Ros1ConnectionBuilder(distro);
+        var topicString = "[{\"topic_name\":\"/image_raw\",\"topic_type\":\"sensor_msgs/Image\"}]";
+        var topics = new List<RosTopicModel>
+        {
+            new()
+            {
+                Name = "/image_raw",
+                Type = "sensor_msgs/Image",
+                Description = "The example description that should not be included in the parsed topic",
+                Enabled = true // this also should not be included
+            }
+        };
+        //act
+        var result = sut.EnableRosCommunication(depl, topics);
+
+        //assert
+        var relayNetAppContainer = result.Spec.Template.Spec.Containers.FirstOrDefault(c => c.Name == "relayNetApp");
+
+        relayNetAppContainer.Should().NotBeNull();
+        relayNetAppContainer!.Env.Should()
+            .HaveCount(2, "We need ros_master_uri and list of topics for reading ros topics");
+
+        var rosTopicsEnv = relayNetAppContainer.Env.FirstOrDefault(e => e.Name == "TOPIC_LIST");
+        rosTopicsEnv.Should().NotBeNull();
+        rosTopicsEnv!.Value.Should().Be(topicString);
+    }
+
+    [Fact]
     public void EnableRelayNetAppCommunication_ShouldAddWebsocketPortToExistingService()
     {
         //arrange
