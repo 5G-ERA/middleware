@@ -1,6 +1,6 @@
 ﻿using Middleware.Common.MessageContracts;
 
-namespace Middleware.TaskPlanner.Publishers;
+namespace Middleware.Common;
 
 public interface IPublisher<in T> where T : Message
 {

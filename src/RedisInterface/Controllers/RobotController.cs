@@ -119,8 +119,7 @@ public class RobotController : ControllerBase
     /// <summary>
     ///     Partially update an existing InstanceModel entity
     /// </summary>
-    /// <param name="patch"></param>
-    /// <param name="id"></param>
+    /// <param name="request"></param>
     /// <returns> the modified InstanceModel entity </returns>
     [HttpPut]
     [Route("{id}", Name = "RobotPatch")]
@@ -138,7 +137,6 @@ public class RobotController : ControllerBase
 
             robot.OnboardedTime = exists.OnboardedTime;
             await _robotRepository.UpdateAsync(robot);
-            //TODO: update onboardedTime
             var response = robot.ToRobotResponse();
             return Ok(response);
         }
