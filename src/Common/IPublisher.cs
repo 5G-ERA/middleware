@@ -1,8 +1,6 @@
-﻿using Middleware.Common.MessageContracts;
+﻿namespace Middleware.Common;
 
-namespace Middleware.Common;
-
-public interface IPublisher<in T> where T : Message
+public interface IPublisher<in T>
 {
     Task PublishAsync(T message);
 }

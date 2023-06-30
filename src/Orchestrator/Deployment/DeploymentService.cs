@@ -8,6 +8,7 @@ using Middleware.Models.Domain;
 using Middleware.Models.Enums;
 using Middleware.Orchestrator.Exceptions;
 using Middleware.Orchestrator.Models;
+using Middleware.Orchestrator.Publishers;
 using Middleware.RedisInterface.Contracts.Mappings;
 using Middleware.RedisInterface.Sdk;
 
@@ -31,6 +32,7 @@ internal class DeploymentService : IDeploymentService
     private readonly ILogger _logger;
 
     private readonly IOptions<MiddlewareConfig> _mwConfig;
+    private readonly IPublishingService _publisher;
 
     /// <summary>
     ///     Redis Interface API client
@@ -43,13 +45,15 @@ internal class DeploymentService : IDeploymentService
         ILogger<DeploymentService> logger,
         IRedisInterfaceClient redisInterfaceClient,
         IOptions<MiddlewareConfig> mwConfig,
-        IKubernetesObjectBuilder kubeObjectBuilder, IRosConnectionBuilderFactory rosConnectionBuilderFactory)
+        IKubernetesObjectBuilder kubeObjectBuilder, IRosConnectionBuilderFactory rosConnectionBuilderFactory,
+        IPublishingService publisher)
     {
         _logger = logger;
         _redisInterfaceClient = redisInterfaceClient;
         _mwConfig = mwConfig;
         _kubeObjectBuilder = kubeObjectBuilder;
         _rosConnectionBuilderFactory = rosConnectionBuilderFactory;
+        _publisher = publisher;
         _kube = kubernetesClientBuilder.CreateKubernetesClient();
     }
 
@@ -331,7 +335,6 @@ internal class DeploymentService : IDeploymentService
             var topics = instance.RosTopicsSub.CreateCopy();
             topics.AddRange(instance.RosTopicsPub);
             deployment = builder.EnableRosCommunication(deployment, topics);
-
         }
 
         var service = string.IsNullOrWhiteSpace(cim.K8SService)
