@@ -73,6 +73,12 @@ public class CloudModel : BaseModel, ILocation
         };
     }
 
+    /// <inheritdoc />
+    public string GetNetAppAddress(string netAppName)
+    {
+        return GetNetAppAddress(netAppName, CloudIp);
+    }
+
     /// <summary>
     ///     Onboarding validation of the cloud data object.
     /// </summary>

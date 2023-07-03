@@ -1,4 +1,6 @@
-﻿namespace Middleware.Models.Domain;
+﻿using Middleware.Models.ExtensionMethods;
+
+namespace Middleware.Models.Domain;
 
 public abstract class BaseModel
 {
@@ -9,4 +11,11 @@ public abstract class BaseModel
     public List<RelationModel>? Relations { get; set; } //= new List<RelationModel>();
 
     public abstract Dto.Dto ToDto();
+
+
+    protected string GetNetAppAddress(string netAppName, Uri address)
+    {
+        var sanitized = netAppName.SanitizeToUriPath();
+        return $"{address}/{sanitized}";
+    }
 }

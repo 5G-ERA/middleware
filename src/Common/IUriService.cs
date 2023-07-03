@@ -1,7 +1,6 @@
-﻿namespace Middleware.Common
+﻿namespace Middleware.Common;
+
+public interface IUriService
 {
-    public interface IUriService
-    {
-        Uri GetPageUri(PaginationFilter filter, string route);
-    }
+    Uri GetPageUri(PaginationFilter filter, string route);
 }

@@ -1,6 +1,4 @@
-﻿using System.Linq;
-using Microsoft.AspNetCore.Mvc;
-using Middleware.Common.MessageContracts;
+﻿using Middleware.Common.MessageContracts;
 using Yarp.ReverseProxy.Configuration;
 using Yarp.ReverseProxy.Transforms;
 
@@ -18,7 +16,7 @@ public class GatewayConfigurationService
 
     public void CreateDynamicRoute(GatewayAddNetAppEntryMessage msg)
     {
-        var config =  _inMemoryConfigProvider.GetConfig();
+        var config = _inMemoryConfigProvider.GetConfig();
 
         var clusterList = config.Clusters.ToList();
         var routeList = config.Routes.ToList();
@@ -36,7 +34,7 @@ public class GatewayConfigurationService
             RouteId = msg.NetAppName + "-Route",
             Match = new()
             {
-                Path = msg.NetAppName
+                Path = msg.Route
             },
             ClusterId = clusterCfg.ClusterId //
         };
@@ -47,10 +45,9 @@ public class GatewayConfigurationService
         routeList.Add(routeCfg);
 
         _inMemoryConfigProvider.Update(routeList, clusterList);
-
     }
 
-    public void DeleteDynamicRoute(GatewayDeleteNetAppEntryMessage msg) 
+    public void DeleteDynamicRoute(GatewayDeleteNetAppEntryMessage msg)
     {
         var config = _inMemoryConfigProvider.GetConfig();
 
@@ -59,26 +56,20 @@ public class GatewayConfigurationService
 
         var matchRouteToDelete = msg.NetAppName + "-Route";
         RouteConfig routeToDelete = null;
-        foreach (var route in routeList) 
+        foreach (var route in routeList)
         {
-
-            if (route.RouteId == matchRouteToDelete) 
-            {
-                routeToDelete = route;
-            }   
+            if (route.RouteId == matchRouteToDelete) routeToDelete = route;
         }
+
         routeList.Remove(routeToDelete);
 
         var matchClusterToDelete = msg.NetAppName + "-Cluster";
         ClusterConfig clusterToDelete = null;
         foreach (var cluster in clusterList)
         {
-
-            if (cluster.ClusterId == matchClusterToDelete)
-            {
-                clusterToDelete = cluster;
-            }
+            if (cluster.ClusterId == matchClusterToDelete) clusterToDelete = cluster;
         }
+
         clusterList.Remove(clusterToDelete);
 
         _inMemoryConfigProvider.Update(routeList, clusterList);

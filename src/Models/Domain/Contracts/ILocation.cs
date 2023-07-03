@@ -40,4 +40,11 @@ public interface ILocation
     /// </summary>
     /// <returns></returns>
     Location ToLocation();
+
+    /// <summary>
+    ///     Prepares the route that will be used to communicate with the NetApp through Gateway in the location
+    /// </summary>
+    /// <param name="netAppName"></param>
+    /// <returns></returns>
+    string GetNetAppAddress(string netAppName);
 }

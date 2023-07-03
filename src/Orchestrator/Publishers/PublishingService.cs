@@ -41,7 +41,8 @@ internal class PublishingService : IPublishingService
             NetAppName = netAppName,
             ActionPlanId = actionPlanId,
             ServiceInstanceId = serviceInstanceId,
-            DeploymentLocation = location
+            DeploymentLocation = location,
+            Route = netAppName
         };
         await _addNetAppEntryPublisher.PublishAsync(message);
     }

@@ -73,6 +73,12 @@ public class EdgeModel : BaseModel, ILocation
         };
     }
 
+    /// <inheritdoc />
+    public string GetNetAppAddress(string netAppName)
+    {
+        return GetNetAppAddress(netAppName, EdgeIp);
+    }
+
     /// <summary>
     ///     Onboarding validation of the edge data object.
     /// </summary>

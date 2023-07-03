@@ -90,6 +90,7 @@ internal class DeploymentService : IDeploymentService
                 {
                     await _publisher.PublishGatewayDeleteNetAppEntryAsync(location, srv.Name, actionPlan.Id,
                         srv.ServiceInstanceId);
+                    srv.SetNetAppAddress(location.GetNetAppAddress(srv.Name));
                 }
             }
         }
@@ -173,6 +174,7 @@ internal class DeploymentService : IDeploymentService
             {
                 await _publisher.PublishGatewayAddNetAppEntryAsync(thisLocation, pair.Name, actionPlan.Id,
                     pair.InstanceId);
+                pair.Instance.SetNetAppAddress(thisLocation.GetNetAppAddress(pair.Name));
             }
 
             _logger.LogDebug("Adding new relation between instance and current location");
@@ -224,6 +226,7 @@ internal class DeploymentService : IDeploymentService
                 {
                     await _publisher.PublishGatewayAddNetAppEntryAsync(location, pair.Name, task.ActionPlanId,
                         pair.InstanceId);
+                    pair.Instance.SetNetAppAddress(location.GetNetAppAddress(pair.Name));
                 }
 
                 _logger.LogDebug("Adding new relation between instance and current location");
