@@ -142,6 +142,9 @@ public class UpdateStatusJob : BaseJob<UpdateStatusJob>
 
     private void UpdateServiceStatus(V1ServiceList services, InstanceModel instance)
     {
+        // BB 03.07.2023 - we don't update the addresses of ROS-based services
+        // as they're always routed through gateway and do not need to change it's address
+        if (instance.RosDistro is not null) return;
         var service = services.Items.FirstOrDefault();
         if (service is null) return;
 
