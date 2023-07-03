@@ -4,7 +4,7 @@ using Redis.OM.Modeling;
 
 namespace Middleware.Models.Dto;
 
-[Document(IndexName = "cloud-idx", StorageType = StorageType.Json, Prefixes = new[] { CloudDto.Prefix })]
+[Document(IndexName = "cloud-idx", StorageType = StorageType.Json, Prefixes = new[] { Prefix })]
 public class CloudDto : Dto
 {
     public const string Prefix = "Cloud";
@@ -30,9 +30,9 @@ public class CloudDto : Dto
 
     [Indexed]
     public HardwareSpec HardwareSpec { get; set; }
-    
+
     [Indexed]
-    public string MacAddress { get; set; }
+    public string? MacAddress { get; set; }
 
     [Indexed(Sortable = true)]
     public DateTimeOffset LastUpdatedTime { get; set; }
@@ -43,7 +43,7 @@ public class CloudDto : Dto
     public override BaseModel ToModel()
     {
         var dto = this;
-        return new CloudModel()
+        return new CloudModel
         {
             Id = Guid.Parse(dto.Id!.Replace(Prefix, "")),
             Name = dto.Name,

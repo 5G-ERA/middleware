@@ -1,7 +1,7 @@
 ﻿using Middleware.Common;
 using Middleware.Common.Helpers;
 using Middleware.Common.MessageContracts;
-using Middleware.Models.Domain;
+using Middleware.Models.Domain.Contracts;
 
 namespace Middleware.Orchestrator.Publishers;
 
@@ -17,10 +17,25 @@ internal class PublishingService : IPublishingService
         _deleteNetAppEntryPublisher = deleteNetAppEntryPublisher;
     }
 
-    public async Task PublishGatewayAddNetAppEntryAsync(ActionModel action, string netAppName, Guid actionPlanId,
+    public async Task PublishGatewayDeleteNetAppEntryAsync(ILocation desiredLocation, string netAppName,
+        Guid actionPlanId,
         Guid serviceInstanceId)
     {
-        var location = QueueHelpers.ConstructRoutingKey(action.Placement, action.PlacementType);
+        var routingKey = QueueHelpers.ConstructRoutingKey(desiredLocation.Name, desiredLocation.Type);
+        var message = new GatewayDeleteNetAppEntryMessage
+        {
+            NetAppName = netAppName,
+            ActionPlanId = actionPlanId,
+            ServiceInstanceId = serviceInstanceId,
+            DeploymentLocation = routingKey
+        };
+        await _deleteNetAppEntryPublisher.PublishAsync(message);
+    }
+
+    public async Task PublishGatewayAddNetAppEntryAsync(ILocation desiredLocation, string netAppName, Guid actionPlanId,
+        Guid serviceInstanceId)
+    {
+        var location = QueueHelpers.ConstructRoutingKey(desiredLocation.Name, desiredLocation.Type);
         var message = new GatewayAddNetAppEntryMessage
         {
             NetAppName = netAppName,
@@ -29,19 +44,5 @@ internal class PublishingService : IPublishingService
             DeploymentLocation = location
         };
         await _addNetAppEntryPublisher.PublishAsync(message);
-    }
-
-    public async Task PublishGatewayDeleteNetAppEntryAsync(ActionModel action, string netAppName, Guid actionPlanId,
-        Guid serviceInstanceId)
-    {
-        var location = QueueHelpers.ConstructRoutingKey(action.Placement, action.PlacementType);
-        var message = new GatewayDeleteNetAppEntryMessage
-        {
-            NetAppName = netAppName,
-            ActionPlanId = actionPlanId,
-            ServiceInstanceId = serviceInstanceId,
-            DeploymentLocation = location
-        };
-        await _deleteNetAppEntryPublisher.PublishAsync(message);
     }
 }

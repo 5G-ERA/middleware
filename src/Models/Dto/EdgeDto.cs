@@ -1,11 +1,10 @@
 ﻿using Middleware.Models.Domain;
 using Middleware.Models.Dto.Hardware;
-using Middleware.Models.Enums;
 using Redis.OM.Modeling;
 
 namespace Middleware.Models.Dto;
 
-[Document(IndexName = "edge-idx", StorageType = StorageType.Json, Prefixes = new[] { EdgeDto.Prefix })]
+[Document(IndexName = "edge-idx", StorageType = StorageType.Json, Prefixes = new[] { Prefix })]
 public class EdgeDto : Dto
 {
     public const string Prefix = "Edge";
@@ -30,11 +29,11 @@ public class EdgeDto : Dto
     public Uri EdgeIp { get; set; }
 
     [Indexed]
-    public string MacAddress { get; set; }
+    public string? MacAddress { get; set; }
 
-    [Indexed()]
+    [Indexed]
     public HardwareSpec HardwareSpec { get; set; } = new();
-    
+
     [Indexed(Sortable = true)]
     public DateTimeOffset LastUpdatedTime { get; set; } = DateTimeOffset.Now;
 
@@ -44,7 +43,7 @@ public class EdgeDto : Dto
     public override BaseModel ToModel()
     {
         var dto = this;
-        return new EdgeModel()
+        return new EdgeModel
         {
             Id = Guid.Parse(dto.Id!.Replace(Prefix, "")),
             Name = dto.Name,

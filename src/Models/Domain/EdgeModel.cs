@@ -1,31 +1,17 @@
 ﻿using System.Text.Json.Serialization;
+using Middleware.Models.Domain.Contracts;
 using Middleware.Models.Dto;
-using Middleware.Models.Dto.Hardware;
 using Middleware.Models.Enums;
-
 
 namespace Middleware.Models.Domain;
 
-public class EdgeModel : BaseModel
+public class EdgeModel : BaseModel, ILocation
 {
-    [JsonPropertyName("Id")]
-    public override Guid Id { get; set; } = Guid.NewGuid();
-
-    [JsonPropertyName("Name")]
-    public override string Name { get; set; }
-
-    [Obsolete]
-    [JsonPropertyName("Type")]
-    public LocationType Type { get; set; } = LocationType.Edge;
-
-    [JsonPropertyName("Organization")]
-    public string Organization { get; set; }
-
     [JsonPropertyName("EdgeStatus")]
-    public string EdgeStatus { get; set; }
+    public string EdgeStatus { get; set; } = default!;
 
     [JsonPropertyName("EdgeIp")]
-    public Uri EdgeIp { get; set; }
+    public Uri EdgeIp { get; set; } = default!;
 
     [JsonPropertyName("MacAddress")]
     public string? MacAddress { get; set; }
@@ -51,26 +37,62 @@ public class EdgeModel : BaseModel
     [JsonPropertyName("IsOnline")]
     public bool IsOnline { get; set; }
 
+    [JsonPropertyName("Id")]
+    public override Guid Id { get; set; } = Guid.NewGuid();
+
+    /// <inheritdoc />
+    public Uri Address => EdgeIp;
+
+    [JsonPropertyName("Name")]
+    public override string Name { get; set; } = default!;
+
+    [Obsolete]
+    [JsonPropertyName("Type")]
+    public LocationType Type { get; set; } = LocationType.Edge;
+
+    [JsonPropertyName("Organization")]
+    public string Organization { get; set; } = default!;
+
+    /// <inheritdoc />
+    public BaseModel ToBaseLocation()
+    {
+        return this;
+    }
+
+    /// <inheritdoc />
+    public Location ToLocation()
+    {
+        var that = this;
+        return new()
+        {
+            Name = that.Name,
+            Organization = that.Organization,
+            Type = LocationType.Edge,
+            Address = that.EdgeIp,
+            Id = that.Id
+        };
+    }
+
     /// <summary>
-    /// Onboarding validation of the edge data object.
+    ///     Onboarding validation of the edge data object.
     /// </summary>
     /// <returns></returns>
     public bool IsValid()
     {
-        if (string.IsNullOrEmpty(Name.ToString())) return false;
+        if (string.IsNullOrEmpty(Name)) return false;
         if (string.IsNullOrEmpty(EdgeIp.ToString())) return false;
         if (string.IsNullOrEmpty(NumberOfCores.ToString())) return false;
         if (string.IsNullOrEmpty(DiskStorage.ToString())) return false;
         // if (string.IsNullOrEmpty(MacAddress.ToString())) return false;
         if (string.IsNullOrEmpty(Ram.ToString())) return false;
-        if (string.IsNullOrEmpty(Organization.ToString())) return false;
+        if (string.IsNullOrEmpty(Organization)) return false;
         return true;
     }
 
     public override Dto.Dto ToDto()
     {
         var domain = this;
-        return new EdgeDto()
+        return new EdgeDto
         {
             Id = domain.Id.ToString(),
             Name = domain.Name,
@@ -79,13 +101,13 @@ public class EdgeModel : BaseModel
             EdgeStatus = domain.EdgeStatus,
             EdgeIp = domain.EdgeIp,
             MacAddress = domain.MacAddress,
-            HardwareSpec = new HardwareSpec
+            HardwareSpec = new()
             {
-              Cpu  = domain.Cpu,
-              Ram = domain.Ram,
-              NumberCores = domain.NumberOfCores,
-              StorageDisk = domain.DiskStorage,
-              VirtualRam = domain.VirtualRam
+                Cpu = domain.Cpu,
+                Ram = domain.Ram,
+                NumberCores = domain.NumberOfCores,
+                StorageDisk = domain.DiskStorage,
+                VirtualRam = domain.VirtualRam
             },
             LastUpdatedTime = domain.LastUpdatedTime == default ? DateTimeOffset.Now : domain.LastUpdatedTime,
             IsOnline = domain.IsOnline

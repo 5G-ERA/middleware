@@ -5,6 +5,7 @@ using Middleware.Common.Config;
 using Middleware.Common.Enums;
 using Middleware.Common.ExtensionMethods;
 using Middleware.Models.Domain;
+using Middleware.Models.Domain.Contracts;
 using Middleware.Models.Enums;
 using Middleware.Orchestrator.Exceptions;
 using Middleware.Orchestrator.Models;
@@ -31,7 +32,14 @@ internal class DeploymentService : IDeploymentService
     /// </summary>
     private readonly ILogger _logger;
 
+    /// <summary>
+    ///     Middleware configuration
+    /// </summary>
     private readonly IOptions<MiddlewareConfig> _mwConfig;
+
+    /// <summary>
+    ///     Service that publishes RabbitMQ messages
+    /// </summary>
     private readonly IPublishingService _publisher;
 
     /// <summary>
@@ -39,6 +47,9 @@ internal class DeploymentService : IDeploymentService
     /// </summary>
     private readonly IRedisInterfaceClient _redisInterfaceClient;
 
+    /// <summary>
+    ///     Factory building ROS communication enablers
+    /// </summary>
     private readonly IRosConnectionBuilderFactory _rosConnectionBuilderFactory;
 
     public DeploymentService(IKubernetesBuilder kubernetesClientBuilder,
@@ -67,12 +78,19 @@ internal class DeploymentService : IDeploymentService
     public async Task<bool> DeletePlanAsync(ActionPlanModel actionPlan)
     {
         var retVal = true;
+        var location = await GetCurrentLocationAsync();
         try
         {
             foreach (var action in actionPlan.ActionSequence!)
             foreach (var srv in action.Services)
             {
                 retVal &= await TerminateNetAppByIdAsync(srv.ServiceInstanceId);
+
+                if (srv.RosDistro is not null)
+                {
+                    await _publisher.PublishGatewayDeleteNetAppEntryAsync(location, srv.Name, actionPlan.Id,
+                        srv.ServiceInstanceId);
+                }
             }
         }
         catch (NotInK8SEnvironmentException)
@@ -114,10 +132,17 @@ internal class DeploymentService : IDeploymentService
                 instance.Name, instance.ServiceInstanceId);
 
             await TerminateNetAppByIdAsync(instance.ServiceInstanceId);
+
+            if (instance.RosDistro is not null)
+            {
+                await _publisher.PublishGatewayDeleteNetAppEntryAsync(thisLocation, instance.Name, actionPlanId,
+                    instance.ServiceInstanceId);
+            }
+
             _logger.LogDebug("Deleting relation between instance '{instanceName}'and location '{locationName}'",
                 instance.Name, thisLocation.Name);
 
-            await _redisInterfaceClient.DeleteRelationAsync(instance, thisLocation, "LOCATED_AT");
+            await _redisInterfaceClient.DeleteRelationAsync(instance, thisLocation.ToBaseLocation(), "LOCATED_AT");
         }
     }
 
@@ -143,8 +168,15 @@ internal class DeploymentService : IDeploymentService
         foreach (var pair in deploymentPairs)
         {
             await DeployNetApp(pair);
+
+            if (pair.Instance.RosDistro is not null)
+            {
+                await _publisher.PublishGatewayAddNetAppEntryAsync(thisLocation, pair.Name, actionPlan.Id,
+                    pair.InstanceId);
+            }
+
             _logger.LogDebug("Adding new relation between instance and current location");
-            await _redisInterfaceClient.AddRelationAsync(pair.Instance, thisLocation, "LOCATED_AT");
+            await _redisInterfaceClient.AddRelationAsync(pair.Instance, thisLocation.ToBaseLocation(), "LOCATED_AT");
         }
 
         _logger.LogDebug("Saving updated ActionPlan");
@@ -187,8 +219,15 @@ internal class DeploymentService : IDeploymentService
                 _logger.LogDebug("Deploying instance '{Name}', with serviceInstanceId '{ServiceInstanceId}'",
                     pair.Instance, pair.InstanceId);
                 await DeployNetApp(pair);
+
+                if (pair.Instance.RosDistro is not null)
+                {
+                    await _publisher.PublishGatewayAddNetAppEntryAsync(location, pair.Name, task.ActionPlanId,
+                        pair.InstanceId);
+                }
+
                 _logger.LogDebug("Adding new relation between instance and current location");
-                await _redisInterfaceClient.AddRelationAsync(pair.Instance, location, "LOCATED_AT");
+                await _redisInterfaceClient.AddRelationAsync(pair.Instance, location.ToBaseLocation(), "LOCATED_AT");
             }
 
             isSuccess &= await SaveActionSequence(task, robot);
@@ -289,7 +328,7 @@ internal class DeploymentService : IDeploymentService
         return $"{name}-{guidSuffix}";
     }
 
-    private async Task<BaseModel> GetCurrentLocationAsync()
+    private async Task<ILocation> GetCurrentLocationAsync()
     {
         _logger.LogDebug("Retrieving location details (cloud or edge)");
         return _mwConfig.Value.InstanceType.ToLower() == "cloud"
