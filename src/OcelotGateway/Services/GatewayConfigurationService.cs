@@ -1,4 +1,5 @@
 ﻿using Middleware.Common.MessageContracts;
+using Middleware.Models.ExtensionMethods;
 using Yarp.ReverseProxy.Configuration;
 using Yarp.ReverseProxy.Transforms;
 
@@ -34,7 +35,7 @@ public class GatewayConfigurationService
             RouteId = msg.NetAppName + "-Route",
             Match = new()
             {
-                Path = msg.Route
+                Path = msg.Route.SanitizeToUriPath()
             },
             ClusterId = clusterCfg.ClusterId //
         };
