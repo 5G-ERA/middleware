@@ -1,40 +1,48 @@
-﻿using Middleware.Models.Dto.Ros;
+﻿using System.Text.Json.Serialization;
+using Middleware.Models.Domain.ValueObjects;
+using Middleware.Models.Dto.Ros;
 
-namespace Middleware.Models.Domain
+namespace Middleware.Models.Domain;
+
+public class RosTopicModel
 {
-    public class RosTopicModel
+    [JsonPropertyName("topic_name")]
+    [JsonConverter(typeof(TopicNameConverter))]
+    public TopicName Name { get; set; } = default!;
+
+    [JsonPropertyName("topic_type")]
+    public string? Type { get; set; }
+
+    [JsonIgnore]
+    public string? Description { get; set; }
+
+    [JsonIgnore]
+    public bool Enabled { get; set; }
+
+    /// <summary>
+    ///     Set the topic to be enabled.
+    /// </summary>
+    public void Enable()
     {
-        public string Name { get; set; } = default!;
-        public string? Type { get; set; }
-        public string? Description { get; set; }
-        public bool Enabled { get; set; }
+        Enabled = true;
+    }
 
-        /// <summary>
-        /// Set the topic to be enabled.
-        /// </summary>
-        public void Enable()
-        {
-            Enabled = true;
-        }
+    /// <summary>
+    ///     Set the topic to be disabled.
+    /// </summary>
+    public void Disable()
+    {
+        Enabled = false;
+    }
 
-        /// <summary>
-        /// Set the topic to be disabled.
-        /// </summary>
-        public void Disable()
+    public RosTopic ToDto()
+    {
+        return new()
         {
-            Enabled = false;
-        }
-
-        public RosTopic ToDto()
-        {
-            return new RosTopic
-            {
-                Name = Name,
-                Type = Type,
-                Description = Description,
-                Enabled = Enabled
-                
-            };
-        }
+            Name = Name.Value,
+            Type = Type,
+            Description = Description,
+            Enabled = Enabled
+        };
     }
 }

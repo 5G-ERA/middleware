@@ -1,17 +1,17 @@
-using Middleware.Models.Domain;
-using Middleware.TaskPlanner.Exceptions;
-using KeyValuePair = Middleware.Models.Domain.KeyValuePair;
+using Middleware.Common;
 using Middleware.Common.MessageContracts;
+using Middleware.Models.Domain;
 using Middleware.RedisInterface.Contracts.Mappings;
 using Middleware.RedisInterface.Sdk;
-using Middleware.TaskPlanner.Publishers;
+using Middleware.TaskPlanner.Exceptions;
+using KeyValuePair = Middleware.Models.Domain.KeyValuePair;
 
 namespace Middleware.TaskPlanner.Services;
 
 public class ActionPlanner : IActionPlanner
 {
-    private readonly IRedisInterfaceClient _redisInterfaceClient;
     private readonly IPublisher<DeployPlanMessage> _deployPlanPublisher;
+    private readonly IRedisInterfaceClient _redisInterfaceClient;
 
     public List<ActionModel> ActionSequence { get; set; }
     public DateTime CurrentTime { get; set; }
@@ -28,7 +28,7 @@ public class ActionPlanner : IActionPlanner
     }
 
     /// <summary>
-    /// BB: this function is not needed
+    ///     BB: this function is not needed
     /// </summary>
     /// <param name="actionSequence"></param>
     /// <param name="currentTime"></param>
@@ -39,7 +39,7 @@ public class ActionPlanner : IActionPlanner
     }
 
     /// <summary>
-    /// Create basic plan based on the configured action sequence
+    ///     Create basic plan based on the configured action sequence
     /// </summary>
     /// <param name="taskId"></param>
     /// <param name="robotId"></param>
@@ -62,46 +62,203 @@ public class ActionPlanner : IActionPlanner
 
         task.ActionPlanId = Guid.NewGuid();
         task.ActionSequence = new();
-        List<RelationModel> relations = await _redisInterfaceClient.GetRelationAsync(task, "EXTENDS");
+        var relations = await _redisInterfaceClient.GetRelationAsync(task, "EXTENDS");
 
-        List<Guid> actionGuids = relations.Select(r => r.PointsTo.Id).ToList();
+        var actionGuids = relations.Select(r => r.PointsTo.Id).ToList();
 
         //Iterate over the pre-defined action sequence of the knowledge redis graph.
-        foreach (Guid actionId in actionGuids)
+        foreach (var actionId in actionGuids)
         {
-            ActionModel actionItem = (await _redisInterfaceClient.ActionGetByIdAsync(actionId)).ToAction();
+            var actionItem = (await _redisInterfaceClient.ActionGetByIdAsync(actionId)).ToAction();
             if (actionItem is null)
                 continue;
 
             task.ActionSequence.Add(actionItem);
         }
 
-        return new Tuple<TaskModel, RobotModel>(task, robot);
+        return new(task, robot);
     }
 
     /// <summary>
-    /// Find an alternative action because replanning.
+    ///     Get predefined action sequence from knowledge graph given TaskId or provide partial or full replan.
+    /// </summary>
+    /// <param name="currentTaskId"></param>
+    /// <param name="resourceLock"></param>
+    /// <param name="dialogueTemp"></param>
+    /// <param name="robotId"></param>
+    /// <returns>TaskModel</returns>
+    public async Task<Tuple<TaskModel, RobotModel>> InferActionSequence(Guid currentTaskId, bool ContextKnown,
+        bool resourceLock, List<DialogueModel> dialogueTemp, Guid robotId)
+    {
+        var tempTask = new List<ActionModel>();
+        var tempReplanedCompleteActionSeq = new List<ActionModel>();
+        if (dialogueTemp is null)
+            dialogueTemp = new();
+        // modify the existing plan with the candidates
+        return await InferActionSequence(currentTaskId, ContextKnown, resourceLock, dialogueTemp, robotId, tempTask,
+            tempReplanedCompleteActionSeq);
+    }
+
+    /// <summary>
+    ///     Reason for the new action plan based upon information provided by robot.
+    /// </summary>
+    /// <param name="oldTask"></param>
+    /// <param name="CompleteReplan"></param>
+    /// <param name="DialogueTemp"></param>
+    /// <returns>Tuple<TaskModel, TaskModel, RobotModel</returns>
+    public async Task<Tuple<TaskModel, TaskModel, RobotModel>> ReInferActionSequence(TaskModel oldTask, Guid RobotId,
+        bool ContextKnown, bool CompleteReplan, List<DialogueModel> DialogueTemp)
+    {
+        var MarkovianProcess = oldTask.MarkovianProcess;
+        var currentTaskId = oldTask.Id;
+        var currentPlanId = oldTask.ActionPlanId;
+        var resourceLock = oldTask.ResourceLock;
+        var ActionReplanLocked = oldTask.ReplanActionPlannerLocked;
+        var oldActionSequence = oldTask.ActionSequence;
+        var FinalCandidatesActions = new List<ActionModel>();
+        //DialogueModel dialogues = oldTask.
+
+        // Define some local method variables
+
+        var candidatesActions = new List<ActionModel>();
+        var FailedActions = new List<ActionModel>();
+        var dependantActions = new List<RelationModel>();
+        var actionStatus = new Dictionary<Guid, string>();
+        var dependency = new RelationModel();
+        var InstanceError = false;
+
+        // Prepare basic information of new plan
+        var task = new TaskModel();
+        task.Id = currentTaskId;
+        task.ActionPlanId = Guid.NewGuid();
+        // Set the plan to be a replan.
+        task.PartialRePlan = false;
+        task.FullReplan = true;
+
+        // Load robot
+        var robotResp = await _redisInterfaceClient.RobotGetByIdAsync(RobotId);
+        var robot = robotResp.ToRobot();
+        robot.Questions = DialogueTemp; //Add the questions-answers to the robot
+
+        //Query Redis given old plan and obtain action seq.
+        var actionPlan = await _redisInterfaceClient.ActionPlanGetByIdAsync(currentPlanId);
+
+        // The robot requests to not change anything from action sequence but placement.
+        if (ActionReplanLocked == false) // TODO - VALIDATION WITH CompleteReplan
+        {
+            //Check if there were any issues with the deployments or instances. --> if so it is a replan on the resource planner level and action plan stays the same.
+            foreach (var action in actionPlan.ActionSequence)
+            {
+                actionStatus.Add(action.Id, action.ActionStatus);
+                if (action.ActionStatus == "Failed") FailedActions.Add(action);
+
+                foreach (var instance in action.Services)
+                {
+                    if (instance.ServiceStatus == "Problem") //maybe another one more specific? Not sure about this one.
+                        InstanceError = true;
+                }
+            }
+
+            // How many actions in actionSeq
+            var numActions = actionStatus.Count;
+
+            // Check if all the actions have the same status?
+            var lists = actionStatus.Select(kv => kv.Value.OrderBy(x => x)).ToList();
+            var first = lists.First();
+            var areEqual = lists.Skip(1).All(hs => hs.SequenceEqual(first));
+
+            // A review of the action seq is neccesary --> there were no errors from the resource perspective.
+            if (InstanceError == false)
+            {
+                //Prepare a complete replan asked explicitely by the robot
+                if (CompleteReplan)
+                {
+                    var replanedTask = await InferActionSequence(currentTaskId, ContextKnown,
+                        resourceLock, DialogueTemp, robot.Id, oldTask.ActionSequence, new());
+                    return new(replanedTask.Item1, oldTask, robot);
+                }
+                //Prepare a partial replan asked explicitely by the robot
+
+                // If the task is single action then by nature it is none-Markovian.
+                if (numActions == 1)
+                {
+                    foreach (var failedAction in FailedActions)
+                    {
+                        var replanedTask = await InferActionSequence(currentTaskId,
+                            ContextKnown, resourceLock, DialogueTemp, robot.Id, oldTask.ActionSequence,
+                            new());
+                        return new(replanedTask.Item1, oldTask, robot);
+                    }
+                }
+                // If task is not single action, query for markovian relationships among actions.
+                else
+                {
+                    // Modify only the actions that have failed
+                    if (MarkovianProcess == false)
+                    {
+                        foreach (var failedAction in FailedActions)
+                        {
+                            var replanedTask = await InferActionSequence(currentTaskId,
+                                ContextKnown, resourceLock, DialogueTemp, robot.Id, oldTask.ActionSequence,
+                                new());
+                            return new(replanedTask.Item1, oldTask, robot);
+                        }
+                    }
+                    // Check if the actions that failed have a depends_on relationship to other actions. Check if there is any failed Markovian action.
+                    else
+                    {
+                        var FinalCandidates = await getMarkovianCandidates(FailedActions, oldActionSequence);
+
+                        // Add failed actions to the final candidates list
+                        foreach (var fAction in FailedActions)
+                        {
+                            FinalCandidates.Add(fAction.Id);
+                            FinalCandidatesActions.Add(fAction);
+                        }
+
+                        //Ask for a new plan
+                        var replanedTask = await InferActionSequence(currentTaskId,
+                            ContextKnown, resourceLock, DialogueTemp, robot.Id, oldTask.ActionSequence,
+                            FinalCandidatesActions);
+                        return new(replanedTask.Item1, oldTask, robot);
+                    }
+                }
+            }
+
+            // Provide same action seq and let resource planner modify the placement.
+            else
+                task.ActionSequence = actionPlan.ActionSequence;
+
+            return new(task, oldTask, robot);
+        }
+
+        // return same action sequence but with new plan id.
+        task.ActionSequence = actionPlan.ActionSequence;
+        return new(task, oldTask, robot);
+    }
+
+    /// <summary>
+    ///     Find an alternative action because replanning.
     /// </summary>
     /// <param name="action"></param>
     /// <returns>ActionModel</returns>
-    /// 
     protected async Task<ActionModel> FindAlternativeAction(ActionModel action)
     {
         //A new action entity will be created with most of the attributes from the previous one but the services.
-        ActionModel newAction = new ActionModel()
+        var newAction = new ActionModel
         {
             Id = action.Id,
             Name = action.Name,
             Order = action.Order,
             ActionPriority = action.ActionPriority,
             Relations = action.Relations,
-            Services = new List<InstanceModel>()
+            Services = new()
         };
 
-        foreach (InstanceModel instance in action.Services)
+        foreach (var instance in action.Services)
         {
             var candidateResponse = await _redisInterfaceClient.GetInstanceAlternativeAsync(instance.Id);
-            InstanceModel candidate = candidateResponse.ToInstance();
+            var candidate = candidateResponse.ToInstance();
             newAction.Services.Add(candidate);
         }
 
@@ -109,19 +266,19 @@ public class ActionPlanner : IActionPlanner
     }
 
     /// <summary>
-    /// Get a list of other "actions" that are markovian to the given action
+    ///     Get a list of other "actions" that are markovian to the given action
     /// </summary>
     /// <param name="actionId"></param>
     /// <returns>List<RelationModel></returns>
     protected async Task<List<RelationModel>> GetMarkovianActions(Guid actionId)
     {
-        List<RelationModel> dependsOnAction =
+        var dependsOnAction =
             await _redisInterfaceClient.GetRelationForActionAsync(actionId, "DEPENDS_ON");
         return dependsOnAction;
     }
 
     /// <summary>
-    /// Check if an action is Markovian (depends on other actions) or not.
+    ///     Check if an action is Markovian (depends on other actions) or not.
     /// </summary>
     /// <param name="actionId"></param>
     /// <returns></returns>
@@ -133,16 +290,16 @@ public class ActionPlanner : IActionPlanner
     }
 
     /// <summary>
-    /// Sort action sequence by descending order of the action attribute order.
+    ///     Sort action sequence by descending order of the action attribute order.
     /// </summary>
     /// <param name="unsortedActionSequence"></param>
     /// <returns>List<ActionModel></returns>
     protected List<ActionModel> SortActionSequence(List<ActionModel> unsortedActionSequence)
     {
-        List<ActionModel> SortedList = new List<ActionModel>();
-        Dictionary<ActionModel, int?> myDict = new Dictionary<ActionModel, int?>();
+        var SortedList = new List<ActionModel>();
+        var myDict = new Dictionary<ActionModel, int?>();
 
-        foreach (ActionModel action in unsortedActionSequence)
+        foreach (var action in unsortedActionSequence)
         {
             myDict.Add(action, action.Order);
         }
@@ -150,7 +307,7 @@ public class ActionPlanner : IActionPlanner
         //sort diccionary by decending order of action attribute order.
         var sortedDict = from entry in myDict orderby entry.Value descending select entry;
 
-        foreach (KeyValuePair<ActionModel, int?> entry in sortedDict)
+        foreach (var entry in sortedDict)
         {
             SortedList.Add(entry.Key);
         }
@@ -159,7 +316,7 @@ public class ActionPlanner : IActionPlanner
     }
 
     /// <summary>
-    /// Get the markovian (dependant) actions Guid's of a single action.
+    ///     Get the markovian (dependant) actions Guid's of a single action.
     /// </summary>
     /// <param name="failedActions"></param>
     /// <param name="completeActionSeq"></param>
@@ -167,30 +324,27 @@ public class ActionPlanner : IActionPlanner
     protected async Task<List<Guid>> getMarkovianCandidates(List<ActionModel> failedActions,
         List<ActionModel> completeActionSeq)
     {
-        List<Guid> FinalCandidates = new List<Guid>();
-        List<Guid> sharedFailedCandidates = new List<Guid>(); //markovian actions that are already in the failed list.
+        var FinalCandidates = new List<Guid>();
+        var sharedFailedCandidates = new List<Guid>(); //markovian actions that are already in the failed list.
 
         //For every single action failed, there are X amount of possible markovian actions.
-        foreach (ActionModel tempFailedAction in failedActions)
+        foreach (var tempFailedAction in failedActions)
         {
-            List<RelationModel> dependsOnAction = await GetMarkovianActions(tempFailedAction.Id);
+            var dependsOnAction = await GetMarkovianActions(tempFailedAction.Id);
 
             //Check if these markovian actions are in the failed actions list
-            foreach (RelationModel relationData in dependsOnAction)
+            foreach (var relationData in dependsOnAction)
             {
-                foreach (ActionModel failedAction in failedActions)
+                foreach (var failedAction in failedActions)
                 {
-                    if (failedAction.Id == relationData.PointsTo.Id)
-                    {
-                        sharedFailedCandidates.Add(failedAction.Id);
-                    }
+                    if (failedAction.Id == relationData.PointsTo.Id) sharedFailedCandidates.Add(failedAction.Id);
                 }
             }
 
             //Which of dependsOnAction is not in sharedFailedCandidates? --> succeded actions required
-            foreach (RelationModel dependsOnActionData in dependsOnAction)
+            foreach (var dependsOnActionData in dependsOnAction)
             {
-                bool found = sharedFailedCandidates.Contains(dependsOnActionData.PointsTo.Id);
+                var found = sharedFailedCandidates.Contains(dependsOnActionData.PointsTo.Id);
                 //Add the succesful actions that are required by the failed actions.
                 if (found == false) FinalCandidates.Add(dependsOnActionData.PointsTo.Id);
             }
@@ -200,7 +354,7 @@ public class ActionPlanner : IActionPlanner
     }
 
     /// <summary>
-    /// Validation of robot and netApp match.
+    ///     Validation of robot and netApp match.
     /// </summary>
     /// <param name="robot"></param>
     /// <param name="actionItem"></param>
@@ -209,8 +363,8 @@ public class ActionPlanner : IActionPlanner
     protected async Task ValidateRobotVsNetApp(RobotModel robot, ActionModel actionItem)
     {
         var instances = new List<InstanceModel>();
-        List<RelationModel> relations = await _redisInterfaceClient.GetRelationAsync(actionItem, "NEEDS");
-        foreach (RelationModel tempRelation in relations)
+        var relations = await _redisInterfaceClient.GetRelationAsync(actionItem, "NEEDS");
+        foreach (var tempRelation in relations)
         {
             var instanceResponse = await _redisInterfaceClient.InstanceGetByIdAsync(tempRelation.PointsTo.Id);
             if (instanceResponse is null)
@@ -222,32 +376,24 @@ public class ActionPlanner : IActionPlanner
         }
 
         // Check if the netApp ROS distro is equal to the ROS distro of robot.
-        foreach (InstanceModel instance in instances)
+        foreach (var instance in instances)
         {
-            if (instance.RosVersion != robot.RosVersion)
-            {
-                throw new IncorrectROSDistroException();
-            }
+            if (instance.RosVersion != robot.RosVersion) throw new IncorrectROSDistroException();
 
-            if (instance.RosDistro != robot.RosDistro)
-            {
-                throw new IncorrectROSVersionException();
-            }
+            if (instance.RosDistro != robot.RosDistro) throw new IncorrectROSVersionException();
         }
 
         //Check if the instances (netApps) support the robot attributes, sensors and specifications.
-        int numSensors = robot.Sensors.Count;
-        int countTemp = 0;
-        foreach (InstanceModel instance in instances)
+        var numSensors = robot.Sensors.Count;
+        var countTemp = 0;
+        foreach (var instance in instances)
         {
             if (instance.InstanceFamily == "ComputerVision")
             {
-                foreach (SensorModel sensor in robot.Sensors)
+                foreach (var sensor in robot.Sensors)
                 {
-                    if (sensor.Type != "camera" | sensor.Type != "depthCamera" | sensor.Type != "rgdbCamera")
-                    {
+                    if ((sensor.Type != "camera") | (sensor.Type != "depthCamera") | (sensor.Type != "rgdbCamera"))
                         countTemp++;
-                    }
                 }
             }
 
@@ -269,27 +415,7 @@ public class ActionPlanner : IActionPlanner
     }
 
     /// <summary>
-    /// Get predefined action sequence from knowledge graph given TaskId or provide partial or full replan.
-    /// </summary>
-    /// <param name="currentTaskId"></param>
-    /// <param name="resourceLock"></param>
-    /// <param name="dialogueTemp"></param>
-    /// <param name="robotId"></param>
-    /// <returns>TaskModel</returns>
-    public async Task<Tuple<TaskModel, RobotModel>> InferActionSequence(Guid currentTaskId, bool ContextKnown,
-        bool resourceLock, List<DialogueModel> dialogueTemp, Guid robotId)
-    {
-        List<ActionModel> tempTask = new List<ActionModel>();
-        List<ActionModel> tempReplanedCompleteActionSeq = new List<ActionModel>();
-        if (dialogueTemp is null)
-            dialogueTemp = new();
-        // modify the existing plan with the candidates
-        return await InferActionSequence(currentTaskId, ContextKnown, resourceLock, dialogueTemp, robotId, tempTask,
-            tempReplanedCompleteActionSeq);
-    }
-
-    /// <summary>
-    /// Get predefined action sequence from knowledge graph given TaskId or provide partial or full replan.
+    ///     Get predefined action sequence from knowledge graph given TaskId or provide partial or full replan.
     /// </summary>
     /// <param name="currentTaskId"></param>
     /// <param name="resourceLock"></param>
@@ -312,22 +438,19 @@ public class ActionPlanner : IActionPlanner
 
         //Load the robot asking for a plan from redis to middleware for infering action sequence.
         var robotResponse = await _redisInterfaceClient.RobotGetByIdAsync(robotId);
-        RobotModel robot = robotResponse.ToRobot();
+        var robot = robotResponse.ToRobot();
 
         // Backup list of replanedCompleteActionSeq for removing items when processed inside this function.
-        List<ActionModel> replanedCompleteActionSeqBk = new List<ActionModel>();
+        var replanedCompleteActionSeqBk = new List<ActionModel>();
         replanedCompleteActionSeqBk.AddRange(replanedCompleteActionSeq);
 
         robot.Questions.AddRange(dialogueTemp); //Append the questions-answers to the robot
 
-        if (contextKnown == false)
-        {
-            throw new NotImplementedException();
-        }
+        if (contextKnown == false) throw new NotImplementedException();
 
         var taskResponse = await _redisInterfaceClient.TaskGetByIdAsync(currentTaskId);
-        TaskModel task = taskResponse.ToTask();
-        bool alreadyExist = task != null; //Check if CurrentTask is inside Redis model
+        var task = taskResponse.ToTask();
+        var alreadyExist = task != null; //Check if CurrentTask is inside Redis model
         task.ActionPlanId = Guid.NewGuid(); //Generate automatic new Guid for plan ID.
 
         task.PartialRePlan = false; //By default
@@ -352,22 +475,22 @@ public class ActionPlanner : IActionPlanner
             task.FullReplan = false;
         }
 
-        bool ActionToConsider = false;
-        bool AllActionToConsider = false;
+        var ActionToConsider = false;
+        var AllActionToConsider = false;
 
         // Check if the redis graph knowledge base knows about this requested task.
-        if (alreadyExist == true)
+        if (alreadyExist)
         {
             // For now query graph to get action sequence. It will be modified in later iterations.
             // according to the StackOverflow this should work, if not let's map objects in the list one by one
-            List<RelationModel>
+            var
                 relations = await _redisInterfaceClient.GetRelationAsync(task,
                     "EXTENDS"); //returns x and y --> taskId and ActionID
 
 
-            List<Guid> actionGuids = relations.Select(r => r.PointsTo.Id).ToList();
+            var actionGuids = relations.Select(r => r.PointsTo.Id).ToList();
 
-            foreach (Guid actionId in
+            foreach (var actionId in
                      actionGuids) //Iterate over the pre-defined action sequence of the knowledge redis graph.
             {
                 //////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -378,7 +501,7 @@ public class ActionPlanner : IActionPlanner
                 //
                 /////////////////////////////////////////////////////////////////////////////////////////////////////////////
                 var actionResp = await _redisInterfaceClient.ActionGetByIdAsync(actionId);
-                ActionModel actionItem = actionResp.ToAction();
+                var actionItem = actionResp.ToAction();
 
                 await ValidateRobotVsNetApp(robot, actionItem);
 
@@ -395,54 +518,45 @@ public class ActionPlanner : IActionPlanner
                     if (replanedCompleteActionSeq.Count == 0)
                     {
                         // Check if any of the candidatesToRePlan actions is the same to the old predefined action.
-                        foreach (ActionModel action in candidatesToRePlan)
+                        foreach (var action in candidatesToRePlan)
                         {
-                            if (actionItem.Name == action.Name)
-                            {
-                                ActionToConsider = true;
-                            }
+                            if (actionItem.Name == action.Name) ActionToConsider = true;
                         }
                     }
 
                     //ONLY add to action seq the actions from replanedCompleteActionSeq
-                    if (replanedCompleteActionSeq.Count != 0)
-                    {
-                        AllActionToConsider = true;
-                    }
+                    if (replanedCompleteActionSeq.Count != 0) AllActionToConsider = true;
                 }
 
                 // REPLAN ESTRATEGY B:
                 // Find new action of candidate action that previously failed, because of replan.
-                if (ActionToConsider == true && AllActionToConsider == false)
+                if (ActionToConsider && AllActionToConsider == false)
                 {
-                    ActionModel newAction = await FindAlternativeAction(actionItem);
+                    var newAction = await FindAlternativeAction(actionItem);
                     //Add action to the action sequence in TaskModel
                     ActionSequence.Add(newAction);
                 }
 
                 // REPLAN ESTRATEGY B:
                 // Add the other actions that did not fail and where not considered for replaning
-                if (AllActionToConsider == false)
-                {
-                    ActionSequence.Add(actionItem);
-                }
+                if (AllActionToConsider == false) ActionSequence.Add(actionItem);
 
                 // REPLAN ESTRATEGY C:
                 // Partial replan running ONLY, the failed actions but with new candidate netApp.
-                if (AllActionToConsider == true)
+                if (AllActionToConsider)
                 {
-                    ActionModel tempActionPr = replanedCompleteActionSeqBk.FirstOrDefault();
+                    var tempActionPr = replanedCompleteActionSeqBk.FirstOrDefault();
                     ActionSequence.Add(tempActionPr);
                     replanedCompleteActionSeqBk.RemoveAt(0); //Remove the item for next iteration of the action loop.
                 }
             }
 
             // Iterate over the answers of the robot to make an action plan accordingly.
-            foreach (DialogueModel entryDialog in robot.Questions)
+            foreach (var entryDialog in robot.Questions)
             {
                 if (entryDialog.Name == "TaskPriority")
                 {
-                    KeyValuePair answer = Answer.First();
+                    var answer = Answer.First();
                     task.TaskPriority = (int)answer.Value;
                 }
             }
@@ -450,155 +564,6 @@ public class ActionPlanner : IActionPlanner
 
         task.ActionSequence = ActionSequence;
         task.ResourceLock = resourceLock;
-        return new Tuple<TaskModel, RobotModel>(task, robot);
-    }
-
-    /// <summary>
-    ///  Reason for the new action plan based upon information provided by robot.
-    /// </summary>
-    /// <param name="oldTask"></param>
-    /// <param name="CompleteReplan"></param>
-    /// <param name="DialogueTemp"></param>
-    /// <returns>Tuple<TaskModel, TaskModel, RobotModel</returns>
-    public async Task<Tuple<TaskModel, TaskModel, RobotModel>> ReInferActionSequence(TaskModel oldTask, Guid RobotId,
-        bool ContextKnown, bool CompleteReplan, List<DialogueModel> DialogueTemp)
-    {
-        bool MarkovianProcess = oldTask.MarkovianProcess;
-        Guid currentTaskId = oldTask.Id;
-        Guid currentPlanId = oldTask.ActionPlanId;
-        bool resourceLock = oldTask.ResourceLock;
-        bool ActionReplanLocked = oldTask.ReplanActionPlannerLocked;
-        List<ActionModel> oldActionSequence = oldTask.ActionSequence;
-        List<ActionModel> FinalCandidatesActions = new List<ActionModel>();
-        //DialogueModel dialogues = oldTask.
-
-        // Define some local method variables
-
-        List<ActionModel> candidatesActions = new List<ActionModel>();
-        List<ActionModel> FailedActions = new List<ActionModel>();
-        List<RelationModel> dependantActions = new List<RelationModel>();
-        Dictionary<Guid, string> actionStatus = new Dictionary<Guid, string>();
-        RelationModel dependency = new RelationModel();
-        bool InstanceError = false;
-
-        // Prepare basic information of new plan
-        TaskModel task = new TaskModel();
-        task.Id = currentTaskId;
-        task.ActionPlanId = Guid.NewGuid();
-        // Set the plan to be a replan.
-        task.PartialRePlan = false;
-        task.FullReplan = true;
-
-        // Load robot
-        var robotResp = await _redisInterfaceClient.RobotGetByIdAsync(RobotId);
-        RobotModel robot = robotResp.ToRobot();
-        robot.Questions = DialogueTemp; //Add the questions-answers to the robot
-
-        //Query Redis given old plan and obtain action seq.
-        var actionPlan = await _redisInterfaceClient.ActionPlanGetByIdAsync(currentPlanId);
-
-        // The robot requests to not change anything from action sequence but placement.
-        if (ActionReplanLocked == false) // TODO - VALIDATION WITH CompleteReplan
-        {
-            //Check if there were any issues with the deployments or instances. --> if so it is a replan on the resource planner level and action plan stays the same.
-            foreach (ActionModel action in actionPlan.ActionSequence)
-            {
-                actionStatus.Add(action.Id, action.ActionStatus);
-                if (action.ActionStatus == "Failed")
-                {
-                    FailedActions.Add(action);
-                }
-
-                foreach (InstanceModel instance in action.Services)
-                {
-                    if (instance.ServiceStatus == "Problem") //maybe another one more specific? Not sure about this one.
-                    {
-                        InstanceError = true;
-                    }
-                }
-            }
-
-            // How many actions in actionSeq
-            int numActions = actionStatus.Count;
-
-            // Check if all the actions have the same status?
-            var lists = actionStatus.Select(kv => kv.Value.OrderBy(x => x)).ToList();
-            var first = lists.First();
-            var areEqual = lists.Skip(1).All(hs => hs.SequenceEqual(first));
-
-            // A review of the action seq is neccesary --> there were no errors from the resource perspective.
-            if (InstanceError == false)
-            {
-                //Prepare a complete replan asked explicitely by the robot
-                if (CompleteReplan == true)
-                {
-                    Tuple<TaskModel, RobotModel> replanedTask = await InferActionSequence(currentTaskId, ContextKnown,
-                        resourceLock, DialogueTemp, robot.Id, oldTask.ActionSequence, new List<ActionModel>());
-                    return new Tuple<TaskModel, TaskModel, RobotModel>(replanedTask.Item1, oldTask, robot);
-                }
-                //Prepare a partial replan asked explicitely by the robot
-                else
-                {
-                    // If the task is single action then by nature it is none-Markovian.
-                    if (numActions == 1)
-                    {
-                        foreach (ActionModel failedAction in FailedActions)
-                        {
-                            Tuple<TaskModel, RobotModel> replanedTask = await InferActionSequence(currentTaskId,
-                                ContextKnown, resourceLock, DialogueTemp, robot.Id, oldTask.ActionSequence,
-                                new List<ActionModel>());
-                            return new Tuple<TaskModel, TaskModel, RobotModel>(replanedTask.Item1, oldTask, robot);
-                        }
-                    }
-                    // If task is not single action, query for markovian relationships among actions.
-                    else
-                    {
-                        // Modify only the actions that have failed
-                        if (MarkovianProcess == false)
-                        {
-                            foreach (ActionModel failedAction in FailedActions)
-                            {
-                                Tuple<TaskModel, RobotModel> replanedTask = await InferActionSequence(currentTaskId,
-                                    ContextKnown, resourceLock, DialogueTemp, robot.Id, oldTask.ActionSequence,
-                                    new List<ActionModel>());
-                                return new Tuple<TaskModel, TaskModel, RobotModel>(replanedTask.Item1, oldTask, robot);
-                            }
-                        }
-                        // Check if the actions that failed have a depends_on relationship to other actions. Check if there is any failed Markovian action.
-                        else
-                        {
-                            List<Guid> FinalCandidates = await getMarkovianCandidates(FailedActions, oldActionSequence);
-
-                            // Add failed actions to the final candidates list
-                            foreach (ActionModel fAction in FailedActions)
-                            {
-                                FinalCandidates.Add(fAction.Id);
-                                FinalCandidatesActions.Add(fAction);
-                            }
-
-                            //Ask for a new plan
-                            Tuple<TaskModel, RobotModel> replanedTask = await InferActionSequence(currentTaskId,
-                                ContextKnown, resourceLock, DialogueTemp, robot.Id, oldTask.ActionSequence,
-                                FinalCandidatesActions);
-                            return new Tuple<TaskModel, TaskModel, RobotModel>(replanedTask.Item1, oldTask, robot);
-                        }
-                    }
-                }
-            }
-
-            // Provide same action seq and let resource planner modify the placement.
-            else
-            {
-                task.ActionSequence = actionPlan.ActionSequence;
-            }
-
-            return new Tuple<TaskModel, TaskModel, RobotModel>(task, oldTask, robot);
-        }
-        else
-        {
-            // return same action sequence but with new plan id.
-            task.ActionSequence = actionPlan.ActionSequence;
-            return new Tuple<TaskModel, TaskModel, RobotModel>(task, oldTask, robot);
-        }
+        return new(task, robot);
     }
 }

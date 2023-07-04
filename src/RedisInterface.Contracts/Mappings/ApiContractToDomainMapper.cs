@@ -1,5 +1,6 @@
 ﻿using Middleware.Models.Domain;
 using Middleware.Models.Domain.Slice;
+using Middleware.Models.Domain.ValueObjects;
 using Middleware.Models.Enums;
 using Middleware.RedisInterface.Contracts.Requests;
 using Middleware.RedisInterface.Contracts.Responses;
@@ -195,8 +196,8 @@ public static class ApiContractToDomainMapper
             OnboardedTime = DateTime.Now,
             RosVersion = x.RosVersion,
             RosDistro = x.RosDistro,
-            RosTopicsPub = x.RosTopicPublishers.ToList(),
-            RosTopicsSub = x.RosTopicSubscribers.ToList(),
+            RosTopicsPub = x.RosTopicPublishers.Select(t => t.ToRosTopic()).ToList(),
+            RosTopicsSub = x.RosTopicSubscribers.Select(t => t.ToRosTopic()).ToList(),
             AppliedPolicies = x.AppliedPolicies.ToList()
         };
     }
@@ -214,8 +215,8 @@ public static class ApiContractToDomainMapper
             MinimumNumCores = x.MinimumNumOfCores,
             RosVersion = x.RosVersion,
             RosDistro = x.RosDistro,
-            RosTopicsPub = x.RosTopicPublishers.ToList(),
-            RosTopicsSub = x.RosTopicSubscribers.ToList(),
+            RosTopicsPub = x.RosTopicPublishers.Select(t => t.ToRosTopic()).ToList(),
+            RosTopicsSub = x.RosTopicSubscribers.Select(t => t.ToRosTopic()).ToList(),
             AppliedPolicies = x.AppliedPolicies.ToList(),
             Tags = x.Tags?.ToList(),
             OnboardedTime = x.OnboardedTime
@@ -441,6 +442,28 @@ public static class ApiContractToDomainMapper
             Name = x.Name,
             Organization = x.Organization,
             Type = Enum.Parse<LocationType>(x.Type)
+        };
+    }
+
+    public static RosTopicModel ToRosTopic(this RosTopicRequest x)
+    {
+        return new()
+        {
+            Name = TopicName.From(x.Name),
+            Type = x.Type,
+            Description = x.Description,
+            Enabled = x.Enabled
+        };
+    }
+
+    public static RosTopicModel ToRosTopic(this RosTopicResponse x)
+    {
+        return new()
+        {
+            Name = TopicName.From(x.Name),
+            Type = x.Type,
+            Description = x.Description,
+            Enabled = x.Enabled
         };
     }
 }

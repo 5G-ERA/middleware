@@ -6,6 +6,7 @@ namespace Middleware.Common.ExtensionMethods;
 public static class KubernetesObjectExtensions
 {
     private const string NetAppIdSelector = "serviceId";
+    private const int WebsocketPort = 80;
 
     /// <summary>
     ///     Sets the label for the object metadata with the specified serviceId
@@ -55,5 +56,17 @@ public static class KubernetesObjectExtensions
     public static IReadOnlyList<string> GetDeploymentNames(this V1DeploymentList deployments)
     {
         return deployments.Items.Select(d => d.Metadata.Name).OrderBy(d => d).ToList();
+    }
+
+    public static bool ContainsWebsocketCompatiblePort(this V1Service service)
+    {
+        var ports = service.Spec.Ports.Select(p => p.Port).ToList();
+
+        return ports.Contains(WebsocketPort);
+    }
+
+    public static void AddWebsocketCompatiblePort(this V1Service service)
+    {
+        service.Spec.Ports.Add(new(WebsocketPort, name: "websocket"));
     }
 }

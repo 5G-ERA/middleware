@@ -8,7 +8,7 @@ public class InstanceModel : BaseModel, IPolicyAssignable
 {
     public override Guid Id { get; set; } = Guid.NewGuid();
 
-    public override string? Name { get; set; } // compulsory field
+    public override string Name { get; set; } = default!; // compulsory field
 
     public Guid ServiceInstanceId { get; set; }
 
@@ -128,5 +128,13 @@ public class InstanceModel : BaseModel, IPolicyAssignable
             LastStatusChange = domain.LastStatusChange,
             AppliedPolicies = domain.AppliedPolicies
         };
+    }
+
+    public void SetNetAppAddress(string netAppAddress)
+    {
+        if (!Uri.IsWellFormedUriString(netAppAddress, UriKind.Absolute))
+            throw new ArgumentException("Specified NetApp address is not a valid Url string", nameof(netAppAddress));
+
+        ServiceUrl = netAppAddress;
     }
 }

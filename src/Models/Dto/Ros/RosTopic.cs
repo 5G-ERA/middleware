@@ -1,10 +1,11 @@
 ﻿using Middleware.Models.Domain;
+using Middleware.Models.Domain.ValueObjects;
 
 namespace Middleware.Models.Dto.Ros;
 
-public class RosTopic 
+public class RosTopic
 {
-    public string? Name { get; set; }
+    public string Name { get; set; } = default!;
     public string? Type { get; set; }
     public string? Description { get; set; }
     public bool Enabled { get; set; }
@@ -12,9 +13,9 @@ public class RosTopic
     public RosTopicModel ToModel()
     {
         var dto = this;
-        return new RosTopicModel()
+        return new()
         {
-            Name = dto.Name,
+            Name = TopicName.From(dto.Name),
             Type = dto.Type,
             Description = dto.Description,
             Enabled = dto.Enabled

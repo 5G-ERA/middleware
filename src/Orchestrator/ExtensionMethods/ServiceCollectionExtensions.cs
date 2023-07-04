@@ -91,6 +91,35 @@ public static class ServiceCollectionExtensions
                         ec.ConfigureConsumer<ConnectRobotToSliceConsumer>(busRegistrationContext);
                     });
 
+
+                #region consumer configuration
+
+                mqBusFactoryConfigurator.Send<GatewayAddNetAppEntryMessage>(topologyConfigurator =>
+                {
+                    topologyConfigurator.UseRoutingKeyFormatter(t => t.Message.DeploymentLocation);
+                });
+                mqBusFactoryConfigurator.Message<GatewayAddNetAppEntryMessage>(topologyConfigurator =>
+                    topologyConfigurator.SetEntityName(nameof(GatewayAddNetAppEntryMessage)));
+                mqBusFactoryConfigurator.Publish<GatewayAddNetAppEntryMessage>(topologyConfigurator =>
+                {
+                    topologyConfigurator.ExchangeType = ExchangeType.Direct;
+                });
+
+
+                mqBusFactoryConfigurator.Send<GatewayDeleteNetAppEntryMessage>(topologyConfigurator =>
+                {
+                    topologyConfigurator.UseRoutingKeyFormatter(t => t.Message.DeploymentLocation);
+                });
+                mqBusFactoryConfigurator.Message<GatewayDeleteNetAppEntryMessage>(topologyConfigurator =>
+                    topologyConfigurator.SetEntityName(nameof(GatewayDeleteNetAppEntryMessage)));
+                mqBusFactoryConfigurator.Publish<GatewayDeleteNetAppEntryMessage>(topologyConfigurator =>
+                {
+                    topologyConfigurator.ExchangeType = ExchangeType.Direct;
+                });
+
+                #endregion
+
+
                 mqBusFactoryConfigurator.ConfigureEndpoints(busRegistrationContext);
             });
         });

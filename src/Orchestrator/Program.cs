@@ -2,14 +2,17 @@ using System.Net;
 using System.Reflection;
 using Middleware.CentralApi.Contracts.Requests;
 using Middleware.CentralApi.Sdk;
+using Middleware.Common;
 using Middleware.Common.Config;
 using Middleware.Common.ExtensionMethods;
+using Middleware.Common.MessageContracts;
 using Middleware.DataAccess.ExtensionMethods;
 using Middleware.DataAccess.Repositories.Abstract;
 using Middleware.DataAccess.Repositories.Redis;
 using Middleware.Orchestrator.Config;
 using Middleware.Orchestrator.Deployment;
 using Middleware.Orchestrator.ExtensionMethods;
+using Middleware.Orchestrator.Publishers;
 using Middleware.Orchestrator.SliceManager;
 using Middleware.Orchestrator.SliceManager.Contracts;
 using Middleware.RedisInterface.Sdk;
@@ -59,6 +62,10 @@ builder.Services.AddScoped<INetAppStatusRepository, RedisNetAppStatusRepository>
 builder.Services.AddScoped<IRobotStatusRepository, RedisRobotStatusRepository>();
 builder.Services.AddScoped<ISliceManagerClientFactory, SliceManagerClientFactory>();
 builder.Services.AddScoped<IKubernetesObjectBuilder, KubernetesObjectBuilder>();
+builder.Services.AddScoped<IRosConnectionBuilderFactory, RosConnectionBuilderFactory>();
+builder.Services.AddScoped<IPublishingService, PublishingService>();
+builder.Services.AddScoped<IPublisher<GatewayAddNetAppEntryMessage>, GatewayAddNetAppEntryPublisher>();
+builder.Services.AddScoped<IPublisher<GatewayDeleteNetAppEntryMessage>, GatewayDeleteNetAppEntryPublisher>();
 builder.Services.AddRedisInterfaceClient();
 
 builder.Services.AddHttpClient("healthCheckClient");

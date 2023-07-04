@@ -1,4 +1,7 @@
-﻿namespace Middleware.Common.Helpers;
+﻿using System.ComponentModel;
+using Middleware.Models.Enums;
+
+namespace Middleware.Common.Helpers;
 
 /// <summary>
 ///     Class responsible for handling common
@@ -17,6 +20,21 @@ public static class QueueHelpers
         if (instanceType == null) throw new ArgumentNullException(nameof(instanceType));
 
         return $"{instanceName}-{instanceType}";
+    }
+
+    /// <summary>
+    ///     Constructs the routing key based on the deployment properties
+    /// </summary>
+    /// <param name="instanceName"></param>
+    /// <param name="locationType"></param>
+    /// <returns></returns>
+    public static string ConstructRoutingKey(string instanceName, LocationType locationType)
+    {
+        if (instanceName == null) throw new ArgumentNullException(nameof(instanceName));
+        if (!Enum.IsDefined(typeof(LocationType), locationType))
+            throw new InvalidEnumArgumentException(nameof(locationType), (int)locationType, typeof(LocationType));
+
+        return ConstructRoutingKey(instanceName, locationType.ToString());
     }
 
     private static string GetQueueName(string organization, string instanceName, string queueName)

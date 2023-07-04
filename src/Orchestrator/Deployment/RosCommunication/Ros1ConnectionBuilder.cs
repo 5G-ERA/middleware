@@ -1,4 +1,7 @@
-﻿using k8s.Models;
+using System.Text.Json;
+using k8s.Models;
+using Middleware.Common.ExtensionMethods;
+
 using Middleware.Models.Domain;
 
 namespace Middleware.Orchestrator.Deployment.RosCommunication;
@@ -26,24 +29,24 @@ internal class Ros1ConnectionBuilder : IRosConnectionBuilder
     /// <inheritdoc />
     public string RosDistro { get; }
 
-    /// <inheritdoc />
-    /// <inheritdoc />
-    public V1Deployment EnableRosCommunication(V1Deployment dpl)
+    public V1Service EnableRelayNetAppCommunication(V1Service service)
     {
+        if (service is null) throw new ArgumentNullException(nameof(service));
+        if (service.Spec?.Ports is null) throw new ArgumentNullException(nameof(service), "Ports list cannot be null");
+
+        if (service.ContainsWebsocketCompatiblePort() == false)
+            service.AddWebsocketCompatiblePort();
+
+        return service;
+    }
+
+    /// <inheritdoc />
+    public V1Deployment EnableRosCommunication(V1Deployment dpl, IReadOnlyList<RosTopicModel> rosTopics)
+    {
+        if (rosTopics is null) throw new ArgumentNullException(nameof(rosTopics));
         if (dpl.Spec?.Template?.Spec?.Containers is null || dpl.Spec.Template.Spec.Containers.Any() == false)
             throw new ArgumentException("Missing Deployment container configuration.", nameof(dpl));
 
-        var imageName = $"ros:{_distro.Name.ToLower()}-ros-core";
-
-        var rosContainer = new V1Container
-        {
-            Image = imageName,
-            Name = _distro.ToString(),
-            Ports = new List<V1ContainerPort>(1)
-            {
-                new(11311, name: "ros-master")
-            }
-        };
         //BB 2023.06.23: containers within single pod communicate over loopback (localhost) interface 
         var rosMasterEnv = new V1EnvVar("ROS_MASTER_URI", "http://127.0.0.1:11311");
         var rosIpEnv = new V1EnvVar("ROS_IP", "127.0.0.1");
@@ -54,8 +57,45 @@ internal class Ros1ConnectionBuilder : IRosConnectionBuilder
             cont.Env.Add(rosIpEnv);
         }
 
-        dpl.Spec.Template.Spec.Containers.Add(rosContainer);
+        dpl.Spec.Template.Spec.Containers.Add(GetRosContainer());
+        dpl.Spec.Template.Spec.Containers.Add(GetRelayNetAppContainer(rosTopics));
 
         return dpl;
     }
+
+    private V1Container GetRosContainer()
+    {
+        var rosContainer = new V1Container
+        {
+            Image = $"ros:{_distro.Name.ToLower()}-ros-core",
+            Name = _distro.ToString(),
+            Ports = new List<V1ContainerPort>
+            {
+                new(11311, name: "ros-master")
+            }
+        };
+        return rosContainer;
+    }
+
+    private V1Container GetRelayNetAppContainer(IReadOnlyList<RosTopicModel> rosTopics)
+    {
+        var topicsString = JsonSerializer.Serialize(rosTopics);
+        var container = new V1Container
+        {
+            Name = "relayNetApp",
+            Ports = new List<V1ContainerPort>
+            {
+                new(80, name: "websocket")
+            },
+            Env = new List<V1EnvVar>
+            {
+                new("ROS_MASTER_URI", "http://127.0.0.1:11311"),
+                new("TOPIC_LIST", topicsString)
+            },
+            Image = "but5gera/relay_network_application:0.1.0"
+        };
+
+        return container;
+    }
+
 }

@@ -1,5 +1,6 @@
 ﻿using Middleware.Models.Domain;
 using Middleware.Models.Enums;
+using Middleware.RedisInterface.Contracts.Mappings;
 using Middleware.RedisInterface.Requests;
 
 namespace Middleware.RedisInterface.Mappings;
@@ -8,7 +9,7 @@ public static class ApiContractToDomainMapper
 {
     public static ActionModel ToAction(this UpdateActionRequest x)
     {
-        return new ActionModel()
+        return new()
         {
             Id = x.Id,
             Name = x.Action.Name,
@@ -21,7 +22,7 @@ public static class ApiContractToDomainMapper
 
     public static CloudModel ToCloud(this UpdateCloudRequest x)
     {
-        return new CloudModel()
+        return new()
         {
             Id = x.Id,
             Name = x.Cloud.Name,
@@ -40,7 +41,7 @@ public static class ApiContractToDomainMapper
 
     public static ContainerImageModel ToContainer(this UpdateContainerRequest x)
     {
-        return new ContainerImageModel()
+        return new()
         {
             Id = x.Id,
             Name = x.Container.Name,
@@ -53,7 +54,7 @@ public static class ApiContractToDomainMapper
 
     public static EdgeModel ToEdge(this UpdateEdgeRequest x)
     {
-        return new EdgeModel()
+        return new()
         {
             Id = x.Id,
             Name = x.Edge.Name,
@@ -72,7 +73,7 @@ public static class ApiContractToDomainMapper
 
     public static InstanceModel ToInstance(this UpdateInstanceRequest x)
     {
-        return new InstanceModel()
+        return new()
         {
             Id = x.Id,
             Name = x.Instance.Name,
@@ -85,13 +86,14 @@ public static class ApiContractToDomainMapper
             OnboardedTime = DateTime.Now,
             RosVersion = x.Instance.RosVersion,
             RosDistro = x.Instance.RosDistro,
-            RosTopicsPub = x.Instance.RosTopicPublishers.ToList(),
-            RosTopicsSub = x.Instance.RosTopicSubscribers.ToList()
+            RosTopicsPub = x.Instance.RosTopicPublishers.Select(t => t.ToRosTopic()).ToList(),
+            RosTopicsSub = x.Instance.RosTopicSubscribers.Select(t => t.ToRosTopic()).ToList()
         };
     }
+
     public static PolicyModel ToPolicy(this UpdatePolicyRequest x)
     {
-        return new PolicyModel()
+        return new()
         {
             Id = x.Id,
             Name = x.Policy.Name,
@@ -103,9 +105,10 @@ public static class ApiContractToDomainMapper
             Timestamp = x.Policy.LastTimeUpdated
         };
     }
+
     public static RobotModel ToRobot(this UpdateRobotRequest x)
     {
-        return new RobotModel()
+        return new()
         {
             Id = x.Id,
             Name = x.Robot.Name,
@@ -134,12 +137,13 @@ public static class ApiContractToDomainMapper
             StorageDisk = x.Robot.StorageDisk,
             Questions = x.Robot.Questions?.ToList(),
             LastUpdatedTime = DateTime.Now,
-            OnboardedTime = DateTime.Now,
+            OnboardedTime = DateTime.Now
         };
     }
+
     public static TaskModel ToTask(this UpdateTaskRequest x)
     {
-        return new TaskModel()
+        return new()
         {
             Id = x.Id,
             Name = x.Task.Name,

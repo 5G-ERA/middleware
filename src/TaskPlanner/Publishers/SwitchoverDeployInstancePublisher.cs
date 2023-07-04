@@ -1,4 +1,5 @@
 ﻿using MassTransit;
+using Middleware.Common;
 using Middleware.Common.MessageContracts;
 
 namespace Middleware.TaskPlanner.Publishers;

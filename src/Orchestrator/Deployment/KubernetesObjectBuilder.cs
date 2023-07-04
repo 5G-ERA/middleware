@@ -5,6 +5,7 @@ using Middleware.Common.Config;
 using Middleware.Common.Enums;
 using Middleware.Common.ExtensionMethods;
 using Middleware.Models.Domain;
+using Middleware.Models.ExtensionMethods;
 using Middleware.Orchestrator.Exceptions;
 using Middleware.Orchestrator.Models;
 
@@ -180,7 +181,7 @@ internal class KubernetesObjectBuilder : IKubernetesObjectBuilder
         if (obj is null) throw new UnableToParseYamlConfigException(name, nameof(ContainerImageModel.K8SService));
 
         obj.Metadata.SetServiceLabel(serviceInstanceId);
-        obj.Metadata.Name = name;
+        obj.Metadata.Name = name.SanitizeAsK8sObjectName();
         foreach (var container in obj.Spec.Template.Spec.Containers)
         {
             var envVars = container.Env is not null

@@ -1,4 +1,4 @@
-﻿namespace Middleware.Common.ExtensionMethods;
+﻿namespace Middleware.Models.ExtensionMethods;
 
 public static class StringExtensions
 {
@@ -31,5 +31,15 @@ public static class StringExtensions
     public static string TrimSuffix(this string s, string suffix)
     {
         return !s.EndsWith(suffix) ? s : s.Substring(0, s.Length - suffix.Length);
+    }
+
+    public static string SanitizeToUriPath(this string s)
+    {
+        return s.Replace(" ", "-")
+            .Replace('_', '-')
+            .Replace(':', '-')
+            .Replace('.', '-')
+            .Replace('/', '-')
+            .ToLower().Trim();
     }
 }

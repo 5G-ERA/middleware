@@ -1,4 +1,5 @@
 using Middleware.CentralApi.Sdk;
+using Middleware.Common;
 using Middleware.Common.Config;
 using Middleware.Common.ExtensionMethods;
 using Middleware.Common.MessageContracts;

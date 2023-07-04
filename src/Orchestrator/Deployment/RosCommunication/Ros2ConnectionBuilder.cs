@@ -21,7 +21,6 @@ internal class Ros2ConnectionBuilder : IRosConnectionBuilder
         RosDistro = distro.Name;
     }
 
-
     /// <inheritdoc />
     public int RosVersion { get; }
 
@@ -29,9 +28,15 @@ internal class Ros2ConnectionBuilder : IRosConnectionBuilder
     public string RosDistro { get; }
 
     /// <inheritdoc />
-    public V1Deployment EnableRosCommunication(V1Deployment dpl)
+    public V1Deployment EnableRosCommunication(V1Deployment dpl, IReadOnlyList<RosTopicModel> topicSubscribers)
     {
         //TODO: we have to figure out how to enable ros2. It is possible that it will be same as ros1, but we will see :)
         return dpl;
+    }
+
+    /// <inheritdoc />
+    public V1Service EnableRelayNetAppCommunication(V1Service service)
+    {
+        throw new NotImplementedException();
     }
 }
