@@ -390,7 +390,7 @@ public class RobotController : ControllerBase
             var response = new UpdateTopicResponse
             {
                 RobotId = request.Id,
-                TopicName = topicModel.Name.Value,
+                TopicName = topicModel.Name,
                 TopicType = topicModel.Type,
                 TopicDescription = topicModel.Description,
                 TopicEnabled = topicModel.Enabled

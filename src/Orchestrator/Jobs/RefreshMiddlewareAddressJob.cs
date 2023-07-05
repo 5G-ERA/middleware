@@ -11,7 +11,8 @@ public class RefreshMiddlewareAddressJob : BaseJob<RefreshMiddlewareAddressJob>
 {
     private readonly IKubernetesBuilder _builder;
 
-    public RefreshMiddlewareAddressJob(IKubernetesBuilder builder, ILogger<RefreshMiddlewareAddressJob> logger) : base(logger)
+    public RefreshMiddlewareAddressJob(IKubernetesBuilder builder, ILogger<RefreshMiddlewareAddressJob> logger) :
+        base(logger)
     {
         _builder = builder;
     }
@@ -21,7 +22,8 @@ public class RefreshMiddlewareAddressJob : BaseJob<RefreshMiddlewareAddressJob>
         try
         {
             var kubeClient = _builder.CreateKubernetesClient();
-            V1Service gateway = await GetGateway(kubeClient);
+            var gateway = await GetGateway(kubeClient);
+            if (gateway is null) return;
             AppConfig.MiddlewareAddress = gateway.GetExternalAddress();
         }
         catch (Exception ex)
@@ -32,7 +34,10 @@ public class RefreshMiddlewareAddressJob : BaseJob<RefreshMiddlewareAddressJob>
 
     private async Task<V1Service> GetGateway(IKubernetes kubeClient)
     {
-        var services = await kubeClient.CoreV1.ListNamespacedServiceAsync(AppConfig.K8SNamespaceName, labelSelector: "app=gateway");
+        if (kubeClient is null) return null;
+        var services =
+            await kubeClient.CoreV1.ListNamespacedServiceAsync(AppConfig.K8SNamespaceName,
+                labelSelector: "app=gateway");
         return services.Items.SingleOrDefault();
     }
 }

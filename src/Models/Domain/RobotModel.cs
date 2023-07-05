@@ -191,7 +191,7 @@ public class RobotModel : BaseModel
     /// <returns></returns>
     public RosTopicModel? GetTopicModelFromRobot(string topicName)
     {
-        return GetAllRobotTopics().Where(t => t.Name.Value == topicName).FirstOrDefault();
+        return GetAllRobotTopics().Where(t => t.Name == topicName).FirstOrDefault();
     }
 
     public override Dto.Dto ToDto()

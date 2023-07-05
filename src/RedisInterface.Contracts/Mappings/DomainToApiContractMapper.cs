@@ -272,7 +272,7 @@ public static class DomainToApiContractMapper
     {
         return new()
         {
-            Name = x.Name.Value,
+            Name = x.Name,
             Type = x.Type,
             Description = x.Description,
             Enabled = x.Enabled
@@ -283,7 +283,7 @@ public static class DomainToApiContractMapper
     {
         return new()
         {
-            Name = x.Name.Value,
+            Name = x.Name,
             Type = x.Type,
             Description = x.Description,
             Enabled = x.Enabled

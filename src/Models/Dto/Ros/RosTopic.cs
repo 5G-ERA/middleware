@@ -1,5 +1,4 @@
 ﻿using Middleware.Models.Domain;
-using Middleware.Models.Domain.ValueObjects;
 
 namespace Middleware.Models.Dto.Ros;
 
@@ -15,7 +14,7 @@ public class RosTopic
         var dto = this;
         return new()
         {
-            Name = TopicName.From(dto.Name),
+            Name = dto.Name,
             Type = dto.Type,
             Description = dto.Description,
             Enabled = dto.Enabled

@@ -1,6 +1,5 @@
 ﻿using Middleware.Models.Domain;
 using Middleware.Models.Domain.Slice;
-using Middleware.Models.Domain.ValueObjects;
 using Middleware.Models.Enums;
 using Middleware.RedisInterface.Contracts.Requests;
 using Middleware.RedisInterface.Contracts.Responses;
@@ -449,7 +448,7 @@ public static class ApiContractToDomainMapper
     {
         return new()
         {
-            Name = TopicName.From(x.Name),
+            Name = x.Name,
             Type = x.Type,
             Description = x.Description,
             Enabled = x.Enabled
@@ -460,7 +459,7 @@ public static class ApiContractToDomainMapper
     {
         return new()
         {
-            Name = TopicName.From(x.Name),
+            Name = x.Name,
             Type = x.Type,
             Description = x.Description,
             Enabled = x.Enabled

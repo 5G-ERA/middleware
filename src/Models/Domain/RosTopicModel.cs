@@ -1,5 +1,4 @@
 ﻿using System.Text.Json.Serialization;
-using Middleware.Models.Domain.ValueObjects;
 using Middleware.Models.Dto.Ros;
 
 namespace Middleware.Models.Domain;
@@ -7,8 +6,8 @@ namespace Middleware.Models.Domain;
 public class RosTopicModel
 {
     [JsonPropertyName("topic_name")]
-    [JsonConverter(typeof(TopicNameConverter))]
-    public TopicName Name { get; set; } = default!;
+    //[JsonConverter(typeof(TopicNameConverter))]
+    public string Name { get; set; } = default!;
 
     [JsonPropertyName("topic_type")]
     public string? Type { get; set; }
@@ -39,7 +38,7 @@ public class RosTopicModel
     {
         return new()
         {
-            Name = Name.Value,
+            Name = Name,
             Type = Type,
             Description = Description,
             Enabled = Enabled

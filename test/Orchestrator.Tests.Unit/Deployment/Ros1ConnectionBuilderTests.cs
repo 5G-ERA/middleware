@@ -4,7 +4,6 @@ using System.Linq;
 using FluentAssertions;
 using k8s.Models;
 using Middleware.Models.Domain;
-using Middleware.Models.Domain.ValueObjects;
 using Middleware.Orchestrator.Deployment.RosCommunication;
 using Xunit;
 
@@ -65,7 +64,7 @@ public class Ros1ConnectionBuilderTests
         {
             new()
             {
-                Name = TopicName.From("/image_raw"),
+                Name = "/image_raw",
                 Type = "sensor_msgs/Image",
                 Description = "The example description that should not be included in the parsed topic",
                 Enabled = true // this also should not be included
