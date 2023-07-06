@@ -69,7 +69,8 @@ public class PolicyModel : BaseModel
             IsActive = domain.IsActive,
             Description = domain.Description,
             IsExclusiveWithinType = domain.IsExclusiveWithinType,
-            Priority = domain.Priority.ToString()
+            Priority = domain.Priority.ToString(),
+            Scope = domain.Scope.ToString()
         };
     }
 }
