@@ -284,6 +284,57 @@
         }
       }
     },
+    "/api/v1/Plan/switchover": {
+      "post": {
+        "tags": [
+          "Plan"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PerformSwitchoverRequest"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PerformSwitchoverRequest"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/PerformSwitchoverRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success"
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/v1/RePlan": {
       "post": {
         "tags": [
@@ -399,11 +450,17 @@
           },
           "MinimumRam": {
             "type": "integer",
-            "format": "int32"
+            "format": "int64",
+            "nullable": true
           },
           "MinimumNumCores": {
             "type": "integer",
-            "format": "int32"
+            "format": "int32",
+            "nullable": true
+          },
+          "networkSlice": {
+            "type": "string",
+            "nullable": true
           }
         },
         "additionalProperties": false
@@ -429,6 +486,43 @@
           "isError": {
             "type": "boolean",
             "readOnly": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "ContainerImageModel": {
+        "type": "object",
+        "properties": {
+          "relations": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/RelationModel"
+            },
+            "nullable": true
+          },
+          "Id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "Name": {
+            "type": "string",
+            "nullable": true
+          },
+          "Timestamp": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "Description": {
+            "type": "string",
+            "nullable": true
+          },
+          "K8SDeployment": {
+            "type": "string",
+            "nullable": true
+          },
+          "K8SService": {
+            "type": "string",
+            "nullable": true
           }
         },
         "additionalProperties": false
@@ -556,86 +650,104 @@
             },
             "nullable": true
           },
-          "Id": {
+          "id": {
             "type": "string",
             "format": "uuid"
           },
-          "Name": {
+          "name": {
             "type": "string",
             "nullable": true
           },
-          "ServiceInstanceId": {
+          "serviceInstanceId": {
             "type": "string",
             "format": "uuid"
           },
-          "ServiceType": {
+          "serviceType": {
             "type": "string",
             "nullable": true
           },
-          "IsReusable": {
+          "isReusable": {
             "type": "boolean",
             "nullable": true
           },
-          "DesiredStatus": {
+          "desiredStatus": {
             "type": "string",
             "nullable": true
           },
-          "ServiceUrl": {
+          "serviceUrl": {
             "type": "string",
             "nullable": true
           },
-          "RosTopicsPub": {
+          "rosTopicsPub": {
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/RosTopicModel"
             },
             "nullable": true
           },
-          "RosTopicsSub": {
+          "rosTopicsSub": {
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/RosTopicModel"
             },
             "nullable": true
           },
-          "ROSVersion": {
+          "rosVersion": {
             "type": "integer",
             "format": "int32"
           },
-          "ROSDistro": {
+          "rosDistro": {
             "type": "string",
             "nullable": true
           },
-          "Tags": {
+          "tags": {
             "type": "array",
             "items": {
               "type": "string"
             },
             "nullable": true
           },
-          "InstanceFamily": {
+          "instanceFamily": {
             "type": "string",
             "nullable": true
           },
-          "SuccessRate": {
+          "successRate": {
             "type": "integer",
             "format": "int32"
           },
-          "ServiceStatus": {
+          "serviceStatus": {
             "type": "string",
+            "nullable": true,
+            "readOnly": true
+          },
+          "containerImage": {
+            "$ref": "#/components/schemas/ContainerImageModel"
+          },
+          "minimumRam": {
+            "type": "integer",
+            "format": "int64",
             "nullable": true
           },
-          "MinimumRam": {
+          "minimumNumCores": {
             "type": "integer",
-            "format": "int32"
+            "format": "int32",
+            "nullable": true
           },
-          "MinimumNumCores": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "OnboardedTime": {
+          "onboardedTime": {
             "type": "string",
             "format": "date-time"
+          },
+          "lastStatusChange": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "appliedPolicies": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "nullable": true
           }
         },
         "additionalProperties": false
@@ -648,6 +760,28 @@
             "nullable": true
           },
           "value": {
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "PerformSwitchoverRequest": {
+        "type": "object",
+        "properties": {
+          "actionPlanId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "actionId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "destination": {
+            "type": "string",
+            "nullable": true
+          },
+          "destinationType": {
+            "type": "string",
             "nullable": true
           }
         },
@@ -679,20 +813,13 @@
       "RosTopicModel": {
         "type": "object",
         "properties": {
-          "name": {
+          "topic_name": {
             "type": "string",
             "nullable": true
           },
-          "type": {
+          "topic_type": {
             "type": "string",
             "nullable": true
-          },
-          "description": {
-            "type": "string",
-            "nullable": true
-          },
-          "enabled": {
-            "type": "boolean"
           }
         },
         "additionalProperties": false

@@ -2,7 +2,7 @@
     "openapi": "3.0.1",
     "info": {
         "title": "5G-ERA Middleware",
-        "version": "0.1"
+        "version": "0.6"
     },
     "components": {
         "schemas": {
@@ -60,11 +60,17 @@
                     },
                     "MinimumRam": {
                         "type": "integer",
-                        "format": "int32"
+                        "format": "int64",
+                        "nullable": true
                     },
                     "MinimumNumCores": {
                         "type": "integer",
-                        "format": "int32"
+                        "format": "int32",
+                        "nullable": true
+                    },
+                    "networkSlice": {
+                        "type": "string",
+                        "nullable": true
                     }
                 },
                 "additionalProperties": false
@@ -79,41 +85,41 @@
                         },
                         "nullable": true
                     },
-                    "Id": {
+                    "id": {
                         "type": "string",
                         "format": "uuid"
                     },
-                    "TaskId": {
+                    "taskId": {
                         "type": "string",
                         "format": "uuid"
                     },
-                    "Name": {
+                    "name": {
                         "type": "string",
                         "nullable": true
                     },
-                    "Status": {
+                    "status": {
                         "type": "string",
                         "nullable": true
                     },
-                    "IsReplan": {
+                    "isReplan": {
                         "type": "boolean"
                     },
-                    "LastStatusChange": {
+                    "lastStatusChange": {
                         "type": "string",
                         "format": "date-time"
                     },
-                    "ActionSequence": {
+                    "actionSequence": {
                         "type": "array",
                         "items": {
                             "$ref": "#/components/schemas/ActionModel"
                         },
                         "nullable": true
                     },
-                    "RobotId": {
+                    "robotId": {
                         "type": "string",
                         "format": "uuid"
                     },
-                    "TaskStartedAt": {
+                    "taskStartedAt": {
                         "type": "string",
                         "format": "date-time"
                     }
@@ -166,6 +172,43 @@
                     "isError": {
                         "type": "boolean",
                         "readOnly": true
+                    }
+                },
+                "additionalProperties": false
+            },
+            "ContainerImageModel": {
+                "type": "object",
+                "properties": {
+                    "relations": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/RelationModel"
+                        },
+                        "nullable": true
+                    },
+                    "Id": {
+                        "type": "string",
+                        "format": "uuid"
+                    },
+                    "Name": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "Timestamp": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "Description": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "K8SDeployment": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "K8SService": {
+                        "type": "string",
+                        "nullable": true
                     }
                 },
                 "additionalProperties": false
@@ -229,86 +272,104 @@
                         },
                         "nullable": true
                     },
-                    "Id": {
+                    "id": {
                         "type": "string",
                         "format": "uuid"
                     },
-                    "Name": {
+                    "name": {
                         "type": "string",
                         "nullable": true
                     },
-                    "ServiceInstanceId": {
+                    "serviceInstanceId": {
                         "type": "string",
                         "format": "uuid"
                     },
-                    "ServiceType": {
+                    "serviceType": {
                         "type": "string",
                         "nullable": true
                     },
-                    "IsReusable": {
+                    "isReusable": {
                         "type": "boolean",
                         "nullable": true
                     },
-                    "DesiredStatus": {
+                    "desiredStatus": {
                         "type": "string",
                         "nullable": true
                     },
-                    "ServiceUrl": {
+                    "serviceUrl": {
                         "type": "string",
                         "nullable": true
                     },
-                    "RosTopicsPub": {
+                    "rosTopicsPub": {
                         "type": "array",
                         "items": {
                             "$ref": "#/components/schemas/RosTopicModel"
                         },
                         "nullable": true
                     },
-                    "RosTopicsSub": {
+                    "rosTopicsSub": {
                         "type": "array",
                         "items": {
                             "$ref": "#/components/schemas/RosTopicModel"
                         },
                         "nullable": true
                     },
-                    "ROSVersion": {
+                    "rosVersion": {
                         "type": "integer",
                         "format": "int32"
                     },
-                    "ROSDistro": {
+                    "rosDistro": {
                         "type": "string",
                         "nullable": true
                     },
-                    "Tags": {
+                    "tags": {
                         "type": "array",
                         "items": {
                             "type": "string"
                         },
                         "nullable": true
                     },
-                    "InstanceFamily": {
+                    "instanceFamily": {
                         "type": "string",
                         "nullable": true
                     },
-                    "SuccessRate": {
+                    "successRate": {
                         "type": "integer",
                         "format": "int32"
                     },
-                    "ServiceStatus": {
+                    "serviceStatus": {
                         "type": "string",
+                        "nullable": true,
+                        "readOnly": true
+                    },
+                    "containerImage": {
+                        "$ref": "#/components/schemas/ContainerImageModel"
+                    },
+                    "minimumRam": {
+                        "type": "integer",
+                        "format": "int64",
                         "nullable": true
                     },
-                    "MinimumRam": {
+                    "minimumNumCores": {
                         "type": "integer",
-                        "format": "int32"
+                        "format": "int32",
+                        "nullable": true
                     },
-                    "MinimumNumCores": {
-                        "type": "integer",
-                        "format": "int32"
-                    },
-                    "OnboardedTime": {
+                    "onboardedTime": {
                         "type": "string",
                         "format": "date-time"
+                    },
+                    "lastStatusChange": {
+                        "type": "string",
+                        "format": "date-time",
+                        "nullable": true
+                    },
+                    "appliedPolicies": {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        },
+                        "nullable": true
                     }
                 },
                 "additionalProperties": false
@@ -340,6 +401,10 @@
                     "number": {
                         "type": "integer",
                         "format": "int32"
+                    },
+                    "type": {
+                        "type": "string",
+                        "nullable": true
                     }
                 },
                 "additionalProperties": false
@@ -519,19 +584,23 @@
                     },
                     "MaximumPayload": {
                         "type": "integer",
-                        "format": "int64"
+                        "format": "int64",
+                        "nullable": true
                     },
                     "MaximumTranslationalVelocity": {
                         "type": "integer",
-                        "format": "int64"
+                        "format": "int64",
+                        "nullable": true
                     },
                     "MaximumRotationalVelocity": {
                         "type": "integer",
-                        "format": "int64"
+                        "format": "int64",
+                        "nullable": true
                     },
                     "RobotWeight": {
                         "type": "integer",
-                        "format": "int64"
+                        "format": "int64",
+                        "nullable": true
                     },
                     "ROSRepo": {
                         "type": "string",
@@ -575,7 +644,7 @@
                     },
                     "BatteryStatus": {
                         "type": "integer",
-                        "format": "int64"
+                        "format": "int32"
                     },
                     "MacAddress": {
                         "type": "string",
@@ -585,7 +654,7 @@
                         "type": "string",
                         "nullable": true
                     },
-                    "LocomotionTypes": {
+                    "LocomotionType": {
                         "type": "string",
                         "nullable": true
                     },
@@ -612,19 +681,23 @@
                     },
                     "CPU": {
                         "type": "integer",
-                        "format": "int32"
+                        "format": "int32",
+                        "nullable": true
                     },
                     "RAM": {
                         "type": "integer",
-                        "format": "int64"
+                        "format": "int64",
+                        "nullable": true
                     },
                     "StorageDisk": {
                         "type": "integer",
-                        "format": "int64"
+                        "format": "int64",
+                        "nullable": true
                     },
                     "NumberCores": {
                         "type": "integer",
-                        "format": "int32"
+                        "format": "int32",
+                        "nullable": true
                     },
                     "Questions": {
                         "type": "array",
@@ -640,6 +713,10 @@
                     "OnboardedTime": {
                         "type": "string",
                         "format": "date-time"
+                    },
+                    "simCardNumber": {
+                        "type": "string",
+                        "nullable": true
                     }
                 },
                 "additionalProperties": false
@@ -689,20 +766,13 @@
             "RosTopicModel": {
                 "type": "object",
                 "properties": {
-                    "name": {
+                    "topic_name": {
                         "type": "string",
                         "nullable": true
                     },
-                    "type": {
+                    "topic_type": {
                         "type": "string",
                         "nullable": true
-                    },
-                    "description": {
-                        "type": "string",
-                        "nullable": true
-                    },
-                    "enabled": {
-                        "type": "boolean"
                     }
                 },
                 "additionalProperties": false
@@ -924,21 +994,6 @@
                         },
                         "nullable": true
                     },
-                    "Id": {
-                        "type": "string",
-                        "format": "uuid"
-                    },
-                    "Name": {
-                        "type": "string",
-                        "nullable": true
-                    },
-                    "Type": {
-                        "$ref": "#/components/schemas/LocationType"
-                    },
-                    "Organization": {
-                        "type": "string",
-                        "nullable": true
-                    },
                     "CloudStatus": {
                         "type": "string",
                         "nullable": true
@@ -983,6 +1038,27 @@
                     },
                     "IsOnline": {
                         "type": "boolean"
+                    },
+                    "Id": {
+                        "type": "string",
+                        "format": "uuid"
+                    },
+                    "address": {
+                        "type": "string",
+                        "format": "uri",
+                        "nullable": true,
+                        "readOnly": true
+                    },
+                    "Name": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "Type": {
+                        "$ref": "#/components/schemas/LocationType"
+                    },
+                    "Organization": {
+                        "type": "string",
+                        "nullable": true
                     }
                 },
                 "additionalProperties": false
@@ -1267,21 +1343,6 @@
                         },
                         "nullable": true
                     },
-                    "Id": {
-                        "type": "string",
-                        "format": "uuid"
-                    },
-                    "Name": {
-                        "type": "string",
-                        "nullable": true
-                    },
-                    "Type": {
-                        "$ref": "#/components/schemas/LocationType"
-                    },
-                    "Organization": {
-                        "type": "string",
-                        "nullable": true
-                    },
                     "EdgeStatus": {
                         "type": "string",
                         "nullable": true
@@ -1326,6 +1387,27 @@
                     },
                     "IsOnline": {
                         "type": "boolean"
+                    },
+                    "Id": {
+                        "type": "string",
+                        "format": "uuid"
+                    },
+                    "address": {
+                        "type": "string",
+                        "format": "uri",
+                        "nullable": true,
+                        "readOnly": true
+                    },
+                    "Name": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "Type": {
+                        "$ref": "#/components/schemas/LocationType"
+                    },
+                    "Organization": {
+                        "type": "string",
+                        "nullable": true
                     }
                 },
                 "additionalProperties": false
@@ -1587,14 +1669,14 @@
                     "rosTopicPublishers": {
                         "type": "array",
                         "items": {
-                            "$ref": "#/components/schemas/RosTopicModel"
+                            "$ref": "#/components/schemas/RosTopicRequest"
                         },
                         "nullable": true
                     },
                     "rosTopicSubscribers": {
                         "type": "array",
                         "items": {
-                            "$ref": "#/components/schemas/RosTopicModel"
+                            "$ref": "#/components/schemas/RosTopicRequest"
                         },
                         "nullable": true
                     },
@@ -1626,6 +1708,13 @@
                             "type": "string"
                         },
                         "nullable": true
+                    },
+                    "appliedPolicies": {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        },
+                        "nullable": true
                     }
                 },
                 "additionalProperties": false
@@ -1652,14 +1741,14 @@
                     "rosTopicPublishers": {
                         "type": "array",
                         "items": {
-                            "$ref": "#/components/schemas/RosTopicModel"
+                            "$ref": "#/components/schemas/RosTopicResponse"
                         },
                         "nullable": true
                     },
                     "rosTopicSubscribers": {
                         "type": "array",
                         "items": {
-                            "$ref": "#/components/schemas/RosTopicModel"
+                            "$ref": "#/components/schemas/RosTopicResponse"
                         },
                         "nullable": true
                     },
@@ -1690,6 +1779,13 @@
                         "format": "date-time"
                     },
                     "tags": {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        },
+                        "nullable": true
+                    },
+                    "appliedPolicies": {
                         "type": "array",
                         "items": {
                             "type": "string"
@@ -1908,8 +2004,13 @@
                         "nullable": true
                     },
                     "Type": {
-                        "type": "string",
-                        "nullable": true
+                        "$ref": "#/components/schemas/PolicyType"
+                    },
+                    "scope": {
+                        "$ref": "#/components/schemas/PolicyScope"
+                    },
+                    "priority": {
+                        "$ref": "#/components/schemas/Priority"
                     },
                     "Timestamp": {
                         "type": "string",
@@ -1940,6 +2041,10 @@
                         "type": "string",
                         "nullable": true
                     },
+                    "scope": {
+                        "type": "string",
+                        "nullable": true
+                    },
                     "isActive": {
                         "type": "boolean"
                     },
@@ -1954,6 +2059,10 @@
                     "lastTimeUpdated": {
                         "type": "string",
                         "format": "date-time"
+                    },
+                    "priority": {
+                        "type": "string",
+                        "nullable": true
                     }
                 },
                 "additionalProperties": false
@@ -1973,6 +2082,10 @@
                         "type": "string",
                         "nullable": true
                     },
+                    "scope": {
+                        "type": "string",
+                        "nullable": true
+                    },
                     "isActive": {
                         "type": "boolean"
                     },
@@ -1987,9 +2100,45 @@
                     "lastTimeUpdated": {
                         "type": "string",
                         "format": "date-time"
+                    },
+                    "priority": {
+                        "type": "string",
+                        "nullable": true
                     }
                 },
                 "additionalProperties": false
+            },
+            "PolicyScope": {
+                "enum": [
+                    0,
+                    1,
+                    2
+                ],
+                "type": "integer",
+                "format": "int32"
+            },
+            "PolicyType": {
+                "enum": [
+                    0,
+                    1,
+                    2,
+                    3,
+                    4,
+                    5
+                ],
+                "type": "integer",
+                "format": "int32"
+            },
+            "Priority": {
+                "enum": [
+                    0,
+                    1,
+                    2,
+                    3,
+                    4
+                ],
+                "type": "integer",
+                "format": "int32"
             },
             "RobotRequest": {
                 "type": "object",
@@ -2117,6 +2266,10 @@
                         "items": {
                             "$ref": "#/components/schemas/DialogueModel"
                         },
+                        "nullable": true
+                    },
+                    "simCardNumber": {
+                        "type": "string",
                         "nullable": true
                     }
                 },
@@ -2261,6 +2414,52 @@
                     "onboardedTime": {
                         "type": "string",
                         "format": "date-time"
+                    },
+                    "simCardNumber": {
+                        "type": "string",
+                        "nullable": true
+                    }
+                },
+                "additionalProperties": false
+            },
+            "RosTopicRequest": {
+                "type": "object",
+                "properties": {
+                    "name": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "type": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "description": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "enabled": {
+                        "type": "boolean"
+                    }
+                },
+                "additionalProperties": false
+            },
+            "RosTopicResponse": {
+                "type": "object",
+                "properties": {
+                    "name": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "type": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "description": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "enabled": {
+                        "type": "boolean"
                     }
                 },
                 "additionalProperties": false
@@ -2530,6 +2729,28 @@
                         "items": {
                             "$ref": "#/components/schemas/DialogueModel"
                         },
+                        "nullable": true
+                    }
+                },
+                "additionalProperties": false
+            },
+            "PerformSwitchoverRequest": {
+                "type": "object",
+                "properties": {
+                    "actionPlanId": {
+                        "type": "string",
+                        "format": "uuid"
+                    },
+                    "actionId": {
+                        "type": "string",
+                        "format": "uuid"
+                    },
+                    "destination": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "destinationType": {
+                        "type": "string",
                         "nullable": true
                     }
                 },
@@ -10151,6 +10372,86 @@
                 }
             }
         },
+        "/data/policy/name/{name}": {
+            "get": {
+                "tags": [
+                    "Policy"
+                ],
+                "operationId": "PolicyGetByName",
+                "parameters": [
+                    {
+                        "name": "name",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Success",
+                        "content": {
+                            "text/plain": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/PolicyResponse"
+                                }
+                            },
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/PolicyResponse"
+                                }
+                            },
+                            "text/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/PolicyResponse"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "content": {
+                            "text/plain": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                }
+                            },
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                }
+                            },
+                            "text/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Server Error",
+                        "content": {
+                            "text/plain": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                }
+                            },
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                }
+                            },
+                            "text/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/data/policy/current": {
             "get": {
                 "tags": [
@@ -12409,6 +12710,57 @@
                     },
                     "500": {
                         "description": "Server Error",
+                        "content": {
+                            "text/plain": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                }
+                            },
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                }
+                            },
+                            "text/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/task/plan/switchover": {
+            "post": {
+                "tags": [
+                    "Plan"
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/PerformSwitchoverRequest"
+                            }
+                        },
+                        "text/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/PerformSwitchoverRequest"
+                            }
+                        },
+                        "application/*+json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/PerformSwitchoverRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Success"
+                    },
+                    "400": {
+                        "description": "Bad Request",
                         "content": {
                             "text/plain": {
                                 "schema": {
