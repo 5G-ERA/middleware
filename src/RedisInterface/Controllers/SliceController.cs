@@ -12,7 +12,7 @@ namespace Middleware.RedisInterface.Controllers;
 
 [Route("api/v1/[controller]")]
 [ApiController]
-internal class SliceController : ControllerBase
+public class SliceController : ControllerBase
 {
     private readonly ILogger<SliceController> _logger;
     private readonly ISliceService _sliceService;
@@ -46,7 +46,7 @@ internal class SliceController : ControllerBase
         }
     }
 
-    [HttpPost]
+    [HttpGet]
     [ProducesResponseType(typeof(GetSlicesResponse), (int)HttpStatusCode.OK)]
     [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.BadRequest)]
     [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.InternalServerError)]
@@ -99,7 +99,7 @@ internal class SliceController : ControllerBase
     }
 
 
-    [HttpGet(Name = "GetBySliceIdAsync")]
+    [HttpGet("sliceId/{id}", Name = "GetBySliceIdAsync")]
     [ProducesResponseType(typeof(SliceResponse), (int)HttpStatusCode.OK)]
     [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.NotFound)]
     [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.BadRequest)]
@@ -223,7 +223,7 @@ internal class SliceController : ControllerBase
     }
 
     [HttpPut]
-    [Route("urllc", Name = "SliceUpdateEmbb")]
+    [Route("embb", Name = "SliceUpdateEmbb")]
     [ProducesResponseType(typeof(SliceResponse), (int)HttpStatusCode.OK)]
     [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.NotFound)]
     [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.InternalServerError)]
@@ -246,7 +246,7 @@ internal class SliceController : ControllerBase
     }
 
     [HttpPut]
-    [Route("urllc", Name = "SliceUpdateEmbb")]
+    [Route("urllc", Name = "SliceUpdateUrllc")]
     [ProducesResponseType(typeof(SliceResponse), (int)HttpStatusCode.OK)]
     [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.NotFound)]
     [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.InternalServerError)]

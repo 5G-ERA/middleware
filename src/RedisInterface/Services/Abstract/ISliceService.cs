@@ -4,7 +4,7 @@ using Middleware.Models.Domain.Slice;
 
 namespace Middleware.RedisInterface.Services.Abstract;
 
-internal interface ISliceService
+public interface ISliceService
 {
     /// <summary>
     ///     Removes existing Slice association with the location and registers new slices
