@@ -5,12 +5,12 @@ namespace Middleware.Models.Domain;
 public class RosTopicModel
 {
     //[JsonConverter(typeof(TopicNameConverter))]
-    public string Name { get; set; } = default!;
+    public string Name { get; init; } = default!;
 
-    public string? Type { get; set; }
+    public string? Type { get; init; }
 
 
-    public string? Description { get; set; }
+    public string? Description { get; init; }
 
 
     public bool Enabled { get; set; }

@@ -2,7 +2,7 @@
     "openapi": "3.0.1",
     "info": {
         "title": "5G-ERA Middleware",
-        "version": "0.6"
+        "version": "0.1"
     },
     "components": {
         "schemas": {
@@ -766,13 +766,20 @@
             "RosTopicModel": {
                 "type": "object",
                 "properties": {
-                    "topic_name": {
+                    "name": {
                         "type": "string",
                         "nullable": true
                     },
-                    "topic_type": {
+                    "type": {
                         "type": "string",
                         "nullable": true
+                    },
+                    "description": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "enabled": {
+                        "type": "boolean"
                     }
                 },
                 "additionalProperties": false
@@ -11964,6 +11971,67 @@
             }
         },
         "/data/slice/{id}": {
+            "delete": {
+                "tags": [
+                    "Slice"
+                ],
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Success"
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "content": {
+                            "text/plain": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                }
+                            },
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                }
+                            },
+                            "text/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Server Error",
+                        "content": {
+                            "text/plain": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                }
+                            },
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                }
+                            },
+                            "text/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
             "get": {
                 "tags": [
                     "Slice"

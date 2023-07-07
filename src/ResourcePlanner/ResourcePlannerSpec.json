@@ -938,13 +938,20 @@
       "RosTopicModel": {
         "type": "object",
         "properties": {
-          "topic_name": {
+          "name": {
             "type": "string",
             "nullable": true
           },
-          "topic_type": {
+          "type": {
             "type": "string",
             "nullable": true
+          },
+          "description": {
+            "type": "string",
+            "nullable": true
+          },
+          "enabled": {
+            "type": "boolean"
           }
         },
         "additionalProperties": false
