@@ -46,7 +46,7 @@ internal class UrllcSliceLocation : ILocationSelectionPolicy
             return null;
 
         FoundMatchingLocation = true;
-        var type = Enum.Parse<LocationType>(location.InitiatesFrom.Type);
+        var type = Enum.Parse<LocationType>(location.InitiatesFrom.Type, true);
         return new(location.InitiatesFrom.Id, location.InitiatesFrom.Name, type, bestSlice.Name);
     }
 
