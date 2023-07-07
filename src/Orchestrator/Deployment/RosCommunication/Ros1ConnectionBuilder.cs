@@ -1,7 +1,8 @@
 using System.Text.Json;
+using System.Text.Json.Serialization;
+using JetBrains.Annotations;
 using k8s.Models;
 using Middleware.Common.ExtensionMethods;
-
 using Middleware.Models.Domain;
 
 namespace Middleware.Orchestrator.Deployment.RosCommunication;
@@ -79,7 +80,8 @@ internal class Ros1ConnectionBuilder : IRosConnectionBuilder
 
     private V1Container GetRelayNetAppContainer(IReadOnlyList<RosTopicModel> rosTopics)
     {
-        var topicsString = JsonSerializer.Serialize(rosTopics);
+        var rosTopicContainers = rosTopics.Select(RosTopicContainer.FromRosTopicModel).ToList();
+        var topicsString = JsonSerializer.Serialize(rosTopicContainers);
         var container = new V1Container
         {
             Name = "relayNetApp",
@@ -98,4 +100,24 @@ internal class Ros1ConnectionBuilder : IRosConnectionBuilder
         return container;
     }
 
+    /// <summary>
+    ///     Temporary class to parse the RosTopicModel into the correct format
+    /// </summary>
+    private class RosTopicContainer
+    {
+        [JsonPropertyName("topic_name")]
+        public string Name { [UsedImplicitly] get; init; }
+
+        [JsonPropertyName("topic_type")]
+        public string Type { [UsedImplicitly] get; init; }
+
+        public static RosTopicContainer FromRosTopicModel(RosTopicModel topic)
+        {
+            return new()
+            {
+                Name = topic.Name,
+                Type = topic.Type
+            };
+        }
+    }
 }

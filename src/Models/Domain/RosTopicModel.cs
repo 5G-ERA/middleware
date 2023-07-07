@@ -1,21 +1,18 @@
-﻿using System.Text.Json.Serialization;
-using Middleware.Models.Dto.Ros;
+﻿using Middleware.Models.Dto.Ros;
 
 namespace Middleware.Models.Domain;
 
 public class RosTopicModel
 {
-    [JsonPropertyName("topic_name")]
     //[JsonConverter(typeof(TopicNameConverter))]
     public string Name { get; set; } = default!;
 
-    [JsonPropertyName("topic_type")]
     public string? Type { get; set; }
 
-    [JsonIgnore]
+
     public string? Description { get; set; }
 
-    [JsonIgnore]
+
     public bool Enabled { get; set; }
 
     /// <summary>
