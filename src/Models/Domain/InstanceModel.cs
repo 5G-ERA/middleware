@@ -35,7 +35,6 @@ public class InstanceModel : BaseModel, IPolicyAssignable
     public int SuccessRate { get; set; }
 
     public string? ServiceStatus { get; internal set; }
-
     public ContainerImageModel? ContainerImage { get; set; }
 
     public long? MinimumRam { get; set; } // Compulsory field

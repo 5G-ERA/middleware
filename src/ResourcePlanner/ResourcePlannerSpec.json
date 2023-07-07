@@ -603,7 +603,8 @@
             "readOnly": true
           },
           "containerImage": {
-            "$ref": "#/components/schemas/ContainerImageModel"
+            "$ref": "#/components/schemas/ContainerImageModel",
+            "nullable": true
           },
           "minimumRam": {
             "type": "integer",
