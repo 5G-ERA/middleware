@@ -76,7 +76,8 @@ public class SliceModel : BaseModel
         var d = this;
         return new SliceDto
         {
-            Id = d.Name,
+            Id = d.Id.ToString(),
+            Name = d.Name,
             Site = d.Site,
             SliceType = d.SliceType.ToString(),
             ExpDataRateUl = d.ExpDataRateUl,

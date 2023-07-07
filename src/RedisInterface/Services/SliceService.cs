@@ -45,6 +45,12 @@ public class SliceService : ISliceService
     }
 
     /// <inheritdoc />
+    public Task DeleteById(Guid id)
+    {
+        return _sliceRepository.DeleteByIdAsync(id);
+    }
+
+    /// <inheritdoc />
     public Task<List<SliceModel>> GetAllSlicesAsync()
     {
         return _sliceRepository.GetAllAsync();

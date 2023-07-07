@@ -15,6 +15,13 @@ public interface ISliceService
     Task ReRegisterSlicesAsync(IReadOnlyList<SliceModel> slices, Location location = null);
 
     /// <summary>
+    ///     Deletes Slice by it's ID
+    /// </summary>
+    /// <param name="id"></param>
+    /// <returns></returns>
+    Task DeleteById(Guid id);
+
+    /// <summary>
     ///     Get All Slice definitions
     /// </summary>
     /// <returns></returns>

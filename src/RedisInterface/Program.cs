@@ -1,3 +1,5 @@
+using System.Reflection;
+using Middleware.Common.Config;
 using Middleware.Common.ExtensionMethods;
 using Middleware.DataAccess.ExtensionMethods;
 using Middleware.DataAccess.HostedServices;
@@ -10,11 +12,15 @@ using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
 
+builder.Configuration
+    .AddEnvironmentVariables()
+    .AddUserSecrets(Assembly.GetExecutingAssembly(), true);
 
 builder.RegisterSecretsManager();
 
 builder.ConfigureLogger();
 
+builder.Services.Configure<MiddlewareConfig>(builder.Configuration.GetSection(MiddlewareConfig.ConfigName));
 
 // Add services to the container.
 builder.Services.AddControllers(options =>

@@ -68,6 +68,27 @@ public class SliceController : ControllerBase
         }
     }
 
+    [HttpDelete("{id}")]
+    [ProducesResponseType(typeof(void), (int)HttpStatusCode.OK)]
+    [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.BadRequest)]
+    [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.InternalServerError)]
+    public async Task<IActionResult> DeleteSliceById(Guid id)
+    {
+        try
+        {
+            await _sliceService.DeleteById(id);
+
+
+            return Ok();
+        }
+        catch (Exception ex)
+        {
+            var statusCode = (int)HttpStatusCode.InternalServerError;
+            _logger.LogError(ex, "An error occurred:");
+            return StatusCode(statusCode, new ApiResponse(statusCode, $"An error has occurred: {ex.Message}"));
+        }
+    }
+
     [HttpGet]
     [Route("{id}", Name = "SliceGetById")]
     [ProducesResponseType(typeof(SliceResponse), (int)HttpStatusCode.OK)]

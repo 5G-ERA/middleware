@@ -158,10 +158,18 @@ public class RedisRepository<TModel, TDto> : IRedisRepository<TModel, TDto> wher
         var relationModels = new List<RelationModel>();
         var entityDef = _entityName + " {ID: '" + id + "' }";
         var query = RelationDirection.Incoming == direction
-            ? "MATCH (x) MATCH (y) WHERE (x)-[: " + relationName + "]->(y: " + entityDef + " ) RETURN x,y"
-            : "MATCH (x: " + entityDef + ") MATCH(y) WHERE(x) -[: " + relationName + "]->(y) RETURN x, y";
+            ? "MATCH (x) MATCH (y) WHERE (x)-[:" + relationName + "]->(y:" + entityDef + " ) RETURN x,y"
+            : "MATCH (x:" + entityDef + ") MATCH(y) WHERE(x) -[:" + relationName + "]->(y) RETURN x, y";
+        ResultSet? resultSet;
+        try
+        {
+            resultSet = await RedisGraph.Query(GraphName, query);
+        }
+        catch (FormatException) //BB 2023.07.07 - when no results are found the library throws FormatException
+        {
+            return relationModels;
+        }
 
-        var resultSet = await RedisGraph.Query(GraphName, query);
         // BB: 24.03.2022
         // We are using the loop with 2 nested loops to retrieve the values from the graph
         // The values are structured in the following way:

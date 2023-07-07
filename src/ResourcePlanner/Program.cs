@@ -1,3 +1,4 @@
+using System.Reflection;
 using Middleware.Common.Config;
 using Middleware.Common.ExtensionMethods;
 using Middleware.RedisInterface.Sdk;
@@ -7,6 +8,10 @@ using Middleware.ResourcePlanner.Config;
 using Middleware.ResourcePlanner.Policies;
 
 var builder = WebApplication.CreateBuilder(args);
+
+builder.Configuration
+    .AddEnvironmentVariables()
+    .AddUserSecrets(Assembly.GetExecutingAssembly(), true);
 
 builder.RegisterSecretsManager();
 

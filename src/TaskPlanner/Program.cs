@@ -1,3 +1,4 @@
+using System.Reflection;
 using Middleware.CentralApi.Sdk;
 using Middleware.Common;
 using Middleware.Common.Config;
@@ -14,8 +15,10 @@ var builder = WebApplication.CreateBuilder(args);
 var centralApiHostname = Environment.GetEnvironmentVariable("CENTRAL_API_HOSTNAME");
 if (centralApiHostname is null)
     throw new ArgumentException("Environment variable not defined: CENTRAL_API_HOSTNAME", "CENTRAL_API_HOSTNAME");
-builder.Configuration.AddEnvironmentVariables();
 
+builder.Configuration
+    .AddEnvironmentVariables()
+    .AddUserSecrets(Assembly.GetExecutingAssembly(), true);
 builder.RegisterSecretsManager();
 
 builder.ConfigureLogger();
