@@ -1,5 +1,7 @@
 ﻿using FluentAssertions;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using Middleware.CentralApi.Sdk;
 using Middleware.Common.Config;
 using Middleware.Models.Enums;
 using Middleware.RedisInterface.Contracts.Responses;
@@ -14,13 +16,16 @@ namespace ResourcePlanner.Tests.Unit.Policies;
 //[LogTestExecution]
 public class PolicyBuilderTests
 {
+    private readonly ICentralApiClient _centralApiClientClient = Substitute.For<ICentralApiClient>();
+    private readonly ILogger _logger = Substitute.For<ILogger>();
     private readonly IOptions<MiddlewareConfig> _mwOptions = Substitute.For<IOptions<MiddlewareConfig>>();
     private readonly IRedisInterfaceClient _redisInterfaceClient = Substitute.For<IRedisInterfaceClient>();
+
     private readonly PolicyBuilder _sut;
 
     public PolicyBuilderTests()
     {
-        _sut = new(_redisInterfaceClient, _mwOptions);
+        _sut = new(_redisInterfaceClient, _mwOptions, _centralApiClientClient, _logger);
     }
 
     [Fact]

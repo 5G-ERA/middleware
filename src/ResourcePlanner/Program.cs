@@ -1,4 +1,5 @@
 using System.Reflection;
+using Middleware.CentralApi.Sdk;
 using Middleware.Common.Config;
 using Middleware.Common.ExtensionMethods;
 using Middleware.RedisInterface.Sdk;
@@ -13,6 +14,11 @@ builder.Configuration
     .AddEnvironmentVariables()
     .AddUserSecrets(Assembly.GetExecutingAssembly(), true);
 
+var centralApiHostname = Environment.GetEnvironmentVariable("CENTRAL_API_HOSTNAME");
+if (centralApiHostname is null)
+    throw new ArgumentException("Environment variable not defined: CENTRAL_API_HOSTNAME", "CENTRAL_API_HOSTNAME");
+var mwConfig = builder.Configuration.GetSection(MiddlewareConfig.ConfigName).Get<MiddlewareConfig>();
+
 builder.RegisterSecretsManager();
 
 builder.ConfigureLogger();
@@ -26,6 +32,7 @@ builder.Services.ConfigureAutoMapper();
 builder.Services.RegisterCommonServices();
 builder.Services.AddHttpClient("healthCheckClient");
 builder.Services.AddHttpClient(AppConfig.OrchestratorApiClientName);
+builder.Services.AddCentralApiClient(centralApiHostname, mwConfig.Organization);
 builder.Services.AddScoped<IResourcePlanner, ResourcePlanner>();
 builder.Services.AddScoped<IApiClientBuilder, ApiClientBuilder>();
 builder.Services.AddScoped<IPolicyService, PolicyService>();

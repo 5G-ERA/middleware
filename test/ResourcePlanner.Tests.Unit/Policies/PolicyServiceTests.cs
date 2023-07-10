@@ -1,5 +1,7 @@
 ﻿using FluentAssertions;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using Middleware.CentralApi.Sdk;
 using Middleware.Common.Config;
 using Middleware.Common.Enums;
 using Middleware.Models.Domain;
@@ -17,6 +19,9 @@ namespace ResourcePlanner.Tests.Unit.Policies;
 //[LogTestExecution]
 public class PolicyServiceTests
 {
+    private readonly ICentralApiClient _centralApiClientClient = Substitute.For<ICentralApiClient>();
+    private readonly ILogger _logger = Substitute.For<ILogger>();
+
     private readonly IOptions<MiddlewareConfig> _mwOptions = Options.Create(new MiddlewareConfig
     {
         InstanceName = "testLocation",
@@ -29,7 +34,8 @@ public class PolicyServiceTests
 
     public PolicyServiceTests()
     {
-        IPolicyBuilder policyBuilder = new PolicyBuilder(_redisInterfaceClient, _mwOptions);
+        IPolicyBuilder policyBuilder =
+            new PolicyBuilder(_redisInterfaceClient, _mwOptions, _centralApiClientClient, _logger);
         _sut = new(policyBuilder);
     }
 
@@ -117,6 +123,8 @@ public class PolicyServiceTests
                 RelationDirection.Incoming.ToString())
             .Returns(relations);
 
+        var centralApiResponse = TestObjectBuilder.ExampleLocationsResponse(edge);
+        _centralApiClientClient.GetAvailableLocations().Returns(centralApiResponse);
         var expected = new PlannedLocation(edge.Id, edge.Name, LocationType.Edge, slice.Name);
         //act
 
@@ -189,6 +197,9 @@ public class PolicyServiceTests
         _redisInterfaceClient.GetRelationAsync(Arg.Is<SliceModel>(t => t.Id == slice.Id), "OFFERS",
                 RelationDirection.Incoming.ToString())
             .Returns(relations);
+
+        var centralApiResponse = TestObjectBuilder.ExampleLocationsResponse(edge, edge2);
+        _centralApiClientClient.GetAvailableLocations().Returns(centralApiResponse);
 
         var expected = new PlannedLocation(edge2.Id, edge2.Name, LocationType.Edge, slice.Name);
 
@@ -302,6 +313,9 @@ public class PolicyServiceTests
             .Returns(relations);
         _redisInterfaceClient.SliceGetByIdAsync(slice.Id).Returns(sliceResponse);
         var expected = new PlannedLocation(sliceEdge.Id, sliceEdge.Name, LocationType.Edge, slice.Name);
+
+        var centralApiResponse = TestObjectBuilder.ExampleLocationsResponse(defaultEdge, sliceEdge);
+        _centralApiClientClient.GetAvailableLocations().Returns(centralApiResponse);
 
         //act
         var result = await _sut.GetLocationAsync(instances);

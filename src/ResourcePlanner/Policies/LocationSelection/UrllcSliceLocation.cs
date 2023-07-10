@@ -1,4 +1,5 @@
 ﻿using System.Collections.Immutable;
+using Middleware.CentralApi.Sdk;
 using Middleware.Common.Enums;
 using Middleware.Models.Domain;
 using Middleware.Models.Enums;
@@ -9,11 +10,16 @@ namespace Middleware.ResourcePlanner.Policies.LocationSelection;
 
 internal class UrllcSliceLocation : ILocationSelectionPolicy
 {
+    private readonly ICentralApiClient _centralApi;
+    private readonly ILogger _logger;
     private readonly IRedisInterfaceClient _redisInterfaceClient;
 
-    public UrllcSliceLocation(Priority priority, IRedisInterfaceClient redisInterfaceClient)
+    public UrllcSliceLocation(Priority priority, IRedisInterfaceClient redisInterfaceClient,
+        ICentralApiClient centralApi, ILogger logger)
     {
         _redisInterfaceClient = redisInterfaceClient;
+        _centralApi = centralApi;
+        _logger = logger;
         Priority = priority;
     }
 
@@ -34,13 +40,22 @@ internal class UrllcSliceLocation : ILocationSelectionPolicy
         if (urllcSlices.Count == 0)
             return null;
 
+        var availableLocationsResponse = await _centralApi.GetAvailableLocations();
+        if (availableLocationsResponse is null)
+            return null;
+
+        var availableLocationIds = availableLocationsResponse.Locations.Select(l => l.Id).ToList();
+
         //TODO: include the lowest latency to the location available to the robot
         var bestSlice = urllcSlices.MinBy(s => s.Latency);
 
         var relations =
             await _redisInterfaceClient.GetRelationAsync(bestSlice, "OFFERS", RelationDirection.Incoming.ToString());
 
-        var location = relations?.FirstOrDefault();
+
+        var location = relations?
+            .Where(l => availableLocationIds.Contains(l.InitiatesFrom.Id))
+            .FirstOrDefault();
 
         if (location is null)
             return null;

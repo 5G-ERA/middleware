@@ -13,7 +13,7 @@ services:
       - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
       - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
       - Middleware__Organization=5G-ERA-DEV
-      - Middleware__InstanceName=MiddlewareBED
+      - Middleware__InstanceName=MiddlewareBB
       - Middleware__InstanceType=Edge
     ports:
       - "5091:80"
@@ -37,7 +37,7 @@ services:
       - REDIS_PORT=${REDIS_PORT}
       - CENTRAL_API_HOSTNAME=central.api
       - Middleware__Organization=5G-ERA-DEV
-      - Middleware__InstanceName=MiddlewareBED
+      - Middleware__InstanceName=MiddlewareBB
       - Middleware__InstanceType=Edge
 
     ports:
@@ -56,10 +56,10 @@ services:
       - RESOURCE_PLANNER_API_SERVICE_HOST=resourceplanner.api
       - ORCHESTRATOR_API_SERVICE_HOST=orchestrator.api
       - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
-      - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
+      - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}      
       - CENTRAL_API_HOSTNAME=central.api
       - Middleware__Organization=5G-ERA-DEV
-      - Middleware__InstanceName=MiddlewareBED
+      - Middleware__InstanceName=MiddlewareBB
       - Middleware__InstanceType=Edge
     ports:
       - "5143:80"
@@ -76,8 +76,9 @@ services:
       - ORCHESTRATOR_API_SERVICE_HOST=orchestrator.api
       - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
       - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
+      - CENTRAL_API_HOSTNAME=central.api
       - Middleware__Organization=5G-ERA-DEV
-      - Middleware__InstanceName=Middleware-BB
+      - Middleware__InstanceName=MiddlewareBB
       - Middleware__InstanceType=Edge
     ports:
       - "5263:80"
@@ -96,6 +97,9 @@ services:
       - REDIS_PORT=${REDIS_PORT}
       - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
       - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
+      - Middleware__Organization=5G-ERA-DEV
+      - Middleware__InstanceName=MiddlewareBB
+      - Middleware__InstanceType=Edge
     ports:
       - "5047:80"
       - "7047:443"

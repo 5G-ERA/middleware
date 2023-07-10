@@ -1,4 +1,6 @@
 ﻿using FluentAssertions;
+using Microsoft.Extensions.Logging;
+using Middleware.CentralApi.Sdk;
 using Middleware.Common.Enums;
 using Middleware.Models.Domain;
 using Middleware.Models.Domain.Slice;
@@ -12,15 +14,18 @@ using NSubstitute.ReturnsExtensions;
 namespace ResourcePlanner.Tests.Unit.Policies;
 
 //[LogTestExecution]
+
 public class UrllcSliceLocationPolicyTests
 {
     private const Priority Priority = Middleware.Models.Enums.Priority.High;
+    private readonly ICentralApiClient _centralApiClientClient = Substitute.For<ICentralApiClient>();
+    private readonly ILogger _logger = Substitute.For<ILogger>();
     private readonly IRedisInterfaceClient _redisInterfaceClient = Substitute.For<IRedisInterfaceClient>();
     private readonly UrllcSliceLocation _sut;
 
     public UrllcSliceLocationPolicyTests()
     {
-        _sut = new(Priority, _redisInterfaceClient);
+        _sut = new(Priority, _redisInterfaceClient, _centralApiClientClient, _logger);
     }
 
     [Fact]
@@ -116,6 +121,9 @@ public class UrllcSliceLocationPolicyTests
                 RelationDirection.Incoming.ToString())
             .Returns(relationList);
 
+        var centralApiResponse = TestObjectBuilder.ExampleLocationsResponse(edge);
+        _centralApiClientClient.GetAvailableLocations().Returns(centralApiResponse);
+
         // Act
         var result = await _sut.GetLocationAsync();
         var found = _sut.FoundMatchingLocation;
@@ -209,6 +217,9 @@ public class UrllcSliceLocationPolicyTests
             relations.Add(new(initiates, points, relationName));
         }
 
+        var centralApiResponse = TestObjectBuilder.ExampleLocationsResponse(cloud);
+        _centralApiClientClient.GetAvailableLocations().Returns(centralApiResponse);
+
         _redisInterfaceClient.GetRelationAsync(Arg.Any<CloudModel>(), relationName).Returns(relations);
         //act
         var result = await _sut.IsLocationSatisfiedByPolicy(plannedLocation);
@@ -263,6 +274,9 @@ public class UrllcSliceLocationPolicyTests
             relations.Add(new(initiates, points, relationName));
         }
 
+        var centralApiResponse = TestObjectBuilder.ExampleLocationsResponse(edge);
+        _centralApiClientClient.GetAvailableLocations().Returns(centralApiResponse);
+
         _redisInterfaceClient.GetRelationAsync(Arg.Any<EdgeModel>(), relationName).Returns(relations);
         //act
         var result = await _sut.IsLocationSatisfiedByPolicy(plannedLocation);
@@ -282,6 +296,10 @@ public class UrllcSliceLocationPolicyTests
         var relationName = "OFFERS";
         _redisInterfaceClient.GetRelationAsync(Arg.Any<EdgeModel>(), relationName)!
             .Returns(Task.FromResult<List<RelationModel>>(null!));
+
+        var centralApiResponse = TestObjectBuilder.ExampleLocationsResponse(edge);
+        _centralApiClientClient.GetAvailableLocations().Returns(centralApiResponse);
+
         //act
         var result = await _sut.IsLocationSatisfiedByPolicy(plannedLocation);
         //assert
@@ -326,6 +344,9 @@ public class UrllcSliceLocationPolicyTests
 
             relations.Add(new(initiates, points, relationName));
         }
+
+        var centralApiResponse = TestObjectBuilder.ExampleLocationsResponse(edge);
+        _centralApiClientClient.GetAvailableLocations().Returns(centralApiResponse);
 
         _redisInterfaceClient.GetRelationAsync(Arg.Any<EdgeModel>(), relationName).Returns(relations);
         //act
@@ -373,6 +394,8 @@ public class UrllcSliceLocationPolicyTests
             relations.Add(new(initiates, points, relationName));
         }
 
+        var centralApiResponse = TestObjectBuilder.ExampleLocationsResponse(edge);
+        _centralApiClientClient.GetAvailableLocations().Returns(centralApiResponse);
         _redisInterfaceClient.GetRelationAsync(Arg.Any<EdgeModel>(), relationName).Returns(relations);
         //act
         var result = await _sut.IsLocationSatisfiedByPolicy(plannedLocation);

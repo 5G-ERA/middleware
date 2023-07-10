@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.Options;
+using Middleware.CentralApi.Sdk;
 using Middleware.Common.Config;
 using Middleware.Models.Enums;
 using Middleware.RedisInterface.Contracts.Mappings;
@@ -10,13 +11,18 @@ namespace Middleware.ResourcePlanner.Policies;
 internal class PolicyBuilder : IPolicyBuilder
 {
     private readonly Dictionary<string, IPolicy> _cachedPolicies = new();
+    private readonly ICentralApiClient _centralApi;
+    private readonly ILogger _logger;
     private readonly IOptions<MiddlewareConfig> _middlewareConfig;
     private readonly IRedisInterfaceClient _redisInterfaceClient;
 
-    public PolicyBuilder(IRedisInterfaceClient redisInterfaceClient, IOptions<MiddlewareConfig> middlewareConfig)
+    public PolicyBuilder(IRedisInterfaceClient redisInterfaceClient, IOptions<MiddlewareConfig> middlewareConfig,
+        ICentralApiClient centralApi, ILogger logger)
     {
         _redisInterfaceClient = redisInterfaceClient;
         _middlewareConfig = middlewareConfig;
+        _centralApi = centralApi;
+        _logger = logger;
     }
 
     public async Task<ILocationSelectionPolicy> CreateLocationPolicy(string policyName)
@@ -37,7 +43,8 @@ internal class PolicyBuilder : IPolicyBuilder
 
         ILocationSelectionPolicy policyImplementation = policyName switch
         {
-            nameof(UrllcSliceLocation) => new UrllcSliceLocation(policy.Priority, _redisInterfaceClient),
+            nameof(UrllcSliceLocation) => new UrllcSliceLocation(policy.Priority, _redisInterfaceClient, _centralApi,
+                _logger),
             _ => new DefaultLocation(_middlewareConfig, _redisInterfaceClient)
         };
         _cachedPolicies[policyName] = policyImplementation;

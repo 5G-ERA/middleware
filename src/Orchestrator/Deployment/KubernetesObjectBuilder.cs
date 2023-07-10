@@ -31,7 +31,7 @@ internal class KubernetesObjectBuilder : IKubernetesObjectBuilder
     {
         _env = env;
         _config = config;
-        _containerRegistryName = _env.GetEnvVariable("IMAGE_REGISTRY") ?? "ghcr.io/5g-era";
+        _containerRegistryName = _env.GetEnvVariable("IMAGE_REGISTRY")?.TrimEnd('/') ?? "ghcr.io/5g-era";
     }
 
     /// <inheritdoc />
@@ -202,8 +202,7 @@ internal class KubernetesObjectBuilder : IKubernetesObjectBuilder
     public V1Service CreateDefaultService(string deploymentName, Guid serviceInstanceId, V1Deployment depl)
     {
         var ports = depl.Spec.Template.Spec.Containers.SelectMany(p =>
-            p.Ports.Select(pp => new CommonPort(pp.Name, pp.ContainerPort, pp.Protocol))).ToList();
-
+            p.Ports?.Select(pp => new CommonPort(pp.Name, pp.ContainerPort, pp.Protocol))!).ToList();
 
         var servicePorts = ports.Any()
             ? MapToServicePorts(ports)
