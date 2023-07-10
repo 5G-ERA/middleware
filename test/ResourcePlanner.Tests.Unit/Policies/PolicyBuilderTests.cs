@@ -17,7 +17,7 @@ namespace ResourcePlanner.Tests.Unit.Policies;
 public class PolicyBuilderTests
 {
     private readonly ICentralApiClient _centralApiClientClient = Substitute.For<ICentralApiClient>();
-    private readonly ILogger _logger = Substitute.For<ILogger>();
+    private readonly ILogger<PolicyBuilder> _logger = Substitute.For<ILogger<PolicyBuilder>>();
     private readonly IOptions<MiddlewareConfig> _mwOptions = Substitute.For<IOptions<MiddlewareConfig>>();
     private readonly IRedisInterfaceClient _redisInterfaceClient = Substitute.For<IRedisInterfaceClient>();
 

@@ -20,7 +20,7 @@ namespace ResourcePlanner.Tests.Unit.Policies;
 public class PolicyServiceTests
 {
     private readonly ICentralApiClient _centralApiClientClient = Substitute.For<ICentralApiClient>();
-    private readonly ILogger _logger = Substitute.For<ILogger>();
+    private readonly ILogger<PolicyBuilder> _logger = Substitute.For<ILogger<PolicyBuilder>>();
 
     private readonly IOptions<MiddlewareConfig> _mwOptions = Options.Create(new MiddlewareConfig
     {
