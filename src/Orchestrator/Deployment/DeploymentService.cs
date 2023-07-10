@@ -1,4 +1,5 @@
 ﻿using k8s;
+using k8s.Autorest;
 using k8s.Models;
 using Microsoft.Extensions.Options;
 using Middleware.Common.Config;
@@ -103,6 +104,12 @@ internal class DeploymentService : IDeploymentService
             if (retVal)
                 _logger.LogWarning("Deployment of the services has been skipped in the Development environment");
         }
+        catch (HttpOperationException ex)
+        {
+            _logger.LogError(ex, "There was an error while deleting the service caused by {reason}",
+                ex.Response.Content);
+            retVal = false;
+        }
         catch (Exception ex)
         {
             _logger.LogError(ex, "The deletion of the Action Plan has failed!");
@@ -168,17 +175,26 @@ internal class DeploymentService : IDeploymentService
 
         foreach (var pair in deploymentPairs)
         {
-            await DeployNetApp(pair);
-
-            if (pair.Instance.RosDistro is not null)
+            try
             {
-                await _publisher.PublishGatewayAddNetAppEntryAsync(thisLocation, pair.Name, actionPlan.Id,
-                    pair.InstanceId);
-                pair.Instance.SetNetAppAddress(thisLocation.GetNetAppAddress(pair.Name));
-            }
+                await DeployNetApp(pair);
 
-            _logger.LogDebug("Adding new relation between instance and current location");
-            await _redisInterfaceClient.AddRelationAsync(pair.Instance, thisLocation.ToBaseLocation(), "LOCATED_AT");
+                if (pair.Instance.RosDistro is not null)
+                {
+                    await _publisher.PublishGatewayAddNetAppEntryAsync(thisLocation, pair.Name, actionPlan.Id,
+                        pair.InstanceId);
+                    pair.Instance.SetNetAppAddress(thisLocation.GetNetAppAddress(pair.Name));
+                }
+
+                _logger.LogDebug("Adding new relation between instance and current location");
+                await _redisInterfaceClient.AddRelationAsync(pair.Instance, thisLocation.ToBaseLocation(),
+                    "LOCATED_AT");
+            }
+            catch (HttpOperationException ex)
+            {
+                _logger.LogError(ex, "There was an error while deploying the service caused by {reason}",
+                    ex.Response.Content);
+            }
         }
 
         _logger.LogDebug("Saving updated ActionPlan");
