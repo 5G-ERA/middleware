@@ -17,7 +17,7 @@ internal class PolicyBuilder : IPolicyBuilder
     private readonly IRedisInterfaceClient _redisInterfaceClient;
 
     public PolicyBuilder(IRedisInterfaceClient redisInterfaceClient, IOptions<MiddlewareConfig> middlewareConfig,
-        ICentralApiClient centralApi, ILogger logger)
+        ICentralApiClient centralApi, ILogger<PolicyBuilder> logger)
     {
         _redisInterfaceClient = redisInterfaceClient;
         _middlewareConfig = middlewareConfig;

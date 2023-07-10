@@ -18,7 +18,7 @@ var centralApiHostname = Environment.GetEnvironmentVariable("CENTRAL_API_HOSTNAM
 if (centralApiHostname is null)
     throw new ArgumentException("Environment variable not defined: CENTRAL_API_HOSTNAME", "CENTRAL_API_HOSTNAME");
 var mwConfig = builder.Configuration.GetSection(MiddlewareConfig.ConfigName).Get<MiddlewareConfig>();
-
+builder.Services.Configure<MiddlewareConfig>(builder.Configuration.GetSection(MiddlewareConfig.ConfigName));
 builder.RegisterSecretsManager();
 
 builder.ConfigureLogger();
