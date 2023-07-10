@@ -37,7 +37,8 @@ public class Ros1ConnectionBuilderTests
         //assert
         result.Spec.Template.Spec.Containers.Should()
             .HaveCount(3, "We need three containers, one RelayNetApp, one ROS core and NetApp itself");
-        var rosCoreContainer = result.Spec.Template.Spec.Containers.FirstOrDefault(c => c.Name == distro.ToString());
+        var rosCoreContainer =
+            result.Spec.Template.Spec.Containers.FirstOrDefault(c => c.Name == distro.Name.ToLower());
 
         rosCoreContainer.Should().NotBeNull();
         rosCoreContainer!.Image.Should().Be("ros:noetic-ros-core");

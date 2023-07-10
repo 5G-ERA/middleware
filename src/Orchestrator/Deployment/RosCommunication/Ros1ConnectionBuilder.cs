@@ -69,7 +69,7 @@ internal class Ros1ConnectionBuilder : IRosConnectionBuilder
         var rosContainer = new V1Container
         {
             Image = $"ros:{_distro.Name.ToLower()}-ros-core",
-            Name = _distro.Name,
+            Name = _distro.Name.ToLower(),
             Ports = new List<V1ContainerPort>
             {
                 new(11311, name: "ros-master")
