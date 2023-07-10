@@ -202,7 +202,8 @@ internal class KubernetesObjectBuilder : IKubernetesObjectBuilder
     public V1Service CreateDefaultService(string deploymentName, Guid serviceInstanceId, V1Deployment depl)
     {
         var ports = depl.Spec.Template.Spec.Containers.SelectMany(p =>
-            p.Ports?.Select(pp => new CommonPort(pp.Name, pp.ContainerPort, pp.Protocol))!).ToList();
+            p.Ports?.Select(pp => new CommonPort(pp.Name, pp.ContainerPort, pp.Protocol)) ??
+            Enumerable.Empty<CommonPort>()).ToList();
 
         var servicePorts = ports.Any()
             ? MapToServicePorts(ports)
