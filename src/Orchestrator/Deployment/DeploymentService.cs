@@ -192,8 +192,8 @@ internal class DeploymentService : IDeploymentService
             }
             catch (HttpOperationException ex)
             {
-                _logger.LogError(ex, "There was an error while deploying the service caused by {reason}",
-                    ex.Response.Content);
+                _logger.LogError(ex, "There was an error while deploying the service {service} caused by {reason}",
+                    pair.Name, ex.Response.Content);
             }
         }
 
@@ -263,6 +263,12 @@ internal class DeploymentService : IDeploymentService
                 isSuccess &= await SaveActionSequence(task, robot);
                 _logger.LogWarning("Deployment of the services has been skipped in the Development environment");
             }
+        }
+        catch (HttpOperationException ex)
+        {
+            _logger.LogError(ex, "There was an error while deploying the service caused by {reason}",
+                ex.Response.Content);
+            isSuccess = false;
         }
         catch (Exception ex)
         {
