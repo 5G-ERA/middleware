@@ -84,7 +84,7 @@ internal class Ros1ConnectionBuilder : IRosConnectionBuilder
         var topicsString = JsonSerializer.Serialize(rosTopicContainers);
         var container = new V1Container
         {
-            Name = "relayNetApp",
+            Name = "relay-net-app",
             Ports = new List<V1ContainerPort>
             {
                 new(80, name: "websocket")

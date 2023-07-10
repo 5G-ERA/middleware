@@ -45,7 +45,7 @@ public class Ros1ConnectionBuilderTests
         rosCoreContainer.Ports.Should().HaveCount(1);
         rosCoreContainer.Ports.First().ContainerPort.Should().Be(11311, "It is default ros master port");
 
-        var relayNetAppContainer = result.Spec.Template.Spec.Containers.FirstOrDefault(c => c.Name == "relayNetApp");
+        var relayNetAppContainer = result.Spec.Template.Spec.Containers.FirstOrDefault(c => c.Name == "relay-net-app");
 
         relayNetAppContainer.Should().NotBeNull();
         relayNetAppContainer!.Image.Should().Be("but5gera/relay_network_application:0.1.0");
@@ -75,7 +75,7 @@ public class Ros1ConnectionBuilderTests
         var result = sut.EnableRosCommunication(depl, topics);
 
         //assert
-        var relayNetAppContainer = result.Spec.Template.Spec.Containers.FirstOrDefault(c => c.Name == "relayNetApp");
+        var relayNetAppContainer = result.Spec.Template.Spec.Containers.FirstOrDefault(c => c.Name == "relay-net-app");
 
         relayNetAppContainer.Should().NotBeNull();
         relayNetAppContainer!.Env.Should()
