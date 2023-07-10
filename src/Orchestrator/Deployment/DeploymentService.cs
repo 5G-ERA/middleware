@@ -244,7 +244,7 @@ internal class DeploymentService : IDeploymentService
                         pair.InstanceId);
                     var netAppAddress = location.GetNetAppAddress(pair.Name);
                     _logger.LogDebug("NetApp address to be set: {address}", netAppAddress);
-                    pair.Instance.SetNetAppAddress(netAppAddress);
+                    pair.Instance.SetNetAppAddress($"http://{netAppAddress}");
                 }
 
                 _logger.LogDebug("Adding new relation between instance and current location");
