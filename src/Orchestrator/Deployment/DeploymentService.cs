@@ -242,7 +242,9 @@ internal class DeploymentService : IDeploymentService
                 {
                     await _publisher.PublishGatewayAddNetAppEntryAsync(location, pair.Name, task.ActionPlanId,
                         pair.InstanceId);
-                    pair.Instance.SetNetAppAddress(location.GetNetAppAddress(pair.Name));
+                    var netAppAddress = location.GetNetAppAddress(pair.Name);
+                    _logger.LogDebug("NetApp address to be set: {address}", netAppAddress);
+                    pair.Instance.SetNetAppAddress(netAppAddress);
                 }
 
                 _logger.LogDebug("Adding new relation between instance and current location");
