@@ -7,6 +7,7 @@ using Middleware.Common.ExtensionMethods;
 using Middleware.DataAccess.ExtensionMethods;
 using Middleware.DataAccess.Repositories;
 using Middleware.DataAccess.Repositories.Abstract;
+using Middleware.OcelotGateway.ExtensionMethods;
 using Middleware.OcelotGateway.Services;
 using Ocelot.Cache.CacheManager;
 using Ocelot.DependencyInjection;
@@ -64,7 +65,11 @@ var ocelotConfig = new OcelotPipelineConfiguration
         await OcelotAuthorizationMiddleware.Authorize(httpContext, next);
     }
 };
+builder.Services.Configure<MiddlewareConfig>(builder.Configuration.GetSection(MiddlewareConfig.ConfigName));
+var mwConfig = builder.Configuration.GetSection(MiddlewareConfig.ConfigName).Get<MiddlewareConfig>();
+var rabbitmqConfig = builder.Configuration.GetSection(RabbitMqConfig.ConfigName).Get<RabbitMqConfig>();
 
+builder.Services.RegisterRabbitMqConsumers(rabbitmqConfig, mwConfig);
 builder.Services.AddReverseProxy()
     .LoadFromMemory(new List<RouteConfig>(), new List<ClusterConfig>());
 
