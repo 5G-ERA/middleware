@@ -91,7 +91,7 @@ internal class DeploymentService : IDeploymentService
                 {
                     await _publisher.PublishGatewayDeleteNetAppEntryAsync(location, srv.Name, actionPlan.Id,
                         srv.ServiceInstanceId);
-                    srv.SetNetAppAddress(location.GetNetAppAddress(srv.Name));
+                    //srv.SetNetAppAddress(location.GetNetAppAddress(srv.Name));
                 }
             }
         }

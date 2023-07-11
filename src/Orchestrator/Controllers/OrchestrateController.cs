@@ -154,57 +154,34 @@ public class OrchestrateController : Controller
             var isSuccess = await _deploymentService.DeletePlanAsync(actionPlan);
 
             //Delete the LOCATED_AT relationships between instance and edge/cloud.
-            /*List<ActionModel> actionTempList = actionPlan.ActionSequence;
-            foreach (ActionModel action in actionTempList)
+            var actionTempList = actionPlan.ActionSequence;
+            foreach (var action in actionTempList!)
             {
                 BaseModel placement;
-                RelationModel tempRelationModel = new RelationModel();
-                tempRelationModel.RelationName = "LOCATED_AT";
-
-                if (action.Placement!.ToUpper().Contains("CLOUD"))
+                if (action.PlacementType!.ToUpper().Contains("CLOUD"))
                 {
-                    var cloud = (await _redisInterfaceClient.GetCloudByNameAsync(action.Placement))?.ToCloud();
+                    var cloud = (await _redisInterfaceClient.GetCloudByNameAsync(action.Placement!))?.ToCloud();
                     placement = cloud;
-
                 }
                 else
                 {
-                    var edge = (await _redisInterfaceClient.GetEdgeByNameAsync(action.Placement)).ToEdge(); 
+                    var edge = (await _redisInterfaceClient.GetEdgeByNameAsync(action.Placement!)).ToEdge();
                     placement = edge;
                 }
 
-                foreach (InstanceModel instance in action.Services)
+                if (placement is null) continue;
+                foreach (var instance in action.Services)
                 {
-                    GraphEntityModel tempInstanceGraph = new GraphEntityModel(); //The instances that the action need.
-                    tempInstanceGraph.Name = instance.Name;
-                    tempInstanceGraph.Id = instance.Id;
-                    tempInstanceGraph.Type = "INSTANCE";
-
                     //delete all the located_at relationships between all instances of 1 action and the resources been edge/cloud
                     await _redisInterfaceClient.DeleteRelationAsync(instance, placement, "LOCATED_AT");
                 }
-            }*/
+            }
 
-            // //Delete the relationship OWNS between the robot and the task that has been completed.
-            // RelationModel deleteRelationRobotOwnsTask = new RelationModel();
-            // deleteRelationRobotOwnsTask.RelationName = "OWNS";
+            ////Delete the relationship OWNS between the robot for the task that has been completed.
+            //var tempRobotObject = (await _redisInterfaceClient.RobotGetByIdAsync(actionPlan.RobotId)).ToRobot();
+            //var tempTaskObject = (await _redisInterfaceClient.TaskGetByIdAsync(actionPlan.TaskId)).ToTask();
 
-            var tempRobotObject = (await _redisInterfaceClient.RobotGetByIdAsync(actionPlan.RobotId)).ToRobot();
-            //
-            // GraphEntityModel tempRobotGraph = new GraphEntityModel();
-            // tempRobotGraph.Id = tempRobotObject.Id;
-            // tempRobotGraph.Name = tempRobotObject.Name;
-
-            var tempTaskObject = (await _redisInterfaceClient.TaskGetByIdAsync(actionPlan.TaskId)).ToTask();
-            //
-            // GraphEntityModel tempTaskGraph = new GraphEntityModel();
-            // tempTaskGraph.Id = id;
-            // tempTaskGraph.Name = tempTaskObject.Name;
-            //
-            // deleteRelationRobotOwnsTask.InitiatesFrom = tempRobotGraph;
-            // deleteRelationRobotOwnsTask.PointsTo = tempTaskGraph;
-
-            await _redisInterfaceClient.DeleteRelationAsync(tempRobotObject, tempTaskObject, "OWNS");
+            //await _redisInterfaceClient.DeleteRelationAsync(tempRobotObject, tempTaskObject, "OWNS");
 
             if (isSuccess == false)
             {
