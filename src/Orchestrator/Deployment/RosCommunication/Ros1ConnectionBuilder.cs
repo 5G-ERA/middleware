@@ -73,7 +73,8 @@ internal class Ros1ConnectionBuilder : IRosConnectionBuilder
             Ports = new List<V1ContainerPort>
             {
                 new(11311, name: "ros-master")
-            }
+            },
+            Args = new List<string> { "roscore" }
         };
         return rosContainer;
     }
