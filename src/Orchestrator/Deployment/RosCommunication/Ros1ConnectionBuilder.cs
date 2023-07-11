@@ -93,7 +93,8 @@ internal class Ros1ConnectionBuilder : IRosConnectionBuilder
             Env = new List<V1EnvVar>
             {
                 new("ROS_MASTER_URI", "http://127.0.0.1:11311"),
-                new("TOPIC_LIST", topicsString)
+                new("TOPIC_LIST", topicsString),
+                new("NETAPP_PORT", "80")
             },
             Image = "but5gera/relay_network_application:0.1.0"
         };
