@@ -69,9 +69,9 @@ builder.Services.Configure<MiddlewareConfig>(builder.Configuration.GetSection(Mi
 var mwConfig = builder.Configuration.GetSection(MiddlewareConfig.ConfigName).Get<MiddlewareConfig>();
 var rabbitmqConfig = builder.Configuration.GetSection(RabbitMqConfig.ConfigName).Get<RabbitMqConfig>();
 
-builder.Services.RegisterRabbitMqConsumers(rabbitmqConfig, mwConfig);
 builder.Services.AddReverseProxy()
     .LoadFromMemory(new List<RouteConfig>(), new List<ClusterConfig>());
+builder.Services.RegisterRabbitMqConsumers(rabbitmqConfig, mwConfig);
 
 
 var app = builder.Build();

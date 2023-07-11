@@ -147,9 +147,7 @@ internal class KubernetesObjectBuilder : IKubernetesObjectBuilder
         {
             Name = name,
             Image = K8SImageHelper.BuildImageName(_containerRegistryName, name, tag),
-            ImagePullPolicy = AppConfig.AppConfiguration == AppVersionEnum.Prod.GetStringValue()
-                ? "Always"
-                : "IfNotPresent",
+            ImagePullPolicy = "Always",
             Env = envList,
             Ports = new List<V1ContainerPort> { new(80), new(433) }
         };
