@@ -8,9 +8,12 @@ namespace Middleware.OcelotGateway.Services;
 public class GatewayConfigurationService
 {
     private readonly InMemoryConfigProvider _inMemoryConfigProvider;
+    private readonly ILogger<GatewayConfigurationService> _logger;
 
-    public GatewayConfigurationService(IProxyConfigProvider inMemoryConfigProvider)
+    public GatewayConfigurationService(IProxyConfigProvider inMemoryConfigProvider,
+        ILogger<GatewayConfigurationService> logger)
     {
+        _logger = logger;
         if (inMemoryConfigProvider is InMemoryConfigProvider imcp)
             _inMemoryConfigProvider = imcp;
     }
@@ -30,12 +33,14 @@ public class GatewayConfigurationService
                 { "destination1", new DestinationConfig { Address = $"http://{msg.NetAppName}" } }
             }
         };
+        var path = msg.Route.SanitizeToUriPath();
+        _logger.LogInformation("Opening new route with path: {path}", path);
         var routeCfg = new RouteConfig
         {
             RouteId = msg.NetAppName + "-Route",
             Match = new()
             {
-                Path = msg.Route.SanitizeToUriPath()
+                Path = path + "/{**remainder}"
             },
             ClusterId = clusterCfg.ClusterId //
         };
@@ -46,6 +51,8 @@ public class GatewayConfigurationService
         routeList.Add(routeCfg);
 
         _inMemoryConfigProvider.Update(routeList, clusterList);
+
+        _logger.LogInformation("Finished updating path to the new NetApp");
     }
 
     public void DeleteDynamicRoute(GatewayDeleteNetAppEntryMessage msg)
