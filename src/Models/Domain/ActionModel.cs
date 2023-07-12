@@ -44,6 +44,11 @@ public class ActionModel : BaseModel
     public string? NetworkSlice { get; set; }
 
     /// <summary>
+    ///     Action has a single connectivity endpoint that will facilitate all the NetApps within the action
+    /// </summary>
+    public bool SingleNetAppEntryPoint { get; set; }
+
+    /// <summary>
     ///     Sets new location identified during resource planning
     /// </summary>
     /// <param name="location"></param>
@@ -78,6 +83,7 @@ public class ActionModel : BaseModel
                 MinimumRam = domain.MinimumRam,
                 MinimumNumCores = domain.MinimumNumCores
             },
+            SingleNetAppEntryPoint = domain.SingleNetAppEntryPoint,
             Tags = domain.Tags
         };
     }

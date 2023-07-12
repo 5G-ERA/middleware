@@ -18,6 +18,7 @@ public static class DomainToApiContractMapper
             Order = x.Order,
             MinimumRam = x.MinimumRam,
             MinimumNumCores = x.MinimumNumCores,
+            SingleNetAppEntryPoint = x.SingleNetAppEntryPoint,
             Tags = x.Tags
         };
     }

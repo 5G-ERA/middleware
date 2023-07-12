@@ -9,5 +9,6 @@ public class ActionResponse
     public int Order { get; init; }
     public int? MinimumNumCores { get; init; }
     public long? MinimumRam { get; init; }
+    public bool SingleNetAppEntryPoint { get; init; }
     public IEnumerable<string> Tags { get; init; } = Enumerable.Empty<string>();
 }

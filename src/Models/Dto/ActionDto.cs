@@ -8,15 +8,22 @@ namespace Middleware.Models.Dto;
 public class ActionDto : Dto
 {
     public const string Prefix = "Action";
+
     [Indexed]
     [RedisIdField]
     public override string Id { get; set; } = default!;
+
     [Indexed]
     public string Name { get; init; } = default!;
+
     [Indexed]
     public List<string>? Tags { get; init; } = new();
+
     [Indexed]
     public string? ActionPriority { get; init; } = default!;
+
+    [Indexed]
+    public bool SingleNetAppEntryPoint { get; init; }
 
     public HardwareRequirements HardwareRequirements { get; init; } = new();
 
@@ -30,7 +37,8 @@ public class ActionDto : Dto
             Tags = dto.Tags,
             MinimumRam = dto.HardwareRequirements.MinimumRam,
             MinimumNumCores = dto.HardwareRequirements.MinimumNumCores,
-            ActionPriority = dto.ActionPriority
+            ActionPriority = dto.ActionPriority,
+            SingleNetAppEntryPoint = dto.SingleNetAppEntryPoint
         };
     }
 }

@@ -16,6 +16,7 @@ public static class ApiContractToDomainMapper
             Order = x.Order,
             MinimumRam = x.MinimumRam,
             MinimumNumCores = x.MinimumNumCores,
+            SingleNetAppEntryPoint = x.SingleNetAppEntryPoint,
             Tags = x.Tags.ToList()
         };
     }
@@ -30,6 +31,7 @@ public static class ApiContractToDomainMapper
             Order = x.Order,
             MinimumRam = x.MinimumRam,
             MinimumNumCores = x.MinimumNumCores,
+            SingleNetAppEntryPoint = x.SingleNetAppEntryPoint,
             Tags = x.Tags.ToList()
         };
     }
