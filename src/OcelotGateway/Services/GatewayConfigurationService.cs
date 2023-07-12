@@ -49,7 +49,7 @@ public class GatewayConfigurationService
             RouteId = msg.NetAppName + "SocketIO-Route",
             Match = new()
             {
-                Path = "/socket-io/{**remainder}"
+                Path = "/socket.io/{**remainder}"
             },
             ClusterId = clusterCfg.ClusterId //
         };
