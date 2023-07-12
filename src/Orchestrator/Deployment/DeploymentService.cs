@@ -189,6 +189,7 @@ internal class DeploymentService : IDeploymentService
                 _logger.LogDebug("Adding new relation between instance and current location");
                 await _redisInterfaceClient.AddRelationAsync(pair.Instance, thisLocation.ToBaseLocation(),
                     "LOCATED_AT");
+                pair.Instance.SetStatus(ServiceStatus.Active);
             }
             catch (HttpOperationException ex)
             {
@@ -249,6 +250,7 @@ internal class DeploymentService : IDeploymentService
 
                 _logger.LogDebug("Adding new relation between instance and current location");
                 await _redisInterfaceClient.AddRelationAsync(pair.Instance, location.ToBaseLocation(), "LOCATED_AT");
+                pair.Instance.SetStatus(ServiceStatus.Active);
             }
 
             isSuccess &= await SaveActionSequence(task, robot);
