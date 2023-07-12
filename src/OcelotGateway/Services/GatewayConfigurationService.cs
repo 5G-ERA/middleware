@@ -44,11 +44,21 @@ public class GatewayConfigurationService
             },
             ClusterId = clusterCfg.ClusterId //
         };
+        var routeSocketIoCfg = new RouteConfig
+        {
+            RouteId = msg.NetAppName + "SocketIO-Route",
+            Match = new()
+            {
+                Path = "/socket-io/{**remainder}"
+            },
+            ClusterId = clusterCfg.ClusterId //
+        };
         // transforms allow us to change the path that is requested like below to replace direct forwarding
         routeCfg = routeCfg.WithTransformPathRemovePrefix($"/{msg.NetAppName}");
 
         clusterList.Add(clusterCfg);
         routeList.Add(routeCfg);
+        routeList.Add(routeSocketIoCfg);
 
         _inMemoryConfigProvider.Update(routeList, clusterList);
 
@@ -63,13 +73,17 @@ public class GatewayConfigurationService
         var routeList = config.Routes.ToList();
 
         var matchRouteToDelete = msg.NetAppName + "-Route";
+        var socketIoRouteName = msg.NetAppName + "SocketIO-Route";
         RouteConfig routeToDelete = null;
+        RouteConfig socketIoRoute = null;
         foreach (var route in routeList)
         {
             if (route.RouteId == matchRouteToDelete) routeToDelete = route;
+            if (route.RouteId == socketIoRouteName) socketIoRoute = route;
         }
 
         routeList.Remove(routeToDelete);
+        routeList.Remove(socketIoRoute);
 
         var matchClusterToDelete = msg.NetAppName + "-Cluster";
         ClusterConfig clusterToDelete = null;
