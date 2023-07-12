@@ -79,11 +79,16 @@ public class Ros1ConnectionBuilderTests
 
         relayNetAppContainer.Should().NotBeNull();
         relayNetAppContainer!.Env.Should()
-            .HaveCount(2, "We need ros_master_uri and list of topics for reading ros topics");
+            .HaveCount(3,
+                "We need ros_master_uri and list of topics for reading ros topics, and to specify teh port NetApp will operate on");
 
         var rosTopicsEnv = relayNetAppContainer.Env.FirstOrDefault(e => e.Name == "TOPIC_LIST");
         rosTopicsEnv.Should().NotBeNull();
         rosTopicsEnv!.Value.Should().Be(topicString);
+
+        var netAppPortEnv = relayNetAppContainer.Env.FirstOrDefault(e => e.Name == "NETAPP_PORT");
+        netAppPortEnv.Should().NotBeNull();
+        netAppPortEnv!.Value.Should().Be("80", "For easy operation, NetApp has to work on port 80");
     }
 
     [Fact]
