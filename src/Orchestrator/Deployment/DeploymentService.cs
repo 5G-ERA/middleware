@@ -375,6 +375,7 @@ internal class DeploymentService : IDeploymentService
     {
         var actionPlan = new ActionPlanModel(task.ActionPlanId, task.Id, task.Name, task.ActionSequence!, robot.Id);
         actionPlan.SetStatus("active");
+        actionPlan.ActionSequence!.ForEach(a => a.Services.ForEach(s => s.SetStatus(ServiceStatus.Active)));
 
         var result = await _redisInterfaceClient.ActionPlanAddAsync(actionPlan);
         //await _redisInterfaceClient.AddRelationAsync(robot, actionPlan, "OWNS");
