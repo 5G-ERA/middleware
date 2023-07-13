@@ -1,5 +1,6 @@
 ﻿using k8s.Models;
 using Middleware.Common.Enums;
+using Middleware.Models.Domain;
 using Middleware.Orchestrator.Models;
 
 namespace Middleware.Orchestrator.Deployment;
@@ -55,4 +56,6 @@ internal interface IKubernetesObjectBuilder
     /// </summary>
     /// <param name="netApps">The list of NetApp configurations</param>
     void ConfigureCrossNetAppConnection(IReadOnlyList<DeploymentPair> netApps);
+
+    DeploymentPair CreateMultiNetAppRelayDeploymentConfig(ActionModel action, IReadOnlyList<DeploymentPair> pairs);
 }

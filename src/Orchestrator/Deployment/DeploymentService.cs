@@ -8,6 +8,7 @@ using Middleware.Common.ExtensionMethods;
 using Middleware.Models.Domain;
 using Middleware.Models.Domain.Contracts;
 using Middleware.Models.Enums;
+using Middleware.Models.ExtensionMethods;
 using Middleware.Orchestrator.Exceptions;
 using Middleware.Orchestrator.Models;
 using Middleware.Orchestrator.Publishers;
@@ -334,25 +335,19 @@ internal class DeploymentService : IDeploymentService
 
         _logger.LogDebug("Retrieved service with Id: {Id}", service.Id);
 
-        var cim = service.ContainerImage = images.First();
+        service.ContainerImage = images.First();
 
         _logger.LogDebug("Preparing the image {ImageName}", service.Name);
 
-        if (deploymentNames.Contains(cim.Name)) cim.Name = GetNewImageNameWithSuffix(cim.Name);
+        if (deploymentNames.Contains(service.Name)) service.Name = service.Name.GetNewImageNameWithSuffix();
 
-        deploymentNames.Add(cim.Name);
+        deploymentNames.Add(service.Name);
         var pair = ConfigureDeploymentObjects(service);
 
         service.SetStatus(ServiceStatus.Instantiating);
         service.ServiceInstanceId = pair.InstanceId;
 
         return pair;
-    }
-
-    private string GetNewImageNameWithSuffix(string name)
-    {
-        var guidSuffix = Guid.NewGuid().ToString().Split('-')[0];
-        return $"{name}-{guidSuffix}";
     }
 
     private async Task<ILocation> GetCurrentLocationAsync()
