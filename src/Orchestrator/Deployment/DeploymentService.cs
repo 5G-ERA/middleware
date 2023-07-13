@@ -401,8 +401,7 @@ internal class DeploymentService : IDeploymentService
 
         if (builder is not null)
         {
-            var topics = instance.RosTopicsSub.CreateCopy();
-            topics.AddRange(instance.RosTopicsPub);
+            var topics = instance.RosTopicsPub.CreateCopy();
             deployment = builder.EnableRosCommunication(deployment, topics);
         }
 

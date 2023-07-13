@@ -48,7 +48,7 @@ public class Ros1ConnectionBuilderTests
         var relayNetAppContainer = result.Spec.Template.Spec.Containers.FirstOrDefault(c => c.Name == "relay-net-app");
 
         relayNetAppContainer.Should().NotBeNull();
-        relayNetAppContainer!.Image.Should().Be("but5gera/relay_network_application:0.1.0");
+        relayNetAppContainer!.Image.Should().Be("but5gera/relay_network_application:0.3.0");
         relayNetAppContainer.Ports.Should().HaveCount(1);
         relayNetAppContainer.Ports.First().ContainerPort.Should().Be(80, "It is needed for websockets connection");
     }
