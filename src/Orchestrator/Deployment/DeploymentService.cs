@@ -207,6 +207,7 @@ internal class DeploymentService : IDeploymentService
                 _logger.LogDebug("Adding new relation between instance and current location");
                 await _redisInterfaceClient.AddRelationAsync(pair.Instance!, thisLocation.ToBaseLocation(),
                     "LOCATED_AT");
+                pair.Instance.SetStatus(ServiceStatus.Active);
             }
             catch (HttpOperationException ex)
             {
@@ -296,6 +297,7 @@ internal class DeploymentService : IDeploymentService
                     _logger.LogDebug("Adding new relation between instance and current location");
                     await _redisInterfaceClient.AddRelationAsync(pair.Instance!, location.ToBaseLocation(),
                         "LOCATED_AT");
+                    pair.Instance.SetStatus(ServiceStatus.Active);
                 }
             }
 
@@ -438,6 +440,7 @@ internal class DeploymentService : IDeploymentService
     {
         var actionPlan = new ActionPlanModel(task.ActionPlanId, task.Id, task.Name, task.ActionSequence!, robot.Id);
         actionPlan.SetStatus("active");
+        actionPlan.ActionSequence!.ForEach(a => a.Services.ForEach(s => s.SetStatus(ServiceStatus.Active)));
 
         var result = await _redisInterfaceClient.ActionPlanAddAsync(actionPlan);
         //await _redisInterfaceClient.AddRelationAsync(robot, actionPlan, "OWNS");
@@ -464,8 +467,7 @@ internal class DeploymentService : IDeploymentService
 
         if (builder is not null)
         {
-            var topics = instance.RosTopicsSub.CreateCopy();
-            topics.AddRange(instance.RosTopicsPub);
+            var topics = instance.RosTopicsPub.CreateCopy();
             deployment = builder.EnableRosCommunication(deployment, topics);
         }
 

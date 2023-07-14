@@ -48,7 +48,7 @@ public class Ros1ConnectionBuilderTests
         var relayNetAppContainer = result.Spec.Template.Spec.Containers.FirstOrDefault(c => c.Name == "relay-net-app");
 
         relayNetAppContainer.Should().NotBeNull();
-        relayNetAppContainer!.Image.Should().Be("but5gera/relay_network_application:0.1.0");
+        relayNetAppContainer!.Image.Should().Be("but5gera/relay_network_application:0.3.0");
         relayNetAppContainer.Ports.Should().HaveCount(1);
         relayNetAppContainer.Ports.First().ContainerPort.Should().Be(80, "It is needed for websockets connection");
     }
@@ -79,11 +79,16 @@ public class Ros1ConnectionBuilderTests
 
         relayNetAppContainer.Should().NotBeNull();
         relayNetAppContainer!.Env.Should()
-            .HaveCount(2, "We need ros_master_uri and list of topics for reading ros topics");
+            .HaveCount(3,
+                "We need ros_master_uri and list of topics for reading ros topics, and to specify teh port NetApp will operate on");
 
         var rosTopicsEnv = relayNetAppContainer.Env.FirstOrDefault(e => e.Name == "TOPIC_LIST");
         rosTopicsEnv.Should().NotBeNull();
         rosTopicsEnv!.Value.Should().Be(topicString);
+
+        var netAppPortEnv = relayNetAppContainer.Env.FirstOrDefault(e => e.Name == "NETAPP_PORT");
+        netAppPortEnv.Should().NotBeNull();
+        netAppPortEnv!.Value.Should().Be("80", "For easy operation, NetApp has to work on port 80");
     }
 
     [Fact]
