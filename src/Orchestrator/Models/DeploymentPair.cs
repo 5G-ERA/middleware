@@ -1,32 +1,51 @@
-﻿using k8s.Models;
+﻿using JetBrains.Annotations;
+using k8s.Models;
 using Middleware.Models.Domain;
 
 namespace Middleware.Orchestrator.Models;
 
-public record DeploymentPair(V1Deployment Deployment, V1Service Service, Guid InstanceId, InstanceModel Instance)
+public record DeploymentPair()
 {
     /// <summary>
     ///     Deployed deployment
     /// </summary>
-    public V1Deployment Deployment { get; init; } = Deployment;
+    public V1Deployment Deployment { get; init; }
 
     /// <summary>
     ///     Deployed service
     /// </summary>
-    public V1Service Service { get; init; } = Service;
+    public V1Service Service { get; init; }
 
     /// <summary>
     ///     Identifier of the deployed instance
     /// </summary>
-    public Guid InstanceId { get; init; } = InstanceId;
+    public Guid InstanceId { get; init; }
 
     /// <summary>
-    ///     Instance to be deployed
+    ///     instance to be deployed
     /// </summary>
-    public InstanceModel Instance { get; init; } = Instance;
+    [CanBeNull]
+    public InstanceModel Instance { get; init; }
 
     /// <summary>
     ///     Name of the Network Application to be deployed
     /// </summary>
-    public string Name { get; init; } = Instance.Name;
+    public string Name { get; init; }
+
+    public DeploymentPair(V1Deployment deployment, V1Service service, Guid instanceId, InstanceModel instance) : this()
+    {
+        Deployment = deployment;
+        Service = service;
+        InstanceId = instanceId;
+        Instance = instance;
+        Name = instance.Name;
+    }
+
+    public DeploymentPair(string name, V1Deployment deployment, V1Service service, Guid instanceId) : this()
+    {
+        Name = name;
+        Deployment = deployment;
+        Service = service;
+        InstanceId = instanceId;
+    }
 }

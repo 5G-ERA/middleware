@@ -214,7 +214,7 @@ internal class KubernetesObjectBuilder : IKubernetesObjectBuilder
         var spec = new V1ServiceSpec
         {
             Ports = servicePorts,
-            Selector = new Dictionary<string, string> { { "app", deploymentName } },
+            Selector = depl.Labels(),
             Type = K8SServiceKind.ClusterIp.GetStringValue()
         };
 
@@ -233,12 +233,18 @@ internal class KubernetesObjectBuilder : IKubernetesObjectBuilder
     }
 
     /// <inheritdoc />
-    public DeploymentPair CreateMultiNetAppRelayDeploymentConfig(ActionModel action, List<DeploymentPair> pairs)
+    public DeploymentPair CreateInterRelayNetAppDeploymentConfig(Guid actionPlanId, ActionModel action,
+        List<DeploymentPair> pairs)
     {
+        if (action == null) throw new ArgumentNullException(nameof(action));
+        if (pairs == null) throw new ArgumentNullException(nameof(pairs));
+        if (actionPlanId == Guid.Empty) throw new ArgumentNullException(nameof(actionPlanId));
+
+        var serviceInstanceId = action.Services.First().ServiceInstanceId;
         var configs = new List<MultiNetAppConfigRow>();
         foreach (var pair in pairs)
         {
-            var topics = pair.Instance.RosTopicsSub.Select(t => t.Name).ToList();
+            var topics = pair.Instance!.RosTopicsSub.Select(t => t.Name).ToList();
             var config = new MultiNetAppConfigRow
             {
                 Address = $"http://{pair.Name}",
@@ -249,19 +255,18 @@ internal class KubernetesObjectBuilder : IKubernetesObjectBuilder
 
         var configString = JsonSerializer.Serialize(configs);
 
-        var deployment = CreateInterRelayDeploymentDefinition(configString);
+        var deployment = CreateInterRelayDeploymentDefinition(actionPlanId, action.Id, configString);
 
+        var service = CreateDefaultService(deployment.Name(), serviceInstanceId, deployment);
 
-        throw new NotImplementedException();
+        return new(deployment.Name(), deployment, service, serviceInstanceId);
     }
 
-    private static V1Deployment CreateInterRelayDeploymentDefinition(string configString)
+    private V1Deployment CreateInterRelayDeploymentDefinition(Guid actionPlanId, Guid actionId,
+        string configString)
     {
         var relayName = "relay-netapp".GetNewImageNameWithSuffix();
-        var labels = new Dictionary<string, string>
-        {
-            { "app", "relay" }, { "name", relayName }
-        };
+        var labels = CreateInterRelayNetAppLabels(relayName, actionPlanId, actionId);
         return new()
         {
             ApiVersion = "apps/v1",
@@ -314,6 +319,17 @@ internal class KubernetesObjectBuilder : IKubernetesObjectBuilder
         };
     }
 
+    public Dictionary<string, string> CreateInterRelayNetAppLabels(string name, Guid actionPlanId,
+        Guid actionId)
+    {
+        return new()
+        {
+            { "app", name },
+            { "actionPlanId", actionPlanId.ToString() },
+            { "actionId", actionId.ToString() }
+        };
+    }
+
     /// <summary>
     ///     This class is used to represent the config for the MultiRelayNetApp
     /// </summary>
@@ -325,6 +341,9 @@ internal class KubernetesObjectBuilder : IKubernetesObjectBuilder
         [JsonPropertyName("topics")]
         public List<string> Topics { [UsedImplicitly] get; set; }
 
+        /// <summary>
+        ///     Do not remove, will be used to support ROS services
+        /// </summary>
         [JsonPropertyName("services")]
         public List<string> Services { get; set; }
     }

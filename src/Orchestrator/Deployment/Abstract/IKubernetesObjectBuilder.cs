@@ -1,4 +1,5 @@
-﻿using k8s.Models;
+﻿using JetBrains.Annotations;
+using k8s.Models;
 using Middleware.Common.Enums;
 using Middleware.Models.Domain;
 using Middleware.Orchestrator.Models;
@@ -57,5 +58,13 @@ internal interface IKubernetesObjectBuilder
     /// <param name="netApps">The list of NetApp configurations</param>
     void ConfigureCrossNetAppConnection(IReadOnlyList<DeploymentPair> netApps);
 
-    DeploymentPair CreateMultiNetAppRelayDeploymentConfig(ActionModel action, IReadOnlyList<DeploymentPair> pairs);
+    /// <summary>
+    ///     Creates the deployment configuration for the Inter Relay NetApp responsible for routing traffic to multiple NetApps
+    /// </summary>
+    /// <param name="actionPlanId"></param>
+    /// <param name="action"></param>
+    /// <param name="pairs"></param>
+    /// <returns></returns>
+    DeploymentPair CreateInterRelayNetAppDeploymentConfig(Guid actionPlanId, [NotNull] ActionModel action,
+        [NotNull] List<DeploymentPair> pairs);
 }
