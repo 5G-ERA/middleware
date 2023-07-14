@@ -1,4 +1,5 @@
-﻿using k8s;
+﻿using JetBrains.Annotations;
+using k8s;
 using k8s.Autorest;
 using k8s.Models;
 using Microsoft.Extensions.Options;
@@ -85,15 +86,23 @@ internal class DeploymentService : IDeploymentService
         try
         {
             foreach (var action in actionPlan.ActionSequence!)
-            foreach (var srv in action.Services)
             {
-                retVal &= await TerminateNetAppByIdAsync(srv.ServiceInstanceId);
-
-                if (srv.RosDistro is not null)
+                foreach (var srv in action.Services)
                 {
-                    await _publisher.PublishGatewayDeleteNetAppEntryAsync(location, srv.Name, actionPlan.Id,
-                        srv.ServiceInstanceId);
-                    //srv.SetNetAppAddress(location.GetNetAppAddress(srv.Name));
+                    retVal &= await TerminateNetAppByIdAsync(srv.ServiceInstanceId);
+
+                    if (ShouldDeployInterRelay(srv, action) == false)
+                    {
+                        await _publisher.PublishGatewayDeleteNetAppEntryAsync(location, srv.Name, actionPlan.Id,
+                            srv.ServiceInstanceId);
+                    }
+                }
+
+                if (action.ShouldUseInterRelayForRosNetApps())
+                {
+                    var deletedRelayName = await TerminateInterRelayNetApp(actionPlan.Id, action.Id);
+                    await _publisher.PublishGatewayDeleteNetAppEntryAsync(location, deletedRelayName, actionPlan.Id,
+                        action.Id);
                 }
             }
         }
@@ -143,7 +152,7 @@ internal class DeploymentService : IDeploymentService
 
             await TerminateNetAppByIdAsync(instance.ServiceInstanceId);
 
-            if (instance.RosDistro is not null)
+            if (ShouldDeployInterRelay(instance, action) == false)
             {
                 await _publisher.PublishGatewayDeleteNetAppEntryAsync(thisLocation, instance.Name, actionPlanId,
                     instance.ServiceInstanceId);
@@ -153,6 +162,13 @@ internal class DeploymentService : IDeploymentService
                 instance.Name, thisLocation.Name);
 
             await _redisInterfaceClient.DeleteRelationAsync(instance, thisLocation.ToBaseLocation(), "LOCATED_AT");
+        }
+
+        if (action.ShouldUseInterRelayForRosNetApps())
+        {
+            var deletedRelayName = await TerminateInterRelayNetApp(actionPlan.Id, action.Id);
+            await _publisher.PublishGatewayDeleteNetAppEntryAsync(thisLocation, deletedRelayName, actionPlan.Id,
+                action.Id);
         }
     }
 
@@ -181,7 +197,7 @@ internal class DeploymentService : IDeploymentService
             {
                 await DeployNetApp(pair);
 
-                if (ShouldDeployInterRelay(pair, action) == false)
+                if (ShouldDeployInterRelay(pair.Instance, action) == false)
                 {
                     await _publisher.PublishGatewayAddNetAppEntryAsync(thisLocation, pair.Name, actionPlan.Id,
                         pair.InstanceId);
@@ -270,7 +286,7 @@ internal class DeploymentService : IDeploymentService
                         pair.Instance, pair.InstanceId);
                     await DeployNetApp(pair);
 
-                    if (ShouldDeployInterRelay(pair, item.Key))
+                    if (ShouldDeployInterRelay(pair.Instance, item.Key))
                     {
                         await _publisher.PublishGatewayAddNetAppEntryAsync(location, pair.Name, task.ActionPlanId,
                             pair.InstanceId);
@@ -324,9 +340,9 @@ internal class DeploymentService : IDeploymentService
         return isSuccess;
     }
 
-    private static bool ShouldDeployInterRelay(DeploymentPair pair, ActionModel action)
+    private static bool ShouldDeployInterRelay(InstanceModel instance, ActionModel action)
     {
-        return pair.Instance!.RosDistro is not null && action.SingleNetAppEntryPoint;
+        return instance.RosDistro is not null && action.SingleNetAppEntryPoint;
     }
 
     public async Task<DeploymentPair> DeployNetApp(DeploymentPair netApp)
@@ -427,6 +443,7 @@ internal class DeploymentService : IDeploymentService
 
         var result = await _redisInterfaceClient.ActionPlanAddAsync(actionPlan);
         //await _redisInterfaceClient.AddRelationAsync(robot, actionPlan, "OWNS");
+        if (result) _logger.LogInformation("Successfully saved action plan with Id {id}", actionPlan.Id);
         return result;
     }
 
@@ -479,7 +496,14 @@ internal class DeploymentService : IDeploymentService
         return await Terminate(deployments, services);
     }
 
-    private async Task<bool> TerminateInterRelayNetApp(Guid actionPlanId, Guid actionId)
+    /// <summary>
+    ///     Terminates the Inter Relay NetApp based on the Action Plan Id and Action Id
+    /// </summary>
+    /// <param name="actionPlanId"></param>
+    /// <param name="actionId"></param>
+    /// <returns>Name of the deleted relay if deleted</returns>
+    [ItemCanBeNull]
+    private async Task<string> TerminateInterRelayNetApp(Guid actionPlanId, Guid actionId)
     {
         var labels = _kubeObjectBuilder.CreateInterRelayNetAppLabels(actionPlanId, actionId)
             .ToLabelSelectorString();
@@ -489,7 +513,10 @@ internal class DeploymentService : IDeploymentService
         var services = await _kube.CoreV1.ListNamespacedServiceAsync(AppConfig.K8SNamespaceName,
             labelSelector: labels);
 
-        return await Terminate(deployments, services);
+        var relayName = deployments.Items.FirstOrDefault()?.Name();
+        await Terminate(deployments, services);
+
+        return relayName;
     }
 
     private async Task<bool> Terminate(V1DeploymentList deployments, V1ServiceList services)
