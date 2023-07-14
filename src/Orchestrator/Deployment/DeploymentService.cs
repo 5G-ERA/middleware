@@ -253,9 +253,7 @@ internal class DeploymentService : IDeploymentService
         try
         {
             _logger.LogDebug("Entered DeploymentService.DeployAsync");
-            var deployments = await _kube.AppsV1.ListNamespacedDeploymentAsync(AppConfig.K8SNamespaceName);
-            var deploymentNames = deployments.GetDeploymentNames().ToList();
-            _logger.LogDebug("Current deployments: {deployments}", string.Join(", ", deploymentNames));
+            var deploymentNames = await GetCurrentlyDeployedAppNames();
 
             var location = await GetCurrentLocationAsync();
             var relays = new Dictionary<Guid, DeploymentPair>();
