@@ -988,6 +988,9 @@
           "networkSlice": {
             "type": "string",
             "nullable": true
+          },
+          "singleNetAppEntryPoint": {
+            "type": "boolean"
           }
         },
         "additionalProperties": false
@@ -1256,8 +1259,7 @@
           },
           "serviceStatus": {
             "type": "string",
-            "nullable": true,
-            "readOnly": true
+            "nullable": true
           },
           "containerImage": {
             "$ref": "#/components/schemas/ContainerImageModel"

@@ -382,6 +382,9 @@
           "networkSlice": {
             "type": "string",
             "nullable": true
+          },
+          "singleNetAppEntryPoint": {
+            "type": "boolean"
           }
         },
         "additionalProperties": false
@@ -599,12 +602,10 @@
           },
           "serviceStatus": {
             "type": "string",
-            "nullable": true,
-            "readOnly": true
+            "nullable": true
           },
           "containerImage": {
-            "$ref": "#/components/schemas/ContainerImageModel",
-            "nullable": true
+            "$ref": "#/components/schemas/ContainerImageModel"
           },
           "minimumRam": {
             "type": "integer",

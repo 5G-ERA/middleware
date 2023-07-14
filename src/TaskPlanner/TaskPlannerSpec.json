@@ -411,8 +411,7 @@
             "format": "uuid"
           },
           "Name": {
-            "type": "string",
-            "nullable": true
+            "type": "string"
           },
           "Tags": {
             "type": "array",
@@ -445,8 +444,7 @@
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/InstanceModel"
-            },
-            "nullable": true
+            }
           },
           "MinimumRam": {
             "type": "integer",
@@ -461,6 +459,9 @@
           "networkSlice": {
             "type": "string",
             "nullable": true
+          },
+          "singleNetAppEntryPoint": {
+            "type": "boolean"
           }
         },
         "additionalProperties": false
@@ -505,8 +506,7 @@
             "format": "uuid"
           },
           "Name": {
-            "type": "string",
-            "nullable": true
+            "type": "string"
           },
           "Timestamp": {
             "type": "string",
@@ -517,8 +517,7 @@
             "nullable": true
           },
           "K8SDeployment": {
-            "type": "string",
-            "nullable": true
+            "type": "string"
           },
           "K8SService": {
             "type": "string",
@@ -606,8 +605,7 @@
             "format": "uuid"
           },
           "Name": {
-            "type": "string",
-            "nullable": true
+            "type": "string"
           },
           "IsSingleAnswer": {
             "type": "boolean"
@@ -630,12 +628,10 @@
             "format": "uuid"
           },
           "type": {
-            "type": "string",
-            "nullable": true
+            "type": "string"
           },
           "name": {
-            "type": "string",
-            "nullable": true
+            "type": "string"
           }
         },
         "additionalProperties": false
@@ -655,8 +651,7 @@
             "format": "uuid"
           },
           "name": {
-            "type": "string",
-            "nullable": true
+            "type": "string"
           },
           "serviceInstanceId": {
             "type": "string",
@@ -682,15 +677,13 @@
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/RosTopicModel"
-            },
-            "nullable": true
+            }
           },
           "rosTopicsSub": {
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/RosTopicModel"
-            },
-            "nullable": true
+            }
           },
           "rosVersion": {
             "type": "integer",
@@ -717,8 +710,7 @@
           },
           "serviceStatus": {
             "type": "string",
-            "nullable": true,
-            "readOnly": true
+            "nullable": true
           },
           "containerImage": {
             "$ref": "#/components/schemas/ContainerImageModel"
@@ -746,8 +738,7 @@
             "type": "array",
             "items": {
               "type": "string"
-            },
-            "nullable": true
+            }
           }
         },
         "additionalProperties": false
@@ -756,12 +747,9 @@
         "type": "object",
         "properties": {
           "key": {
-            "type": "string",
-            "nullable": true
+            "type": "string"
           },
-          "value": {
-            "nullable": true
-          }
+          "value": { }
         },
         "additionalProperties": false
       },
@@ -794,8 +782,7 @@
             "$ref": "#/components/schemas/GraphEntityModel"
           },
           "relationName": {
-            "type": "string",
-            "nullable": true
+            "type": "string"
           },
           "relationAttributes": {
             "type": "array",
@@ -814,8 +801,7 @@
         "type": "object",
         "properties": {
           "name": {
-            "type": "string",
-            "nullable": true
+            "type": "string"
           },
           "type": {
             "type": "string",
@@ -846,8 +832,7 @@
             "format": "uuid"
           },
           "Name": {
-            "type": "string",
-            "nullable": true
+            "type": "string"
           },
           "ReplanActionPlannerLocked": {
             "type": "boolean"

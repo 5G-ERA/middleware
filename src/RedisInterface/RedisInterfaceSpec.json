@@ -9773,6 +9773,9 @@
           "networkSlice": {
             "type": "string",
             "nullable": true
+          },
+          "singleNetAppEntryPoint": {
+            "type": "boolean"
           }
         },
         "additionalProperties": false
@@ -9853,6 +9856,9 @@
             "format": "int64",
             "nullable": true
           },
+          "singleNetAppEntryPoint": {
+            "type": "boolean"
+          },
           "tags": {
             "type": "array",
             "items": {
@@ -9891,6 +9897,9 @@
             "type": "integer",
             "format": "int64",
             "nullable": true
+          },
+          "singleNetAppEntryPoint": {
+            "type": "boolean"
           },
           "tags": {
             "type": "array",
@@ -10839,8 +10848,7 @@
           },
           "serviceStatus": {
             "type": "string",
-            "nullable": true,
-            "readOnly": true
+            "nullable": true
           },
           "containerImage": {
             "$ref": "#/components/schemas/ContainerImageModel"
