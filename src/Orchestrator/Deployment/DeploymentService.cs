@@ -201,7 +201,7 @@ internal class DeploymentService : IDeploymentService
                 {
                     await _publisher.PublishGatewayAddNetAppEntryAsync(thisLocation, pair.Name, actionPlan.Id,
                         pair.InstanceId);
-                    pair.Instance!.SetNetAppAddress(thisLocation.GetNetAppAddress(pair.Name));
+                    pair.Instance!.SetNetAppAddress($"http://{thisLocation.GetNetAppAddress(pair.Name)}");
                 }
 
                 _logger.LogDebug("Adding new relation between instance and current location");
@@ -223,7 +223,7 @@ internal class DeploymentService : IDeploymentService
 
             foreach (var pair in deploymentPairs)
             {
-                pair.Instance!.SetNetAppAddress(thisLocation.GetNetAppAddress(pair.Name));
+                pair.Instance!.SetNetAppAddress($"http://{thisLocation.GetNetAppAddress(pair.Name)}");
             }
 
             await _publisher.PublishGatewayAddNetAppEntryAsync(thisLocation, interRelay.Name, actionPlanId, action.Id);
@@ -272,7 +272,7 @@ internal class DeploymentService : IDeploymentService
                 {
                     var netAppAddress = location.GetNetAppAddress(relay.Name);
                     _logger.LogDebug("{netAppName} NetApp address to be set: {address}", pair.Name, netAppAddress);
-                    pair.Instance!.SetNetAppAddress(netAppAddress);
+                    pair.Instance!.SetNetAppAddress($"http://{netAppAddress}");
                 }
             }
 
