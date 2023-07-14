@@ -1,4 +1,7 @@
-﻿using k8s;
+﻿using System.Text.Json;
+using System.Text.Json.Serialization;
+using JetBrains.Annotations;
+using k8s;
 using k8s.Models;
 using Middleware.Common;
 using Middleware.Common.Config;
@@ -211,7 +214,7 @@ internal class KubernetesObjectBuilder : IKubernetesObjectBuilder
         var spec = new V1ServiceSpec
         {
             Ports = servicePorts,
-            Selector = new Dictionary<string, string> { { "app", deploymentName } },
+            Selector = depl.Labels(),
             Type = K8SServiceKind.ClusterIp.GetStringValue()
         };
 
@@ -229,6 +232,88 @@ internal class KubernetesObjectBuilder : IKubernetesObjectBuilder
         return service;
     }
 
+    /// <inheritdoc />
+    public DeploymentPair CreateInterRelayNetAppDeploymentConfig(Guid actionPlanId, ActionModel action,
+        IReadOnlyList<DeploymentPair> pairs)
+    {
+        if (action == null) throw new ArgumentNullException(nameof(action));
+        if (pairs == null) throw new ArgumentNullException(nameof(pairs));
+        if (actionPlanId == Guid.Empty) throw new ArgumentNullException(nameof(actionPlanId));
+
+        var serviceInstanceId = action.Services.First().ServiceInstanceId;
+        var configs = new List<MultiNetAppConfigRow>();
+        foreach (var pair in pairs)
+        {
+            var topics = pair.Instance!.RosTopicsSub.Select(t => t.Name).ToList();
+            var config = new MultiNetAppConfigRow
+            {
+                Address = $"http://{pair.Name}",
+                Topics = topics
+            };
+            configs.Add(config);
+        }
+
+        var configString = JsonSerializer.Serialize(configs);
+
+        var deployment = CreateInterRelayDeploymentDefinition(actionPlanId, action.Id, configString);
+
+        var service = CreateDefaultService(deployment.Name(), serviceInstanceId, deployment);
+
+        return new(deployment.Name(), deployment, service, serviceInstanceId);
+    }
+
+    public Dictionary<string, string> CreateInterRelayNetAppLabels(Guid actionPlanId, Guid actionId)
+    {
+        return new()
+        {
+            { "actionPlanId", actionPlanId.ToString() },
+            { "actionId", actionId.ToString() }
+        };
+    }
+
+    private V1Deployment CreateInterRelayDeploymentDefinition(Guid actionPlanId, Guid actionId,
+        string configString)
+    {
+        var relayName = "relay-netapp".GetNewImageNameWithSuffix();
+        var labels = CreateInterRelayNetAppLabels(actionPlanId, actionId);
+        return new()
+        {
+            ApiVersion = "apps/v1",
+            Metadata = new()
+            {
+                Name = relayName,
+                Labels = labels
+            },
+            Spec = new()
+            {
+                Replicas = 1,
+                Template = new()
+                {
+                    Metadata = new()
+                    {
+                        Name = relayName,
+                        Labels = labels
+                    },
+                    Spec = new()
+                    {
+                        Containers = new List<V1Container>
+                        {
+                            new()
+                            {
+                                Name = "relay",
+                                Image = "but5gera/inter_relay_network_application:0.1.0",
+                                Env = new List<V1EnvVar>
+                                {
+                                    new("RELAY_LIST", configString)
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        };
+    }
+
     private static List<V1ServicePort> MapToServicePorts(IEnumerable<CommonPort> ports)
     {
         return ports.Select(p => new V1ServicePort(p.Port, p.Protocol, p.Name)).ToList();
@@ -241,6 +326,24 @@ internal class KubernetesObjectBuilder : IKubernetesObjectBuilder
             new(80, "TCP", "http", null, "TCP", 80),
             new(443, "TCP", "https", null, "TCP", 80)
         };
+    }
+
+    /// <summary>
+    ///     This class is used to represent the config for the MultiRelayNetApp
+    /// </summary>
+    private class MultiNetAppConfigRow
+    {
+        [JsonPropertyName("relay_address")]
+        public string Address { [UsedImplicitly] get; set; }
+
+        [JsonPropertyName("topics")]
+        public List<string> Topics { [UsedImplicitly] get; set; }
+
+        /// <summary>
+        ///     Do not remove, will be used to support ROS services
+        /// </summary>
+        [JsonPropertyName("services")]
+        public List<string> Services { get; set; }
     }
 }
 

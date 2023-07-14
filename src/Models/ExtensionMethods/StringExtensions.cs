@@ -42,4 +42,10 @@ public static class StringExtensions
             .Replace('/', '-')
             .ToLower().Trim();
     }
+
+    public static string GetNewImageNameWithSuffix(this string name)
+    {
+        var guidSuffix = Guid.NewGuid().ToString().Split('-')[0];
+        return $"{name}-{guidSuffix}";
+    }
 }
