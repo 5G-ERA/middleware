@@ -32,7 +32,8 @@ public record DeploymentPair()
     /// </summary>
     public string Name { get; init; }
 
-    public DeploymentPair(V1Deployment deployment, V1Service service, Guid instanceId, InstanceModel instance) : this()
+    public DeploymentPair(V1Deployment deployment, V1Service service, Guid instanceId,
+        [NotNull] InstanceModel instance) : this()
     {
         Deployment = deployment;
         Service = service;

@@ -234,7 +234,7 @@ internal class KubernetesObjectBuilder : IKubernetesObjectBuilder
 
     /// <inheritdoc />
     public DeploymentPair CreateInterRelayNetAppDeploymentConfig(Guid actionPlanId, ActionModel action,
-        List<DeploymentPair> pairs)
+        IReadOnlyList<DeploymentPair> pairs)
     {
         if (action == null) throw new ArgumentNullException(nameof(action));
         if (pairs == null) throw new ArgumentNullException(nameof(pairs));
@@ -262,11 +262,20 @@ internal class KubernetesObjectBuilder : IKubernetesObjectBuilder
         return new(deployment.Name(), deployment, service, serviceInstanceId);
     }
 
+    public Dictionary<string, string> CreateInterRelayNetAppLabels(Guid actionPlanId, Guid actionId)
+    {
+        return new()
+        {
+            { "actionPlanId", actionPlanId.ToString() },
+            { "actionId", actionId.ToString() }
+        };
+    }
+
     private V1Deployment CreateInterRelayDeploymentDefinition(Guid actionPlanId, Guid actionId,
         string configString)
     {
         var relayName = "relay-netapp".GetNewImageNameWithSuffix();
-        var labels = CreateInterRelayNetAppLabels(relayName, actionPlanId, actionId);
+        var labels = CreateInterRelayNetAppLabels(actionPlanId, actionId);
         return new()
         {
             ApiVersion = "apps/v1",
@@ -316,17 +325,6 @@ internal class KubernetesObjectBuilder : IKubernetesObjectBuilder
         {
             new(80, "TCP", "http", null, "TCP", 80),
             new(443, "TCP", "https", null, "TCP", 80)
-        };
-    }
-
-    public Dictionary<string, string> CreateInterRelayNetAppLabels(string name, Guid actionPlanId,
-        Guid actionId)
-    {
-        return new()
-        {
-            { "app", name },
-            { "actionPlanId", actionPlanId.ToString() },
-            { "actionId", actionId.ToString() }
         };
     }
 

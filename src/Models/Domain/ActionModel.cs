@@ -70,6 +70,11 @@ public class ActionModel : BaseModel
         return string.IsNullOrWhiteSpace(NetworkSlice) == false;
     }
 
+    public bool ShouldUseInterRelayForRosNetApps()
+    {
+        return SingleNetAppEntryPoint && Services.Any(s => s.RosDistro is not null);
+    }
+
     public override Dto.Dto ToDto()
     {
         var domain = this;

@@ -66,5 +66,13 @@ internal interface IKubernetesObjectBuilder
     /// <param name="pairs"></param>
     /// <returns></returns>
     DeploymentPair CreateInterRelayNetAppDeploymentConfig(Guid actionPlanId, [NotNull] ActionModel action,
-        [NotNull] List<DeploymentPair> pairs);
+        [NotNull] IReadOnlyList<DeploymentPair> pairs);
+
+    /// <summary>
+    ///     Creates the labels used to identify the Inter Relay NetApp
+    /// </summary>
+    /// <param name="actionPlanId"></param>
+    /// <param name="actionId"></param>
+    /// <returns></returns>
+    Dictionary<string, string> CreateInterRelayNetAppLabels(Guid actionPlanId, Guid actionId);
 }

@@ -10,6 +10,7 @@ using Middleware.Models.Domain.Contracts;
 using Middleware.Models.Enums;
 using Middleware.Models.ExtensionMethods;
 using Middleware.Orchestrator.Exceptions;
+using Middleware.Orchestrator.Helpers;
 using Middleware.Orchestrator.Models;
 using Middleware.Orchestrator.Publishers;
 using Middleware.RedisInterface.Contracts.Mappings;
@@ -180,15 +181,15 @@ internal class DeploymentService : IDeploymentService
             {
                 await DeployNetApp(pair);
 
-                if (pair.Instance.RosDistro is not null)
+                if (ShouldDeployInterRelay(pair, action) == false)
                 {
                     await _publisher.PublishGatewayAddNetAppEntryAsync(thisLocation, pair.Name, actionPlan.Id,
                         pair.InstanceId);
-                    pair.Instance.SetNetAppAddress(thisLocation.GetNetAppAddress(pair.Name));
+                    pair.Instance!.SetNetAppAddress(thisLocation.GetNetAppAddress(pair.Name));
                 }
 
                 _logger.LogDebug("Adding new relation between instance and current location");
-                await _redisInterfaceClient.AddRelationAsync(pair.Instance, thisLocation.ToBaseLocation(),
+                await _redisInterfaceClient.AddRelationAsync(pair.Instance!, thisLocation.ToBaseLocation(),
                     "LOCATED_AT");
             }
             catch (HttpOperationException ex)
@@ -196,6 +197,20 @@ internal class DeploymentService : IDeploymentService
                 _logger.LogError(ex, "There was an error while deploying the service {service} caused by {reason}",
                     pair.Name, ex.Response.Content);
             }
+        }
+
+        if (action.ShouldUseInterRelayForRosNetApps())
+        {
+            var interRelay =
+                _kubeObjectBuilder.CreateInterRelayNetAppDeploymentConfig(actionPlanId, action, deploymentPairs);
+            await DeployInterRelayNetApp(interRelay);
+
+            foreach (var pair in deploymentPairs)
+            {
+                pair.Instance!.SetNetAppAddress(thisLocation.GetNetAppAddress(pair.Name));
+            }
+
+            await _publisher.PublishGatewayAddNetAppEntryAsync(thisLocation, interRelay.Name, actionPlanId, action.Id);
         }
 
         _logger.LogDebug("Saving updated ActionPlan");
@@ -210,6 +225,7 @@ internal class DeploymentService : IDeploymentService
 
     public async Task<bool> DeployActionPlanAsync(TaskModel task, Guid robotId)
     {
+        // TODO: BIG BOI, needs refactoring!!
         if (_kube is null)
             return true;
 
@@ -217,7 +233,7 @@ internal class DeploymentService : IDeploymentService
         var robot = robotResp.ToRobot();
 
         var isSuccess = true;
-        var deploymentQueue = new List<DeploymentPair>();
+        var deploymentQueue = new Dictionary<ActionModel, IReadOnlyList<DeploymentPair>>();
         try
         {
             _logger.LogDebug("Entered DeploymentService.DeployAsync");
@@ -226,30 +242,56 @@ internal class DeploymentService : IDeploymentService
             _logger.LogDebug("Current deployments: {deployments}", string.Join(", ", deploymentNames));
 
             var location = await GetCurrentLocationAsync();
-
+            var relays = new Dictionary<Guid, DeploymentPair>();
             foreach (var action in task.ActionSequence!)
             {
                 var dplTmp = await ConstructDeployments(action, deploymentNames);
-                deploymentQueue.AddRange(dplTmp);
+                deploymentQueue.Add(action, dplTmp);
+
+                if (action.ShouldUseInterRelayForRosNetApps() == false) continue;
+
+                _logger.LogDebug("Current deployments: {deployments}", string.Join(", ", deploymentNames));
+                var relay = _kubeObjectBuilder.CreateInterRelayNetAppDeploymentConfig(task.ActionPlanId, action,
+                    dplTmp);
+                relays[action.Id] = relay;
+                foreach (var pair in dplTmp)
+                {
+                    var netAppAddress = location.GetNetAppAddress(relay.Name);
+                    _logger.LogDebug("{netAppName} NetApp address to be set: {address}", pair.Name, netAppAddress);
+                    pair.Instance!.SetNetAppAddress(netAppAddress);
+                }
             }
 
-            foreach (var pair in deploymentQueue)
+            foreach (var item in deploymentQueue)
             {
-                _logger.LogDebug("Deploying instance '{Name}', with serviceInstanceId '{ServiceInstanceId}'",
-                    pair.Instance, pair.InstanceId);
-                await DeployNetApp(pair);
-
-                if (pair.Instance.RosDistro is not null)
+                foreach (var pair in item.Value)
                 {
-                    await _publisher.PublishGatewayAddNetAppEntryAsync(location, pair.Name, task.ActionPlanId,
-                        pair.InstanceId);
-                    var netAppAddress = location.GetNetAppAddress(pair.Name);
-                    _logger.LogDebug("NetApp address to be set: {address}", netAppAddress);
-                    pair.Instance.SetNetAppAddress($"http://{netAppAddress}");
-                }
+                    _logger.LogDebug("Deploying instance '{Name}', with serviceInstanceId '{ServiceInstanceId}'",
+                        pair.Instance, pair.InstanceId);
+                    await DeployNetApp(pair);
 
-                _logger.LogDebug("Adding new relation between instance and current location");
-                await _redisInterfaceClient.AddRelationAsync(pair.Instance, location.ToBaseLocation(), "LOCATED_AT");
+                    if (ShouldDeployInterRelay(pair, item.Key))
+                    {
+                        await _publisher.PublishGatewayAddNetAppEntryAsync(location, pair.Name, task.ActionPlanId,
+                            pair.InstanceId);
+                        var netAppAddress = location.GetNetAppAddress(pair.Name);
+                        _logger.LogDebug("NetApp address to be set: {address}", netAppAddress);
+                        pair.Instance!.SetNetAppAddress($"http://{netAppAddress}");
+                    }
+
+                    _logger.LogDebug("Adding new relation between instance and current location");
+                    await _redisInterfaceClient.AddRelationAsync(pair.Instance!, location.ToBaseLocation(),
+                        "LOCATED_AT");
+                }
+            }
+
+            foreach (var kvp in relays)
+            {
+                _logger.LogDebug("Deploying Inter Relay NetApp '{Name}' for action: {actionId}", kvp.Value.Name,
+                    kvp.Key);
+                await DeployInterRelayNetApp(kvp.Value);
+                await _publisher.PublishGatewayAddNetAppEntryAsync(location, kvp.Value.Name, task.ActionPlanId,
+                    kvp.Key);
             }
 
             isSuccess &= await SaveActionSequence(task, robot);
@@ -282,13 +324,27 @@ internal class DeploymentService : IDeploymentService
         return isSuccess;
     }
 
+    private static bool ShouldDeployInterRelay(DeploymentPair pair, ActionModel action)
+    {
+        return pair.Instance!.RosDistro is not null && action.SingleNetAppEntryPoint;
+    }
+
     public async Task<DeploymentPair> DeployNetApp(DeploymentPair netApp)
     {
         var service = await _kube.CoreV1.CreateNamespacedServiceAsync(netApp.Service, AppConfig.K8SNamespaceName);
         var deployment =
             await _kube.AppsV1.CreateNamespacedDeploymentAsync(netApp.Deployment, AppConfig.K8SNamespaceName);
 
-        return new(deployment, service, netApp.InstanceId, netApp.Instance);
+        return new(deployment, service, netApp.InstanceId, netApp.Instance!);
+    }
+
+    public async Task<DeploymentPair> DeployInterRelayNetApp(DeploymentPair netApp)
+    {
+        var service = await _kube.CoreV1.CreateNamespacedServiceAsync(netApp.Service, AppConfig.K8SNamespaceName);
+        var deployment =
+            await _kube.AppsV1.CreateNamespacedDeploymentAsync(netApp.Deployment, AppConfig.K8SNamespaceName);
+
+        return new(netApp.Name, deployment, service, netApp.InstanceId);
     }
 
     private async Task<List<string>> GetCurrentlyDeployedAppNames()
@@ -414,19 +470,36 @@ internal class DeploymentService : IDeploymentService
     /// <returns></returns>
     private async Task<bool> TerminateNetAppByIdAsync(Guid instanceId)
     {
-        const string success = "Success";
-        var retVal = true;
-
         var deployments = await _kube.AppsV1.ListNamespacedDeploymentAsync(AppConfig.K8SNamespaceName,
             labelSelector: KubernetesObjectExtensions.GetNetAppLabelSelector(instanceId));
         var services = await _kube.CoreV1.ListNamespacedServiceAsync(AppConfig.K8SNamespaceName,
             labelSelector: KubernetesObjectExtensions.GetNetAppLabelSelector(instanceId));
 
+
+        return await Terminate(deployments, services);
+    }
+
+    private async Task<bool> TerminateInterRelayNetApp(Guid actionPlanId, Guid actionId)
+    {
+        var labels = _kubeObjectBuilder.CreateInterRelayNetAppLabels(actionPlanId, actionId)
+            .ToLabelSelectorString();
+
+        var deployments = await _kube.AppsV1.ListNamespacedDeploymentAsync(AppConfig.K8SNamespaceName,
+            labelSelector: labels);
+        var services = await _kube.CoreV1.ListNamespacedServiceAsync(AppConfig.K8SNamespaceName,
+            labelSelector: labels);
+
+        return await Terminate(deployments, services);
+    }
+
+    private async Task<bool> Terminate(V1DeploymentList deployments, V1ServiceList services)
+    {
+        var retVal = true;
         foreach (var deployment in deployments.Items)
         {
             var status =
                 await _kube.AppsV1.DeleteNamespacedDeploymentAsync(deployment.Name(), AppConfig.K8SNamespaceName);
-            retVal &= status.Status == success;
+            retVal &= status.Status == OutcomeType.Successful;
         }
 
         foreach (var service in services.Items)

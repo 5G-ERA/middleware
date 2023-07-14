@@ -69,4 +69,16 @@ public static class KubernetesObjectExtensions
     {
         service.Spec.Ports.Add(new(WebsocketPort, name: "websocket"));
     }
+
+    public static string ToLabelSelectorString(this IDictionary<string, string> dic)
+    {
+        var configs = new List<string>();
+        foreach (var kvp in dic)
+        {
+            var cfg = $"{kvp.Key}={kvp.Value}";
+            configs.Add(cfg);
+        }
+
+        return string.Join(',', configs);
+    }
 }
