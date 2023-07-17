@@ -282,10 +282,10 @@ internal class DeploymentService : IDeploymentService
                 foreach (var pair in item.Value)
                 {
                     _logger.LogDebug("Deploying instance '{Name}', with serviceInstanceId '{ServiceInstanceId}'",
-                        pair.Instance, pair.InstanceId);
+                        pair.Instance!.Name, pair.InstanceId);
                     await DeployNetApp(pair);
 
-                    if (ShouldDeployInterRelay(pair.Instance, item.Key))
+                    if (ShouldDeployInterRelay(pair.Instance, item.Key) == false)
                     {
                         await _publisher.PublishGatewayAddNetAppEntryAsync(location, pair.Name, task.ActionPlanId,
                             pair.InstanceId);
@@ -342,7 +342,7 @@ internal class DeploymentService : IDeploymentService
 
     private static bool ShouldDeployInterRelay(InstanceModel instance, ActionModel action)
     {
-        return instance.RosDistro is not null && action.SingleNetAppEntryPoint;
+        return string.IsNullOrWhiteSpace(instance.RosDistro) == false && action.SingleNetAppEntryPoint;
     }
 
     public async Task<DeploymentPair> DeployNetApp(DeploymentPair netApp)
