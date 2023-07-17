@@ -224,7 +224,7 @@ internal class DeploymentService : IDeploymentService
 
             foreach (var pair in deploymentPairs)
             {
-                pair.Instance!.SetNetAppAddress($"http://{thisLocation.GetNetAppAddress(pair.Name)}");
+                pair.Instance!.SetNetAppAddress($"http://{thisLocation.GetNetAppAddress(interRelay.Name)}");
             }
 
             await _publisher.PublishGatewayAddNetAppEntryAsync(thisLocation, interRelay.Name, actionPlanId, action.Id);
