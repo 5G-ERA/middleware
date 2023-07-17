@@ -286,6 +286,10 @@ internal class KubernetesObjectBuilder : IKubernetesObjectBuilder
             },
             Spec = new()
             {
+                Selector = new()
+                {
+                    MatchLabels = labels
+                },
                 Replicas = 1,
                 Template = new()
                 {
