@@ -305,7 +305,7 @@ internal class KubernetesObjectBuilder : IKubernetesObjectBuilder
                             new()
                             {
                                 Name = "relay",
-                                Image = "but5gera/inter_relay_network_application:0.1.0",
+                                Image = "but5gera/inter_relay_network_application:0.3.0",
                                 Env = new List<V1EnvVar>
                                 {
                                     new("RELAY_LIST", configString)
