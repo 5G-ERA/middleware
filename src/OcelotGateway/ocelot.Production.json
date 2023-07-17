@@ -50,7 +50,7 @@
       "DownstreamScheme": "http",
       "DownstreamHostAndPorts": [
         {
-          "Host": "redisinterface.api",
+          "Host": "redis-interface-api.middleware.svc.cluster.local",
           "Port": "80"
         }
       ],
