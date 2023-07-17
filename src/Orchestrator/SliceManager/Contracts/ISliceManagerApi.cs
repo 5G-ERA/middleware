@@ -10,6 +10,6 @@ internal interface ISliceManagerApi
     [Post("/api/v1/sliceInventory/SB/reportSliceParameters/embb")]
     Task RegisterEmbbSlice(string slice);
 
-    [Post("/testbed/sliceUE/attach")]
+    [Post("/sliceUE/attach")]
     Task AttachImsiToSlice([Body] AttachImsiToSliceRequest request);
 }
