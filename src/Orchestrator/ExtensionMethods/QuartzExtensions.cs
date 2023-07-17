@@ -7,7 +7,7 @@ namespace Middleware.Orchestrator.ExtensionMethods;
 public static class QuartzExtensions
 {
     /// <summary>
-    /// Registers the Orchestrator Quartz jobs
+    ///     Registers the Orchestrator Quartz jobs
     /// </summary>
     /// <param name="services"></param>
     /// <returns></returns>
@@ -28,21 +28,17 @@ public static class QuartzExtensions
                 .WithIdentity("Update service status Job")
                 .WithDescription("Job that monitors the status of the deployed services by the Middleware. " +
                                  "Updates their status and reports any seen failures.")
-                .WithSimpleSchedule(x => 
+                .WithSimpleSchedule(x =>
                     x.WithInterval(TimeSpan.FromSeconds(AppConfig.StatusCheckInterval)).RepeatForever())
                 .StartAt(DateBuilder.EvenMinuteDateBefore(DateTimeOffset.Now.AddMinutes(2))));
 
             q.ScheduleJob<RefreshMiddlewareAddressJob>(trg => trg
                 .WithIdentity("Update the Middleware address Job")
                 .WithDescription("Updates the current address under which the Middleware has to be contacted")
-                .WithSimpleSchedule(x => x.WithInterval(TimeSpan.FromMinutes(1)).RepeatForever())
-                .StartAt(DateBuilder.EvenMinuteDateBefore(DateTimeOffset.UtcNow.AddMinutes(1))));
-
+                .WithSimpleSchedule(x => x.WithInterval(TimeSpan.FromSeconds(10)).RepeatForever())
+                .StartAt(DateBuilder.EvenMinuteDateBefore(DateTimeOffset.UtcNow.AddSeconds(10))));
         });
-        services.AddQuartzHostedService(opt =>
-        {
-            opt.WaitForJobsToComplete = true;
-        });
+        services.AddQuartzHostedService(opt => { opt.WaitForJobsToComplete = true; });
         services.AddTransient<MiddlewareStartupJob>();
         services.AddTransient<UpdateStatusJob>();
         services.AddTransient<RefreshMiddlewareAddressJob>();
