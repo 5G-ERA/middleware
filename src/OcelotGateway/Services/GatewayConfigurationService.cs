@@ -25,14 +25,20 @@ public class GatewayConfigurationService
         var clusterList = config.Clusters.ToList();
         var routeList = config.Routes.ToList();
 
+        var address = $"http://{msg.NetAppName}.middleware.svc.cluster.local";
         var clusterCfg = new ClusterConfig
         {
             ClusterId = msg.NetAppName + "-Cluster",
             Destinations = new Dictionary<string, DestinationConfig>
             {
-                { "destination1", new DestinationConfig { Address = $"http://{msg.NetAppName}" } }
+                {
+                    "destination1",
+                    new DestinationConfig { Address = address }
+                }
             }
         };
+        _logger.LogInformation("{netAppName} started adding new route with address: {address}", msg.NetAppName,
+            address);
         var path = msg.Route.SanitizeToUriPath();
         _logger.LogInformation("Opening new route with path: {path}", path);
         var routeCfg = new RouteConfig
