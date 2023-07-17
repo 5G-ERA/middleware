@@ -19,7 +19,7 @@ public interface IRedisInterface
     [Get("/api/v1/action/plan/{id}")]
     Task<ApiResponse<ActionPlanModel?>> ActionPlanGetById(Guid id);
 
-    [Delete("/api/v1/action/plan")]
+    [Delete("/api/v1/action/plan/{id}")]
     Task ActionPlanDeleteAsync(Guid id);
 
     [Get("/api/v1/action/plan/robot/{id}")]
