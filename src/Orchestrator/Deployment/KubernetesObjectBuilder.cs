@@ -248,7 +248,8 @@ internal class KubernetesObjectBuilder : IKubernetesObjectBuilder
             var config = new MultiNetAppConfigRow
             {
                 Address = $"http://{pair.Name}",
-                Topics = topics
+                Topics = topics,
+                Services = new()
             };
             configs.Add(config);
         }
@@ -356,7 +357,7 @@ internal class KubernetesObjectBuilder : IKubernetesObjectBuilder
         ///     Do not remove, will be used to support ROS services
         /// </summary>
         [JsonPropertyName("services")]
-        public List<string> Services { get; set; }
+        public List<string> Services { get; set; } = new();
     }
 }
 
