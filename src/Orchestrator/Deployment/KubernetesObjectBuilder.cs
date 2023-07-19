@@ -281,8 +281,7 @@ internal class KubernetesObjectBuilder : IKubernetesObjectBuilder
             ApiVersion = "apps/v1",
             Metadata = new()
             {
-                Name = relayName,
-                Labels = labels
+                Name = relayName
             },
             Spec = new()
             {
