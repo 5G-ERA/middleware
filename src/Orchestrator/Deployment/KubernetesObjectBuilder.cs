@@ -316,7 +316,8 @@ internal class KubernetesObjectBuilder : IKubernetesObjectBuilder
                                 Image = "but5gera/inter_relay_network_application:0.1.0",
                                 Env = new List<V1EnvVar>
                                 {
-                                    new("RELAYS_LIST", configString)
+                                    new("RELAYS_LIST", configString),
+                                    new("NETAPP_PORT", "80")
                                 }
                             }
                         }

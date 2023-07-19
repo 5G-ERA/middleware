@@ -507,12 +507,13 @@ internal class DeploymentService : IDeploymentService
     {
         var labels = _kubeObjectBuilder.CreateInterRelayNetAppLabels(actionPlanId, actionId)
             .ToLabelSelectorString();
-
+        _logger.LogDebug("Identified labelString: {labels}", labels);
         var deployments = await _kube.AppsV1.ListNamespacedDeploymentAsync(AppConfig.K8SNamespaceName,
             labelSelector: labels);
         var services = await _kube.CoreV1.ListNamespacedServiceAsync(AppConfig.K8SNamespaceName,
             labelSelector: labels);
 
+        _logger.LogDebug("Identified deployments: {dpl}", string.Join(", ", deployments.Items.Select(d => d.Name())));
         var relayName = deployments.Items.FirstOrDefault()?.Name();
         await Terminate(deployments, services);
 
