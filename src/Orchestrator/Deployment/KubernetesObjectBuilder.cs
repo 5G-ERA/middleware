@@ -274,7 +274,7 @@ internal class KubernetesObjectBuilder : IKubernetesObjectBuilder
     private V1Deployment CreateInterRelayDeploymentDefinition(Guid actionPlanId, Guid actionId,
         string configString)
     {
-        var relayName = "relay-netapp".GetNewImageNameWithSuffix();
+        var relayName = "inter-relay-netapp"; //.GetNewImageNameWithSuffix();
         var labels = CreateInterRelayNetAppLabels(actionPlanId, actionId);
         return new()
         {
