@@ -47,4 +47,6 @@ public interface ILocation
     /// <param name="netAppName"></param>
     /// <returns></returns>
     string GetNetAppAddress(string netAppName);
+
+    string GetNetAppStatusReportAddress();
 }

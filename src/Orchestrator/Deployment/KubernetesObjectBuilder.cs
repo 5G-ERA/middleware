@@ -8,6 +8,7 @@ using Middleware.Common.Config;
 using Middleware.Common.Enums;
 using Middleware.Common.ExtensionMethods;
 using Middleware.Models.Domain;
+using Middleware.Models.Domain.Contracts;
 using Middleware.Models.ExtensionMethods;
 using Middleware.Orchestrator.Exceptions;
 using Middleware.Orchestrator.Models;
@@ -171,35 +172,6 @@ internal class KubernetesObjectBuilder : IKubernetesObjectBuilder
     }
 
     /// <inheritdoc />
-    public V1Deployment DeserializeAndConfigureDeployment(string deploymentStr, Guid serviceInstanceId, string name)
-    {
-        if (string.IsNullOrWhiteSpace(deploymentStr))
-            throw new ArgumentException("Service definition cannot be empty.", nameof(deploymentStr));
-
-        var sanitized = deploymentStr.SanitizeAsK8SYaml();
-        var obj = KubernetesYaml.Deserialize<V1Deployment>(sanitized);
-
-        if (obj is null) throw new UnableToParseYamlConfigException(name, nameof(ContainerImageModel.K8SService));
-
-        obj.Metadata.SetServiceLabel(serviceInstanceId);
-        obj.Metadata.Name = name.SanitizeAsK8sObjectName();
-        foreach (var container in obj.Spec.Template.Spec.Containers)
-        {
-            var envVars = container.Env is not null
-                ? new(container.Env)
-                : new List<V1EnvVar>();
-
-            envVars.Add(new("NETAPP_ID", serviceInstanceId.ToString()));
-            envVars.Add(new("MIDDLEWARE_ADDRESS", AppConfig.GetMiddlewareAddress()));
-            envVars.Add(new("MIDDLEWARE_REPORT_INTERVAL", ReportIntervalInSeconds.ToString()));
-
-            container.Env = envVars;
-        }
-
-        return obj;
-    }
-
-    /// <inheritdoc />
     public V1Service CreateDefaultService(string deploymentName, Guid serviceInstanceId, V1Deployment depl)
     {
         var ports = depl.Spec.Template.Spec.Containers.SelectMany(p =>
@@ -270,6 +242,36 @@ internal class KubernetesObjectBuilder : IKubernetesObjectBuilder
             { "actionPlanId", actionPlanId.ToString() },
             { "actionId", actionId.ToString() }
         };
+    }
+
+    /// <inheritdoc />
+    public V1Deployment DeserializeAndConfigureDeployment(string deploymentStr, Guid serviceInstanceId, string name,
+        ILocation thisLocation)
+    {
+        if (string.IsNullOrWhiteSpace(deploymentStr))
+            throw new ArgumentException("Service definition cannot be empty.", nameof(deploymentStr));
+
+        var sanitized = deploymentStr.SanitizeAsK8SYaml();
+        var obj = KubernetesYaml.Deserialize<V1Deployment>(sanitized);
+
+        if (obj is null) throw new UnableToParseYamlConfigException(name, nameof(ContainerImageModel.K8SService));
+
+        obj.Metadata.SetServiceLabel(serviceInstanceId);
+        obj.Metadata.Name = name.SanitizeAsK8sObjectName();
+        foreach (var container in obj.Spec.Template.Spec.Containers)
+        {
+            var envVars = container.Env is not null
+                ? new(container.Env)
+                : new List<V1EnvVar>();
+
+            envVars.Add(new("NETAPP_ID", serviceInstanceId.ToString()));
+            envVars.Add(new("MIDDLEWARE_ADDRESS", thisLocation.GetNetAppStatusReportAddress()));
+            envVars.Add(new("MIDDLEWARE_REPORT_INTERVAL", ReportIntervalInSeconds.ToString()));
+
+            container.Env = envVars;
+        }
+
+        return obj;
     }
 
     public Dictionary<string, string> CreateInterRelayNetAppMatchLabels(string relayName)

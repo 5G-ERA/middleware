@@ -189,7 +189,7 @@ internal class DeploymentService : IDeploymentService
 
         var thisLocation = await GetCurrentLocationAsync();
 
-        var deploymentPairs = await ConstructDeployments(action, deploymentNames);
+        var deploymentPairs = await ConstructDeployments(action, deploymentNames, thisLocation);
 
         foreach (var pair in deploymentPairs)
         {
@@ -260,7 +260,7 @@ internal class DeploymentService : IDeploymentService
             var relays = new Dictionary<Guid, DeploymentPair>();
             foreach (var action in task.ActionSequence!)
             {
-                var dplTmp = await ConstructDeployments(action, deploymentNames);
+                var dplTmp = await ConstructDeployments(action, deploymentNames, location);
                 deploymentQueue.Add(action, dplTmp);
 
                 if (action.ShouldUseInterRelayForRosNetApps() == false) continue;
@@ -372,7 +372,7 @@ internal class DeploymentService : IDeploymentService
     }
 
     private async Task<IReadOnlyList<DeploymentPair>> ConstructDeployments(ActionModel action,
-        ICollection<string> deploymentNames)
+        ICollection<string> deploymentNames, ILocation thisLocation)
     {
         var deployments = new List<DeploymentPair>();
         foreach (var service in action.Services)
@@ -382,7 +382,7 @@ internal class DeploymentService : IDeploymentService
                 // BB: service can be reused, to be decided by the resource planner
                 if (service.ServiceInstanceId != Guid.Empty)
                     continue;
-                var pair = await PrepareDeploymentPair(service, deploymentNames);
+                var pair = await PrepareDeploymentPair(service, deploymentNames, thisLocation);
                 deployments.Add(pair);
             }
             catch (Exception ex)
@@ -396,7 +396,8 @@ internal class DeploymentService : IDeploymentService
         return deployments;
     }
 
-    private async Task<DeploymentPair> PrepareDeploymentPair(InstanceModel service, ICollection<string> deploymentNames)
+    private async Task<DeploymentPair> PrepareDeploymentPair(InstanceModel service, ICollection<string> deploymentNames,
+        ILocation thisLocation)
     {
         _logger.LogDebug("Querying for the images for service {Id}", service.Id);
         var imagesResponse = await _redisInterfaceClient.ContainerImageGetForInstanceAsync(service.Id);
@@ -414,7 +415,7 @@ internal class DeploymentService : IDeploymentService
         if (deploymentNames.Contains(service.Name)) service.Name = service.Name.GetNewImageNameWithSuffix();
 
         deploymentNames.Add(service.Name);
-        var pair = ConfigureDeploymentObjects(service);
+        var pair = ConfigureDeploymentObjects(service, thisLocation);
 
         service.SetStatus(ServiceStatus.Instantiating);
         service.ServiceInstanceId = pair.InstanceId;
@@ -448,14 +449,15 @@ internal class DeploymentService : IDeploymentService
         return result;
     }
 
-    private DeploymentPair ConfigureDeploymentObjects(InstanceModel instance)
+    private DeploymentPair ConfigureDeploymentObjects(InstanceModel instance, ILocation thisLocation)
     {
         var cim = instance.ContainerImage;
         var instanceName = instance.Name;
         var instanceId = Guid.NewGuid();
 
         var deployment =
-            _kubeObjectBuilder.DeserializeAndConfigureDeployment(cim!.K8SDeployment, instanceId, instanceName);
+            _kubeObjectBuilder.DeserializeAndConfigureDeployment(cim!.K8SDeployment, instanceId, instanceName,
+                thisLocation);
 
         IRosConnectionBuilder builder = null;
 

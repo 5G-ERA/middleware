@@ -2,6 +2,7 @@
 using k8s.Models;
 using Middleware.Common.Enums;
 using Middleware.Models.Domain;
+using Middleware.Models.Domain.Contracts;
 using Middleware.Orchestrator.Models;
 
 namespace Middleware.Orchestrator.Deployment;
@@ -23,7 +24,8 @@ internal interface IKubernetesObjectBuilder
     /// <param name="serviceInstanceId"></param>
     /// <param name="name"></param>
     /// <returns></returns>
-    V1Deployment DeserializeAndConfigureDeployment(string deployment, Guid serviceInstanceId, string name);
+    V1Deployment DeserializeAndConfigureDeployment(string deployment, Guid serviceInstanceId, string name,
+        ILocation thisLocation);
 
     /// <summary>
     ///     Deserializes string to the service definition that will be used to expose the NetApp internally or externally
