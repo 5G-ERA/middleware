@@ -32,8 +32,10 @@ public static class KubernetesObjectExtensions
     public static string GetExternalAddress(this V1Service service, ILogger logger = null)
     {
         var ingress = service.Status?.LoadBalancer?.Ingress?.FirstOrDefault();
+        var nodePort = service.Spec.Ports.FirstOrDefault(n => n.NodePort is not null);
+        if (ingress is null && nodePort is null) return string.Empty;
 
-        if (ingress is null) return string.Empty;
+        if (nodePort is not null) return $"gateway:{nodePort.NodePort}";
 
         logger?.LogInformation(
             "Available ExternalIP: {externalIp}, ExternalName: {externalName}, IngressIP: {ingressIP}, " +
