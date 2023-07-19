@@ -271,23 +271,32 @@ internal class KubernetesObjectBuilder : IKubernetesObjectBuilder
         };
     }
 
+    public Dictionary<string, string> CreateInterRelayNetAppMatchLabels(string relayName)
+    {
+        return new()
+        {
+            { "app", relayName }
+        };
+    }
+
     private V1Deployment CreateInterRelayDeploymentDefinition(Guid actionPlanId, Guid actionId,
         string configString)
     {
-        var relayName = "inter-relay-netapp"; //.GetNewImageNameWithSuffix();
-        var labels = CreateInterRelayNetAppLabels(actionPlanId, actionId);
+        var relayName = "inter-relay-netapp".GetNewImageNameWithSuffix();
+        var matchLabels = CreateInterRelayNetAppMatchLabels(relayName);
         return new()
         {
             ApiVersion = "apps/v1",
             Metadata = new()
             {
-                Name = relayName
+                Name = relayName,
+                Labels = CreateInterRelayNetAppLabels(actionPlanId, actionId)
             },
             Spec = new()
             {
                 Selector = new()
                 {
-                    MatchLabels = labels
+                    MatchLabels = matchLabels
                 },
                 Replicas = 1,
                 Template = new()
@@ -295,7 +304,7 @@ internal class KubernetesObjectBuilder : IKubernetesObjectBuilder
                     Metadata = new()
                     {
                         Name = relayName,
-                        Labels = labels
+                        Labels = matchLabels
                     },
                     Spec = new()
                     {
