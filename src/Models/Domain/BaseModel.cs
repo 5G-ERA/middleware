@@ -18,4 +18,9 @@ public abstract class BaseModel
         var sanitized = netAppName.SanitizeToUriPath();
         return $"{address}/{sanitized}";
     }
+
+    protected string GetNetAppReportAddress(Uri address)
+    {
+        return $"{address}/status/netapp";
+    }
 }

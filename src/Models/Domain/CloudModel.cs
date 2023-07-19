@@ -79,6 +79,12 @@ public class CloudModel : BaseModel, ILocation
         return GetNetAppAddress(netAppName, CloudIp);
     }
 
+    /// <inheritdoc />
+    public string GetNetAppStatusReportAddress()
+    {
+        return GetNetAppReportAddress(CloudIp);
+    }
+
     /// <summary>
     ///     Onboarding validation of the cloud data object.
     /// </summary>
