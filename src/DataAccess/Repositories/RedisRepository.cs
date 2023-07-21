@@ -296,7 +296,7 @@ public class RedisRepository<TModel, TDto> : IRedisRepository<TModel, TDto> wher
     public async Task UpdateAsync(TModel model)
     {
         var dto = ToTDto(model);
-        await Collection.UpdateAsync(dto);
+        await Collection.InsertAsync(dto);
     }
 
     private async Task DeleteFromGraph(Guid id)
