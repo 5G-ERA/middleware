@@ -96,7 +96,7 @@ internal class Ros1ConnectionBuilder : IRosConnectionBuilder
                 new("TOPIC_LIST", topicsString),
                 new("NETAPP_PORT", "80")
             },
-            Image = "but5gera/relay_network_application:0.4.0"
+            Image = "but5gera/relay_network_application:0.4.1"
         };
 
         return container;
