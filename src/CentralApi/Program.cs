@@ -1,6 +1,7 @@
 using Microsoft.OpenApi.Models;
 using Middleware.CentralApi.Auth;
 using Middleware.CentralApi.Services;
+using Middleware.Common;
 using Middleware.Common.ExtensionMethods;
 using Middleware.DataAccess.ExtensionMethods;
 using Middleware.DataAccess.Repositories;

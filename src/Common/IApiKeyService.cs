@@ -1,6 +1,6 @@
 ﻿using Middleware.Common.Enums;
 
-namespace Middleware.CentralApi.Auth;
+namespace Middleware.Common;
 
 public interface IApiKeyService
 {

@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.Caching.Memory;
+using Middleware.Common;
 
 namespace Middleware.CentralApi.Auth;
 

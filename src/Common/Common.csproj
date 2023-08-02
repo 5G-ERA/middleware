@@ -42,5 +42,6 @@
 
 	<ItemGroup>
 	  <ProjectReference Include="..\Models\Models.csproj" />
+	  <ProjectReference Include="..\DataAccess\DataAccess.csproj" />
 	</ItemGroup>
 </Project>
