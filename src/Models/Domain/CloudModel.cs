@@ -37,6 +37,9 @@ public class CloudModel : BaseModel, ILocation
     [JsonPropertyName("IsOnline")]
     public bool IsOnline { get; set; }
 
+    /// <inheritdoc />
+    public string? ApiKey { get; set; }
+
     [JsonPropertyName("Id")]
     public override Guid Id { get; set; } = Guid.NewGuid();
 

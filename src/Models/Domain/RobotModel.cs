@@ -98,6 +98,8 @@ public class RobotModel : BaseModel
 
     public string? SimCardNumber { get; set; }
 
+    public string? ApiKey { get; set; }
+
     /// <summary>
     ///     Onboarding validation of the robot data object.
     /// </summary>

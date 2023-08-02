@@ -359,7 +359,7 @@ internal class KubernetesObjectBuilder : IKubernetesObjectBuilder
         ///     Do not remove, will be used to support ROS services
         /// </summary>
         [JsonPropertyName("services")]
-        public List<string> Services { get; set; } = new();
+        public List<string> Services { [UsedImplicitly] get; set; } = new();
     }
 }
 

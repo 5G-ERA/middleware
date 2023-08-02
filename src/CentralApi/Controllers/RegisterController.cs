@@ -1,5 +1,5 @@
-﻿using System;
-using System.Net;
+﻿using System.Net;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Middleware.CentralApi.Contracts.Requests;
 using Middleware.CentralApi.Contracts.Responses;
@@ -21,21 +21,27 @@ public class RegisterController : Controller
     }
 
     // GET
+    [AllowAnonymous]
     [HttpPost]
     [ProducesResponseType(typeof(LocationResponse), (int)HttpStatusCode.OK)]
     [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.NotFound)]
     [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.BadRequest)]
     public async Task<IActionResult> Register([FromBody] RegisterRequest request)
     {
-        
         var location = request.ToLocation();
-        
+
         var result = await _locationService.RegisterLocation(location);
 
         return result.Match<IActionResult>(
-            location => { return Ok(location.ToLocationResponse()); },
-            exception => { return BadRequest(new ApiResponse((int)HttpStatusCode.BadRequest, $"There were problems with the request: {string.Join("; ", exception.Errors)}")); },
-            _ => { return NotFound(new ApiResponse((int)HttpStatusCode.NotFound, $"The specified location was not found")); });
-
+            loc => { return Ok(loc.ToLocationResponse()); },
+            exception =>
+            {
+                return BadRequest(new ApiResponse((int)HttpStatusCode.BadRequest,
+                    $"There were problems with the request: {string.Join("; ", exception.Errors)}"));
+            },
+            _ =>
+            {
+                return NotFound(new ApiResponse((int)HttpStatusCode.NotFound, "The specified location was not found"));
+            });
     }
 }

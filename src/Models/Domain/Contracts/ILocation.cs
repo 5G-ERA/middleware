@@ -4,6 +4,8 @@ namespace Middleware.Models.Domain.Contracts;
 
 public interface ILocation
 {
+    string? ApiKey { get; set; }
+
     /// <summary>
     ///     Id of the location
     /// </summary>
