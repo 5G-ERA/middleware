@@ -43,6 +43,7 @@ builder.Services.AddSwaggerGen(setup =>
 
 builder.Services.AddScoped<ICloudRepository, RedisCloudRepository>();
 builder.Services.AddScoped<IEdgeRepository, RedisEdgeRepository>();
+builder.Services.AddScoped<IRobotRepository, RedisRobotRepository>();
 builder.Services.AddScoped<ILocationService, LocationService>();
 builder.Services
     .AddScoped<IApiKeyService, ApiKeyService>()

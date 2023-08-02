@@ -15,4 +15,5 @@ public class CloudResponse
     public long? VirtualRam { get; init; }
     public string MacAddress { get; init; }
     public DateTime LastUpdatedTime { get; init; }
+    public string ApiKey { get; init; }
 }

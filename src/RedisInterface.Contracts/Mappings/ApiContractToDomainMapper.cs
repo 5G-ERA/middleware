@@ -68,27 +68,15 @@ public static class ApiContractToDomainMapper
             Ram = x.Ram,
             VirtualRam = x.VirtualRam,
             DiskStorage = x.DiskStorage,
-            LastUpdatedTime = x.LastUpdatedTime
+            LastUpdatedTime = x.LastUpdatedTime,
+            ApiKey = x.ApiKey,
+            Organization = x.Organization
         };
     }
 
     public static List<CloudModel> ToCloudList(this GetCloudsResponse clouds)
     {
-        return clouds.Clouds.Select(x =>
-            new CloudModel
-            {
-                Id = x.Id,
-                Name = x.Name,
-                CloudIp = x.IpAddress,
-                MacAddress = x.MacAddress,
-                CloudStatus = x.Status,
-                Cpu = x.Cpu,
-                NumberOfCores = x.NumberOfCores,
-                Ram = x.Ram,
-                VirtualRam = x.VirtualRam,
-                DiskStorage = x.DiskStorage,
-                LastUpdatedTime = x.LastUpdatedTime
-            }).ToList();
+        return clouds.Clouds.Select(x => x.ToCloud()).ToList();
     }
 
     public static ContainerImageModel ToContainer(this ContainerRequest x)
@@ -117,16 +105,7 @@ public static class ApiContractToDomainMapper
 
     public static List<ContainerImageModel> ToContainersList(this GetContainersResponse containers)
     {
-        return containers.Containers.Select(x =>
-            new ContainerImageModel
-            {
-                Id = x.Id,
-                Name = x.Name,
-                Description = x.Description,
-                K8SDeployment = x.K8sDeployment,
-                K8SService = x.K8sService,
-                Timestamp = x.LastUpdateTime
-            }).ToList();
+        return containers.Containers.Select(x => x.ToContainer()).ToList();
     }
 
     public static EdgeModel ToEdge(this EdgeRequest x)
@@ -161,26 +140,15 @@ public static class ApiContractToDomainMapper
             Ram = x.Ram,
             VirtualRam = x.VirtualRam,
             DiskStorage = x.DiskStorage,
-            LastUpdatedTime = x.LastUpdatedTime
+            LastUpdatedTime = x.LastUpdatedTime,
+            ApiKey = x.ApiKey,
+            Organization = x.Organization
         };
     }
 
     public static List<EdgeModel> ToEdgeList(this GetEdgesResponse edges)
     {
-        return edges.Edges.Select(x => new EdgeModel
-        {
-            Id = x.Id,
-            Name = x.Name,
-            EdgeStatus = x.Status,
-            EdgeIp = x.IpAddress,
-            MacAddress = x.MacAddress,
-            Cpu = x.Cpu,
-            NumberOfCores = x.NumberOfCores,
-            Ram = x.Ram,
-            VirtualRam = x.VirtualRam,
-            DiskStorage = x.DiskStorage,
-            LastUpdatedTime = x.LastUpdatedTime
-        }).ToList();
+        return edges.Edges.Select(x => x.ToEdge()).ToList();
     }
 
     public static InstanceModel ToInstance(this InstanceRequest x)
@@ -337,7 +305,8 @@ public static class ApiContractToDomainMapper
             Questions = x.Questions?.ToList(),
             LastUpdatedTime = x.LastUpdatedTime,
             OnboardedTime = x.OnboardedTime,
-            SimCardNumber = x.SimCardNumber
+            SimCardNumber = x.SimCardNumber,
+            ApiKey = x.ApiKey
         };
     }
 

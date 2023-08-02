@@ -33,4 +33,5 @@ public class RobotResponse
     public DateTime LastUpdatedTime { get; init; }
     public DateTime OnboardedTime { get; init; }
     public string SimCardNumber { get; init; }
+    public string ApiKey { get; init; }
 }

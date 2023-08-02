@@ -40,6 +40,9 @@ public class CloudDto : Dto
     [Indexed]
     public bool IsOnline { get; set; }
 
+    [Indexed]
+    public string? ApiKey { get; set; }
+
     public override BaseModel ToModel()
     {
         var dto = this;
@@ -57,7 +60,8 @@ public class CloudDto : Dto
             Ram = dto.HardwareSpec.Ram,
             MacAddress = dto.MacAddress,
             LastUpdatedTime = dto.LastUpdatedTime.DateTime,
-            IsOnline = dto.IsOnline
+            IsOnline = dto.IsOnline,
+            ApiKey = dto.ApiKey
         };
     }
 }

@@ -237,7 +237,8 @@ public class RobotModel : BaseModel
             Questions = domain.Questions,
             LastUpdatedTime = domain.LastUpdatedTime == default ? DateTimeOffset.Now : domain.LastUpdatedTime,
             OnboardedTime = domain.OnboardedTime == default ? DateTimeOffset.Now : domain.OnboardedTime,
-            SimCardNumber = domain.SimCardNumber
+            SimCardNumber = domain.SimCardNumber,
+            ApiKey = domain.ApiKey
         };
     }
 }

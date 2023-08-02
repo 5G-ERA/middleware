@@ -85,6 +85,9 @@ public class RobotDto : Dto
     [Indexed]
     public string? SimCardNumber { get; init; }
 
+    [Indexed]
+    public string? ApiKey { get; set; }
+
     public override BaseModel ToModel()
     {
         var dto = this;
@@ -120,7 +123,8 @@ public class RobotDto : Dto
             TaskList = dto.TaskList,
             CurrentTaskId = Guid.Parse(dto.CurrentTaskId),
             ROSNodes = dto.Ros.RosNodes?.Select(x => x.ToModel()).ToList(),
-            SimCardNumber = dto.SimCardNumber
+            SimCardNumber = dto.SimCardNumber,
+            ApiKey = dto.ApiKey
         };
     }
 }

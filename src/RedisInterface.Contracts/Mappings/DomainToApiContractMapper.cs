@@ -47,7 +47,8 @@ public static class DomainToApiContractMapper
             Ram = x.Ram,
             VirtualRam = x.VirtualRam,
             DiskStorage = x.DiskStorage,
-            LastUpdatedTime = x.LastUpdatedTime
+            LastUpdatedTime = x.LastUpdatedTime,
+            ApiKey = x.ApiKey
         };
     }
 
@@ -96,7 +97,8 @@ public static class DomainToApiContractMapper
             Ram = x.Ram,
             VirtualRam = x.VirtualRam,
             DiskStorage = x.DiskStorage,
-            LastUpdatedTime = x.LastUpdatedTime
+            LastUpdatedTime = x.LastUpdatedTime,
+            ApiKey = x.ApiKey
         };
     }
 
@@ -193,7 +195,8 @@ public static class DomainToApiContractMapper
             Questions = x.Questions,
             LastUpdatedTime = x.LastUpdatedTime,
             OnboardedTime = x.OnboardedTime,
-            SimCardNumber = x.SimCardNumber
+            SimCardNumber = x.SimCardNumber,
+            ApiKey = x.ApiKey
         };
     }
 

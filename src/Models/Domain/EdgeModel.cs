@@ -125,7 +125,8 @@ public class EdgeModel : BaseModel, ILocation
                 VirtualRam = domain.VirtualRam
             },
             LastUpdatedTime = domain.LastUpdatedTime == default ? DateTimeOffset.Now : domain.LastUpdatedTime,
-            IsOnline = domain.IsOnline
+            IsOnline = domain.IsOnline,
+            ApiKey = domain.ApiKey
         };
     }
 }

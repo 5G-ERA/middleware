@@ -125,7 +125,8 @@ public class CloudModel : BaseModel, ILocation
             },
             MacAddress = domain.MacAddress,
             LastUpdatedTime = domain.LastUpdatedTime == default ? DateTimeOffset.Now : domain.LastUpdatedTime,
-            IsOnline = domain.IsOnline
+            IsOnline = domain.IsOnline,
+            ApiKey = domain.ApiKey
         };
     }
 }

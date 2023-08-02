@@ -4,7 +4,7 @@ public class EdgeResponse
 {
     public Guid Id { get; init; }
     public string Name { get; init; }
-    public string Type { get; init; }    
+    public string Type { get; init; }
     public string Organization { get; init; }
     public string Status { get; init; }
     public Uri IpAddress { get; init; }
@@ -15,4 +15,5 @@ public class EdgeResponse
     public long? VirtualRam { get; init; }
     public long? DiskStorage { get; init; }
     public DateTime LastUpdatedTime { get; init; }
+    public string ApiKey { get; init; }
 }
