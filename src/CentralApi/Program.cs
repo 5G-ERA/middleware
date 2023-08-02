@@ -3,6 +3,7 @@ using Middleware.CentralApi.Auth;
 using Middleware.CentralApi.Services;
 using Middleware.Common;
 using Middleware.Common.ExtensionMethods;
+using Middleware.DataAccess;
 using Middleware.DataAccess.ExtensionMethods;
 using Middleware.DataAccess.Repositories;
 using Middleware.DataAccess.Repositories.Abstract;

@@ -9,4 +9,5 @@ public class Location
     public string Name { get; init; } = default!;
     public Uri? Address { get; init; } = default!;
     public string Organization { get; init; } = default!;
+    public string? ApiKey { get; init; } = default!;
 }

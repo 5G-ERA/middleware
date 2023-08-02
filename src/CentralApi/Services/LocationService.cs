@@ -1,5 +1,7 @@
 ﻿using System.Collections.Immutable;
 using FluentValidation;
+using Middleware.Common;
+using Middleware.Common.Enums;
 using Middleware.DataAccess.Repositories.Abstract;
 using Middleware.Models.Domain;
 using Middleware.Models.Enums;
@@ -10,13 +12,16 @@ namespace Middleware.CentralApi.Services;
 
 public class LocationService : ILocationService
 {
+    private readonly IApiKeyService _apiKeyService;
     private readonly ICloudRepository _cloudRepository;
     private readonly IEdgeRepository _edgeRepository;
 
 
-    public LocationService(ICloudRepository cloudRepository, IEdgeRepository edgeRepository)
+    public LocationService(IApiKeyService apiKeyService, ICloudRepository cloudRepository,
+        IEdgeRepository edgeRepository)
     {
         _cloudRepository = cloudRepository;
+        _apiKeyService = apiKeyService;
         _edgeRepository = edgeRepository;
     }
 
@@ -39,7 +44,8 @@ public class LocationService : ILocationService
                 Name = edge.Name,
                 Organization = edge.Organization,
                 Address = edge.EdgeIp,
-                Type = edge.Type
+                Type = edge.Type,
+                ApiKey = edge.ApiKey
             };
             await _edgeRepository.AddAsync(edge);
             return result;
@@ -53,7 +59,8 @@ public class LocationService : ILocationService
                 Name = cloud.Name,
                 Organization = cloud.Organization,
                 Address = cloud.CloudIp,
-                Type = cloud.Type
+                Type = cloud.Type,
+                ApiKey = cloud.ApiKey
             };
             await _cloudRepository.AddAsync(cloud);
             return result;
@@ -100,6 +107,7 @@ public class LocationService : ILocationService
     private async Task<Location> RegisterNewLocation(Location location)
     {
         var id = Guid.NewGuid();
+        var apiKey = _apiKeyService.GenerateApiKey(ApiKeyUserType.Location);
         if (location.Type == LocationType.Cloud)
         {
             var cloud = new CloudModel
@@ -107,7 +115,8 @@ public class LocationService : ILocationService
                 Id = id,
                 Name = location.Name,
                 Organization = location.Organization,
-                LastUpdatedTime = DateTimeOffset.Now.Date
+                LastUpdatedTime = DateTimeOffset.Now.Date,
+                ApiKey = apiKey
             };
             await _cloudRepository.AddAsync(cloud);
         }
@@ -118,7 +127,8 @@ public class LocationService : ILocationService
                 Id = id,
                 Name = location.Name,
                 Organization = location.Organization,
-                LastUpdatedTime = DateTimeOffset.Now.Date
+                LastUpdatedTime = DateTimeOffset.Now.Date,
+                ApiKey = apiKey
             };
             await _edgeRepository.AddAsync(cloud);
         }

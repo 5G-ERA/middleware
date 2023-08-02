@@ -1,6 +1,7 @@
 ﻿using System.Collections.Immutable;
 using FluentAssertions;
 using Middleware.CentralApi.Services;
+using Middleware.Common;
 using Middleware.DataAccess.Repositories.Abstract;
 using Middleware.Models.Domain;
 using Middleware.Models.Enums;
@@ -12,6 +13,7 @@ namespace CentralApi.Tests.Unit.Services;
 //[LogTestExecution]
 public class LocationServiceTests
 {
+    private readonly IApiKeyService _apiKeyService = Substitute.For<IApiKeyService>();
     private readonly ICloudRepository _cloudRepository = Substitute.For<ICloudRepository>();
     private readonly IEdgeRepository _edgeRepository = Substitute.For<IEdgeRepository>();
     private readonly Random _rng = new(420);
@@ -19,7 +21,7 @@ public class LocationServiceTests
 
     public LocationServiceTests()
     {
-        _sut = new(_cloudRepository, _edgeRepository);
+        _sut = new(_apiKeyService, _cloudRepository, _edgeRepository);
     }
 
     [Fact]

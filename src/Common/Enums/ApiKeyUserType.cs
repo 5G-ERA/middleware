@@ -2,7 +2,6 @@
 
 public enum ApiKeyUserType
 {
-    Invalid,
     Location,
     Robot
 }

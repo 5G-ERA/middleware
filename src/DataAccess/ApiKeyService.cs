@@ -1,8 +1,9 @@
 ﻿using System.Security.Cryptography;
+using Middleware.Common;
 using Middleware.Common.Enums;
 using Middleware.DataAccess.Repositories.Abstract;
 
-namespace Middleware.Common;
+namespace Middleware.DataAccess;
 
 public class ApiKeyService : IApiKeyService
 {
