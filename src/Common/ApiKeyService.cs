@@ -1,5 +1,6 @@
 ﻿using System.Security.Cryptography;
 using Middleware.Common.Enums;
+using Middleware.DataAccess.Repositories.Abstract;
 
 namespace Middleware.Common;
 
