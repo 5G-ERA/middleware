@@ -1,4 +1,4 @@
-name: Task planner docker build on tag
+name: Clear untagged package versions
 
 on:
   workflow_dispatch:
