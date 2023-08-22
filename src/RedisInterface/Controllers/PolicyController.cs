@@ -207,7 +207,7 @@ namespace Middleware.RedisInterface.Controllers
 
                 exists.IsActive = model.IsActive;
                 exists.Priority = model.Priority;
-                exists.Timestamp = DateTime.Now;
+                exists.Timestamp = DateTime.UtcNow;
 
                 await _policyRepository.UpdateAsync(exists);
                 var response = exists.ToPolicyResponse();
