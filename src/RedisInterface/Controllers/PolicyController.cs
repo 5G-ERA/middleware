@@ -1,4 +1,5 @@
 ﻿using System.Net;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Middleware.Common.Attributes;
 using Middleware.Common.Responses;
@@ -197,14 +198,19 @@ namespace Middleware.RedisInterface.Controllers
         {
             try
             {
-                var model = request.ToPolicy();
+                var model = request.ToLimitedPolicy();
                 var exists = await _policyRepository.GetByIdAsync(model.Id);
                 if (exists == null)
                 {
                     return NotFound(new ApiResponse((int)HttpStatusCode.NotFound, "Object to be updated was not found."));
                 }
-                await _policyRepository.UpdateAsync(model);
-                var response = model.ToPolicyResponse();
+
+                exists.IsActive = model.IsActive;
+                exists.Priority = model.Priority;
+                exists.Timestamp = DateTime.Now;
+
+                await _policyRepository.UpdateAsync(exists);
+                var response = exists.ToPolicyResponse();
                 return Ok(response);
             }
             catch (Exception ex) 
