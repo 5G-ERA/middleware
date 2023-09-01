@@ -105,6 +105,15 @@ public static class ApiContractToDomainMapper
             Timestamp = x.Policy.LastTimeUpdated
         };
     }
+    public static PolicyModel ToLimitedPolicy(this UpdatePolicyRequest x)
+    {
+        return new()
+        {
+            Id = x.Id,
+            IsActive = x.Policy.IsActive,
+            Priority = Enum.Parse<Priority>(x.Policy.Priority)
+        };
+    }
 
     public static RobotModel ToRobot(this UpdateRobotRequest x)
     {

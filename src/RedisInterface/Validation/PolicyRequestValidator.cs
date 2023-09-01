@@ -28,7 +28,7 @@ public class PolicyRequestValidator : AbstractValidator<PolicyRequest>
             .NotNull().IsEnumName(typeof(Priority), caseSensitive: false)
             .WithMessage(x =>
                 $"{x.Priority} is not a valid Policy Priority name. " +
-                $"Valid options are: {string.Join(", ", Enum.GetNames<PolicyType>())}");
+                $"Valid options are: {string.Join(", ", Enum.GetNames<Priority>())}");
         //TODO: add validation if the policy can be active when it is added or activated
     }
 }
