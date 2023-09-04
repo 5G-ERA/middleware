@@ -1,0 +1,71 @@
+name: Clear untagged package versions
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: 0 4 * * 1-5
+
+
+jobs:
+  clear-orchestrator:
+    runs-on: ubuntu-latest
+
+    steps:
+    
+    - uses: actions/delete-package-versions@v4
+      with: 
+        package-name: 'orchestrator-api'
+        package-type: 'container'
+        min-versions-to-keep: 2
+        delete-only-untagged-versions: 'true'
+  
+  clear-gateway:
+    runs-on: ubuntu-latest
+
+    steps:  
+    - uses: actions/delete-package-versions@v4
+      with: 
+        package-name: 'gateway'
+        package-type: 'container'
+        min-versions-to-keep: 2
+        delete-only-untagged-versions: 'true'
+  
+  clear-redis-interface-api:
+    runs-on: ubuntu-latest
+    steps:      
+    - uses: actions/delete-package-versions@v4
+      with: 
+        package-name: 'redis-interface-api'
+        package-type: 'container'
+        min-versions-to-keep: 2
+        delete-only-untagged-versions: 'true'
+  
+  clear-task-planner-api:
+    runs-on: ubuntu-latest
+    steps:      
+    - uses: actions/delete-package-versions@v4
+      with: 
+        package-name: 'task-planner-api'
+        package-type: 'container'
+        min-versions-to-keep: 2
+        delete-only-untagged-versions: 'true'
+  
+  clear-resource-planner-api:
+    runs-on: ubuntu-latest
+    steps:  
+    - uses: actions/delete-package-versions@v4
+      with: 
+        package-name: 'resource-planner-api'
+        package-type: 'container'
+        min-versions-to-keep: 2
+        delete-only-untagged-versions: 'true'
+  
+  clear-central-api:
+    runs-on: ubuntu-latest
+    steps:  
+    - uses: actions/delete-package-versions@v4
+      with: 
+        package-name: 'central-api'
+        package-type: 'container'
+        min-versions-to-keep: 2
+        delete-only-untagged-versions: 'true'
