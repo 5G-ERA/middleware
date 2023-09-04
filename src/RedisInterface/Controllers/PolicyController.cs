@@ -25,38 +25,6 @@ namespace Middleware.RedisInterface.Controllers
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
-
-        /// <summary>
-        /// Add a new PolicyModel entity
-        /// </summary>
-        /// <param name="request"></param>
-        /// <returns> the newly created PolicyModel entity </returns>
-        [HttpPost(Name = "PolicyAdd")]
-        [ProducesResponseType(typeof(PolicyResponse), (int)HttpStatusCode.OK)]
-        [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.BadRequest)]
-        [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.InternalServerError)]
-        public async Task<IActionResult> PolicyAdd ([FromBody] PolicyRequest request)
-        {
-            if (request == null)
-            {
-                return BadRequest(new ApiResponse((int)HttpStatusCode.BadRequest, "Parameters were not specified."));
-            }
-            try
-            {
-                var policy = request.ToPolicy();
-                policy = await _policyRepository.AddAsync(policy);
-                var response = policy.ToPolicyResponse();
-                return Ok(response);
-            }
-            catch (Exception ex)
-            {
-                var statusCode = (int)HttpStatusCode.InternalServerError;
-                _logger.LogError(ex, "An error occurred:");
-                return StatusCode(statusCode, new ApiResponse(statusCode, $"An error has occurred: {ex.Message}"));
-            }
-        }
-
-
         /// <summary>
         /// Get a PolicyModel entity by id
         /// </summary>
