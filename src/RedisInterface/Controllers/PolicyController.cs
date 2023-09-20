@@ -1,192 +1,177 @@
 ﻿using System.Net;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Middleware.Common.Attributes;
 using Middleware.Common.Responses;
 using Middleware.DataAccess.Repositories.Abstract;
-using Middleware.Models.Domain;
 using Middleware.RedisInterface.Contracts.Mappings;
-using Middleware.RedisInterface.Contracts.Requests;
 using Middleware.RedisInterface.Contracts.Responses;
 using Middleware.RedisInterface.Mappings;
 using Middleware.RedisInterface.Requests;
 
-namespace Middleware.RedisInterface.Controllers
+namespace Middleware.RedisInterface.Controllers;
+
+[Route("api/v1/[controller]")]
+[ApiController]
+public class PolicyController : ControllerBase
 {
-    [Route("api/v1/[controller]")]
-    [ApiController]
-    public class PolicyController : ControllerBase
+    private readonly ILogger _logger;
+    private readonly IPolicyRepository _policyRepository;
+
+    public PolicyController(IPolicyRepository policyRepository, ILogger<PolicyController> logger)
     {
-        private readonly IPolicyRepository _policyRepository;
-        private readonly ILogger _logger;
+        _policyRepository = policyRepository ?? throw new ArgumentNullException(nameof(policyRepository));
+        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+    }
 
-        public PolicyController(IPolicyRepository policyRepository, ILogger<PolicyController> logger)
+    /// <summary>
+    ///     Get a PolicyModel entity by id
+    /// </summary>
+    /// <param name="id"></param>
+    /// <returns> the PolicyModel entity for the specified id </returns>
+    [HttpGet]
+    [Route("{id}", Name = "PolicyGetById")]
+    [ProducesResponseType(typeof(PolicyResponse), (int)HttpStatusCode.OK)]
+    [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.NotFound)]
+    [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.InternalServerError)]
+    public async Task<IActionResult> GetPolicyByIdAsync(Guid id)
+    {
+        try
         {
-            _policyRepository = policyRepository ?? throw new ArgumentNullException(nameof(policyRepository));
-            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+            var model = await _policyRepository.GetByIdAsync(id);
+            if (model == null) return NotFound(new ApiResponse((int)HttpStatusCode.NotFound, "Object was not found."));
+
+            var response = model.ToPolicyResponse();
+            return Ok(response);
         }
-
-        /// <summary>
-        /// Get a PolicyModel entity by id
-        /// </summary>
-        /// <param name="id"></param>
-        /// <returns> the PolicyModel entity for the specified id </returns>
-        [HttpGet]
-        [Route("{id}", Name = "PolicyGetById")]
-        [ProducesResponseType(typeof(PolicyResponse), (int)HttpStatusCode.OK)]
-        [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.NotFound)]
-        [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.InternalServerError)]
-        public async Task<IActionResult> GetPolicyByIdAsync(Guid id)
+        catch (Exception ex)
         {
-            try
-            {
-                PolicyModel model = await _policyRepository.GetByIdAsync(id);
-                if (model == null)
-                {
-                    return NotFound(new ApiResponse((int)HttpStatusCode.NotFound, "Object was not found."));
-                }
-
-                var response = model.ToPolicyResponse();
-                return Ok(response);
-            }
-            catch (Exception ex) 
-            {
-                int statusCode = (int)HttpStatusCode.InternalServerError;
-                _logger.LogError(ex, "An error occurred:");
-                return StatusCode(statusCode, new ApiResponse(statusCode, $"An error has occurred: {ex.Message}"));
-            }
-        }
-
-        /// <summary>
-        /// Get Policy by name
-        /// </summary>
-        /// <param name="name">Name of the Policy</param>
-        /// <returns> the PolicyModel entity for the specified id </returns>
-        [HttpGet]
-        [Route("name/{name}", Name = "PolicyGetByName")]
-        [ProducesResponseType(typeof(PolicyResponse), (int)HttpStatusCode.OK)]
-        [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.NotFound)]
-        [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.InternalServerError)]
-        public async Task<IActionResult> GetPolicyByNameAsync(string name)
-        {
-            try
-            {
-                PolicyModel model = await _policyRepository.GetPolicyByName(name);
-                if (model == null)
-                {
-                    return NotFound(new ApiResponse((int)HttpStatusCode.NotFound, "Object was not found."));
-                }
-
-                var response = model.ToPolicyResponse();
-                return Ok(response);
-            }
-            catch (Exception ex)
-            {
-                var statusCode = (int)HttpStatusCode.InternalServerError;
-                _logger.LogError(ex, "An error occurred:");
-                return StatusCode(statusCode, new ApiResponse(statusCode, $"An error has occurred: {ex.Message}"));
-            }
-        }
-
-        /// <summary>
-        /// Get all the PolicyModel entities
-        /// </summary>
-        /// <returns> the list of PolicyModel entities </returns>
-        [HttpGet(Name = "PolicyGetAll")]
-        [ProducesResponseType(typeof(GetPoliciesResponse), (int)HttpStatusCode.OK)]
-        [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.NotFound)]
-        [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.InternalServerError)]
-        public async Task<IActionResult> GetAllPoliciesAsync()
-        {
-            try
-            {
-                List<PolicyModel> models = await _policyRepository.GetAllAsync();
-                if (models.Any() == false)
-                {
-                    return NotFound(new ApiResponse((int)HttpStatusCode.NotFound, "Objects were not found."));
-                }
-
-                var response = models.ToPoliciesResponse();
-                return Ok(response);
-            }
-            catch (Exception ex) 
-            {
-                int statusCode = (int)HttpStatusCode.InternalServerError;
-                _logger.LogError(ex, "An error occurred:");
-                return StatusCode(statusCode, new ApiResponse(statusCode, $"An error has occurred: {ex.Message}"));
-            }
-        }
-
-        /// <summary>
-        /// Represents the single currently active policy
-        /// </summary>
-        /// <param name="Id"></param>
-        /// <param name="PolicyName"></param>
-        /// <param name="PolicyDescription"></param>
-        public record ActivePolicy(Guid Id, string PolicyName, string PolicyDescription);
-
-        [HttpGet]
-        [Route("current", Name = "PolicyGetActive")]
-        [ProducesResponseType(typeof(List<ActivePolicy>), (int)HttpStatusCode.OK)]
-        [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.NotFound)]
-        [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.InternalServerError)]
-        public async Task<ActionResult<List<ActivePolicy>>> GetActivePolicies()
-        {
-            try
-            {
-                List<PolicyModel> activePolicies = await _policyRepository.GetActivePoliciesAsync();
-                if (activePolicies.Any() == false)
-                {
-                    return NotFound(new ApiResponse((int)HttpStatusCode.NotFound, "Object was not found."));
-                }
-                List<ActivePolicy> activePoliciesRecords = activePolicies.Select(p => new ActivePolicy(p.Id, p.Name, p.Description)).ToList();
-                return Ok(activePoliciesRecords);     
-            }
-            catch (Exception ex) 
-            {
-                var statusCode = (int)HttpStatusCode.InternalServerError;
-                _logger.LogError(ex, "An error occurred:");
-                return StatusCode(statusCode, new ApiResponse(statusCode, $"An error has occurred: {ex.Message}"));
-            }
-        }
-
-
-        /// <summary>
-        /// Partially update an existing policy entity
-        /// </summary>
-        /// <param name="request"></param>
-        /// <returns> the modified InstanceModel entity </returns>
-        [HttpPut]
-        [Route("{id}", Name = "PolicyPatch")]
-        [ProducesResponseType(typeof(PolicyModel), (int)HttpStatusCode.OK)]
-        [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.NotFound)]
-        [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.InternalServerError)]
-        // ReSharper disable once RouteTemplates.MethodMissingRouteParameters
-        public async Task<IActionResult> PatchPolicyAsync([FromMultiSource] UpdatePolicyRequest request)
-        {
-            try
-            {
-                var model = request.ToLimitedPolicy();
-                var exists = await _policyRepository.GetByIdAsync(model.Id);
-                if (exists == null)
-                {
-                    return NotFound(new ApiResponse((int)HttpStatusCode.NotFound, "Object to be updated was not found."));
-                }
-
-                exists.IsActive = model.IsActive;
-                exists.Priority = model.Priority;
-                exists.Timestamp = DateTime.UtcNow;
-
-                await _policyRepository.UpdateAsync(exists);
-                var response = exists.ToPolicyResponse();
-                return Ok(response);
-            }
-            catch (Exception ex) 
-            {
-                int statusCode = (int)HttpStatusCode.InternalServerError;
-                _logger.LogError(ex, "An error occurred:");
-                return StatusCode(statusCode, new ApiResponse(statusCode, $"An error has occurred: {ex.Message}"));
-            }
+            var statusCode = (int)HttpStatusCode.InternalServerError;
+            _logger.LogError(ex, "An error occurred:");
+            return StatusCode(statusCode, new ApiResponse(statusCode, $"An error has occurred: {ex.Message}"));
         }
     }
+
+    /// <summary>
+    ///     Get Policy by name
+    /// </summary>
+    /// <param name="name">Name of the Policy</param>
+    /// <returns> the PolicyModel entity for the specified id </returns>
+    [HttpGet]
+    [Route("name/{name}", Name = "PolicyGetByName")]
+    [ProducesResponseType(typeof(PolicyResponse), (int)HttpStatusCode.OK)]
+    [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.NotFound)]
+    [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.InternalServerError)]
+    public async Task<IActionResult> GetPolicyByNameAsync(string name)
+    {
+        try
+        {
+            var model = await _policyRepository.GetPolicyByName(name);
+            if (model == null) return NotFound(new ApiResponse((int)HttpStatusCode.NotFound, "Object was not found."));
+
+            var response = model.ToPolicyResponse();
+            return Ok(response);
+        }
+        catch (Exception ex)
+        {
+            var statusCode = (int)HttpStatusCode.InternalServerError;
+            _logger.LogError(ex, "An error occurred:");
+            return StatusCode(statusCode, new ApiResponse(statusCode, $"An error has occurred: {ex.Message}"));
+        }
+    }
+
+    /// <summary>
+    ///     Get all the PolicyModel entities
+    /// </summary>
+    /// <returns> the list of PolicyModel entities </returns>
+    [HttpGet(Name = "PolicyGetAll")]
+    [ProducesResponseType(typeof(GetPoliciesResponse), (int)HttpStatusCode.OK)]
+    [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.NotFound)]
+    [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.InternalServerError)]
+    public async Task<IActionResult> GetAllPoliciesAsync()
+    {
+        try
+        {
+            var models = await _policyRepository.GetAllAsync();
+            if (models.Any() == false)
+                return NotFound(new ApiResponse((int)HttpStatusCode.NotFound, "Objects were not found."));
+
+            var response = models.ToPoliciesResponse();
+            return Ok(response);
+        }
+        catch (Exception ex)
+        {
+            var statusCode = (int)HttpStatusCode.InternalServerError;
+            _logger.LogError(ex, "An error occurred:");
+            return StatusCode(statusCode, new ApiResponse(statusCode, $"An error has occurred: {ex.Message}"));
+        }
+    }
+
+    [HttpGet]
+    [Route("current", Name = "PolicyGetActive")]
+    [ProducesResponseType(typeof(List<ActivePolicy>), (int)HttpStatusCode.OK)]
+    [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.NotFound)]
+    [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.InternalServerError)]
+    public async Task<ActionResult<List<ActivePolicy>>> GetActivePolicies()
+    {
+        try
+        {
+            var activePolicies = await _policyRepository.GetActivePoliciesAsync();
+            if (activePolicies.Any() == false)
+                return NotFound(new ApiResponse((int)HttpStatusCode.NotFound, "Object was not found."));
+            var activePoliciesRecords =
+                activePolicies.Select(p => new ActivePolicy(p.Id, p.Name, p.Description)).ToList();
+            return Ok(activePoliciesRecords);
+        }
+        catch (Exception ex)
+        {
+            var statusCode = (int)HttpStatusCode.InternalServerError;
+            _logger.LogError(ex, "An error occurred:");
+            return StatusCode(statusCode, new ApiResponse(statusCode, $"An error has occurred: {ex.Message}"));
+        }
+    }
+
+
+    /// <summary>
+    ///     Partially update an existing policy entity
+    /// </summary>
+    /// <param name="request"></param>
+    /// <returns> the modified InstanceModel entity </returns>
+    [HttpPut]
+    [Route("{id}", Name = "PolicyPatch")]
+    [ProducesResponseType(typeof(PolicyResponse), (int)HttpStatusCode.OK)]
+    [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.NotFound)]
+    [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.InternalServerError)]
+    // ReSharper disable once RouteTemplates.MethodMissingRouteParameters
+    public async Task<IActionResult> PatchPolicyAsync([FromMultiSource] UpdatePolicyRequest request)
+    {
+        try
+        {
+            var model = request.ToLimitedPolicy();
+            var exists = await _policyRepository.GetByIdAsync(model.Id);
+            if (exists == null)
+                return NotFound(new ApiResponse((int)HttpStatusCode.NotFound, "Object to be updated was not found."));
+
+            exists.IsActive = model.IsActive;
+            exists.Priority = model.Priority;
+            exists.Timestamp = DateTime.UtcNow;
+
+            await _policyRepository.UpdateAsync(exists);
+            var response = exists.ToPolicyResponse();
+            return Ok(response);
+        }
+        catch (Exception ex)
+        {
+            var statusCode = (int)HttpStatusCode.InternalServerError;
+            _logger.LogError(ex, "An error occurred:");
+            return StatusCode(statusCode, new ApiResponse(statusCode, $"An error has occurred: {ex.Message}"));
+        }
+    }
+
+    /// <summary>
+    ///     Represents the single currently active policy
+    /// </summary>
+    /// <param name="Id"></param>
+    /// <param name="PolicyName"></param>
+    /// <param name="PolicyDescription"></param>
+    public record ActivePolicy(Guid Id, string PolicyName, string PolicyDescription);
 }
