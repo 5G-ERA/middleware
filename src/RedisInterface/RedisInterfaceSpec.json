@@ -9223,6 +9223,87 @@
         }
       }
     },
+    "/api/v1/Task/{id}/full": {
+      "get": {
+        "tags": [
+          "Task"
+        ],
+        "operationId": "TaskGetFullDefinition",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/FullTaskResponse"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FullTaskResponse"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FullTaskResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Server Error",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/v1/Task/AddRelation": {
       "post": {
         "tags": [
@@ -10520,6 +10601,199 @@
           "lastUpdatedTime": {
             "type": "string",
             "format": "date-time"
+          }
+        },
+        "additionalProperties": false
+      },
+      "FullActionResponse": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "name": {
+            "type": "string",
+            "nullable": true
+          },
+          "priority": {
+            "type": "string",
+            "nullable": true
+          },
+          "order": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "minimumNumCores": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "minimumRam": {
+            "type": "integer",
+            "format": "int64",
+            "nullable": true
+          },
+          "singleNetAppEntryPoint": {
+            "type": "boolean"
+          },
+          "tags": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "nullable": true
+          },
+          "instances": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/FullInstanceResponse"
+            },
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "FullContainerResponse": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "name": {
+            "type": "string",
+            "nullable": true
+          },
+          "lastUpdateTime": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "description": {
+            "type": "string",
+            "nullable": true
+          },
+          "k8sDeployment": {
+            "type": "string",
+            "nullable": true
+          },
+          "k8sService": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "FullInstanceResponse": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "name": {
+            "type": "string",
+            "nullable": true
+          },
+          "type": {
+            "type": "string",
+            "nullable": true
+          },
+          "isReusable": {
+            "type": "boolean",
+            "nullable": true
+          },
+          "rosTopicPublishers": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/RosTopicResponse"
+            },
+            "nullable": true
+          },
+          "rosTopicSubscribers": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/RosTopicResponse"
+            },
+            "nullable": true
+          },
+          "rosVersion": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "rosDistro": {
+            "type": "string",
+            "nullable": true
+          },
+          "family": {
+            "type": "string",
+            "nullable": true
+          },
+          "minimumRam": {
+            "type": "integer",
+            "format": "int64",
+            "nullable": true
+          },
+          "minimumNumOfCores": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "onboardedTime": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "tags": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "nullable": true
+          },
+          "appliedPolicies": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "nullable": true
+          },
+          "containerImage": {
+            "$ref": "#/components/schemas/FullContainerResponse"
+          }
+        },
+        "additionalProperties": false
+      },
+      "FullTaskResponse": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "name": {
+            "type": "string",
+            "nullable": true
+          },
+          "priority": {
+            "type": "string",
+            "nullable": true
+          },
+          "isDeterministic": {
+            "type": "boolean"
+          },
+          "tags": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "nullable": true
+          },
+          "actionSequence": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/FullActionResponse"
+            },
+            "nullable": true
           }
         },
         "additionalProperties": false
