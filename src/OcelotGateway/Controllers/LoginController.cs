@@ -107,6 +107,27 @@ namespace Middleware.OcelotGateway.Controllers
             
         }
 
+        //[Authorize]
+        [HttpPost]
+        [Route("logout", Name = "Logout")]
+        [ProducesResponseType(typeof(TokenModel), (int)HttpStatusCode.OK)]
+        public async Task<IActionResult> Logout([FromBody] LoginRequest logout)
+        {
+            (bool authenticated, UserModel user) = await AuthenticateUser(logout);
+            if (authenticated)
+            {
+                TokenModel token = new TokenModel();
+
+                //get the attached token for the logout request
+
+                //alter token by setting expiry date to now
+                var authToken = token.ExpirationDate = DateTime.UtcNow;
+                return Ok(authToken);
+
+            }
+            return Ok(new { message = "Logout successful" });
+        }
+
 
         /// <summary>
         /// Checks for user credentials
