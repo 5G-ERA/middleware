@@ -43,6 +43,7 @@ builder.Services.RegisterRepositories();
 builder.Services.AddScoped<IDashboardService, DashboardService>();
 builder.Services.AddScoped<IActionService, ActionService>();
 builder.Services.AddScoped<ISliceService, SliceService>();
+builder.Services.AddScoped<ITaskService, TaskService>();
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
