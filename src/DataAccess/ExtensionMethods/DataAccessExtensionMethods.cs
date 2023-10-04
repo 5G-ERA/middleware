@@ -31,8 +31,8 @@ public static class DataAccessExtensionMethods
         IRedisConnectionProvider provider = new RedisConnectionProvider(mux);
         builder.Services.AddSingleton(provider);
         builder.Services.AddSingleton<IConnectionMultiplexer>(mux);
-        var redisGraphClient = new RedisGraphClient(mux);
-        builder.Services.AddSingleton<IRedisGraphClient>(redisGraphClient);
+        //var redisGraphClient = new RedisGraphClient(mux);
+        //builder.Services.AddSingleton<IRedisGraphClient>(redisGraphClient);
         return builder;
     }
 

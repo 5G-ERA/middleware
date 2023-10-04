@@ -7,6 +7,7 @@ using Middleware.RedisInterface;
 using Middleware.RedisInterface.Services;
 using Middleware.RedisInterface.Services.Abstract;
 using Middleware.RedisInterface.Validation;
+using Neo4j.Driver;
 using Newtonsoft.Json;
 using Serilog;
 
@@ -31,6 +32,9 @@ builder.Services.AddControllers(options =>
 builder.Services.AddFluentValidation(typeof(Program));
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
+
+using var driver = GraphDatabase.Driver("bolt://localhost:7687", AuthTokens.Basic("neo4j", "password"));
+var queryOperation = await driver.ExecutableQuery("CREATE (n) RETURN n").ExecuteAsync();
 
 builder.Services.AddSwaggerGen();
 builder.Services.AddEndpointsApiExplorer();
