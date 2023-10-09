@@ -2,6 +2,7 @@
 using Middleware.Models.Domain;
 using Middleware.Models.Dto;
 using Middleware.Models.Enums;
+using Neo4j.Driver;
 using Redis.OM.Contracts;
 using RedisGraphDotNet.Client;
 using ILogger = Serilog.ILogger;
@@ -17,7 +18,7 @@ namespace Middleware.DataAccess.Repositories
         /// <param name="provider"></param>
         /// <param name="redisGraph"></param>
         /// <param name="logger"></param>
-        public RedisPolicyRepository(IRedisConnectionProvider provider, IRedisGraphClient redisGraph, ILogger logger) : base(provider, redisGraph, true, logger)
+        public RedisPolicyRepository(IRedisConnectionProvider provider, IRedisGraphClient redisGraph, Microsoft.Extensions.Logging.ILogger<RedisPolicyRepository> logger, IDriver driver) : base(provider, redisGraph, true, logger, driver)
         {
         }
 

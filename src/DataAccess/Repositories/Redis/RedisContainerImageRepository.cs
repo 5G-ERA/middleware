@@ -1,6 +1,7 @@
 ﻿using Middleware.DataAccess.Repositories.Abstract;
 using Middleware.Models.Domain;
 using Middleware.Models.Dto;
+using Neo4j.Driver;
 using Redis.OM.Contracts;
 using RedisGraphDotNet.Client;
 using ILogger = Serilog.ILogger;
@@ -19,7 +20,7 @@ namespace Middleware.DataAccess.Repositories
         /// <param name="redisGraph"></param>
         /// <param name="logger"></param>
 
-        public RedisContainerImageRepository(IInstanceRepository instanceRepository, IRedisConnectionProvider provider, IRedisGraphClient redisGraph, ILogger logger) : base(provider, redisGraph, true, logger)
+        public RedisContainerImageRepository(IInstanceRepository instanceRepository, IRedisConnectionProvider provider, IRedisGraphClient redisGraph, Microsoft.Extensions.Logging.ILogger<RedisContainerImageRepository> logger, IDriver driver) : base(provider, redisGraph, true, logger, driver)
         {
             _instanceRepository = instanceRepository;
         }

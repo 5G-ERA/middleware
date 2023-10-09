@@ -1,6 +1,7 @@
 ﻿using FluentAssertions;
 using Middleware.DataAccess.Repositories;
 using Middleware.Models.Domain;
+using Neo4j.Driver;
 using NSubstitute;
 using Redis.OM.Contracts;
 using RedisGraphDotNet.Client;
@@ -13,12 +14,13 @@ public class RedisEdgeRepositoryTests
 {
     private readonly IRedisConnectionProvider _connectionProvider = Substitute.For<IRedisConnectionProvider>();
     private readonly IRedisGraphClient _graphClient = Substitute.For<IRedisGraphClient>();
-    private readonly ILogger _logger = Substitute.For<ILogger>();
+    private readonly Microsoft.Extensions.Logging.ILogger<RedisEdgeRepository> _logger = Substitute.For<Microsoft.Extensions.Logging.ILogger<RedisEdgeRepository>>();
     private readonly RedisEdgeRepository _sut;
+    private readonly IDriver _driver = Substitute.For<IDriver>();
 
     public RedisEdgeRepositoryTests()
     {
-        _sut = new(_connectionProvider, _graphClient, _logger);
+        _sut = new(_connectionProvider, _graphClient, _logger, _driver);
     }
 
     [Fact]

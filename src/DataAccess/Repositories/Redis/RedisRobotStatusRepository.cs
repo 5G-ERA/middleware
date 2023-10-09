@@ -1,6 +1,7 @@
 ﻿using Middleware.DataAccess.Repositories.Abstract;
 using Middleware.Models.Domain;
 using Middleware.Models.Dto;
+using Neo4j.Driver;
 using Redis.OM.Contracts;
 using RedisGraphDotNet.Client;
 using ILogger = Serilog.ILogger;
@@ -9,7 +10,7 @@ namespace Middleware.DataAccess.Repositories.Redis
 {
     public class RedisRobotStatusRepository : RedisRepository<RobotStatusModel, RobotStatusDto>, IRobotStatusRepository
     {
-        public RedisRobotStatusRepository(IRedisConnectionProvider provider, IRedisGraphClient redisGraph, ILogger logger) : base(provider, redisGraph, true, logger)
+        public RedisRobotStatusRepository(IRedisConnectionProvider provider, IRedisGraphClient redisGraph, Microsoft.Extensions.Logging.ILogger<RedisRobotStatusRepository> logger, IDriver driver) : base(provider, redisGraph, true, logger, driver)
         {
         }
 

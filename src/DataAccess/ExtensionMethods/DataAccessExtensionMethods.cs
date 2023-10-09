@@ -5,6 +5,7 @@ using Middleware.Common.Config;
 using Middleware.DataAccess.Repositories;
 using Middleware.DataAccess.Repositories.Abstract;
 using Middleware.DataAccess.Repositories.Redis;
+using Neo4j.Driver;
 using Redis.OM;
 using Redis.OM.Contracts;
 using RedisGraphDotNet.Client;
@@ -31,8 +32,10 @@ public static class DataAccessExtensionMethods
         IRedisConnectionProvider provider = new RedisConnectionProvider(mux);
         builder.Services.AddSingleton(provider);
         builder.Services.AddSingleton<IConnectionMultiplexer>(mux);
-        //var redisGraphClient = new RedisGraphClient(mux);
-        //builder.Services.AddSingleton<IRedisGraphClient>(redisGraphClient);
+        var redisGraphClient = new RedisGraphClient(mux);
+        builder.Services.AddSingleton<IRedisGraphClient>(redisGraphClient);
+        var driver = GraphDatabase.Driver("bolt://localhost:7687", AuthTokens.Basic("", ""));
+        builder.Services.AddSingleton(driver);
         return builder;
     }
 

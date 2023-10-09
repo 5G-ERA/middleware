@@ -10,6 +10,9 @@ using Redis.OM.Contracts;
 using Redis.OM.Searching;
 using RedisGraphDotNet.Client;
 using Serilog;
+using Neo4j.Driver;
+using System.Reflection.Emit;
+using Microsoft.Extensions.Logging;
 
 namespace Middleware.DataAccess.Repositories;
 
@@ -24,18 +27,21 @@ public class RedisRepository<TModel, TDto> : IRedisRepository<TModel, TDto> wher
     /// </summary>
     protected readonly bool IsWritableToGraph;
 
-    protected readonly ILogger Logger;
+    protected readonly Microsoft.Extensions.Logging.ILogger Logger;
 
     protected IRedisGraphClient RedisGraph { get; }
 
+    protected readonly IDriver _driver;
+
     public RedisRepository(IRedisConnectionProvider provider, IRedisGraphClient redisGraph, bool isWritableToGraph,
-        ILogger logger)
+        Microsoft.Extensions.Logging.ILogger logger, IDriver driver)
     {
         RedisGraph = redisGraph;
         _entityName = typeof(TModel).GetModelName().ToUpper();
         Collection = provider.RedisCollection<TDto>();
         IsWritableToGraph = isWritableToGraph;
         Logger = logger;
+        _driver = driver;
     }
 
     /// <summary>
@@ -241,11 +247,45 @@ public class RedisRepository<TModel, TDto> : IRedisRepository<TModel, TDto> wher
     {
         model.Type = _entityName;
         if (await ObjectExistsOnGraph(model)) return true;
-        var query = "CREATE (x: " + model.Type + " {ID: '" + model.Id + "', Type: '" + model.Type +
+
+        using (var session = _driver.AsyncSession())
+        {
+            try
+            {
+                // Create a transaction to execute the Cypher query
+                using (var transaction = await session.BeginTransactionAsync())
+                {
+                    // Create a node with the specified label and property
+                    //var query = $"CREATE (n:{label} {{ {propertyName}: '{propertyValue}' }})";
+                    var query = $"CREATE (n: " + model.Type + " {ID: '" + model.Id + "', Type: '" + model.Type +
+                    "', Name: '" + model.Name + "'})";
+
+                    // Execute the Cypher query asynchronously
+                    var result = await transaction.RunAsync(query);
+
+                    // Commit the transaction
+                    await transaction.CommitAsync();
+
+                    //Console.WriteLine("Graph node created successfully.");
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.LogError(ex, "An error occurred:");
+            }
+        }
+
+        /*var query = await _driver 
+            .ExecutableQuery("CREATE (x: " + model.Type + " {ID: '" + model.Id + "', Type: '" + model.Type +
+                    "', Name: '" + model.Name + "'})")
+            .ExecuteAsync();*/
+
+        /*var query = "CREATE (x: " + model.Type + " {ID: '" + model.Id + "', Type: '" + model.Type +
                     "', Name: '" + model.Name + "'})";
         var resultSet = await RedisGraph.Query(GraphName, query);
 
-        return resultSet != null && resultSet.Metrics.NodesCreated == 1;
+        return resultSet != null && resultSet.Metrics.NodesCreated == 1;*/
+        return true;
     }
 
     /// <summary>
