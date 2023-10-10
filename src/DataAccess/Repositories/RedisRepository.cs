@@ -255,8 +255,6 @@ public class RedisRepository<TModel, TDto> : IRedisRepository<TModel, TDto> wher
                 // Create a transaction to execute the Cypher query
                 using (var transaction = await session.BeginTransactionAsync())
                 {
-                    // Create a node with the specified label and property
-                    //var query = $"CREATE (n:{label} {{ {propertyName}: '{propertyValue}' }})";
                     var query = $"CREATE (n: " + model.Type + " {ID: '" + model.Id + "', Type: '" + model.Type +
                     "', Name: '" + model.Name + "'})";
 
@@ -265,8 +263,6 @@ public class RedisRepository<TModel, TDto> : IRedisRepository<TModel, TDto> wher
 
                     // Commit the transaction
                     await transaction.CommitAsync();
-
-                    //Console.WriteLine("Graph node created successfully.");
                 }
             }
             catch (Exception ex)
@@ -274,17 +270,6 @@ public class RedisRepository<TModel, TDto> : IRedisRepository<TModel, TDto> wher
                 Logger.LogError(ex, "An error occurred:");
             }
         }
-
-        /*var query = await _driver 
-            .ExecutableQuery("CREATE (x: " + model.Type + " {ID: '" + model.Id + "', Type: '" + model.Type +
-                    "', Name: '" + model.Name + "'})")
-            .ExecuteAsync();*/
-
-        /*var query = "CREATE (x: " + model.Type + " {ID: '" + model.Id + "', Type: '" + model.Type +
-                    "', Name: '" + model.Name + "'})";
-        var resultSet = await RedisGraph.Query(GraphName, query);
-
-        return resultSet != null && resultSet.Metrics.NodesCreated == 1;*/
         return true;
     }
 
@@ -295,12 +280,30 @@ public class RedisRepository<TModel, TDto> : IRedisRepository<TModel, TDto> wher
     /// <returns></returns>
     public virtual async Task<bool> AddRelationAsync(RelationModel relation)
     {
-        var query = "MATCH (x: " + relation.InitiatesFrom.Type + " {ID: '" + relation.InitiatesFrom.Id +
-                    "'}), (c: " + relation.PointsTo.Type + " {ID: '" + relation.PointsTo.Id +
-                    "'}) CREATE (x)-[:" + relation.RelationName + "]->(c) ";
-        var resultSet = await RedisGraph.Query(GraphName, query);
+        using (var session = _driver.AsyncSession())
+        {
+            try
+            {
+                // Create a transaction to execute the Cypher query
+                using (var transaction = await session.BeginTransactionAsync())
+                {
+                    var query = "MATCH (n1: " + relation.InitiatesFrom.Type + " {ID: '" + relation.InitiatesFrom.Id +
+                    "'}), (n2: " + relation.PointsTo.Type + " {ID: '" + relation.PointsTo.Id +
+                    "'}) CREATE (n1)-[:" + relation.RelationName + "]->(n2) ";
 
-        return resultSet != null && resultSet.Metrics.RelationshipsCreated >= 1;
+                    // Execute the Cypher query asynchronously
+                    var result = await transaction.RunAsync(query);
+
+                    // Commit the transaction
+                    await transaction.CommitAsync();
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.LogError(ex, "An error occurred:");
+            }
+        }
+        return true;
     }
 
     /// <summary>
