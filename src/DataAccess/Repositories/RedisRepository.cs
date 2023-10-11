@@ -13,6 +13,8 @@ using Serilog;
 using Neo4j.Driver;
 using System.Reflection.Emit;
 using Microsoft.Extensions.Logging;
+using Elasticsearch.Net;
+using System.Reflection;
 
 namespace Middleware.DataAccess.Repositories;
 
@@ -315,10 +317,28 @@ public class RedisRepository<TModel, TDto> : IRedisRepository<TModel, TDto> wher
     {
         model.Type = _entityName;
 
-        var query = "MATCH (e: " + model.Type + " {ID: '" + model.Id + "'}) DELETE e";
-        var resultSet = await RedisGraph.Query(GraphName, query);
+        using (var session = _driver.AsyncSession())
+        {
+            try
+            {
+                // Create a transaction to execute the Cypher query
+                using (var transaction = await session.BeginTransactionAsync())
+                {
+                    var query = "MATCH (n: " + model.Type + " {ID: '" + model.Id + "'}) DELETE n";
 
-        return resultSet != null && resultSet.Metrics.NodesDeleted == 1;
+                    // Execute the Cypher query asynchronously
+                    var result = await transaction.RunAsync(query);
+
+                    // Commit the transaction
+                    await transaction.CommitAsync();
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.LogError(ex, "An error occurred:");
+            }
+        }
+        return true;
     }
 
     /// <summary>
@@ -328,12 +348,30 @@ public class RedisRepository<TModel, TDto> : IRedisRepository<TModel, TDto> wher
     /// <returns></returns>
     public virtual async Task<bool> DeleteRelationAsync(RelationModel relation)
     {
-        var query = "MATCH (x: " + relation.InitiatesFrom.Type + " {ID: '" + relation.InitiatesFrom.Id +
-                    "'})-[e: " + relation.RelationName + " ]->(y: " + relation.PointsTo.Type + " {ID: '" +
-                    relation.PointsTo.Id + "'}) DELETE e";
-        var resultSet = await RedisGraph.Query(GraphName, query);
+        using (var session = _driver.AsyncSession())
+        {
+            try
+            {
+                // Create a transaction to execute the Cypher query
+                using (var transaction = await session.BeginTransactionAsync())
+                {
+                    var query = "MATCH (n1: " + relation.InitiatesFrom.Type + " {ID: '" + relation.InitiatesFrom.Id +
+                    "'})-[r: " + relation.RelationName + " ]->(n2: " + relation.PointsTo.Type + " {ID: '" +
+                    relation.PointsTo.Id + "'}) DELETE r";
 
-        return resultSet != null && resultSet.Metrics.RelationshipsDeleted == 1;
+                    // Execute the Cypher query asynchronously
+                    var result = await transaction.RunAsync(query);
+
+                    // Commit the transaction
+                    await transaction.CommitAsync();
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.LogError(ex, "An error occurred:");
+            }
+        }
+        return true;
     }
 
     public async Task UpdateAsync(TModel model)
