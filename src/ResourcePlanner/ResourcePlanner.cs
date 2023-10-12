@@ -120,16 +120,22 @@ internal class ResourcePlanner : IResourcePlanner
 
         // Iterate through old actions in actionSequence and check with have failed and add them to failed actions list.
         foreach (var oldAction in oldActionSequence)
+        {
             if (oldAction.ActionStatus == "Failed")
                 failedActions.Add(oldAction);
+        }
 
         // Check in which of the failed actions action planner has not done some modifications.
         foreach (var failedAction in failedActions)
         foreach (var newAction in actionSequence)
+        {
             if (failedAction.Order == newAction.Order) //Compare old action with new one
+            {
                 if (failedAction.Id == newAction.Id)
                     // Action planner did no change to the failed action.
                     actionsCandidates.Add(failedAction);
+            }
+        }
 
         // If full replan was requested by robot.
         if (isFullReplan)
@@ -163,25 +169,30 @@ internal class ResourcePlanner : IResourcePlanner
         var activePolicies = activePoliciesResp.ToPolicyList();
 
         foreach (var policy in activePolicies)
+        {
             switch (policy.Name)
             {
                 case "Use5G":
                 {
                     //TODO: Query testbed for number of slices and types.
                     foreach (var question in robot.Questions!)
+                    {
                         if (question.Name == "StandAlone5G or NoneStandAlone5G")
                         {
                             var answer = question.Answer!.First();
                             var standAlone5GParam = (bool)answer.Value;
                         }
+                    }
 
                     foreach (var question in robot.Questions)
+                    {
                         if (question.Name == "What type of 5G slice")
                         {
                             var answer = question.Answer!.First();
                             // there is an upper limit of eight network slices that be used by a device
                             var slice5GType = (string)answer.Value;
                         } //Nest template
+                    }
 
                     //TODO: Attach robot to slice in Redis graph
                     break;
@@ -191,6 +202,7 @@ internal class ResourcePlanner : IResourcePlanner
                 case "UseWifi":
                     break;
             }
+        }
     }
 
     /// <summary>
@@ -250,10 +262,12 @@ internal class ResourcePlanner : IResourcePlanner
 
                 foreach (var instance in actionParam.Services)
                     // Check with BB
+                {
                     cloudsThatMeetNetAppRequirementsTotal.AddRange(freeClouds
                         .Where(cloud => cloud.NumberOfCores <= instance.MinimumNumCores &&
                                         cloud.Ram <= actionParam.MinimumRam)
                         .ToList());
+                }
 
                 var freeCloudNodes = cloudsThatMeetNetAppRequirementsTotal.FirstOrDefault();
                 if (freeCloudNodes is not null)
@@ -272,18 +286,22 @@ internal class ResourcePlanner : IResourcePlanner
             {
                 //If there are free clouds, get a better cloud from the HW perspective for the netApp
                 foreach (var freeCandidateCloud in freeClouds)
+                {
                     if (freeCandidateCloud.NumberOfCores > cloudCurrentData.NumberOfCores &&
                         freeCandidateCloud.Ram > cloudCurrentData.Ram)
                         return freeCandidateCloud.Name;
+                }
             }
 
             else //There are no clouds free
             {
                 // Get a better less busy cloud from the HW perspective for the netApp
                 foreach (var lessBusyCandidatesClouds in lessBusyClouds)
+                {
                     if (lessBusyCandidatesClouds.NumberOfCores > cloudCurrentData.NumberOfCores &&
                         lessBusyCandidatesClouds.Ram > cloudCurrentData.Ram)
                         return lessBusyCandidatesClouds.Name;
+                }
             }
         }
 
@@ -302,10 +320,14 @@ internal class ResourcePlanner : IResourcePlanner
     {
         //Check if the robot can handle the HW requirements of instance (NetApp's)
         foreach (var instance in actionParam.Services!)
+        {
             if (robot.NumberCores < actionParam.MinimumNumCores && robot.Ram < actionParam.MinimumRam)
                 //TODO: handle this other way.
+            {
                 throw new("The robot with ID " + robot.Id +
                           "doesn't have the HW requirements to run the netApp with ID: " + actionParam.Id);
+            }
+        }
 
         // Select the placement to te the robot
         return Task.FromResult(robot.Name); //guid
@@ -361,10 +383,12 @@ internal class ResourcePlanner : IResourcePlanner
             {
                 // Remove edges that do not have minimum instance (NetApps) HW requirements
                 foreach (var instance in actionParam.Services)
+                {
                     edgesThatMeetNetAppRequirementsTotal.AddRange(freeEdges
                         .Where(edge => edge.NumberOfCores <= actionParam.MinimumNumCores &&
                                        edge.Ram <= actionParam.MinimumRam)
                         .ToList());
+                }
 
                 var freeEdgesNodes = edgesThatMeetNetAppRequirementsTotal.FirstOrDefault();
                 if (freeEdgesNodes is not null)
@@ -382,17 +406,21 @@ internal class ResourcePlanner : IResourcePlanner
             {
                 //If there are free edges, get a better edge from the HW perspective for the netApp
                 foreach (var freeCandidateEdge in freeEdges)
+                {
                     if (freeCandidateEdge.NumberOfCores > edgeCurrentData.NumberOfCores &&
                         freeCandidateEdge.Ram > edgeCurrentData.Ram)
                         return freeCandidateEdge.Name;
+                }
             }
             else //There are no edge free
             {
                 // Get a better less busy edge from the HW perspective for the netApp
                 foreach (var lessBusyCandidatesEdges in lessBusyEdges)
+                {
                     if (lessBusyCandidatesEdges.NumberOfCores > edgeCurrentData.NumberOfCores &&
                         lessBusyCandidatesEdges.Ram > edgeCurrentData.Ram)
                         return lessBusyCandidatesEdges.Name;
+                }
             }
         }
 
@@ -406,8 +434,10 @@ internal class ResourcePlanner : IResourcePlanner
         var actionToConsider = false;
         // Check if this action requires inferring a new placement
         foreach (var action in candidates)
+        {
             if (actionParam.Name == action.Name && rePlan)
                 actionToConsider = true;
+        }
 
         // Check if this action requires inferring a new placement
         if (rePlan == false) actionToConsider = true;
@@ -517,7 +547,12 @@ internal class ResourcePlanner : IResourcePlanner
             var statuses =
                 (await orchestratorApi.NetAppStatusGetByInstanceIdAsync(instance.Id))?.ToList();
             if (statuses == null || statuses.Any() == false)
-                return null;
+            {
+                return
+                    await GetAlreadyDeployedNetAppAsync(
+                        instance); // get already deployed instance when no heartbeat found
+            }
+
             if (statuses.Count == 1)
             {
                 var status = statuses.First();
@@ -560,5 +595,21 @@ internal class ResourcePlanner : IResourcePlanner
         }
 
         return null;
+    }
+
+    private async Task<InstanceModel> GetAlreadyDeployedNetAppAsync(InstanceModel instance)
+    {
+        var allActionPlans = await _redisInterfaceClient.ActionPlanGetAllAsync();
+        if (allActionPlans is null)
+            return null;
+
+        var instances = allActionPlans
+            .SelectMany(a => a.ActionSequence!.SelectMany(x => x.Services))
+            .Where(i => i.Id == instance.Id).ToList();
+
+        if (instances.Any() == false) return null;
+        var selected = instances.First();
+        selected.ContainerImage = null;
+        return selected;
     }
 }
