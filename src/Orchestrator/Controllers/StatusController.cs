@@ -4,6 +4,7 @@ using Middleware.Common.Responses;
 using Middleware.DataAccess.Repositories.Abstract;
 using Middleware.Models.Domain;
 using Middleware.Orchestrator.Heartbeat;
+using Middleware.Orchestrator.Models.Responses;
 using Middleware.RedisInterface.Sdk;
 
 namespace Middleware.Orchestrator.Controllers;
@@ -39,7 +40,7 @@ public class StatusController : Controller
     /// <returns> the list of RobotStatusModel entities </returns>
     [HttpGet]
     [Route("robot", Name = "RobotStatusGetAll")]
-    [ProducesResponseType(typeof(RobotStatusModel), (int)HttpStatusCode.OK)]
+    [ProducesResponseType(typeof(GetRobotStatusesResponse), (int)HttpStatusCode.OK)]
     [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.BadRequest)]
     [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.NotFound)]
     [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.InternalServerError)]
@@ -54,7 +55,11 @@ public class StatusController : Controller
                     "No robot statuses were found."));
             }
 
-            return Ok(status);
+            var resp = new GetRobotStatusesResponse
+            {
+                Robots = status
+            };
+            return Ok(resp);
         }
         catch (Exception ex)
         {
@@ -136,7 +141,7 @@ public class StatusController : Controller
     /// <returns> the list of RobotStatusModel entities </returns>
     [HttpGet]
     [Route("netapp", Name = "NetAppStatuses")]
-    [ProducesResponseType(typeof(NetAppStatusModel), (int)HttpStatusCode.OK)]
+    [ProducesResponseType(typeof(GetNetAppStatusesResponse), (int)HttpStatusCode.OK)]
     [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.BadRequest)]
     [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.NotFound)]
     [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.InternalServerError)]
@@ -151,7 +156,11 @@ public class StatusController : Controller
                     "No NetApp statuses were found."));
             }
 
-            return Ok(status);
+            var resp = new GetNetAppStatusesResponse
+            {
+                NetApps = status
+            };
+            return Ok(resp);
         }
         catch (Exception ex)
         {
