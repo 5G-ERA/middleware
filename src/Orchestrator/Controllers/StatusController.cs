@@ -48,10 +48,10 @@ public class StatusController : Controller
         try
         {
             var status = await _heartbeatService.GetAllRobotStatusesAsync(generateFakeData);
-            if (status is null)
+            if (status is null || !status.Any())
             {
                 return NotFound(new ApiResponse((int)HttpStatusCode.NotFound,
-                    "Status for the specified robot was not found."));
+                    "No robot statuses were found."));
             }
 
             return Ok(status);
@@ -145,10 +145,10 @@ public class StatusController : Controller
         try
         {
             var status = await _heartbeatService.GetAllAppStatusesAsync(generateFakeData);
-            if (status is null)
+            if (status is null || !status.Any())
             {
                 return NotFound(new ApiResponse((int)HttpStatusCode.NotFound,
-                    "Status for the specified robot was not found."));
+                    "No NetApp statuses were found."));
             }
 
             return Ok(status);
@@ -181,12 +181,11 @@ public class StatusController : Controller
 
         try
         {
-            //TODO: put behind service
             var status = await _heartbeatService.GetNetAppStatusByIdAsync(id, generateFakeData);
             if (status is null)
             {
                 return NotFound(new ApiResponse((int)HttpStatusCode.NotFound,
-                    "Status for the specified robot was not found."));
+                    "Status for the specified NetApp was not found."));
             }
 
             return Ok(status);
