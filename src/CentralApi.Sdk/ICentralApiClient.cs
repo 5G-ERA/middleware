@@ -6,20 +6,26 @@ namespace Middleware.CentralApi.Sdk;
 public interface ICentralApiClient
 {
     /// <summary>
-    /// Gets all available (online) Middleware locations  
+    ///     Gets all available (online) Middleware locations
     /// </summary>
     /// <returns></returns>
     Task<LocationsResponse?> GetAvailableLocations();
 
     /// <summary>
-    /// Sets specified location available (online) to be communicated to 
+    ///     Gets all available (online) Middleware locations for the specified Organization
+    /// </summary>
+    /// <returns></returns>
+    Task<LocationsResponse?> GetAvailableLocations(string orgName);
+
+    /// <summary>
+    ///     Sets specified location available (online) to be communicated to
     /// </summary>
     /// <param name="request"></param>
     /// <returns></returns>
     Task<LocationResponse?> RegisterLocation(RegisterRequest request);
 
     /// <summary>
-    /// Sets specified location unavailable (offline)
+    ///     Sets specified location unavailable (offline)
     /// </summary>
     /// <param name="request"></param>
     /// <returns></returns>

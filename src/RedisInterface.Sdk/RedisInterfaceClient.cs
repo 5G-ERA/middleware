@@ -112,6 +112,17 @@ public class RedisInterfaceClient : IRedisInterfaceClient
         return await InstanceGetByIdAsync(id, CancellationToken.None);
     }
 
+    /// <inheritdoc />
+    public async Task<GetInstancesResponse?> InstanceGetAllAsync()
+    {
+        var result = await _api.InstanceGetAll();
+
+        if (!result.IsSuccessStatusCode)
+            _logger.LogError(result.Error, "{} - unsuccessful API call", nameof(InstanceGetAllAsync));
+
+        return result.IsSuccessStatusCode ? result.Content : null;
+    }
+
     public async Task<GetContainersResponse?> ContainerImageGetForInstanceAsync(Guid id)
     {
         return await ContainerImageGetForInstanceAsync(id, CancellationToken.None);
@@ -312,6 +323,17 @@ public class RedisInterfaceClient : IRedisInterfaceClient
             _logger.LogError(result.Error, "{} - unsuccessful API call", nameof(ActionPlanAddAsync));
 
         return result.IsSuccessStatusCode;
+    }
+
+    /// <inheritdoc />
+    public async Task<GetRobotsResponse?> RobotGetAllAsync()
+    {
+        var result = await _api.RobotGetAll();
+
+        if (!result.IsSuccessStatusCode)
+            _logger.LogError(result.Error, "{} - unsuccessful API call", nameof(RobotGetAllAsync));
+
+        return result.IsSuccessStatusCode ? result.Content : null;
     }
 
     private RelationModel CreateRelation<TSource, TDirection>(TSource source, TDirection direction, string name)

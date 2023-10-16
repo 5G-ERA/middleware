@@ -37,6 +37,8 @@ public static class ServiceCollectionExtensions
                     hostConfig.Password(mqConfig.Pass);
                 });
 
+                #region consumer configuration
+
                 mqBusFactoryConfigurator.ReceiveEndpoint(
                     QueueHelpers.ConstructSwitchoverDeleteActionQueueName(mwConfig.Organization,
                         mwConfig.InstanceName),
@@ -91,8 +93,10 @@ public static class ServiceCollectionExtensions
                         ec.ConfigureConsumer<ConnectRobotToSliceConsumer>(busRegistrationContext);
                     });
 
+                #endregion
 
-                #region consumer configuration
+
+                #region publisher configuration
 
                 mqBusFactoryConfigurator.Send<GatewayAddNetAppEntryMessage>(topologyConfigurator =>
                 {
