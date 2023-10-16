@@ -1,8 +1,12 @@
-﻿using Middleware.Common;
+﻿using Middleware.CentralApi.Sdk;
+using Middleware.Common;
 using Middleware.Common.Enums;
 using Middleware.DataAccess.Repositories.Abstract;
 using Middleware.Models.Domain;
+using Middleware.Models.Domain.Slice;
+using Middleware.Models.Enums;
 using Middleware.Models.ExtensionMethods;
+using Middleware.RedisInterface.Contracts.Mappings;
 using Middleware.RedisInterface.Contracts.Responses;
 using StackExchange.Redis;
 
@@ -12,10 +16,12 @@ public class DashboardService : IDashboardService
 {
     private readonly IActionPlanRepository _actionPlanRepository;
     private readonly IActionRepository _actionRepository;
+    private readonly ICentralApiClient _centralApiClient;
     private readonly ICloudRepository _cloudRepository;
     private readonly IEdgeRepository _edgeRepository;
     private readonly IInstanceRepository _instanceRepository;
     private readonly IRobotRepository _robotRepository;
+    private readonly ISliceRepository _sliceRepository;
     private readonly ITaskRepository _taskRepository;
 
 
@@ -25,7 +31,9 @@ public class DashboardService : IDashboardService
         IEdgeRepository edgeRepository,
         ICloudRepository cloudRepository,
         IInstanceRepository instanceRepository,
-        IActionRepository actionRepository)
+        IActionRepository actionRepository,
+        ICentralApiClient centralApiClient,
+        ISliceRepository sliceRepository)
     {
         _instanceRepository = instanceRepository;
         _cloudRepository = cloudRepository;
@@ -34,6 +42,8 @@ public class DashboardService : IDashboardService
         _taskRepository = taskRepository;
         _robotRepository = robotRepository;
         _actionRepository = actionRepository;
+        _centralApiClient = centralApiClient;
+        _sliceRepository = sliceRepository;
     }
 
     /// <summary>
@@ -278,5 +288,46 @@ public class DashboardService : IDashboardService
         var response = new GraphResponse { Entities = entities, Relations = relations };
 
         return response;
+    }
+
+    /// <inheritdoc />
+    public async Task<IReadOnlyList<LocationResponse>> GetOrganizationStructureAsync(string orgName)
+    {
+        var locationsResponse = await _centralApiClient.GetAvailableLocations(orgName);
+        if (locationsResponse is null) return null;
+
+        var locations = new List<LocationResponse>();
+        foreach (var loc in locationsResponse.Locations)
+        {
+            var slices = await GetSlicesForLocation(loc.Id, Enum.Parse<LocationType>(loc.Type));
+            var slicesResp = slices.Select(s => s.ToSliceResponse()).ToArray();
+            locations.Add(new()
+            {
+                Id = loc.Id,
+                Name = loc.Name,
+                Type = loc.Type,
+                IsOnline = loc.IsOnline,
+                IpAddress = loc.Address,
+                Slices = slicesResp
+            });
+        }
+
+        return locations;
+    }
+
+    private async Task<IReadOnlyList<SliceModel>> GetSlicesForLocation(Guid locId, LocationType locType)
+    {
+        var slices = new List<SliceModel>();
+        var relations = locType == LocationType.Cloud
+            ? await _cloudRepository.GetRelation(locId, "OFFERS")
+            : await _edgeRepository.GetRelation(locId, "OFFERS");
+
+        foreach (var relation in relations)
+        {
+            var slice = await _sliceRepository.GetByIdAsync(relation.PointsTo.Id);
+            if (slice is not null) slices.Add(slice);
+        }
+
+        return slices;
     }
 }
