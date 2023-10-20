@@ -469,8 +469,9 @@ internal class DeploymentService : IDeploymentService
 
         if (builder is not null)
         {
-            var topics = instance.RosTopicsPub.CreateCopy();
-            deployment = builder.EnableRosCommunication(deployment, topics);
+            var topicPub = instance.RosTopicsPub.CreateCopy();
+            var topicSub = instance.RosTopicsSub.CreateCopy();
+            deployment = builder.EnableRosCommunication(deployment, topicSub, topicPub);
         }
 
         var service = string.IsNullOrWhiteSpace(cim.K8SService)

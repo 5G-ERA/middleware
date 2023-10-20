@@ -1,4 +1,6 @@
-﻿using k8s.Models;
+﻿using System.Text.Json;
+using k8s.Models;
+using Middleware.Common.ExtensionMethods;
 using Middleware.Models.Domain;
 
 namespace Middleware.Orchestrator.Deployment.RosCommunication;
@@ -28,15 +30,55 @@ internal class Ros2ConnectionBuilder : IRosConnectionBuilder
     public string RosDistro { get; }
 
     /// <inheritdoc />
-    public V1Deployment EnableRosCommunication(V1Deployment dpl, IReadOnlyList<RosTopicModel> topicSubscribers)
+    public V1Deployment EnableRosCommunication(V1Deployment dpl, IReadOnlyList<RosTopicModel> topicSubscribers,
+        IReadOnlyList<RosTopicModel> topicPublishers)
     {
-        //TODO: we have to figure out how to enable ros2. It is possible that it will be same as ros1, but we will see :)
+        if (topicSubscribers is null) throw new ArgumentNullException(nameof(topicSubscribers));
+        if (dpl.Spec?.Template?.Spec?.Containers is null || dpl.Spec.Template.Spec.Containers.Any() == false)
+            throw new ArgumentException("Missing Deployment container configuration.", nameof(dpl));
+
+        dpl.Spec.Template.Spec.Containers.Add(GetRelayNetAppContainer(topicSubscribers, topicPublishers));
+
         return dpl;
     }
 
     /// <inheritdoc />
     public V1Service EnableRelayNetAppCommunication(V1Service service)
     {
-        throw new NotImplementedException();
+        if (service is null) throw new ArgumentNullException(nameof(service));
+        if (service.Spec?.Ports is null) throw new ArgumentNullException(nameof(service), "Ports list cannot be null");
+
+        if (service.ContainsWebsocketCompatiblePort() == false)
+            service.AddWebsocketCompatiblePort();
+
+        return service;
+    }
+
+    private V1Container GetRelayNetAppContainer(IReadOnlyList<RosTopicModel> topicSubscribers,
+        IReadOnlyList<RosTopicModel> topicPublishers)
+    {
+        var subscribersContainers = topicSubscribers.Select(RosTopicContainer.FromRosTopicModel).ToList();
+        var publishersContainers = topicPublishers.Select(RosTopicContainer.FromRosTopicModel).ToList();
+        var subscribersString = JsonSerializer.Serialize(subscribersContainers);
+        var publishersString = JsonSerializer.Serialize(publishersContainers);
+        var container = new V1Container
+        {
+            Name = "relay-net-app",
+            Ports = new List<V1ContainerPort>
+            {
+                new(80, name: "websocket")
+            },
+            Env = new List<V1EnvVar>
+            {
+                new("TOPIC_LIST",
+                    publishersString), // MK 2023.10.20: TOPIC_LIST - list of topics to be sent FROM cloud TO robot
+                new("TOPIC_TO_PUB_LIST",
+                    subscribersString), // MK 2023.10.20: TOPIC_TO_PUB_LIST - list of topics to be sent FROM robot TO cloud
+                new("NETAPP_PORT", "80")
+            },
+            Image = "but5gera/ros2_relay_server:0.1.0"
+        };
+
+        return container;
     }
 }
