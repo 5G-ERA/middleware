@@ -33,7 +33,7 @@ public class Ros1ConnectionBuilderTests
         var sut = new Ros1ConnectionBuilder(distro);
         var topics = new List<RosTopicModel>();
         //act
-        var result = sut.EnableRosCommunication(depl, topics);
+        var result = sut.EnableRosCommunication(depl, topics, topics);
         //assert
         result.Spec.Template.Spec.Containers.Should()
             .HaveCount(3, "We need three containers, one RelayNetApp, one ROS core and NetApp itself");
@@ -72,7 +72,7 @@ public class Ros1ConnectionBuilderTests
             }
         };
         //act
-        var result = sut.EnableRosCommunication(depl, topics);
+        var result = sut.EnableRosCommunication(depl, topics, topics);
 
         //assert
         var relayNetAppContainer = result.Spec.Template.Spec.Containers.FirstOrDefault(c => c.Name == "relay-net-app");
