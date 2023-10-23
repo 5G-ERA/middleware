@@ -1,5 +1,13 @@
 # Changelog
 
+### [0.7.1](https://github.com/5G-ERA/middleware/compare/v0.7.0...v0.7.1) (2023-10-23)
+
+
+### Bug Fixes
+
+* add missing ROS2 support for the Relay NetApp ([#214](https://github.com/5G-ERA/middleware/issues/214)) ([96f74ba](https://github.com/5G-ERA/middleware/commit/96f74bad9df8b0f487f7631473bc11de890ca5ec))
+* use PAT for release-please workflow ([45a327a](https://github.com/5G-ERA/middleware/commit/45a327a20e8db9d20bab02172b00913e2a400e08))
+
 ## [0.7.0](https://github.com/5G-ERA/middleware/compare/v0.6.4...v0.7.0) (2023-10-16)
 
 
