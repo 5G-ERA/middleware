@@ -13,6 +13,7 @@ using Middleware.Orchestrator.Config;
 using Middleware.Orchestrator.Deployment;
 using Middleware.Orchestrator.ExtensionMethods;
 using Middleware.Orchestrator.Heartbeat;
+using Middleware.Orchestrator.Installer;
 using Middleware.Orchestrator.Publishers;
 using Middleware.Orchestrator.SliceManager;
 using Middleware.Orchestrator.SliceManager.Contracts;
@@ -68,6 +69,7 @@ builder.Services.AddScoped<IPublishingService, PublishingService>();
 builder.Services.AddScoped<IPublisher<GatewayAddNetAppEntryMessage>, GatewayAddNetAppEntryPublisher>();
 builder.Services.AddScoped<IPublisher<GatewayDeleteNetAppEntryMessage>, GatewayDeleteNetAppEntryPublisher>();
 builder.Services.AddScoped<IHeartbeatService, HeartbeatService>();
+builder.Services.AddScoped<IStartupDataInstaller, StartupDataInstaller>();
 builder.Services.AddRedisInterfaceClient();
 
 builder.Services.AddHttpClient("healthCheckClient");
