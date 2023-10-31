@@ -15,6 +15,9 @@ using System.Reflection.Emit;
 using Microsoft.Extensions.Logging;
 using Elasticsearch.Net;
 using System.Reflection;
+using Neo4j.Driver.Preview.Mapping;
+using System.Data;
+using k8s;
 
 namespace Middleware.DataAccess.Repositories;
 
@@ -160,57 +163,89 @@ public class RedisRepository<TModel, TDto> : IRedisRepository<TModel, TDto> wher
             throw new ArgumentException($"'{nameof(relationName)}' cannot be null or whitespace.",
                 nameof(relationName));
         }
-
-
         relationName = relationName.ToUpper();
         var relationModels = new List<RelationModel>();
         var entityDef = _entityName + " {ID: '" + id + "' }";
-        var query = RelationDirection.Incoming == direction
-            ? "MATCH (x) MATCH (y) WHERE (x)-[:" + relationName + "]->(y:" + entityDef + " ) RETURN x,y"
-            : "MATCH (x:" + entityDef + ") MATCH(y) WHERE(x) -[:" + relationName + "]->(y) RETURN x, y";
-        ResultSet? resultSet;
-        try
-        {
-            resultSet = await RedisGraph.Query(GraphName, query);
-        }
-        catch (FormatException) //BB 2023.07.07 - when no results are found the library throws FormatException
-        {
-            return relationModels;
-        }
 
-        // BB: 24.03.2022
-        // We are using the loop with 2 nested loops to retrieve the values from the graph
-        // The values are structured in the following way:
-        // First result contains the information about the objects that the relation initiates from
-        // Second results contains the information about the objects that the relation is pointing to
-        // This structure will be universal for the explanation of all the queries on the redis graph
-        for (var i = 0; i < resultSet.Results.Count; i++)
+        using (var session = _driver.AsyncSession())
         {
-            var res = resultSet.Results.ElementAt(i);
-            if (i % 2 == 0)
+            try
             {
-                foreach (var node in res.Value)
+                // Create a transaction to execute the Cypher query
+                using (var transaction = await session.BeginTransactionAsync())
                 {
-                    var relationModel = new RelationModel
+                    var query = RelationDirection.Outgoing == direction
+                        ? $"MATCH (n1:" + entityDef + ")-[r:" + relationName + "]->(n2) RETURN *"
+                        : $"MATCH (n1:" + entityDef + ")<-[r:" + relationName + "]-(n2) RETURN *";
+
+                    // Execute the Cypher query asynchronously
+                    var result = await transaction.RunAsync(query);
+
+                    while (await result.FetchAsync()) 
                     {
-                        RelationName = relationName
-                    };
-                    if (node is Node nd) SetGraphModelValues(relationModel.InitiatesFrom, nd);
+                        var record = result.Current;
 
-                    relationModels.Add(relationModel);
+                        var n1 = record.Values["n1"];
+                        GraphEntityModel n1GraphModel = null;
+                        if (n1 is Neo4j.Driver.INode node1)
+                        {
+                            var n1Id = node1.Properties["ID"].ToString();
+                            var n1Name = node1.Properties["Name"].ToString();
+                            var n1Type = node1.Properties["Type"].ToString();
+                            n1GraphModel = new GraphEntityModel
+                            {
+                                Id = Guid.Parse(n1Id!),
+                                Type = n1Type!,
+                                Name = n1Name!
+
+                            };
+                        }
+                        var n2 = record.Values["n2"];
+                        GraphEntityModel n2GraphModel = null;
+                        if (n2 is Neo4j.Driver.INode node2)
+                        {
+                            var n2Id = node2.Properties["ID"].ToString();
+                            var n2Name = node2.Properties["Name"].ToString();
+                            var n2Type = node2.Properties["Type"].ToString();
+                            n2GraphModel = new GraphEntityModel
+                            {
+                                Id = Guid.Parse(n2Id!),
+                                Type = n2Type!,
+                                Name = n2Name!
+
+                            };
+                        }      
+                        RelationModel relationModel = null;
+                        var r = record.Values["r"];
+                        if (r is IRelationship relationship)
+                        {
+                            var relType = relationship.Type;
+                            if (n1GraphModel is null || n2GraphModel is null)
+                            {
+                                continue;
+                            }
+                            relationModel = new RelationModel
+                            {
+                                InitiatesFrom = n1GraphModel,
+                                PointsTo = n2GraphModel,
+                                RelationName = relType,
+                            };
+                        }                        
+                        relationModels.Add(relationModel!);
+                    }
+                    if (relationModels.Count == 0) 
+                    {
+                        Logger.LogError("No relationship found.");
+                        return null;
+                    }
                 }
             }
-            else
+            catch (Exception ex)
             {
-                foreach (var node in res.Value)
-                {
-                    var idxTmp = res.Value.IndexOf(node);
-                    var relationModel = relationModels[idxTmp];
-                    if (node is Node nd) SetGraphModelValues(relationModel.PointsTo, nd);
-                }
+                Logger.LogError(ex, "An error occurred:");
+                return null;
             }
         }
-
         return relationModels;
     }
 
@@ -291,7 +326,7 @@ public class RedisRepository<TModel, TDto> : IRedisRepository<TModel, TDto> wher
                 {
                     var query = "MATCH (n1: " + relation.InitiatesFrom.Type + " {ID: '" + relation.InitiatesFrom.Id +
                     "'}), (n2: " + relation.PointsTo.Type + " {ID: '" + relation.PointsTo.Id +
-                    "'}) CREATE (n1)-[:" + relation.RelationName + "]->(n2) ";
+                    "'}) CREATE (n1)-[r:" + relation.RelationName + "]->(n2) ";
 
                     // Execute the Cypher query asynchronously
                     var result = await transaction.RunAsync(query);
