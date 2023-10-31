@@ -1,4 +1,5 @@
 ﻿using Middleware.Common.Helpers;
+using Middleware.DataAccess.Repositories.Abstract;
 using Middleware.Models.Domain;
 using Middleware.Models.Enums;
 
@@ -6,10 +7,27 @@ namespace Middleware.Orchestrator.Installer;
 
 internal class StartupDataInstaller : IStartupDataInstaller
 {
-    /// <inheritdoc />
-    public Task InitializeStartupDataAsync()
+    private readonly IPolicyRepository _policyRepository;
+    private readonly IUserRepository _userRepository;
+
+    public StartupDataInstaller(IUserRepository userRepository, IPolicyRepository policyRepository)
     {
-        throw new NotImplementedException();
+        _userRepository = userRepository;
+        _policyRepository = policyRepository;
+    }
+
+    /// <inheritdoc />
+    public async Task InitializeStartupDataAsync()
+    {
+        var user = CreateDefaultUser();
+        var existing = await _userRepository.GetByIdAsync(user.Id);
+        if (existing is null)
+            await _userRepository.AddAsync(user);
+
+        var urllcPolicy = CreateUrllcPolicy();
+        var existingPolicy = await _policyRepository.GetByIdAsync(urllcPolicy.Id);
+        if (existingPolicy is null)
+            await _policyRepository.AddAsync(urllcPolicy);
     }
 
     private PolicyModel CreateUrllcPolicy()
@@ -35,7 +53,7 @@ internal class StartupDataInstaller : IStartupDataInstaller
 
         return new()
         {
-            Id = Guid.NewGuid(),
+            Id = Guid.Parse("AD20F254-DC3B-406D-9F15-B73CCD47E867"),
             Name = "middleware",
             Password = AuthHelper.HashPasswordWithSalt(password, salt),
             Role = "admin",

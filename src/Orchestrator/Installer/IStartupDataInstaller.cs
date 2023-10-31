@@ -3,7 +3,7 @@
 internal interface IStartupDataInstaller
 {
     /// <summary>
-    ///     Initializes startup data for teh Middleware
+    ///     Initializes startup data for the Middleware
     /// </summary>
     /// <returns></returns>
     Task InitializeStartupDataAsync();

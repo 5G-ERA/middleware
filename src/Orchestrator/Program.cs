@@ -90,6 +90,9 @@ using (var scope = app.Services.CreateScope())
     };
     var result = await centralApiClient!.RegisterLocation(request);
     if (result is null) throw new("Cannot register at centralAPI");
+
+    var dataInstaller = scope.ServiceProvider.GetService<IStartupDataInstaller>();
+    await dataInstaller!.InitializeStartupDataAsync();
 }
 
 // Configure the HTTP request pipeline.
