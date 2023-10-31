@@ -30,6 +30,7 @@ builder.RegisterSecretsManager();
 builder.ConfigureLogger();
 builder.Services.Configure<MiddlewareConfig>(builder.Configuration.GetSection(MiddlewareConfig.ConfigName));
 builder.Services.Configure<SliceConfig>(builder.Configuration.GetSection(SliceConfig.ConfigName));
+builder.Services.Configure<UserConfig>(builder.Configuration.GetSection(UserConfig.ConfigName));
 
 var mwConfig = builder.Configuration.GetSection(MiddlewareConfig.ConfigName).Get<MiddlewareConfig>();
 var centralApiHostname = Environment.GetEnvironmentVariable("CENTRAL_API_HOSTNAME");

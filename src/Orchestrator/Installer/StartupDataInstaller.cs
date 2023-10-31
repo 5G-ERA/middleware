@@ -1,4 +1,6 @@
-﻿using Middleware.Common.Helpers;
+﻿using Microsoft.Extensions.Options;
+using Middleware.Common.Config;
+using Middleware.Common.Helpers;
 using Middleware.DataAccess.Repositories.Abstract;
 using Middleware.Models.Domain;
 using Middleware.Models.Enums;
@@ -8,18 +10,21 @@ namespace Middleware.Orchestrator.Installer;
 internal class StartupDataInstaller : IStartupDataInstaller
 {
     private readonly IPolicyRepository _policyRepository;
+    private readonly IOptions<UserConfig> _userConfig;
     private readonly IUserRepository _userRepository;
 
-    public StartupDataInstaller(IUserRepository userRepository, IPolicyRepository policyRepository)
+    public StartupDataInstaller(IUserRepository userRepository, IPolicyRepository policyRepository,
+        IOptions<UserConfig> userConfig)
     {
         _userRepository = userRepository;
         _policyRepository = policyRepository;
+        _userConfig = userConfig;
     }
 
     /// <inheritdoc />
     public async Task InitializeStartupDataAsync()
     {
-        var user = CreateDefaultUser();
+        var user = CreateDefaultUser(_userConfig.Value);
         var existing = await _userRepository.GetByIdAsync(user.Id);
         if (existing is null)
             await _userRepository.AddAsync(user);
@@ -46,15 +51,17 @@ internal class StartupDataInstaller : IStartupDataInstaller
         };
     }
 
-    private UserModel CreateDefaultUser()
+    private UserModel CreateDefaultUser(UserConfig config)
     {
-        var password = "middleware";
+        var isEmpty = !string.IsNullOrWhiteSpace(config.Password) && !string.IsNullOrWhiteSpace(config.Username);
+        var password = isEmpty ? "middleware" : config.Password;
+        var name = isEmpty ? "middleware" : config.Username;
         var salt = AuthHelper.GetSalt();
 
         return new()
         {
             Id = Guid.Parse("AD20F254-DC3B-406D-9F15-B73CCD47E867"),
-            Name = "middleware",
+            Name = name,
             Password = AuthHelper.HashPasswordWithSalt(password, salt),
             Role = "admin",
             Salt = AuthHelper.StringifySalt(salt)
