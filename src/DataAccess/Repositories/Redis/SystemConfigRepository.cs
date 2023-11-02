@@ -11,7 +11,7 @@ public class SystemConfigRepository : RedisRepository<SystemConfigModel, SystemC
 {
     /// <inheritdoc />
     public SystemConfigRepository(IRedisConnectionProvider provider, IRedisGraphClient redisGraph,
-        bool isWritableToGraph, ILogger logger) : base(provider, redisGraph, isWritableToGraph, logger)
+        ILogger logger) : base(provider, redisGraph, false, logger)
     {
     }
 
@@ -21,5 +21,11 @@ public class SystemConfigRepository : RedisRepository<SystemConfigModel, SystemC
         var cfg = await GetByIdAsync(Guid.Empty);
 
         return cfg;
+    }
+
+    /// <inheritdoc />
+    public async Task InitializeConfigAsync(SystemConfigModel cfg)
+    {
+        await AddAsync(cfg);
     }
 }

@@ -10,20 +10,30 @@ namespace Middleware.Orchestrator.Installer;
 internal class StartupDataInstaller : IStartupDataInstaller
 {
     private readonly IPolicyRepository _policyRepository;
+    private readonly ISystemConfigRepository _systemConfigRepository;
     private readonly IOptions<UserConfig> _userConfig;
     private readonly IUserRepository _userRepository;
 
     public StartupDataInstaller(IUserRepository userRepository, IPolicyRepository policyRepository,
+        ISystemConfigRepository systemConfigRepository,
         IOptions<UserConfig> userConfig)
     {
         _userRepository = userRepository;
         _policyRepository = policyRepository;
+        _systemConfigRepository = systemConfigRepository;
         _userConfig = userConfig;
     }
 
     /// <inheritdoc />
     public async Task InitializeStartupDataAsync()
     {
+        var cfg = await _systemConfigRepository.GetConfigAsync();
+        if (cfg is null)
+        {
+            cfg = InitializeSystemConfigModel();
+            await _systemConfigRepository.InitializeConfigAsync(cfg);
+        }
+
         var user = CreateDefaultUser(_userConfig.Value);
         var existing = await _userRepository.GetByIdAsync(user.Id);
         if (existing is null)
@@ -33,6 +43,19 @@ internal class StartupDataInstaller : IStartupDataInstaller
         var existingPolicy = await _policyRepository.GetByIdAsync(urllcPolicy.Id);
         if (existingPolicy is null)
             await _policyRepository.AddAsync(urllcPolicy);
+    }
+
+    private SystemConfigModel InitializeSystemConfigModel()
+    {
+        var cfg = new SystemConfigModel
+        {
+            Ros1RelayContainer = "but5gera/relay_network_application:0.4.4",
+            Ros2RelayContainer = "but5gera/ros2_relay_server:0.1.0",
+            RosInterRelayNetAppContainer = "but5gera/inter_relay_network_application:0.4.4"
+        };
+
+
+        return cfg;
     }
 
     private PolicyModel CreateUrllcPolicy()

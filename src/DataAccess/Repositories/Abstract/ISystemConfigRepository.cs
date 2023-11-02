@@ -9,4 +9,11 @@ public interface ISystemConfigRepository
     /// </summary>
     /// <returns></returns>
     Task<SystemConfigModel?> GetConfigAsync();
+
+    /// <summary>
+    ///     Initializes system config values
+    /// </summary>
+    /// <param name="cfg"></param>
+    /// <returns></returns>
+    Task InitializeConfigAsync(SystemConfigModel cfg);
 }
