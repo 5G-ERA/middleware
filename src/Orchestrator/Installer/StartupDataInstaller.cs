@@ -34,6 +34,8 @@ internal class StartupDataInstaller : IStartupDataInstaller
             await _systemConfigRepository.InitializeConfigAsync(cfg);
         }
 
+        if (IsConfigCorrect(cfg) == false) await _systemConfigRepository.InitializeConfigAsync(cfg);
+
         var user = CreateDefaultUser(_userConfig.Value);
         var existing = await _userRepository.GetByIdAsync(user.Id);
         if (existing is null)
@@ -43,6 +45,32 @@ internal class StartupDataInstaller : IStartupDataInstaller
         var existingPolicy = await _policyRepository.GetByIdAsync(urllcPolicy.Id);
         if (existingPolicy is null)
             await _policyRepository.AddAsync(urllcPolicy);
+    }
+
+    private bool IsConfigCorrect(SystemConfigModel cfg)
+    {
+        var defaultCfg = InitializeSystemConfigModel();
+        var isCorrect = true;
+
+        if (string.IsNullOrWhiteSpace(cfg.Ros1RelayContainer))
+        {
+            isCorrect = false;
+            cfg.Ros1RelayContainer = defaultCfg.Ros1RelayContainer;
+        }
+
+        if (string.IsNullOrWhiteSpace(cfg.Ros2RelayContainer))
+        {
+            isCorrect = false;
+            cfg.Ros2RelayContainer = defaultCfg.Ros2RelayContainer;
+        }
+
+        if (string.IsNullOrWhiteSpace(cfg.RosInterRelayNetAppContainer))
+        {
+            isCorrect = false;
+            cfg.RosInterRelayNetAppContainer = defaultCfg.RosInterRelayNetAppContainer;
+        }
+
+        return isCorrect;
     }
 
     private SystemConfigModel InitializeSystemConfigModel()
