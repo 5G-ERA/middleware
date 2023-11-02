@@ -61,8 +61,10 @@ builder.Services.RegisterRabbitMqConsumers(rabbitmqConfig, mwConfig)
 builder.Services.AddHttpClient(AppConfig.OsmApiClientName);
 builder.Services.AddScoped<IKubernetesBuilder, KubernetesBuilder>();
 builder.Services.AddScoped<IDeploymentService, DeploymentService>();
-builder.Services.AddScoped<INetAppStatusRepository, RedisNetAppStatusRepository>();
 builder.Services.AddScoped<IRobotStatusRepository, RedisRobotStatusRepository>();
+builder.Services.AddScoped<INetAppStatusRepository, RedisNetAppStatusRepository>();
+builder.Services.RegisterRepositories();
+
 builder.Services.AddScoped<ISliceManagerClientFactory, SliceManagerClientFactory>();
 builder.Services.AddScoped<IKubernetesObjectBuilder, KubernetesObjectBuilder>();
 builder.Services.AddScoped<IRosConnectionBuilderFactory, RosConnectionBuilderFactory>();
@@ -71,6 +73,7 @@ builder.Services.AddScoped<IPublisher<GatewayAddNetAppEntryMessage>, GatewayAddN
 builder.Services.AddScoped<IPublisher<GatewayDeleteNetAppEntryMessage>, GatewayDeleteNetAppEntryPublisher>();
 builder.Services.AddScoped<IHeartbeatService, HeartbeatService>();
 builder.Services.AddScoped<IStartupDataInstaller, StartupDataInstaller>();
+
 builder.Services.AddRedisInterfaceClient();
 
 builder.Services.AddHttpClient("healthCheckClient");

@@ -104,9 +104,9 @@ internal class StartupDataInstaller : IStartupDataInstaller
 
     private UserModel CreateDefaultUser(UserConfig config)
     {
-        var isEmpty = !string.IsNullOrWhiteSpace(config.Password) && !string.IsNullOrWhiteSpace(config.Username);
-        var password = isEmpty ? "middleware" : config.Password;
-        var name = isEmpty ? "middleware" : config.Username;
+        var hasValue = !string.IsNullOrWhiteSpace(config.Password) && !string.IsNullOrWhiteSpace(config.Username);
+        var password = hasValue ? config.Password : "middleware";
+        var name = hasValue ? config.Username : "middleware";
         var salt = AuthHelper.GetSalt();
 
         return new()
