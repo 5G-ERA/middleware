@@ -8,9 +8,10 @@ namespace Middleware.Orchestrator.Deployment.RosCommunication;
 internal class Ros1ConnectionBuilder : IRosConnectionBuilder
 {
     private const RosVersion Ros1 = Middleware.Models.Domain.RosVersion.Ros1;
+    private readonly SystemConfigModel _cfg;
     private readonly RosDistro _distro;
 
-    public Ros1ConnectionBuilder(RosDistro distro)
+    public Ros1ConnectionBuilder(RosDistro distro, SystemConfigModel cfg)
     {
         if (distro.RosVersion != Ros1)
         {
@@ -19,6 +20,7 @@ internal class Ros1ConnectionBuilder : IRosConnectionBuilder
         }
 
         _distro = distro;
+        _cfg = cfg;
         RosVersion = distro.RosVersionInt;
         RosDistro = distro.Name;
     }
@@ -96,7 +98,7 @@ internal class Ros1ConnectionBuilder : IRosConnectionBuilder
                 new("TOPIC_LIST", topicsString),
                 new("NETAPP_PORT", "80")
             },
-            Image = "but5gera/relay_network_application:0.4.4"
+            Image = _cfg.Ros1RelayContainer
         };
 
         return container;
