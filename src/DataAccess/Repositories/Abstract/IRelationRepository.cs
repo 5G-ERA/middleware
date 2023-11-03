@@ -1,5 +1,6 @@
 ﻿using Middleware.Common.Enums;
 using Middleware.Models.Domain;
+using Neo4j.Driver;
 
 namespace Middleware.DataAccess.Repositories.Abstract
 {
@@ -28,6 +29,6 @@ namespace Middleware.DataAccess.Repositories.Abstract
 
         Task<bool> DeleteRelationAsync(RelationModel relation);
 
-        Task<Dictionary<string, List<RedisGraphResult>>> GetAllRelations();
+        Task<Tuple<List<GraphEntityModel>, List<SimpleRelation>>> GetGraph();
     }
 }

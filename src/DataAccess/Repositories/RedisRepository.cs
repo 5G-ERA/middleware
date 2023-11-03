@@ -18,6 +18,10 @@ using System.Reflection;
 using Neo4j.Driver.Preview.Mapping;
 using System.Data;
 using k8s;
+using k8s.KubeConfigModels;
+using StackExchange.Redis;
+using System.Collections.Generic;
+using System.Xml.Linq;
 
 namespace Middleware.DataAccess.Repositories;
 
@@ -85,7 +89,6 @@ public class RedisRepository<TModel, TDto> : IRedisRepository<TModel, TDto> wher
             var graphModel = new GraphEntityModel(model.Id, model.Name, _entityName);
             await AddGraphAsync(graphModel);
         }
-
         return ToTModel(dto);
     }
 
@@ -259,7 +262,6 @@ public class RedisRepository<TModel, TDto> : IRedisRepository<TModel, TDto> wher
             var currentRelation = await GetRelation(id, relationName);
             relations.AddRange(currentRelation);
         }
-
         return relations;
     }
 
@@ -267,12 +269,99 @@ public class RedisRepository<TModel, TDto> : IRedisRepository<TModel, TDto> wher
     ///     Return all RelationModels to recreate the graph.
     /// </summary>
     /// <returns></returns>
-    public virtual async Task<Dictionary<string, List<RedisGraphResult>>> GetAllRelations()
+    public virtual async Task<Tuple<List<GraphEntityModel>, List<SimpleRelation>>> GetGraph()
     {
-        var query = "MATCH (n) OPTIONAL MATCH (n)-[r]->(m) RETURN n, type(r) as r, m";
-        var resultSet = await RedisGraph.Query(GraphName, query);
+        var entities = new List<GraphEntityModel>();
+        var relations = new List<SimpleRelation>();
+        var entityIds = new List<Guid>();
+        
+        using (var session = _driver.AsyncSession())
+        {
+            try
+            {
+                // Create a transaction to execute the Cypher query
+                using (var transaction = await session.BeginTransactionAsync())
+                {
+                    var query = "MATCH (n1) OPTIONAL MATCH (n1)-[r]->(n2) RETURN *";
 
-        return resultSet?.Results;
+                    // Execute the Cypher query asynchronously
+                    var result = await transaction.RunAsync(query);
+
+                    while (await result.FetchAsync())
+                    {
+                        var record = result.Current;
+
+                        var n1 = record.Values["n1"];
+                        GraphEntityModel n1GraphModel = null;
+                        if (n1 is Neo4j.Driver.INode node1)
+                        {
+                            var n1Id = node1.Properties["ID"].ToString();
+                            var n1Name = node1.Properties["Name"].ToString();
+                            var n1Type = node1.Properties["Type"].ToString();
+                            n1GraphModel = new GraphEntityModel
+                            {
+                                Id = Guid.Parse(n1Id!),
+                                Type = n1Type!,
+                                Name = n1Name!
+
+                            };
+                        }
+                        if (entityIds.Contains(n1GraphModel!.Id) == false)
+                        {
+                            entities.Add(n1GraphModel);
+                            entityIds.Add(n1GraphModel.Id);
+                        }
+                            
+                        var n2 = record.Values["n2"];
+                        GraphEntityModel n2GraphModel = null;
+                        if (n2 is Neo4j.Driver.INode node2)
+                        {
+                            var n2Id = node2.Properties["ID"].ToString();
+                            var n2Name = node2.Properties["Name"].ToString();
+                            var n2Type = node2.Properties["Type"].ToString();
+                            n2GraphModel = new GraphEntityModel
+                            {
+                                Id = Guid.Parse(n2Id!),
+                                Type = n2Type!,
+                                Name = n2Name!
+
+                            };
+                        }
+                        if (n2GraphModel is not null && entityIds.Contains(n2GraphModel!.Id) == false)
+                        {
+                            entities.Add(n2GraphModel);
+                            entityIds.Add(n2GraphModel.Id);
+                        }
+
+                        SimpleRelation relationModel = null;
+                        var r = record.Values["r"];
+                        if (r is IRelationship relationship)
+                        {
+                            var relType = relationship.Type;
+                            if (n1GraphModel is null)
+                            {
+                                continue;
+                            }
+                            relationModel = new SimpleRelation
+                            {
+                                OriginatingId = n1GraphModel.Id,
+                                RelationName = relType,
+                                PointsToId = n2GraphModel.Id
+                            };
+                        }
+                        if (n1GraphModel is not null && n2GraphModel is not null && relations.Contains(relationModel) == false)
+                        {
+                            relations.Add(relationModel);
+                        }                      
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.LogError(ex, "An error occurred:");
+            }
+        }
+        return new Tuple<List<GraphEntityModel>, List<SimpleRelation>>(entities, relations);
     }
 
     /// <summary>
@@ -305,6 +394,7 @@ public class RedisRepository<TModel, TDto> : IRedisRepository<TModel, TDto> wher
             catch (Exception ex)
             {
                 Logger.LogError(ex, "An error occurred:");
+                return false;
             }
         }
         return true;
@@ -338,6 +428,7 @@ public class RedisRepository<TModel, TDto> : IRedisRepository<TModel, TDto> wher
             catch (Exception ex)
             {
                 Logger.LogError(ex, "An error occurred:");
+                return false;
             }
         }
         return true;
@@ -371,6 +462,7 @@ public class RedisRepository<TModel, TDto> : IRedisRepository<TModel, TDto> wher
             catch (Exception ex)
             {
                 Logger.LogError(ex, "An error occurred:");
+                return false;
             }
         }
         return true;
@@ -404,6 +496,7 @@ public class RedisRepository<TModel, TDto> : IRedisRepository<TModel, TDto> wher
             catch (Exception ex)
             {
                 Logger.LogError(ex, "An error occurred:");
+                return false;
             }
         }
         return true;
@@ -413,6 +506,32 @@ public class RedisRepository<TModel, TDto> : IRedisRepository<TModel, TDto> wher
     {
         var dto = ToTDto(model);
         await Collection.InsertAsync(dto);
+        await UpdateGraphAsync(model);
+    }
+
+    private async Task UpdateGraphAsync(TModel model) 
+    {
+        using (var session = _driver.AsyncSession())
+        {
+            try
+            {
+                // Create a transaction to execute the Cypher query
+                using (var transaction = await session.BeginTransactionAsync())
+                {
+                    var query = "MATCH(n1: " + _entityName + " ) WHERE n1.ID = '" + model.Id + "' SET n1.Name = '" + model.Name + "' RETURN n1";
+
+                    // Execute the Cypher query asynchronously
+                    var result = await transaction.RunAsync(query);
+
+                    // Commit the transaction
+                    await transaction.CommitAsync();
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.LogError(ex, "An error occurred:");
+            }
+        }     
     }
 
     private async Task DeleteFromGraph(Guid id)
@@ -451,8 +570,37 @@ public class RedisRepository<TModel, TDto> : IRedisRepository<TModel, TDto> wher
 
     private async Task<bool> ObjectExistsOnGraph(GraphEntityModel graphModel)
     {
-        var query = "match (x:" + _entityName + " {ID: '" + graphModel.Id + "'}) return x";
-        var resultSet = await RedisGraph.Query(GraphName, query);
-        return resultSet != null && resultSet.Results.Count > 0;
+        bool exists = false;
+
+        using (var session = _driver.AsyncSession())
+        {
+            try
+            {
+                // Create a transaction to execute the Cypher query
+                using (var transaction = await session.BeginTransactionAsync())
+                {
+                    var query = "MATCH (n1:" + _entityName + " {ID: '" + graphModel.Id + "'}) RETURN n1";
+
+                    // Execute the Cypher query asynchronously
+                    var result = await transaction.RunAsync(query);
+
+                    while (await result.FetchAsync())
+                    {
+                        var record = result.Current;
+
+                        if (record.Keys.Count() > 0)
+                        {
+                            exists = true;
+                        }
+                        else { exists = false; }                                  
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.LogError(ex, "An error occurred:");
+            }
+        }
+        return exists;
     }
 }

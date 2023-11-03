@@ -1,4 +1,6 @@
-﻿namespace Middleware.RedisInterface.Contracts.Responses;
+﻿/*using Middleware.Models.Domain;
+
+namespace Middleware.RedisInterface.Contracts.Responses;
 
 public class SimpleRelation
 {
@@ -14,7 +16,7 @@ public class SimpleRelationComparer : IEqualityComparer<SimpleRelation>
         if (ReferenceEquals(x, null)) return false;
         if (ReferenceEquals(y, null)) return false;
         if (x.GetType() != y.GetType()) return false;
-        return  x.RelationName == y.RelationName  
+        return x.RelationName == y.RelationName
              && (x.OriginatingId.Equals(y.PointsToId) && x.PointsToId.Equals(y.PointsToId)
                  || x.OriginatingId.Equals(y.PointsToId) && y.PointsToId.Equals(x.OriginatingId));
     }
@@ -25,3 +27,4 @@ public class SimpleRelationComparer : IEqualityComparer<SimpleRelation>
         return string.Join("", elems.OrderBy(x => x).ToArray()).GetHashCode();
     }
 }
+*/

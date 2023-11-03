@@ -29,11 +29,11 @@ IRedisConnectionProvider clusterConnectionProvider = new RedisConnectionProvider
 
 IRedisGraphClient clusterGraphClient = new RedisGraphClient(clusterMultiplexer);
 
-#region Robot
+/*#region Robot
 Console.WriteLine("Writing Robots...");
 var robotRepository = new RobotRepository(multiplexer, redisGraphClient, new NullLogger<RobotRepository>());
-/*var clusterRobotRepository =
-    new RedisRobotRepository(clusterConnectionProvider, clusterGraphClient, Serilog.Log.Logger);*/
+*//*var clusterRobotRepository =
+    new RedisRobotRepository(clusterConnectionProvider, clusterGraphClient, Serilog.Log.Logger);*//*
 
 var robots = await robotRepository.GetAllAsync();
 
@@ -46,8 +46,8 @@ foreach (var robot in robots)
 #region action
 Console.WriteLine("Writing Actions...");
 var actionRepository = new ActionRepository(multiplexer, redisGraphClient, new NullLogger<ActionRepository>());
-/*var clusterActionRepository =
-    new RedisActionRepository(clusterConnectionProvider, clusterGraphClient, Serilog.Log.Logger);*/
+*//*var clusterActionRepository =
+    new RedisActionRepository(clusterConnectionProvider, clusterGraphClient, Serilog.Log.Logger);*//*
 
 var actions = await actionRepository.GetAllAsync();
 
@@ -62,8 +62,8 @@ foreach (var action in actions)
 #region cloud
 Console.WriteLine("Writing Clouds...");
 var cloudRepository = new CloudRepository(multiplexer, redisGraphClient, new NullLogger<CloudRepository>());
-/*var redisCloudRepository =
-    new RedisCloudRepository(clusterConnectionProvider, clusterGraphClient, Serilog.Log.Logger);*/
+*//*var redisCloudRepository =
+    new RedisCloudRepository(clusterConnectionProvider, clusterGraphClient, Serilog.Log.Logger);*//*
 
 var clouds = await cloudRepository.GetAllAsync();
 
@@ -78,8 +78,8 @@ foreach (var cloud in clouds)
 #region instance
 Console.WriteLine("Writing Instances...");
 var instanceRepository = new InstanceRepository(multiplexer, redisGraphClient, new NullLogger<InstanceRepository>());
-/*var redisInstanceRepository =
-    new RedisInstanceRepository(clusterConnectionProvider, clusterGraphClient, Serilog.Log.Logger);*/
+*//*var redisInstanceRepository =
+    new RedisInstanceRepository(clusterConnectionProvider, clusterGraphClient, Serilog.Log.Logger);*//*
 
 var instances = await instanceRepository.GetAllAsync();
 
@@ -93,8 +93,8 @@ foreach (var instance in instances)
 #region continerImage
 Console.WriteLine("Writing Container images...");
 var containerImageRepository = new ContainerImageRepository(instanceRepository, multiplexer, redisGraphClient, new NullLogger<ContainerImageRepository>());
-/*var redisContainerImageRepository =
-    new RedisContainerImageRepository(redisInstanceRepository, clusterConnectionProvider, clusterGraphClient, Serilog.Log.Logger);*/
+*//*var redisContainerImageRepository =
+    new RedisContainerImageRepository(redisInstanceRepository, clusterConnectionProvider, clusterGraphClient, Serilog.Log.Logger);*//*
 
 var containers = await containerImageRepository.GetAllAsync();
 
@@ -108,8 +108,8 @@ foreach (var container in containers)
 #region Edge
 Console.WriteLine("Writing Edges...");
 var edgeRepository = new EdgeRepository(multiplexer, redisGraphClient, new NullLogger<EdgeRepository>());
-/*var redisEdgeRepository =
-    new RedisEdgeRepository(clusterConnectionProvider, clusterGraphClient, Serilog.Log.Logger);*/
+*//*var redisEdgeRepository =
+    new RedisEdgeRepository(clusterConnectionProvider, clusterGraphClient, Serilog.Log.Logger);*//*
 
 var edges = await edgeRepository.GetAllAsync();
 
@@ -124,8 +124,8 @@ foreach (var edge in edges)
 #region Users
 Console.WriteLine("Writing Users...");
 var userRepository = new UserRepository(multiplexer, redisGraphClient, new NullLogger<UserRepository>());
-/*var redisUserRepository =
-    new RedisUserRepository(clusterConnectionProvider, clusterGraphClient, Serilog.Log.Logger);*/
+*//*var redisUserRepository =
+    new RedisUserRepository(clusterConnectionProvider, clusterGraphClient, Serilog.Log.Logger);*//*
 
 var users = await userRepository.GetAllAsync();
 
@@ -140,8 +140,8 @@ foreach (var user in users)
 #region Policy
 Console.WriteLine("Writing Policies...");
 var policyRepository = new PolicyRepository(multiplexer, redisGraphClient, new NullLogger<PolicyRepository>());
-/*var redisPolicyRepository =
-    new RedisPolicyRepository(clusterConnectionProvider, clusterGraphClient, Serilog.Log.Logger);*/
+*//*var redisPolicyRepository =
+    new RedisPolicyRepository(clusterConnectionProvider, clusterGraphClient, Serilog.Log.Logger);*//*
 
 var policies = await policyRepository.GetAllAsync();
 
@@ -157,8 +157,8 @@ foreach (var policy in policies)
 #region Task
 Console.WriteLine("Writing Tasks...");
 var taskRepository = new TaskRepository(multiplexer, redisGraphClient, new NullLogger<TaskRepository>());
-/*var redisTaskRepository =
-    new RedisTaskRepository(clusterConnectionProvider, clusterGraphClient, Serilog.Log.Logger);*/
+*//*var redisTaskRepository =
+    new RedisTaskRepository(clusterConnectionProvider, clusterGraphClient, Serilog.Log.Logger);*//*
 
 var tasks = await taskRepository.GetAllAsync();
 
@@ -173,8 +173,8 @@ foreach (var task in tasks)
 #region ActionPlan
 Console.WriteLine("Writing ActionPlans...");
 var actionPlanRepository = new ActionPlanRepository(multiplexer, redisGraphClient, new NullLogger<ActionPlanRepository>());
-/*var redisActionPlanRepository =
-    new RedisActionPlanRepository(clusterConnectionProvider, clusterGraphClient, Serilog.Log.Logger);*/
+*//*var redisActionPlanRepository =
+    new RedisActionPlanRepository(clusterConnectionProvider, clusterGraphClient, Serilog.Log.Logger);*//*
 
 var actionPlans = await actionPlanRepository.GetAllAsync();
 
@@ -214,4 +214,4 @@ foreach (var relation in hashRelations)
 #endregion
 
 Console.WriteLine("The data conversion process has finished. Press any key to close.");
-Console.ReadLine();
+Console.ReadLine();*/

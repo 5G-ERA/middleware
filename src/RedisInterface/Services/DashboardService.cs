@@ -225,55 +225,10 @@ public class DashboardService : IDashboardService
     /// <returns></returns>
     public async Task<GraphResponse> GetAllRelationModelsAsync()
     {
-        var resultSet = await _robotRepository.GetAllRelations();
+        var results = await _robotRepository.GetGraph();
 
-        var entities = new List<GraphEntityModel>();
-        var relations = new List<SimpleRelation>();
-        foreach (var node in resultSet["n"])
-        {
-            var entity = new GraphEntityModel();
-            if (node is not Node nd)
-                continue;
-
-            RedisValue? id = null, name = null, type = null;
-            var props = nd.Properties;
-            if (props.ContainsKey("ID"))
-                id = props["ID"];
-            if (props.ContainsKey("Type"))
-                type = props["Type"];
-            if (props.ContainsKey("Name"))
-                name = props["Name"];
-
-            if (id == null || (id != null && Guid.TryParse(id?.ToString(), out _)) == false)
-                continue;
-
-            entity.Id = Guid.Parse(id?.ToString());
-            var typeStr = type?.ToString();
-            entity.Type = (typeStr == "CONTAINER" ? "CONTAINERIMAGE" : typeStr)!;
-            entity.Name = name?.ToString();
-
-            entities.Add(entity);
-        }
-
-        var entityIds = entities.Select(e => e.Id.ToString()).ToList();
-
-        for (var i = 0; i < resultSet["n"].Count; i++)
-        {
-            var initiatesId = (resultSet["n"][i] as Node).Properties["ID"].ToString();
-            var type = resultSet["r"][i].GetType();
-            var relationName = (resultSet["r"][i] as ScalarResult<string>).Value;
-
-            if (relationName is null || entityIds.Contains(initiatesId) == false)
-                continue;
-            var pointsTo = (resultSet["m"][i] as Node)?.Properties["ID"].ToString();
-            relations.Add(
-                new()
-                {
-                    OriginatingId = Guid.Parse(initiatesId),
-                    PointsToId = Guid.Parse(pointsTo),
-                    RelationName = relationName
-                });
-        }
+        var entities = new List<GraphEntityModel>(results.Item1);
+        var relations = new List<SimpleRelation>(results.Item2);
 
         var response = new GraphResponse { Entities = entities, Relations = relations };
 
