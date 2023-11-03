@@ -102,7 +102,7 @@ namespace Middleware.DataAccess.Repositories
                     "LOCATED_AT",
                     RelationDirection.Incoming);
 
-                if (relations.Count ==0 )
+                if (relations is not null && relations.Count == 0)
                 {
                     TempFreeEdges.Add(edge);
                 }
