@@ -13,6 +13,7 @@ using Middleware.Orchestrator.Config;
 using Middleware.Orchestrator.Deployment;
 using Middleware.Orchestrator.ExtensionMethods;
 using Middleware.Orchestrator.Heartbeat;
+using Middleware.Orchestrator.Installer;
 using Middleware.Orchestrator.Publishers;
 using Middleware.Orchestrator.SliceManager;
 using Middleware.Orchestrator.SliceManager.Contracts;
@@ -29,6 +30,7 @@ builder.RegisterSecretsManager();
 builder.ConfigureLogger();
 builder.Services.Configure<MiddlewareConfig>(builder.Configuration.GetSection(MiddlewareConfig.ConfigName));
 builder.Services.Configure<SliceConfig>(builder.Configuration.GetSection(SliceConfig.ConfigName));
+builder.Services.Configure<UserConfig>(builder.Configuration.GetSection(UserConfig.ConfigName));
 
 var mwConfig = builder.Configuration.GetSection(MiddlewareConfig.ConfigName).Get<MiddlewareConfig>();
 var centralApiHostname = Environment.GetEnvironmentVariable("CENTRAL_API_HOSTNAME");
@@ -59,8 +61,10 @@ builder.Services.RegisterRabbitMqConsumers(rabbitmqConfig, mwConfig)
 builder.Services.AddHttpClient(AppConfig.OsmApiClientName);
 builder.Services.AddScoped<IKubernetesBuilder, KubernetesBuilder>();
 builder.Services.AddScoped<IDeploymentService, DeploymentService>();
-builder.Services.AddScoped<INetAppStatusRepository, RedisNetAppStatusRepository>();
 builder.Services.AddScoped<IRobotStatusRepository, RedisRobotStatusRepository>();
+builder.Services.AddScoped<INetAppStatusRepository, RedisNetAppStatusRepository>();
+builder.Services.RegisterRepositories();
+
 builder.Services.AddScoped<ISliceManagerClientFactory, SliceManagerClientFactory>();
 builder.Services.AddScoped<IKubernetesObjectBuilder, KubernetesObjectBuilder>();
 builder.Services.AddScoped<IRosConnectionBuilderFactory, RosConnectionBuilderFactory>();
@@ -68,6 +72,8 @@ builder.Services.AddScoped<IPublishingService, PublishingService>();
 builder.Services.AddScoped<IPublisher<GatewayAddNetAppEntryMessage>, GatewayAddNetAppEntryPublisher>();
 builder.Services.AddScoped<IPublisher<GatewayDeleteNetAppEntryMessage>, GatewayDeleteNetAppEntryPublisher>();
 builder.Services.AddScoped<IHeartbeatService, HeartbeatService>();
+builder.Services.AddScoped<IStartupDataInstaller, StartupDataInstaller>();
+
 builder.Services.AddRedisInterfaceClient();
 
 builder.Services.AddHttpClient("healthCheckClient");
@@ -88,6 +94,9 @@ using (var scope = app.Services.CreateScope())
     };
     var result = await centralApiClient!.RegisterLocation(request);
     if (result is null) throw new("Cannot register at centralAPI");
+
+    var dataInstaller = scope.ServiceProvider.GetService<IStartupDataInstaller>();
+    await dataInstaller!.InitializeStartupDataAsync();
 }
 
 // Configure the HTTP request pipeline.

@@ -8,9 +8,10 @@ namespace Middleware.Orchestrator.Deployment.RosCommunication;
 internal class Ros2ConnectionBuilder : IRosConnectionBuilder
 {
     private const RosVersion Ros2 = Middleware.Models.Domain.RosVersion.Ros2;
+    private readonly SystemConfigModel _cfg;
     private readonly RosDistro _distro;
 
-    public Ros2ConnectionBuilder(RosDistro distro)
+    public Ros2ConnectionBuilder(RosDistro distro, SystemConfigModel cfg)
     {
         if (distro.RosVersion != Ros2)
         {
@@ -19,6 +20,7 @@ internal class Ros2ConnectionBuilder : IRosConnectionBuilder
         }
 
         _distro = distro;
+        _cfg = cfg;
         RosVersion = distro.RosVersionInt;
         RosDistro = distro.Name;
     }
@@ -76,7 +78,7 @@ internal class Ros2ConnectionBuilder : IRosConnectionBuilder
                     subscribersString), // MK 2023.10.20: TOPIC_TO_PUB_LIST - list of topics to be sent FROM robot TO cloud
                 new("NETAPP_PORT", "80")
             },
-            Image = "but5gera/ros2_relay_server:0.1.0"
+            Image = _cfg.Ros2RelayContainer
         };
 
         return container;
