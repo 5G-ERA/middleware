@@ -355,4 +355,33 @@ public static class DomainToApiContractMapper
             ActionSequence = x.ActionSequence?.Select(s => s.ToFullActionResponse())
         };
     }
+
+    public static LocationResponse ToLocationResponse(this Location x)
+    {
+        return new()
+        {
+            Id = x.Id,
+            Name = x.Name,
+            Organization = x.Organization,
+            Type = x.Type.ToString(),
+            IpAddress = x.Address,
+            MacAddress = x.MacAddress,
+            Status = x.Status,
+            Cpu = x.Cpu,
+            NumberOfCores = x.NumberOfCores,
+            Ram = x.Ram,
+            VirtualRam = x.VirtualRam,
+            DiskStorage = x.DiskStorage,
+            IsOnline = x.IsOnline,
+            LastUpdatedTime = x.LastUpdatedTime
+        };
+    }
+
+    public static GetLocationsResponse ToLocationsResponse(this IEnumerable<Location> x)
+    {
+        return new()
+        {
+            Locations = x.Select(l => l.ToLocationResponse())
+        };
+    }
 }

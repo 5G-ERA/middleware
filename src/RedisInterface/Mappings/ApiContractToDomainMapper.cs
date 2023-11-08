@@ -105,6 +105,7 @@ public static class ApiContractToDomainMapper
             Timestamp = x.Policy.LastTimeUpdated
         };
     }
+
     public static PolicyModel ToLimitedPolicy(this UpdatePolicyRequest x)
     {
         return new()
@@ -159,6 +160,26 @@ public static class ApiContractToDomainMapper
             TaskPriority = (int)Enum.Parse<Priority>(x.Task.Priority),
             DeterministicTask = x.Task.IsDeterministic,
             Tags = x.Task.Tags.ToList()
+        };
+    }
+
+    public static Location ToLocation(this UpdateLocationRequest x)
+    {
+        var loc = x.Location;
+        return new()
+        {
+            Id = x.Id,
+            Address = loc.IpAddress,
+            Type = Enum.Parse<LocationType>(loc.Type),
+            Name = loc.Name,
+            Cpu = loc.Cpu,
+            DiskStorage = loc.DiskStorage,
+            MacAddress = loc.MacAddress,
+            NumberOfCores = loc.NumberOfCores,
+            Organization = loc.Organization,
+            Ram = loc.Ram,
+            Status = loc.Status,
+            VirtualRam = loc.VirtualRam
         };
     }
 }

@@ -4,23 +4,23 @@ using Middleware.Models.Dto;
 
 namespace Middleware.DataAccess.Repositories.Abstract;
 
-public interface ILocationRepository : IRedisRepository<LocationModel, LocationDto>
+public interface ILocationRepository : IRedisRepository<Location, LocationDto>
 {
-    Task<LocationModel?> PatchAsync(Guid id, LocationModel patch);
+    Task<Location?> PatchAsync(Guid id, Location patch);
 
     /// <summary>
     ///     Get Location by name
     /// </summary>
     /// <param name="name"></param>
     /// <returns></returns>
-    Task<LocationModel?> GetByNameAsync(string name);
+    Task<Location?> GetByNameAsync(string name);
 
     /// <summary>
     ///     Filter out locations that are not busy (have no instances deployed)
     /// </summary>
     /// <param name="locationsToCheck">List of Locations to be checked</param>
     /// <returns></returns>
-    Task<List<LocationModel>> FilterFreeLocationsAsync(IReadOnlyList<LocationModel> locationsToCheck);
+    Task<List<Location>> FilterFreeLocationsAsync(IReadOnlyList<Location> locationsToCheck);
 
     /// <summary>
     ///     Order the given list of locations by the number of deployed instances in ascending order.
@@ -28,7 +28,7 @@ public interface ILocationRepository : IRedisRepository<LocationModel, LocationD
     /// <param name="locationsToCheck"></param>
     /// <param name="descending">Should the order be descending</param>
     /// <returns></returns>
-    Task<List<LocationModel>> OrderLocationsByUtilizationAsync(List<LocationModel> locationsToCheck,
+    Task<List<Location>> OrderLocationsByUtilizationAsync(List<Location> locationsToCheck,
         bool descending = false);
 
     /// <summary>
@@ -43,9 +43,9 @@ public interface ILocationRepository : IRedisRepository<LocationModel, LocationD
     Task<bool> IsBusyAsync(string name);
 
     Task<bool> IsBusyAsync(Guid id);
-    Task<ImmutableList<LocationModel>> GetLocationsByOrganizationAsync(string organization);
+    Task<ImmutableList<Location>> GetLocationsByOrganizationAsync(string organization);
 
-    Task<(bool, LocationModel?)> ExistsAsync(string name);
+    Task<(bool, Location?)> ExistsAsync(string name);
 
-    Task<(bool, LocationModel?)> ExistsAsync(Guid id);
+    Task<(bool, Location?)> ExistsAsync(Guid id);
 }

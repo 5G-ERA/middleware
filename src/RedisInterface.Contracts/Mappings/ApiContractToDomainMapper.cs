@@ -439,10 +439,17 @@ public static class ApiContractToDomainMapper
     {
         return new()
         {
-            Id = x.Id,
             Name = x.Name,
             Organization = x.Organization,
-            Type = Enum.Parse<LocationType>(x.Type)
+            Type = Enum.Parse<LocationType>(x.Type),
+            Address = x.IpAddress,
+            Cpu = x.Cpu,
+            DiskStorage = x.DiskStorage,
+            MacAddress = x.MacAddress,
+            NumberOfCores = x.NumberOfCores,
+            Ram = x.Ram,
+            Status = x.Status,
+            VirtualRam = x.VirtualRam
         };
     }
 

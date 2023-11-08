@@ -9,7 +9,7 @@ using Serilog;
 
 namespace Middleware.DataAccess.Repositories;
 
-public class RedisLocationRepository : RedisRepository<LocationModel, LocationDto>, ILocationRepository
+public class RedisLocationRepository : RedisRepository<Location, LocationDto>, ILocationRepository
 {
     /// <inheritdoc />
     public RedisLocationRepository(IRedisConnectionProvider provider, IRedisGraphClient redisGraph, ILogger logger) :
@@ -18,7 +18,7 @@ public class RedisLocationRepository : RedisRepository<LocationModel, LocationDt
     }
 
     /// <inheritdoc />
-    public async Task<LocationModel?> PatchAsync(Guid id, LocationModel patch)
+    public async Task<Location?> PatchAsync(Guid id, Location patch)
     {
         var currentModel = await GetByIdAsync(id);
         if (currentModel == null) return null;
@@ -41,16 +41,16 @@ public class RedisLocationRepository : RedisRepository<LocationModel, LocationDt
     }
 
     /// <inheritdoc />
-    public async Task<LocationModel?> GetByNameAsync(string name)
+    public async Task<Location?> GetByNameAsync(string name)
     {
         var loc = await FindSingleAsync(dto => dto.Name == name);
         return loc;
     }
 
     /// <inheritdoc />
-    public async Task<List<LocationModel>> FilterFreeLocationsAsync(IReadOnlyList<LocationModel> locationsToCheck)
+    public async Task<List<Location>> FilterFreeLocationsAsync(IReadOnlyList<Location> locationsToCheck)
     {
-        var freeLocations = new List<LocationModel>();
+        var freeLocations = new List<Location>();
 
         foreach (var loc in locationsToCheck)
         {
@@ -109,14 +109,14 @@ public class RedisLocationRepository : RedisRepository<LocationModel, LocationDt
     }
 
     /// <inheritdoc />
-    public async Task<ImmutableList<LocationModel>> GetLocationsByOrganizationAsync(string organization)
+    public async Task<ImmutableList<Location>> GetLocationsByOrganizationAsync(string organization)
     {
         var locations = await FindAsync(dto => dto.Organization == organization);
         return locations.ToImmutableList();
     }
 
     /// <inheritdoc />
-    public async Task<(bool, LocationModel?)> ExistsAsync(string name)
+    public async Task<(bool, Location?)> ExistsAsync(string name)
     {
         var loc = await FindSingleAsync(dto => dto.Name == name);
 
@@ -124,7 +124,7 @@ public class RedisLocationRepository : RedisRepository<LocationModel, LocationDt
     }
 
     /// <inheritdoc />
-    public async Task<(bool, LocationModel?)> ExistsAsync(Guid id)
+    public async Task<(bool, Location?)> ExistsAsync(Guid id)
     {
         var loc = await GetByIdAsync(id);
 
@@ -132,10 +132,10 @@ public class RedisLocationRepository : RedisRepository<LocationModel, LocationDt
     }
 
     /// <inheritdoc />
-    public async Task<List<LocationModel>> OrderLocationsByUtilizationAsync(List<LocationModel> locationsToCheck,
+    public async Task<List<Location>> OrderLocationsByUtilizationAsync(List<Location> locationsToCheck,
         bool descending = false)
     {
-        var counter = new Dictionary<LocationModel, int>();
+        var counter = new Dictionary<Location, int>();
 
         foreach (var busyEdge in locationsToCheck)
         {

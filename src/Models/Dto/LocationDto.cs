@@ -44,7 +44,7 @@ public class LocationDto : Dto
     public override BaseModel ToModel()
     {
         var dto = this;
-        return new LocationModel
+        return new Location
         {
             Id = Guid.Parse(dto.Id!.Replace(Prefix, "")),
             Name = dto.Name,
