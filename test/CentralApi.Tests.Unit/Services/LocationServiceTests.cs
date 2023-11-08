@@ -12,45 +12,45 @@ namespace CentralApi.Tests.Unit.Services;
 //[LogTestExecution]
 public class LocationServiceTests
 {
-    private readonly ICloudRepository _cloudRepository = Substitute.For<ICloudRepository>();
-    private readonly IEdgeRepository _edgeRepository = Substitute.For<IEdgeRepository>();
-    private readonly Random _rng = new(420);
+    private readonly ILocationRepository _locationRepository = Substitute.For<ILocationRepository>();
     private readonly LocationService _sut;
 
     public LocationServiceTests()
     {
-        _sut = new(_cloudRepository, _edgeRepository);
+        _sut = new(_locationRepository);
     }
 
     [Fact]
-    public async Task RegisterLocation_ShouldMakeEdgeOnline_WhenExistingLocationIsEdge()
+    public async Task RegisterLocation_ShouldMakeLocationOnline_WhenLocationExists()
     {
         // arrange
         var paramLocation = new Location
         {
-            Name = "TestEdge",
+            Name = "TestCloud",
             Organization = "MiddlewareTesting",
-            Type = LocationType.Edge
+            Type = LocationType.Cloud
         };
         var id = Guid.NewGuid();
-        var edge = new EdgeModel
+        var cloud = new Location
         {
             Id = id,
-            Name = "TestEdge",
+            Name = "TestCloud",
             Organization = "MiddlewareTesting",
-            EdgeIp = new("https://xkcd.com/927/")
+            Address = new("https://xkcd.com/927/"),
+            Type = LocationType.Cloud
         };
         var expectedLocation = new Location
         {
             Id = id,
-            Name = "TestEdge",
+            Name = "TestCloud",
             Organization = "MiddlewareTesting",
             Address = new("https://xkcd.com/927/"),
-            Type = LocationType.Edge
+            Type = LocationType.Cloud,
+            IsOnline = true
         };
-        _cloudRepository.CheckIfNameExists(Arg.Any<string>()).Returns((false, null));
-        _edgeRepository.CheckIfNameExists(Arg.Any<string>()).Returns((true, edge));
-        _edgeRepository.AddAsync(Arg.Any<EdgeModel>()).ReturnsForAnyArgs(edge);
+        _locationRepository.ExistsAsync(Arg.Any<string>()).Returns((true, cloud));
+
+        _locationRepository.AddAsync(Arg.Any<Location>()).ReturnsForAnyArgs(cloud);
         // act
         var result = await _sut.RegisterLocation(paramLocation);
         // assert
@@ -61,53 +61,9 @@ public class LocationServiceTests
 
         var resultType = result.AsT0;
         resultType.Should().BeEquivalentTo(expectedLocation);
-
-        await _edgeRepository.ReceivedWithAnyArgs(1).AddAsync(default!);
-        await _cloudRepository.ReceivedWithAnyArgs(0).AddAsync(default!);
-    }
-
-    [Fact]
-    public async Task RegisterLocation_ShouldMakeCloudOnline_WhenExistingLocationIsCloud()
-    {
-        // arrange
-        var paramLocation = new Location
-        {
-            Name = "TestCloud",
-            Organization = "MiddlewareTesting",
-            Type = LocationType.Cloud
-        };
-        var id = Guid.NewGuid();
-        var cloud = new CloudModel
-        {
-            Id = id,
-            Name = "TestCloud",
-            Organization = "MiddlewareTesting",
-            CloudIp = new("https://xkcd.com/927/")
-        };
-        var expectedLocation = new Location
-        {
-            Id = id,
-            Name = "TestCloud",
-            Organization = "MiddlewareTesting",
-            Address = new("https://xkcd.com/927/"),
-            Type = LocationType.Cloud
-        };
-        _cloudRepository.CheckIfNameExists(Arg.Any<string>()).Returns((true, cloud));
-        _edgeRepository.CheckIfNameExists(Arg.Any<string>()).Returns((false, null));
-        _cloudRepository.AddAsync(Arg.Any<CloudModel>()).ReturnsForAnyArgs(cloud);
-        // act
-        var result = await _sut.RegisterLocation(paramLocation);
-        // assert
-
-        result.IsT0.Should().BeTrue();
-        result.IsT1.Should().BeFalse();
-        result.IsT2.Should().BeFalse();
-
-        var resultType = result.AsT0;
-        resultType.Should().BeEquivalentTo(expectedLocation);
-
-        await _cloudRepository.ReceivedWithAnyArgs(1).AddAsync(default!);
-        await _edgeRepository.Received(0).AddAsync(Arg.Any<EdgeModel>());
+        resultType.IsOnline.Should().BeTrue();
+        await _locationRepository.ReceivedWithAnyArgs(0).AddAsync(default!);
+        await _locationRepository.ReceivedWithAnyArgs(1).UpdateAsync(default!);
     }
 
     [Fact]
@@ -120,8 +76,8 @@ public class LocationServiceTests
             Organization = "MiddlewareTesting",
             Type = LocationType.Cloud
         };
-        _cloudRepository.CheckIfNameExists(Arg.Any<string>()).Returns((false, null));
-        _edgeRepository.CheckIfNameExists(Arg.Any<string>()).Returns((false, null));
+        _locationRepository.ExistsAsync(Arg.Any<string>()).Returns((false, null));
+
         // act
         var result = await _sut.RegisterLocation(paramLocation);
         // assert
@@ -132,8 +88,7 @@ public class LocationServiceTests
         var resultType = result.AsT0;
         resultType.Should().BeOfType<Location>();
 
-        await _cloudRepository.ReceivedWithAnyArgs(1).AddAsync(default!);
-        await _edgeRepository.ReceivedWithAnyArgs(0).AddAsync(default!);
+        await _locationRepository.ReceivedWithAnyArgs(1).AddAsync(default!);
     }
 
     [Fact]
@@ -141,17 +96,19 @@ public class LocationServiceTests
     {
         // arrange
         var org = "testOrganization";
-        var edge = new EdgeModel
+        var edge = new Location
         {
             Id = Guid.NewGuid(),
             Name = "TestEdge",
-            Organization = org
+            Organization = org,
+            Type = LocationType.Edge
         };
-        var cloud = new CloudModel
+        var cloud = new Location
         {
             Id = Guid.NewGuid(),
             Name = "TestCloud",
-            Organization = org
+            Organization = org,
+            Type = LocationType.Cloud
         };
         var locations = new List<Location>
         {
@@ -170,11 +127,9 @@ public class LocationServiceTests
                 Type = LocationType.Edge
             }
         }.ToImmutableList();
-        var clouds = new List<CloudModel> { cloud }.ToImmutableList();
-        var edges = new List<EdgeModel> { edge }.ToImmutableList();
-        _cloudRepository.GetCloudsByOrganizationAsync(org).Returns(clouds);
-        _edgeRepository.GetEdgesByOrganizationAsync(org).Returns(edges);
+        var retVal = new List<Location> { cloud, edge }.ToImmutableList();
 
+        _locationRepository.GetLocationsByOrganizationAsync(org).Returns(retVal);
         // act
         var result = await _sut.GetAvailableLocations(org);
 
@@ -194,8 +149,7 @@ public class LocationServiceTests
         // arrange
         var org = "testOrganization";
         var locations = ImmutableList<Location>.Empty;
-        _cloudRepository.GetCloudsByOrganizationAsync(org).Returns(ImmutableList<CloudModel>.Empty);
-        _edgeRepository.GetEdgesByOrganizationAsync(org).Returns(ImmutableList<EdgeModel>.Empty);
+        _locationRepository.GetLocationsByOrganizationAsync(org).Returns(ImmutableList<Location>.Empty);
 
         // act
         var result = await _sut.GetAvailableLocations(org);
