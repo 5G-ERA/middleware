@@ -182,4 +182,24 @@ public static class ApiContractToDomainMapper
             VirtualRam = loc.VirtualRam
         };
     }
+
+    public static Location ToLocation(this UpdateCloudRequest x)
+    {
+        var loc = x.Cloud;
+        return new()
+        {
+            Id = x.Id,
+            Address = loc.IpAddress,
+            Type = LocationType.Cloud,
+            Name = loc.Name,
+            Cpu = loc.Cpu,
+            DiskStorage = loc.DiskStorage,
+            MacAddress = loc.MacAddress,
+            NumberOfCores = loc.NumberOfCores,
+            Organization = loc.Organization,
+            Ram = loc.Ram,
+            Status = loc.Status,
+            VirtualRam = loc.VirtualRam
+        };
+    }
 }

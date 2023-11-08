@@ -384,4 +384,32 @@ public static class DomainToApiContractMapper
             Locations = x.Select(l => l.ToLocationResponse())
         };
     }
+
+    public static CloudResponse ToCloudResponse(this Location x)
+    {
+        return new()
+        {
+            Id = x.Id,
+            Name = x.Name,
+            Organization = x.Organization,
+            Type = x.Type.ToString(),
+            IpAddress = x.Address,
+            MacAddress = x.MacAddress,
+            Status = x.Status,
+            Cpu = x.Cpu,
+            NumberOfCores = x.NumberOfCores,
+            Ram = x.Ram,
+            VirtualRam = x.VirtualRam,
+            DiskStorage = x.DiskStorage,
+            LastUpdatedTime = x.LastUpdatedTime
+        };
+    }
+
+    public static GetCloudsResponse ToCloudsResponse(this IEnumerable<Location> x)
+    {
+        return new()
+        {
+            Clouds = x.Select(l => l.ToCloudResponse())
+        };
+    }
 }
