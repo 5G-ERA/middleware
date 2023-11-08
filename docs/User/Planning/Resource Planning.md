@@ -379,3 +379,104 @@ Formula: score = sum(p*c)
 
 Cloud < edge (OD deployed in cloud) 
 In this third scenario, when Robot queries the Redis graph on who could provide the requirements for task allocation whether edge or cloud. According to the formula, The task allocation object detection netapp will be deployed in the cloud. 
+
+### Scenario 3
+<table style="width: 98%; margin-right: calc(2%);">
+    <tbody>
+        <tr>
+            <td style="width: 19.9372%;"><br></td>
+            <td style="width: 19.9372%;">Latency</td>
+            <td style="width: 19.9686%;">Throughput</td>
+            <td style="width: 19.9686%;">Number of Cores</td>
+            <td style="width: 20.0000%;">Ram</td>
+            <td style="width: 20.0000%;">Disk Storage</td>
+        </tr>
+        <tr>
+            <td style="width: 19.9372%;">Cloud</td>
+            <td style="width: 19.9372%;">100ms</td>
+            <td style="width: 19.9686%;">140mb</td>
+            <td style="width: 19.9686%;">2</td>
+            <td style="width: 19.9686%;">16gb</td>
+            <td style="width: 19.9686%;">10gb</td>
+            <td style="width: 19.9686%;"><br>
+                <table style="width: 100%;">
+                    <tbody>
+                        <tr>
+                        </tr>
+                    </tbody>
+                </table><br>
+            </td>
+        </tr>
+        <tr>
+            <td style="width: 19.9372%;">Edge</td>
+            <td style="width: 19.9372%;">90ms</td>
+            <td style="width: 19.9686%;">150mb</td>
+             <td style="width: 19.9686%;">4</td>
+              <td style="width: 19.9686%;">16gb</td>
+               <td style="width: 19.9686%;">10gb</td>
+            <td style="width: 19.9686%;">
+                <table style="width: 100%;">
+                    <tbody>
+                        <tr>
+                        </tr>
+                    </tbody>
+                </table><br>
+            </td>
+            <td style="width: 20.0000%;">
+                <table style="width: 98%; margin-right: calc(2%);">
+                    <tbody>
+                        <tr>
+                        </tr>
+                    </tbody>
+                </table><br>
+            </td>
+        </tr>
+        <tr>
+                        <tr>
+                        </tr>
+                    </tbody>
+                </table><br>
+            </td>
+            <td style="width: 20.0000%;">
+                <table style="width: 98%; margin-right: calc(2%);">
+                    <tbody>
+                        <tr>
+                        </tr>
+                    </tbody>
+                </table><br>
+            </td>
+        </tr>
+        <tr>
+                        <tr>
+                        </tr>
+                    </tbody>
+                </table><br>
+            </td>
+            <td style="width: 20.0000%;">
+                <table style="width: 98%; margin-right: calc(2%);">
+                    <tbody>
+                        <tr>
+                        </tr>
+                    </tbody>
+                </table><br>
+            </td>
+        </tr>
+    </tbody>
+</table>
+
+
+Colour: 
+* Green – 1
+* Yellow – 2
+* Red -3 
+
+Formula: score = sum(p*c)
+
+* Cloud = 1 + 4 + 3 + 8 + 5 + 12 = 33
+* Edge = 1 + 2 + 3 + 4 +5 + 12 = 27 
+
+Edge < cloud
+ 
+The task allocation (object detection netapp) will be deployed in the edge 
+
+
