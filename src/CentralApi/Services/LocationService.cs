@@ -2,7 +2,6 @@
 using FluentValidation;
 using Middleware.DataAccess.Repositories.Abstract;
 using Middleware.Models.Domain;
-using Middleware.Models.Enums;
 using OneOf;
 using OneOf.Types;
 
@@ -10,126 +9,43 @@ namespace Middleware.CentralApi.Services;
 
 public class LocationService : ILocationService
 {
-    private readonly ICloudRepository _cloudRepository;
-    private readonly IEdgeRepository _edgeRepository;
+    private readonly ILocationRepository _locationRepository;
 
 
-    public LocationService(ICloudRepository cloudRepository, IEdgeRepository edgeRepository)
+    public LocationService(ILocationRepository locationRepository)
     {
-        _cloudRepository = cloudRepository;
-        _edgeRepository = edgeRepository;
+        _locationRepository = locationRepository;
     }
 
     public async Task<OneOf<Location, ValidationException, NotFound>> RegisterLocation(Location location)
     {
         // when location not found in db
-        var (queryResultCloud, cloud) = await _cloudRepository.CheckIfNameExists(location.Name);
-        var (queryResultEdge, edge) = await _edgeRepository.CheckIfNameExists(location.Name);
+        var (found, loc) = await _locationRepository.ExistsAsync(location.Name);
 
-        if ((queryResultEdge == false || edge is null) && (queryResultCloud == false || cloud is null))
+
+        if (found == false)
             return await RegisterNewLocation(location);
 
         // make it online & return info about location based on matched edge
-        if (cloud is null)
-        {
-            edge!.IsOnline = true;
-            var result = new Location
-            {
-                Id = edge.Id,
-                Name = edge.Name,
-                Organization = edge.Organization,
-                Address = edge.EdgeIp,
-                Type = edge.Type
-            };
-            await _edgeRepository.AddAsync(edge);
-            return result;
-        }
-        else // make it online & return info about location based on matched cloud
-        {
-            cloud.IsOnline = true;
-            var result = new Location
-            {
-                Id = cloud.Id,
-                Name = cloud.Name,
-                Organization = cloud.Organization,
-                Address = cloud.CloudIp,
-                Type = cloud.Type
-            };
-            await _cloudRepository.AddAsync(cloud);
-            return result;
-        }
+        loc!.IsOnline = true;
+        await _locationRepository.UpdateAsync(loc);
+        return loc;
     }
 
     public async Task<OneOf<ImmutableList<Location>, NotFound>> GetAvailableLocations(string organization)
     {
-        // get all online edges and clouds
-        var locations = new List<Location>();
+        // get all online edges and clouds where organization = organization
+        var edges = await _locationRepository.GetLocationsByOrganizationAsync(organization);
 
-        // edges where organization = organization
-        var edges = await _edgeRepository.GetEdgesByOrganizationAsync(organization);
+        if (edges.Any() == false) return new NotFound();
 
-        var locationsEdges = edges.Select(x => new Location
-        {
-            Id = x.Id,
-            Type = LocationType.Edge,
-            Name = x.Name,
-            Address = x.EdgeIp,
-            Organization = x.Organization
-        });
-
-        // clouds where organization = organization
-        var clouds = await _cloudRepository.GetCloudsByOrganizationAsync(organization);
-
-        var locationsClouds = clouds.Select(x => new Location
-        {
-            Id = x.Id,
-            Type = LocationType.Cloud,
-            Name = x.Name,
-            Address = x.CloudIp,
-            Organization = x.Organization
-        });
-
-        locations.AddRange(locationsEdges);
-        locations.AddRange(locationsClouds);
-
-        if (locations.Any() == false) return new NotFound();
-
-        return locations.ToImmutableList();
+        return edges;
     }
 
     private async Task<Location> RegisterNewLocation(Location location)
     {
-        var id = Guid.NewGuid();
-        if (location.Type == LocationType.Cloud)
-        {
-            var cloud = new CloudModel
-            {
-                Id = id,
-                Name = location.Name,
-                Organization = location.Organization,
-                LastUpdatedTime = DateTimeOffset.Now.Date
-            };
-            await _cloudRepository.AddAsync(cloud);
-        }
-        else if (location.Type == LocationType.Edge)
-        {
-            var cloud = new EdgeModel
-            {
-                Id = id,
-                Name = location.Name,
-                Organization = location.Organization,
-                LastUpdatedTime = DateTimeOffset.Now.Date
-            };
-            await _edgeRepository.AddAsync(cloud);
-        }
-
-        var newLoc = new Location
-        {
-            Id = id,
-            Name = location.Name,
-            Organization = location.Organization,
-            Type = location.Type
-        };
-        return newLoc;
+        location.LastUpdatedTime = DateTimeOffset.Now.DateTime;
+        await _locationRepository.AddAsync(location);
+        return location;
     }
 }
