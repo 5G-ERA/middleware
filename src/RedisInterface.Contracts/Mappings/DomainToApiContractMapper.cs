@@ -412,4 +412,32 @@ public static class DomainToApiContractMapper
             Clouds = x.Select(l => l.ToCloudResponse())
         };
     }
+
+    public static EdgeResponse ToEdgeResponse(this Location x)
+    {
+        return new()
+        {
+            Id = x.Id,
+            Name = x.Name,
+            Organization = x.Organization,
+            Type = x.Type.ToString(),
+            IpAddress = x.Address,
+            MacAddress = x.MacAddress,
+            Status = x.Status,
+            Cpu = x.Cpu,
+            NumberOfCores = x.NumberOfCores,
+            Ram = x.Ram,
+            VirtualRam = x.VirtualRam,
+            DiskStorage = x.DiskStorage,
+            LastUpdatedTime = x.LastUpdatedTime
+        };
+    }
+
+    public static GetEdgesResponse ToEdgesResponse(this IEnumerable<Location> x)
+    {
+        return new()
+        {
+            Edges = x.Select(l => l.ToEdgeResponse())
+        };
+    }
 }

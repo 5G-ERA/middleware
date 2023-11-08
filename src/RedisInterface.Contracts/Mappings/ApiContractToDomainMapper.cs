@@ -471,6 +471,24 @@ public static class ApiContractToDomainMapper
         };
     }
 
+    public static Location ToLocation(this EdgeRequest x)
+    {
+        return new()
+        {
+            Name = x.Name,
+            Organization = x.Organization,
+            Type = LocationType.Edge,
+            Address = x.IpAddress,
+            Cpu = x.Cpu,
+            DiskStorage = x.DiskStorage,
+            MacAddress = x.MacAddress,
+            NumberOfCores = x.NumberOfCores,
+            Ram = x.Ram,
+            Status = x.Status,
+            VirtualRam = x.VirtualRam
+        };
+    }
+
     public static RosTopicModel ToRosTopic(this RosTopicRequest x)
     {
         return new()

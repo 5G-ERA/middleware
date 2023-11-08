@@ -202,4 +202,24 @@ public static class ApiContractToDomainMapper
             VirtualRam = loc.VirtualRam
         };
     }
+
+    public static Location ToLocation(this UpdateEdgeRequest x)
+    {
+        var loc = x.Edge;
+        return new()
+        {
+            Id = x.Id,
+            Address = loc.IpAddress,
+            Type = LocationType.Edge,
+            Name = loc.Name,
+            Cpu = loc.Cpu,
+            DiskStorage = loc.DiskStorage,
+            MacAddress = loc.MacAddress,
+            NumberOfCores = loc.NumberOfCores,
+            Organization = loc.Organization,
+            Ram = loc.Ram,
+            Status = loc.Status,
+            VirtualRam = loc.VirtualRam
+        };
+    }
 }
