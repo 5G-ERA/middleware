@@ -258,5 +258,53 @@ namespace Middleware.DataAccess.Repositories
                 return (false, matchedCloud);
             }
         }
+
+        /// <summary>
+        /// Return online status and LastUpdatedTime of cloud by cloud Id.
+        /// </summary>
+        /// <param name="cloudId"></param>
+        /// <returns>Return model of cloud which contain infomation of Online status and LastUpdatedTime</returns>
+        public async Task<CloudEdgeStatusResponse> GetCloudOnlineStatusLastUpdatedTimeAsync(Guid cloudId)
+        {
+            CloudModel? cloud = await GetByIdAsync(cloudId);
+            if (cloud is null)
+            {
+                throw new ArgumentException("Cloud does not exist", nameof(cloudId));
+            }
+            else
+            {
+                CloudEdgeStatusResponse response = new CloudEdgeStatusResponse();
+                response.Id = cloudId;
+                response.LastUpdatedTime = cloud.LastUpdatedTime;
+                response.IsOnline = cloud.IsOnline;
+                response.Type = "Cloud";
+
+                return response;
+            }
+        }
+
+        /// <summary>
+        /// Change online status of cloud by cloud Id.
+        /// </summary>
+        /// <param name="cloudId"></param>
+        /// <param name="isOnline"></param>
+        /// <returns></returns>
+        public async Task SetCloudOnlineStatusAsync(Guid cloudId, bool isOnline)
+        {
+            CloudModel? cloud = await GetByIdAsync(cloudId);
+            if (cloud is null)
+            {
+                throw new ArgumentException("Cloud does not exist", nameof(cloudId));
+            }
+            else
+            {
+                cloud.IsOnline = isOnline;
+                if (cloud.IsOnline == true)
+                {
+                    cloud.LastUpdatedTime = DateTime.UtcNow;
+                }                
+                _ = await AddAsync(cloud) ?? throw new ArgumentException("Cloud does not exist", nameof(cloud));
+            }
+        }
     }
 }
