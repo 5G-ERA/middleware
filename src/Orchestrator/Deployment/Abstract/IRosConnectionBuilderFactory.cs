@@ -4,5 +4,5 @@ namespace Middleware.Orchestrator.Deployment;
 
 internal interface IRosConnectionBuilderFactory
 {
-    IRosConnectionBuilder CreateConnectionBuilder(RosDistro distro);
+    Task<IRosConnectionBuilder> CreateConnectionBuilder(RosDistro distro);
 }

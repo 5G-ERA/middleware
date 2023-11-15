@@ -2,7 +2,7 @@
     "openapi": "3.0.1",
     "info": {
         "title": "5G-ERA Middleware",
-        "version": "0.1"
+        "version": "0.6.5"
     },
     "components": {
         "schemas": {
@@ -71,6 +71,9 @@
                     "networkSlice": {
                         "type": "string",
                         "nullable": true
+                    },
+                    "singleNetAppEntryPoint": {
+                        "type": "boolean"
                     }
                 },
                 "additionalProperties": false
@@ -339,8 +342,7 @@
                     },
                     "serviceStatus": {
                         "type": "string",
-                        "nullable": true,
-                        "readOnly": true
+                        "nullable": true
                     },
                     "containerImage": {
                         "$ref": "#/components/schemas/ContainerImageModel"
@@ -899,6 +901,9 @@
                         "format": "int64",
                         "nullable": true
                     },
+                    "singleNetAppEntryPoint": {
+                        "type": "boolean"
+                    },
                     "tags": {
                         "type": "array",
                         "items": {
@@ -937,6 +942,9 @@
                         "type": "integer",
                         "format": "int64",
                         "nullable": true
+                    },
+                    "singleNetAppEntryPoint": {
+                        "type": "boolean"
                     },
                     "tags": {
                         "type": "array",
@@ -2027,51 +2035,6 @@
                 },
                 "additionalProperties": false
             },
-            "PolicyModel": {
-                "type": "object",
-                "properties": {
-                    "relations": {
-                        "type": "array",
-                        "items": {
-                            "$ref": "#/components/schemas/RelationModel"
-                        },
-                        "nullable": true
-                    },
-                    "Id": {
-                        "type": "string",
-                        "format": "uuid"
-                    },
-                    "Name": {
-                        "type": "string",
-                        "nullable": true
-                    },
-                    "Type": {
-                        "$ref": "#/components/schemas/PolicyType"
-                    },
-                    "scope": {
-                        "$ref": "#/components/schemas/PolicyScope"
-                    },
-                    "priority": {
-                        "$ref": "#/components/schemas/Priority"
-                    },
-                    "Timestamp": {
-                        "type": "string",
-                        "format": "date-time"
-                    },
-                    "IsActive": {
-                        "type": "boolean"
-                    },
-                    "Description": {
-                        "type": "string",
-                        "nullable": true
-                    },
-                    "IsExclusiveWithinType": {
-                        "type": "integer",
-                        "format": "int32"
-                    }
-                },
-                "additionalProperties": false
-            },
             "PolicyRequest": {
                 "type": "object",
                 "properties": {
@@ -2149,38 +2112,6 @@
                     }
                 },
                 "additionalProperties": false
-            },
-            "PolicyScope": {
-                "enum": [
-                    0,
-                    1,
-                    2
-                ],
-                "type": "integer",
-                "format": "int32"
-            },
-            "PolicyType": {
-                "enum": [
-                    0,
-                    1,
-                    2,
-                    3,
-                    4,
-                    5
-                ],
-                "type": "integer",
-                "format": "int32"
-            },
-            "Priority": {
-                "enum": [
-                    0,
-                    1,
-                    2,
-                    3,
-                    4
-                ],
-                "type": "integer",
-                "format": "int32"
             },
             "RegisterSlicesRequest": {
                 "type": "object",
@@ -10198,168 +10129,6 @@
                 }
             }
         },
-        "/data/policy": {
-            "post": {
-                "tags": [
-                    "Policy"
-                ],
-                "operationId": "PolicyAdd",
-                "requestBody": {
-                    "content": {
-                        "application/json-patch+json": {
-                            "schema": {
-                                "$ref": "#/components/schemas/PolicyRequest"
-                            }
-                        },
-                        "application/json": {
-                            "schema": {
-                                "$ref": "#/components/schemas/PolicyRequest"
-                            }
-                        },
-                        "text/json": {
-                            "schema": {
-                                "$ref": "#/components/schemas/PolicyRequest"
-                            }
-                        },
-                        "application/*+json": {
-                            "schema": {
-                                "$ref": "#/components/schemas/PolicyRequest"
-                            }
-                        }
-                    }
-                },
-                "responses": {
-                    "200": {
-                        "description": "Success",
-                        "content": {
-                            "text/plain": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/PolicyResponse"
-                                }
-                            },
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/PolicyResponse"
-                                }
-                            },
-                            "text/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/PolicyResponse"
-                                }
-                            }
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "content": {
-                            "text/plain": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/ApiResponse"
-                                }
-                            },
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/ApiResponse"
-                                }
-                            },
-                            "text/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/ApiResponse"
-                                }
-                            }
-                        }
-                    },
-                    "500": {
-                        "description": "Server Error",
-                        "content": {
-                            "text/plain": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/ApiResponse"
-                                }
-                            },
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/ApiResponse"
-                                }
-                            },
-                            "text/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/ApiResponse"
-                                }
-                            }
-                        }
-                    }
-                }
-            },
-            "get": {
-                "tags": [
-                    "Policy"
-                ],
-                "operationId": "PolicyGetAll",
-                "responses": {
-                    "200": {
-                        "description": "Success",
-                        "content": {
-                            "text/plain": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/GetPoliciesResponse"
-                                }
-                            },
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/GetPoliciesResponse"
-                                }
-                            },
-                            "text/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/GetPoliciesResponse"
-                                }
-                            }
-                        }
-                    },
-                    "404": {
-                        "description": "Not Found",
-                        "content": {
-                            "text/plain": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/ApiResponse"
-                                }
-                            },
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/ApiResponse"
-                                }
-                            },
-                            "text/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/ApiResponse"
-                                }
-                            }
-                        }
-                    },
-                    "500": {
-                        "description": "Server Error",
-                        "content": {
-                            "text/plain": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/ApiResponse"
-                                }
-                            },
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/ApiResponse"
-                                }
-                            },
-                            "text/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/ApiResponse"
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        },
         "/data/policy/{id}": {
             "get": {
                 "tags": [
@@ -10486,17 +10255,17 @@
                         "content": {
                             "text/plain": {
                                 "schema": {
-                                    "$ref": "#/components/schemas/PolicyModel"
+                                    "$ref": "#/components/schemas/PolicyResponse"
                                 }
                             },
                             "application/json": {
                                 "schema": {
-                                    "$ref": "#/components/schemas/PolicyModel"
+                                    "$ref": "#/components/schemas/PolicyResponse"
                                 }
                             },
                             "text/json": {
                                 "schema": {
-                                    "$ref": "#/components/schemas/PolicyModel"
+                                    "$ref": "#/components/schemas/PolicyResponse"
                                 }
                             }
                         }
@@ -10577,6 +10346,76 @@
                             "text/json": {
                                 "schema": {
                                     "$ref": "#/components/schemas/PolicyResponse"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "content": {
+                            "text/plain": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                }
+                            },
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                }
+                            },
+                            "text/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Server Error",
+                        "content": {
+                            "text/plain": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                }
+                            },
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                }
+                            },
+                            "text/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/data/policy": {
+            "get": {
+                "tags": [
+                    "Policy"
+                ],
+                "operationId": "PolicyGetAll",
+                "responses": {
+                    "200": {
+                        "description": "Success",
+                        "content": {
+                            "text/plain": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/GetPoliciesResponse"
+                                }
+                            },
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/GetPoliciesResponse"
+                                }
+                            },
+                            "text/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/GetPoliciesResponse"
                                 }
                             }
                         }

@@ -290,4 +290,69 @@ public static class DomainToApiContractMapper
             Enabled = x.Enabled
         };
     }
+
+
+    public static FullActionResponse ToFullActionResponse(this ActionModel x)
+    {
+        return new()
+        {
+            Id = x.Id,
+            Name = x.Name,
+            Priority = x.ActionPriority,
+            Order = x.Order,
+            MinimumRam = x.MinimumRam,
+            MinimumNumCores = x.MinimumNumCores,
+            SingleNetAppEntryPoint = x.SingleNetAppEntryPoint,
+            Tags = x.Tags,
+            Instances = x.Services?.Select(s => s.ToFullInstanceResponse())
+        };
+    }
+
+    public static FullInstanceResponse ToFullInstanceResponse(this InstanceModel x)
+    {
+        return new()
+        {
+            Id = x.Id,
+            Name = x.Name,
+            Family = x.InstanceFamily,
+            Type = x.ServiceType,
+            IsReusable = x.IsReusable,
+            MinimumRam = x.MinimumRam,
+            MinimumNumOfCores = x.MinimumNumCores,
+            RosVersion = x.RosVersion,
+            RosDistro = x.RosDistro,
+            RosTopicPublishers = x.RosTopicsPub.Select(t => t.ToRosTopicResponse()),
+            RosTopicSubscribers = x.RosTopicsSub.Select(t => t.ToRosTopicResponse()),
+            Tags = x.Tags,
+            OnboardedTime = x.OnboardedTime,
+            AppliedPolicies = x.AppliedPolicies,
+            ContainerImage = x.ContainerImage?.ToFullContainerResponse()
+        };
+    }
+
+    public static FullContainerResponse ToFullContainerResponse(this ContainerImageModel x)
+    {
+        return new()
+        {
+            Id = x.Id,
+            Name = x.Name,
+            Description = x.Description,
+            K8sDeployment = x.K8SDeployment,
+            K8sService = x.K8SService,
+            LastUpdateTime = x.Timestamp
+        };
+    }
+
+    public static FullTaskResponse ToFullTaskResponse(this TaskModel x)
+    {
+        return new()
+        {
+            Id = x.Id,
+            Name = x.Name,
+            Priority = ((Priority)x.TaskPriority).ToString(),
+            IsDeterministic = x.DeterministicTask,
+            Tags = x.Tags,
+            ActionSequence = x.ActionSequence?.Select(s => s.ToFullActionResponse())
+        };
+    }
 }

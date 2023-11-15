@@ -16,8 +16,9 @@ public class Ros1ConnectionBuilderTests
     {
         //arrange
         var ros2Distro = RosDistro.Foxy;
+        var cfg = new SystemConfigModel();
         //act
-        var act = () => new Ros1ConnectionBuilder(ros2Distro);
+        var act = () => new Ros1ConnectionBuilder(ros2Distro, cfg);
         //assert
         act.Should().Throw<ArgumentException>()
             .WithMessage(
@@ -30,10 +31,15 @@ public class Ros1ConnectionBuilderTests
         //arrange
         var distro = RosDistro.Noetic;
         var depl = CreateExampleDeployment();
-        var sut = new Ros1ConnectionBuilder(distro);
+        var cfg = new SystemConfigModel
+        {
+            Ros1RelayContainer = "but5gera/relay_network_application:0.4.4"
+        };
+
+        var sut = new Ros1ConnectionBuilder(distro, cfg);
         var topics = new List<RosTopicModel>();
         //act
-        var result = sut.EnableRosCommunication(depl, topics);
+        var result = sut.EnableRosCommunication(depl, topics, topics);
         //assert
         result.Spec.Template.Spec.Containers.Should()
             .HaveCount(3, "We need three containers, one RelayNetApp, one ROS core and NetApp itself");
@@ -48,7 +54,7 @@ public class Ros1ConnectionBuilderTests
         var relayNetAppContainer = result.Spec.Template.Spec.Containers.FirstOrDefault(c => c.Name == "relay-net-app");
 
         relayNetAppContainer.Should().NotBeNull();
-        relayNetAppContainer!.Image.Should().Be("but5gera/relay_network_application:0.4.4");
+        relayNetAppContainer!.Image.Should().Be(cfg.Ros1RelayContainer);
         relayNetAppContainer.Ports.Should().HaveCount(1);
         relayNetAppContainer.Ports.First().ContainerPort.Should().Be(80, "It is needed for websockets connection");
     }
@@ -58,8 +64,12 @@ public class Ros1ConnectionBuilderTests
     {
         //arrange
         var distro = RosDistro.Noetic;
+        var cfg = new SystemConfigModel
+        {
+            Ros1RelayContainer = "but5gera/relay_network_application:0.4.4"
+        };
         var depl = CreateExampleDeployment();
-        var sut = new Ros1ConnectionBuilder(distro);
+        var sut = new Ros1ConnectionBuilder(distro, cfg);
         var topicString = "[{\"topic_name\":\"/image_raw\",\"topic_type\":\"sensor_msgs/Image\"}]";
         var topics = new List<RosTopicModel>
         {
@@ -72,7 +82,7 @@ public class Ros1ConnectionBuilderTests
             }
         };
         //act
-        var result = sut.EnableRosCommunication(depl, topics);
+        var result = sut.EnableRosCommunication(depl, topics, topics);
 
         //assert
         var relayNetAppContainer = result.Spec.Template.Spec.Containers.FirstOrDefault(c => c.Name == "relay-net-app");
@@ -108,7 +118,8 @@ public class Ros1ConnectionBuilderTests
                 Ports = new List<V1ServicePort>()
             }
         };
-        var sut = new Ros1ConnectionBuilder(RosDistro.Noetic);
+        var cfg = new SystemConfigModel();
+        var sut = new Ros1ConnectionBuilder(RosDistro.Noetic, cfg);
         //act
         var result = sut.EnableRelayNetAppCommunication(service);
         //assert

@@ -1,4 +1,5 @@
 using System.Reflection;
+using Middleware.CentralApi.Sdk;
 using Middleware.Common.Config;
 using Middleware.Common.ExtensionMethods;
 using Middleware.DataAccess.ExtensionMethods;
@@ -20,6 +21,11 @@ builder.RegisterSecretsManager();
 
 builder.ConfigureLogger();
 
+var mwConfig = builder.Configuration.GetSection(MiddlewareConfig.ConfigName).Get<MiddlewareConfig>();
+var centralApiHostname = Environment.GetEnvironmentVariable("CENTRAL_API_HOSTNAME");
+if (centralApiHostname is null)
+    throw new ArgumentException("Environment variable not defined: CENTRAL_API_HOSTNAME", "CENTRAL_API_HOSTNAME");
+
 builder.Services.Configure<MiddlewareConfig>(builder.Configuration.GetSection(MiddlewareConfig.ConfigName));
 
 // Add services to the container.
@@ -30,8 +36,6 @@ builder.Services.AddControllers(options =>
     .AddNewtonsoftJson(x => { x.SerializerSettings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore; });
 builder.Services.AddFluentValidation(typeof(Program));
 
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
-
 builder.Services.AddSwaggerGen();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddHttpClient("healthCheckClient");
@@ -40,9 +44,12 @@ builder.RegisterRedis();
 builder.Services.AddUriHelper();
 builder.Services.AddHostedService<IndexCreationService>();
 builder.Services.RegisterRepositories();
+builder.Services.AddCentralApiClient(centralApiHostname, mwConfig.Organization);
 builder.Services.AddScoped<IDashboardService, DashboardService>();
 builder.Services.AddScoped<IActionService, ActionService>();
 builder.Services.AddScoped<ISliceService, SliceService>();
+builder.Services.AddScoped<ITaskService, TaskService>();
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.

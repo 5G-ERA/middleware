@@ -606,7 +606,7 @@
           },
           "containerImage": {
             "$ref": "#/components/schemas/ContainerImageModel",
-            "nullable": true
+			"nullable": true
           },
           "minimumRam": {
             "type": "integer",
