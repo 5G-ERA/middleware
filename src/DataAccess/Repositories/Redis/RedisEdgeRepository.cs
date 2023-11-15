@@ -276,7 +276,6 @@ namespace Middleware.DataAccess.Repositories
         /// </summary>
         /// <param name="edgeId"></param>
         /// <returns>Return bool of isOnline and dateTime of lastUpdatedTime of the edgeModel</returns>
-        [Obsolete]
         public async Task<CloudEdgeStatusResponse> GetEdgeOnlineStatusLastUpdatedTimeAsync(Guid edgeId)
         {
             EdgeModel? edge = await GetByIdAsync(edgeId);

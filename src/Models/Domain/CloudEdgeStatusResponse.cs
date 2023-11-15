@@ -6,9 +6,6 @@ using System.Threading.Tasks;
 using Middleware.Models.Enums;
 
 namespace Middleware.Models.Domain;
-//internal class CloudEdgeStatus
-//{
-//}
 
 public class CloudEdgeStatusResponse
 {

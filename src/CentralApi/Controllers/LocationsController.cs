@@ -6,6 +6,7 @@ using Middleware.CentralApi.Services;
 using Middleware.Common.Responses;
 using Middleware.DataAccess.Repositories.Abstract;
 using Middleware.Models.Domain;
+using Middleware.CentralApi.Domain;
 
 namespace Middleware.CentralApi.Controllers;
 
@@ -14,16 +15,12 @@ namespace Middleware.CentralApi.Controllers;
 public class LocationsController : Controller
 {
     private readonly ILocationService _locationService;
-    //private readonly ILogger<LocationsController> _logger;
-
-    //private readonly ILogger _logger;
     private readonly ICloudRepository _cloudRepository;
     private readonly IEdgeRepository _edgeRepository;
 
-    public LocationsController(ILocationService locationService, ICloudRepository cloudRepository,IEdgeRepository edgeRepository)
+    public LocationsController(ILocationService locationService, ICloudRepository cloudRepository, IEdgeRepository edgeRepository)
     {
         _locationService = locationService;
-        //_logger = logger;
         _cloudRepository = cloudRepository;
         _edgeRepository = edgeRepository;
     }
@@ -95,7 +92,7 @@ public class LocationsController : Controller
     [ProducesResponseType((int)HttpStatusCode.OK)]
     [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.NotFound)]
     [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.BadRequest)]
-    public async Task<IActionResult> SetStatus([FromBody] CloudEdgeStatusRequest request, Guid id)
+    public async Task<IActionResult> SetStatus([FromBody] CloudEdgeStatusRequest2 request, Guid id)
     {
         try
         {
