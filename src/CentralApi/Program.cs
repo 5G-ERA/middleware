@@ -1,3 +1,4 @@
+using Middleware.CentralApi.ExtensionMethods;
 using Middleware.CentralApi.Services;
 using Middleware.Common.ExtensionMethods;
 using Middleware.DataAccess.ExtensionMethods;
@@ -19,6 +20,7 @@ builder.Services.AddScoped<ICloudRepository, RedisCloudRepository>();
 builder.Services.AddScoped<IEdgeRepository, RedisEdgeRepository>();
 builder.Services.AddScoped<ILocationService, LocationService>();
 
+builder.Services.RegisterCentralApiQuartzJobs();
 
 var app = builder.Build();
 

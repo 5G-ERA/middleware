@@ -14,6 +14,9 @@
     <ItemGroup>
         <PackageReference Include="FluentValidation" Version="11.5.1" />
         <PackageReference Include="OneOf" Version="3.0.243" />
+        <PackageReference Include="Quartz" Version="3.6.0" />
+        <PackageReference Include="Quartz.AspNetCore" Version="3.6.0" />
+        <PackageReference Include="Quartz.Extensions.DependencyInjection" Version="3.6.0" />
         <PackageReference Include="Swashbuckle.AspNetCore" Version="6.4.0" />
     </ItemGroup>
 

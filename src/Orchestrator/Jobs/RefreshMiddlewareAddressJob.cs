@@ -4,6 +4,7 @@ using Middleware.Common.Config;
 using Middleware.Common.ExtensionMethods;
 using Middleware.Orchestrator.Deployment;
 using Quartz;
+using Middleware.Common.Job;
 
 namespace Middleware.Orchestrator.Jobs;
 
