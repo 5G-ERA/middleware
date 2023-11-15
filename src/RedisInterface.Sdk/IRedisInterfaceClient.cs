@@ -206,4 +206,32 @@ public interface IRedisInterfaceClient
 
     Task<bool> SliceAddAsync(SliceRequest slice);
     Task<GetRobotsResponse?> RobotGetAllAsync();
+
+    /// <summary>
+    ///     Get Location Data by its name
+    /// </summary>
+    /// <param name="name"></param>
+    /// <returns></returns>
+    Task<LocationResponse?> GetLocationByNameAsync(string name);
+
+    /// <summary>
+    ///     Get Location Data by its Id
+    /// </summary>
+    /// <param name="id"></param>
+    /// <returns></returns>
+    Task<LocationResponse?> GetLocationByIdAsync(Guid id);
+
+    /// <summary>
+    ///     Pick only free (unused) locations from the specified list
+    /// </summary>
+    /// <param name="availableLocations"></param>
+    /// <returns></returns>
+    Task<GetLocationsResponse?> GetFreeLocationIdsAsync(List<Location>? availableLocations);
+
+    /// <summary>
+    ///     Order Locations based on the resource usage from the specified list
+    /// </summary>
+    /// <param name="availableLocations"></param>
+    /// <returns></returns>
+    Task<GetLocationsResponse?> GetLessBusyLocationsAsync(List<Location> availableLocations);
 }

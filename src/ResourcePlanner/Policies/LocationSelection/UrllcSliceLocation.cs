@@ -68,23 +68,12 @@ internal class UrllcSliceLocation : ILocationSelectionPolicy
     /// <inheritdoc />
     public async Task<bool> IsLocationSatisfiedByPolicy(PlannedLocation plannedLocation)
     {
-        BaseModel location;
-        if (plannedLocation.Type == LocationType.Cloud)
+        var location = new Location
         {
-            location = new CloudModel
-            {
-                Id = plannedLocation.Id,
-                Name = plannedLocation.Name
-            };
-        }
-        else
-        {
-            location = new EdgeModel
-            {
-                Id = plannedLocation.Id,
-                Name = plannedLocation.Name
-            };
-        }
+            Id = plannedLocation.Id,
+            Name = plannedLocation.Name,
+            Type = plannedLocation.Type
+        };
 
         var relations = await _redisInterfaceClient.GetRelationAsync(location, "OFFERS");
 
