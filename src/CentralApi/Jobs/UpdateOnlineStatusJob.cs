@@ -36,7 +36,7 @@ public class UpdateOnlineStatusJob : BaseJobCentralApi<UpdateOnlineStatusJob>
                     {
                         try
                         {
-                            _ = _cloudRepository.SetCloudOnlineStatusAsync(model.Id, false);
+                            await _cloudRepository.SetCloudOnlineStatusAsync(model.Id, false);
                         }
                         catch (Exception ex)
                         {
@@ -71,7 +71,7 @@ public class UpdateOnlineStatusJob : BaseJobCentralApi<UpdateOnlineStatusJob>
                     {
                         try
                         {
-                            _ = _edgeRepository.SetEdgeOnlineStatusAsync(model.Id, false);
+                            await _edgeRepository.SetEdgeOnlineStatusAsync(model.Id, false);
                         }
                         catch (Exception ex)
                         {

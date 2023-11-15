@@ -30,7 +30,6 @@
       <ProjectReference Include="..\CentralApi.Contracts\CentralApi.Contracts.csproj" />
       <ProjectReference Include="..\Common\Common.csproj" />
       <ProjectReference Include="..\DataAccess\DataAccess.csproj" />
-      <ProjectReference Include="..\Orchestrator\Orchestrator.csproj" />
     </ItemGroup>
 
 </Project>

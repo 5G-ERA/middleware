@@ -14,14 +14,12 @@ namespace Middleware.CentralApi.Controllers;
 public class LocationsController : Controller
 {
     private readonly ILocationService _locationService;
-    private readonly ILogger _logger;
     private readonly ICloudRepository _cloudRepository;
     private readonly IEdgeRepository _edgeRepository;
 
-    public LocationsController(ILocationService locationService, ILogger<LocationsController> logger, ICloudRepository cloudRepository,IEdgeRepository edgeRepository)
+    public LocationsController(ILocationService locationService, ICloudRepository cloudRepository,IEdgeRepository edgeRepository)
     {
         _locationService = locationService;
-        _logger = logger;
         _cloudRepository = cloudRepository;
         _edgeRepository = edgeRepository;
     }
@@ -95,6 +93,10 @@ public class LocationsController : Controller
     [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.BadRequest)]
     public async Task<IActionResult> SetStatus([FromBody] CloudEdgeStatusRequest request, Guid id)
     {
+        if(request == null)
+        {
+            return BadRequest();
+        }
         try
         {
             if (request.Type.ToLower() == "cloud")
