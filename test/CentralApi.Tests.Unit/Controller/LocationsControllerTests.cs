@@ -5,7 +5,6 @@ using Middleware.CentralApi.Contracts.Responses;
 using Middleware.CentralApi.Controllers;
 using Middleware.CentralApi.Services;
 using Middleware.Common.Responses;
-using Middleware.DataAccess.Repositories.Abstract;
 using Middleware.Models.Domain;
 using NSubstitute;
 using OneOf.Types;
@@ -16,13 +15,11 @@ namespace CentralApi.Tests.Unit.Controller;
 public class LocationsControllerTests
 {
     private readonly ILocationService _locationService = Substitute.For<ILocationService>();
-    private readonly ICloudRepository _cloudRepository = Substitute.For<ICloudRepository>();
-    private readonly IEdgeRepository _edgeRepository = Substitute.For<IEdgeRepository>();
     private readonly LocationsController _sut;
 
     public LocationsControllerTests()
     {
-        _sut = new(_locationService, _cloudRepository,_edgeRepository);
+        _sut = new(_locationService);
     }
 
     [Fact]
