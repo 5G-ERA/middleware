@@ -1,7 +1,6 @@
 using k8s.Models;
 using Middleware.Models.Domain;
 
-
 namespace Middleware.Orchestrator.Deployment;
 
 internal interface IRosConnectionBuilder
@@ -20,9 +19,11 @@ internal interface IRosConnectionBuilder
     ///     Enables the communication using ROS between the services within deployment
     /// </summary>
     /// <param name="dpl"></param>
-    /// <param name="rosTopics"></param>
+    /// <param name="topicSubscribers"></param>
+    /// <param name="topicPublishers"></param>
     /// <returns></returns>
-    V1Deployment EnableRosCommunication(V1Deployment dpl, IReadOnlyList<RosTopicModel> rosTopics);
+    V1Deployment EnableRosCommunication(V1Deployment dpl, IReadOnlyList<RosTopicModel> topicSubscribers,
+        IReadOnlyList<RosTopicModel> topicPublishers);
 
     /// <summary>
     ///     Enables the communication with the service to the Relay NetApp

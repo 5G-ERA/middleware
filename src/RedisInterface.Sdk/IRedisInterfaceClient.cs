@@ -1,5 +1,4 @@
 using Middleware.Models.Domain;
-using Middleware.Models.Domain.Slice;
 using Middleware.RedisInterface.Contracts.Requests;
 using Middleware.RedisInterface.Contracts.Responses;
 
@@ -110,6 +109,12 @@ public interface IRedisInterfaceClient
     Task<InstanceResponse?> InstanceGetByIdAsync(Guid id);
 
     /// <summary>
+    ///     Get all instance data
+    /// </summary>
+    /// <returns></returns>
+    Task<GetInstancesResponse?> InstanceGetAllAsync();
+
+    /// <summary>
     ///     Retrieves the Container Images associated with the specified Instance
     /// </summary>
     /// <param name="id"></param>
@@ -199,5 +204,6 @@ public interface IRedisInterfaceClient
 
     Task<SliceResponse?> GetBySliceIdAsync(string id);
 
-    Task<bool> SliceAddAsync(SliceRequest slice); 
+    Task<bool> SliceAddAsync(SliceRequest slice);
+    Task<GetRobotsResponse?> RobotGetAllAsync();
 }

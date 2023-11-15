@@ -1,6 +1,4 @@
 using System.Text.Json;
-using System.Text.Json.Serialization;
-using JetBrains.Annotations;
 using k8s.Models;
 using Middleware.Common.ExtensionMethods;
 using Middleware.Models.Domain;
@@ -10,9 +8,10 @@ namespace Middleware.Orchestrator.Deployment.RosCommunication;
 internal class Ros1ConnectionBuilder : IRosConnectionBuilder
 {
     private const RosVersion Ros1 = Middleware.Models.Domain.RosVersion.Ros1;
+    private readonly SystemConfigModel _cfg;
     private readonly RosDistro _distro;
 
-    public Ros1ConnectionBuilder(RosDistro distro)
+    public Ros1ConnectionBuilder(RosDistro distro, SystemConfigModel cfg)
     {
         if (distro.RosVersion != Ros1)
         {
@@ -21,6 +20,7 @@ internal class Ros1ConnectionBuilder : IRosConnectionBuilder
         }
 
         _distro = distro;
+        _cfg = cfg;
         RosVersion = distro.RosVersionInt;
         RosDistro = distro.Name;
     }
@@ -42,9 +42,10 @@ internal class Ros1ConnectionBuilder : IRosConnectionBuilder
     }
 
     /// <inheritdoc />
-    public V1Deployment EnableRosCommunication(V1Deployment dpl, IReadOnlyList<RosTopicModel> rosTopics)
+    public V1Deployment EnableRosCommunication(V1Deployment dpl, IReadOnlyList<RosTopicModel> topicSubscribers,
+        IReadOnlyList<RosTopicModel> topicPublishers)
     {
-        if (rosTopics is null) throw new ArgumentNullException(nameof(rosTopics));
+        if (topicSubscribers is null) throw new ArgumentNullException(nameof(topicSubscribers));
         if (dpl.Spec?.Template?.Spec?.Containers is null || dpl.Spec.Template.Spec.Containers.Any() == false)
             throw new ArgumentException("Missing Deployment container configuration.", nameof(dpl));
 
@@ -59,7 +60,8 @@ internal class Ros1ConnectionBuilder : IRosConnectionBuilder
         }
 
         dpl.Spec.Template.Spec.Containers.Add(GetRosContainer());
-        dpl.Spec.Template.Spec.Containers.Add(GetRelayNetAppContainer(rosTopics));
+        //MK 2023.10.20: ROS1 version of Relay only needs to know the topics FROM cloud TO robot
+        dpl.Spec.Template.Spec.Containers.Add(GetRelayNetAppContainer(topicPublishers));
 
         return dpl;
     }
@@ -96,30 +98,9 @@ internal class Ros1ConnectionBuilder : IRosConnectionBuilder
                 new("TOPIC_LIST", topicsString),
                 new("NETAPP_PORT", "80")
             },
-            Image = "but5gera/relay_network_application:0.4.4"
+            Image = _cfg.Ros1RelayContainer
         };
 
         return container;
-    }
-
-    /// <summary>
-    ///     Temporary class to parse the RosTopicModel into the correct format
-    /// </summary>
-    private class RosTopicContainer
-    {
-        [JsonPropertyName("topic_name")]
-        public string Name { [UsedImplicitly] get; init; }
-
-        [JsonPropertyName("topic_type")]
-        public string Type { [UsedImplicitly] get; init; }
-
-        public static RosTopicContainer FromRosTopicModel(RosTopicModel topic)
-        {
-            return new()
-            {
-                Name = topic.Name,
-                Type = topic.Type
-            };
-        }
     }
 }

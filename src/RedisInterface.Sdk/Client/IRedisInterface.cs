@@ -95,4 +95,10 @@ public interface IRedisInterface
 
     [Post("/api/v1/slice/embb")] //doesn't matter if we add it to embb or urllc
     Task<ApiResponse<SliceResponse?>> SliceAddAsync(SliceRequest slice);
+
+    [Get("/api/v1/instance")]
+    Task<ApiResponse<GetInstancesResponse?>> InstanceGetAll();
+
+    [Get("/api/v1/robot")]
+    Task<ApiResponse<GetRobotsResponse?>> RobotGetAll();
 }

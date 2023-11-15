@@ -33,6 +33,7 @@ public static class AutoMapperConfig
             cfg.CreateMap<KeyValuePair, ResourcePlanner.KeyValuePair>().ReverseMap();
             cfg.CreateMap<RelationModel, ResourcePlanner.RelationModel>().ReverseMap();
             cfg.CreateMap<GraphEntityModel, ResourcePlanner.GraphEntityModel>().ReverseMap();
+            cfg.CreateMap<ContainerImageModel, ResourcePlanner.ContainerImageModel>().ReverseMap();
         });
         return services;
     }
