@@ -4,25 +4,22 @@ using Middleware.Common.Enums;
 using Middleware.DataAccess.Repositories.Abstract;
 using Middleware.Models.Domain;
 using Middleware.Models.Domain.Slice;
-using Middleware.Models.Enums;
 using Middleware.RedisInterface.Services.Abstract;
 
 namespace Middleware.RedisInterface.Services;
 
 public class SliceService : ISliceService
 {
-    private readonly ICloudRepository _cloudRepository;
-    private readonly IEdgeRepository _edgeRepository;
+    private readonly ILocationRepository _locationRepository;
     private readonly ILogger _logger;
     private readonly IOptions<MiddlewareConfig> _middlewareConfig;
     private readonly ISliceRepository _sliceRepository;
 
-    public SliceService(IEdgeRepository edgeRepository, ICloudRepository cloudRepository,
-        ISliceRepository sliceRepository, IOptions<MiddlewareConfig> middlewareConfig, ILogger<SliceService> logger)
+    public SliceService(ISliceRepository sliceRepository, ILocationRepository locationRepository,
+        IOptions<MiddlewareConfig> middlewareConfig, ILogger<SliceService> logger)
     {
-        _edgeRepository = edgeRepository;
-        _cloudRepository = cloudRepository;
         _sliceRepository = sliceRepository;
+        _locationRepository = locationRepository;
         _middlewareConfig = middlewareConfig;
         _logger = logger;
     }
@@ -88,10 +85,7 @@ public class SliceService : ISliceService
         relation.PointsTo = pointsTo;
 
         await _sliceRepository.AddAsync(slice);
-        if (location.GetType() == typeof(CloudModel))
-            await _cloudRepository.AddRelationAsync(relation);
-        else if (location.GetType() == typeof(EdgeModel))
-            await _edgeRepository.AddRelationAsync(relation);
+        await _locationRepository.AddRelationAsync(relation);
     }
 
     /// <summary>
@@ -166,10 +160,7 @@ public class SliceService : ISliceService
             relation.PointsTo = pointsTo;
 
             await _sliceRepository.AddAsync(slice);
-            if (location.GetType() == typeof(CloudModel))
-                await _cloudRepository.AddRelationAsync(relation);
-            else if (location.GetType() == typeof(EdgeModel))
-                await _edgeRepository.AddRelationAsync(relation);
+            await _locationRepository.AddRelationAsync(relation);
 
             relation.PointsTo = null!;
         }
@@ -177,25 +168,12 @@ public class SliceService : ISliceService
 
     private async Task DeleteExistingSlice(BaseModel location, Guid sliceId)
     {
-        if (location.GetType() == typeof(CloudModel))
+        var relations = await _locationRepository.GetRelation(location.Id, "OFFERS");
+        // should be only one
+        foreach (var relation in relations.Where(r => r.PointsTo.Id == sliceId))
         {
-            var relations = await _cloudRepository.GetRelation(location.Id, "OFFERS");
-            // should be only one
-            foreach (var relation in relations.Where(r => r.PointsTo.Id == sliceId))
-            {
-                await _cloudRepository.DeleteRelationAsync(relation);
-                await _sliceRepository.DeleteByIdAsync(relation.PointsTo.Id);
-            }
-        }
-        else if (location.GetType() == typeof(EdgeModel))
-        {
-            var relations = await _edgeRepository.GetRelation(location.Id, "OFFERS");
-            // should be only one
-            foreach (var relation in relations.Where(r => r.PointsTo.Id == sliceId))
-            {
-                await _edgeRepository.DeleteRelationAsync(relation);
-                await _sliceRepository.DeleteByIdAsync(relation.PointsTo.Id);
-            }
+            await _locationRepository.DeleteRelationAsync(relation);
+            await _sliceRepository.DeleteByIdAsync(relation.PointsTo.Id);
         }
     }
 
@@ -206,25 +184,12 @@ public class SliceService : ISliceService
     /// <returns></returns>
     private async Task DeleteExistingSlices(BaseModel location)
     {
-        if (location.GetType() == typeof(CloudModel))
-        {
-            var relations = await _cloudRepository.GetRelation(location.Id, "OFFERS");
+        var relations = await _locationRepository.GetRelation(location.Id, "OFFERS");
 
-            foreach (var relation in relations)
-            {
-                await _cloudRepository.DeleteRelationAsync(relation);
-                await _sliceRepository.DeleteByIdAsync(relation.PointsTo.Id);
-            }
-        }
-        else if (location.GetType() == typeof(EdgeModel))
+        foreach (var relation in relations)
         {
-            var relations = await _edgeRepository.GetRelation(location.Id, "OFFERS");
-
-            foreach (var relation in relations)
-            {
-                await _edgeRepository.DeleteRelationAsync(relation);
-                await _sliceRepository.DeleteByIdAsync(relation.PointsTo.Id);
-            }
+            await _locationRepository.DeleteRelationAsync(relation);
+            await _sliceRepository.DeleteByIdAsync(relation.PointsTo.Id);
         }
     }
 
@@ -235,11 +200,7 @@ public class SliceService : ISliceService
     private async Task<BaseModel> GetCurrentLocation()
     {
         var config = _middlewareConfig.Value;
-        BaseModel location;
-        if (config.InstanceType == LocationType.Cloud.ToString())
-            location = await _cloudRepository.GetCloudResourceDetailsByNameAsync(config.InstanceName);
-        else
-            location = await _edgeRepository.GetEdgeResourceDetailsByNameAsync(config.InstanceName);
+        BaseModel location = await _locationRepository.GetByNameAsync(config.InstanceName);
 
         return location;
     }
@@ -251,11 +212,7 @@ public class SliceService : ISliceService
     /// <returns></returns>
     private async Task<BaseModel> GetLocationData(Location location)
     {
-        BaseModel locationData;
-        if (location.Type == LocationType.Cloud)
-            locationData = await _cloudRepository.GetCloudResourceDetailsByNameAsync(location.Name);
-        else
-            locationData = await _edgeRepository.GetEdgeResourceDetailsByNameAsync(location.Name);
+        BaseModel locationData = await _locationRepository.GetByNameAsync(location.Name);
 
         return locationData;
     }
