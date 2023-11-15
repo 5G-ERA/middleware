@@ -1,11 +1,12 @@
 ﻿using Middleware.DataAccess.Repositories.Abstract;
 using Middleware.Models.Domain;
 using Quartz;
+using Middleware.Common.Job;
 
 namespace Middleware.CentralApi.Jobs;
 
 [DisallowConcurrentExecution]
-public class UpdateOnlineStatusJob : BaseJobCentralApi<UpdateOnlineStatusJob>
+public class UpdateOnlineStatusJob : BaseJob<UpdateOnlineStatusJob>
 {
 
     private readonly ILogger _logger;

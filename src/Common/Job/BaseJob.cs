@@ -1,12 +1,12 @@
-﻿using Quartz;
+﻿using Microsoft.Extensions.Logging;
+using Quartz;
 
-namespace Middleware.CentralApi.Jobs;
-
-public abstract class BaseJobCentralApi<T> : IJob
+namespace Middleware.Common.Job;
+public abstract class BaseJob<T> : IJob
 {
     protected readonly ILogger<T> Logger;
 
-    protected BaseJobCentralApi(ILogger<T> logger)
+    protected BaseJob(ILogger<T> logger)
     {
         Logger = logger;
     }
