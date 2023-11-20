@@ -77,3 +77,16 @@ Calling the API planning endpoint for a known context plan will require providin
 ```
 
 
+* The RobotId is a unique identifier generated after the [registration](https://github.com/5G-ERA/middleware/blob/main/docs/1_Middleware/3_Architecture/Gateway/ProposedInterface.md)
+* LockResourceReUse parameter avoids the middleware from trying to reuse some of the containers from other past deployments with same instances. Recommed to be false by default.
+* ReplanActionPlannerLocked: Do not modify action sequence if replan is neccesary, only placement
+* TaskId parameter is automatically generated when performed a new [onboarding_task](https://github.com/5G-ERA/middleware/blob/main/docs/1_Middleware/3_Architecture/RedisInterface/ProposedInterface.md). Let's recall that it will contain a predefined action sequence with the **Known Context** perspective.
+* Questions: list of questions template including task criticality, priority, danger etc. This will mainly be applied to the resource planner to choose a much power powerful machine to avoid failure.
+
+For more information about this API endpoint, check [API](https://github.com/5G-ERA/middleware/)
+
+
+
+
+
+
