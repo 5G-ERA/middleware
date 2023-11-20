@@ -24,3 +24,7 @@ variable "cluster_ca_certificate" {
 variable "middleware_role_arn" {
   description = "ARN of the middleware role to be associated with the service account"
 }
+variable "aws_iam_role_arn" {
+  description = "ARN of IAM Role that has permissions to manage the cluster for other IAM users"
+  type        = string  
+}

@@ -1,36 +1,47 @@
 locals {
   namespace = "middleware"
-}
-
-# Retrieve EKS cluster information
-provider "aws" {
-  region = var.region
+  central-api-namespace = "central-api"
 }
 
 data "aws_eks_cluster" "cluster" {
-  name = var.cluster_name
+  name = var.cluster_name  
 }
 
-provider "kubernetes" {
-  host                   = var.cluster_endpoint
-  cluster_ca_certificate = base64decode(var.cluster_ca_certificate)
-  exec {
-    api_version = "client.authentication.k8s.io/v1beta1"
-    command     = "aws"
-    args = [
-      "eks",
-      "get-token",
-      "--cluster-name",
-      var.cluster_name
-    ]
-  }
-}
 
 resource "kubernetes_namespace" "middleware" {
   metadata {
     name = local.namespace
     annotations = {
       name = local.namespace
+    }
+  }
+  
+}
+
+resource "kubernetes_namespace" "central-api" {
+  metadata {
+    name = local.central-api-namespace
+    annotations = {
+      name = local.central-api-namespace
+    }
+  }
+  
+}
+
+resource "kubernetes_namespace" "redis" {
+  metadata {
+    name = "redis"
+    annotations = {
+      name = "redis"
+    }
+  }
+  
+}
+resource "kubernetes_namespace" "memgraph" {
+  metadata {
+    name = "memgraph"
+    annotations = {
+      name = "memgraph"
     }
   }
   
@@ -48,7 +59,33 @@ resource "kubernetes_service_account" "orchestrator" {
   automount_service_account_token = true
 }
 
-resource "kubernetes_role" "role" {  
+resource "kubernetes_cluster_role" "admin" {
+  metadata {
+    name      = "admin-role"    
+  }
+  rule {
+    api_groups = ["*"]
+    resources = ["*"]
+    verbs = ["*"]
+  }
+}
+resource "kubernetes_cluster_role_binding" "admin_role_binding" {
+  metadata {
+    name = "admin-role-binding"    
+  }
+  role_ref {
+    api_group = "rbac.authorization.k8s.io"
+    kind = "ClusterRole"
+    name = "admin-role"
+  }
+  subject {
+    kind = "User"
+    api_group = "rbac.authorization.k8s.io"
+    name = var.aws_iam_role_arn
+  }
+}
+
+resource "kubernetes_role" "role" {
   metadata {
     name      = "${var.service_account_name}-role"
     namespace = local.namespace

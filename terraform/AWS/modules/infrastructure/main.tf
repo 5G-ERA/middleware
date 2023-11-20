@@ -1,10 +1,6 @@
 # Copyright (c) HashiCorp, Inc.
 # SPDX-License-Identifier: MPL-2.0
 
-provider "aws" {
-  region = var.region
-}
-
 data "aws_availability_zones" "available" {}
 
 locals {
@@ -40,36 +36,79 @@ module "vpc" {
   }
 }
 
+resource "aws_security_group" "allow_lb_traffic" {
+  name        = "allow_lb_traffic"
+  description = "Allow Traffic from NLB to k8s Cluster"
+  vpc_id      = module.vpc.vpc_id
 
+  ingress {
+    description      = "TCP to EKS Cluster from LoadBalancer"
+    from_port        = 31000
+    to_port          = 32664
+    protocol         = "TCP"
+    cidr_blocks      = ["0.0.0.0/0"]
+  }
+
+  egress {
+    from_port        = 0
+    to_port          = 0
+    protocol         = "-1"
+    cidr_blocks      = ["0.0.0.0/0"]
+    ipv6_cidr_blocks = ["::/0"]
+  }
+
+  tags = {
+    Name = "NLB Node Ports"
+  }
+}
+# resource "aws_launch_template" "middleware-launch-template" {
+#   name          = "5G-ERA-launch-template"
+#   image_id      = "ami-12345678"
+#   instance_type = "t3.small"
+  
+
+#   security_group_names = [ aws_security_group.allow_lb_traffic.name ]
+# }
 module "eks" {
   source  = "terraform-aws-modules/eks/aws"
   version = "19.5.1"
 
   cluster_name    = local.cluster_name
-  cluster_version = "1.26"
+  cluster_version = "1.27"
 
   vpc_id                         = module.vpc.vpc_id
   subnet_ids                     = module.vpc.private_subnets
   cluster_endpoint_public_access = true
   enable_irsa                    = true
+  aws_auth_roles  = [{
+      rolearn  = var.aws_iam_role_arn
+      username = "admin"
+      groups   = ["system:masters"]
+    }]
+}
 
-  
+module "eks_managed_node_group" {
+  source = "terraform-aws-modules/eks/aws//modules/eks-managed-node-group"
 
-  eks_managed_node_group_defaults = {
-    ami_type = local.eks_ami_type
-  }
-  eks_managed_node_groups = {
-    one = {
-      name = "node-group-1"
+  name            = "5g-era-eks-mng"
+  cluster_name    = local.cluster_name
+  subnet_ids = module.vpc.private_subnets
+  // The following variables are necessary if you decide to use the module outside of the parent EKS module context.
+  // Without it, the security groups of the nodes are empty and thus won't join the cluster.
+  cluster_primary_security_group_id = module.eks.cluster_primary_security_group_id
+  vpc_security_group_ids            = [module.eks.node_security_group_id, aws_security_group.allow_lb_traffic.id]
 
-      instance_types = ["t3.small"]
+  min_size     = 1
+  max_size     = 5
+  desired_size = 2
 
-      min_size     = 1
-      max_size     = 3
-      desired_size = 2
-    }
+  instance_types = ["t3.small"]
+
+  tags = {
+    Terraform   = "true"
   }
 }
+
 
 module "iam_eks_role" {
   source    = "terraform-aws-modules/iam/aws//modules/iam-role-for-service-accounts-eks"
@@ -107,7 +146,7 @@ module "irsa-ebs-csi" {
 resource "aws_eks_addon" "ebs-csi" {
   cluster_name             = module.eks.cluster_name
   addon_name               = "aws-ebs-csi-driver"
-  addon_version            = "v1.18.0-eksbuild.1"
+  addon_version            = "v1.20.0-eksbuild.1"
   service_account_role_arn = module.irsa-ebs-csi.iam_role_arn
   tags = {
     "eks_addon" = "ebs-csi"
