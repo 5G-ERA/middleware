@@ -28,13 +28,21 @@ public static class DataAccessExtensionMethods
         var config = builder.Configuration.GetSection(RedisConfig.ConfigName).Get<RedisConfig>();
 
         //For the redis-cluster master node, port 6380 should be used, using port 6379 will point to the replicas of the redis-cluster
-        var mux = ConnectionMultiplexer.Connect($"{config.ClusterHostname}:6380", c => c.Password = config.Password);
+        var mux = ConnectionMultiplexer.Connect($"{config.ClusterHostname}:6379", c => c.Password = config.Password);
         IRedisConnectionProvider provider = new RedisConnectionProvider(mux);
         builder.Services.AddSingleton(provider);
         builder.Services.AddSingleton<IConnectionMultiplexer>(mux);
         var redisGraphClient = new RedisGraphClient(mux);
         builder.Services.AddSingleton<IRedisGraphClient>(redisGraphClient);
-        var driver = GraphDatabase.Driver("bolt://localhost:7687", AuthTokens.Basic("", ""));
+        //var driver = GraphDatabase.Driver($"bolt+routing://{config.ClusterHostname}:7687", AuthTokens.Basic("", ""));
+        /*    (ConfigBuilder cfg)  =>
+        {
+            //cfg.WithMaxTransactionRetryTime(TimeSpan.FromSeconds(5));
+            cfg.WithConnectionTimeout(TimeSpan.FromSeconds(5));
+        });*/
+        //var driver = GraphDatabase.Driver(uri, AuthTokens.Basic("", ""));
+        var uri = $"bolt://{config.ClusterHostname}:7687";
+        var driver = GraphDatabase.Driver(uri, AuthTokens.Basic("", ""));
         builder.Services.AddSingleton(driver);
         return builder;
     }
