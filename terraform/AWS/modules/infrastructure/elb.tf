@@ -29,7 +29,7 @@ resource "aws_lb_target_group" "redis-tg" {
 
 resource "aws_lb_target_group" "memgraph-tg" {
   name     = "memgraph-tg"
-  port     = 30148
+  port     = 31007
   protocol = "TCP"
   vpc_id   = module.vpc.vpc_id
 }
