@@ -2,6 +2,7 @@ using Middleware.CentralApi.ExtensionMethods;
 using Middleware.CentralApi.Services;
 using Middleware.Common.ExtensionMethods;
 using Middleware.DataAccess.ExtensionMethods;
+using Middleware.DataAccess.HostedServices;
 using Middleware.DataAccess.Repositories;
 using Middleware.DataAccess.Repositories.Abstract;
 
@@ -16,6 +17,7 @@ builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+builder.Services.AddHostedService<IndexCreationService>();
 builder.Services.AddScoped<ICloudRepository, RedisCloudRepository>();
 builder.Services.AddScoped<IEdgeRepository, RedisEdgeRepository>();
 builder.Services.AddScoped<ILocationService, LocationService>();
