@@ -27,5 +27,8 @@ namespace Middleware.DataAccess.Repositories.Abstract
 
         Task<(bool, CloudModel?)> CheckIfIdExists(string id);
 
+        Task<CloudEdgeStatusResponse> GetCloudOnlineStatusLastUpdatedTimeAsync(Guid cloudId);
+
+        Task SetCloudOnlineStatusAsync(Guid cloudId, bool isOnline);
     }
 }

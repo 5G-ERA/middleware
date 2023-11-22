@@ -1,9 +1,7 @@
 name: Redis Interface docker build
 
 on:
-  workflow_dispatch:
-    inputs:
-     -dummy:
+  workflow_dispatch:    
   schedule:
     - cron: 0 3 * * 1-5
 
@@ -38,31 +36,3 @@ jobs:
         echo VERSION=$VERSION
         docker tag $IMAGE_REPOSITORY $IMAGE_ID:edge
         docker push $IMAGE_ID:edge
-  
-  
-    - name: Configure AWS credentials
-      uses: aws-actions/configure-aws-credentials@v1
-      with:
-        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-        aws-region: eu-west-1
-
-    - name: Login to Amazon ECR
-      id: login-ecr
-      uses: aws-actions/amazon-ecr-login@v1
-      
-    - name: Build, tag, and push the image to Amazon ECR
-      id: build-image
-      env:
-        ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-        IMAGE_REPOSITORY: ${{ secrets.REDIS_INTERFACE_REPO_NAME }}
-        AWS_KEY_ID: ${{ secrets.AWS_APP_KEY_ID }}
-        AWS_SECRET_KEY: ${{ secrets.AWS_APP_SECRET_KEY }}
-        IMAGE_TAG: edge
-      run: |
-        # Build a docker container and push it to ECR 
-        docker build -f ./src/RedisInterface/Dockerfile -t $ECR_REGISTRY/$IMAGE_REPOSITORY:$IMAGE_TAG \
-         --build-arg AWS_KEY_ID=$AWS_KEY_ID --build-arg AWS_SECRET_KEY=$AWS_SECRET_KEY ./src
-        echo "Pushing image to ECR..."
-        docker push $ECR_REGISTRY/$IMAGE_REPOSITORY:$IMAGE_TAG
-        echo "::set-output name=image::$ECR_REGISTRY/$IMAGE_REPOSITORY:$IMAGE_TAG"

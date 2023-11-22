@@ -7,6 +7,7 @@ using Middleware.Models.Enums;
 using Middleware.Orchestrator.Deployment;
 using Middleware.RedisInterface.Sdk;
 using Quartz;
+using Middleware.Common.Job;
 
 namespace Middleware.Orchestrator.Jobs;
 

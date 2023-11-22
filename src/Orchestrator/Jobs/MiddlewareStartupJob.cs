@@ -7,6 +7,7 @@ using Middleware.Common.ExtensionMethods;
 using Middleware.Orchestrator.Deployment;
 using Middleware.Orchestrator.Exceptions;
 using Quartz;
+using Middleware.Common.Job;
 
 namespace Middleware.Orchestrator.Jobs;
 
