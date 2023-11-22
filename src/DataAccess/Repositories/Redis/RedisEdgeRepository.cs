@@ -218,73 +218,40 @@ public class RedisEdgeRepository : RedisRepository<EdgeModel, EdgeDto>, IEdgeRep
         if (matchedEdge is not null)
             return (true, matchedEdge);
         return (false, matchedEdge);
-        }
+    }
 
-        /// <summary>
-        /// Checks if an edge exists with a particular id.
-        /// </summary>
-        /// <param name="id"></param>
-        /// <returns></returns>
-        public async Task<(bool, EdgeModel?)> CheckIfIdExists(string id)
-        {
-            var matchedEdge = await FindSingleAsync(dto => dto.Id == id);
-            if (matchedEdge is not null)
-            {
-                return (true, matchedEdge);
-            }
-            else
-            {
-                return (false, matchedEdge);
-            }
-        }
+    /// <summary>
+    ///     Return online status and LastUpdatedTime of edge by cloud Id.
+    /// </summary>
+    /// <param name="edgeId"></param>
+    /// <returns>Return bool of isOnline and dateTime of lastUpdatedTime of the edgeModel</returns>
+    public async Task<CloudEdgeStatusResponse> GetEdgeOnlineStatusLastUpdatedTimeAsync(Guid edgeId)
+    {
+        var edge = await GetByIdAsync(edgeId);
+        if (edge is null)
+            throw new ArgumentException("Edge does not exist", nameof(edgeId));
+        var response = new CloudEdgeStatusResponse();
+        response.Id = edgeId;
+        response.LastUpdatedTime = edge.LastUpdatedTime;
+        response.IsOnline = edge.IsOnline;
+        response.Type = "Edge";
 
-        /// <summary>
-        /// Return online status and LastUpdatedTime of edge by cloud Id.
-        /// </summary>
-        /// <param name="edgeId"></param>
-        /// <returns>Return bool of isOnline and dateTime of lastUpdatedTime of the edgeModel</returns>
-        public async Task<CloudEdgeStatusResponse> GetEdgeOnlineStatusLastUpdatedTimeAsync(Guid edgeId)
-        {
-            EdgeModel? edge = await GetByIdAsync(edgeId);
-            if (edge is null)
-            {
-                throw new ArgumentException("Edge does not exist", nameof(edgeId));
-            } 
-            else
-            {
-                CloudEdgeStatusResponse response = new CloudEdgeStatusResponse();
-                response.Id = edgeId;
-                response.LastUpdatedTime = edge.LastUpdatedTime;
-                response.IsOnline = edge.IsOnline;
-                response.Type = "Edge";
+        return response;
+    }
 
-                return response;
-            }
-        }
-
-        /// <summary>
-        /// Change online status of edge by edge Id.
-        /// </summary>
-        /// <param name="edgeId"></param>
-        /// <param name="isOnline"></param>
-        /// <returns></returns>
-        public async Task SetEdgeOnlineStatusAsync(Guid edgeId, bool isOnline)
-        {
-            EdgeModel? edge = await GetByIdAsync(edgeId);
-            if (edge is null)
-            {
-                throw new ArgumentException("Edge does not exist", nameof(edgeId));
-            }
-            else
-            {
-                edge.IsOnline = isOnline;
-                if(edge.IsOnline == true)
-                {
-                    edge.LastUpdatedTime = DateTime.UtcNow;
-                }                
-                _ = await AddAsync(edge) ?? throw new ArgumentException("Edge does not exist", nameof(edge));
-            }
-        }
-
+    /// <summary>
+    ///     Change online status of edge by edge Id.
+    /// </summary>
+    /// <param name="edgeId"></param>
+    /// <param name="isOnline"></param>
+    /// <returns></returns>
+    public async Task SetEdgeOnlineStatusAsync(Guid edgeId, bool isOnline)
+    {
+        var edge = await GetByIdAsync(edgeId);
+        if (edge is null)
+            throw new ArgumentException("Edge does not exist", nameof(edgeId));
+        edge.IsOnline = isOnline;
+        if (edge.IsOnline) edge.LastUpdatedTime = DateTime.UtcNow;
+        _ = await AddAsync(edge) ?? throw new ArgumentException("Edge does not exist", nameof(edge));
     }
 }
