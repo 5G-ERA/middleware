@@ -1,6 +1,7 @@
 using MassTransit;
 using Middleware.Common.Config;
 using Middleware.Common.MessageContracts;
+using Middleware.Models.Domain;
 using RabbitMQ.Client;
 
 namespace Middleware.TaskPlanner.ExtensionMethods;
@@ -19,6 +20,7 @@ public static class ServiceCollectionExtensions
                     hostConfig.Username(mqConfig.User);
                     hostConfig.Password(mqConfig.Pass);
                 });
+
                 mqBusFactoryConfigurator.Send<DeployPlanMessage>(x =>
                 {
                     x.UseRoutingKeyFormatter(t => t.Message.DeploymentLocation);
@@ -63,6 +65,8 @@ public static class ServiceCollectionExtensions
 
                 mqBusFactoryConfigurator.ConfigureEndpoints(busRegistrationContext);
             });
+
+            x.AddRequestClient<TaskModel>();
         });
         // MassTransit-RabbitMQ Configuration
         services.AddOptions<MassTransitHostOptions>()

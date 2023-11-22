@@ -46,6 +46,9 @@ builder.Services.AddScoped<IPublisher<DeployPlanMessage>, DeployPlanMessagePubli
 builder.Services.AddScoped<IPublisher<SwitchoverDeleteAction>, SwitchoverDeleteInstancePublisher>();
 builder.Services.AddScoped<IPublisher<SwitchoverDeployAction>, SwitchoverDeployInstancePublisher>();
 builder.Services.AddScoped<IPublisher<ConnectRobotToSliceMessage>, ConnectRobotToSlicePublisher>();
+builder.Services
+    .AddScoped<IRequestResponseClient<RequestResourcePlanMessage, RequestResourcePlanMessage>,
+        ResourcePlanRequestPublisher>();
 
 var app = builder.Build();
 

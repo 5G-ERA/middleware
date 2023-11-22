@@ -42,4 +42,11 @@ public interface IPublishService
     /// <returns></returns>
     Task PublishConnectImsiToSlice(Guid robotId, Guid actionPlanId, string imsi, string slice, string location,
         string locationType);
+
+    /// <summary>
+    ///     Request ResourcePlanner for the resource plan for the task
+    /// </summary>
+    /// <param name="task"></param>
+    /// <returns></returns>
+    Task<TaskModel> RequestResourcePlan(TaskModel task);
 }

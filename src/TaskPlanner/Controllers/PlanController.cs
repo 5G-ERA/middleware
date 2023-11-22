@@ -62,16 +62,18 @@ public class PlanController : ControllerBase
             plan.ResourceLock = lockResource;
 
             // call resource planner for resources
-            var tmpTaskSend = _mapper.Map<ResourcePlanner.TaskModel>(plan);
-            var tmpRobotSend = _mapper.Map<RobotModel>(robot2);
-            var resourceInput = new ResourceInput
-            {
-                Robot = tmpRobotSend,
-                Task = tmpTaskSend
-            };
-            var tmpFinalTask =
-                await _resourcePlannerClient.ResourceAsync(resourceInput);
-            var resourcePlan = _mapper.Map<TaskModel>(tmpFinalTask);
+            //var tmpTaskSend = _mapper.Map<ResourcePlanner.TaskModel>(plan);
+            //var tmpRobotSend = _mapper.Map<RobotModel>(robot2);
+            //var resourceInput = new ResourceInput
+            //{
+            //    Robot = tmpRobotSend,
+            //    Task = tmpTaskSend
+            //};
+            //var tmpFinalTask =
+            //    await _resourcePlannerClient.ResourceAsync(resourceInput);
+            //var resourcePlan = _mapper.Map<TaskModel>(tmpFinalTask);
+
+            var resourcePlan = await _publishService.RequestResourcePlan(plan);
 
             if (dryRun)
                 return Ok(resourcePlan);
