@@ -101,4 +101,23 @@ public interface IRedisInterface
 
     [Get("/api/v1/robot")]
     Task<ApiResponse<GetRobotsResponse?>> RobotGetAll();
+
+    #region Location
+
+    [Get("/api/v1/location/{id}")]
+    Task<ApiResponse<LocationResponse?>> LocationGetById(Guid id);
+
+    [Get("/api/v1/location/name/{name}")]
+    Task<ApiResponse<LocationResponse?>> LocationGetByName(string name);
+
+    [Post("/api/v1/location")]
+    Task<ApiResponse<LocationResponse?>> LocationAdd([Body] LocationRequest payload);
+
+    [Post("/api/v1/location/free")]
+    Task<ApiResponse<GetLocationsResponse>> LocationGetFree([Body] List<Location> locations);
+
+    [Post("/api/v1/location/lessBusy")]
+    Task<ApiResponse<GetLocationsResponse>> LocationGetLessBusy([Body] List<Location> clouds);
+
+    #endregion
 }
