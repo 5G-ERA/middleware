@@ -262,7 +262,7 @@ public class EdgeController : ControllerBase
             var inputDirection = directionEnum;
             try
             {
-                var relations = await _edgeRepository.GetRelation(id, name, inputDirection);
+                var relations = await _locationRepository.GetRelation(id, name, inputDirection);
                 if (!relations.Any())
                 {
                     return NotFound(new ApiResponse((int)HttpStatusCode.NotFound, "Relations were not found."));
