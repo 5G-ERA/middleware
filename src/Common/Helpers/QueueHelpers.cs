@@ -132,4 +132,19 @@ public static class QueueHelpers
 
         return GetQueueName(organization, instanceName, "slice-imsi-connect");
     }
+
+    /// <summary>
+    ///     Constructs the resource planning queue name
+    /// </summary>
+    /// <param name="organization"></param>
+    /// <param name="instanceName"></param>
+    /// <returns></returns>
+    /// <exception cref="ArgumentNullException">When parameters are not specified or contain empty or whitespace string</exception>
+    public static string ConstructResourcePlanningServiceQueueName(string organization, string instanceName)
+    {
+        if (string.IsNullOrWhiteSpace(organization)) throw new ArgumentNullException(nameof(organization));
+        if (string.IsNullOrWhiteSpace(organization)) throw new ArgumentNullException(nameof(instanceName));
+
+        return GetQueueName(organization, instanceName, "resource-plan");
+    }
 }

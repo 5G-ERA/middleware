@@ -26,8 +26,6 @@ public class DeployPlanConsumer : IConsumer<DeployPlanMessage>
         var plan = ctx.Message;
         _logger.LogDebug("Location {0}-{1} received message request addressed to {2}", config.InstanceName,
             config.InstanceType, plan.DeploymentLocation);
-        var _ = await _deploymentService.DeployActionPlanAsync(plan.Task, plan.RobotId);
-
-        ctx.re
+        _ = await _deploymentService.DeployActionPlanAsync(plan.Task, plan.RobotId);
     }
 }
