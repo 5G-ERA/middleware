@@ -6,14 +6,6 @@ public class RegisterSlicesRequest
     public LocationRequest Location { get; init; }
 }
 
-public class LocationRequest
-{
-    public Guid Id { get; init; }
-    public string Type { get; init; }
-    public string Name { get; init; }
-    public string Organization { get; init; }
-}
-
 public class SliceRequest
 {
     public string SliceId { get; init; }

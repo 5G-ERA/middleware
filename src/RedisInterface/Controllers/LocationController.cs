@@ -1,12 +1,9 @@
 ﻿using System.Net;
 using Microsoft.AspNetCore.Mvc;
 using Middleware.Common.Attributes;
-using Middleware.Common.Enums;
 using Middleware.Common.Responses;
 using Middleware.DataAccess.Repositories.Abstract;
-using Middleware.Models;
 using Middleware.Models.Domain;
-using Middleware.Models.Enums;
 using Middleware.RedisInterface.Contracts.Mappings;
 using Middleware.RedisInterface.Contracts.Requests;
 using Middleware.RedisInterface.Contracts.Responses;
@@ -17,34 +14,34 @@ namespace Middleware.RedisInterface.Controllers;
 
 [Route("api/v1/[controller]")]
 [ApiController]
-public class EdgeController : ControllerBase
+public class LocationController : ControllerBase
 {
     private readonly ILocationRepository _locationRepository;
     private readonly ILogger _logger;
 
-    public EdgeController(ILocationRepository locationRepository, ILogger<EdgeController> logger)
+    public LocationController(ILocationRepository locationRepository, ILogger<LocationController> logger)
     {
-        _locationRepository = locationRepository ?? throw new ArgumentNullException(nameof(locationRepository));
-        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+        _locationRepository = locationRepository;
+        _logger = logger;
     }
 
     /// <summary>
-    ///     Get all the Edge entities
+    ///     Get all the Location entities
     /// </summary>
-    /// <returns> the list of Edge entities </returns>
-    [HttpGet(Name = "EdgeGetAll")]
-    [ProducesResponseType(typeof(GetEdgesResponse), (int)HttpStatusCode.OK)]
+    /// <returns> the list of Location entities </returns>
+    [HttpGet(Name = "LocationGetAll")]
+    [ProducesResponseType(typeof(GetLocationsResponse), (int)HttpStatusCode.OK)]
     [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.NotFound)]
     [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.InternalServerError)]
     public async Task<IActionResult> GetAllAsync()
     {
         try
         {
-            var models = await _locationRepository.FindAsync(e => e.Type == LocationType.Edge.ToString());
+            var models = await _locationRepository.GetAllAsync();
             if (models.Any() == false)
                 return NotFound(new ApiResponse((int)HttpStatusCode.NotFound, "Objects were not found."));
 
-            var response = models.ToEdgesResponse();
+            var response = models.ToLocationsResponse();
             return Ok(response);
         }
         catch (Exception ex)
@@ -56,24 +53,23 @@ public class EdgeController : ControllerBase
     }
 
     /// <summary>
-    ///     Get an Edge entity by id
+    ///     Get an LocationModel entity by id
     /// </summary>
     /// <param name="id"></param>
-    /// <returns> the Edge entity for the specified id </returns>
+    /// <returns> the LocationModel entity for the specified id </returns>
     [HttpGet]
-    [Route("{id}", Name = "EdgeGetById")]
-    [ProducesResponseType(typeof(EdgeResponse), (int)HttpStatusCode.OK)]
+    [Route("{id}", Name = "LocationGetById")]
+    [ProducesResponseType(typeof(LocationResponse), (int)HttpStatusCode.OK)]
     [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.NotFound)]
     [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.InternalServerError)]
     public async Task<IActionResult> GetByIdAsync(Guid id)
     {
         try
         {
-            var model = await _locationRepository.FindSingleAsync(e =>
-                e.Id == id.ToString() && e.Type == LocationType.Edge.ToString());
+            var model = await _locationRepository.GetByIdAsync(id);
             if (model == null) return NotFound(new ApiResponse((int)HttpStatusCode.NotFound, "Object was not found."));
 
-            var response = model.ToEdgeResponse();
+            var response = model.ToLocationResponse();
             return Ok(response);
         }
         catch (Exception ex)
@@ -85,15 +81,15 @@ public class EdgeController : ControllerBase
     }
 
     /// <summary>
-    ///     Add a new Edge entity
+    ///     Add a new Location entity
     /// </summary>
     /// <param name="request"></param>
-    /// <returns> the newly created EdgeModel entity </returns>
-    [HttpPost(Name = "EdgeAdd")]
-    [ProducesResponseType(typeof(EdgeResponse), (int)HttpStatusCode.OK)]
+    /// <returns> the newly created Location entity </returns>
+    [HttpPost(Name = "LocationAdd")]
+    [ProducesResponseType(typeof(LocationResponse), (int)HttpStatusCode.OK)]
     [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.BadRequest)]
     [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.InternalServerError)]
-    public async Task<IActionResult> AddAsync([FromBody] EdgeRequest request)
+    public async Task<IActionResult> AddAsync([FromBody] LocationRequest request)
     {
         if (request == null)
             return BadRequest(new ApiResponse((int)HttpStatusCode.BadRequest, "Parameters were not specified."));
@@ -101,15 +97,15 @@ public class EdgeController : ControllerBase
         try
         {
             var model = request.ToLocation();
-            var edge = await _locationRepository.AddAsync(model);
-            if (edge is null)
+            var location = await _locationRepository.AddAsync(model);
+            if (location is null)
             {
                 return StatusCode((int)HttpStatusCode.InternalServerError,
                     new ApiResponse((int)HttpStatusCode.NotFound,
-                        "Problem while adding the Edge to the data store"));
+                        "Problem while adding the Location to the data store"));
             }
 
-            var response = edge.ToEdgeResponse();
+            var response = location.ToLocationResponse();
             return Ok(response);
         }
         catch (Exception ex)
@@ -121,16 +117,16 @@ public class EdgeController : ControllerBase
     }
 
     /// <summary>
-    ///     Partially update an existing Edge entity
+    ///     Update an existing Location entity
     /// </summary>
     /// <param name="request"></param>
-    /// <returns> the modified Edge entity </returns>
+    /// <returns> the modified Location entity </returns>
     [HttpPut]
-    [Route("{id}", Name = "EdgePatch")]
-    [ProducesResponseType(typeof(EdgeResponse), (int)HttpStatusCode.OK)]
+    [Route("{id}", Name = "LocationUpdate")]
+    [ProducesResponseType(typeof(LocationResponse), (int)HttpStatusCode.OK)]
     [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.NotFound)]
     [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.InternalServerError)]
-    public async Task<IActionResult> PatchEdgeAsync([FromMultiSource] UpdateEdgeRequest request)
+    public async Task<IActionResult> PatchLocationAsync([FromMultiSource] UpdateLocationRequest request)
     {
         if (request is null)
         {
@@ -140,16 +136,16 @@ public class EdgeController : ControllerBase
 
         try
         {
-            var edge = request.ToLocation();
-            var exists = await _locationRepository.GetByIdAsync(edge.Id);
+            var location = request.ToLocation();
+            var exists = await _locationRepository.GetByIdAsync(location.Id);
             if (exists is null)
             {
                 return NotFound(
                     new ApiResponse((int)HttpStatusCode.NotFound, "Object to be updated was not found."));
             }
 
-            await _locationRepository.UpdateAsync(edge);
-            var response = edge.ToEdgeResponse();
+            await _locationRepository.UpdateAsync(location);
+            var response = location.ToLocationResponse();
             return Ok(response);
         }
         catch (Exception ex)
@@ -162,12 +158,12 @@ public class EdgeController : ControllerBase
 
 
     /// <summary>
-    ///     Delete an Edge entity for the given id
+    ///     Delete an LocationModel entity for the given id
     /// </summary>
     /// <param name="id"></param>
     /// <returns> no return </returns>
     [HttpDelete]
-    [Route("{id}", Name = "EdgeDelete")]
+    [Route("{id}", Name = "LocationDelete")]
     [ProducesResponseType(typeof(void), (int)HttpStatusCode.OK)]
     [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.NotFound)]
     [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.InternalServerError)]
@@ -179,13 +175,6 @@ public class EdgeController : ControllerBase
             {
                 return NotFound(new ApiResponse((int)HttpStatusCode.NotFound,
                     "The id cannot be empty"));
-            }
-
-            var exists = await _locationRepository.GetByIdAsync(id);
-            if (exists is null)
-            {
-                return NotFound(new ApiResponse((int)HttpStatusCode.NotFound,
-                    "The specified Edge has not been found."));
             }
 
             await _locationRepository.DeleteByIdAsync(id);
@@ -205,7 +194,7 @@ public class EdgeController : ControllerBase
     /// <param name="model"></param>
     /// <returns></returns>
     [HttpPost]
-    [Route("AddRelation", Name = "EdgeAddRelation")]
+    [Route("AddRelation", Name = "LocationAddRelation")]
     [ProducesResponseType(typeof(RelationModel), (int)HttpStatusCode.OK)]
     [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.BadRequest)]
     [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.InternalServerError)]
@@ -234,39 +223,23 @@ public class EdgeController : ControllerBase
     }
 
     /// <summary>
-        /// Retrieves a single relation by name
-        /// </summary>
-        /// <param name="id"></param>
-        /// <param name="name"></param>
-        /// <returns></returns>
-        [HttpGet]
-        [Route("relation/{name}", Name = "EdgeGetRelationByName")]
-        [ProducesResponseType(typeof(List<RelationModel>), (int)HttpStatusCode.OK)]
-        [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.NotFound)]
-        [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.InternalServerError)]
-        public async Task<IActionResult> GetRelationAsync(Guid id, string name, string direction = "Outgoing")
+    ///     Retrieves a single relation by name
+    /// </summary>
+    /// <param name="id"></param>
+    /// <param name="name"></param>
+    /// <returns></returns>
+    [HttpGet]
+    [Route("relation/{name}", Name = "LocationGetRelationByName")]
+    [ProducesResponseType(typeof(List<RelationModel>), (int)HttpStatusCode.OK)]
+    [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.NotFound)]
+    [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.InternalServerError)]
+    public async Task<IActionResult> GetRelationAsync(Guid id, string name)
+    {
+        try
         {
-            if (string.IsNullOrWhiteSpace(name))
-            {
-                return BadRequest(new ApiResponse((int)HttpStatusCode.BadRequest, "Relation name not specified"));
-            }
-            if (id == Guid.Empty)
-            {
-                return BadRequest(new ApiResponse((int)HttpStatusCode.BadRequest, "Relation ID not specified"));
-            }
-            RelationDirection directionEnum;
-            if (Enum.TryParse<RelationDirection>(direction, out directionEnum) == false)
-            {
-                return BadRequest(new ApiResponse((int)HttpStatusCode.BadRequest, "Wrong Relation direction specified"));
-            }
-            var inputDirection = directionEnum;
-            try
-            {
-                var relations = await _edgeRepository.GetRelation(id, name, inputDirection);
-                if (!relations.Any())
-                {
-                    return NotFound(new ApiResponse((int)HttpStatusCode.NotFound, "Relations were not found."));
-                }
+            var relations = await _locationRepository.GetRelation(id, name);
+            if (!relations.Any())
+                return NotFound(new ApiResponse((int)HttpStatusCode.NotFound, "Relations were not found."));
 
             return Ok(relations);
         }
@@ -286,7 +259,7 @@ public class EdgeController : ControllerBase
     /// <param name="secondName"></param>
     /// <returns></returns>
     [HttpGet]
-    [Route("relations/{firstName}/{secondName}", Name = "EdgeGetRelationsByName")]
+    [Route("relations/{firstName}/{secondName}", Name = "LocationGetRelationsByName")]
     [ProducesResponseType(typeof(List<RelationModel>), (int)HttpStatusCode.OK)]
     [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.NotFound)]
     [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.InternalServerError)]
@@ -299,7 +272,6 @@ public class EdgeController : ControllerBase
             if (!relations.Any())
                 return NotFound(new ApiResponse((int)HttpStatusCode.NotFound, "Relations were not found"));
 
-
             return Ok(relations);
         }
         catch (Exception ex)
@@ -310,79 +282,21 @@ public class EdgeController : ControllerBase
         }
     }
 
+
     [HttpGet]
-    [Route("free", Name = "GetFreeEdgesIds")] //edges
-    [ProducesResponseType(typeof(GetEdgesResponse), (int)HttpStatusCode.OK)]
+    [Route("name/{name}", Name = "LocationGetDataByName")]
+    [ProducesResponseType(typeof(LocationResponse), (int)HttpStatusCode.OK)]
     [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.NotFound)]
-    [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.BadRequest)]
     [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.InternalServerError)]
-    public async Task<IActionResult> GetFreeEdgesIdsAsync(List<EdgeModel> edgesToCheck)
+    public async Task<IActionResult> GetLocationByNameAsync(string name)
     {
         try
         {
-            if (!edgesToCheck.Any())
-                return BadRequest(new ApiResponse((int)HttpStatusCode.BadRequest, "No Edge ids were provided"));
-
-            var edgeFree = await _locationRepository.FilterFreeLocationsAsync(edgesToCheck.ToLocations());
-            if (!edgeFree.Any())
-            {
-                return NotFound(new ApiResponse((int)HttpStatusCode.BadRequest,
-                    "There are no edges connected to the Robot"));
-            }
-
-            var response = edgeFree.ToEdgesResponse();
-            return Ok(response);
-        }
-        catch (Exception ex)
-        {
-            var statusCode = (int)HttpStatusCode.InternalServerError;
-            _logger.LogError(ex, "An error occurred:");
-            return StatusCode(statusCode, new ApiResponse(statusCode, $"An error has occurred: {ex.Message}"));
-        }
-    }
-
-    [HttpGet]
-    [Route("lessBusy", Name = "GetLessBusyEdges")]
-    [ProducesResponseType(typeof(GetEdgesResponse), (int)HttpStatusCode.OK)]
-    [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.NotFound)]
-    [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.BadRequest)]
-    [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.InternalServerError)]
-    public async Task<IActionResult> GetLessBusyEdgesAsync(List<EdgeModel> edgesToCheck)
-    {
-        try
-        {
-            if (!edgesToCheck.Any())
-                return BadRequest(new ApiResponse((int)HttpStatusCode.BadRequest, "No Edge ids were provided"));
-
-            var lessBusyEdge = await _locationRepository.OrderLocationsByUtilizationAsync(edgesToCheck.ToLocations());
-            if (!lessBusyEdge.Any())
-                return NotFound(new ApiResponse((int)HttpStatusCode.BadRequest, "There are no busy edges"));
-
-            var response = lessBusyEdge.ToEdgesResponse();
-            return Ok(response);
-        }
-        catch (Exception ex)
-        {
-            var statusCode = (int)HttpStatusCode.InternalServerError;
-            _logger.LogError(ex, "An error occurred:");
-            return StatusCode(statusCode, new ApiResponse(statusCode, $"An error has occurred: {ex.Message}"));
-        }
-    }
-
-    [HttpGet]
-    [Route("name/{name}", Name = "EdgeGetDataByName")]
-    [ProducesResponseType(typeof(EdgeResponse), (int)HttpStatusCode.OK)]
-    [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.NotFound)]
-    [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.InternalServerError)]
-    public async Task<IActionResult> GetEdgeResourceDetailsByNameAsync(string name)
-    {
-        try
-        {
-            var edgeResource = await _locationRepository.GetByNameAsync(name);
-            if (edgeResource is null)
+            var location = await _locationRepository.GetByNameAsync(name);
+            if (location is null)
                 return NotFound(new ApiResponse((int)HttpStatusCode.NotFound, "Object was not found."));
 
-            var response = edgeResource.ToEdgeResponse();
+            var response = location.ToLocationResponse();
             return Ok(response);
         }
         catch (Exception ex)
@@ -394,20 +308,20 @@ public class EdgeController : ControllerBase
     }
 
     /// <summary>
-    ///     Check if a edge is busy by Id.
+    ///     Check if a Location is busy by Id.
     /// </summary>
-    /// <param name="edgeId"></param>
+    /// <param name="id"></param>
     /// <returns>bool</returns>
     [HttpGet]
-    [Route("{id}/busy", Name = "IsBusyEdgeById")]
+    [Route("{id}/busy", Name = "IsBusyLocationById")]
     [ProducesResponseType(typeof(bool), (int)HttpStatusCode.OK)]
     [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.NotFound)]
     [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.InternalServerError)]
-    public async Task<ActionResult<bool>> IsBusyEdgeById(Guid edgeId)
+    public async Task<ActionResult<bool>> IsBusyLocationById(Guid id)
     {
         try
         {
-            var busy = await _locationRepository.IsBusyAsync(edgeId);
+            var busy = await _locationRepository.IsBusyAsync(id);
             return Ok(busy);
         }
         catch (Exception ex)
@@ -419,16 +333,16 @@ public class EdgeController : ControllerBase
     }
 
     /// <summary>
-    ///     Check if a edge is busy by Name.
+    ///     Check if a Location is busy by Name.
     /// </summary>
     /// <param name="name"></param>
     /// <returns>bool</returns>
     [HttpGet]
-    [Route("{name}/busy", Name = "IsBusyEdgeByName")]
+    [Route("{name}/busy", Name = "IsBusyLocationByName")]
     [ProducesResponseType(typeof(bool), (int)HttpStatusCode.OK)]
     [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.NotFound)]
     [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.InternalServerError)]
-    public async Task<IActionResult> IsBusyEdgeByName(string name)
+    public async Task<IActionResult> IsBusyLocationByName(string name)
     {
         try
         {
@@ -445,21 +359,21 @@ public class EdgeController : ControllerBase
 
 
     /// <summary>
-    ///     Returns the number of containers that are deployed in a cloud entity base on cloud Id.
+    ///     Returns the number of containers that are deployed in a location base on location Id.
     /// </summary>
-    /// <param name="edgeId"></param>
+    /// <param name="id"></param>
     /// <returns>int</returns>
     [HttpGet]
-    [Route("{id}/containers/count", Name = "GetNumEdgeContainersById")]
+    [Route("{id}/containers/count", Name = "GetNumLocationContainersById")]
     [ProducesResponseType(typeof(int), (int)HttpStatusCode.OK)]
     [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.NotFound)]
     [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.BadRequest)]
     [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.InternalServerError)]
-    public async Task<IActionResult> GetNumEdgeContainersById(Guid edgeId)
+    public async Task<IActionResult> GetNumLocationContainersById(Guid id)
     {
         try
         {
-            var countContainers = await _locationRepository.GetDeployedInstancesCountAsync(edgeId);
+            var countContainers = await _locationRepository.GetDeployedInstancesCountAsync(id);
             return Ok(countContainers);
         }
         catch (Exception ex)
@@ -474,19 +388,19 @@ public class EdgeController : ControllerBase
     /// <summary>
     ///     Returns the number of containers that are deployed in a cloud entity base on cloud Name.
     /// </summary>
-    /// <param name="edgeName"></param>
+    /// <param name="name"></param>
     /// <returns>int</returns>
     [HttpGet]
-    [Route("{name}/containers/count", Name = "GetNumEdgeContainersByName")]
+    [Route("{name}/containers/count", Name = "GetNumLocationContainersByName")]
     [ProducesResponseType(typeof(int), (int)HttpStatusCode.OK)]
     [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.NotFound)]
     [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.BadRequest)]
     [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.InternalServerError)]
-    public async Task<ActionResult<int>> GetNumEdgeContainersByName(string edgeName)
+    public async Task<ActionResult<int>> GetNumLocationContainersByName(string name)
     {
         try
         {
-            var countContainers = await _locationRepository.GetDeployedInstancesCountAsync(edgeName);
+            var countContainers = await _locationRepository.GetDeployedInstancesCountAsync(name);
             return Ok(countContainers);
         }
         catch (Exception ex)

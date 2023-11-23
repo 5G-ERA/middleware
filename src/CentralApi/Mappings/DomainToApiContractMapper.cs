@@ -9,7 +9,7 @@ public static class DomainToApiContractMapper
     {
         return new()
         {
-            Id = x.Id!.Value,
+            Id = x.Id,
             Name = x.Name,
             Organization = x.Organization,
             Type = x.Type.ToString(),
