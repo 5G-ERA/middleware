@@ -4,6 +4,7 @@ using Middleware.CentralApi.Contracts.Requests;
 using Middleware.CentralApi.Contracts.Responses;
 using Middleware.CentralApi.Sdk.Client;
 using Middleware.CentralApi.Sdk.Options;
+using Middleware.Models.Domain;
 
 namespace Middleware.CentralApi.Sdk;
 
@@ -57,5 +58,15 @@ public class CentralApiClient : ICentralApiClient
     {
         _logger.LogDebug("Entered DeRegisterLocation");
         throw new NotImplementedException();
+    }
+
+    public async Task SetStatus(CloudEdgeStatusRequest request, Guid id)
+    {
+        if (request == null) throw new ArgumentNullException(nameof(request));
+        if (id == Guid.Empty) throw new ArgumentNullException(nameof(id));
+        if (request.Type == string.Empty) throw new ArgumentNullException(nameof(request.Type));
+        request.IsOnline = true;
+
+        await _api.SetStatus(request, id);
     }
 }
