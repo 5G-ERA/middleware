@@ -1,6 +1,7 @@
 ﻿using System.Net;
 using Microsoft.AspNetCore.Mvc;
 using Middleware.Common.Attributes;
+using Middleware.Common.Enums;
 using Middleware.Common.Responses;
 using Middleware.DataAccess.Repositories.Abstract;
 using Middleware.Models;
@@ -233,23 +234,39 @@ public class EdgeController : ControllerBase
     }
 
     /// <summary>
-    ///     Retrieves a single relation by name
-    /// </summary>
-    /// <param name="id"></param>
-    /// <param name="name"></param>
-    /// <returns></returns>
-    [HttpGet]
-    [Route("relation/{name}", Name = "EdgeGetRelationByName")]
-    [ProducesResponseType(typeof(List<RelationModel>), (int)HttpStatusCode.OK)]
-    [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.NotFound)]
-    [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.InternalServerError)]
-    public async Task<IActionResult> GetRelationAsync(Guid id, string name)
-    {
-        try
+        /// Retrieves a single relation by name
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="name"></param>
+        /// <returns></returns>
+        [HttpGet]
+        [Route("relation/{name}", Name = "EdgeGetRelationByName")]
+        [ProducesResponseType(typeof(List<RelationModel>), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.NotFound)]
+        [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.InternalServerError)]
+        public async Task<IActionResult> GetRelationAsync(Guid id, string name, string direction = "Outgoing")
         {
-            var relations = await _locationRepository.GetRelation(id, name);
-            if (!relations.Any())
-                return NotFound(new ApiResponse((int)HttpStatusCode.NotFound, "Relations were not found."));
+            if (string.IsNullOrWhiteSpace(name))
+            {
+                return BadRequest(new ApiResponse((int)HttpStatusCode.BadRequest, "Relation name not specified"));
+            }
+            if (id == Guid.Empty)
+            {
+                return BadRequest(new ApiResponse((int)HttpStatusCode.BadRequest, "Relation ID not specified"));
+            }
+            RelationDirection directionEnum;
+            if (Enum.TryParse<RelationDirection>(direction, out directionEnum) == false)
+            {
+                return BadRequest(new ApiResponse((int)HttpStatusCode.BadRequest, "Wrong Relation direction specified"));
+            }
+            var inputDirection = directionEnum;
+            try
+            {
+                var relations = await _locationRepository.GetRelation(id, name, inputDirection);
+                if (!relations.Any())
+                {
+                    return NotFound(new ApiResponse((int)HttpStatusCode.NotFound, "Relations were not found."));
+                }
 
             return Ok(relations);
         }
@@ -281,6 +298,7 @@ public class EdgeController : ControllerBase
             var relations = await _locationRepository.GetRelations(id, relationNames);
             if (!relations.Any())
                 return NotFound(new ApiResponse((int)HttpStatusCode.NotFound, "Relations were not found"));
+
 
             return Ok(relations);
         }
