@@ -15,7 +15,7 @@ The Module configures the following aspects of the Middleware infrastructure:
 * Enables IRSA in EKS
 * Configures IAM Role for Middleware to access k8s API
 * Network Load Balancer
-* Configures the created EKS Cluster for the Middleware deployment
+* Configures the created EKS Cluster for the Middleware and CentralApi deployment
 
 ## Prerequisites
 
@@ -24,7 +24,7 @@ To provide the necessary infrastructure the AWS Access Keys are needed. The mach
 * Terraform ([install guide](https://developer.hashicorp.com/terraform/tutorials/aws-get-started/install-cli))
 * AWS CLI v2.7.0/v1.24.0 or newer ([install guide](https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html), [configuration guide](https://docs.aws.amazon.com/cli/latest/userguide/getting-started-quickstart.html))
 * AWS IAM Authenticator ([install guide](https://docs.aws.amazon.com/eks/latest/userguide/install-aws-iam-authenticator.html))
-* kubectl  v1.24.0 or newer ([install guide](https://kubernetes.io/docs/tasks/tools/))
+* kubectl  v1.27.0 or newer ([install guide](https://kubernetes.io/docs/tasks/tools/))
 
 ## Provision
 
@@ -72,6 +72,21 @@ $ kubectl cluster-info
 ```shell
 $ kubectl get nodes
 ```
+
+## Allowing access for other user groups
+To enable the use of the Kubernetes cluster by other IAM users, the AWS auth `ConfigMap` needs to be updated. We will add permission to the already existing group with the following command:
+```shell
+$ eksctl create iamidentitymapping \
+    --cluster 5G-ERA-AWS \
+    --region eu-west-2 \
+    --arn arn:aws:iam::132465798:role/KubernetesAdmin \
+    --group system:masters \
+    --no-duplicate-arns \
+    --username admin-k8sAdminsGroup
+```
+
+
+
 ## Destroy the infrastructure
 
 To destroy the deployed infrastructure use `destroy` command.

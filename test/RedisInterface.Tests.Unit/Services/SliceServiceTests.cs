@@ -14,8 +14,7 @@ namespace RedisInterface.Tests.Unit.Services;
 //[LogTestExecution]
 public class SliceServiceTests
 {
-    private readonly ICloudRepository _cloudRepository = Substitute.For<ICloudRepository>();
-    private readonly IEdgeRepository _edgeRepository = Substitute.For<IEdgeRepository>();
+    private readonly ILocationRepository _locationRepository = Substitute.For<ILocationRepository>();
     private readonly ILogger<SliceService> _logger = Substitute.For<ILogger<SliceService>>();
     private readonly IOptions<MiddlewareConfig> _mwOptions = Substitute.For<IOptions<MiddlewareConfig>>();
     private readonly ISliceRepository _sliceRepository = Substitute.For<ISliceRepository>();
@@ -23,7 +22,7 @@ public class SliceServiceTests
 
     public SliceServiceTests()
     {
-        _sut = new(_edgeRepository, _cloudRepository, _sliceRepository, _mwOptions, _logger);
+        _sut = new(_sliceRepository, _locationRepository, _mwOptions, _logger);
     }
 
     [Fact]
@@ -43,16 +42,17 @@ public class SliceServiceTests
             InstanceType = "Edge",
             Organization = "TestOrg"
         };
-        var edge = new EdgeModel
+        var edge = new Location
         {
             Id = Guid.NewGuid(),
             Name = localMwOptions.InstanceName,
-            Organization = localMwOptions.Organization
+            Organization = localMwOptions.Organization,
+            Type = LocationType.Edge
         };
         var relationSlices = GetSlicesRelatedToLocation(edge);
         _mwOptions.Value.Returns(localMwOptions);
-        _edgeRepository.GetEdgeResourceDetailsByNameAsync(edge.Name).Returns(edge);
-        _edgeRepository.GetRelation(edge.Id, "OFFERS").ReturnsForAnyArgs(relationSlices);
+        _locationRepository.GetByNameAsync(edge.Name).Returns(edge);
+        _locationRepository.GetRelation(edge.Id, "OFFERS").ReturnsForAnyArgs(relationSlices);
 
         //act
         await _sut.ReRegisterSlicesAsync(slices);
@@ -60,12 +60,12 @@ public class SliceServiceTests
         //assert
 
         //deleting
-        await _edgeRepository.ReceivedWithAnyArgs(relationSlices.Count).DeleteRelationAsync(default!);
+        await _locationRepository.ReceivedWithAnyArgs(relationSlices.Count).DeleteRelationAsync(default!);
         await _sliceRepository.ReceivedWithAnyArgs(relationSlices.Count).DeleteByIdAsync(default!);
         //adding
         await _sliceRepository.Received().AddAsync(urllcSlice);
         await _sliceRepository.Received().AddAsync(embbSlice);
-        await _edgeRepository.ReceivedWithAnyArgs(2).AddRelationAsync(default!);
+        await _locationRepository.ReceivedWithAnyArgs(2).AddRelationAsync(default!);
     }
 
     [Fact]
@@ -85,11 +85,12 @@ public class SliceServiceTests
             InstanceType = "Edge",
             Organization = "TestOrg"
         };
-        var edge = new EdgeModel
+        var edge = new Location
         {
             Id = Guid.NewGuid(),
             Name = localMwOptions.InstanceName,
-            Organization = localMwOptions.Organization
+            Organization = localMwOptions.Organization,
+            Type = LocationType.Edge
         };
         var location = new Location
         {
@@ -100,8 +101,8 @@ public class SliceServiceTests
         };
         var relationSlices = GetSlicesRelatedToLocation(edge);
         _mwOptions.Value.Returns(localMwOptions);
-        _edgeRepository.GetEdgeResourceDetailsByNameAsync(edge.Name).Returns(edge);
-        _edgeRepository.GetRelation(default!, default!).ReturnsForAnyArgs(relationSlices);
+        _locationRepository.GetByNameAsync(edge.Name).Returns(edge);
+        _locationRepository.GetRelation(default!, default!).ReturnsForAnyArgs(relationSlices);
 
         //act
         await _sut.ReRegisterSlicesAsync(slices, location);
@@ -109,12 +110,12 @@ public class SliceServiceTests
         //assert
 
         //deleting
-        await _edgeRepository.ReceivedWithAnyArgs(relationSlices.Count).DeleteRelationAsync(default!);
+        await _locationRepository.ReceivedWithAnyArgs(relationSlices.Count).DeleteRelationAsync(default!);
         await _sliceRepository.ReceivedWithAnyArgs(relationSlices.Count).DeleteByIdAsync(default!);
         //adding
         await _sliceRepository.Received().AddAsync(urllcSlice);
         await _sliceRepository.Received().AddAsync(embbSlice);
-        await _edgeRepository.ReceivedWithAnyArgs(2).AddRelationAsync(default!);
+        await _locationRepository.ReceivedWithAnyArgs(2).AddRelationAsync(default!);
     }
 
     [Fact]
@@ -134,7 +135,7 @@ public class SliceServiceTests
             InstanceType = "Cloud",
             Organization = "TestOrg"
         };
-        var cloud = new CloudModel
+        var cloud = new Location
         {
             Id = Guid.NewGuid(),
             Name = localMwOptions.InstanceName,
@@ -142,8 +143,8 @@ public class SliceServiceTests
         };
         var relationSlices = GetSlicesRelatedToLocation(cloud);
         _mwOptions.Value.Returns(localMwOptions);
-        _cloudRepository.GetCloudResourceDetailsByNameAsync(cloud.Name).Returns(cloud);
-        _cloudRepository.GetRelation(cloud.Id, "OFFERS").Returns(relationSlices);
+        _locationRepository.GetByNameAsync(cloud.Name).Returns(cloud);
+        _locationRepository.GetRelation(cloud.Id, "OFFERS").Returns(relationSlices);
 
         //act
         await _sut.ReRegisterSlicesAsync(slices);
@@ -151,12 +152,12 @@ public class SliceServiceTests
         //assert
 
         //deleting
-        await _cloudRepository.ReceivedWithAnyArgs(relationSlices.Count).DeleteRelationAsync(default!);
+        await _locationRepository.ReceivedWithAnyArgs(relationSlices.Count).DeleteRelationAsync(default!);
         await _sliceRepository.ReceivedWithAnyArgs(relationSlices.Count).DeleteByIdAsync(default!);
         //adding
         await _sliceRepository.Received().AddAsync(urllcSlice);
         await _sliceRepository.Received().AddAsync(embbSlice);
-        await _cloudRepository.ReceivedWithAnyArgs(2).AddRelationAsync(default!);
+        await _locationRepository.ReceivedWithAnyArgs(2).AddRelationAsync(default!);
     }
 
     [Fact]
@@ -176,11 +177,12 @@ public class SliceServiceTests
             InstanceType = "Cloud",
             Organization = "TestOrg"
         };
-        var cloud = new CloudModel
+        var cloud = new Location
         {
             Id = Guid.NewGuid(),
             Name = localMwOptions.InstanceName,
-            Organization = localMwOptions.Organization
+            Organization = localMwOptions.Organization,
+            Type = LocationType.Cloud
         };
         var location = new Location
         {
@@ -191,8 +193,8 @@ public class SliceServiceTests
         };
         var relationSlices = GetSlicesRelatedToLocation(cloud);
         _mwOptions.Value.Returns(localMwOptions);
-        _cloudRepository.GetCloudResourceDetailsByNameAsync(cloud.Name).Returns(cloud);
-        _cloudRepository.GetRelation(cloud.Id, "OFFERS").ReturnsForAnyArgs(relationSlices);
+        _locationRepository.GetByNameAsync(cloud.Name).Returns(cloud);
+        _locationRepository.GetRelation(cloud.Id, "OFFERS").ReturnsForAnyArgs(relationSlices);
 
         //act
         await _sut.ReRegisterSlicesAsync(slices, location);
@@ -200,12 +202,12 @@ public class SliceServiceTests
         //assert
 
         //deleting
-        await _cloudRepository.ReceivedWithAnyArgs(relationSlices.Count).DeleteRelationAsync(default!);
+        await _locationRepository.ReceivedWithAnyArgs(relationSlices.Count).DeleteRelationAsync(default!);
         await _sliceRepository.ReceivedWithAnyArgs(relationSlices.Count).DeleteByIdAsync(default!);
         //adding
         await _sliceRepository.Received().AddAsync(urllcSlice);
         await _sliceRepository.Received().AddAsync(embbSlice);
-        await _cloudRepository.ReceivedWithAnyArgs(2).AddRelationAsync(default!);
+        await _locationRepository.ReceivedWithAnyArgs(2).AddRelationAsync(default!);
     }
 
     [Fact]

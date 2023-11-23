@@ -17,9 +17,8 @@ public class DashboardService : IDashboardService
     private readonly IActionPlanRepository _actionPlanRepository;
     private readonly IActionRepository _actionRepository;
     private readonly ICentralApiClient _centralApiClient;
-    private readonly ICloudRepository _cloudRepository;
-    private readonly IEdgeRepository _edgeRepository;
     private readonly IInstanceRepository _instanceRepository;
+    private readonly ILocationRepository _locationRepository;
     private readonly IRobotRepository _robotRepository;
     private readonly ISliceRepository _sliceRepository;
     private readonly ITaskRepository _taskRepository;
@@ -28,22 +27,20 @@ public class DashboardService : IDashboardService
     public DashboardService(IRobotRepository robotRepository,
         ITaskRepository taskRepository,
         IActionPlanRepository actionPlanRepository,
-        IEdgeRepository edgeRepository,
-        ICloudRepository cloudRepository,
         IInstanceRepository instanceRepository,
         IActionRepository actionRepository,
         ICentralApiClient centralApiClient,
-        ISliceRepository sliceRepository)
+        ISliceRepository sliceRepository,
+        ILocationRepository locationRepository)
     {
         _instanceRepository = instanceRepository;
-        _cloudRepository = cloudRepository;
-        _edgeRepository = edgeRepository;
         _actionPlanRepository = actionPlanRepository;
         _taskRepository = taskRepository;
         _robotRepository = robotRepository;
         _actionRepository = actionRepository;
         _centralApiClient = centralApiClient;
         _sliceRepository = sliceRepository;
+        _locationRepository = locationRepository;
     }
 
     /// <summary>
@@ -75,13 +72,13 @@ public class DashboardService : IDashboardService
     /// <returns></returns>
     public async Task<Tuple<List<LocationStatusResponse>, int>> GetLocationsStatusListAsync(PaginationFilter filter)
     {
-        var locations = new List<LocationStatusResponse>();
-        var clouds = await _cloudRepository.GetAllAsync();
+        var retVal = new List<LocationStatusResponse>();
+        var locations = await _locationRepository.GetAllAsync();
 
-        foreach (var cloud in clouds)
+        foreach (var loc in locations)
         {
             var locatedInstances =
-                await _cloudRepository.GetRelation(cloud.Id, "LOCATED_AT", RelationDirection.Incoming);
+                await _locationRepository.GetRelation(loc.Id, "LOCATED_AT", RelationDirection.Incoming);
 
             var noOfContainers = 0;
             foreach (var item in locatedInstances)
@@ -90,39 +87,16 @@ public class DashboardService : IDashboardService
                 noOfContainers += instanceContainers.Count;
             }
 
-            var location = new LocationStatusResponse(cloud.Name,
-                cloud.LastUpdatedTime,
-                cloud.CloudStatus,
-                cloud.IsOnline,
+            var location = new LocationStatusResponse(loc.Name,
+                loc.LastUpdatedTime,
+                loc.Status,
+                loc.IsOnline,
                 noOfContainers > 0,
                 noOfContainers);
-            locations.Add(location);
+            retVal.Add(location);
         }
 
-        var edges = await _edgeRepository.GetAllAsync();
-
-        foreach (var edge in edges)
-        {
-            var locatedInstances =
-                await _edgeRepository.GetRelation(edge.Id, "LOCATED_AT", RelationDirection.Incoming);
-
-            var noOfContainers = 0;
-            foreach (var item in locatedInstances)
-            {
-                var instanceContainers = await _instanceRepository.GetRelation(item.InitiatesFrom.Id, "NEEDS");
-                noOfContainers += instanceContainers.Count;
-            }
-
-            var location = new LocationStatusResponse(edge.Name,
-                edge.LastUpdatedTime,
-                edge.EdgeStatus,
-                edge.IsOnline,
-                noOfContainers > 0,
-                noOfContainers);
-            locations.Add(location);
-        }
-
-        return new(filter.FilterResult(locations), locations.Count);
+        return new(filter.FilterResult(retVal), retVal.Count);
     }
 
     /// <summary>
@@ -318,9 +292,7 @@ public class DashboardService : IDashboardService
     private async Task<IReadOnlyList<SliceModel>> GetSlicesForLocation(Guid locId, LocationType locType)
     {
         var slices = new List<SliceModel>();
-        var relations = locType == LocationType.Cloud
-            ? await _cloudRepository.GetRelation(locId, "OFFERS")
-            : await _edgeRepository.GetRelation(locId, "OFFERS");
+        var relations = await _locationRepository.GetRelation(locId, "OFFERS");
 
         foreach (var relation in relations)
         {

@@ -3,9 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Middleware.Common.Attributes;
 using Middleware.Common.Responses;
 using Middleware.DataAccess.Repositories.Abstract;
-using Middleware.Models;
 using Middleware.Models.Domain;
-using Middleware.Models.Enums;
 using Middleware.RedisInterface.Contracts.Mappings;
 using Middleware.RedisInterface.Contracts.Requests;
 using Middleware.RedisInterface.Contracts.Responses;
@@ -16,124 +14,34 @@ namespace Middleware.RedisInterface.Controllers;
 
 [Route("api/v1/[controller]")]
 [ApiController]
-public class CloudController : ControllerBase
+public class LocationController : ControllerBase
 {
     private readonly ILocationRepository _locationRepository;
     private readonly ILogger _logger;
 
-    public CloudController(ILocationRepository locationRepository, ILogger<CloudController> logger)
+    public LocationController(ILocationRepository locationRepository, ILogger<LocationController> logger)
     {
-        _locationRepository = locationRepository ?? throw new ArgumentNullException(nameof(locationRepository));
-        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+        _locationRepository = locationRepository;
+        _logger = logger;
     }
 
     /// <summary>
-    ///     Get all the CloudModel entities
+    ///     Get all the Location entities
     /// </summary>
-    /// <returns> the list of CloudModel entities </returns>
-    [HttpGet(Name = "CloudGetAll")]
-    [ProducesResponseType(typeof(GetCloudsResponse), (int)HttpStatusCode.OK)]
+    /// <returns> the list of Location entities </returns>
+    [HttpGet(Name = "LocationGetAll")]
+    [ProducesResponseType(typeof(GetLocationsResponse), (int)HttpStatusCode.OK)]
     [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.NotFound)]
     [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.InternalServerError)]
     public async Task<IActionResult> GetAllAsync()
     {
         try
         {
-            var models = await _locationRepository.FindAsync(c => c.Type == LocationType.Cloud.ToString());
+            var models = await _locationRepository.GetAllAsync();
             if (models.Any() == false)
-                return NotFound(new ApiResponse((int)HttpStatusCode.NotFound, "Clouds were not found."));
-            return Ok(models.ToCloudsResponse());
-        }
-        catch (Exception ex)
-        {
-            var statusCode = (int)HttpStatusCode.InternalServerError;
-            _logger.LogError(ex, "An error occurred:");
-            return StatusCode(statusCode, new ApiResponse(statusCode, $"An error has occurred: {ex.Message}"));
-        }
-    }
+                return NotFound(new ApiResponse((int)HttpStatusCode.NotFound, "Objects were not found."));
 
-    /// <summary>
-    ///     Get a CloudModel entity by id
-    /// </summary>
-    /// <param name="id"></param>
-    /// <returns> the CloudModel entity for the specified id </returns>
-    [HttpGet]
-    [Route("{id}", Name = "CloudGetById")]
-    [ProducesResponseType(typeof(CloudResponse), (int)HttpStatusCode.OK)]
-    [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.NotFound)]
-    [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.InternalServerError)]
-    public async Task<IActionResult> GetByIdAsync(Guid id)
-    {
-        try
-        {
-            var model = await _locationRepository.FindSingleAsync(l =>
-                l.Id == id.ToString() && l.Type == LocationType.Cloud.ToString());
-            if (model is null)
-            {
-                return NotFound(new ApiResponse((int)HttpStatusCode.NotFound,
-                    $"Cloud with specified id: '{id}' was not found."));
-            }
-
-            return Ok(model.ToCloudResponse());
-        }
-        catch (Exception ex)
-        {
-            var statusCode = (int)HttpStatusCode.InternalServerError;
-            _logger.LogError(ex, "An error occurred:");
-            return StatusCode(statusCode, new ApiResponse(statusCode, $"An error has occurred: {ex.Message}"));
-        }
-    }
-
-
-    /// <summary>
-    ///     Add a new CloudModel entity
-    /// </summary>
-    /// <param name="model"></param>
-    /// <returns> the newly created CloudModel entity </returns>
-    [HttpPost(Name = "CloudAdd")]
-    [ProducesResponseType(typeof(CloudResponse), (int)HttpStatusCode.OK)]
-    [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.BadRequest)]
-    [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.InternalServerError)]
-    public async Task<IActionResult> AddAsync([FromBody] CloudRequest model)
-    {
-        if (model == null) return BadRequest("Parameters were not specified.");
-        try
-        {
-            var location = await _locationRepository.AddAsync(model.ToLocation());
-            if (location is null)
-            {
-                return StatusCode((int)HttpStatusCode.InternalServerError,
-                    new ApiResponse((int)HttpStatusCode.InternalServerError,
-                        "Could not add the cloud to the data store"));
-            }
-
-            return Ok(location.ToCloudResponse());
-        }
-        catch (Exception ex)
-        {
-            var statusCode = (int)HttpStatusCode.InternalServerError;
-            _logger.LogError(ex, "An error occurred:");
-            return StatusCode(statusCode, new ApiResponse(statusCode, $"An error has occurred: {ex.Message}"));
-        }
-    }
-
-    /// <summary>
-    ///     Partially update an existing CloudModel entity
-    /// </summary>
-    /// <param name="patch"></param>
-    /// <returns> the modified CloudModel entity </returns>
-    [HttpPut]
-    [Route("{id}", Name = "CloudPatch")]
-    [ProducesResponseType(typeof(CloudResponse), (int)HttpStatusCode.OK)]
-    [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.NotFound)]
-    [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.InternalServerError)]
-    public async Task<IActionResult> PatchCloudAsync([FromMultiSource] UpdateCloudRequest patch)
-    {
-        try
-        {
-            var location = patch.ToLocation();
-            await _locationRepository.UpdateAsync(location);
-            var response = location.ToCloudResponse();
+            var response = models.ToLocationsResponse();
             return Ok(response);
         }
         catch (Exception ex)
@@ -145,26 +53,131 @@ public class CloudController : ControllerBase
     }
 
     /// <summary>
-    ///     Delete an CloudModel entity for the given id
+    ///     Get an LocationModel entity by id
+    /// </summary>
+    /// <param name="id"></param>
+    /// <returns> the LocationModel entity for the specified id </returns>
+    [HttpGet]
+    [Route("{id}", Name = "LocationGetById")]
+    [ProducesResponseType(typeof(LocationResponse), (int)HttpStatusCode.OK)]
+    [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.NotFound)]
+    [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.InternalServerError)]
+    public async Task<IActionResult> GetByIdAsync(Guid id)
+    {
+        try
+        {
+            var model = await _locationRepository.GetByIdAsync(id);
+            if (model == null) return NotFound(new ApiResponse((int)HttpStatusCode.NotFound, "Object was not found."));
+
+            var response = model.ToLocationResponse();
+            return Ok(response);
+        }
+        catch (Exception ex)
+        {
+            var statusCode = (int)HttpStatusCode.InternalServerError;
+            _logger.LogError(ex, "An error occurred:");
+            return StatusCode(statusCode, new ApiResponse(statusCode, $"An error has occurred: {ex.Message}"));
+        }
+    }
+
+    /// <summary>
+    ///     Add a new Location entity
+    /// </summary>
+    /// <param name="request"></param>
+    /// <returns> the newly created Location entity </returns>
+    [HttpPost(Name = "LocationAdd")]
+    [ProducesResponseType(typeof(LocationResponse), (int)HttpStatusCode.OK)]
+    [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.BadRequest)]
+    [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.InternalServerError)]
+    public async Task<IActionResult> AddAsync([FromBody] LocationRequest request)
+    {
+        if (request == null)
+            return BadRequest(new ApiResponse((int)HttpStatusCode.BadRequest, "Parameters were not specified."));
+
+        try
+        {
+            var model = request.ToLocation();
+            var location = await _locationRepository.AddAsync(model);
+            if (location is null)
+            {
+                return StatusCode((int)HttpStatusCode.InternalServerError,
+                    new ApiResponse((int)HttpStatusCode.NotFound,
+                        "Problem while adding the Location to the data store"));
+            }
+
+            var response = location.ToLocationResponse();
+            return Ok(response);
+        }
+        catch (Exception ex)
+        {
+            var statusCode = (int)HttpStatusCode.InternalServerError;
+            _logger.LogError(ex, "An error occurred:");
+            return StatusCode(statusCode, new ApiResponse(statusCode, $"An error has occurred: {ex.Message}"));
+        }
+    }
+
+    /// <summary>
+    ///     Update an existing Location entity
+    /// </summary>
+    /// <param name="request"></param>
+    /// <returns> the modified Location entity </returns>
+    [HttpPut]
+    [Route("{id}", Name = "LocationUpdate")]
+    [ProducesResponseType(typeof(LocationResponse), (int)HttpStatusCode.OK)]
+    [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.NotFound)]
+    [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.InternalServerError)]
+    public async Task<IActionResult> PatchLocationAsync([FromMultiSource] UpdateLocationRequest request)
+    {
+        if (request is null)
+        {
+            return BadRequest(new ApiResponse((int)HttpStatusCode.BadRequest,
+                "Parameters were not specified or wrongly specified."));
+        }
+
+        try
+        {
+            var location = request.ToLocation();
+            var exists = await _locationRepository.GetByIdAsync(location.Id);
+            if (exists is null)
+            {
+                return NotFound(
+                    new ApiResponse((int)HttpStatusCode.NotFound, "Object to be updated was not found."));
+            }
+
+            await _locationRepository.UpdateAsync(location);
+            var response = location.ToLocationResponse();
+            return Ok(response);
+        }
+        catch (Exception ex)
+        {
+            var statusCode = (int)HttpStatusCode.InternalServerError;
+            _logger.LogError(ex, "An error occurred:");
+            return StatusCode(statusCode, new ApiResponse(statusCode, $"An error has occurred: {ex.Message}"));
+        }
+    }
+
+
+    /// <summary>
+    ///     Delete an LocationModel entity for the given id
     /// </summary>
     /// <param name="id"></param>
     /// <returns> no return </returns>
     [HttpDelete]
-    [Route("{id}", Name = "CloudDelete")]
+    [Route("{id}", Name = "LocationDelete")]
     [ProducesResponseType(typeof(void), (int)HttpStatusCode.OK)]
     [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.NotFound)]
     [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.InternalServerError)]
-    public async Task<ActionResult> DeleteByIdAsync(Guid id)
+    public async Task<IActionResult> DeleteByIdAsync(Guid id)
     {
         try
         {
-            var deleted = await _locationRepository.DeleteByIdAsync(id);
-            if (deleted == false)
+            if (id == Guid.Empty)
             {
-                return NotFound(
-                    new ApiResponse((int)HttpStatusCode.NotFound, "The specified Cloud has not been found."));
+                return NotFound(new ApiResponse((int)HttpStatusCode.NotFound,
+                    "The id cannot be empty"));
             }
 
+            await _locationRepository.DeleteByIdAsync(id);
             return Ok();
         }
         catch (Exception ex)
@@ -181,17 +194,23 @@ public class CloudController : ControllerBase
     /// <param name="model"></param>
     /// <returns></returns>
     [HttpPost]
-    [Route("AddRelation", Name = "CloudAddRelation")]
+    [Route("AddRelation", Name = "LocationAddRelation")]
     [ProducesResponseType(typeof(RelationModel), (int)HttpStatusCode.OK)]
     [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.BadRequest)]
     [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.InternalServerError)]
     public async Task<ActionResult<RelationModel>> AddRelationAsync([FromBody] RelationModel model)
     {
-        if (model == null) return BadRequest("Parameters were not specified.");
+        if (model == null)
+            return BadRequest(new ApiResponse((int)HttpStatusCode.BadRequest, "Parameters were not specified."));
+
         try
         {
             var isValid = await _locationRepository.AddRelationAsync(model);
-            if (!isValid) return Problem("The relation was not created");
+            if (!isValid)
+            {
+                return StatusCode((int)HttpStatusCode.InternalServerError,
+                    new ApiResponse((int)HttpStatusCode.InternalServerError, "The relation was not created"));
+            }
         }
         catch (Exception ex)
         {
@@ -210,7 +229,7 @@ public class CloudController : ControllerBase
     /// <param name="name"></param>
     /// <returns></returns>
     [HttpGet]
-    [Route("relation/{name}", Name = "CloudGetRelationByName")]
+    [Route("relation/{name}", Name = "LocationGetRelationByName")]
     [ProducesResponseType(typeof(List<RelationModel>), (int)HttpStatusCode.OK)]
     [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.NotFound)]
     [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.InternalServerError)]
@@ -221,6 +240,7 @@ public class CloudController : ControllerBase
             var relations = await _locationRepository.GetRelation(id, name);
             if (!relations.Any())
                 return NotFound(new ApiResponse((int)HttpStatusCode.NotFound, "Relations were not found."));
+
             return Ok(relations);
         }
         catch (Exception ex)
@@ -239,7 +259,7 @@ public class CloudController : ControllerBase
     /// <param name="secondName"></param>
     /// <returns></returns>
     [HttpGet]
-    [Route("relations/{firstName}/{secondName}", Name = "CloudGetRelationsByName")]
+    [Route("relations/{firstName}/{secondName}", Name = "LocationGetRelationsByName")]
     [ProducesResponseType(typeof(List<RelationModel>), (int)HttpStatusCode.OK)]
     [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.NotFound)]
     [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.InternalServerError)]
@@ -251,6 +271,7 @@ public class CloudController : ControllerBase
             var relations = await _locationRepository.GetRelations(id, relationNames);
             if (!relations.Any())
                 return NotFound(new ApiResponse((int)HttpStatusCode.NotFound, "Relations were not found"));
+
             return Ok(relations);
         }
         catch (Exception ex)
@@ -261,79 +282,21 @@ public class CloudController : ControllerBase
         }
     }
 
+
     [HttpGet]
-    [Route("name/{name}", Name = "CloudGetDataByName")]
-    [ProducesResponseType(typeof(CloudResponse), (int)HttpStatusCode.OK)]
+    [Route("name/{name}", Name = "LocationGetDataByName")]
+    [ProducesResponseType(typeof(LocationResponse), (int)HttpStatusCode.OK)]
     [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.NotFound)]
     [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.InternalServerError)]
-    public async Task<IActionResult> GetCloudResourceDetailsByNameAsync(string name)
+    public async Task<IActionResult> GetLocationByNameAsync(string name)
     {
         try
         {
-            var cloudResource = await _locationRepository.GetByNameAsync(name);
-            if (cloudResource is null)
+            var location = await _locationRepository.GetByNameAsync(name);
+            if (location is null)
                 return NotFound(new ApiResponse((int)HttpStatusCode.NotFound, "Object was not found."));
-            return Ok(cloudResource.ToCloudResponse());
-        }
-        catch (Exception ex)
-        {
-            var statusCode = (int)HttpStatusCode.InternalServerError;
-            _logger.LogError(ex, "An error occurred:");
-            return StatusCode(statusCode, new ApiResponse(statusCode, $"An error has occurred: {ex.Message}"));
-        }
-    }
 
-    /// <summary>
-    ///     Get the free clouds that have connectivity to the robot
-    /// </summary>
-    /// <param name="cloudsToCheck"></param>
-    /// <returns>list of cloudModel</returns>
-    [HttpGet]
-    [Route("free", Name = "GetFreeCloudIds")]
-    [ProducesResponseType(typeof(GetCloudsResponse), (int)HttpStatusCode.OK)]
-    [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.NotFound)]
-    [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.BadRequest)]
-    [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.InternalServerError)]
-    public async Task<ActionResult<List<CloudModel>>> GetFreeCloudsIdsAsync(List<CloudModel> cloudsToCheck)
-    {
-        try
-        {
-            if (!cloudsToCheck.Any())
-                return BadRequest(new ApiResponse((int)HttpStatusCode.BadRequest, "No Edge ids were provided"));
-
-            var freeClouds = await _locationRepository.FilterFreeLocationsAsync(cloudsToCheck.ToLocations());
-            if (!freeClouds.Any())
-                return NotFound(new ApiResponse((int)HttpStatusCode.BadRequest, "There are no busy edges"));
-
-            var response = freeClouds.ToCloudsResponse();
-            return Ok(response);
-        }
-        catch (Exception ex)
-        {
-            var statusCode = (int)HttpStatusCode.InternalServerError;
-            _logger.LogError(ex, "An error occurred:");
-            return StatusCode(statusCode, new ApiResponse(statusCode, $"An error has occurred: {ex.Message}"));
-        }
-    }
-
-    [HttpGet]
-    [Route("lessBusy", Name = "GetLessBusyClouds")]
-    [ProducesResponseType(typeof(GetCloudsResponse), (int)HttpStatusCode.OK)]
-    [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.NotFound)]
-    [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.BadRequest)]
-    [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.InternalServerError)]
-    public async Task<IActionResult> GetLessBusyCloudsAsync(List<CloudModel> cloudsToCheck)
-    {
-        try
-        {
-            if (!cloudsToCheck.Any())
-                return BadRequest(new ApiResponse((int)HttpStatusCode.BadRequest, "No Cloud ids were provided"));
-
-            var lessBusyCloud = await _locationRepository.OrderLocationsByUtilizationAsync(cloudsToCheck.ToLocations());
-            if (!lessBusyCloud.Any())
-                return NotFound(new ApiResponse((int)HttpStatusCode.BadRequest, "There are no busy edges"));
-
-            var response = lessBusyCloud.ToCloudsResponse();
+            var response = location.ToLocationResponse();
             return Ok(response);
         }
         catch (Exception ex)
@@ -345,22 +308,21 @@ public class CloudController : ControllerBase
     }
 
     /// <summary>
-    ///     Returns the number of containers that are deployed in a cloud entity base on cloud Name.
+    ///     Check if a Location is busy by Id.
     /// </summary>
-    /// <param name="name"></param>
-    /// <returns>int</returns>
+    /// <param name="id"></param>
+    /// <returns>bool</returns>
     [HttpGet]
-    [Route("{name}/containers/count", Name = "GetNumCloudContainersByName")]
-    [ProducesResponseType(typeof(int), (int)HttpStatusCode.OK)]
+    [Route("{id}/busy", Name = "IsBusyLocationById")]
+    [ProducesResponseType(typeof(bool), (int)HttpStatusCode.OK)]
     [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.NotFound)]
-    [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.BadRequest)]
     [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.InternalServerError)]
-    public async Task<IActionResult> GetNumCloudContainersByName(string name)
+    public async Task<ActionResult<bool>> IsBusyLocationById(Guid id)
     {
         try
         {
-            var countContainers = await _locationRepository.GetDeployedInstancesCountAsync(name);
-            return Ok(countContainers);
+            var busy = await _locationRepository.IsBusyAsync(id);
+            return Ok(busy);
         }
         catch (Exception ex)
         {
@@ -371,49 +333,19 @@ public class CloudController : ControllerBase
     }
 
     /// <summary>
-    ///     Returns the number of containers that are deployed in a cloud entity base on cloud Id.
-    /// </summary>
-    /// <param name="cloudId"></param>
-    /// <returns>int</returns>
-    [HttpGet]
-    [Route("{id}/containers/count", Name = "GetNumCloudContainersById")]
-    [ProducesResponseType(typeof(int), (int)HttpStatusCode.OK)]
-    [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.NotFound)]
-    [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.BadRequest)]
-    [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.InternalServerError)]
-    public async Task<IActionResult> GetNumCloudContainersById(Guid cloudId)
-    {
-        try
-        {
-            var countContainers = await _locationRepository.GetDeployedInstancesCountAsync(cloudId);
-            return Ok(countContainers);
-        }
-        catch (Exception ex)
-        {
-            var statusCode = (int)HttpStatusCode.InternalServerError;
-            _logger.LogError(ex, "An error occurred:");
-            return StatusCode(statusCode, new ApiResponse(statusCode, $"An error has occurred: {ex.Message}"));
-        }
-    }
-
-    /// <summary>
-    ///     Returns bool for status of BusyCloud by Name
+    ///     Check if a Location is busy by Name.
     /// </summary>
     /// <param name="name"></param>
     /// <returns>bool</returns>
     [HttpGet]
-    [Route("{name}/busy", Name = "IsBusyCloudByName")]
-    [ProducesResponseType(typeof(int), (int)HttpStatusCode.OK)]
+    [Route("{name}/busy", Name = "IsBusyLocationByName")]
+    [ProducesResponseType(typeof(bool), (int)HttpStatusCode.OK)]
     [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.NotFound)]
-    [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.BadRequest)]
     [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.InternalServerError)]
-    public async Task<IActionResult> IsBusyCloudByName(string name)
+    public async Task<IActionResult> IsBusyLocationByName(string name)
     {
         try
         {
-            if (string.IsNullOrWhiteSpace(name))
-                return BadRequest(new ApiResponse((int)HttpStatusCode.BadRequest, "Name was not provided"));
-
             var busy = await _locationRepository.IsBusyAsync(name);
             return Ok(busy);
         }
@@ -425,23 +357,51 @@ public class CloudController : ControllerBase
         }
     }
 
+
     /// <summary>
-    ///     Returns bool for status of BusyCloud by Id
+    ///     Returns the number of containers that are deployed in a location base on location Id.
     /// </summary>
-    /// <param name="cloudId"></param>
-    /// <returns>bool</returns>
+    /// <param name="id"></param>
+    /// <returns>int</returns>
     [HttpGet]
-    [Route("{id}/busy", Name = "isBusyCloudById")]
+    [Route("{id}/containers/count", Name = "GetNumLocationContainersById")]
     [ProducesResponseType(typeof(int), (int)HttpStatusCode.OK)]
     [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.NotFound)]
     [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.BadRequest)]
     [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.InternalServerError)]
-    public async Task<IActionResult> IsBusyCloudById(Guid cloudId)
+    public async Task<IActionResult> GetNumLocationContainersById(Guid id)
     {
         try
         {
-            var busy = await _locationRepository.IsBusyAsync(cloudId);
-            return Ok(busy);
+            var countContainers = await _locationRepository.GetDeployedInstancesCountAsync(id);
+            return Ok(countContainers);
+        }
+        catch (Exception ex)
+        {
+            var statusCode = (int)HttpStatusCode.InternalServerError;
+            _logger.LogError(ex, "An error occurred:");
+            return StatusCode(statusCode, new ApiResponse(statusCode, $"An error has occurred: {ex.Message}"));
+        }
+    }
+
+
+    /// <summary>
+    ///     Returns the number of containers that are deployed in a cloud entity base on cloud Name.
+    /// </summary>
+    /// <param name="name"></param>
+    /// <returns>int</returns>
+    [HttpGet]
+    [Route("{name}/containers/count", Name = "GetNumLocationContainersByName")]
+    [ProducesResponseType(typeof(int), (int)HttpStatusCode.OK)]
+    [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.NotFound)]
+    [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.BadRequest)]
+    [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.InternalServerError)]
+    public async Task<ActionResult<int>> GetNumLocationContainersByName(string name)
+    {
+        try
+        {
+            var countContainers = await _locationRepository.GetDeployedInstancesCountAsync(name);
+            return Ok(countContainers);
         }
         catch (Exception ex)
         {

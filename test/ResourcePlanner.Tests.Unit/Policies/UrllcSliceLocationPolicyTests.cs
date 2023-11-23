@@ -198,7 +198,7 @@ public class UrllcSliceLocationPolicyTests
             Jitter = 5,
             TrafficType = TrafficType.Tcp.ToString()
         };
-        var cloud = new CloudModel
+        var cloud = new Location
         {
             Name = "testLocation"
         };
@@ -220,7 +220,7 @@ public class UrllcSliceLocationPolicyTests
         var centralApiResponse = TestObjectBuilder.ExampleLocationsResponse(cloud);
         _centralApiClientClient.GetAvailableLocations().Returns(centralApiResponse);
 
-        _redisInterfaceClient.GetRelationAsync(Arg.Any<CloudModel>(), relationName).Returns(relations);
+        _redisInterfaceClient.GetRelationAsync(Arg.Any<Location>(), relationName).Returns(relations);
         //act
         var result = await _sut.IsLocationSatisfiedByPolicy(plannedLocation);
         //assert
@@ -255,7 +255,7 @@ public class UrllcSliceLocationPolicyTests
             Jitter = 5,
             TrafficType = TrafficType.Tcp.ToString()
         };
-        var edge = new EdgeModel
+        var edge = new Location
         {
             Name = "testLocation"
         };
@@ -277,7 +277,7 @@ public class UrllcSliceLocationPolicyTests
         var centralApiResponse = TestObjectBuilder.ExampleLocationsResponse(edge);
         _centralApiClientClient.GetAvailableLocations().Returns(centralApiResponse);
 
-        _redisInterfaceClient.GetRelationAsync(Arg.Any<EdgeModel>(), relationName).Returns(relations);
+        _redisInterfaceClient.GetRelationAsync(Arg.Any<Location>(), relationName).Returns(relations);
         //act
         var result = await _sut.IsLocationSatisfiedByPolicy(plannedLocation);
         //assert

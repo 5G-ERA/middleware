@@ -28,7 +28,12 @@ variable "iam_role_name" {
 }
 
 variable "kubernetes_service_account_name" {
-  description = "Name of teh service Account that the Middleware will use in k8s"
+  description = "Name of the service Account that the Middleware will use in k8s"
   type        = string
   default     = "orchestrator"
+}
+
+variable "aws_iam_role_arn" {
+  description = "ARN of IAM Role that has permissions to manage the cluster for other IAM users"
+  type        = string  
 }
