@@ -1,5 +1,6 @@
 ﻿using Middleware.CentralApi.Contracts.Requests;
 using Middleware.CentralApi.Contracts.Responses;
+using Middleware.Models.Domain;
 using Refit;
 
 namespace Middleware.CentralApi.Sdk.Client;
@@ -12,4 +13,7 @@ public interface ICentralApi
     Task<ApiResponse<LocationResponse>> RegisterLocation([Body]RegisterRequest request);
     [Post("")]
     Task DeRegisterLocation([Body]RegisterRequest request);
+
+    [Post("/api/v1/locations/status/{id}")]
+    Task SetStatus([Body] CloudEdgeStatusRequest request, Guid id);
 }

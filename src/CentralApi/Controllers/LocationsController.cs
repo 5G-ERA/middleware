@@ -13,16 +13,14 @@ namespace Middleware.CentralApi.Controllers;
 [Route("api/v1/[controller]")]
 public class LocationsController : ControllerBase
 {
-    private readonly ICloudRepository _cloudRepository;
-    private readonly IEdgeRepository _edgeRepository;
+    private readonly ILocationRepository _locationRepository;
     private readonly ILocationService _locationService;
 
-    public LocationsController(ILocationService locationService, ICloudRepository cloudRepository,
-        IEdgeRepository edgeRepository)
+    public LocationsController(ILocationService locationService, ILocationRepository locationRepository)
+
     {
         _locationService = locationService;
-        _cloudRepository = cloudRepository;
-        _edgeRepository = edgeRepository;
+        _locationRepository = locationRepository;
     }
 
     // GET
@@ -48,20 +46,13 @@ public class LocationsController : ControllerBase
     [ProducesResponseType(typeof(CloudEdgeStatusResponse), (int)HttpStatusCode.OK)]
     [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.NotFound)]
     [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.BadRequest)]
-    public async Task<IActionResult> GetStatus(string location, Guid id)
+    public async Task<IActionResult> GetStatus(string? location, Guid id)
     {
         if (location == null)
-            throw new ArgumentNullException(nameof(location));
+            return BadRequest("location parameter not specified");
         try
         {
-            CloudEdgeStatusResponse response;
-
-            if (location.ToLower() == "cloud")
-                response = await _cloudRepository.GetCloudOnlineStatusLastUpdatedTimeAsync(id);
-            else if (location.ToLower() == "edge")
-                response = await _edgeRepository.GetEdgeOnlineStatusLastUpdatedTimeAsync(id);
-            else
-                return BadRequest();
+            var response = await _locationRepository.GetCloudOnlineStatusLastUpdatedTimeAsync(id);
             return Ok(response);
         }
         catch (ArgumentException argEx)
@@ -80,17 +71,14 @@ public class LocationsController : ControllerBase
     [ProducesResponseType((int)HttpStatusCode.OK)]
     [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.NotFound)]
     [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.BadRequest)]
-    public async Task<IActionResult> SetStatus([FromBody] CloudEdgeStatusRequest request, Guid id)
+    public async Task<IActionResult> SetStatus([FromBody] CloudEdgeStatusRequest? request, Guid id)
     {
-        if (request == null) return BadRequest();
+        if (request == null)
+            return BadRequest();
         try
         {
-            if (request.Type.ToLower() == "cloud")
-                await _cloudRepository.SetCloudOnlineStatusAsync(id, request.IsOnline);
-            else if (request.Type.ToLower() == "edge")
-                await _edgeRepository.SetEdgeOnlineStatusAsync(id, request.IsOnline);
-            else
-                return BadRequest();
+            await _locationRepository.SetCloudOnlineStatusAsync(id, request.IsOnline);
+
             return Ok();
         }
         catch (ArgumentException argEx)

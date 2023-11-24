@@ -32,19 +32,9 @@ internal class DefaultLocation : ILocationSelectionPolicy
     /// <inheritdoc />
     public async Task<PlannedLocation> GetLocationAsync()
     {
-        Guid id;
-        if (_middlewareOptions.Value.InstanceType == LocationType.Cloud.ToString())
-        {
-            var cloud = await _redisInterfaceClient.GetCloudByNameAsync(_middlewareOptions.Value.InstanceName);
-            id = cloud!.Id;
-        }
-        else
-        {
-            var edgeResponse = await _redisInterfaceClient.GetEdgeByNameAsync(_middlewareOptions.Value.InstanceName);
-            id = edgeResponse!.Id;
-        }
+        var locationResp = await _redisInterfaceClient.GetLocationByNameAsync(_middlewareOptions.Value.InstanceName);
 
-        var location = new PlannedLocation(id, _middlewareOptions.Value.InstanceName,
+        var location = new PlannedLocation(locationResp!.Id, _middlewareOptions.Value.InstanceName,
             Enum.Parse<LocationType>(_middlewareOptions.Value.InstanceType));
 
         FoundMatchingLocation = true;

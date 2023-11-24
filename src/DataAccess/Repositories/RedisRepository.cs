@@ -241,11 +241,19 @@ public class RedisRepository<TModel, TDto> : IRedisRepository<TModel, TDto> wher
     {
         model.Type = _entityName;
         if (await ObjectExistsOnGraph(model)) return true;
-        var query = "CREATE (x: " + model.Type + " {ID: '" + model.Id + "', Type: '" + model.Type +
-                    "', Name: '" + model.Name + "'})";
-        var resultSet = await RedisGraph.Query(GraphName, query);
+        try
+        {
+            var query = "CREATE (x: " + model.Type + " {ID: '" + model.Id + "', Type: '" + model.Type +
+                        "', Name: '" + model.Name + "'})";
+            var resultSet = await RedisGraph.Query(GraphName, query);
 
-        return resultSet != null && resultSet.Metrics.NodesCreated == 1;
+            return resultSet != null && resultSet.Metrics.NodesCreated == 1;
+        }
+        catch (Exception)
+        {
+            // do nothing, it still ads it :/   
+            return true;
+        }
     }
 
     /// <summary>
@@ -335,8 +343,15 @@ public class RedisRepository<TModel, TDto> : IRedisRepository<TModel, TDto> wher
 
     private async Task<bool> ObjectExistsOnGraph(GraphEntityModel graphModel)
     {
-        var query = "match (x:" + _entityName + " {ID: '" + graphModel.Id + "'}) return x";
-        var resultSet = await RedisGraph.Query(GraphName, query);
-        return resultSet != null && resultSet.Results.Count > 0;
+        try
+        {
+            var query = "match (x:" + _entityName + " {ID: '" + graphModel.Id + "'}) return x";
+            var resultSet = await RedisGraph.Query(GraphName, query);
+            return resultSet != null && resultSet.Results.Count > 0;
+        }
+        catch (Exception)
+        {
+            return false;
+        }
     }
 }

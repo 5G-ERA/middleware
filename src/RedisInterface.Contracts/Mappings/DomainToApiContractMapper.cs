@@ -355,4 +355,89 @@ public static class DomainToApiContractMapper
             ActionSequence = x.ActionSequence?.Select(s => s.ToFullActionResponse())
         };
     }
+
+    public static LocationResponse ToLocationResponse(this Location x)
+    {
+        return new()
+        {
+            Id = x.Id,
+            Name = x.Name,
+            Organization = x.Organization,
+            Type = x.Type.ToString(),
+            IpAddress = x.Address,
+            MacAddress = x.MacAddress,
+            Status = x.Status,
+            Cpu = x.Cpu,
+            NumberOfCores = x.NumberOfCores,
+            Ram = x.Ram,
+            VirtualRam = x.VirtualRam,
+            DiskStorage = x.DiskStorage,
+            IsOnline = x.IsOnline,
+            LastUpdatedTime = x.LastUpdatedTime
+        };
+    }
+
+    public static GetLocationsResponse ToLocationsResponse(this IEnumerable<Location> x)
+    {
+        return new()
+        {
+            Locations = x.Select(l => l.ToLocationResponse())
+        };
+    }
+
+    public static CloudResponse ToCloudResponse(this Location x)
+    {
+        return new()
+        {
+            Id = x.Id,
+            Name = x.Name,
+            Organization = x.Organization,
+            Type = x.Type.ToString(),
+            IpAddress = x.Address,
+            MacAddress = x.MacAddress,
+            Status = x.Status,
+            Cpu = x.Cpu,
+            NumberOfCores = x.NumberOfCores,
+            Ram = x.Ram,
+            VirtualRam = x.VirtualRam,
+            DiskStorage = x.DiskStorage,
+            LastUpdatedTime = x.LastUpdatedTime
+        };
+    }
+
+    public static GetCloudsResponse ToCloudsResponse(this IEnumerable<Location> x)
+    {
+        return new()
+        {
+            Clouds = x.Select(l => l.ToCloudResponse())
+        };
+    }
+
+    public static EdgeResponse ToEdgeResponse(this Location x)
+    {
+        return new()
+        {
+            Id = x.Id,
+            Name = x.Name,
+            Organization = x.Organization,
+            Type = x.Type.ToString(),
+            IpAddress = x.Address,
+            MacAddress = x.MacAddress,
+            Status = x.Status,
+            Cpu = x.Cpu,
+            NumberOfCores = x.NumberOfCores,
+            Ram = x.Ram,
+            VirtualRam = x.VirtualRam,
+            DiskStorage = x.DiskStorage,
+            LastUpdatedTime = x.LastUpdatedTime
+        };
+    }
+
+    public static GetEdgesResponse ToEdgesResponse(this IEnumerable<Location> x)
+    {
+        return new()
+        {
+            Edges = x.Select(l => l.ToEdgeResponse())
+        };
+    }
 }

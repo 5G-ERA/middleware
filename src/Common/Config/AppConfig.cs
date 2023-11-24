@@ -59,6 +59,8 @@ public static class AppConfig
 
     public static string MiddlewareDeploymentLocationName { get; set; }
 
+    public static Guid MiddlewareId { get; set; }
+
     /// <summary>
     ///     Is the application running in the Development environment
     /// </summary>

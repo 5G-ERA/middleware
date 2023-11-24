@@ -31,15 +31,10 @@ public class RegisterController : ControllerBase
         var result = await _locationService.RegisterLocation(location);
 
         return result.Match<IActionResult>(
-            location => { return Ok(location.ToLocationResponse()); },
-            exception =>
-            {
-                return BadRequest(new ApiResponse((int)HttpStatusCode.BadRequest,
-                    $"There were problems with the request: {string.Join("; ", exception.Errors)}"));
-            },
-            _ =>
-            {
-                return NotFound(new ApiResponse((int)HttpStatusCode.NotFound, "The specified location was not found"));
-            });
+            loc => Ok(loc.ToLocationResponse()),
+            exception => BadRequest(new ApiResponse((int)HttpStatusCode.BadRequest,
+                $"There were problems with the request: {string.Join("; ", exception.Errors)}")),
+            _ => NotFound(new ApiResponse((int)HttpStatusCode.NotFound, "The specified location was not found")));
+
     }
 }

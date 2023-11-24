@@ -15,14 +15,13 @@ namespace CentralApi.Tests.Unit.Controller;
 //[LogTestExecution]
 public class LocationsControllerTests
 {
+    private readonly ILocationRepository _locationRepository = Substitute.For<ILocationRepository>();
     private readonly ILocationService _locationService = Substitute.For<ILocationService>();
-    private readonly ICloudRepository _cloudRepository = Substitute.For<ICloudRepository>();
-    private readonly IEdgeRepository _edgeRepository = Substitute.For<IEdgeRepository>();
     private readonly LocationsController _sut;
 
     public LocationsControllerTests()
     {
-        _sut = new(_locationService, _cloudRepository,_edgeRepository);
+        _sut = new(_locationService, _locationRepository);
     }
 
     [Fact]
