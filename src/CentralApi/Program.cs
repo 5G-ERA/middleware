@@ -17,7 +17,11 @@ builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
-builder.Services.AddHostedService<IndexCreationService>();
+
+if (builder.Environment.IsDevelopment() == false)
+    builder.Services.AddHostedService<IndexCreationService>();
+
+
 builder.Services.AddScoped<ICloudRepository, RedisCloudRepository>();
 builder.Services.AddScoped<IEdgeRepository, RedisEdgeRepository>();
 builder.Services.AddScoped<ILocationService, LocationService>();
@@ -32,7 +36,6 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
-
 
 //app.UseHttpsRedirection();
 
