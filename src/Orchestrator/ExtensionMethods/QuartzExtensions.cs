@@ -37,6 +37,12 @@ public static class QuartzExtensions
                 .WithDescription("Updates the current address under which the Middleware has to be contacted")
                 .WithSimpleSchedule(x => x.WithInterval(TimeSpan.FromSeconds(10)).RepeatForever())
                 .StartAt(DateBuilder.EvenMinuteDateBefore(DateTimeOffset.UtcNow.AddSeconds(10))));
+
+            q.ScheduleJob<UpdateOnlineStatusMiddleware>(trg => trg
+                .WithIdentity("Update online status of the middleware Job")
+                .WithDescription("Set online status of the middleware every minute.")
+                .WithSimpleSchedule(x => x.WithIntervalInMinutes(1).RepeatForever())
+                .StartAt(DateBuilder.EvenMinuteDateBefore(DateTimeOffset.Now.AddMinutes(2))));
         });
         services.AddQuartzHostedService(opt => { opt.WaitForJobsToComplete = true; });
         services.AddTransient<MiddlewareStartupJob>();

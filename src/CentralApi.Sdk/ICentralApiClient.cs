@@ -1,5 +1,6 @@
 ﻿using Middleware.CentralApi.Contracts.Requests;
 using Middleware.CentralApi.Contracts.Responses;
+using Middleware.Models.Domain;
 
 namespace Middleware.CentralApi.Sdk;
 
@@ -30,4 +31,6 @@ public interface ICentralApiClient
     /// <param name="request"></param>
     /// <returns></returns>
     Task DeRegisterLocation(RegisterRequest request);
+
+    Task SetStatus(CloudEdgeStatusRequest request, Guid id);
 }

@@ -95,6 +95,8 @@ using (var scope = app.Services.CreateScope())
     var result = await centralApiClient!.RegisterLocation(request);
     if (result is null) throw new("Cannot register at centralAPI");
 
+    AppConfig.MiddlewareId = result.Id;
+
     var dataInstaller = scope.ServiceProvider.GetService<IStartupDataInstaller>();
     await dataInstaller!.InitializeStartupDataAsync();
 }
