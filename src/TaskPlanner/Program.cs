@@ -26,7 +26,7 @@ var mqConfig = builder.Configuration.GetSection(RabbitMqConfig.ConfigName).Get<R
 var mwConfig = builder.Configuration.GetSection(MiddlewareConfig.ConfigName).Get<MiddlewareConfig>();
 builder.Services.Configure<MiddlewareConfig>(builder.Configuration.GetSection(MiddlewareConfig.ConfigName));
 // Add services to the container.
-builder.Services.RegisterRabbitMqPublishers(mqConfig);
+builder.Services.RegisterRabbitMqPublishers(mqConfig, mwConfig);
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
