@@ -1,93 +1,52 @@
-﻿using Middleware.DataAccess.Repositories.Abstract;
-using Middleware.Models.Domain;
+﻿using Middleware.Common.Job;
+using Middleware.DataAccess.Repositories.Abstract;
 using Quartz;
-using Middleware.Common.Job;
 
 namespace Middleware.CentralApi.Jobs;
 
 [DisallowConcurrentExecution]
 public class UpdateOnlineStatusJob : BaseJob<UpdateOnlineStatusJob>
 {
+    private readonly ILocationRepository _locationRepository;
 
-    private readonly ILogger _logger;
-    private readonly ICloudRepository _cloudRepository;
-    private readonly IEdgeRepository _edgeRepository;
-
-    public UpdateOnlineStatusJob(ILogger<UpdateOnlineStatusJob> logger, ICloudRepository cloudRepository, IEdgeRepository edgeRepository) : base(logger)
+    public UpdateOnlineStatusJob(ILogger<UpdateOnlineStatusJob> logger, ILocationRepository locationRepository) :
+        base(logger)
     {
-        _logger = logger;
-        _cloudRepository = cloudRepository;
-        _edgeRepository = edgeRepository;
+        _locationRepository = locationRepository;
     }
 
     protected override async Task ExecuteJobAsync(IJobExecutionContext context)
     {
         try
         {
-            List<CloudModel> cloudModels = await _cloudRepository.GetAllAsync();
+            var locations = await _locationRepository.GetAllAsync();
 
-            foreach (CloudModel model in cloudModels)
+            foreach (var loc in locations)
             {
-                bool isOnline = model.IsOnline;
-                if (isOnline)
-                {
-                    DateTime threeMinutesEarlier = DateTime.UtcNow.AddMinutes(-3);
-                    // Check if last updated time was no later then 3 minutes ago from now.
-                    if (model.LastUpdatedTime < threeMinutesEarlier)
-                    {
-                        try
-                        {
-                            await _cloudRepository.SetCloudOnlineStatusAsync(model.Id, false);
-                        }
-                        catch (Exception ex)
-                        {
+                if (!loc.IsOnline)
+                    continue;
 
-                            Logger.LogError(ex,
-                                "There was en error while updating the status of the cloud: {Id}",
-                                model.Id);
-                        }
+                var threeMinutesEarlier = DateTime.UtcNow.AddMinutes(-3);
+                // Check if last updated time was no later then 3 minutes ago from now.
+                if (loc.LastUpdatedTime < threeMinutesEarlier)
+                {
+                    try
+                    {
+                        await _locationRepository.SetCloudOnlineStatusAsync(loc.Id, false);
+                    }
+                    catch (Exception ex)
+                    {
+                        Logger.LogError(ex,
+                            "There was en error while updating the status of the cloud: {Id}",
+                            loc.Id);
                     }
                 }
             }
         }
         catch (Exception ex)
         {
-            Logger.LogError(ex, "Where was a problem during the execution of {Job} in the cloud", nameof(UpdateOnlineStatusJob));
-            // throw;
-        }
-
-        try
-        {
-            List<EdgeModel> edgeModels = await _edgeRepository.GetAllAsync();
-
-            foreach (EdgeModel model in edgeModels)
-            {
-                bool isOnline = model.IsOnline;
-                if (isOnline)
-                {
-                    DateTime threeMinutesEarlier = DateTime.UtcNow.AddMinutes(-3);
-
-                    // Check if last updated time was no later then 3 minutes ago from now.
-                    if (model.LastUpdatedTime < threeMinutesEarlier)
-                    {
-                        try
-                        {
-                            await _edgeRepository.SetEdgeOnlineStatusAsync(model.Id, false);
-                        }
-                        catch (Exception ex)
-                        {
-                            Logger.LogError(ex,
-                                "There was en error while updating the status of the edge: {Id}",
-                                model.Id);
-                        }
-                    }
-                }
-            }
-        }
-        catch (Exception ex)
-        {
-            Logger.LogError(ex, "Where was a problem during the execution of {Job} in the edge", nameof(UpdateOnlineStatusJob));
-            // throw;
+            Logger.LogError(ex, "Where was a problem during the execution of {Job} in the cloud",
+                nameof(UpdateOnlineStatusJob));
         }
     }
 }

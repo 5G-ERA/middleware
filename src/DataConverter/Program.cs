@@ -14,7 +14,7 @@ var redisConfig = configurationManager.GetSection(RedisConfig.ConfigName).Get<Re
 
 
 var multiplexer = ConnectionMultiplexer.Connect(
-    redisConfig.HostName,
+    redisConfig.ClusterHostname,
     c => { c.Password = redisConfig.Password; });
 IRedisGraphClient redisGraphClient = new RedisGraphClient(multiplexer);
 

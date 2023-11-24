@@ -151,4 +151,34 @@ public class RedisLocationRepository : RedisRepository<Location, LocationDto>, I
 
         return ordered.ToList();
     }
+
+    public async Task<CloudEdgeStatusResponse> GetCloudOnlineStatusLastUpdatedTimeAsync(Guid locationId)
+    {
+        var cloud = await GetByIdAsync(locationId);
+
+        if (cloud is null)
+            throw new ArgumentException("Cloud does not exist", nameof(locationId));
+
+        var response = new CloudEdgeStatusResponse
+        {
+            Id = locationId,
+            LastUpdatedTime = cloud.LastUpdatedTime,
+            IsOnline = cloud.IsOnline,
+            Type = "Cloud"
+        };
+        return response;
+    }
+
+    public async Task SetCloudOnlineStatusAsync(Guid cloudId, bool isOnline)
+    {
+        var cloud = await GetByIdAsync(cloudId);
+        if (cloud is null)
+            throw new ArgumentException("Cloud does not exist", nameof(cloudId));
+
+        cloud.IsOnline = isOnline;
+
+        if (cloud.IsOnline)
+            cloud.LastUpdatedTime = DateTime.UtcNow;
+        await UpdateAsync(cloud);
+    }
 }
