@@ -40,6 +40,7 @@ services:
       - Middleware__Organization=5G-ERA-DEV
       - Middleware__InstanceName=MiddlewareBB
       - Middleware__InstanceType=Edge
+      - Middleware__Address=localhost:5047
 
     ports:
       - "5036:80"

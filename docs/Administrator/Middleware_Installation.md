@@ -141,19 +141,20 @@ The last step is to prepare the deployment script for the middleware. It can be 
 2. Middleware__Organization – the organization to which this middleware belongs. The organization is an artificial group of Middlewares that can cooperate.
 3. Middleware__InstanceName – a **unique** name of the Middleware.
 4. Middleware__InstanceType – Either Edge/Cloud.
-5. CustomLogger__LoggerName - Either Loki/Elasticsearch.
-6. CustomLogger__Url - The url of the logger.
-7. CustomLogger__User - The username for the logger.
-8. CustomLogger__Password - The password for the logger.
-9. Slice__Hostname - The hostname of the SliceManager API that allows integration of the 5G slices into the planning process of the Middleware.
-10. RabbitMQ__Address - The address of RabbitMQ. 
-11. RabbitMQ__User - The user for RabbitMQ. 
-12. RabbitMQ__Pass - The password for RabbitMQ.
-13. CENTRAL_API_HOSTNAME - Address of the CentralAPI that is responsible for authenticating the Middleware instances during the startup. For more information refer to the [CentralAPI documentation](CentralApi).
-14. AWS_ACCESS_KEY_ID - Aws access key ID used to access the services in AWS like Secret Manager.
-15. AWS_SECRET_ACCESS_KEY - Aws secret used to authenticate the access key.
-16. Redis__ClusterHostname - The address of the redis backend.
-17. Redis__Password - The password for the redis backend.
+5. Middleware__Address - The entry point for the middleware usually the gateway address ex: 10.10.18.17:80 
+6. CustomLogger__LoggerName - Either Loki/Elasticsearch.
+7. CustomLogger__Url - The url of the logger.
+8. CustomLogger__User - The username for the logger.
+9. CustomLogger__Password - The password for the logger.
+10. Slice__Hostname - The hostname of the SliceManager API that allows integration of the 5G slices into the planning process of the Middleware.
+11. RabbitMQ__Address - The address of RabbitMQ. 
+12. RabbitMQ__User - The user for RabbitMQ. 
+13. RabbitMQ__Pass - The password for RabbitMQ.
+14. CENTRAL_API_HOSTNAME - Address of the CentralAPI that is responsible for authenticating the Middleware instances during the startup. For more information refer to the [CentralAPI documentation](CentralApi).
+15. AWS_ACCESS_KEY_ID - Aws access key ID used to access the services in AWS like Secret Manager.
+16. AWS_SECRET_ACCESS_KEY - Aws secret used to authenticate the access key.
+17. Redis__ClusterHostname - The address of the redis backend.
+18. Redis__Password - The password for the redis backend.
 
 The most up-to-date Middleware version is `v0.4`.
 

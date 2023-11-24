@@ -90,7 +90,8 @@ using (var scope = app.Services.CreateScope())
     {
         Name = mwConfig.InstanceName,
         Organization = mwConfig.Organization,
-        Type = mwConfig.InstanceType
+        Type = mwConfig.InstanceType,
+        Address = mwConfig.Address
     };
     var result = await centralApiClient!.RegisterLocation(request);
     if (result is null) throw new("Cannot register at centralAPI");
