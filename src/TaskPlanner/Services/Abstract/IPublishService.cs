@@ -1,4 +1,5 @@
-﻿using Middleware.Models.Domain;
+﻿using Middleware.Common.MessageContracts;
+using Middleware.Models.Domain;
 
 namespace Middleware.TaskPlanner.Services;
 
@@ -49,5 +50,5 @@ public interface IPublishService
     /// <param name="task"></param>
     /// <param name="robot"></param>
     /// <returns></returns>
-    Task<TaskModel> RequestResourcePlan(TaskModel task, RobotModel robot);
+    Task<RequestResourcePlanMessage> RequestResourcePlan(TaskModel task, RobotModel robot);
 }

@@ -61,24 +61,20 @@ public class PlanController : ControllerBase
                 await _actionPlanner.Plan(id, robotId);
             plan.ResourceLock = lockResource;
 
-            // call resource planner for resources
-            //var tmpTaskSend = _mapper.Map<ResourcePlanner.TaskModel>(plan);
-            //var tmpRobotSend = _mapper.Map<RobotModel>(robot2);
-            //var resourceInput = new ResourceInput
-            //{
-            //    Robot = tmpRobotSend,
-            //    Task = tmpTaskSend
-            //};
-            //var tmpFinalTask =
-            //    await _resourcePlannerClient.ResourceAsync(resourceInput);
-            //var resourcePlan = _mapper.Map<TaskModel>(tmpFinalTask);
-
             var resourcePlan = await _publishService.RequestResourcePlan(plan, robot2);
+
+            if (!resourcePlan.IsSuccess)
+            {
+                var statusCode = (int)HttpStatusCode.BadRequest;
+                return StatusCode(statusCode,
+                    new ApiResponse(statusCode,
+                        $"Error while preparing ResourcePlan: {resourcePlan.Error}"));
+            }
 
             if (dryRun)
                 return Ok(resourcePlan);
 
-            await _publishService.PublishPlanAsync(resourcePlan, robot2);
+            await _publishService.PublishPlanAsync(resourcePlan.Task, robot2);
 
             return Ok(resourcePlan);
         }
