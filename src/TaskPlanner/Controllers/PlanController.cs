@@ -73,7 +73,7 @@ public class PlanController : ControllerBase
             //    await _resourcePlannerClient.ResourceAsync(resourceInput);
             //var resourcePlan = _mapper.Map<TaskModel>(tmpFinalTask);
 
-            var resourcePlan = await _publishService.RequestResourcePlan(plan);
+            var resourcePlan = await _publishService.RequestResourcePlan(plan, robot2);
 
             if (dryRun)
                 return Ok(resourcePlan);

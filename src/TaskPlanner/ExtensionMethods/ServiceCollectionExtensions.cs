@@ -2,7 +2,6 @@ using MassTransit;
 using Middleware.Common.Config;
 using Middleware.Common.Helpers;
 using Middleware.Common.MessageContracts;
-using Middleware.Models.Domain;
 using RabbitMQ.Client;
 
 namespace Middleware.TaskPlanner.ExtensionMethods;
@@ -69,7 +68,7 @@ public static class ServiceCollectionExtensions
             var serviceAddress =
                 $"rabbitmq://{mqConfig.Address}/{QueueHelpers.ConstructResourcePlanningServiceQueueName(mwConfig.Organization, mwConfig.InstanceName)}";
 
-            x.AddRequestClient<TaskModel>(new(serviceAddress), RequestTimeout.Default);
+            x.AddRequestClient<RequestResourcePlanMessage>(new(serviceAddress), RequestTimeout.Default);
         });
         // MassTransit-RabbitMQ Configuration
         services.AddOptions<MassTransitHostOptions>()

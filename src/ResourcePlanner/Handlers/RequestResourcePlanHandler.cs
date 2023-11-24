@@ -15,12 +15,26 @@ internal class RequestResourcePlanHandler : IConsumer<RequestResourcePlanMessage
     /// <inheritdoc />
     public async Task Consume(ConsumeContext<RequestResourcePlanMessage> context)
     {
-        var resourcePlan = await _resourcePlanner.Plan(context.Message.Task, context.Message.Robot);
-
-        var resp = new RequestResourcePlanMessage
+        try
         {
-            Task = resourcePlan
-        };
-        await context.RespondAsync(resp);
+            var resourcePlan = await _resourcePlanner.Plan(context.Message.Task, context.Message.Robot);
+
+            var resp = new RequestResourcePlanMessage
+            {
+                Task = resourcePlan,
+                IsSuccess = true
+            };
+            await context.RespondAsync(resp);
+        }
+        catch (Exception ex)
+        {
+            var resp = new RequestResourcePlanMessage
+            {
+                Task = null,
+                IsSuccess = false,
+                Error = ex.ToString()
+            };
+            await context.RespondAsync(resp);
+        }
     }
 }

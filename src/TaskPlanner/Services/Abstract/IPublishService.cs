@@ -47,6 +47,7 @@ public interface IPublishService
     ///     Request ResourcePlanner for the resource plan for the task
     /// </summary>
     /// <param name="task"></param>
+    /// <param name="robot"></param>
     /// <returns></returns>
-    Task<TaskModel> RequestResourcePlan(TaskModel task);
+    Task<TaskModel> RequestResourcePlan(TaskModel task, RobotModel robot);
 }

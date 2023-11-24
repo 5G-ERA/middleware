@@ -13,7 +13,10 @@ public static class ServiceCollectionExtensions
         services.AddMassTransit(x =>
         {
             services.AddScoped<RequestResourcePlanHandler>();
-            x.AddConsumer<RequestResourcePlanHandler>();
+            x.AddConsumer<RequestResourcePlanHandler>()
+                .Endpoint(e => e.Name = QueueHelpers.ConstructResourcePlanningServiceQueueName(mwConfig.Organization,
+                    mwConfig.InstanceName));
+            ;
 
             x.UsingRabbitMq((busRegistrationContext, mqBusFactoryConfigurator) =>
             {

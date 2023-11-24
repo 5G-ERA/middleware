@@ -4,7 +4,7 @@ using Middleware.Models.Enums;
 namespace Middleware.Common.Helpers;
 
 /// <summary>
-///     Class responsible for handling common
+///     Class responsible for handling common queue configurations
 /// </summary>
 public static class QueueHelpers
 {

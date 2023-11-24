@@ -123,11 +123,12 @@ public class PublishingService : IPublishService
     }
 
     /// <inheritdoc />
-    public async Task<TaskModel> RequestResourcePlan(TaskModel task)
+    public async Task<TaskModel> RequestResourcePlan(TaskModel task, RobotModel robot)
     {
         var payload = new RequestResourcePlanMessage
         {
-            Task = task
+            Task = task,
+            Robot = robot
         };
         var resp = await _requestResourcePlanClient.Request(payload);
 
