@@ -10,7 +10,7 @@ namespace Middleware.CentralApi.Controllers;
 
 [ApiController]
 [Route("api/v1/[controller]")]
-public class RegisterController : Controller
+public class RegisterController : ControllerBase
 {
     private readonly ILocationService _locationService;
 
@@ -35,5 +35,6 @@ public class RegisterController : Controller
             exception => BadRequest(new ApiResponse((int)HttpStatusCode.BadRequest,
                 $"There were problems with the request: {string.Join("; ", exception.Errors)}")),
             _ => NotFound(new ApiResponse((int)HttpStatusCode.NotFound, "The specified location was not found")));
+
     }
 }

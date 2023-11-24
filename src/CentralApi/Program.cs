@@ -20,7 +20,11 @@ builder.Services.AddControllers();
 builder.Services.AddFluentValidation(typeof(Program));
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
-builder.Services.AddHostedService<IndexCreationService>();
+
+if (builder.Environment.IsDevelopment() == false)
+    builder.Services.AddHostedService<IndexCreationService>();
+
+
 builder.Services.AddScoped<ICloudRepository, RedisCloudRepository>();
 builder.Services.AddScoped<IEdgeRepository, RedisEdgeRepository>();
 builder.Services.AddScoped<ILocationRepository, RedisLocationRepository>();

@@ -11,12 +11,13 @@ namespace Middleware.CentralApi.Controllers;
 
 [ApiController]
 [Route("api/v1/[controller]")]
-public class LocationsController : Controller
+public class LocationsController : ControllerBase
 {
     private readonly ILocationRepository _locationRepository;
     private readonly ILocationService _locationService;
 
     public LocationsController(ILocationService locationService, ILocationRepository locationRepository)
+
     {
         _locationService = locationService;
         _locationRepository = locationRepository;
