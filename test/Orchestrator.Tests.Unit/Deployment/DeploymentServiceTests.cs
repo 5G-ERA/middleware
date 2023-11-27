@@ -2,11 +2,9 @@
 using System.Linq;
 using System.Threading.Tasks;
 using k8s;
-using k8s.Models;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Middleware.Common.Config;
-using Middleware.Common.ExtensionMethods;
 using Middleware.Models.Domain;
 using Middleware.Orchestrator.Deployment;
 using Middleware.Orchestrator.Publishers;
@@ -49,7 +47,10 @@ public class DeploymentServiceTests
         //arrange
         var actionPlan = CreateActionPlan();
         var instanceId = actionPlan.ActionSequence!.First().Services.First().ServiceInstanceId;
-        _kube.AppsV1.ListNamespacedDeploymentAsync("middleware", labelSelector: KubernetesObjectExtensions.GetNetAppLabelSelector(instanceId)).Returns(new V1DeploymentList())
+        //_kube.AppsV1
+        //    .ListNamespacedDeploymentAsync("middleware",
+        //        labelSelector: KubernetesObjectExtensions.GetNetAppLabelSelector(instanceId))
+        //    .Returns(new V1DeploymentList());
         //act
 
         //assert
