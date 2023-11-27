@@ -7,6 +7,7 @@ using Middleware.Common;
 using Middleware.Common.Config;
 using Middleware.Common.Enums;
 using Middleware.Common.ExtensionMethods;
+using Middleware.DataAccess.Repositories.Abstract;
 using Middleware.Models.Domain;
 using Middleware.Models.Domain.Contracts;
 using Middleware.Models.ExtensionMethods;
@@ -30,11 +31,14 @@ internal class KubernetesObjectBuilder : IKubernetesObjectBuilder
     private readonly string _containerRegistryName;
 
     private readonly IEnvironment _env;
+    private readonly ISystemConfigRepository _systemConfigRepository;
 
-    public KubernetesObjectBuilder(IEnvironment env, IConfiguration config)
+    public KubernetesObjectBuilder(IEnvironment env, IConfiguration config,
+        ISystemConfigRepository systemConfigRepository)
     {
         _env = env;
         _config = config;
+        _systemConfigRepository = systemConfigRepository;
         _containerRegistryName = _env.GetEnvVariable("IMAGE_REGISTRY")?.TrimEnd('/') ?? "ghcr.io/5g-era";
     }
 
@@ -204,37 +208,6 @@ internal class KubernetesObjectBuilder : IKubernetesObjectBuilder
         return service;
     }
 
-    /// <inheritdoc />
-    public DeploymentPair CreateInterRelayNetAppDeploymentConfig(Guid actionPlanId, ActionModel action,
-        IReadOnlyList<DeploymentPair> pairs)
-    {
-        if (action == null) throw new ArgumentNullException(nameof(action));
-        if (pairs == null) throw new ArgumentNullException(nameof(pairs));
-        if (actionPlanId == Guid.Empty) throw new ArgumentNullException(nameof(actionPlanId));
-
-        var serviceInstanceId = action.Services.First().ServiceInstanceId;
-        var configs = new List<MultiNetAppConfigRow>();
-        foreach (var pair in pairs)
-        {
-            var topics = pair.Instance!.RosTopicsSub.Select(t => t.Name).ToList();
-            var config = new MultiNetAppConfigRow
-            {
-                Address = $"http://{pair.Name}",
-                Topics = topics,
-                Services = new()
-            };
-            configs.Add(config);
-        }
-
-        var configString = JsonSerializer.Serialize(configs);
-
-        var deployment = CreateInterRelayDeploymentDefinition(actionPlanId, action.Id, configString);
-
-        var service = CreateDefaultService(deployment.Name(), serviceInstanceId, deployment);
-
-        return new(deployment.Name(), deployment, service, serviceInstanceId);
-    }
-
     public Dictionary<string, string> CreateInterRelayNetAppLabels(Guid actionPlanId, Guid actionId)
     {
         return new()
@@ -274,6 +247,37 @@ internal class KubernetesObjectBuilder : IKubernetesObjectBuilder
         return obj;
     }
 
+    /// <inheritdoc />
+    public DeploymentPair CreateInterRelayNetAppDeploymentConfig(Guid actionPlanId, ActionModel action,
+        IReadOnlyList<DeploymentPair> pairs, SystemConfigModel cfg)
+    {
+        if (action == null) throw new ArgumentNullException(nameof(action));
+        if (pairs == null) throw new ArgumentNullException(nameof(pairs));
+        if (actionPlanId == Guid.Empty) throw new ArgumentNullException(nameof(actionPlanId));
+
+        var serviceInstanceId = action.Services.First().ServiceInstanceId;
+        var configs = new List<MultiNetAppConfigRow>();
+        foreach (var pair in pairs)
+        {
+            var topics = pair.Instance!.RosTopicsSub.Select(t => t.Name).ToList();
+            var config = new MultiNetAppConfigRow
+            {
+                Address = $"http://{pair.Name}",
+                Topics = topics,
+                Services = new()
+            };
+            configs.Add(config);
+        }
+
+        var configString = JsonSerializer.Serialize(configs);
+
+        var deployment = CreateInterRelayDeploymentDefinition(actionPlanId, action.Id, configString, cfg);
+
+        var service = CreateDefaultService(deployment.Name(), serviceInstanceId, deployment);
+
+        return new(deployment.Name(), deployment, service, serviceInstanceId);
+    }
+
     public Dictionary<string, string> CreateInterRelayNetAppMatchLabels(string relayName)
     {
         return new()
@@ -283,7 +287,7 @@ internal class KubernetesObjectBuilder : IKubernetesObjectBuilder
     }
 
     private V1Deployment CreateInterRelayDeploymentDefinition(Guid actionPlanId, Guid actionId,
-        string configString)
+        string configString, SystemConfigModel cfg)
     {
         var relayName = "inter-relay-netapp".GetNewImageNameWithSuffix();
         var matchLabels = CreateInterRelayNetAppMatchLabels(relayName);
@@ -316,7 +320,7 @@ internal class KubernetesObjectBuilder : IKubernetesObjectBuilder
                             new()
                             {
                                 Name = "relay",
-                                Image = "but5gera/inter_relay_network_application:0.4.4",
+                                Image = cfg.RosInterRelayNetAppContainer,
                                 Env = new List<V1EnvVar>
                                 {
                                     new("RELAYS_LIST", configString),

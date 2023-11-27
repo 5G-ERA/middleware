@@ -336,6 +336,58 @@ public class RedisInterfaceClient : IRedisInterfaceClient
         return result.IsSuccessStatusCode ? result.Content : null;
     }
 
+    /// <inheritdoc />
+    public async Task<LocationResponse?> GetLocationByNameAsync(string name)
+    {
+        if (string.IsNullOrWhiteSpace(name))
+            throw new ArgumentNullException(nameof(name));
+
+        var result = await _api.LocationGetByName(name);
+        if (!result.IsSuccessStatusCode)
+            _logger.LogError(result.Error, "{} - unsuccessful API call", nameof(GetLocationByNameAsync));
+
+        return result.IsSuccessStatusCode ? result.Content : null;
+    }
+
+    /// <inheritdoc />
+    public async Task<LocationResponse?> GetLocationByIdAsync(Guid id)
+    {
+        if (id == Guid.Empty)
+            throw new ArgumentNullException(nameof(id));
+
+        var result = await _api.LocationGetById(id);
+        if (!result.IsSuccessStatusCode)
+            _logger.LogError(result.Error, "{} - unsuccessful API call", nameof(GetLocationByIdAsync));
+
+        return result.IsSuccessStatusCode ? result.Content : null;
+    }
+
+    /// <inheritdoc />
+    public async Task<GetLocationsResponse?> GetFreeLocationIdsAsync(List<Location>? availableLocations)
+    {
+        if (availableLocations is null || availableLocations.Any() == false)
+            throw new ArgumentException(nameof(availableLocations));
+
+        var result = await _api.LocationGetFree(availableLocations);
+        if (!result.IsSuccessStatusCode)
+            _logger.LogError(result.Error, "{} - unsuccessful API call", nameof(GetFreeLocationIdsAsync));
+
+        return result.IsSuccessStatusCode ? result.Content : null;
+    }
+
+    /// <inheritdoc />
+    public async Task<GetLocationsResponse?> GetLessBusyLocationsAsync(List<Location> availableLocations)
+    {
+        if (availableLocations is null || availableLocations.Any() == false)
+            throw new ArgumentException(nameof(availableLocations));
+
+        var result = await _api.LocationGetLessBusy(availableLocations);
+        if (!result.IsSuccessStatusCode)
+            _logger.LogError(result.Error, "{} - unsuccessful API call", nameof(GetLessBusyLocationsAsync));
+
+        return result.IsSuccessStatusCode ? result.Content : null;
+    }
+
     private RelationModel CreateRelation<TSource, TDirection>(TSource source, TDirection direction, string name)
         where TSource : BaseModel
         where TDirection : BaseModel

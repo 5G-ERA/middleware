@@ -23,7 +23,23 @@ terraform {
 
   required_version = "~> 1.3"
 }
-
+provider "aws" {
+  region = var.region
+}
+provider "kubernetes" {
+  host                   = module.infrastructure.cluster_endpoint
+  cluster_ca_certificate = base64decode(module.infrastructure.cluster_ca_certificate)
+  exec {
+    api_version = "client.authentication.k8s.io/v1beta1"
+    command     = "aws"
+    args = [
+      "eks",
+      "get-token",
+      "--cluster-name",
+      var.cluster_name
+    ]
+  }
+}
 locals {
   kubernetes_namespace = "middleware"
 }
@@ -36,6 +52,7 @@ module "infrastructure" {
   iam_policy_name                 = var.iam_policy_name
   iam_role_name                   = var.iam_role_name
   kubernetes_service_account_name = var.kubernetes_service_account_name
+  aws_iam_role_arn = var.aws_iam_role_arn
 }
 
 module "cluster_config" {
@@ -49,4 +66,6 @@ module "cluster_config" {
 
   service_account_name = var.kubernetes_service_account_name
   middleware_role_arn  = module.infrastructure.middleware_role_arn
+  aws_iam_role_arn = var.aws_iam_role_arn
+  depends_on           = [module.infrastructure]
 }

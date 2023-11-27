@@ -47,15 +47,16 @@ public class DefaultLocationPolicyTests
             Organization = "testOrg",
             InstanceType = LocationType.Cloud.ToString()
         };
-        var cloud = new CloudResponse
+        var loc = new LocationResponse
         {
             Id = Guid.NewGuid(),
             Name = config.InstanceName,
             Organization = config.Organization,
-            LastUpdatedTime = DateTime.Now
+            LastUpdatedTime = DateTime.Now,
+            Type = LocationType.Cloud.ToString()
         };
         _mwOptions.Value.Returns(config);
-        _redisInterfaceClient.GetCloudByNameAsync(config.InstanceName).Returns(cloud);
+        _redisInterfaceClient.GetLocationByNameAsync(config.InstanceName).Returns(loc);
 
         //act
         await _sut.GetLocationAsync();
@@ -73,15 +74,16 @@ public class DefaultLocationPolicyTests
             Organization = "testOrg",
             InstanceType = LocationType.Edge.ToString()
         };
-        var edge = new EdgeResponse
+        var loc = new LocationResponse
         {
             Id = Guid.NewGuid(),
             Name = config.InstanceName,
             Organization = config.Organization,
-            LastUpdatedTime = DateTime.Now
+            LastUpdatedTime = DateTime.Now,
+            Type = LocationType.Edge.ToString()
         };
         _mwOptions.Value.Returns(config);
-        _redisInterfaceClient.GetEdgeByNameAsync(config.InstanceName).Returns(edge);
+        _redisInterfaceClient.GetLocationByNameAsync(config.InstanceName).Returns(loc);
 
         //act
         var result = await _sut.GetLocationAsync();
@@ -89,7 +91,7 @@ public class DefaultLocationPolicyTests
         //assert
         result.Should().BeOfType<PlannedLocation>();
 
-        result.Id.Should().Be(edge.Id);
+        result.Id.Should().Be(loc.Id);
         result.Name.Should().Be(config.InstanceName);
         result.Type.Should().Be(LocationType.Edge);
     }
@@ -103,15 +105,16 @@ public class DefaultLocationPolicyTests
             Organization = "testOrg",
             InstanceType = LocationType.Edge.ToString()
         };
-        var edge = new EdgeResponse
+        var location = new LocationResponse
         {
             Id = Guid.NewGuid(),
             Name = config.InstanceName,
             Organization = config.Organization,
-            LastUpdatedTime = DateTime.Now
+            LastUpdatedTime = DateTime.Now,
+            Type = LocationType.Edge.ToString()
         };
         _mwOptions.Value.Returns(config);
-        _redisInterfaceClient.GetEdgeByNameAsync(config.InstanceName).Returns(edge);
+        _redisInterfaceClient.GetLocationByNameAsync(config.InstanceName).Returns(location);
 
         //act
         var result = await _sut.GetLocationAsync();

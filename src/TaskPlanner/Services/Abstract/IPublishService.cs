@@ -1,4 +1,5 @@
-﻿using Middleware.Models.Domain;
+﻿using Middleware.Common.MessageContracts;
+using Middleware.Models.Domain;
 
 namespace Middleware.TaskPlanner.Services;
 
@@ -42,4 +43,12 @@ public interface IPublishService
     /// <returns></returns>
     Task PublishConnectImsiToSlice(Guid robotId, Guid actionPlanId, string imsi, string slice, string location,
         string locationType);
+
+    /// <summary>
+    ///     Request ResourcePlanner for the resource plan for the task
+    /// </summary>
+    /// <param name="task"></param>
+    /// <param name="robot"></param>
+    /// <returns></returns>
+    Task<RequestResourcePlanMessage> RequestResourcePlan(TaskModel task, RobotModel robot);
 }

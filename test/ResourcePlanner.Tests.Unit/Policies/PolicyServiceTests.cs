@@ -51,15 +51,15 @@ public class PolicyServiceTests
                 OnboardedTime = DateTime.Today
             }
         };
-        var edge = new EdgeModel
+        var loc = new Location
         {
             Name = _mwOptions.Value.InstanceName,
             Organization = _mwOptions.Value.Organization
         };
-        var edgeResp = edge.ToEdgeResponse();
-        _redisInterfaceClient.GetEdgeByNameAsync(edge.Name).Returns(edgeResp);
+        var locResp = loc.ToLocationResponse();
+        _redisInterfaceClient.GetLocationByNameAsync(loc.Name).Returns(locResp);
 
-        var expected = new PlannedLocation(edge.Id, edge.Name, LocationType.Edge);
+        var expected = new PlannedLocation(loc.Id, loc.Name, LocationType.Edge);
 
         //act
         var result = await _sut.GetLocationAsync(instances);
@@ -158,15 +158,17 @@ public class PolicyServiceTests
             Latency = 10,
             TrafficType = TrafficType.Tcp
         };
-        var edge = new EdgeModel
+        var edge = new Location
         {
             Name = _mwOptions.Value.InstanceName,
-            Organization = _mwOptions.Value.Organization
+            Organization = _mwOptions.Value.Organization,
+            Type = LocationType.Edge
         };
-        var edge2 = new EdgeModel
+        var edge2 = new Location
         {
             Name = "otherEdgeWithSlice",
-            Organization = _mwOptions.Value.Organization
+            Organization = _mwOptions.Value.Organization,
+            Type = LocationType.Edge
         };
         var policy = CreateLocationPolicy("UrllcSliceLocation", Priority.High);
         var policy2 = CreateLocationPolicy("DefaultLocation", Priority.Normal);
@@ -180,8 +182,8 @@ public class PolicyServiceTests
                 RelationName = "OFFERS"
             }
         };
-        var edgeResp = edge.ToEdgeResponse();
-        var edge2Resp = edge2.ToEdgeResponse();
+        var edgeResp = edge.ToLocationResponse();
+        var edge2Resp = edge2.ToLocationResponse();
         var policyResp = policy.ToPolicyResponse();
         var defaultPolicyResp = policy2.ToPolicyResponse();
         var slices = new GetSlicesResponse
@@ -190,8 +192,8 @@ public class PolicyServiceTests
         };
 
         _redisInterfaceClient.SliceGetAllAsync().Returns(slices);
-        _redisInterfaceClient.GetEdgeByNameAsync(edge.Name).Returns(edgeResp);
-        _redisInterfaceClient.GetEdgeByNameAsync(edge2.Name).Returns(edge2Resp);
+        _redisInterfaceClient.GetLocationByNameAsync(edge.Name).Returns(edgeResp);
+        _redisInterfaceClient.GetLocationByNameAsync(edge2.Name).Returns(edge2Resp);
         _redisInterfaceClient.GetPolicyByNameAsync(policy.Name).Returns(policyResp);
         _redisInterfaceClient.GetPolicyByNameAsync(policy2.Name).Returns(defaultPolicyResp);
         _redisInterfaceClient.GetRelationAsync(Arg.Is<SliceModel>(t => t.Id == slice.Id), "OFFERS",
@@ -228,15 +230,15 @@ public class PolicyServiceTests
             }
         };
 
-        var defaultEdge = new EdgeModel
+        var defaultLoc = new Location
         {
             Name = _mwOptions.Value.InstanceName,
             Organization = _mwOptions.Value.Organization
         };
-        var defaultEdgeResp = defaultEdge.ToEdgeResponse();
-        _redisInterfaceClient.GetEdgeByNameAsync(defaultEdge.Name).Returns(defaultEdgeResp);
+        var defaultEdgeResp = defaultLoc.ToLocationResponse();
+        _redisInterfaceClient.GetLocationByNameAsync(defaultLoc.Name).Returns(defaultEdgeResp);
         _redisInterfaceClient.GetPolicyByNameAsync("NotExistingPolicy").ReturnsNull();
-        var expected = new PlannedLocation(defaultEdge.Id, defaultEdge.Name, LocationType.Edge);
+        var expected = new PlannedLocation(defaultLoc.Id, defaultLoc.Name, LocationType.Edge);
 
         //act
         var result = await _sut.GetLocationAsync(instances);
@@ -269,15 +271,17 @@ public class PolicyServiceTests
             Latency = 10,
             TrafficType = TrafficType.Tcp
         };
-        var defaultEdge = new EdgeModel
+        var defaultEdge = new Location
         {
             Name = _mwOptions.Value.InstanceName,
-            Organization = _mwOptions.Value.Organization
+            Organization = _mwOptions.Value.Organization,
+            Type = LocationType.Edge
         };
-        var sliceEdge = new EdgeModel
+        var sliceEdge = new Location
         {
             Name = "otherEdgeWithSlice",
-            Organization = _mwOptions.Value.Organization
+            Organization = _mwOptions.Value.Organization,
+            Type = LocationType.Edge
         };
         var slicePolicy = CreateLocationPolicy("UrllcSliceLocation", Priority.Low);
         var defaultPolicy = CreateLocationPolicy("DefaultLocation", Priority.Low);
@@ -291,8 +295,8 @@ public class PolicyServiceTests
                 RelationName = "OFFERS"
             }
         };
-        var defaultEdgeResp = defaultEdge.ToEdgeResponse();
-        var sliceEdgeResp = sliceEdge.ToEdgeResponse();
+        var defaultEdgeResp = defaultEdge.ToLocationResponse();
+        var sliceEdgeResp = sliceEdge.ToLocationResponse();
         var slicePolicyResp = slicePolicy.ToPolicyResponse();
         var defaultPolicyResp = defaultPolicy.ToPolicyResponse();
         var sliceResponse = slice.ToSliceResponse();
@@ -302,14 +306,14 @@ public class PolicyServiceTests
         };
 
         _redisInterfaceClient.SliceGetAllAsync().Returns(slices);
-        _redisInterfaceClient.GetEdgeByNameAsync(defaultEdge.Name).Returns(defaultEdgeResp);
-        _redisInterfaceClient.GetEdgeByNameAsync(sliceEdge.Name).Returns(sliceEdgeResp);
+        _redisInterfaceClient.GetLocationByNameAsync(defaultEdge.Name).Returns(defaultEdgeResp);
+        _redisInterfaceClient.GetLocationByNameAsync(sliceEdge.Name).Returns(sliceEdgeResp);
         _redisInterfaceClient.GetPolicyByNameAsync(slicePolicy.Name).Returns(slicePolicyResp);
         _redisInterfaceClient.GetPolicyByNameAsync(defaultPolicy.Name).Returns(defaultPolicyResp);
         _redisInterfaceClient.GetRelationAsync(Arg.Is<SliceModel>(t => t.Id == slice.Id), "OFFERS",
                 RelationDirection.Incoming.ToString())
             .Returns(relations);
-        _redisInterfaceClient.GetRelationAsync(Arg.Is<EdgeModel>(t => t.Id == sliceEdge.Id), "OFFERS")
+        _redisInterfaceClient.GetRelationAsync(Arg.Is<Location>(t => t.Id == sliceEdge.Id), "OFFERS")
             .Returns(relations);
         _redisInterfaceClient.SliceGetByIdAsync(slice.Id).Returns(sliceResponse);
         var expected = new PlannedLocation(sliceEdge.Id, sliceEdge.Name, LocationType.Edge, slice.Name);

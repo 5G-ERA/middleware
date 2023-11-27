@@ -246,5 +246,15 @@ namespace Middleware.DataAccess.Repositories
         {
             throw new NotImplementedException();
         }
+
+        public Task<CloudEdgeStatusResponse> GetCloudOnlineStatusLastUpdatedTimeAsync(Guid cloudId)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task SetCloudOnlineStatusAsync(Guid cloudId, bool isOnline)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

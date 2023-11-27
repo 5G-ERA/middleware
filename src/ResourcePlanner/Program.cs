@@ -6,6 +6,7 @@ using Middleware.RedisInterface.Sdk;
 using Middleware.ResourcePlanner;
 using Middleware.ResourcePlanner.ApiReference;
 using Middleware.ResourcePlanner.Config;
+using Middleware.ResourcePlanner.ExtensionMethods;
 using Middleware.ResourcePlanner.Policies;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -17,17 +18,23 @@ builder.Configuration
 var centralApiHostname = Environment.GetEnvironmentVariable("CENTRAL_API_HOSTNAME");
 if (centralApiHostname is null)
     throw new ArgumentException("Environment variable not defined: CENTRAL_API_HOSTNAME", "CENTRAL_API_HOSTNAME");
+
+builder.RegisterSecretsManager();
+
 var mwConfig = builder.Configuration.GetSection(MiddlewareConfig.ConfigName).Get<MiddlewareConfig>();
 builder.Services.Configure<MiddlewareConfig>(builder.Configuration.GetSection(MiddlewareConfig.ConfigName));
-builder.RegisterSecretsManager();
+var mqConfig = builder.Configuration.GetSection(RabbitMqConfig.ConfigName).Get<RabbitMqConfig>();
+builder.Services.Configure<RabbitMqConfig>(builder.Configuration.GetSection(RabbitMqConfig.ConfigName));
+
 
 builder.ConfigureLogger();
 // Add services to the container.
 
 builder.Services.AddControllers();
+builder.Services.RegisterRabbitMqConsumers(mqConfig, mwConfig);
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+builder.Services.AddSwaggerGen(s => { s.SupportNonNullableReferenceTypes(); });
 builder.Services.ConfigureAutoMapper();
 builder.Services.RegisterCommonServices();
 builder.Services.AddHttpClient("healthCheckClient");

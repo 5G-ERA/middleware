@@ -5,6 +5,7 @@ using Middleware.CentralApi.Contracts.Responses;
 using Middleware.CentralApi.Controllers;
 using Middleware.CentralApi.Services;
 using Middleware.Common.Responses;
+using Middleware.DataAccess.Repositories.Abstract;
 using Middleware.Models.Domain;
 using NSubstitute;
 using OneOf.Types;
@@ -14,12 +15,13 @@ namespace CentralApi.Tests.Unit.Controller;
 //[LogTestExecution]
 public class LocationsControllerTests
 {
+    private readonly ILocationRepository _locationRepository = Substitute.For<ILocationRepository>();
     private readonly ILocationService _locationService = Substitute.For<ILocationService>();
     private readonly LocationsController _sut;
 
     public LocationsControllerTests()
     {
-        _sut = new(_locationService);
+        _sut = new(_locationService, _locationRepository);
     }
 
     [Fact]

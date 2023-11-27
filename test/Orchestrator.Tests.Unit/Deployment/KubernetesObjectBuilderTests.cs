@@ -6,6 +6,7 @@ using Microsoft.Extensions.Configuration;
 using Middleware.Common;
 using Middleware.Common.Enums;
 using Middleware.Common.ExtensionMethods;
+using Middleware.DataAccess.Repositories.Abstract;
 using Middleware.Models.Domain;
 using Middleware.Orchestrator.Deployment;
 using Middleware.Orchestrator.Models;
@@ -19,10 +20,11 @@ public class KubernetesObjectBuilderTests
     private readonly IConfiguration _configuration = Substitute.For<IConfiguration>();
     private readonly IEnvironment _environment = Substitute.For<IEnvironment>();
     private readonly KubernetesObjectBuilder _sut;
+    private readonly ISystemConfigRepository _systemConfigRepository = Substitute.For<ISystemConfigRepository>();
 
     public KubernetesObjectBuilderTests()
     {
-        _sut = new(_environment, _configuration);
+        _sut = new(_environment, _configuration, _systemConfigRepository);
     }
 
     [Theory]

@@ -35,3 +35,7 @@ variable "kubernetes_service_account_name" {
   type    = string
   default = "orchestrator"
 }
+variable "aws_iam_role_arn" {
+  description = "ARN of IAM Role that has permissions to manage the cluster for other IAM users"
+  type        = string
+}

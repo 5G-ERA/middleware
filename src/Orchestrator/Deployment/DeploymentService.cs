@@ -6,6 +6,7 @@ using Microsoft.Extensions.Options;
 using Middleware.Common.Config;
 using Middleware.Common.Enums;
 using Middleware.Common.ExtensionMethods;
+using Middleware.DataAccess.Repositories.Abstract;
 using Middleware.Models.Domain;
 using Middleware.Models.Domain.Contracts;
 using Middleware.Models.Enums;
@@ -56,12 +57,14 @@ internal class DeploymentService : IDeploymentService
     /// </summary>
     private readonly IRosConnectionBuilderFactory _rosConnectionBuilderFactory;
 
+    private readonly ISystemConfigRepository _systemConfigRepository;
+
     public DeploymentService(IKubernetesBuilder kubernetesClientBuilder,
         ILogger<DeploymentService> logger,
         IRedisInterfaceClient redisInterfaceClient,
         IOptions<MiddlewareConfig> mwConfig,
         IKubernetesObjectBuilder kubeObjectBuilder, IRosConnectionBuilderFactory rosConnectionBuilderFactory,
-        IPublishingService publisher)
+        IPublishingService publisher, ISystemConfigRepository systemConfigRepository)
     {
         _logger = logger;
         _redisInterfaceClient = redisInterfaceClient;
@@ -69,6 +72,7 @@ internal class DeploymentService : IDeploymentService
         _kubeObjectBuilder = kubeObjectBuilder;
         _rosConnectionBuilderFactory = rosConnectionBuilderFactory;
         _publisher = publisher;
+        _systemConfigRepository = systemConfigRepository;
         _kube = kubernetesClientBuilder.CreateKubernetesClient();
     }
 
@@ -195,6 +199,7 @@ internal class DeploymentService : IDeploymentService
         if (action is null)
             return;
 
+        var cfg = await _systemConfigRepository.GetConfigAsync();
         var deploymentNames = await GetCurrentlyDeployedAppNames();
 
         var thisLocation = await GetCurrentLocationAsync();
@@ -229,7 +234,7 @@ internal class DeploymentService : IDeploymentService
         if (action.ShouldUseInterRelayForRosNetApps())
         {
             var interRelay =
-                _kubeObjectBuilder.CreateInterRelayNetAppDeploymentConfig(actionPlanId, action, deploymentPairs);
+                _kubeObjectBuilder.CreateInterRelayNetAppDeploymentConfig(actionPlanId, action, deploymentPairs, cfg);
             await DeployInterRelayNetApp(interRelay);
 
             foreach (var pair in deploymentPairs)
@@ -259,6 +264,8 @@ internal class DeploymentService : IDeploymentService
         var robotResp = await _redisInterfaceClient.RobotGetByIdAsync(robotId);
         var robot = robotResp.ToRobot();
 
+        var cfg = await _systemConfigRepository.GetConfigAsync();
+
         var isSuccess = true;
         var deploymentQueue = new Dictionary<ActionModel, IReadOnlyList<DeploymentPair>>();
         try
@@ -277,7 +284,7 @@ internal class DeploymentService : IDeploymentService
 
                 _logger.LogDebug("Current deployments: {deployments}", string.Join(", ", deploymentNames));
                 var relay = _kubeObjectBuilder.CreateInterRelayNetAppDeploymentConfig(task.ActionPlanId, action,
-                    dplTmp);
+                    dplTmp, cfg);
                 relays[action.Id] = relay;
                 foreach (var pair in dplTmp)
                 {
@@ -439,7 +446,7 @@ internal class DeploymentService : IDeploymentService
         if (deploymentNames.Contains(service.Name)) service.Name = service.Name.GetNewImageNameWithSuffix();
 
         deploymentNames.Add(service.Name);
-        var pair = ConfigureDeploymentObjects(service, thisLocation);
+        var pair = await ConfigureDeploymentObjects(service, thisLocation);
 
         service.SetStatus(ServiceStatus.Instantiating);
         service.ServiceInstanceId = pair.InstanceId;
@@ -482,7 +489,7 @@ internal class DeploymentService : IDeploymentService
         return result;
     }
 
-    private DeploymentPair ConfigureDeploymentObjects(InstanceModel instance, ILocation thisLocation)
+    private async Task<DeploymentPair> ConfigureDeploymentObjects(InstanceModel instance, ILocation thisLocation)
     {
         var cim = instance.ContainerImage;
         var instanceName = instance.Name;
@@ -497,7 +504,7 @@ internal class DeploymentService : IDeploymentService
         if (instance.RosDistro is not null)
         {
             var distroEnum = RosDistroHelper.FromName(instance.RosDistro);
-            builder = _rosConnectionBuilderFactory.CreateConnectionBuilder(distroEnum);
+            builder = await _rosConnectionBuilderFactory.CreateConnectionBuilder(distroEnum);
         }
 
         if (builder is not null)
