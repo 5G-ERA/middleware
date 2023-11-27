@@ -154,6 +154,7 @@ public class OrchestrateController : Controller
             var isSuccess = await _deploymentService.DeletePlanAsync(actionPlan);
 
             //Delete the LOCATED_AT relationships between instance and edge/cloud.
+            // TODO: refactor so RedisInterfaceClient can take ILocation as parameter to adding the relation
             var actionTempList = actionPlan.ActionSequence;
             foreach (var action in actionTempList!)
             {
@@ -185,7 +186,7 @@ public class OrchestrateController : Controller
 
             if (isSuccess == false)
             {
-                var statusCode = (int)HttpStatusCode.InternalServerError;
+                var statusCode = (int)HttpStatusCode.BadRequest;
                 return StatusCode(statusCode,
                     new ApiResponse(statusCode, $"Unable to delete the services for the action plan with id {id}"));
             }
