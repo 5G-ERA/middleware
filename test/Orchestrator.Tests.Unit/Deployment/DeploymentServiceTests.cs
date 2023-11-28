@@ -5,6 +5,7 @@ using k8s;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Middleware.Common.Config;
+using Middleware.DataAccess.Repositories.Abstract;
 using Middleware.Models.Domain;
 using Middleware.Orchestrator.Deployment;
 using Middleware.Orchestrator.Publishers;
@@ -31,6 +32,7 @@ public class DeploymentServiceTests
     private readonly IPublishingService _publishingService = Substitute.For<IPublishingService>();
     private readonly IRedisInterfaceClient _redisInterface = Substitute.For<IRedisInterfaceClient>();
     private readonly IRosConnectionBuilderFactory _rosConnection = Substitute.For<IRosConnectionBuilderFactory>();
+    private readonly ISystemConfigRepository _settingsRepo = Substitute.For<ISystemConfigRepository>();
 
     private readonly DeploymentService _sut;
 
@@ -38,7 +40,7 @@ public class DeploymentServiceTests
     {
         _kubeBuilder.CreateKubernetesClient().Returns(_kube);
         _sut = new(_kubeBuilder, _logger, _redisInterface, _mwConfig, _kubernetesObjectBuilder,
-            _rosConnection, _publishingService);
+            _rosConnection, _publishingService, _settingsRepo);
     }
 
     [Fact(Skip = "Test not ready due to the complexity of the used functionalities")]
