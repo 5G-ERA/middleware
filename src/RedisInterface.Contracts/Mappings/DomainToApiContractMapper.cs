@@ -304,7 +304,7 @@ public static class DomainToApiContractMapper
             MinimumNumCores = x.MinimumNumCores,
             SingleNetAppEntryPoint = x.SingleNetAppEntryPoint,
             Tags = x.Tags,
-            Services = x.Services?.Select(s => s.ToFullInstanceResponse())
+            Instances = x.Services?.Select(s => s.ToFullInstanceResponse())
         };
     }
 
