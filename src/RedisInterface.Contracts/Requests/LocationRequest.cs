@@ -13,4 +13,6 @@ public class LocationRequest
     public long? Ram { get; init; }
     public long? VirtualRam { get; init; }
     public long? DiskStorage { get; init; }
+    public int? Throughput { get; init; }
+    public int? Latency { get; init; }
 }
