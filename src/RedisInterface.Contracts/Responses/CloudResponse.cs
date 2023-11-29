@@ -15,4 +15,6 @@ public class CloudResponse
     public long? VirtualRam { get; init; }
     public string MacAddress { get; init; }
     public DateTime LastUpdatedTime { get; init; }
+    public int? Throughput { get; init; }
+    public int? Latency { get; init; }
 }

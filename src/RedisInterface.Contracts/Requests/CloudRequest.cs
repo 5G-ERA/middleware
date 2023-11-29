@@ -13,4 +13,6 @@ public class CloudRequest
     public long? Ram { get; init; }
     public long? VirtualRam { get; init; }
     public string MacAddress { get; init; }
+    public int? Throughput { get; init; }
+    public int? Latency { get; init; }
 }

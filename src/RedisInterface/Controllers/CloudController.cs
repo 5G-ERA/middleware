@@ -3,7 +3,6 @@ using Microsoft.AspNetCore.Mvc;
 using Middleware.Common.Attributes;
 using Middleware.Common.Enums;
 using Middleware.Common.Responses;
-using Middleware.DataAccess.Repositories;
 using Middleware.DataAccess.Repositories.Abstract;
 using Middleware.Models;
 using Middleware.Models.Domain;
@@ -41,7 +40,8 @@ public class CloudController : ControllerBase
     {
         try
         {
-            var models = await _locationRepository.FindAsync(c => c.Type == LocationType.Cloud.ToString());
+            var cloudType = LocationType.Cloud.ToString();
+            var models = await _locationRepository.FindAsync(c => c.Type == cloudType);
             if (models.Any() == false)
                 return NotFound(new ApiResponse((int)HttpStatusCode.NotFound, "Clouds were not found."));
             return Ok(models.ToCloudsResponse());
@@ -68,8 +68,9 @@ public class CloudController : ControllerBase
     {
         try
         {
+            var cloudType = LocationType.Cloud.ToString();
             var model = await _locationRepository.FindSingleAsync(l =>
-                l.Id == id.ToString() && l.Type == LocationType.Cloud.ToString());
+                l.Id == id.ToString() && l.Type == cloudType);
             if (model is null)
             {
                 return NotFound(new ApiResponse((int)HttpStatusCode.NotFound,
@@ -145,7 +146,7 @@ public class CloudController : ControllerBase
             return StatusCode(statusCode, new ApiResponse(statusCode, $"An error has occurred: {ex.Message}"));
         }
     }
-        
+
     /// <summary>
     ///     Delete an CloudModel entity for the given id
     /// </summary>
@@ -206,7 +207,7 @@ public class CloudController : ControllerBase
     }
 
     /// <summary>
-    /// Retrieves a single relation by name
+    ///     Retrieves a single relation by name
     /// </summary>
     /// <param name="id"></param>
     /// <param name="name"></param>
@@ -219,28 +220,20 @@ public class CloudController : ControllerBase
     public async Task<IActionResult> GetRelationAsync(Guid id, string name, string direction = "Outgoing")
     {
         if (string.IsNullOrWhiteSpace(name))
-        {
             return BadRequest(new ApiResponse((int)HttpStatusCode.BadRequest, "Relation name not specified"));
-        }
         if (id == Guid.Empty)
-        {
             return BadRequest(new ApiResponse((int)HttpStatusCode.BadRequest, "Relation ID not specified"));
-        }
         RelationDirection directionEnum;
-        if (Enum.TryParse<RelationDirection>(direction, out directionEnum) == false)
-        {
+        if (Enum.TryParse(direction, out directionEnum) == false)
             return BadRequest(new ApiResponse((int)HttpStatusCode.BadRequest, "Wrong Relation direction specified"));
-        }
         var inputDirection = directionEnum;
         try
         {
             var relations = await _locationRepository.GetRelation(id, name, inputDirection);
             if (!relations.Any())
-            {
                 return NotFound(new ApiResponse((int)HttpStatusCode.NotFound, "Relations were not found."));
-            }
             return Ok(relations);
-        }        
+        }
         catch (Exception ex)
         {
             var statusCode = (int)HttpStatusCode.InternalServerError;

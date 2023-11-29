@@ -35,7 +35,9 @@ public static class ApiContractToDomainMapper
             VirtualRam = x.Cloud.VirtualRam,
             DiskStorage = x.Cloud.DiskStorage,
             LastUpdatedTime = DateTime.Now,
-            Organization = x.Cloud.Organization
+            Organization = x.Cloud.Organization,
+            Latency = x.Cloud.Latency,
+            Throughput = x.Cloud.Throughput
         };
     }
 
@@ -67,7 +69,9 @@ public static class ApiContractToDomainMapper
             VirtualRam = x.Edge.VirtualRam,
             DiskStorage = x.Edge.DiskStorage,
             LastUpdatedTime = DateTime.Now,
-            Organization = x.Edge.Organization
+            Organization = x.Edge.Organization,
+            Latency = x.Edge.Latency,
+            Throughput = x.Edge.Throughput
         };
     }
 
@@ -179,7 +183,9 @@ public static class ApiContractToDomainMapper
             Organization = loc.Organization,
             Ram = loc.Ram,
             Status = loc.Status,
-            VirtualRam = loc.VirtualRam
+            VirtualRam = loc.VirtualRam,
+            Latency = loc.Latency,
+            Throughput = loc.Throughput
         };
     }
 
@@ -199,7 +205,9 @@ public static class ApiContractToDomainMapper
             Organization = loc.Organization,
             Ram = loc.Ram,
             Status = loc.Status,
-            VirtualRam = loc.VirtualRam
+            VirtualRam = loc.VirtualRam,
+            Latency = loc.Latency,
+            Throughput = loc.Throughput
         };
     }
 
@@ -219,7 +227,9 @@ public static class ApiContractToDomainMapper
             Organization = loc.Organization,
             Ram = loc.Ram,
             Status = loc.Status,
-            VirtualRam = loc.VirtualRam
+            VirtualRam = loc.VirtualRam,
+            Latency = loc.Latency,
+            Throughput = loc.Throughput
         };
     }
 }

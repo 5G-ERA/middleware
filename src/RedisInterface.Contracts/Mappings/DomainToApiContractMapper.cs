@@ -47,7 +47,9 @@ public static class DomainToApiContractMapper
             Ram = x.Ram,
             VirtualRam = x.VirtualRam,
             DiskStorage = x.DiskStorage,
-            LastUpdatedTime = x.LastUpdatedTime
+            LastUpdatedTime = x.LastUpdatedTime,
+            Latency = x.Latency,
+            Throughput = x.Throughput
         };
     }
 
@@ -96,7 +98,9 @@ public static class DomainToApiContractMapper
             Ram = x.Ram,
             VirtualRam = x.VirtualRam,
             DiskStorage = x.DiskStorage,
-            LastUpdatedTime = x.LastUpdatedTime
+            LastUpdatedTime = x.LastUpdatedTime,
+            Latency = x.Latency,
+            Throughput = x.Throughput
         };
     }
 
@@ -373,7 +377,9 @@ public static class DomainToApiContractMapper
             VirtualRam = x.VirtualRam,
             DiskStorage = x.DiskStorage,
             IsOnline = x.IsOnline,
-            LastUpdatedTime = x.LastUpdatedTime
+            LastUpdatedTime = x.LastUpdatedTime,
+            Latency = x.Latency,
+            Throughput = x.Throughput
         };
     }
 
@@ -401,7 +407,9 @@ public static class DomainToApiContractMapper
             Ram = x.Ram,
             VirtualRam = x.VirtualRam,
             DiskStorage = x.DiskStorage,
-            LastUpdatedTime = x.LastUpdatedTime
+            LastUpdatedTime = x.LastUpdatedTime,
+            Latency = x.Latency,
+            Throughput = x.Throughput
         };
     }
 
@@ -429,7 +437,9 @@ public static class DomainToApiContractMapper
             Ram = x.Ram,
             VirtualRam = x.VirtualRam,
             DiskStorage = x.DiskStorage,
-            LastUpdatedTime = x.LastUpdatedTime
+            LastUpdatedTime = x.LastUpdatedTime,
+            Latency = x.Latency,
+            Throughput = x.Throughput
         };
     }
 
