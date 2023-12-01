@@ -40,7 +40,7 @@ public class RedisRepository<TModel, TDto> : IRedisRepository<TModel, TDto> wher
 
     protected IRedisGraphClient RedisGraph { get; }
 
-    protected readonly IDriver _driver;
+    protected readonly IDriver Driver;
 
     public RedisRepository(IRedisConnectionProvider provider, IRedisGraphClient redisGraph, bool isWritableToGraph,
         Microsoft.Extensions.Logging.ILogger logger, IDriver driver)
@@ -50,7 +50,7 @@ public class RedisRepository<TModel, TDto> : IRedisRepository<TModel, TDto> wher
         Collection = provider.RedisCollection<TDto>();
         IsWritableToGraph = isWritableToGraph;
         Logger = logger;
-        _driver = driver;
+        Driver = driver;
     }
 
     /// <summary>
@@ -66,7 +66,7 @@ public class RedisRepository<TModel, TDto> : IRedisRepository<TModel, TDto> wher
         if (IsWritableToGraph)
         {
             var newGraphModel = new GraphEntityModel(Guid.Parse(dto.Id), model.Name, _entityName);
-            await AddGraphAsync(newGraphModel);
+            await AddGraphAsyncTest(newGraphModel);
         }
 
         return ToTModel(dto);
@@ -87,7 +87,7 @@ public class RedisRepository<TModel, TDto> : IRedisRepository<TModel, TDto> wher
         if (IsWritableToGraph)
         {
             var graphModel = new GraphEntityModel(model.Id, model.Name, _entityName);
-            await AddGraphAsync(graphModel);
+            await AddGraphAsyncTest(graphModel);
         }
         return ToTModel(dto);
     }
@@ -170,7 +170,7 @@ public class RedisRepository<TModel, TDto> : IRedisRepository<TModel, TDto> wher
         var relationModels = new List<RelationModel>();
         var entityDef = _entityName + " {ID: '" + id + "' }";
 
-        using (var session = _driver.AsyncSession())
+        using (var session = Driver.AsyncSession())
         {
             try
             {
@@ -275,7 +275,7 @@ public class RedisRepository<TModel, TDto> : IRedisRepository<TModel, TDto> wher
         var relations = new List<SimpleRelation>();
         var entityIds = new List<Guid>();
         
-        using (var session = _driver.AsyncSession())
+        using (var session = Driver.AsyncSession())
         {
             try
             {
@@ -374,7 +374,7 @@ public class RedisRepository<TModel, TDto> : IRedisRepository<TModel, TDto> wher
         model.Type = _entityName;
         if (await ObjectExistsOnGraph(model)) return true;
 
-        using (var session = _driver.AsyncSession())
+        using (var session = Driver.AsyncSession())
         {
             try
             {
@@ -400,6 +400,60 @@ public class RedisRepository<TModel, TDto> : IRedisRepository<TModel, TDto> wher
         return true;
     }
 
+    public virtual async Task<bool> AddGraphAsyncTest(GraphEntityModel model) 
+    {
+        /*IResultCursor result;
+
+        await using var tx = Driver.AsyncSession();
+
+        var cypher = $"CREATE (n: " + model.Type + " {ID: '" + model.Id + "', Type: '" + model.Type +
+                    "', Name: '" + model.Name + "'})";
+
+        if (model != null)
+        {
+            result = await tx.RunAsync(cypher);
+        }
+        else
+        {
+            result = await tx.RunAsync(cypher);
+        }
+
+        return await result?.ToListAsync();*/
+
+        /*await using var session = Driver.AsyncSession();
+        return await session.ExecuteWriteAsync(
+            async tx =>
+            {
+                var query = $"CREATE (n: " + model.Type + " {ID: '" + model.Id + "', Type: '" + model.Type +
+                    "', Name: '" + model.Name + "'})";
+                var result = await tx.RunAsync(query);
+                return await result.ToListAsync(r => r[0].As<string>());
+            });*/
+
+        await using var session = Driver.AsyncSession();
+
+        var query = $"CREATE (n: " + model.Type + " {ID: '" + model.Id + "', Type: '" + model.Type +
+                    "', Name: '" + model.Name + "'})";
+
+        await session.ExecuteWriteAsync(async tx =>
+        {
+            var result = await tx.RunAsync(query);
+            return result;
+        });
+
+        return true;
+
+
+        /*var query = $"CREATE (n: " + model.Type + " {ID: '" + model.Id + "', Type: '" + model.Type +
+                    "', Name: '" + model.Name + "'})";*/
+
+        //var reader = await session.RunAsync(query);
+
+        //await reader.ConsumeAsync();
+
+        //return true;
+    }
+
     /// <summary>
     ///     Creating a new relation between two models
     /// </summary>
@@ -407,7 +461,7 @@ public class RedisRepository<TModel, TDto> : IRedisRepository<TModel, TDto> wher
     /// <returns></returns>
     public virtual async Task<bool> AddRelationAsync(RelationModel relation)
     {
-        using (var session = _driver.AsyncSession())
+        using (var session = Driver.AsyncSession())
         {
             try
             {
@@ -443,7 +497,7 @@ public class RedisRepository<TModel, TDto> : IRedisRepository<TModel, TDto> wher
     {
         model.Type = _entityName;
 
-        using (var session = _driver.AsyncSession())
+        using (var session = Driver.AsyncSession())
         {
             try
             {
@@ -475,7 +529,7 @@ public class RedisRepository<TModel, TDto> : IRedisRepository<TModel, TDto> wher
     /// <returns></returns>
     public virtual async Task<bool> DeleteRelationAsync(RelationModel relation)
     {
-        using (var session = _driver.AsyncSession())
+        using (var session = Driver.AsyncSession())
         {
             try
             {
@@ -511,7 +565,7 @@ public class RedisRepository<TModel, TDto> : IRedisRepository<TModel, TDto> wher
 
     private async Task UpdateGraphAsync(TModel model) 
     {
-        using (var session = _driver.AsyncSession())
+        using (var session =    Driver.AsyncSession())
         {
             try
             {
@@ -572,7 +626,7 @@ public class RedisRepository<TModel, TDto> : IRedisRepository<TModel, TDto> wher
     {
         bool exists = false;
 
-        using (var session = _driver.AsyncSession())
+        using (var session = Driver.AsyncSession())
         {
             try
             {

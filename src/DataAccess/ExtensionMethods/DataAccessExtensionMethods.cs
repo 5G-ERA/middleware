@@ -41,7 +41,7 @@ public static class DataAccessExtensionMethods
             cfg.WithConnectionTimeout(TimeSpan.FromSeconds(5));
         });*/
         //var driver = GraphDatabase.Driver(uri, AuthTokens.Basic("", ""));
-        var uri = $"bolt://{config.ClusterHostname}:7687";
+        var uri = $"bolt://localhost:31007";
         var driver = GraphDatabase.Driver(uri, AuthTokens.Basic("", ""));
         builder.Services.AddSingleton(driver);
         return builder;
