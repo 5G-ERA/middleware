@@ -40,7 +40,8 @@ public class EdgeController : ControllerBase
     {
         try
         {
-            var models = await _locationRepository.FindAsync(e => e.Type == LocationType.Edge.ToString());
+            var edgeStr = LocationType.Edge.ToString();
+            var models = await _locationRepository.FindAsync(e => e.Type == edgeStr);
             if (models.Any() == false)
                 return NotFound(new ApiResponse((int)HttpStatusCode.NotFound, "Objects were not found."));
 

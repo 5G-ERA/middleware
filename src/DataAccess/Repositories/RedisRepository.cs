@@ -10,6 +10,7 @@ using Redis.OM.Contracts;
 using Redis.OM.Searching;
 using RedisGraphDotNet.Client;
 using Serilog;
+using KeyValuePair = Middleware.Models.Domain.KeyValuePair;
 
 namespace Middleware.DataAccess.Repositories;
 
@@ -170,38 +171,69 @@ public class RedisRepository<TModel, TDto> : IRedisRepository<TModel, TDto> wher
             return relationModels;
         }
 
-        // BB: 24.03.2022
-        // We are using the loop with 2 nested loops to retrieve the values from the graph
-        // The values are structured in the following way:
-        // First result contains the information about the objects that the relation initiates from
-        // Second results contains the information about the objects that the relation is pointing to
-        // This structure will be universal for the explanation of all the queries on the redis graph
-        for (var i = 0; i < resultSet.Results.Count; i++)
-        {
-            var res = resultSet.Results.ElementAt(i);
-            if (i % 2 == 0)
-            {
-                foreach (var node in res.Value)
-                {
-                    var relationModel = new RelationModel
-                    {
-                        RelationName = relationName
-                    };
-                    if (node is Node nd) SetGraphModelValues(relationModel.InitiatesFrom, nd);
+        relationModels = ExtractFullRelation(resultSet, relationName);
 
-                    relationModels.Add(relationModel);
-                }
-            }
-            else
-            {
-                foreach (var node in res.Value)
-                {
-                    var idxTmp = res.Value.IndexOf(node);
-                    var relationModel = relationModels[idxTmp];
-                    if (node is Node nd) SetGraphModelValues(relationModel.PointsTo, nd);
-                }
-            }
+        return relationModels;
+    }
+
+    // Designed to check if speific relation between two known entities exist
+    public virtual async Task<RelationModel> GetOneRelation(RelationModel relation)
+    {
+        if (string.IsNullOrWhiteSpace(relation.RelationName))
+        {
+            throw new ArgumentException($"'{nameof(relation.RelationName)}' cannot be null or whitespace.",
+                nameof(relation.RelationName));
         }
+
+        var relationName = relation.RelationName;
+        relationName = relationName.ToUpper();
+
+        var relationModels = new List<RelationModel>();
+        var finalRelationModel = new RelationModel();
+
+        var query = "MATCH (x:ROBOT)-[r:" + relationName +"]->(y:LOCATION) where (x)-[r]->(y) and x.ID='" + relation.InitiatesFrom.Id +
+            "' and y.ID='" + relation.PointsTo.Id + "' return x,y,r";
+        //var query33 =  "MATCH (x:ROBOT)-[r:CAN_REACH]->(y:LOCATION) RETURN x,y,r";
+        ResultSet? resultSet;
+
+        try
+        {
+            resultSet = await RedisGraph.Query(GraphName, query);
+        }
+        catch (FormatException) //BB 2023.07.07 - when no results are found the library throws FormatException
+        {
+            return finalRelationModel;
+        }
+
+        relationModels = ExtractFullRelation(resultSet, relationName);
+        finalRelationModel = relationModels.FirstOrDefault();
+        return finalRelationModel;
+    }
+
+    // will return all relations which contain passed relation name
+    public virtual async Task<List<RelationModel>> GetRelationsWithName(string relationName)
+    {
+        if (string.IsNullOrWhiteSpace(relationName))
+        {
+            throw new ArgumentException($"'{nameof(relationName)}' cannot be null or whitespace.",
+                nameof(relationName));
+        }
+
+        relationName = relationName.ToUpper();
+        var relationModels = new List<RelationModel>();
+        var query33 = "MATCH (x)-[r:"+ relationName + "]->(y) RETURN x,y,r";
+
+        ResultSet? resultSet;
+        try
+        {
+            resultSet = await RedisGraph.Query(GraphName, query33);
+        }
+        catch (FormatException) //BB 2023.07.07 - when no results are found the library throws FormatException
+        {
+            return relationModels;
+        }
+
+        relationModels = ExtractFullRelation(resultSet, relationName);
 
         return relationModels;
     }
@@ -255,13 +287,152 @@ public class RedisRepository<TModel, TDto> : IRedisRepository<TModel, TDto> wher
     /// <returns></returns>
     public virtual async Task<bool> AddRelationAsync(RelationModel relation)
     {
-        var query = "MATCH (x: " + relation.InitiatesFrom.Type + " {ID: '" + relation.InitiatesFrom.Id +
-                    "'}), (c: " + relation.PointsTo.Type + " {ID: '" + relation.PointsTo.Id +
-                    "'}) CREATE (x)-[:" + relation.RelationName + "]->(c) ";
-        var resultSet = await RedisGraph.Query(GraphName, query);
+        // check if relation exist
+        var relationExist = await GetOneRelation(relation);
 
-        return resultSet != null && resultSet.Metrics.RelationshipsCreated >= 1;
+        if (relationExist != null)
+        {
+            if (relationExist.InitiatesFrom.Id == relation.InitiatesFrom.Id)
+            {
+                //Relation exist
+                // Update relation
+
+                string querySetAttributes = GetQueryAtributesToUpdate(relation);
+
+                var query = "MATCH (x: " + relation.InitiatesFrom.Type + " {ID: '" + relation.InitiatesFrom.Id +
+                             "'})-[r: " + relation.RelationName + "]->(c: " + relation.PointsTo.Type +
+                             " {ID: '" + relation.PointsTo.Id + "'}) SET " + querySetAttributes;
+
+                var resultSet = await RedisGraph.Query(GraphName, query);
+
+                return resultSet != null && resultSet.Metrics.RelationshipsCreated >= 1;
+            }
+            else
+            {
+                //Relation does not exist
+                // Create relation
+                string queryAttributes = GetQueryAtributesToCreate(relation);
+
+                var query = "MATCH (x: " + relation.InitiatesFrom.Type + " {ID: '" + relation.InitiatesFrom.Id +
+                            "'}), (c: " + relation.PointsTo.Type + " {ID: '" + relation.PointsTo.Id +
+                            "'}) CREATE (x)-[:" + relation.RelationName + queryAttributes + "]->(c) ";
+
+                var resultSet = await RedisGraph.Query(GraphName, query);
+
+                return resultSet != null && resultSet.Metrics.RelationshipsCreated >= 1;
+            }
+        }
+        else
+        {
+            //Relation does not exist
+            // Create relation
+            string queryAttributes = GetQueryAtributesToCreate(relation);
+
+            var query = "MATCH (x: " + relation.InitiatesFrom.Type + " {ID: '" + relation.InitiatesFrom.Id +
+                        "'}), (c: " + relation.PointsTo.Type + " {ID: '" + relation.PointsTo.Id +
+                        "'}) CREATE (x)-[:" + relation.RelationName + queryAttributes + "]->(c) ";
+
+            var resultSet = await RedisGraph.Query(GraphName, query);
+
+            return resultSet != null && resultSet.Metrics.RelationshipsCreated >= 1;
+        }
     }
+    /// <summary>
+    ///     Creating a new relation between two models
+    /// </summary>
+    /// <param name="relation"></param>
+    /// <returns></returns>
+    /// 
+
+    public virtual async Task<bool> UpdateRelationAsync(RelationModel relation)
+    {
+        var relationExist = await GetOneRelation(relation);
+        if (relationExist != null)
+        {
+            if(relationExist.InitiatesFrom.Id == relation.InitiatesFrom.Id)
+            {
+                //Relation exist
+                // Update relation
+
+                string querySetAttributes = GetQueryAtributesToUpdate(relation);      
+
+                var query = "MATCH (x: " + relation.InitiatesFrom.Type + " {ID: '" + relation.InitiatesFrom.Id +
+                             "'})-[r: " + relation.RelationName + "]->(c: " + relation.PointsTo.Type +
+                             " {ID: '" + relation.PointsTo.Id + "'}) SET " + querySetAttributes;
+
+                var resultSet = await RedisGraph.Query(GraphName, query);
+
+                return resultSet != null && resultSet.Metrics.RelationshipsCreated >= 1;
+            } else { return false; }
+        }
+        else
+        {
+            return false;
+        }
+    }
+
+    private string GetQueryAtributesToCreate(RelationModel relation)
+    {
+        var allAttributes = relation.RelationAttributes;
+        string queryAttributes = "";
+
+        // create following pattern as string
+        // {key1:'val1',key2: 'val2'}
+        if (allAttributes != null)
+        {
+            bool atLeastOneValidAttribute = false;
+            queryAttributes = "{";
+            foreach (KeyValuePair item in allAttributes)
+            {
+                if (item.Key != null && item.Value != null && item.Key != string.Empty && item.Value != string.Empty)
+                {
+                    queryAttributes += item.Key + ":'" + item.Value + "',";
+                    atLeastOneValidAttribute = true;
+                }
+            }
+            queryAttributes = queryAttributes.Remove(queryAttributes.Length - 1);
+            queryAttributes += "}";
+            if (atLeastOneValidAttribute == false)
+            {
+                // if did not find any valid key value pair, do not add any attributes;
+                queryAttributes = "";
+            }
+        }
+        return queryAttributes;
+    }
+    private string GetQueryAtributesToUpdate(RelationModel relation)
+    {
+        var allAttributes = relation.RelationAttributes;
+        string queryAttributes = "";
+
+        // create following pattern as string
+        // r.time_udated1 = 'new_Value24', r.time_udated2 = 'new_Value234', r.time_udated3 = 'new_Value2345'"
+        if (allAttributes != null)
+        {
+            bool atLeastOneValidAttribute = false;
+            
+            foreach (KeyValuePair item in allAttributes)
+            {
+                if (item.Key != null && item.Value != null && item.Key != string.Empty && item.Value != string.Empty)
+                {
+                    queryAttributes += "r." + item.Key + "= '" + item.Value + "',";
+                    atLeastOneValidAttribute = true;
+                }
+            }
+            queryAttributes = queryAttributes.Remove(queryAttributes.Length - 1);
+
+            if (atLeastOneValidAttribute == false)
+            {
+                // if did not find any valid key value pair, do not add any attributes;
+                queryAttributes = "";
+            }
+        }
+        return queryAttributes;
+    }
+
+
+
+    //GRAPH.QUERY Cars 'MERGE (honda:Cars {id: "c12345"}) MERGE (driver1:Person {id: "d12345"}) MERGE (honda)-[r1:rider {id: "r12345", via: "uber"}]->(driver1)'
 
     /// <summary>
     ///     Removing a model from RedisGraph db
@@ -338,5 +509,113 @@ public class RedisRepository<TModel, TDto> : IRedisRepository<TModel, TDto> wher
         var query = "match (x:" + _entityName + " {ID: '" + graphModel.Id + "'}) return x";
         var resultSet = await RedisGraph.Query(GraphName, query);
         return resultSet != null && resultSet.Results.Count > 0;
+    }
+
+    private List<RelationModel> ExtractRelations(ResultSet resultSet, string relationName)
+    {
+        var relationModels = new List<RelationModel>();
+        // BB: 24.03.2022
+        // We are using the loop with 2 nested loops to retrieve the values from the graph
+        // The values are structured in the following way:
+        // First result contains the information about the objects that the relation initiates from
+        // Second results contains the information about the objects that the relation is pointing to
+        // This structure will be universal for the explanation of all the queries on the redis graph
+
+        for (var i = 0; i < resultSet.Results.Count; i++)
+        {
+            var res = resultSet.Results.ElementAt(i);
+            if (i % 2 == 0)
+            {
+                foreach (var node in res.Value)
+                {
+                    var relationModel = new RelationModel
+                    {
+                        RelationName = relationName
+                    };
+                    if (node is Node nd) SetGraphModelValues(relationModel.InitiatesFrom, nd);
+
+                    relationModels.Add(relationModel);
+                }
+            }
+            else
+            {
+                foreach (var node in res.Value)
+                {
+                    var idxTmp = res.Value.IndexOf(node);
+                    var relationModel = relationModels[idxTmp];
+                    if (node is Node nd) SetGraphModelValues(relationModel.PointsTo, nd);
+                }
+            }
+        }
+        return relationModels;
+    }
+
+    private List<RelationModel> ExtractFullRelation(ResultSet resultSet, string relationName)
+    {
+        var relationModels = new List<RelationModel>();
+        // BB: 12.12.2023
+        // example of query in order to work correctly
+        // var query33 = "MATCH (x:ROBOT)-[r:CAN_REACH]->(y:LOCATION) RETURN x,y,r";
+        // We are using the loop with 3 nested loops to retrieve the values from the graph
+        // The values are structured in the following way:
+        // First result contains the information about the objects that the relation initiates from
+        // Second result contains the information about the objects that the relation is pointing to
+        // Third result contains information about propertis of the relation atributes
+        // This structure will be universal for the explanation of all the queries on the redis graph
+
+        for (var i = 0; i < resultSet.Results.Count; i++)
+        {
+            var res = resultSet.Results.ElementAt(i);
+            if (i % 3 == 0)
+            {
+                foreach (var node in res.Value)
+                {
+                    var relationModel = new RelationModel
+                    {
+                        RelationName = relationName
+                    };
+                    if (node is Node nd) SetGraphModelValues(relationModel.InitiatesFrom, nd);
+
+                    relationModels.Add(relationModel);
+                }
+            }
+            else if (i % 3 == 1)
+            {
+                foreach (var node in res.Value)
+                {
+                    var idxTmp = res.Value.IndexOf(node);
+                    var relationModel = relationModels[idxTmp];
+                    if (node is Node nd) SetGraphModelValues(relationModel.PointsTo, nd);
+                }
+            }
+            else
+            {
+                foreach (var relation in res.Value)
+                {
+                    var idxTmp = res.Value.IndexOf(relation);
+                    var relationModel = relationModels[idxTmp];
+                    if (relation is Relation nd)
+                        relationModel.RelationAttributes = GetRelationAttributes(nd);
+                }
+            }
+        }
+        return relationModels;
+    }
+
+    private List<KeyValuePair> GetRelationAttributes(Relation nd)
+    {
+        var retVal = new List<KeyValuePair>();
+        foreach (var item in nd.Properties)
+        {
+            var key = item.Key;
+            var value = item.Value;
+            var kv = new KeyValuePair
+            {
+                Key = key,
+                Value = value.ToString()
+            };
+            retVal.Add(kv);
+        }
+        return retVal;
     }
 }

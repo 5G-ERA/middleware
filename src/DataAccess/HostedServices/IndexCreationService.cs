@@ -161,6 +161,15 @@ public class IndexCreationService : IHostedService
             await _provider.Connection.DropIndexAsync(typeof(SliceDto));
             await _provider.Connection.CreateIndexAsync(typeof(SliceDto));
         }
+        if (info.All(x => x != "location-idx"))
+        {
+            await _provider.Connection.CreateIndexAsync(typeof(LocationDto));
+        }
+        else
+        {
+            await _provider.Connection.DropIndexAsync(typeof(LocationDto));
+            await _provider.Connection.CreateIndexAsync(typeof(LocationDto));
+        }
     }
 
     public Task StopAsync(CancellationToken cancellationToken)

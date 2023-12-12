@@ -116,6 +116,13 @@ public class RedisLocationRepository : RedisRepository<Location, LocationDto>, I
     }
 
     /// <inheritdoc />
+    public async Task<Location?> GetSingleLocationByOrganizationAndNameAsync(string organization, string name)
+    {
+        var location = await FindSingleAsync(dto => dto.Organization == organization && dto.Name == name);
+        return location;
+    }
+
+    /// <inheritdoc />
     public async Task<(bool, Location?)> ExistsAsync(string name)
     {
         var loc = await FindSingleAsync(dto => dto.Name == name);

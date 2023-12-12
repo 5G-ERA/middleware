@@ -7,6 +7,14 @@
 		<RootNamespace>Middleware.$(MSBuildProjectName.Replace(" ", "_"))</RootNamespace>
 	</PropertyGroup>
 
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+	  <LangVersion>preview</LangVersion>
+	</PropertyGroup>
+
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+	  <LangVersion>preview</LangVersion>
+	</PropertyGroup>
+
 	<ItemGroup>
 		<PackageReference Include="Redis.OM" Version="0.4.0" />
 		<PackageReference Include="NReJSON" Version="4.0.0" />
