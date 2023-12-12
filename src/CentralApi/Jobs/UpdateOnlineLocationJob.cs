@@ -1,5 +1,4 @@
-﻿using Middleware.CentralApi.Services.Abstract;
-using Middleware.Common.Job;
+﻿using Middleware.Common.Job;
 using Middleware.DataAccess.Repositories.Abstract;
 using Middleware.Models.Domain;
 using Quartz;

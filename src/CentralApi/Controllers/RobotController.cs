@@ -31,13 +31,14 @@ public class RobotController : ControllerBase
     [ProducesResponseType(typeof(RelationModel), (int)HttpStatusCode.OK)]
     [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.BadRequest)]
     [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.InternalServerError)]
-    public async Task<ActionResult<RelationModel>> RobotToLocationAddRelation([FromBody] RelationToLocationRequest model)
+    public async Task<ActionResult<List<string>>> RobotToLocationAddRelation([FromBody] RelationToLocationRequest model)
     {
         if (model == null)
             return BadRequest(new ApiResponse((int)HttpStatusCode.BadRequest, "Parameters were not specified."));
         try
         {
-            await _robotService.CreateRelation(model);
+            List<string> errorss = await _robotService.CreateRelation(model);
+            return errorss;
         } catch (ArgumentNullException ex1)
         {
             _logger.LogError(ex1, "Adding relation/relations did not succeed, robot was not found:");
@@ -50,8 +51,6 @@ public class RobotController : ControllerBase
             _logger.LogError(ex, "An error occurred:");
             return StatusCode(statusCode, new ApiResponse(statusCode, $"An error has occurred: {ex.Message}"));
         }
-
-        return Ok(model);
     }
 
     /// <summary>
@@ -64,13 +63,14 @@ public class RobotController : ControllerBase
     [ProducesResponseType(typeof(RelationModel), (int)HttpStatusCode.OK)]
     [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.BadRequest)]
     [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.InternalServerError)]
-    public async Task<ActionResult<RelationModel>> DeleteRobotToLocationRelation([FromBody] RelationToLocationRequest model)
+    public async Task<ActionResult<List<string>>> DeleteRobotToLocationRelation([FromBody] RelationToLocationRequest model)
     {
         if (model == null)
             return BadRequest(new ApiResponse((int)HttpStatusCode.BadRequest, "Parameters were not specified."));
         try
         {
-            await _robotService.DeleteRelation(model);
+            List<string> returnedErrorss = await _robotService.DeleteRelation(model);
+            return returnedErrorss;
         }
         catch (ArgumentNullException ex)
         {
@@ -84,6 +84,5 @@ public class RobotController : ControllerBase
             _logger.LogError(ex, "An error occurred:");
             return StatusCode(statusCode, new ApiResponse(statusCode, $"An error has occurred: {ex.Message}"));
         }
-        return Ok(model);
     }
 }

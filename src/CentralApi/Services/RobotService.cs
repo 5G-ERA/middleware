@@ -28,14 +28,14 @@ public class RobotService : IRobotService
         // check if name of robot can be retreived
         var robotName = await GetRobotNameByIdAsync(data.robotId);
         if (robotName == null)
-            throw new ArgumentNullException(nameof(robotName));               
+            throw new ArgumentNullException(nameof(robotName));
         
 
         List<string> errorsList = new List<string>();
         List<RelationModel> availableRrelations = new();
         var relationName = "CAN_REACH";
 
-        availableRrelations = await GetRelation(data.robotId, relationName);
+        availableRrelations = await _robotRepository.GetRelation(data.robotId, relationName);
 
         foreach (LocationNames relGraph2 in relGraph2s)
         {
@@ -193,7 +193,7 @@ public class RobotService : IRobotService
             _logger.LogError(ex, "An error occurred:");
         }
     }
-    public async void DeleteRelationAsync(RelationModel model)
+    private async void DeleteRelationAsync(RelationModel model)
     {
         //RelationModel model2;
         try
@@ -223,15 +223,5 @@ public class RobotService : IRobotService
             var name = model.Name;
             return name;
         }        
-    }
-
-
-    private async Task <List<RelationModel>> GetRelation(Guid id, string relationName,
-        RelationDirection direction = RelationDirection.Outgoing)
-    {
-        //var relationModels = new List<RelationModel>();
-        //relationModels = await _robotRepository.GetRelation(id, relationName);
-        List<RelationModel> relationModels = await _robotRepository.GetRelation(id, relationName);
-        return relationModels;
     }
 }
