@@ -1,4 +1,5 @@
 ﻿using Middleware.Models.Domain.Contracts;
+using Middleware.Models.Domain.ValueObjects;
 using Middleware.Models.Dto;
 using Middleware.Models.Enums;
 
@@ -36,11 +37,6 @@ public class InstanceModel : BaseModel, IPolicyAssignable
 
     public string? ServiceStatus { get; set; }
     public ContainerImageModel? ContainerImage { get; set; }
-
-    public long? MinimumRam { get; set; } // Compulsory field
-
-    public int? MinimumNumCores { get; set; } // Compulsory field
-
     public DateTime OnboardedTime { get; set; } // Compulsory field
 
     public DateTimeOffset? LastStatusChange { get; set; }
@@ -70,7 +66,7 @@ public class InstanceModel : BaseModel, IPolicyAssignable
 
 
     /// <summary>
-    ///     On boarding validation of the instance data object.
+    ///     Onboarding validation of the instance data object.
     /// </summary>
     /// <returns>bool</returns>
     public bool IsValid()
@@ -80,8 +76,8 @@ public class InstanceModel : BaseModel, IPolicyAssignable
         //if (string.IsNullOrWhiteSpace(Name)) return false;
         if (RosVersion > 2) return false;
         if (RosVersion == 0) return false;
-        if (string.IsNullOrEmpty(MinimumRam.ToString())) return false;
-        if (string.IsNullOrEmpty(MinimumNumCores.ToString())) return false;
+        if (string.IsNullOrEmpty(Ram.ToString())) return false;
+        //if (string.IsNullOrEmpty(MinimumNumCores.ToString())) return false;
         if (string.IsNullOrEmpty(RosDistro)) return false;
         if (string.IsNullOrEmpty(InstanceFamily)) return false;
         if (!rosDistroNames.Contains(RosDistro)) return false;
@@ -120,8 +116,21 @@ public class InstanceModel : BaseModel, IPolicyAssignable
             ServiceStatus = domain.ServiceStatus,
             HardwareRequirements = new()
             {
-                MinimumRam = domain.MinimumRam,
-                MinimumNumCores = domain.MinimumNumCores
+                MinimumRam = domain.Ram?.Minimal,
+                OptimalRam = domain.Ram?.Optimal,
+                RamPriority = domain.Ram?.Priority.ToString(),
+                MinimumNumberOfCores = domain.NumberOfCores?.Minimal,
+                OptimalNumberOfCores = domain.NumberOfCores?.Optimal,
+                NumberOfCoresPriority = domain.NumberOfCores?.Priority.ToString(),
+                MinimumDiskStorage = domain.DiskStorage?.Minimal,
+                OptimalDiskStorage = domain.DiskStorage?.Optimal,
+                DiskStoragePriority = domain.DiskStorage?.Priority.ToString(),
+                MinimumThroughput = domain.Throughput?.Minimal,
+                OptimalThroughput = domain.Throughput?.Optimal,
+                ThroughputPriority = domain.Throughput?.Priority.ToString(),
+                MinimumLatency = domain.Latency?.Minimal,
+                OptimalLatency = domain.Latency?.Optimal,
+                LatencyPriority = domain.Latency?.Priority.ToString()
             },
             OnboardedTime = domain.OnboardedTime == default ? DateTimeOffset.Now : domain.OnboardedTime,
             LastStatusChange = domain.LastStatusChange,
@@ -136,4 +145,15 @@ public class InstanceModel : BaseModel, IPolicyAssignable
 
         ServiceUrl = netAppAddress;
     }
+
+    #region Resource Reguirements
+
+    public NetAppRequirement? Ram { get; set; }
+
+    public NetAppRequirement? NumberOfCores { get; set; }
+    public NetAppRequirement? DiskStorage { get; set; }
+    public NetAppRequirement? Throughput { get; set; }
+    public NetAppRequirement? Latency { get; set; }
+
+    #endregion
 }

@@ -44,10 +44,10 @@ public class RedisInstanceRepository : RedisRepository<InstanceModel, InstanceDt
         if (!string.IsNullOrEmpty(patch.InstanceFamily)) currentModel.InstanceFamily = patch.InstanceFamily;
         if (!string.IsNullOrEmpty(patch.SuccessRate.ToString())) currentModel.SuccessRate = patch.SuccessRate;
         if (patch.ContainerImage != null) currentModel.ContainerImage = patch.ContainerImage;
-        if (!string.IsNullOrEmpty(patch.MinimumRam.ToString())) currentModel.MinimumRam = patch.MinimumRam;
-        if (!string.IsNullOrEmpty(patch.MinimumNumCores.ToString()))
-            currentModel.MinimumNumCores = patch.MinimumNumCores;
-        if (!string.IsNullOrEmpty(patch.OnboardedTime.ToString())) currentModel.OnboardedTime = patch.OnboardedTime;
+        if (!string.IsNullOrEmpty(patch.Ram.ToString())) currentModel.Ram = patch.Ram;
+        //if (!string.IsNullOrEmpty(patch.NumberOfCores.ToString()))
+        //currentModel.MinimumNumCores = patch.MinimumNumCores;
+        //if (!string.IsNullOrEmpty(patch.OnboardedTime.ToString())) currentModel.OnboardedTime = patch.OnboardedTime;
         await UpdateAsync(currentModel);
         return currentModel;
     }

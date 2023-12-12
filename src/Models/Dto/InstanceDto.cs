@@ -71,7 +71,7 @@ public class InstanceDto : Dto
         return new InstanceModel
         {
             Id = Guid.Parse(dto.Id.Replace(Prefix, "")),
-            Name = dto.Name,
+            Name = dto.Name!,
             ServiceInstanceId = Guid.Parse(dto.ServiceInstanceId),
             ServiceType = dto.ServiceType,
             IsReusable = dto.IsReusable,
@@ -85,8 +85,16 @@ public class InstanceDto : Dto
             InstanceFamily = dto.InstanceFamily,
             SuccessRate = dto.SuccessRate,
             ServiceStatus = dto.ServiceStatus,
-            MinimumRam = dto.HardwareRequirements.MinimumRam,
-            MinimumNumCores = dto.HardwareRequirements.MinimumNumCores,
+            Ram = new(dto.HardwareRequirements.MinimumRam, dto.HardwareRequirements.OptimalRam,
+                dto.HardwareRequirements.RamPriority),
+            NumberOfCores = new(dto.HardwareRequirements.MinimumNumberOfCores,
+                dto.HardwareRequirements.OptimalNumberOfCores, dto.HardwareRequirements.NumberOfCoresPriority),
+            DiskStorage = new(dto.HardwareRequirements.MinimumDiskStorage, dto.HardwareRequirements.OptimalDiskStorage,
+                dto.HardwareRequirements.DiskStoragePriority),
+            Throughput = new(dto.HardwareRequirements.MinimumThroughput, dto.HardwareRequirements.OptimalThroughput,
+                dto.HardwareRequirements.ThroughputPriority),
+            Latency = new(dto.HardwareRequirements.MinimumLatency, dto.HardwareRequirements.OptimalLatency,
+                dto.HardwareRequirements.LatencyPriority),
             OnboardedTime = dto.OnboardedTime.DateTime,
             LastStatusChange = dto.LastStatusChange,
             AppliedPolicies = dto.AppliedPolicies
