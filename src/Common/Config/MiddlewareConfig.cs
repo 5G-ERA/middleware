@@ -7,4 +7,5 @@ public class MiddlewareConfig
     public string Organization { get; init; }
     public string InstanceName { get; init; }
     public string InstanceType { get; init; }
+    public string Address { get; init; }
 }

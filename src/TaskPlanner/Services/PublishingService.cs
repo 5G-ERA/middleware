@@ -15,21 +15,28 @@ public class PublishingService : IPublishService
     private readonly IPublisher<ConnectRobotToSliceMessage> _connectRobotToSlicePublisher;
     private readonly IPublisher<DeployPlanMessage> _deployPlanPublisher;
     private readonly MiddlewareConfig _middlewareConfig;
+
+    private readonly IRequestResponseClient<RequestResourcePlanMessage, RequestResourcePlanMessage>
+        _requestResourcePlanClient;
+
     private readonly IPublisher<SwitchoverDeleteAction> _switchoverDeleteInstancePublisher;
     private readonly IPublisher<SwitchoverDeployAction> _switchoverDeployInstancePublisher;
+
 
     public PublishingService(IPublisher<DeployPlanMessage> deployPlanPublisher,
         IPublisher<SwitchoverDeleteAction> switchoverDeleteInstancePublisher,
         IPublisher<SwitchoverDeployAction> switchoverDeployInstancePublisher,
         IPublisher<ConnectRobotToSliceMessage> connectRobotToSlicePublisher,
         IOptions<MiddlewareConfig> middlewareConfig,
-        ICentralApiClient centralApiClient)
+        ICentralApiClient centralApiClient,
+        IRequestResponseClient<RequestResourcePlanMessage, RequestResourcePlanMessage> requestResourcePlanClient)
     {
         _deployPlanPublisher = deployPlanPublisher;
         _switchoverDeleteInstancePublisher = switchoverDeleteInstancePublisher;
         _switchoverDeployInstancePublisher = switchoverDeployInstancePublisher;
         _connectRobotToSlicePublisher = connectRobotToSlicePublisher;
         _centralApiClient = centralApiClient;
+        _requestResourcePlanClient = requestResourcePlanClient;
         _middlewareConfig = middlewareConfig.Value;
     }
 
@@ -113,5 +120,18 @@ public class PublishingService : IPublishService
             Location = loc
         };
         await _connectRobotToSlicePublisher.PublishAsync(payload);
+    }
+
+    /// <inheritdoc />
+    public async Task<RequestResourcePlanMessage> RequestResourcePlan(TaskModel task, RobotModel robot)
+    {
+        var payload = new RequestResourcePlanMessage
+        {
+            Task = task,
+            Robot = robot
+        };
+        var resp = await _requestResourcePlanClient.Request(payload);
+
+        return resp;
     }
 }

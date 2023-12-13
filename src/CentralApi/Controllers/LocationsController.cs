@@ -11,17 +11,16 @@ namespace Middleware.CentralApi.Controllers;
 
 [ApiController]
 [Route("api/v1/[controller]")]
-public class LocationsController : Controller
+public class LocationsController : ControllerBase
 {
+    private readonly ILocationRepository _locationRepository;
     private readonly ILocationService _locationService;
-    private readonly ICloudRepository _cloudRepository;
-    private readonly IEdgeRepository _edgeRepository;
 
-    public LocationsController(ILocationService locationService, ICloudRepository cloudRepository,IEdgeRepository edgeRepository)
+    public LocationsController(ILocationService locationService, ILocationRepository locationRepository)
+
     {
         _locationService = locationService;
-        _cloudRepository = cloudRepository;
-        _edgeRepository = edgeRepository;
+        _locationRepository = locationRepository;
     }
 
     // GET
@@ -32,9 +31,7 @@ public class LocationsController : Controller
     public async Task<IActionResult> GetAvailableLocations(string organization)
     {
         if (string.IsNullOrEmpty(organization))
-        {
-            return BadRequest(new ApiResponse((int)HttpStatusCode.BadRequest, $"Organization was not specified"));
-        }
+            return BadRequest(new ApiResponse((int)HttpStatusCode.BadRequest, "Organization was not specified"));
 
         var result = await _locationService.GetAvailableLocations(organization);
 
@@ -49,39 +46,22 @@ public class LocationsController : Controller
     [ProducesResponseType(typeof(CloudEdgeStatusResponse), (int)HttpStatusCode.OK)]
     [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.NotFound)]
     [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.BadRequest)]
-    public async Task<IActionResult> GetStatus(string location, Guid id )
+    public async Task<IActionResult> GetStatus(string? location, Guid id)
     {
         if (location == null)
+            return BadRequest("location parameter not specified");
+        try
         {
-            throw new ArgumentNullException(nameof(location));
+            var response = await _locationRepository.GetCloudOnlineStatusLastUpdatedTimeAsync(id);
+            return Ok(response);
         }
-        else
+        catch (ArgumentException argEx)
         {
-            try
-            {
-                CloudEdgeStatusResponse response;
-
-                if (location.ToLower() == "cloud")
-                {
-                    response = await _cloudRepository.GetCloudOnlineStatusLastUpdatedTimeAsync(id);
-                } else if (location.ToLower() == "edge")
-                {
-                    response = await _edgeRepository.GetEdgeOnlineStatusLastUpdatedTimeAsync(id);
-                } else
-                {
-                    return BadRequest();
-                }
-                return Ok(response);
-
-            }
-            catch (ArgumentException argEx)
-            {
-                return NotFound(argEx.Message);
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(ex.Message);
-            }
+            return NotFound(argEx.Message);
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(ex.Message);
         }
     }
 
@@ -91,28 +71,17 @@ public class LocationsController : Controller
     [ProducesResponseType((int)HttpStatusCode.OK)]
     [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.NotFound)]
     [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.BadRequest)]
-    public async Task<IActionResult> SetStatus([FromBody] CloudEdgeStatusRequest request, Guid id)
+    public async Task<IActionResult> SetStatus([FromBody] CloudEdgeStatusRequest? request, Guid id)
     {
-        if(request == null)
-        {
+        if (request == null)
             return BadRequest();
-        }
         try
         {
-            if (request.Type.ToLower() == "cloud")
-            {
-                await _cloudRepository.SetCloudOnlineStatusAsync(id, request.IsOnline);
-            }
-            else if (request.Type.ToLower() == "edge")
-            {
-                await _edgeRepository.SetEdgeOnlineStatusAsync(id, request.IsOnline);
-            } else
-            {
-                return BadRequest();
-            }
+            await _locationRepository.SetCloudOnlineStatusAsync(id, request.IsOnline);
+
             return Ok();
         }
-        catch(ArgumentException argEx)
+        catch (ArgumentException argEx)
         {
             return NotFound(argEx.Message);
         }

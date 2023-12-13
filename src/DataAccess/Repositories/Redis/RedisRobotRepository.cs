@@ -16,7 +16,7 @@ public class RedisRobotRepository : RedisRepository<RobotModel, RobotDto>, IRobo
     /// <param name="redisGraph"></param>
     /// <param name="logger"></param>
     public RedisRobotRepository(IRedisConnectionProvider provider, IRedisGraphClient redisGraph, ILogger logger) : base(
-        provider, redisGraph, false, logger)
+        provider, redisGraph, true, logger)
     {
     }
 

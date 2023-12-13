@@ -50,7 +50,9 @@ public static class ApiContractToDomainMapper
             VirtualRam = x.VirtualRam,
             DiskStorage = x.DiskStorage,
             LastUpdatedTime = DateTime.Now,
-            Organization = x.Organization
+            Organization = x.Organization,
+            Latency = x.Latency,
+            Throughput = x.Throughput
         };
     }
 
@@ -68,27 +70,15 @@ public static class ApiContractToDomainMapper
             Ram = x.Ram,
             VirtualRam = x.VirtualRam,
             DiskStorage = x.DiskStorage,
-            LastUpdatedTime = x.LastUpdatedTime
+            LastUpdatedTime = x.LastUpdatedTime,
+            Latency = x.Latency,
+            Throughput = x.Throughput
         };
     }
 
     public static List<CloudModel> ToCloudList(this GetCloudsResponse clouds)
     {
-        return clouds.Clouds.Select(x =>
-            new CloudModel
-            {
-                Id = x.Id,
-                Name = x.Name,
-                CloudIp = x.IpAddress,
-                MacAddress = x.MacAddress,
-                CloudStatus = x.Status,
-                Cpu = x.Cpu,
-                NumberOfCores = x.NumberOfCores,
-                Ram = x.Ram,
-                VirtualRam = x.VirtualRam,
-                DiskStorage = x.DiskStorage,
-                LastUpdatedTime = x.LastUpdatedTime
-            }).ToList();
+        return clouds.Clouds.Select(x => x.ToCloud()).ToList();
     }
 
     public static ContainerImageModel ToContainer(this ContainerRequest x)
@@ -117,16 +107,7 @@ public static class ApiContractToDomainMapper
 
     public static List<ContainerImageModel> ToContainersList(this GetContainersResponse containers)
     {
-        return containers.Containers.Select(x =>
-            new ContainerImageModel
-            {
-                Id = x.Id,
-                Name = x.Name,
-                Description = x.Description,
-                K8SDeployment = x.K8sDeployment,
-                K8SService = x.K8sService,
-                Timestamp = x.LastUpdateTime
-            }).ToList();
+        return containers.Containers.Select(x => x.ToContainer()).ToList();
     }
 
     public static EdgeModel ToEdge(this EdgeRequest x)
@@ -143,7 +124,9 @@ public static class ApiContractToDomainMapper
             VirtualRam = x.VirtualRam,
             DiskStorage = x.DiskStorage,
             LastUpdatedTime = DateTime.Now,
-            Organization = x.Organization
+            Organization = x.Organization,
+            Latency = x.Latency,
+            Throughput = x.Throughput
         };
     }
 
@@ -161,26 +144,15 @@ public static class ApiContractToDomainMapper
             Ram = x.Ram,
             VirtualRam = x.VirtualRam,
             DiskStorage = x.DiskStorage,
-            LastUpdatedTime = x.LastUpdatedTime
+            LastUpdatedTime = x.LastUpdatedTime,
+            Latency = x.Latency,
+            Throughput = x.Throughput
         };
     }
 
     public static List<EdgeModel> ToEdgeList(this GetEdgesResponse edges)
     {
-        return edges.Edges.Select(x => new EdgeModel
-        {
-            Id = x.Id,
-            Name = x.Name,
-            EdgeStatus = x.Status,
-            EdgeIp = x.IpAddress,
-            MacAddress = x.MacAddress,
-            Cpu = x.Cpu,
-            NumberOfCores = x.NumberOfCores,
-            Ram = x.Ram,
-            VirtualRam = x.VirtualRam,
-            DiskStorage = x.DiskStorage,
-            LastUpdatedTime = x.LastUpdatedTime
-        }).ToList();
+        return edges.Edges.Select(x => x.ToEdge()).ToList();
     }
 
     public static InstanceModel ToInstance(this InstanceRequest x)
@@ -449,7 +421,9 @@ public static class ApiContractToDomainMapper
             NumberOfCores = x.NumberOfCores,
             Ram = x.Ram,
             Status = x.Status,
-            VirtualRam = x.VirtualRam
+            VirtualRam = x.VirtualRam,
+            Latency = x.Latency,
+            Throughput = x.Throughput
         };
     }
 
@@ -467,7 +441,9 @@ public static class ApiContractToDomainMapper
             NumberOfCores = x.NumberOfCores,
             Ram = x.Ram,
             Status = x.Status,
-            VirtualRam = x.VirtualRam
+            VirtualRam = x.VirtualRam,
+            Latency = x.Latency,
+            Throughput = x.Throughput
         };
     }
 
@@ -485,7 +461,9 @@ public static class ApiContractToDomainMapper
             NumberOfCores = x.NumberOfCores,
             Ram = x.Ram,
             Status = x.Status,
-            VirtualRam = x.VirtualRam
+            VirtualRam = x.VirtualRam,
+            Latency = x.Latency,
+            Throughput = x.Throughput
         };
     }
 

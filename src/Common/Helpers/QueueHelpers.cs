@@ -4,7 +4,7 @@ using Middleware.Models.Enums;
 namespace Middleware.Common.Helpers;
 
 /// <summary>
-///     Class responsible for handling common
+///     Class responsible for handling common queue configurations
 /// </summary>
 public static class QueueHelpers
 {
@@ -131,5 +131,20 @@ public static class QueueHelpers
         if (string.IsNullOrWhiteSpace(organization)) throw new ArgumentNullException(nameof(instanceName));
 
         return GetQueueName(organization, instanceName, "slice-imsi-connect");
+    }
+
+    /// <summary>
+    ///     Constructs the resource planning queue name
+    /// </summary>
+    /// <param name="organization"></param>
+    /// <param name="instanceName"></param>
+    /// <returns></returns>
+    /// <exception cref="ArgumentNullException">When parameters are not specified or contain empty or whitespace string</exception>
+    public static string ConstructResourcePlanningServiceQueueName(string organization, string instanceName)
+    {
+        if (string.IsNullOrWhiteSpace(organization)) throw new ArgumentNullException(nameof(organization));
+        if (string.IsNullOrWhiteSpace(organization)) throw new ArgumentNullException(nameof(instanceName));
+
+        return GetQueueName(organization, instanceName, "resource-plan");
     }
 }

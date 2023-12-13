@@ -5,6 +5,9 @@ using Middleware.Models.Enums;
 
 namespace Middleware.Models.Domain;
 
+/// <summary>
+///     Definition of the edge, from version 0.8 used as a facade for <see cref="Location" />
+/// </summary>
 public class EdgeModel : BaseModel, ILocation
 {
     [JsonPropertyName("EdgeStatus")]
@@ -36,6 +39,9 @@ public class EdgeModel : BaseModel, ILocation
 
     [JsonPropertyName("IsOnline")]
     public bool IsOnline { get; set; }
+
+    public int? Throughput { get; init; }
+    public int? Latency { get; init; }
 
     [JsonPropertyName("Id")]
     public override Guid Id { get; set; } = Guid.NewGuid();

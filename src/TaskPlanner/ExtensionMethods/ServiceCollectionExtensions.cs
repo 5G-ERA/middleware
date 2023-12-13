@@ -1,5 +1,6 @@
 using MassTransit;
 using Middleware.Common.Config;
+using Middleware.Common.Helpers;
 using Middleware.Common.MessageContracts;
 using RabbitMQ.Client;
 
@@ -8,7 +9,7 @@ namespace Middleware.TaskPlanner.ExtensionMethods;
 public static class ServiceCollectionExtensions
 {
     public static IServiceCollection RegisterRabbitMqPublishers(this IServiceCollection services,
-        RabbitMqConfig mqConfig)
+        RabbitMqConfig mqConfig, MiddlewareConfig mwConfig)
     {
         services.AddMassTransit(x =>
         {
@@ -19,6 +20,7 @@ public static class ServiceCollectionExtensions
                     hostConfig.Username(mqConfig.User);
                     hostConfig.Password(mqConfig.Pass);
                 });
+
                 mqBusFactoryConfigurator.Send<DeployPlanMessage>(x =>
                 {
                     x.UseRoutingKeyFormatter(t => t.Message.DeploymentLocation);
@@ -63,6 +65,10 @@ public static class ServiceCollectionExtensions
 
                 mqBusFactoryConfigurator.ConfigureEndpoints(busRegistrationContext);
             });
+            var serviceAddress =
+                $"rabbitmq://{mqConfig.Address}/{QueueHelpers.ConstructResourcePlanningServiceQueueName(mwConfig.Organization, mwConfig.InstanceName)}";
+
+            x.AddRequestClient<RequestResourcePlanMessage>(new(serviceAddress), RequestTimeout.Default);
         });
         // MassTransit-RabbitMQ Configuration
         services.AddOptions<MassTransitHostOptions>()
