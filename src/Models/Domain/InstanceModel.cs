@@ -66,26 +66,6 @@ public class InstanceModel : BaseModel, IPolicyAssignable
 
 
     /// <summary>
-    ///     Onboarding validation of the instance data object.
-    /// </summary>
-    /// <returns>bool</returns>
-    public bool IsValid()
-    {
-        var rosDistroNames = Enum.GetNames(typeof(RosDistro)).ToList();
-
-        //if (string.IsNullOrWhiteSpace(Name)) return false;
-        if (RosVersion > 2) return false;
-        if (RosVersion == 0) return false;
-        if (string.IsNullOrEmpty(Ram.ToString())) return false;
-        //if (string.IsNullOrEmpty(MinimumNumCores.ToString())) return false;
-        if (string.IsNullOrEmpty(RosDistro)) return false;
-        if (string.IsNullOrEmpty(InstanceFamily)) return false;
-        if (!rosDistroNames.Contains(RosDistro)) return false;
-
-        return true;
-    }
-
-    /// <summary>
     ///     Can the instance be reused by multiple consumers
     /// </summary>
     /// <returns></returns>

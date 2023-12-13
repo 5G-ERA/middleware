@@ -25,6 +25,6 @@ public class InstanceResponse
     public RequirementResponse Latency { get; init; }
 
     public DateTime OnboardedTime { get; init; }
-    public IEnumerable<string>? Tags { get; init; } = Enumerable.Empty<string>();
+    public IEnumerable<string> Tags { get; init; } = Enumerable.Empty<string>();
     public IEnumerable<string> AppliedPolicies { get; init; } = Enumerable.Empty<string>();
 }
