@@ -2,9 +2,9 @@
 
 public class RelationToLocationRequest
 {
-    public Guid robotId { get; set; }
+    public Guid RobotId { get; set; }
 
-    public List<LocationNames> Locations { get; set; }
+    public List<LocationNames> Locations { get; set; } = new List<LocationNames>();
 }
 public class LocationNames
 {

@@ -1,4 +1,5 @@
 ﻿using System.Linq.Expressions;
+using Microsoft.IdentityModel.Tokens;
 using Middleware.Common.Enums;
 using Middleware.DataAccess.Repositories.Abstract;
 using Middleware.Models.Domain;
@@ -292,12 +293,12 @@ public class RedisRepository<TModel, TDto> : IRedisRepository<TModel, TDto> wher
 
         if (relationExist != null)
         {
-            if (relationExist.InitiatesFrom.Id == relation.InitiatesFrom.Id)
+            if (relationExist.InitiatesFrom.Id == relation.InitiatesFrom.Id && relationExist.PointsTo.Id == relation.PointsTo.Id)
             {
                 //Relation exist
                 // Update relation
 
-                string querySetAttributes = GetQueryAtributesToUpdate(relation);
+                string querySetAttributes = GetQueryAttributesToUpdate(relation);
 
                 var query = "MATCH (x: " + relation.InitiatesFrom.Type + " {ID: '" + relation.InitiatesFrom.Id +
                              "'})-[r: " + relation.RelationName + "]->(c: " + relation.PointsTo.Type +
@@ -354,7 +355,7 @@ public class RedisRepository<TModel, TDto> : IRedisRepository<TModel, TDto> wher
                 //Relation exist
                 // Update relation
 
-                string querySetAttributes = GetQueryAtributesToUpdate(relation);      
+                string querySetAttributes = GetQueryAttributesToUpdate(relation);      
 
                 var query = "MATCH (x: " + relation.InitiatesFrom.Type + " {ID: '" + relation.InitiatesFrom.Id +
                              "'})-[r: " + relation.RelationName + "]->(c: " + relation.PointsTo.Type +
@@ -384,7 +385,8 @@ public class RedisRepository<TModel, TDto> : IRedisRepository<TModel, TDto> wher
             queryAttributes = "{";
             foreach (KeyValuePair item in allAttributes)
             {
-                if (item.Key != null && item.Value != null && item.Key != string.Empty && item.Value != string.Empty)
+                if (item.Value != null)
+                if (!string.IsNullOrEmpty(item.Key) && !string.IsNullOrEmpty(item.Value.ToString()))
                 {
                     queryAttributes += item.Key + ":'" + item.Value + "',";
                     atLeastOneValidAttribute = true;
@@ -400,7 +402,7 @@ public class RedisRepository<TModel, TDto> : IRedisRepository<TModel, TDto> wher
         }
         return queryAttributes;
     }
-    private string GetQueryAtributesToUpdate(RelationModel relation)
+    private string GetQueryAttributesToUpdate(RelationModel relation)
     {
         var allAttributes = relation.RelationAttributes;
         string queryAttributes = "";
@@ -511,49 +513,10 @@ public class RedisRepository<TModel, TDto> : IRedisRepository<TModel, TDto> wher
         return resultSet != null && resultSet.Results.Count > 0;
     }
 
-    private List<RelationModel> ExtractRelations(ResultSet resultSet, string relationName)
-    {
-        var relationModels = new List<RelationModel>();
-        // BB: 24.03.2022
-        // We are using the loop with 2 nested loops to retrieve the values from the graph
-        // The values are structured in the following way:
-        // First result contains the information about the objects that the relation initiates from
-        // Second results contains the information about the objects that the relation is pointing to
-        // This structure will be universal for the explanation of all the queries on the redis graph
-
-        for (var i = 0; i < resultSet.Results.Count; i++)
-        {
-            var res = resultSet.Results.ElementAt(i);
-            if (i % 2 == 0)
-            {
-                foreach (var node in res.Value)
-                {
-                    var relationModel = new RelationModel
-                    {
-                        RelationName = relationName
-                    };
-                    if (node is Node nd) SetGraphModelValues(relationModel.InitiatesFrom, nd);
-
-                    relationModels.Add(relationModel);
-                }
-            }
-            else
-            {
-                foreach (var node in res.Value)
-                {
-                    var idxTmp = res.Value.IndexOf(node);
-                    var relationModel = relationModels[idxTmp];
-                    if (node is Node nd) SetGraphModelValues(relationModel.PointsTo, nd);
-                }
-            }
-        }
-        return relationModels;
-    }
-
     private List<RelationModel> ExtractFullRelation(ResultSet resultSet, string relationName)
     {
         var relationModels = new List<RelationModel>();
-        // BB: 12.12.2023
+        // BB: 24.03.2022; updated: 12.12.2023
         // example of query in order to work correctly
         // var query33 = "MATCH (x:ROBOT)-[r:CAN_REACH]->(y:LOCATION) RETURN x,y,r";
         // We are using the loop with 3 nested loops to retrieve the values from the graph

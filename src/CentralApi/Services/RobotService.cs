@@ -26,7 +26,7 @@ public class RobotService : IRobotService
     {
         List<LocationNames> relGraph2s = data.Locations;
         // check if name of robot can be retreived
-        var robotName = await GetRobotNameByIdAsync(data.robotId);
+        var robotName = await GetRobotNameByIdAsync(data.RobotId);
         if (robotName == null)
             throw new ArgumentNullException(nameof(robotName));
         
@@ -35,7 +35,7 @@ public class RobotService : IRobotService
         List<RelationModel> availableRrelations = new();
         var relationName = "CAN_REACH";
 
-        availableRrelations = await _robotRepository.GetRelation(data.robotId, relationName);
+        availableRrelations = await _robotRepository.GetRelation(data.RobotId, relationName);
 
         foreach (LocationNames relGraph2 in relGraph2s)
         {
@@ -43,8 +43,7 @@ public class RobotService : IRobotService
             {
                 var organisationName = relGraph2.OrganisationName;
                 var locationName = relGraph2.LocationName;
-
-                if (organisationName != null && organisationName != string.Empty && locationName != null && locationName != string.Empty)
+                if (!string.IsNullOrEmpty(organisationName) && !string.IsNullOrEmpty(locationName))
                 {
                     try
                     {
@@ -55,7 +54,7 @@ public class RobotService : IRobotService
 
                             RelationModel model = new();
                             model.RelationName = relationName;
-                            model.InitiatesFrom.Id = data.robotId;
+                            model.InitiatesFrom.Id = data.RobotId;
                             // need revisel; InitiatesFrom.Type name is HARDCODED
                             model.InitiatesFrom.Type = "ROBOT";
                             model.InitiatesFrom.Name = robotName;
@@ -92,8 +91,8 @@ public class RobotService : IRobotService
                     }
                     catch (Exception ex)
                     {
-                        _logger.LogError(ex, "An error occurred: for Location {locationName} with organisation {organisationName} and robot id {data.robotId}; error: ", locationName, organisationName, data.robotId);
-                        var exceptionError = "An error occurred: for Location" +  locationName.ToString() + " with organisation " + organisationName.ToString() + " and robot id: " + data.robotId.ToString() + " error: " + ex.ToString();
+                        _logger.LogError(ex, "An error occurred: for Location {locationName} with organisation {organisationName} and robot id {data.robotId}; error: ", locationName, organisationName, data.RobotId);
+                        var exceptionError = "An error occurred: for Location" +  locationName.ToString() + " with organisation " + organisationName.ToString() + " and robot id: " + data.RobotId.ToString() + " error: " + ex.ToString();
 
                         errorsList.Append(exceptionError);
                     }
@@ -109,7 +108,7 @@ public class RobotService : IRobotService
         List<LocationNames> allLocations = data.Locations;
 
         // check if name of robot can be retreived
-        var robotName = await GetRobotNameByIdAsync(data.robotId);
+        var robotName = await GetRobotNameByIdAsync(data.RobotId);
         if (robotName == null)
             throw new ArgumentNullException(nameof(robotName));
         List<string> errorsList = new();
@@ -118,44 +117,41 @@ public class RobotService : IRobotService
 
         foreach (LocationNames localLocation in allLocations)
         {
-            if (localLocation != null)
+            var organisationName = localLocation.OrganisationName;
+            var locationName = localLocation.LocationName;
+
+            if (!string.IsNullOrEmpty(organisationName) && !string.IsNullOrEmpty(locationName))
             {
-                var organisationName = localLocation.OrganisationName;
-                var locationName = localLocation.LocationName;
-
-                if (organisationName != null && locationName != null)
+                try
                 {
-                    try
+                    Location? location = await _locationRepository.GetSingleLocationByOrganizationAndNameAsync(organisationName, locationName);
+                    if (location != null)
                     {
-                        Location? location = await _locationRepository.GetSingleLocationByOrganizationAndNameAsync(organisationName, locationName);
-                        if (location != null)
-                        {
-                            RelationModel model = new();
-                            model.RelationName = relationName;
-                            model.InitiatesFrom.Id = data.robotId;
-                            model.InitiatesFrom.Type = "ROBOT";
-                            model.InitiatesFrom.Name = robotName;
+                        RelationModel model = new();
+                        model.RelationName = relationName;
+                        model.InitiatesFrom.Id = data.RobotId;
+                        model.InitiatesFrom.Type = "ROBOT";
+                        model.InitiatesFrom.Name = robotName;
 
-                            model.PointsTo.Id = location.Id;
-                            model.PointsTo.Type = "LOCATION";
-                            model.PointsTo.Name = location.Name;
+                        model.PointsTo.Id = location.Id;
+                        model.PointsTo.Type = "LOCATION";
+                        model.PointsTo.Name = location.Name;
 
-                            DeleteRelationAsync(model);
-                        }
-                        else
-                        {
-                            _logger.LogWarning("Location {locationName} with organisation {organisationName} not found!", locationName, organisationName);
-                        }
+                        DeleteRelationAsync(model);
                     }
-                    catch (Exception ex)
+                    else
                     {
-                        _logger.LogError(ex, "An error occurred for deleteing Location {locationName} with organisation {organisationName} and robot id {data.robotId}; error: ", locationName, organisationName, data.robotId);
-                        var exceptionError = "An error occurred for deleteing Location" + locationName.ToString() + " with organisation " + organisationName.ToString() + " and robot id: " + data.robotId.ToString() + " error: " + ex.ToString();
-
-                        errorsList.Append(exceptionError);
+                        _logger.LogWarning("Location {locationName} with organisation {organisationName} not found!", locationName, organisationName);
                     }
                 }
-            }
+                catch (Exception ex)
+                {
+                    _logger.LogError(ex, "An error occurred for deleteing Location {locationName} with organisation {organisationName} and robot id {data.robotId}; error: ", locationName, organisationName, data.RobotId);
+                    var exceptionError = "An error occurred for deleteing Location" + locationName.ToString() + " with organisation " + organisationName.ToString() + " and robot id: " + data.RobotId.ToString() + " error: " + ex.ToString();
+
+                    errorsList.Append(exceptionError);
+                }
+            }            
         }
         return errorsList;
     }
