@@ -1,5 +1,6 @@
 ﻿using Middleware.Models.Domain;
 using Middleware.Models.Dto.Hardware;
+using Middleware.Models.Enums;
 using Redis.OM.Modeling;
 
 namespace Middleware.Models.Dto;
@@ -40,6 +41,13 @@ public class LocationDto : Dto
     [Indexed]
     public bool IsOnline { get; set; }
 
+    [Indexed]
+    public int? Throughput { get; set; }
+
+    [Indexed]
+    public int? Latency { get; set; }
+
+
     /// <inheritdoc />
     public override BaseModel ToModel()
     {
@@ -58,7 +66,10 @@ public class LocationDto : Dto
             Ram = dto.HardwareSpec.Ram,
             MacAddress = dto.MacAddress,
             LastUpdatedTime = dto.LastUpdatedTime.DateTime,
-            IsOnline = dto.IsOnline
+            IsOnline = dto.IsOnline,
+            Type = Enum.Parse<LocationType>(dto.Type),
+            Latency = dto.Latency,
+            Throughput = dto.Throughput
         };
     }
 }

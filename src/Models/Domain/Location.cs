@@ -15,6 +15,17 @@ public class Location : BaseModel, ILocation
     public string? MacAddress { get; set; }
     public DateTime LastUpdatedTime { get; set; }
     public bool IsOnline { get; set; }
+
+    /// <summary>
+    ///     Available Throughput in Mb/s
+    /// </summary>
+    public int? Throughput { get; set; }
+
+    /// <summary>
+    ///     Expected Latency to the Location expressed in ms
+    /// </summary>
+    public int? Latency { get; set; }
+
     public override Guid Id { get; set; } = Guid.NewGuid();
     public LocationType Type { get; set; }
 
@@ -69,7 +80,9 @@ public class Location : BaseModel, ILocation
             },
             MacAddress = domain.MacAddress,
             LastUpdatedTime = domain.LastUpdatedTime == default ? DateTimeOffset.Now : domain.LastUpdatedTime,
-            IsOnline = domain.IsOnline
+            IsOnline = domain.IsOnline,
+            Latency = domain.Latency,
+            Throughput = domain.Throughput
         };
     }
 }

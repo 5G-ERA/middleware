@@ -86,26 +86,36 @@ internal class DeploymentService : IDeploymentService
     public async Task<bool> DeletePlanAsync(ActionPlanModel actionPlan)
     {
         var retVal = true;
-        var location = await GetCurrentLocationAsync();
         try
         {
             foreach (var action in actionPlan.ActionSequence!)
             {
+                var relayShouldBeDeleted = true;
+                var actionLoc =
+                    await GetLocationAsync(Enum.Parse<LocationType>(action.PlacementType!), action.Placement);
+
                 foreach (var srv in action.Services)
                 {
+                    if (srv.IsReusable is not null && srv.IsReusable!.Value &&
+                        await IsServiceUsedInOtherActionPlans(actionPlan.Id, srv.ServiceInstanceId))
+                    {
+                        relayShouldBeDeleted = false;
+                        continue;
+                    }
+
                     retVal &= await TerminateNetAppByIdAsync(srv.ServiceInstanceId);
 
                     if (ShouldDeployInterRelay(srv, action) == false)
                     {
-                        await _publisher.PublishGatewayDeleteNetAppEntryAsync(location, srv.Name, actionPlan.Id,
+                        await _publisher.PublishGatewayDeleteNetAppEntryAsync(actionLoc, srv.Name, actionPlan.Id,
                             srv.ServiceInstanceId);
                     }
                 }
 
-                if (action.ShouldUseInterRelayForRosNetApps())
+                if (relayShouldBeDeleted && action.ShouldUseInterRelayForRosNetApps())
                 {
                     var deletedRelayName = await TerminateInterRelayNetApp(actionPlan.Id, action.Id);
-                    await _publisher.PublishGatewayDeleteNetAppEntryAsync(location, deletedRelayName, actionPlan.Id,
+                    await _publisher.PublishGatewayDeleteNetAppEntryAsync(actionLoc, deletedRelayName, actionPlan.Id,
                         action.Id);
                 }
             }
@@ -347,6 +357,20 @@ internal class DeploymentService : IDeploymentService
         return isSuccess;
     }
 
+    private async Task<bool> IsServiceUsedInOtherActionPlans(Guid actionPlanId, Guid serviceInstanceId)
+    {
+        var actionPlans = await _redisInterfaceClient.ActionPlanGetAllAsync();
+
+        if (actionPlans is null) return true;
+
+        // select all instances from all action plans except of current one
+        var filtered = actionPlans.Where(a => a.Id != actionPlanId)
+            .SelectMany(a => a.ActionSequence!.SelectMany(x => x.Services))
+            .Where(i => i.ServiceInstanceId == serviceInstanceId).ToList();
+
+        return filtered.Count > 0;
+    }
+
     private static bool ShouldDeployInterRelay(InstanceModel instance, ActionModel action)
     {
         return string.IsNullOrWhiteSpace(instance.RosDistro) == false && action.SingleNetAppEntryPoint;
@@ -436,6 +460,15 @@ internal class DeploymentService : IDeploymentService
         return _mwConfig.Value.InstanceType.ToLower() == "cloud"
             ? (await _redisInterfaceClient.GetCloudByNameAsync(_mwConfig.Value.InstanceName)).ToCloud()
             : (await _redisInterfaceClient.GetEdgeByNameAsync(_mwConfig.Value.InstanceName)).ToEdge();
+    }
+
+    private async Task<ILocation> GetLocationAsync(LocationType type, string name)
+    {
+        _logger.LogDebug("Retrieving location details (cloud or edge) for type {type}, name: {name}", type.ToString(),
+            name);
+        return type == LocationType.Cloud
+            ? (await _redisInterfaceClient.GetCloudByNameAsync(name)).ToCloud()
+            : (await _redisInterfaceClient.GetEdgeByNameAsync(name)).ToEdge();
     }
 
     /// <summary>

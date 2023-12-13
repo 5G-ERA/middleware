@@ -17,6 +17,8 @@ public class LocationResponse
     public long? VirtualRam { get; init; }
     public long? DiskStorage { get; init; }
     public DateTime LastUpdatedTime { get; init; }
+    public int? Throughput { get; init; }
+    public int? Latency { get; init; }
     public IEnumerable<SliceResponse> Slices { get; init; } = Enumerable.Empty<SliceResponse>();
 }
 

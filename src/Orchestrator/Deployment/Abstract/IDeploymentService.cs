@@ -24,7 +24,7 @@ public interface IDeploymentService
     V1Service CreateStartupService(string serviceImageName, K8SServiceKind kind, V1ObjectMeta meta);
 
     /// <summary>
-    ///     Deletes the resources instantiated by the specified Action Plan
+    ///     Deletes the ActionPlan and resources instantiated by the specified ActionPlan if not used by other ActionPlans
     /// </summary>
     /// <param name="actionPlan">Action Plan to be deleted</param>
     /// <returns>Has the operation succeeded</returns>

@@ -23,7 +23,7 @@ public class FullActionResponse
     public bool SingleNetAppEntryPoint { get; init; }
     public IEnumerable<string> Tags { get; init; } = Enumerable.Empty<string>();
 
-    public IEnumerable<FullInstanceResponse> Instances { get; init; }
+    public IEnumerable<FullInstanceResponse> Services { get; init; }
 }
 
 public class FullInstanceResponse

@@ -1,4 +1,7 @@
-﻿FROM mcr.microsoft.com/dotnet/aspnet:6.0 AS base
+FROM mcr.microsoft.com/dotnet/aspnet:6.0 AS base
+# curl is used for healthchecks in the dev environment
+RUN apt update
+RUN apt install -y curl
 WORKDIR /app
 EXPOSE 80
 EXPOSE 443
@@ -15,6 +18,7 @@ FROM build AS publish
 RUN dotnet publish "CentralApi.csproj" -c Release -o /app/publish 
 
 FROM base AS final
+
 ARG AWS_KEY_ID
 ARG AWS_SECRET_KEY
 WORKDIR /app
