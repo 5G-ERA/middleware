@@ -3,6 +3,7 @@ using Middleware.CentralApi.Services;
 using Middleware.Common.ExtensionMethods;
 using Middleware.DataAccess.ExtensionMethods;
 using Middleware.CentralApi.Services.Abstract;
+using Middleware.DataAccess.HostedServices;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -16,7 +17,8 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-//builder.Services.AddHostedService<IndexCreationService>();
+if (builder.Environment.IsDevelopment() == false)
+    builder.Services.AddHostedService<IndexCreationService>();
 
 builder.Services.RegisterCentralApiRepositories();
 builder.Services.AddScoped<IRobotService, RobotService>();
