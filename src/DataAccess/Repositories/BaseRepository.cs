@@ -352,6 +352,21 @@ namespace Middleware.DataAccess.Repositories
         }
 
         /// <summary>
+        /// Creating a new relation between two models
+        /// </summary>
+        /// <param name="relation"></param>
+        /// <returns></returns>
+        public virtual async Task<bool> UpdateRelationAsync(RelationModel relation)
+        {
+            string query = "MATCH (x: " + relation.InitiatesFrom.Type + " {ID: '" + relation.InitiatesFrom.Id +
+                           "'}), (c: " + relation.PointsTo.Type + " {ID: '" + relation.PointsTo.Id +
+                           "'}) MERGE  (x)-[:" + relation.RelationName + "]->(c) ";
+            ResultSet resultSet = await RedisGraph.Query(GraphName, query);
+
+            return (resultSet != null) && (resultSet.Metrics.RelationshipsCreated == 1);
+        }
+        
+        /// <summary>
         /// Removing a model from RedisGraph db
         /// </summary>
         /// <param name="model"></param>
@@ -404,6 +419,9 @@ namespace Middleware.DataAccess.Repositories
             throw new NotImplementedException();
         }
 
-
+        public Task<List<RelationModel>> GetRelationsWithName(string relationName)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

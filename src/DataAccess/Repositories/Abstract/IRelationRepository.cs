@@ -21,8 +21,17 @@ namespace Middleware.DataAccess.Repositories.Abstract
         /// <returns></returns>
         Task<List<RelationModel>> GetRelations(Guid id, List<string> relationNames);
 
+        /// <summary>
+        /// Get relations for the objects only by the name of the relations
+        /// </summary>
+        /// <param name="relationName">Name of the relations</param>
+        /// <returns></returns>
+        Task<List<RelationModel>> GetRelationsWithName(string relationName);
+
         Task<bool> AddGraphAsync(GraphEntityModel model);
         Task<bool> AddRelationAsync(RelationModel relation);
+        Task<bool> UpdateRelationAsync(RelationModel relation);
+        
 
         Task<bool> DeleteGraphModelAsync(GraphEntityModel model);
 
