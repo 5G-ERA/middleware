@@ -72,7 +72,9 @@ public class InstanceDto : Dto
         {
             Id = Guid.Parse(dto.Id.Replace(Prefix, "")),
             Name = dto.Name!,
-            ServiceInstanceId = Guid.Parse(dto.ServiceInstanceId),
+            ServiceInstanceId = string.IsNullOrEmpty(dto.ServiceInstanceId)
+                ? Guid.Empty
+                : Guid.Parse(dto.ServiceInstanceId),
             ServiceType = dto.ServiceType,
             IsReusable = dto.IsReusable,
             DesiredStatus = dto.DesiredStatus,

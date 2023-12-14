@@ -12,7 +12,7 @@ public class LocationDto : Dto
 
     [Indexed]
     [RedisIdField]
-    public override string Id { get; set; }
+    public override string Id { get; set; } = default!;
 
     [Indexed]
     public string? Name { get; set; }
@@ -27,10 +27,10 @@ public class LocationDto : Dto
     public string? Status { get; set; }
 
     [Indexed]
-    public Uri Address { get; set; }
+    public Uri Address { get; set; } = default!;
 
     [Indexed]
-    public HardwareSpec HardwareSpec { get; set; }
+    public HardwareSpec? HardwareSpec { get; set; }
 
     [Indexed]
     public string? MacAddress { get; set; }
@@ -55,15 +55,15 @@ public class LocationDto : Dto
         return new Location
         {
             Id = Guid.Parse(dto.Id!.Replace(Prefix, "")),
-            Name = dto.Name,
+            Name = dto.Name!,
             Organization = dto.Organization,
-            Status = dto.Status,
+            Status = dto.Status!,
             Address = dto.Address,
-            NumberOfCores = dto.HardwareSpec.NumberCores,
-            DiskStorage = dto.HardwareSpec.StorageDisk,
-            VirtualRam = dto.HardwareSpec.VirtualRam,
-            Cpu = dto.HardwareSpec.Cpu,
-            Ram = dto.HardwareSpec.Ram,
+            NumberOfCores = dto.HardwareSpec?.NumberCores,
+            DiskStorage = dto.HardwareSpec?.StorageDisk,
+            VirtualRam = dto.HardwareSpec?.VirtualRam,
+            Cpu = dto.HardwareSpec?.Cpu,
+            Ram = dto.HardwareSpec?.Ram,
             MacAddress = dto.MacAddress,
             LastUpdatedTime = dto.LastUpdatedTime.DateTime,
             IsOnline = dto.IsOnline,

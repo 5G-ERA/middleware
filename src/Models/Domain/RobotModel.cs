@@ -118,7 +118,7 @@ public class RobotModel : BaseModel
         if (!valLocomotionSystemsEnum.Contains(LocomotionSystem)) return false;
 
         //Check sensors validity
-        if (Sensors.Any())
+        if (Sensors is not null && Sensors.Any())
         {
             var valSensorTypeEnum = Enum.GetNames(typeof(SensorType)).ToList();
             foreach (var sensor in Sensors)
@@ -133,7 +133,7 @@ public class RobotModel : BaseModel
         }
 
         //Check actuators validity
-        if (Actuators.Any())
+        if (Actuators is not null && Actuators.Any())
         {
             var valActuatorTypesEnum = Enum.GetNames(typeof(RobotActuatorType)).ToList();
             foreach (var actuator in Actuators)
@@ -145,7 +145,7 @@ public class RobotModel : BaseModel
         }
 
         //Check Manipulators validity
-        if (Manipulators.Any())
+        if (Manipulators is not null && Manipulators.Any())
         {
             var valActuatorTypesEnum = Enum.GetNames(typeof(RobotActuatorType)).ToList();
             foreach (var manipulator in Manipulators)
@@ -163,11 +163,12 @@ public class RobotModel : BaseModel
     /// <summary>
     ///     Get all topics of a robot in a single list.
     /// </summary>
-    /// <param name="nodes"></param>
     /// <returns></returns>
     public HashSet<RosTopicModel> GetAllRobotTopics()
     {
         var topics = new HashSet<RosTopicModel>();
+        if (ROSNodes is null) return topics;
+
         foreach (var node in ROSNodes)
         {
             foreach (var pubTopic in node.Publications)

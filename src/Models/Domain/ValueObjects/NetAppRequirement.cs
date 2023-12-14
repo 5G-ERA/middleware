@@ -4,6 +4,8 @@ namespace Middleware.Models.Domain.ValueObjects;
 
 public class NetAppRequirement
 {
+    private ResourcePriority _priority;
+
     /// <summary>
     ///     Value for the minimal requirement for the resource from the NetApp
     /// </summary>
@@ -17,7 +19,11 @@ public class NetAppRequirement
     /// <summary>
     ///     Priority describing how important
     /// </summary>
-    public ResourcePriority Priority { get; set; }
+    public ResourcePriority Priority
+    {
+        get => (int)_priority == 0 ? ResourcePriority.Low : _priority;
+        set => _priority = value;
+    }
 
     /// <summary>
     ///     Are values ordered in Ascending order
@@ -46,5 +52,10 @@ public class NetAppRequirement
         if (optimal != null) Optimal = optimal.Value;
         if (priority != null) Priority = Enum.Parse<ResourcePriority>(priority);
         Ascending = ascending;
+    }
+
+    public bool IsValid()
+    {
+        return Minimal != default;
     }
 }
