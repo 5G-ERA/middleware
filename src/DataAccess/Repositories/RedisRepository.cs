@@ -284,7 +284,7 @@ public class RedisRepository<TModel, TDto> : IRedisRepository<TModel, TDto> wher
         }
         catch (Exception)
         {
-            // do nothing, it still ads it :/   
+            // do nothing, it still adds it :/   
             return true;
         }
     }

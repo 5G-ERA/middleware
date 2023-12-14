@@ -7,10 +7,10 @@ namespace Middleware.Models.Dto.Ros;
 public class Actuator
 {
     [Indexed]
-    public string? Name { get; set; }
+    public string Name { get; set; } = default!;
 
     [Indexed]
-    public string? Type { get; set; }
+    public string Type { get; set; } = default!;
 
     [Indexed(Sortable = true)]
     public int Number { get; set; }
@@ -21,7 +21,7 @@ public class Actuator
     public ActuatorModel ToModel()
     {
         var dto = this;
-        return new ActuatorModel()
+        return new()
         {
             Name = dto.Name,
             Type = dto.Type,

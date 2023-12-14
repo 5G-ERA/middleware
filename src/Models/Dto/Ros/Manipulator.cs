@@ -6,13 +6,13 @@ namespace Middleware.Models.Dto.Ros;
 public class Manipulator
 {
     /// <summary>
-    /// Actuator Name
+    ///     Actuator Name
     /// </summary>
     [Indexed]
-    public string? ActuatorName { get; set; }
+    public string ActuatorName { get; set; } = default!;
 
     /// <summary>
-    /// Degrees of freedom
+    ///     Degrees of freedom
     /// </summary>
     [Indexed]
     public int Dof { get; set; }
@@ -23,7 +23,7 @@ public class Manipulator
     public ManipulatorModel ToModel()
     {
         var dto = this;
-        return new ManipulatorModel()
+        return new()
         {
             ActuatorName = dto.ActuatorName,
             Dof = dto.Dof,

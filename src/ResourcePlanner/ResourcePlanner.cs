@@ -264,7 +264,7 @@ internal class ResourcePlanner : IResourcePlanner
                     // Check with BB
                 {
                     cloudsThatMeetNetAppRequirementsTotal.AddRange(freeClouds
-                        .Where(cloud => cloud.NumberOfCores <= instance.MinimumNumCores &&
+                        .Where(cloud => cloud.NumberOfCores <= instance.NumberOfCores.Minimal &&
                                         cloud.Ram <= actionParam.MinimumRam)
                         .ToList());
                 }

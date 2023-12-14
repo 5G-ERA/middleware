@@ -12,7 +12,7 @@ public class RedisInstanceRepository : RedisRepository<InstanceModel, InstanceDt
     /// <summary>
     ///     Default constructor
     /// </summary>
-    /// <param name="redisClient"></param>
+    /// <param name="provider"></param>
     /// <param name="redisGraph"></param>
     /// <param name="logger"></param>
     public RedisInstanceRepository(IRedisConnectionProvider provider, IRedisGraphClient redisGraph, ILogger logger) :
@@ -21,7 +21,7 @@ public class RedisInstanceRepository : RedisRepository<InstanceModel, InstanceDt
     }
 
     /// <summary>
-    ///     Patching properties for InstaceModel
+    ///     Patching properties for InstanceModel
     /// </summary>
     /// <param name="id"></param>
     /// <param name="patch"></param>
@@ -36,18 +36,18 @@ public class RedisInstanceRepository : RedisRepository<InstanceModel, InstanceDt
         if (!string.IsNullOrEmpty(patch.DesiredStatus)) currentModel.DesiredStatus = patch.DesiredStatus;
         if (patch.ServiceUrl != null && Uri.IsWellFormedUriString(patch.ServiceUrl, UriKind.RelativeOrAbsolute))
             currentModel.ServiceUrl = patch.ServiceUrl;
-        if (patch.RosTopicsPub != null) currentModel.RosTopicsPub = patch.RosTopicsPub;
-        if (patch.RosTopicsSub != null) currentModel.RosTopicsSub = patch.RosTopicsSub;
+        if (patch.RosTopicsPub.Any()) currentModel.RosTopicsPub = patch.RosTopicsPub;
+        if (patch.RosTopicsSub.Any()) currentModel.RosTopicsSub = patch.RosTopicsSub;
         if (!string.IsNullOrEmpty(patch.RosVersion.ToString())) currentModel.RosVersion = patch.RosVersion;
         if (!string.IsNullOrEmpty(patch.RosDistro)) currentModel.RosDistro = patch.RosDistro;
         if (patch.Tags != null) currentModel.Tags = patch.Tags;
         if (!string.IsNullOrEmpty(patch.InstanceFamily)) currentModel.InstanceFamily = patch.InstanceFamily;
         if (!string.IsNullOrEmpty(patch.SuccessRate.ToString())) currentModel.SuccessRate = patch.SuccessRate;
         if (patch.ContainerImage != null) currentModel.ContainerImage = patch.ContainerImage;
-        if (!string.IsNullOrEmpty(patch.MinimumRam.ToString())) currentModel.MinimumRam = patch.MinimumRam;
-        if (!string.IsNullOrEmpty(patch.MinimumNumCores.ToString()))
-            currentModel.MinimumNumCores = patch.MinimumNumCores;
-        if (!string.IsNullOrEmpty(patch.OnboardedTime.ToString())) currentModel.OnboardedTime = patch.OnboardedTime;
+        //if (!string.IsNullOrEmpty(patch.Ram.ToString())) currentModel.Ram = patch.Ram;
+        //if (!string.IsNullOrEmpty(patch.NumberOfCores.ToString()))
+        //currentModel.MinimumNumCores = patch.MinimumNumCores;
+        //if (!string.IsNullOrEmpty(patch.OnboardedTime.ToString())) currentModel.OnboardedTime = patch.OnboardedTime;
         await UpdateAsync(currentModel);
         return currentModel;
     }
@@ -56,21 +56,22 @@ public class RedisInstanceRepository : RedisRepository<InstanceModel, InstanceDt
     ///     Return alternative instance to the provided instance.
     ///     It will be of the same family and comply with previous ROS versions.
     /// </summary>
-    /// <param name="instance"></param>
+    /// <param name="instanceId"></param>
     /// <returns>InstanceModel</returns>
     public async Task<InstanceModel?> FindAlternativeInstance(Guid instanceId)
     {
         var instance = await GetByIdAsync(instanceId);
-
+        if (instance is null) return null;
         var instanceCandidatesFinal = new List<InstanceModel>();
-        var PotentialInstanceCandidates = await GetAllAsync();
-        foreach (var instanceCandidate in PotentialInstanceCandidates)
+        var potentialInstanceCandidates = await GetAllAsync();
+        foreach (var instanceCandidate in potentialInstanceCandidates)
         {
             if (instanceCandidate.Id != instance.Id)
             {
                 if (instanceCandidate.InstanceFamily == instance.InstanceFamily &&
                     instanceCandidate.RosDistro == instance.RosDistro &&
-                    instanceCandidate.RosVersion == instance.RosVersion) instanceCandidatesFinal.Add(instanceCandidate);
+                    instanceCandidate.RosVersion == instance.RosVersion)
+                    instanceCandidatesFinal.Add(instanceCandidate);
             }
         }
 
