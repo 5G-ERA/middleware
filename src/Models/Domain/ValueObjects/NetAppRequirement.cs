@@ -30,6 +30,10 @@ public class NetAppRequirement
     /// </summary>
     public bool Ascending { get; set; }
 
+    public NetAppRequirement()
+    {
+    }
+
     public NetAppRequirement(long minimal, long optimal, ResourcePriority priority, bool ascending = true)
     {
         Minimal = minimal;
