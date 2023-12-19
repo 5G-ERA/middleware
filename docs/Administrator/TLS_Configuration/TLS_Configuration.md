@@ -203,11 +203,23 @@ ingress-central-api   nginx   central-api.5gera.net   172.20.190.113   80      1
 There are multiple ways in which one can obtain the TLS certificate through the cert-manager issuer, for this tutorial we will create a new aws user, an access key ID, and new policy for aws route 53.
 
 ### 1. AWS User:
+Follow the link below to create a new user:
+```
+https://docs.aws.amazon.com/IAM/latest/UserGuide/id_users_create.html
+```
 
 ### 2. AWS access key ID:
+Follow the link below to create a new access key ID:
+```
+https://docs.aws.amazon.com/IAM/latest/UserGuide/id_credentials_access-keys.html
+```
 
 ### 3. AWS Policy:
-
+Follow the link below to create a new policy:
+```
+https://docs.aws.amazon.com/IAM/latest/UserGuide/access_policies_create-console.html
+```
+Use the following json template for your new policy:
 ```
 {
     "Version": "2012-10-17",
@@ -234,10 +246,14 @@ There are multiple ways in which one can obtain the TLS certificate through the 
 }
 ```
 ### 4. Attach policy to the user
+Follow the link below to attach the policy to the user:
+```
+https://docs.aws.amazon.com/apigateway/latest/developerguide/api-gateway-create-and-attach-iam-policy.html
+```
 
 ### 5. Cert Manager ClusterIssuer:
 The issuer for cert-manager has been implemented as `ClusterIssuer` and had to be deployed in the same namespace as the `cert-manager`. When obtaining the TLS certificate, Lets Encrypt has to check the ownership of the domain, cert-manager will create a challenge based on the configuration that is provided in the issuer to fulfill the ownership check with Lets Encrypt.\
-Create the ClusterIssuer in a `cluster-issuer.yaml` as below:
+Create the ClusterIssuer in a `cluster-issuer.yaml` as below, using the credentials created in the previous steps:
 ```
 apiVersion: cert-manager.io/v1
 kind: ClusterIssuer
