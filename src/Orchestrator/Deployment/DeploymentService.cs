@@ -84,31 +84,6 @@ internal class DeploymentService : IDeploymentService
         var retVal = true;
         try
         {
-            //Delete the LOCATED_AT relationships between instance and edge/cloud.
-            // TODO: refactor so RedisInterfaceClient can take ILocation as parameter to adding the relation
-            var actionTempList = actionPlan.ActionSequence;
-            foreach (var action in actionTempList!)
-            {
-                BaseModel placement;
-                if (action.PlacementType!.ToUpper().Contains("CLOUD"))
-                {
-                    var cloud = (await _redisInterfaceClient.GetCloudByNameAsync(action.Placement!))?.ToCloud();
-                    placement = cloud;
-                }
-                else
-                {
-                    var edge = (await _redisInterfaceClient.GetEdgeByNameAsync(action.Placement!)).ToEdge();
-                    placement = edge;
-                }
-
-                if (placement is null) continue;
-                foreach (var instance in action.Services)
-                {
-                    //delete all the located_at relationships between all instances of 1 action and the resources been edge/cloud
-                    await _redisInterfaceClient.DeleteRelationAsync(instance, placement, "LOCATED_AT");
-                }
-            }
-
             foreach (var action in actionPlan.ActionSequence!)
             {
                 var relayShouldBeDeleted = true;
