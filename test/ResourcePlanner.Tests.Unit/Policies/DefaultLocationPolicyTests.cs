@@ -86,7 +86,7 @@ public class DefaultLocationPolicyTests
         _redisInterfaceClient.GetLocationByNameAsync(config.InstanceName).Returns(loc);
 
         //act
-        var result = await _sut.GetLocationAsync();
+        var result = await _sut.GetLocationAsync(null);
 
         //assert
         result.Should().BeOfType<PlannedLocation>();
@@ -117,7 +117,7 @@ public class DefaultLocationPolicyTests
         _redisInterfaceClient.GetLocationByNameAsync(config.InstanceName).Returns(location);
 
         //act
-        var result = await _sut.GetLocationAsync();
+        var result = await _sut.GetLocationAsync(null);
 
         //assert
         result.Should().BeOfType<PlannedLocation>();
@@ -130,7 +130,7 @@ public class DefaultLocationPolicyTests
     [Fact]
     public async Task IsLocationSatisfiedByPolicy_ShouldAlwaysAcceptGivenLocation()
     {
-        var location = new PlannedLocation(Guid.NewGuid(), "name", LocationType.Cloud);
+        var location = new PlannedLocation(Guid.NewGuid(), "name", LocationType.Cloud, null!, null);
         var result = await _sut.IsLocationSatisfiedByPolicy(location);
 
         result.Should().BeTrue();

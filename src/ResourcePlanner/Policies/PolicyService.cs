@@ -1,29 +1,47 @@
 ﻿using Middleware.Models.Domain;
-using Middleware.Models.Domain.Contracts;
 using Middleware.Models.Enums;
+using Middleware.RedisInterface.Contracts.Mappings;
+using Middleware.RedisInterface.Sdk;
+using Middleware.ResourcePlanner.Policies.LocationSelection;
 
 namespace Middleware.ResourcePlanner.Policies;
 
 internal class PolicyService : IPolicyService
 {
+    private readonly ILogger<PolicyService> _logger;
     private readonly IPolicyBuilder _policyBuilder;
+    private readonly IRedisInterfaceClient _redisInterfaceClient;
 
-    public PolicyService(IPolicyBuilder policyBuilder)
+    public PolicyService(IPolicyBuilder policyBuilder, IRedisInterfaceClient redisInterfaceClient,
+        ILogger<PolicyService> logger)
     {
         _policyBuilder = policyBuilder;
+        _redisInterfaceClient = redisInterfaceClient;
+        _logger = logger;
     }
 
     /// <inheritdoc />
-    public async Task<PlannedLocation> GetLocationAsync(IReadOnlyList<IPolicyAssignable> members)
+    public async Task<PlannedLocation> GetLocationAsync(IReadOnlyList<InstanceModel> members)
     {
         var allAppliedPolicies = new HashSet<string>();
         var resultLocations = new HashSet<PlannedLocation>();
+        var resourcePolicy = await GetResourceLocationPolicy();
+        // BB: should not happen but who knows...
+        if (resourcePolicy is null)
+        {
+            _logger.LogCritical("System policy not found {0}", nameof(ResourceBasedLocation));
+            return null;
+        }
+
         foreach (var member in members)
         {
+            if (resourcePolicy.IsActive)
+                member.AppliedPolicies.Add(PolicyBuilder.ResourcePolicyName);
+
             if (member.AppliedPolicies.Any() == false)
             {
                 var policy = _policyBuilder.GetDefaultLocationPolicy();
-                var location = await policy.GetLocationAsync();
+                var location = await policy.GetLocationAsync(member);
                 resultLocations.Add(location);
                 continue;
             }
@@ -36,12 +54,12 @@ internal class PolicyService : IPolicyService
                 if (policy is null)
                     continue;
 
-                var location = await policy.GetLocationAsync();
+                var location = await policy.GetLocationAsync(member);
                 if (location is not null)
                     localLocations.Add(new(policy.Priority, location));
             }
 
-            // always 1 location will match, if more, negotiate best location for instance
+            // always 1 location will match, if more, negotiate the best location for instance
             var desiredLocation = localLocations.Count == 1
                 ? localLocations.First().Item2
                 : await NegotiateLocation(localLocations, member.AppliedPolicies);
@@ -57,6 +75,13 @@ internal class PolicyService : IPolicyService
             .ToHashSet();
         var negotiatedLocation = await NegotiateLocation(locationsTmp, allAppliedPolicies.ToList());
         return negotiatedLocation;
+    }
+
+    private async Task<PolicyModel> GetResourceLocationPolicy()
+    {
+        var response = await _redisInterfaceClient.GetPolicyByNameAsync("ResourceBasedLocation");
+
+        return response.ToPolicy();
     }
 
     /// <summary>
@@ -116,6 +141,6 @@ internal class PolicyService : IPolicyService
 
         // when no location can be selected, we return the default location
         var defaultLocation = _policyBuilder.GetDefaultLocationPolicy();
-        return await defaultLocation.GetLocationAsync();
+        return await defaultLocation.GetLocationAsync(null!);
     }
 }

@@ -5,7 +5,7 @@ using Middleware.Models.Enums;
 
 namespace Middleware.Models.Domain;
 
-public class InstanceModel : BaseModel, IPolicyAssignable
+public class InstanceModel : BaseModel, IPolicyAssignable, IHardwareRequirementClaim
 {
     public override Guid Id { get; set; } = Guid.NewGuid();
 

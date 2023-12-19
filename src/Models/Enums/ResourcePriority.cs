@@ -2,10 +2,10 @@
 
 public enum ResourcePriority
 {
-    Low = 6,
-    MediumLow = 5,
-    Medium = 4,
-    High = 3,
-    VeryHigh = 2,
-    Critical = 1
+    Low = 1,
+    MediumLow = 2,
+    Medium = 3,
+    High = 4,
+    VeryHigh = 5,
+    Critical = 6
 }

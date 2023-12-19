@@ -388,6 +388,16 @@ public class RedisInterfaceClient : IRedisInterfaceClient
         return result.IsSuccessStatusCode ? result.Content : null;
     }
 
+    /// <inheritdoc />
+    public async Task<GetLocationsResponse?> LocationGetAllAsync()
+    {
+        var result = await _api.LocationGetAll();
+        if (!result.IsSuccessStatusCode)
+            _logger.LogError(result.Error, "{0} - unsuccessful API call", nameof(GetLessBusyLocationsAsync));
+
+        return result.IsSuccessStatusCode ? result.Content : null;
+    }
+
     private RelationModel CreateRelation<TSource, TDirection>(TSource source, TDirection direction, string name)
         where TSource : BaseModel
         where TDirection : BaseModel

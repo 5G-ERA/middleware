@@ -7,4 +7,8 @@
         <RootNamespace>Middleware.CentralApi.Contracts</RootNamespace>
     </PropertyGroup>
 
+    <ItemGroup>
+      <ProjectReference Include="..\Models\Models.csproj" />
+    </ItemGroup>
+
 </Project>
