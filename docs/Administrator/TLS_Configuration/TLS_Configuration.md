@@ -44,7 +44,7 @@ helm repo update
 ```
 
 ### 3. Modify values.yaml file:
-The nginx chart contains a `values.yaml` file, this file requires a few modifications in the `ipFamilyPolicy` section, in order to function with the current Middleware architecture. The initial configuration for the nginx controller service comes with `type: LoadBalancer`. Since the Middleware is already exposed through a Network Load Balancer this has to be adjusted to `type: NodePort`. In the Network Load Balancer that serves the Middleware system the listeners and target groups are assigned: `http: 80:31000` and `https: 443:31011` these properties also have to be adjusted to match the same values. The below code depicts the required modifications.   
+The nginx chart contains a `values.yaml` file, this file requires a few modifications in the `ipFamilyPolicy` section, in order to function with the current Middleware architecture. The initial configuration for the nginx controller service comes with `type: LoadBalancer`. Since the Middleware is already exposed through a Network Load Balancer, this has to be adjusted to `type: NodePort`. Also in the Network Load Balancer that serves the Middleware system the listeners and target groups are assigned to: `http: 80:31000` and `https: 443:31011`, these properties also have to be adjusted to match the same values. The below code depicts the required modifications:   
 
 ```
     ipFamilyPolicy: "SingleStack"
@@ -68,7 +68,7 @@ The nginx chart contains a `values.yaml` file, this file requires a few modifica
 ```
 
 ### 4. Installing Nginx Ingress Controller:
-To apply the modifications that were configured in section 3 above, when installing the nginx controller, specify the `-f values.yaml` in the installation command.
+To apply the configuration that was modified in the previous step, when installing the nginx controller, specify the `-f values.yaml` in the installation command:
 
 ```
 helm install ingress-nginx ingress-nginx/ingress-nginx --namespace ingress --create-namespace --set controller.ingressClassResource.name=nginx -f values.yaml
@@ -87,7 +87,11 @@ service/ingress-nginx-controller   NodePort   172.20.190.113   <none>        80:
 ```
 
 ## Domain registration
-The Middleware system has been registered under Amazon Route 53, and the TLS certificate authority used is Let's Encrypt. For other options for domain providers check the following list of compatibility with Let's Encrypt, under the following link:
+The domain for the Middleware system has been registered under Amazon Route 53, check following link:
+```
+https://docs.aws.amazon.com/Route53/latest/DeveloperGuide/domain-register.html
+```
+The TLS certificate authority used is Let's Encrypt. For other options for domain providers check the following list of compatibility with Let's Encrypt, under the following link:
 
 ```
 https://community.letsencrypt.org/t/dns-providers-who-easily-integrate-with-lets-encrypt-dns-validation/86438
@@ -354,10 +358,10 @@ The desired result should look like below, notice the port 443 in the new ingres
 NAME              CLASS   HOSTS         ADDRESS          PORTS     AGE
 ingress-gateway   nginx   *.5gera.net   172.20.190.113   80, 443   11d1h
 ```
-The ingress for central-api can remain with the same configuration, the nginx-ingress-controller will automatically forward the traffic that is coming on port 80/http to port 443/https. The TLS configuration is also not required in the ingress for the central-api, as explained above the wildcard certificate will serve for all other subdomains registered under the `5gera.net` domain, and this option has already been adjusted when applying the new `ingress-gateway.yaml`.
+The ingress for central-api can remain with the same configuration, the nginx-ingress-controller will automatically forward the traffic that is coming on port 80/http to port 443/https. The TLS configuration is also not required in the ingress for the central-api, as explained above the wildcard certificate will serve for all other subdomains registered under the `5gera.net` domain, and this option has already been enabled when applying the new `ingress-gateway.yaml`.
 
 ## Troubleshooting
-In the last step of this tutorial, where the ingress for the Gateway has been re-applied, in the last line of the ingress we have added the `secretName: tls-secret`. Cert Manager will place the certificate that was retrieved from Lets Encrypt inside this variable `tls-secret`. The Nginx Ingress Controller should pick up this `tls-secret` and place it in the nginx-ingress-controller pod. However, it might happen that the Nginx Ingress Controller will pick up the configuration change, will redeploy the pod and try to reload the certificate as configured but fail.\
+In the last step of this tutorial, where the ingress for the Gateway has been re-applied, in the last line of the ingress we have added the `secretName: tls-secret`. Cert Manager will place the certificate that was retrieved from Lets Encrypt inside this variable `tls-secret`. The Nginx Ingress Controller should pick up this `tls-secret` and place it in the nginx-ingress-controller pod. However, it might happen that the Nginx Ingress Controller will pick up the configuration change, will redeploy the pod and try to reload the certificate as configured, but fail.\
 To check for the right configuration, execute in the nginx pod and look for the certificate that was loaded in the `nginx.conf`, see below:
 ```
 rhadoo@rhadoo:~$ k -n ingress get pods
@@ -369,7 +373,7 @@ ingress-nginx-controller-675c77997b-zr9z6:/etc/nginx$ grep .pem nginx.conf
         ssl_certificate     /etc/ingress-controller/ssl/middleware-tls-secret.pem;
         ssl_certificate_key /etc/ingress-controller/ssl/middleware-tls-secret.pem;
 ```
-If the certificate has not be loaded properly and it shows as `/etc/ingress-controller/ssl/fake/certificate.pem`, you will have to manually adjust this in the nginx ingress controller `deployment.yaml` file, by adding in the containers `args:` section, in the last entry, the following line:\
+If the certificate has not be loaded properly and it shows as `/etc/ingress-controller/ssl/fake/certificate.pem`, you will have to manually adjust this in the nginx ingress controller `deployment.yaml` file, by adding in the containers `args:` section, in the last entry, the following line:
 ```
 --default-ssl-certificate=middleware/tls-secret
 ```
@@ -386,7 +390,7 @@ spec:
         - --configmap=$(POD_NAMESPACE)/ingress-nginx-controller
         - --default-ssl-certificate=middleware/tls-secret
 ```
-When saving changes the nginx ingress controller will pick up the change and redeploy a pod that will contain the correct certificate. For more details, the following link explains how to fix the same issue:
+When saving the changes made in the `deployment.yaml` file, the nginx ingress controller will pick up the change and redeploy a pod that will contain the correct certificate. For more details, the following link explains how to fix the same issue:
 ```
 https://stackoverflow.com/questions/71127151/ssl-certificate-added-but-shows-kubernetes-ingress-controller-fake-certificate
 ```
