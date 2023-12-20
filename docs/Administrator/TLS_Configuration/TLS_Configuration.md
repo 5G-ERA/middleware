@@ -355,3 +355,38 @@ NAME              CLASS   HOSTS         ADDRESS          PORTS     AGE
 ingress-gateway   nginx   *.5gera.net   172.20.190.113   80, 443   11d1h
 ```
 The ingress for central-api can remain with the same configuration, the nginx-ingress-controller will automatically forward the traffic that is coming on port 80/http to port 443/https. The TLS configuration is also not required in the ingress for the central-api, as explained above the wildcard certificate will serve for all other subdomains registered under the `5gera.net` domain, and this option has already been adjusted when applying the new `ingress-gateway.yaml`.
+
+## Troubleshooting
+In the last step of this tutorial, where the ingress for the Gateway has been re-applied, in the last line of the ingress we have added the `secretName: tls-secret`. Cert Manager will place the certificate that was retrieved from Lets Encrypt inside this variable `tls-secret`. The Nginx Ingress Controller should pick up this `tls-secret` and place it in the nginx-ingress-controller pod. However, it might happen that the Nginx Ingress Controller will pick up the configuration change, will redeploy the pod and try to reload the certificate as configured but fail.\
+To check for the right configuration, execute in the nginx pod and look for the certificate that was loaded in the `nginx.conf`, see below:
+```
+rhadoo@rhadoo:~$ k -n ingress get pods
+NAME                                        READY   STATUS    RESTARTS   AGE
+ingress-nginx-controller-675c77997b-zr9z6   1/1     Running   0          11d22h
+rhadoo@rhadoo:~$ k -n ingress exec -it ingress-nginx-controller-675c77997b-zr9z6 /bin/bash
+ingress-nginx-controller-675c77997b-zr9z6:/$ cd /etc/nginx/
+ingress-nginx-controller-675c77997b-zr9z6:/etc/nginx$ grep .pem nginx.conf
+        ssl_certificate     /etc/ingress-controller/ssl/middleware-tls-secret.pem;
+        ssl_certificate_key /etc/ingress-controller/ssl/middleware-tls-secret.pem;
+```
+If the certificate has not be loaded properly and it shows as `/etc/ingress-controller/ssl/fake/certificate.pem`, you will have to manually adjust this in the nginx ingress controller `deployment.yaml` file, by adding in the containers `args:` section, in the last entry, the following line:\
+```
+--default-ssl-certificate=middleware/tls-secret
+```
+See below:
+```
+spec:
+      containers:
+      - args:
+        - /nginx-ingress-controller
+        - --publish-service=$(POD_NAMESPACE)/ingress-nginx-controller
+        - --election-id=ingress-nginx-leader
+        - --controller-class=k8s.io/ingress-nginx
+        - --ingress-class=nginx
+        - --configmap=$(POD_NAMESPACE)/ingress-nginx-controller
+        - --default-ssl-certificate=middleware/tls-secret
+```
+When saving changes the nginx ingress controller will pick up the change and redeploy a pod that will contain the correct certificate. For more details, the following link explains how to fix the same issue:
+```
+https://stackoverflow.com/questions/71127151/ssl-certificate-added-but-shows-kubernetes-ingress-controller-fake-certificate
+```
