@@ -11,22 +11,22 @@ public class EdgeDto : Dto
 
     [Indexed]
     [RedisIdField]
-    public override string Id { get; set; }
+    public override string Id { get; set; } = default!;
 
     [Indexed]
     public string? Name { get; set; }
 
     [Indexed]
-    public string Type { get; set; }
+    public string Type { get; set; } = default!;
 
     [Indexed]
-    public string Organization { get; set; }
+    public string Organization { get; set; } = default!;
 
     [Indexed]
     public string? EdgeStatus { get; set; }
 
     [Indexed]
-    public Uri EdgeIp { get; set; }
+    public Uri? EdgeIp { get; set; }
 
     [Indexed]
     public string? MacAddress { get; set; }
@@ -46,10 +46,10 @@ public class EdgeDto : Dto
         return new EdgeModel
         {
             Id = Guid.Parse(dto.Id!.Replace(Prefix, "")),
-            Name = dto.Name,
+            Name = dto.Name!,
             Organization = dto.Organization,
-            EdgeStatus = dto.EdgeStatus,
-            EdgeIp = dto.EdgeIp,
+            EdgeStatus = dto.EdgeStatus!,
+            EdgeIp = dto.EdgeIp!,
             NumberOfCores = dto.HardwareSpec.NumberCores,
             DiskStorage = dto.HardwareSpec.StorageDisk,
             VirtualRam = dto.HardwareSpec.VirtualRam,

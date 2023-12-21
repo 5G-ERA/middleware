@@ -12,7 +12,7 @@ public class RobotDto : Dto
 
     [Indexed]
     [RedisIdField]
-    public override string Id { get; set; }
+    public override string Id { get; set; } = default!;
 
     [Indexed]
     public string? Name { get; set; }
@@ -41,7 +41,7 @@ public class RobotDto : Dto
     public long? MaximumTranslationalVelocity { get; set; }
 
     [Indexed]
-    public string CurrentTaskId { get; set; }
+    public string? CurrentTaskId { get; set; }
 
     [Indexed]
     public List<string>? TaskList { get; set; }
@@ -118,7 +118,7 @@ public class RobotDto : Dto
             OnboardedTime = dto.OnboardedTime.DateTime,
             Questions = dto.Questions,
             TaskList = dto.TaskList,
-            CurrentTaskId = Guid.Parse(dto.CurrentTaskId),
+            CurrentTaskId = string.IsNullOrEmpty(dto.CurrentTaskId) ? Guid.Empty : Guid.Parse(dto.CurrentTaskId),
             ROSNodes = dto.Ros.RosNodes?.Select(x => x.ToModel()).ToList(),
             SimCardNumber = dto.SimCardNumber
         };

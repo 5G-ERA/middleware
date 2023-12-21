@@ -3,9 +3,8 @@ using Middleware.CentralApi.Services;
 using Middleware.Common.ExtensionMethods;
 using Middleware.Common.Validation;
 using Middleware.DataAccess.ExtensionMethods;
+using Middleware.CentralApi.Services.Abstract;
 using Middleware.DataAccess.HostedServices;
-using Middleware.DataAccess.Repositories;
-using Middleware.DataAccess.Repositories.Abstract;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -25,9 +24,9 @@ if (builder.Environment.IsDevelopment() == false)
     builder.Services.AddHostedService<IndexCreationService>();
 
 
-builder.Services.AddScoped<ICloudRepository, RedisCloudRepository>();
-builder.Services.AddScoped<IEdgeRepository, RedisEdgeRepository>();
-builder.Services.AddScoped<ILocationRepository, RedisLocationRepository>();
+builder.Services.RegisterCentralApiRepositories();
+builder.Services.AddScoped<IRobotService, RobotService>();
+
 builder.Services.AddScoped<ILocationService, LocationService>();
 
 builder.Services.RegisterCentralApiQuartzJobs();

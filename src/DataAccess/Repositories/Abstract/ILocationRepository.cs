@@ -48,6 +48,9 @@ public interface ILocationRepository : IRedisRepository<Location, LocationDto>
     Task<(bool, Location?)> ExistsAsync(string name);
 
     Task<(bool, Location?)> ExistsAsync(Guid id);
+    
+    Task<Location?> GetSingleLocationByOrganizationAndNameAsync(string organization, string name);
+    
     Task<CloudEdgeStatusResponse> GetCloudOnlineStatusLastUpdatedTimeAsync(Guid locationId);
 
     /// <summary>

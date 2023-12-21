@@ -55,4 +55,13 @@ public static class DataAccessExtensionMethods
 
         return services;
     }
+    public static IServiceCollection RegisterCentralApiRepositories(this IServiceCollection services)
+    {
+        services.AddScoped<ICloudRepository, RedisCloudRepository>();
+        services.AddScoped<IEdgeRepository, RedisEdgeRepository>();
+        services.AddScoped<IRobotRepository, RedisRobotRepository>();
+        services.AddScoped<ILocationRepository, RedisLocationRepository>();
+
+        return services;
+    }
 }

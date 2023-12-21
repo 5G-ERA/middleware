@@ -86,7 +86,7 @@ public class ActionModel : BaseModel
             HardwareRequirements = new()
             {
                 MinimumRam = domain.MinimumRam,
-                MinimumNumCores = domain.MinimumNumCores
+                MinimumNumberOfCores = domain.MinimumNumCores
             },
             SingleNetAppEntryPoint = domain.SingleNetAppEntryPoint,
             Tags = domain.Tags
