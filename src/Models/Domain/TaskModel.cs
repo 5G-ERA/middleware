@@ -22,8 +22,8 @@ public class TaskModel : BaseModel
     ///     Should the resources be limited to the current deployment location
     ///     and should skip the reuse of the existing resources
     /// </summary>
-    [JsonPropertyName("ResourceLock")]
-    public bool ResourceLock { get; set; }
+    [JsonPropertyName("DisableResourceReuse")]
+    public bool DisableResourceReuse { get; set; }
 
     [JsonPropertyName("TaskPriority")]
     public int TaskPriority { get; set; }

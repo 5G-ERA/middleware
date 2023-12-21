@@ -112,7 +112,7 @@ public class ActionPlanner : IActionPlanner
         var MarkovianProcess = oldTask.MarkovianProcess;
         var currentTaskId = oldTask.Id;
         var currentPlanId = oldTask.ActionPlanId;
-        var resourceLock = oldTask.ResourceLock;
+        var resourceLock = oldTask.DisableResourceReuse;
         var ActionReplanLocked = oldTask.ReplanActionPlannerLocked;
         var oldActionSequence = oldTask.ActionSequence;
         var FinalCandidatesActions = new List<ActionModel>();
@@ -563,7 +563,7 @@ public class ActionPlanner : IActionPlanner
         }
 
         task.ActionSequence = ActionSequence;
-        task.ResourceLock = resourceLock;
+        task.DisableResourceReuse = resourceLock;
         return new(task, robot);
     }
 }

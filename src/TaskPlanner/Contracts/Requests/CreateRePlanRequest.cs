@@ -3,12 +3,12 @@ using Middleware.Models.Domain;
 
 namespace Middleware.TaskPlanner.Contracts.Requests;
 
-public class CreateRePlanRequest 
+public class CreateRePlanRequest
 {
     [JsonPropertyName("RobotId")]
     public Guid RobotId { get; set; }
 
-    [JsonPropertyName("LockResourceReUse")]
+    [JsonPropertyName("DisableResourceReuse")]
     public bool LockResourceReUse { get; set; }
 
     [JsonPropertyName("ContextKnown")]
@@ -22,5 +22,4 @@ public class CreateRePlanRequest
 
     [JsonPropertyName("Questions")]
     public List<DialogueModel> Questions { get; set; }
-
 }
