@@ -54,7 +54,7 @@ public class CentralApiClient : ICentralApiClient
         return response.IsSuccessStatusCode ? response.Content : null;
     }
 
-    public async Task DeRegisterLocation(RegisterRequest request)
+    public Task DeRegisterLocation(RegisterRequest request)
     {
         _logger.LogDebug("Entered DeRegisterLocation");
         throw new NotImplementedException();

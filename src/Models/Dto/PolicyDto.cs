@@ -4,17 +4,18 @@ using Redis.OM.Modeling;
 
 namespace Middleware.Models.Dto;
 
-[Document(IndexName = "policy-idx", StorageType = StorageType.Json, Prefixes = new[] { PolicyDto.Prefix })]
+[Document(IndexName = "policy-idx", StorageType = StorageType.Json, Prefixes = new[] { Prefix })]
 public class PolicyDto : Dto
 {
     public const string Prefix = "Policy";
 
     [Indexed]
     [RedisIdField]
-    public override string Id { get; set; }
+    public override string Id { get; set; } = default!;
 
     [Indexed]
     public string Name { get; set; } = default!;
+
     [Indexed]
     public string Type { get; set; } = default!;
 

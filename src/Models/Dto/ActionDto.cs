@@ -36,7 +36,7 @@ public class ActionDto : Dto
             Name = dto.Name,
             Tags = dto.Tags,
             MinimumRam = dto.HardwareRequirements.MinimumRam,
-            MinimumNumCores = dto.HardwareRequirements.MinimumNumCores,
+            MinimumNumCores = (int?)dto.HardwareRequirements.MinimumNumberOfCores,
             ActionPriority = dto.ActionPriority,
             SingleNetAppEntryPoint = dto.SingleNetAppEntryPoint
         };

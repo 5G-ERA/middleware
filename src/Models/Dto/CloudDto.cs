@@ -11,25 +11,25 @@ public class CloudDto : Dto
 
     [Indexed]
     [RedisIdField]
-    public override string Id { get; set; }
+    public override string Id { get; set; } = default!;
 
     [Indexed]
     public string? Name { get; set; }
 
     [Indexed]
-    public string Type { get; set; }
+    public string Type { get; set; } = default!;
 
     [Indexed]
-    public string Organization { get; set; }
+    public string Organization { get; set; } = default!;
 
     [Indexed]
     public string? CloudStatus { get; set; }
 
     [Indexed]
-    public Uri CloudIp { get; set; }
+    public Uri CloudIp { get; set; } = default!;
 
     [Indexed]
-    public HardwareSpec HardwareSpec { get; set; }
+    public HardwareSpec? HardwareSpec { get; set; }
 
     [Indexed]
     public string? MacAddress { get; set; }
@@ -46,15 +46,15 @@ public class CloudDto : Dto
         return new CloudModel
         {
             Id = Guid.Parse(dto.Id!.Replace(Prefix, "")),
-            Name = dto.Name,
+            Name = dto.Name!,
             Organization = dto.Organization,
-            CloudStatus = dto.CloudStatus,
+            CloudStatus = dto.CloudStatus!,
             CloudIp = dto.CloudIp,
-            NumberOfCores = dto.HardwareSpec.NumberCores,
-            DiskStorage = dto.HardwareSpec.StorageDisk,
-            VirtualRam = dto.HardwareSpec.VirtualRam,
-            Cpu = dto.HardwareSpec.Cpu,
-            Ram = dto.HardwareSpec.Ram,
+            NumberOfCores = dto.HardwareSpec?.NumberCores,
+            DiskStorage = dto.HardwareSpec?.StorageDisk,
+            VirtualRam = dto.HardwareSpec?.VirtualRam,
+            Cpu = dto.HardwareSpec?.Cpu,
+            Ram = dto.HardwareSpec?.Ram,
             MacAddress = dto.MacAddress,
             LastUpdatedTime = dto.LastUpdatedTime.DateTime,
             IsOnline = dto.IsOnline

@@ -21,19 +21,6 @@ public class IndexCreationService : BackgroundService
         await RecreateIndexes();
     }
 
-    /// <summary>
-    ///     Checks redis to see if the index already exists, if it doesn't create a new index
-    /// </summary>
-    /// <param name="cancellationToken"></param>
-    public async Task StartAsync(CancellationToken cancellationToken)
-    {
-    }
-
-    public Task StopAsync(CancellationToken cancellationToken)
-    {
-        return Task.CompletedTask;
-    }
-
     private async Task RecreateIndexes()
     {
         var info = (await _provider.Connection.ExecuteAsync("FT._LIST")).ToArray().Select(x => x.ToString()).ToList();
@@ -147,6 +134,14 @@ public class IndexCreationService : BackgroundService
         {
             await _provider.Connection.DropIndexAsync(typeof(SliceDto));
             await _provider.Connection.CreateIndexAsync(typeof(SliceDto));
+        }
+
+        if (info.Any(x => x == "location-idx") == false)
+            await _provider.Connection.CreateIndexAsync(typeof(LocationDto));
+        else
+        {
+            await _provider.Connection.DropIndexAsync(typeof(LocationDto));
+            await _provider.Connection.CreateIndexAsync(typeof(LocationDto));
         }
     }
 }

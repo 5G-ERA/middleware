@@ -9,15 +9,44 @@ public class HardwareRequirements
     public long? MinimumRam { get; set; }
 
     [Indexed]
-    public int? MinimumNumCores { get; set; }
+    public long? OptimalRam { get; set; }
 
-    public HardwareRequirements()
-    {
-    }
+    [Indexed]
+    public string? RamPriority { get; set; } = default!;
 
-    public HardwareRequirements(int minimumRam, int minimumNumCores)
-    {
-        MinimumRam = minimumRam;
-        MinimumNumCores = minimumNumCores;
-    }
+    [Indexed]
+    public long? MinimumNumberOfCores { get; set; }
+
+    [Indexed]
+    public long? OptimalNumberOfCores { get; set; }
+
+    [Indexed]
+    public string? NumberOfCoresPriority { get; set; } = default!;
+
+    [Indexed]
+    public long? MinimumDiskStorage { get; set; }
+
+    [Indexed]
+    public long? OptimalDiskStorage { get; set; }
+
+    [Indexed]
+    public string? DiskStoragePriority { get; set; } = default!;
+
+    [Indexed]
+    public long? MinimumThroughput { get; set; }
+
+    [Indexed]
+    public long? OptimalThroughput { get; set; }
+
+    [Indexed]
+    public string? ThroughputPriority { get; set; } = default!;
+
+    [Indexed]
+    public long? MinimumLatency { get; set; }
+
+    [Indexed]
+    public long? OptimalLatency { get; set; }
+
+    [Indexed]
+    public string? LatencyPriority { get; set; } = default!;
 }

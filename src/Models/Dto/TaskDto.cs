@@ -3,34 +3,34 @@ using Redis.OM.Modeling;
 
 namespace Middleware.Models.Dto;
 
-[Document(IndexName = "task-idx", StorageType = StorageType.Json, Prefixes = new[] { TaskDto.Prefix })]
+[Document(IndexName = "task-idx", StorageType = StorageType.Json, Prefixes = new[] { Prefix })]
 public class TaskDto : Dto
 {
     public const string Prefix = "Task";
 
     [Indexed]
     [RedisIdField]
-    public override string Id { get; set; }
+    public override string Id { get; set; } = default!;
 
     [Indexed]
-    public string? Name { get; set; }
-   
+    public string Name { get; set; } = default!;
+
     [Indexed(Sortable = true)]
     public int TaskPriority { get; set; }
-    
+
     [Indexed(Sortable = true)]
     public bool DeterministicTask { get; set; } // The result is always the same if true.
-    
+
     /*[Indexed]
     public List<ActionDto> ActionSequence { get; set; }*/
 
     [Indexed]
-    public List<string> Tags { get; set; }
+    public List<string> Tags { get; set; } = new();
 
     public override BaseModel ToModel()
     {
         var dto = this;
-        return new TaskModel()
+        return new TaskModel
         {
             Id = Guid.Parse(dto.Id!.Replace(Prefix, "")),
             Name = dto.Name,

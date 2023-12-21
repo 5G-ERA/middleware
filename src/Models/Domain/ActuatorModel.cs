@@ -1,27 +1,25 @@
 ﻿using Middleware.Models.Dto.Ros;
 
-namespace Middleware.Models.Domain
+namespace Middleware.Models.Domain;
+
+public class ActuatorModel
 {
-    public class ActuatorModel
+    public string Name { get; set; } = default!;
+
+    public string Type { get; set; } = default!;
+
+    public int Number { get; set; }
+
+    public List<string> Nodes { get; set; } = new();
+
+    public Actuator ToDto()
     {
-        public string Name { get; set; }
-
-        public string Type { get; set; }
-
-        public int Number { get; set; }
-
-        public List<string> Nodes { get; set; }
-
-        public Actuator ToDto()
+        return new()
         {
-            return new Actuator()
-            {
-                Name = Name,
-                Type = Type,
-                Number = Number,
-                Nodes = Nodes
-
-            };
-        }
+            Name = Name,
+            Type = Type,
+            Number = Number,
+            Nodes = Nodes
+        };
     }
 }
