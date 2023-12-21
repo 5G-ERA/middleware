@@ -112,24 +112,28 @@ internal class ResourceBasedLocation : ILocationSelectionPolicy
             scores.Add(loc, score);
         }
 
-        var maxScore = new KeyValuePair<Location, int>();
+        KeyValuePair<Location, int>? maxScore = null;
         foreach (var score in scores)
         {
-            if (score.Value > maxScore.Value) maxScore = score;
+            maxScore ??= score;
+            if (score.Value > maxScore.Value.Value) maxScore = score;
         }
 
+        if (maxScore is null) return null;
+
         FoundMatchingLocation = true;
+        var finalLoc = maxScore.Value.Key;
         var hwSpec = new HardwareSpec
         {
-            Ram = maxScore.Key.Ram,
-            Cpu = maxScore.Key.Cpu,
-            NumberCores = maxScore.Key.NumberOfCores,
-            StorageDisk = maxScore.Key.DiskStorage,
-            VirtualRam = maxScore.Key.VirtualRam,
-            Latency = maxScore.Key.Latency,
-            Throughput = maxScore.Key.Throughput
+            Ram = finalLoc.Ram,
+            Cpu = finalLoc.Cpu,
+            NumberCores = finalLoc.NumberOfCores,
+            StorageDisk = finalLoc.DiskStorage,
+            VirtualRam = finalLoc.VirtualRam,
+            Latency = finalLoc.Latency,
+            Throughput = finalLoc.Throughput
         };
-        return new(maxScore.Key.Id, maxScore.Key.Name, maxScore.Key.Type, hwSpec, hwClaim);
+        return new(finalLoc.Id, finalLoc.Name, finalLoc.Type, hwSpec, hwClaim);
     }
 
     /// <inheritdoc />
