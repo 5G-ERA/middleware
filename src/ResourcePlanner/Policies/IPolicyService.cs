@@ -1,5 +1,4 @@
 ﻿using Middleware.Models.Domain;
-using Middleware.Models.Domain.Contracts;
 
 namespace Middleware.ResourcePlanner.Policies;
 
@@ -10,5 +9,5 @@ internal interface IPolicyService
     /// </summary>
     /// <param name="members"></param>
     /// <returns></returns>
-    Task<PlannedLocation> GetLocationAsync(IReadOnlyList<IPolicyAssignable> members);
+    Task<PlannedLocation> GetLocationAsync(IReadOnlyList<InstanceModel> members);
 }

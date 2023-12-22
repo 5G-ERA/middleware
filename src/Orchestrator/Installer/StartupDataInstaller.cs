@@ -45,6 +45,11 @@ internal class StartupDataInstaller : IStartupDataInstaller
         var existingPolicy = await _policyRepository.GetByIdAsync(urllcPolicy.Id);
         if (existingPolicy is null)
             await _policyRepository.AddAsync(urllcPolicy);
+
+        var resourcePolicy = CreateResourceSelectionPolicy();
+        var existingResourcePolicy = await _policyRepository.GetByIdAsync(urllcPolicy.Id);
+        if (existingResourcePolicy is null)
+            await _policyRepository.AddAsync(resourcePolicy);
     }
 
     private bool IsConfigCorrect(SystemConfigModel cfg)
@@ -101,6 +106,23 @@ internal class StartupDataInstaller : IStartupDataInstaller
             Timestamp = DateTimeOffset.Now.DateTime
         };
     }
+
+    private PolicyModel CreateResourceSelectionPolicy()
+    {
+        return new()
+        {
+            Id = Guid.Parse("AC10B7E7-8B71-4548-BD17-90AACCEFF270"),
+            Name = "ResourceBasedLocation",
+            Description = "Automatically adds resource-based location selection for the NetApps deployment",
+            IsActive = true,
+            IsExclusiveWithinType = 0,
+            Priority = Priority.Normal,
+            Scope = PolicyScope.System,
+            Type = PolicyType.LocationSelection,
+            Timestamp = DateTimeOffset.Now.DateTime
+        };
+    }
+
 
     private UserModel CreateDefaultUser(UserConfig config)
     {

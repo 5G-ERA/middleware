@@ -104,6 +104,9 @@ public interface IRedisInterface
 
     #region Location
 
+    [Get("/api/v1/location")]
+    Task<ApiResponse<GetLocationsResponse?>> LocationGetAll();
+
     [Get("/api/v1/location/{id}")]
     Task<ApiResponse<LocationResponse?>> LocationGetById(Guid id);
 

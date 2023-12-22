@@ -234,4 +234,10 @@ public interface IRedisInterfaceClient
     /// <param name="availableLocations"></param>
     /// <returns></returns>
     Task<GetLocationsResponse?> GetLessBusyLocationsAsync(List<Location> availableLocations);
+
+    /// <summary>
+    ///     Get All locations
+    /// </summary>
+    /// <returns></returns>
+    Task<GetLocationsResponse?> LocationGetAllAsync();
 }

@@ -1,6 +1,8 @@
 ﻿using Microsoft.Extensions.Options;
 using Middleware.Common.Config;
 using Middleware.Models.Domain;
+using Middleware.Models.Domain.Contracts;
+using Middleware.Models.Domain.ValueObjects;
 using Middleware.Models.Enums;
 using Middleware.RedisInterface.Sdk;
 
@@ -30,12 +32,23 @@ internal class DefaultLocation : ILocationSelectionPolicy
     public bool FoundMatchingLocation { get; private set; }
 
     /// <inheritdoc />
-    public async Task<PlannedLocation> GetLocationAsync()
+    public async Task<PlannedLocation> GetLocationAsync(IHardwareRequirementClaim hwClaim = null)
     {
         var locationResp = await _redisInterfaceClient.GetLocationByNameAsync(_middlewareOptions.Value.InstanceName);
+        if (locationResp is null) return null;
 
+        var hwSpec = new HardwareSpec
+        {
+            Ram = locationResp.Ram,
+            Cpu = locationResp.Cpu,
+            NumberCores = locationResp.NumberOfCores,
+            VirtualRam = locationResp.VirtualRam,
+            StorageDisk = locationResp.DiskStorage,
+            Latency = locationResp.Latency,
+            Throughput = locationResp.Throughput
+        };
         var location = new PlannedLocation(locationResp!.Id, _middlewareOptions.Value.InstanceName,
-            Enum.Parse<LocationType>(_middlewareOptions.Value.InstanceType));
+            Enum.Parse<LocationType>(_middlewareOptions.Value.InstanceType), hwSpec, null);
 
         FoundMatchingLocation = true;
 
