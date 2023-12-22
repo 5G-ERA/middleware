@@ -1,4 +1,5 @@
 ﻿using Middleware.Models.Domain;
+using Middleware.Models.Domain.Contracts;
 
 namespace Middleware.ResourcePlanner.Policies;
 
@@ -13,7 +14,7 @@ internal interface ILocationSelectionPolicy : IPolicy
     ///     Evaluates the best possible plannedLocation based on the policy implementation
     /// </summary>
     /// <returns></returns>
-    Task<PlannedLocation> GetLocationAsync();
+    Task<PlannedLocation> GetLocationAsync(IHardwareRequirementClaim hwClaim = null);
 
     /// <summary>
     ///     Checks if the specified plannedLocation acceptable by the policy

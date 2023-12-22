@@ -62,4 +62,22 @@ public class NetAppRequirement
     {
         return Minimal != default;
     }
+
+    public ColourCode GetValueScore(long value)
+    {
+        if (Ascending)
+        {
+            if (value < Minimal) return ColourCode.Red;
+
+            if (Optimal != default && value >= Optimal) return ColourCode.Green;
+
+            return ColourCode.Yellow;
+        }
+
+        if (value > Minimal) return ColourCode.Red;
+
+        if (Optimal != default && value <= Optimal) return ColourCode.Green;
+
+        return ColourCode.Yellow;
+    }
 }

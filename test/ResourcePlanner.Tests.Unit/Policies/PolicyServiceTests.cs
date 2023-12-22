@@ -6,11 +6,13 @@ using Middleware.Common.Config;
 using Middleware.Common.Enums;
 using Middleware.Models.Domain;
 using Middleware.Models.Domain.Slice;
+using Middleware.Models.Domain.ValueObjects;
 using Middleware.Models.Enums;
 using Middleware.RedisInterface.Contracts.Mappings;
 using Middleware.RedisInterface.Contracts.Responses;
 using Middleware.RedisInterface.Sdk;
 using Middleware.ResourcePlanner.Policies;
+using Middleware.ResourcePlanner.Policies.LocationSelection;
 using NSubstitute;
 using NSubstitute.ReturnsExtensions;
 
@@ -19,8 +21,21 @@ namespace ResourcePlanner.Tests.Unit.Policies;
 //[LogTestExecution]
 public class PolicyServiceTests
 {
+    private static readonly PolicyResponse ResourcePolicyResponse = new()
+    {
+        Id = Guid.Parse("AC10B7E7-8B71-4548-BD17-90AACCEFF270"),
+        Name = "ResourceBasedLocation",
+        Description = "Automatically adds resource-based location selection for the NetApps deployment",
+        IsActive = false,
+        IsExclusiveWithinType = 0,
+        Priority = Priority.Normal.ToString(),
+        Scope = PolicyScope.System.ToString(),
+        Type = PolicyType.LocationSelection.ToString()
+    };
+
     private readonly ICentralApiClient _centralApiClientClient = Substitute.For<ICentralApiClient>();
     private readonly ILogger<PolicyBuilder> _logger = Substitute.For<ILogger<PolicyBuilder>>();
+    private readonly ILogger<PolicyService> _loggerService = Substitute.For<ILogger<PolicyService>>();
 
     private readonly IOptions<MiddlewareConfig> _mwOptions = Options.Create(new MiddlewareConfig
     {
@@ -36,7 +51,7 @@ public class PolicyServiceTests
     {
         IPolicyBuilder policyBuilder =
             new PolicyBuilder(_redisInterfaceClient, _mwOptions, _centralApiClientClient, _logger);
-        _sut = new(policyBuilder);
+        _sut = new(policyBuilder, _redisInterfaceClient, _loggerService);
     }
 
     [Fact]
@@ -51,15 +66,33 @@ public class PolicyServiceTests
                 OnboardedTime = DateTime.Today
             }
         };
+        var hwSpec = new HardwareSpec
+        {
+            Ram = 1024,
+            Cpu = 1,
+            NumberCores = 4,
+            StorageDisk = 500,
+            VirtualRam = 2048,
+            Latency = 100,
+            Throughput = 1000
+        };
         var loc = new Location
         {
             Name = _mwOptions.Value.InstanceName,
-            Organization = _mwOptions.Value.Organization
+            Organization = _mwOptions.Value.Organization,
+            Ram = hwSpec.Ram,
+            Cpu = hwSpec.Cpu,
+            NumberOfCores = hwSpec.NumberCores,
+            Latency = (int)hwSpec.Latency.Value,
+            Throughput = (int)hwSpec.Throughput.Value,
+            VirtualRam = hwSpec.VirtualRam.Value,
+            DiskStorage = hwSpec.StorageDisk.Value
         };
+
         var locResp = loc.ToLocationResponse();
         _redisInterfaceClient.GetLocationByNameAsync(loc.Name).Returns(locResp);
-
-        var expected = new PlannedLocation(loc.Id, loc.Name, LocationType.Edge);
+        _redisInterfaceClient.GetPolicyByNameAsync(nameof(ResourceBasedLocation)).Returns(ResourcePolicyResponse);
+        var expected = new PlannedLocation(loc.Id, loc.Name, LocationType.Edge, hwSpec, null);
 
         //act
         var result = await _sut.GetLocationAsync(instances);
@@ -92,10 +125,27 @@ public class PolicyServiceTests
             Latency = 10,
             TrafficType = TrafficType.Tcp
         };
+        var hwSpec = new HardwareSpec
+        {
+            Ram = 1024,
+            Cpu = 1,
+            NumberCores = 4,
+            StorageDisk = 500,
+            VirtualRam = 2048,
+            Latency = 100,
+            Throughput = 1000
+        };
         var edge = new EdgeModel
         {
             Name = _mwOptions.Value.InstanceName,
-            Organization = _mwOptions.Value.Organization
+            Organization = _mwOptions.Value.Organization,
+            Ram = hwSpec.Ram,
+            Cpu = hwSpec.Cpu,
+            NumberOfCores = hwSpec.NumberCores,
+            Latency = (int)hwSpec.Latency.Value,
+            Throughput = (int)hwSpec.Throughput.Value,
+            VirtualRam = hwSpec.VirtualRam.Value,
+            DiskStorage = hwSpec.StorageDisk.Value
         };
 
         var policy = CreateLocationPolicy("UrllcSliceLocation", Priority.Normal);
@@ -109,6 +159,8 @@ public class PolicyServiceTests
                 RelationName = "OFFERS"
             }
         };
+        var loc = edge.ToLocation();
+        var locResp = loc.ToLocationResponse();
         var edgeResp = edge.ToEdgeResponse();
         var policyResp = policy.ToPolicyResponse();
         var slices = new GetSlicesResponse
@@ -119,13 +171,14 @@ public class PolicyServiceTests
         _redisInterfaceClient.SliceGetAllAsync().Returns(slices);
         _redisInterfaceClient.GetEdgeByNameAsync(edge.Name).Returns(edgeResp);
         _redisInterfaceClient.GetPolicyByNameAsync(policy.Name).Returns(policyResp);
+        _redisInterfaceClient.GetPolicyByNameAsync(nameof(ResourceBasedLocation)).Returns(ResourcePolicyResponse);
         _redisInterfaceClient.GetRelationAsync(Arg.Is<SliceModel>(t => t.Id == slice.Id), "OFFERS",
                 RelationDirection.Incoming.ToString())
             .Returns(relations);
-
+        _redisInterfaceClient.GetLocationByIdAsync(edge.Id).Returns(locResp);
         var centralApiResponse = TestObjectBuilder.ExampleLocationsResponse(edge);
         _centralApiClientClient.GetAvailableLocations().Returns(centralApiResponse);
-        var expected = new PlannedLocation(edge.Id, edge.Name, LocationType.Edge, slice.Name);
+        var expected = new PlannedLocation(edge.Id, edge.Name, LocationType.Edge, slice.Name, hwSpec, null);
         //act
 
         var result = await _sut.GetLocationAsync(instances);
@@ -164,11 +217,28 @@ public class PolicyServiceTests
             Organization = _mwOptions.Value.Organization,
             Type = LocationType.Edge
         };
+        var hwSpec = new HardwareSpec
+        {
+            Ram = 1024,
+            Cpu = 1,
+            NumberCores = 4,
+            StorageDisk = 500,
+            VirtualRam = 2048,
+            Latency = 100,
+            Throughput = 1000
+        };
         var edge2 = new Location
         {
             Name = "otherEdgeWithSlice",
             Organization = _mwOptions.Value.Organization,
-            Type = LocationType.Edge
+            Type = LocationType.Edge,
+            Ram = hwSpec.Ram,
+            Cpu = hwSpec.Cpu,
+            NumberOfCores = hwSpec.NumberCores,
+            Latency = (int)hwSpec.Latency.Value,
+            Throughput = (int)hwSpec.Throughput.Value,
+            VirtualRam = hwSpec.VirtualRam.Value,
+            DiskStorage = hwSpec.StorageDisk.Value
         };
         var policy = CreateLocationPolicy("UrllcSliceLocation", Priority.High);
         var policy2 = CreateLocationPolicy("DefaultLocation", Priority.Normal);
@@ -196,6 +266,8 @@ public class PolicyServiceTests
         _redisInterfaceClient.GetLocationByNameAsync(edge2.Name).Returns(edge2Resp);
         _redisInterfaceClient.GetPolicyByNameAsync(policy.Name).Returns(policyResp);
         _redisInterfaceClient.GetPolicyByNameAsync(policy2.Name).Returns(defaultPolicyResp);
+        _redisInterfaceClient.GetLocationByIdAsync(edge2Resp.Id).Returns(edge2Resp);
+        _redisInterfaceClient.GetPolicyByNameAsync(nameof(ResourceBasedLocation)).Returns(ResourcePolicyResponse);
         _redisInterfaceClient.GetRelationAsync(Arg.Is<SliceModel>(t => t.Id == slice.Id), "OFFERS",
                 RelationDirection.Incoming.ToString())
             .Returns(relations);
@@ -203,7 +275,7 @@ public class PolicyServiceTests
         var centralApiResponse = TestObjectBuilder.ExampleLocationsResponse(edge, edge2);
         _centralApiClientClient.GetAvailableLocations().Returns(centralApiResponse);
 
-        var expected = new PlannedLocation(edge2.Id, edge2.Name, LocationType.Edge, slice.Name);
+        var expected = new PlannedLocation(edge2.Id, edge2.Name, LocationType.Edge, slice.Name, hwSpec, null);
 
         //act
         var result = await _sut.GetLocationAsync(instances);
@@ -229,16 +301,33 @@ public class PolicyServiceTests
                 }
             }
         };
-
+        var hwSpec = new HardwareSpec
+        {
+            Ram = 1024,
+            Cpu = 1,
+            NumberCores = 4,
+            StorageDisk = 500,
+            VirtualRam = 2048,
+            Latency = 100,
+            Throughput = 1000
+        };
         var defaultLoc = new Location
         {
             Name = _mwOptions.Value.InstanceName,
-            Organization = _mwOptions.Value.Organization
+            Organization = _mwOptions.Value.Organization,
+            Ram = hwSpec.Ram,
+            Cpu = hwSpec.Cpu,
+            NumberOfCores = hwSpec.NumberCores,
+            Latency = (int)hwSpec.Latency.Value,
+            Throughput = (int)hwSpec.Throughput.Value,
+            VirtualRam = hwSpec.VirtualRam.Value,
+            DiskStorage = hwSpec.StorageDisk.Value
         };
         var defaultEdgeResp = defaultLoc.ToLocationResponse();
         _redisInterfaceClient.GetLocationByNameAsync(defaultLoc.Name).Returns(defaultEdgeResp);
         _redisInterfaceClient.GetPolicyByNameAsync("NotExistingPolicy").ReturnsNull();
-        var expected = new PlannedLocation(defaultLoc.Id, defaultLoc.Name, LocationType.Edge);
+        _redisInterfaceClient.GetPolicyByNameAsync(nameof(ResourceBasedLocation)).Returns(ResourcePolicyResponse);
+        var expected = new PlannedLocation(defaultLoc.Id, defaultLoc.Name, LocationType.Edge, hwSpec, null);
 
         //act
         var result = await _sut.GetLocationAsync(instances);
@@ -277,11 +366,28 @@ public class PolicyServiceTests
             Organization = _mwOptions.Value.Organization,
             Type = LocationType.Edge
         };
+        var hwSpec = new HardwareSpec
+        {
+            Ram = 1024,
+            Cpu = 1,
+            NumberCores = 4,
+            StorageDisk = 500,
+            VirtualRam = 2048,
+            Latency = 100,
+            Throughput = 1000
+        };
         var sliceEdge = new Location
         {
             Name = "otherEdgeWithSlice",
             Organization = _mwOptions.Value.Organization,
-            Type = LocationType.Edge
+            Type = LocationType.Edge,
+            Ram = hwSpec.Ram,
+            Cpu = hwSpec.Cpu,
+            NumberOfCores = hwSpec.NumberCores,
+            Latency = (int)hwSpec.Latency.Value,
+            Throughput = (int)hwSpec.Throughput.Value,
+            VirtualRam = hwSpec.VirtualRam.Value,
+            DiskStorage = hwSpec.StorageDisk.Value
         };
         var slicePolicy = CreateLocationPolicy("UrllcSliceLocation", Priority.Low);
         var defaultPolicy = CreateLocationPolicy("DefaultLocation", Priority.Low);
@@ -310,13 +416,15 @@ public class PolicyServiceTests
         _redisInterfaceClient.GetLocationByNameAsync(sliceEdge.Name).Returns(sliceEdgeResp);
         _redisInterfaceClient.GetPolicyByNameAsync(slicePolicy.Name).Returns(slicePolicyResp);
         _redisInterfaceClient.GetPolicyByNameAsync(defaultPolicy.Name).Returns(defaultPolicyResp);
+        _redisInterfaceClient.GetPolicyByNameAsync(nameof(ResourceBasedLocation)).Returns(ResourcePolicyResponse);
         _redisInterfaceClient.GetRelationAsync(Arg.Is<SliceModel>(t => t.Id == slice.Id), "OFFERS",
                 RelationDirection.Incoming.ToString())
             .Returns(relations);
         _redisInterfaceClient.GetRelationAsync(Arg.Is<Location>(t => t.Id == sliceEdge.Id), "OFFERS")
             .Returns(relations);
         _redisInterfaceClient.SliceGetByIdAsync(slice.Id).Returns(sliceResponse);
-        var expected = new PlannedLocation(sliceEdge.Id, sliceEdge.Name, LocationType.Edge, slice.Name);
+        _redisInterfaceClient.GetLocationByIdAsync(sliceEdge.Id).Returns(sliceEdgeResp);
+        var expected = new PlannedLocation(sliceEdge.Id, sliceEdge.Name, LocationType.Edge, slice.Name, hwSpec, null);
 
         var centralApiResponse = TestObjectBuilder.ExampleLocationsResponse(defaultEdge, sliceEdge);
         _centralApiClientClient.GetAvailableLocations().Returns(centralApiResponse);

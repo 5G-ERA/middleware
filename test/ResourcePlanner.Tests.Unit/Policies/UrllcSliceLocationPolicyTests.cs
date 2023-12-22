@@ -4,7 +4,9 @@ using Middleware.CentralApi.Sdk;
 using Middleware.Common.Enums;
 using Middleware.Models.Domain;
 using Middleware.Models.Domain.Slice;
+using Middleware.Models.Domain.ValueObjects;
 using Middleware.Models.Enums;
+using Middleware.RedisInterface.Contracts.Mappings;
 using Middleware.RedisInterface.Contracts.Responses;
 using Middleware.RedisInterface.Sdk;
 using Middleware.ResourcePlanner.Policies.LocationSelection;
@@ -98,12 +100,31 @@ public class UrllcSliceLocationPolicyTests
             Jitter = 5,
             TrafficType = TrafficType.Tcp.ToString()
         };
+        var hwSpec = new HardwareSpec
+        {
+            Ram = 1024,
+            Cpu = 1,
+            NumberCores = 4,
+            StorageDisk = 500,
+            VirtualRam = 2048,
+            Latency = 100,
+            Throughput = 1000
+        };
         var edge = new EdgeModel
         {
             Name = "sliceEdge",
-            Organization = "sliceOrg"
+            Organization = "sliceOrg",
+            Ram = hwSpec.Ram,
+            Cpu = hwSpec.Cpu,
+            NumberOfCores = hwSpec.NumberCores,
+            Latency = (int)hwSpec.Latency.Value,
+            Throughput = (int)hwSpec.Throughput.Value,
+            VirtualRam = hwSpec.VirtualRam.Value,
+            DiskStorage = hwSpec.StorageDisk.Value
         };
-        var expectedLocation = new PlannedLocation(edge.Id, edge.Name, LocationType.Edge, lowLatencySlice.Name);
+        var locResp = edge.ToLocation().ToLocationResponse();
+        var expectedLocation =
+            new PlannedLocation(edge.Id, edge.Name, LocationType.Edge, lowLatencySlice.Name, hwSpec, null);
         // Arrange
         var slices = new GetSlicesResponse
         {
@@ -120,7 +141,7 @@ public class UrllcSliceLocationPolicyTests
         _redisInterfaceClient.GetRelationAsync(Arg.Is<SliceModel>(t => t.Id == lowLatencySlice.Id), "OFFERS",
                 RelationDirection.Incoming.ToString())
             .Returns(relationList);
-
+        _redisInterfaceClient.GetLocationByIdAsync(edge.Id).Returns(locResp);
         var centralApiResponse = TestObjectBuilder.ExampleLocationsResponse(edge);
         _centralApiClientClient.GetAvailableLocations().Returns(centralApiResponse);
 
@@ -198,12 +219,29 @@ public class UrllcSliceLocationPolicyTests
             Jitter = 5,
             TrafficType = TrafficType.Tcp.ToString()
         };
+        var hwSpec = new HardwareSpec
+        {
+            Ram = 1024,
+            Cpu = 1,
+            NumberCores = 4,
+            StorageDisk = 500,
+            VirtualRam = 2048,
+            Latency = 100,
+            Throughput = 1000
+        };
         var cloud = new Location
         {
-            Name = "testLocation"
+            Name = "testLocation",
+            Ram = hwSpec.Ram,
+            Cpu = hwSpec.Cpu,
+            NumberOfCores = hwSpec.NumberCores,
+            Latency = (int)hwSpec.Latency.Value,
+            Throughput = (int)hwSpec.Throughput.Value,
+            VirtualRam = hwSpec.VirtualRam.Value,
+            DiskStorage = hwSpec.StorageDisk.Value
         };
         var slices = new List<SliceResponse> { embbSlice, embbSlice2, mediumLatencySlice };
-        var plannedLocation = new PlannedLocation(cloud.Id, cloud.Name, LocationType.Cloud);
+        var plannedLocation = new PlannedLocation(cloud.Id, cloud.Name, LocationType.Cloud, hwSpec, null);
         _redisInterfaceClient.SliceGetByIdAsync(embbSlice.Id).Returns(embbSlice);
         _redisInterfaceClient.SliceGetByIdAsync(embbSlice2.Id).Returns(embbSlice2);
         _redisInterfaceClient.SliceGetByIdAsync(mediumLatencySlice.Id).Returns(mediumLatencySlice);
@@ -255,12 +293,29 @@ public class UrllcSliceLocationPolicyTests
             Jitter = 5,
             TrafficType = TrafficType.Tcp.ToString()
         };
+        var hwSpec = new HardwareSpec
+        {
+            Ram = 1024,
+            Cpu = 1,
+            NumberCores = 4,
+            StorageDisk = 500,
+            VirtualRam = 2048,
+            Latency = 100,
+            Throughput = 1000
+        };
         var edge = new Location
         {
-            Name = "testLocation"
+            Name = "testLocation",
+            Ram = hwSpec.Ram,
+            Cpu = hwSpec.Cpu,
+            NumberOfCores = hwSpec.NumberCores,
+            Latency = (int)hwSpec.Latency.Value,
+            Throughput = (int)hwSpec.Throughput.Value,
+            VirtualRam = hwSpec.VirtualRam.Value,
+            DiskStorage = hwSpec.StorageDisk.Value
         };
         var slices = new List<SliceResponse> { embbSlice, embbSlice2, mediumLatencySlice };
-        var plannedLocation = new PlannedLocation(edge.Id, edge.Name, LocationType.Edge);
+        var plannedLocation = new PlannedLocation(edge.Id, edge.Name, LocationType.Edge, hwSpec, null);
         _redisInterfaceClient.SliceGetByIdAsync(embbSlice.Id).Returns(embbSlice);
         _redisInterfaceClient.SliceGetByIdAsync(embbSlice2.Id).Returns(embbSlice2);
         _redisInterfaceClient.SliceGetByIdAsync(mediumLatencySlice.Id).Returns(mediumLatencySlice);
@@ -288,11 +343,28 @@ public class UrllcSliceLocationPolicyTests
     public async Task IsLocationSatisfiedByPolicy_ShouldReturnFalse_WhenRelationsAreNull()
     {
         //arrange
+        var hwSpec = new HardwareSpec
+        {
+            Ram = 1024,
+            Cpu = 1,
+            NumberCores = 4,
+            StorageDisk = 500,
+            VirtualRam = 2048,
+            Latency = 100,
+            Throughput = 1000
+        };
         var edge = new EdgeModel
         {
-            Name = "testLocation"
+            Name = "testLocation",
+            Ram = hwSpec.Ram,
+            Cpu = hwSpec.Cpu,
+            NumberOfCores = hwSpec.NumberCores,
+            Latency = (int)hwSpec.Latency.Value,
+            Throughput = (int)hwSpec.Throughput.Value,
+            VirtualRam = hwSpec.VirtualRam.Value,
+            DiskStorage = hwSpec.StorageDisk.Value
         };
-        var plannedLocation = new PlannedLocation(edge.Id, edge.Name, LocationType.Edge);
+        var plannedLocation = new PlannedLocation(edge.Id, edge.Name, LocationType.Edge, hwSpec, null);
         var relationName = "OFFERS";
         _redisInterfaceClient.GetRelationAsync(Arg.Any<EdgeModel>(), relationName)!
             .Returns(Task.FromResult<List<RelationModel>>(null!));
@@ -326,13 +398,29 @@ public class UrllcSliceLocationPolicyTests
             UserSpeed = 100,
             TrafficType = TrafficType.Tcp.ToString()
         };
-
+        var hwSpec = new HardwareSpec
+        {
+            Ram = 1024,
+            Cpu = 1,
+            NumberCores = 4,
+            StorageDisk = 500,
+            VirtualRam = 2048,
+            Latency = 100,
+            Throughput = 1000
+        };
         var edge = new EdgeModel
         {
-            Name = "testLocation"
+            Name = "testLocation",
+            Ram = hwSpec.Ram,
+            Cpu = hwSpec.Cpu,
+            NumberOfCores = hwSpec.NumberCores,
+            Latency = (int)hwSpec.Latency.Value,
+            Throughput = (int)hwSpec.Throughput.Value,
+            VirtualRam = hwSpec.VirtualRam.Value,
+            DiskStorage = hwSpec.StorageDisk.Value
         };
         var slices = new List<SliceResponse> { embbSlice, embbSlice2 };
-        var plannedLocation = new PlannedLocation(edge.Id, edge.Name, LocationType.Edge);
+        var plannedLocation = new PlannedLocation(edge.Id, edge.Name, LocationType.Edge, hwSpec, null);
         _redisInterfaceClient.SliceGetByIdAsync(embbSlice.Id).Returns(embbSlice);
         _redisInterfaceClient.SliceGetByIdAsync(embbSlice2.Id)!.Returns(Task.FromResult<SliceResponse>(null!));
         var relations = new List<RelationModel>();
@@ -375,13 +463,29 @@ public class UrllcSliceLocationPolicyTests
             UserSpeed = 100,
             TrafficType = TrafficType.Tcp.ToString()
         };
-
+        var hwSpec = new HardwareSpec
+        {
+            Ram = 1024,
+            Cpu = 1,
+            NumberCores = 4,
+            StorageDisk = 500,
+            VirtualRam = 2048,
+            Latency = 100,
+            Throughput = 1000
+        };
         var edge = new EdgeModel
         {
-            Name = "testLocation"
+            Name = "testLocation",
+            Ram = hwSpec.Ram,
+            Cpu = hwSpec.Cpu,
+            NumberOfCores = hwSpec.NumberCores,
+            Latency = (int)hwSpec.Latency.Value,
+            Throughput = (int)hwSpec.Throughput.Value,
+            VirtualRam = hwSpec.VirtualRam.Value,
+            DiskStorage = hwSpec.StorageDisk.Value
         };
         var slices = new List<SliceResponse> { embbSlice, embbSlice2 };
-        var plannedLocation = new PlannedLocation(edge.Id, edge.Name, LocationType.Edge);
+        var plannedLocation = new PlannedLocation(edge.Id, edge.Name, LocationType.Edge, hwSpec, null);
         _redisInterfaceClient.SliceGetByIdAsync(embbSlice.Id).Returns(embbSlice);
         _redisInterfaceClient.SliceGetByIdAsync(embbSlice2.Id).Returns(embbSlice2);
         var relations = new List<RelationModel>();

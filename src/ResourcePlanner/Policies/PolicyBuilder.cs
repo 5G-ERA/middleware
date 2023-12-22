@@ -10,6 +10,7 @@ namespace Middleware.ResourcePlanner.Policies;
 
 internal class PolicyBuilder : IPolicyBuilder
 {
+    public const string ResourcePolicyName = "ResourceBasedLocation";
     private readonly Dictionary<string, IPolicy> _cachedPolicies = new();
     private readonly ICentralApiClient _centralApi;
     private readonly ILogger _logger;
@@ -45,6 +46,8 @@ internal class PolicyBuilder : IPolicyBuilder
         {
             nameof(UrllcSliceLocation) => new UrllcSliceLocation(policy.Priority, _redisInterfaceClient, _centralApi,
                 _logger),
+            nameof(ResourceBasedLocation) => new ResourceBasedLocation(policy.Priority, _redisInterfaceClient,
+                _centralApi, _logger),
             _ => new DefaultLocation(_middlewareConfig, _redisInterfaceClient)
         };
         _cachedPolicies[policyName] = policyImplementation;

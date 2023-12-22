@@ -2,6 +2,8 @@
 using Middleware.CentralApi.Sdk;
 using Middleware.Common.Enums;
 using Middleware.Models.Domain;
+using Middleware.Models.Domain.Contracts;
+using Middleware.Models.Domain.ValueObjects;
 using Middleware.Models.Enums;
 using Middleware.RedisInterface.Contracts.Mappings;
 using Middleware.RedisInterface.Sdk;
@@ -30,7 +32,35 @@ internal class UrllcSliceLocation : ILocationSelectionPolicy
     public bool FoundMatchingLocation { get; private set; }
 
     /// <inheritdoc />
-    public async Task<PlannedLocation> GetLocationAsync()
+    public async Task<bool> IsLocationSatisfiedByPolicy(PlannedLocation plannedLocation)
+    {
+        var location = new Location
+        {
+            Id = plannedLocation.Id,
+            Name = plannedLocation.Name,
+            Type = plannedLocation.Type
+        };
+
+        var relations = await _redisInterfaceClient.GetRelationAsync(location, "OFFERS");
+
+        if (relations is null) return false;
+
+        foreach (var relation in relations)
+        {
+            var sliceResponse = await _redisInterfaceClient.SliceGetByIdAsync(relation.PointsTo.Id);
+            if (sliceResponse is null)
+                continue;
+
+            var slice = sliceResponse.ToSlice();
+            if (slice.SliceType == SliceType.Urllc)
+                return true;
+        }
+
+        return false;
+    }
+
+    /// <inheritdoc />
+    public async Task<PlannedLocation> GetLocationAsync(IHardwareRequirementClaim hwClaim = null)
     {
         var slices = await _redisInterfaceClient.SliceGetAllAsync();
         if (slices is null)
@@ -62,35 +92,20 @@ internal class UrllcSliceLocation : ILocationSelectionPolicy
 
         FoundMatchingLocation = true;
         var locDetails = availableLocationsResponse.Locations.FirstOrDefault(l => l.Id == location.InitiatesFrom.Id);
-        var type = Enum.Parse<LocationType>(locDetails.Type, true);
-        return new(location.InitiatesFrom.Id, location.InitiatesFrom.Name, type, bestSlice.Name);
-    }
+        var loc = await _redisInterfaceClient.GetLocationByIdAsync(locDetails!.Id);
+        if (loc is null) return null;
 
-    /// <inheritdoc />
-    public async Task<bool> IsLocationSatisfiedByPolicy(PlannedLocation plannedLocation)
-    {
-        var location = new Location
+        var hwSpec = new HardwareSpec
         {
-            Id = plannedLocation.Id,
-            Name = plannedLocation.Name,
-            Type = plannedLocation.Type
+            Ram = loc.Ram,
+            Cpu = loc.Cpu,
+            NumberCores = loc.NumberOfCores,
+            StorageDisk = loc.DiskStorage,
+            VirtualRam = loc.VirtualRam,
+            Throughput = loc.Throughput,
+            Latency = loc.Latency
         };
-
-        var relations = await _redisInterfaceClient.GetRelationAsync(location, "OFFERS");
-
-        if (relations is null) return false;
-
-        foreach (var relation in relations)
-        {
-            var sliceResponse = await _redisInterfaceClient.SliceGetByIdAsync(relation.PointsTo.Id);
-            if (sliceResponse is null)
-                continue;
-
-            var slice = sliceResponse.ToSlice();
-            if (slice.SliceType == SliceType.Urllc)
-                return true;
-        }
-
-        return false;
+        var type = Enum.Parse<LocationType>(locDetails.Type, true);
+        return new(location.InitiatesFrom.Id, location.InitiatesFrom.Name, type, bestSlice.Name, hwSpec, null);
     }
 }

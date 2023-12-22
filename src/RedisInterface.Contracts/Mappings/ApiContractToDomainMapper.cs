@@ -433,6 +433,34 @@ public static class ApiContractToDomainMapper
         };
     }
 
+    public static Location ToLocation(this LocationResponse x)
+    {
+        return new()
+        {
+            Id = x.Id,
+            Name = x.Name,
+            Organization = x.Organization,
+            Type = Enum.Parse<LocationType>(x.Type),
+            Address = x.IpAddress,
+            Cpu = x.Cpu,
+            DiskStorage = x.DiskStorage,
+            MacAddress = x.MacAddress,
+            NumberOfCores = x.NumberOfCores,
+            Ram = x.Ram,
+            Status = x.Status,
+            VirtualRam = x.VirtualRam,
+            Latency = x.Latency,
+            Throughput = x.Throughput,
+            IsOnline = x.IsOnline,
+            LastUpdatedTime = x.LastUpdatedTime
+        };
+    }
+
+    public static List<Location> ToLocations(this GetLocationsResponse x)
+    {
+        return x.Locations.Select(l => l.ToLocation()).ToList();
+    }
+
     public static Location ToLocation(this CloudRequest x)
     {
         return new()

@@ -1,4 +1,6 @@
-﻿using Middleware.Models.Enums;
+﻿using Middleware.Models.Domain.Contracts;
+using Middleware.Models.Domain.ValueObjects;
+using Middleware.Models.Enums;
 
 namespace Middleware.Models.Domain;
 
@@ -9,20 +11,28 @@ public record PlannedLocation
     public LocationType Type { get; init; }
     public string? NetworkSliceName { get; }
     public bool HasSlicesEnabled { get; init; }
+    public HardwareSpec HardwareSpec { get; init; }
+    public IHardwareRequirementClaim? HardwareClaim { get; init; }
 
-    public PlannedLocation(Guid id, string name, LocationType type)
+    public PlannedLocation(Guid id, string name, LocationType type, HardwareSpec hardwareSpec,
+        IHardwareRequirementClaim? hardwareClaim)
     {
         Id = id;
         Name = name;
         Type = type;
+        HardwareClaim = hardwareClaim;
+        HardwareSpec = hardwareSpec;
     }
 
-    public PlannedLocation(Guid id, string name, LocationType type, string networkSliceName)
+    public PlannedLocation(Guid id, string name, LocationType type, string networkSliceName,
+        HardwareSpec hardwareSpec, IHardwareRequirementClaim? hardwareClaim)
     {
         Id = id;
         Name = name;
         Type = type;
         NetworkSliceName = networkSliceName;
+        HardwareClaim = hardwareClaim;
+        HardwareSpec = hardwareSpec;
         HasSlicesEnabled = true;
     }
 }

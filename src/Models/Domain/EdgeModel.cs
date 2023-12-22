@@ -75,7 +75,19 @@ public class EdgeModel : BaseModel, ILocation
             Organization = that.Organization,
             Type = LocationType.Edge,
             Address = that.EdgeIp,
-            Id = that.Id
+            Id = that.Id,
+            Ram = that.Ram,
+            NumberOfCores = that.NumberOfCores,
+            DiskStorage = that.DiskStorage,
+            VirtualRam = that.VirtualRam,
+            Cpu = that.Cpu,
+            IsOnline = that.IsOnline,
+            Throughput = that.Throughput,
+            Latency = that.Latency,
+            LastUpdatedTime = that.LastUpdatedTime,
+            MacAddress = that.MacAddress,
+            Relations = that.Relations,
+            Status = that.EdgeStatus
         };
     }
 
