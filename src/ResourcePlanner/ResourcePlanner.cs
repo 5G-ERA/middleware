@@ -67,7 +67,7 @@ internal class ResourcePlanner : IResourcePlanner
                 var instanceResp = await _redisInterfaceClient.InstanceGetByIdAsync(relation.PointsTo.Id);
                 var instance = instanceResp.ToInstance();
 
-                if (instance.CanBeReused() && taskModel.ResourceLock)
+                if (instance.CanBeReused() && !taskModel.DisableResourceReuse)
                 {
                     var reusedInstance = await GetInstanceToReuse(instance, orchestratorApiClient);
                     if (reusedInstance is not null)
@@ -520,7 +520,7 @@ internal class ResourcePlanner : IResourcePlanner
                     await _redisInterfaceClient.InstanceGetByIdAsync(relation.PointsTo.Id);
                 var instance = instanceResponse.ToInstance();
 
-                if (instance.CanBeReused() && taskModel.ResourceLock)
+                if (instance.CanBeReused() && !taskModel.DisableResourceReuse)
                 {
                     var reusedInstance = await GetInstanceToReuse(instance, orchestratorApiClient);
                     if (reusedInstance is not null)

@@ -50,7 +50,7 @@ public class PlanController : ControllerBase
         }
 
         var id = inputModel.Id;
-        var lockResource = inputModel.LockResourceReUse;
+        var lockResource = inputModel.DisableResourceReuse;
         var robotId = inputModel.RobotId;
 
         try
@@ -59,7 +59,7 @@ public class PlanController : ControllerBase
 
             var (plan, robot2) =
                 await _actionPlanner.Plan(id, robotId);
-            plan.ResourceLock = lockResource;
+            plan.DisableResourceReuse = lockResource;
 
             var resourcePlan = await _publishService.RequestResourcePlan(plan, robot2);
 
@@ -118,7 +118,7 @@ public class PlanController : ControllerBase
         }
 
         var id = inputModel.Id; //task id
-        var lockResource = inputModel.LockResourceReUse;
+        var lockResource = inputModel.DisableResourceReuse;
         var robotId = inputModel.RobotId; //robot id
         var contextKnown = inputModel.ContextKnown;
         var dialogueTemp = inputModel.Questions;
