@@ -61,6 +61,7 @@ public class InstanceModel : BaseModel, IPolicyAssignable, IHardwareRequirementC
     public bool CanBeDeleted()
     {
         return ServiceStatus == Enums.ServiceStatus.Down.ToString()
+               // TODO: extract the time comparison to external service
                && DateTimeOffset.Now - LastStatusChange > new TimeSpan(1, 0, 0);
     }
 
