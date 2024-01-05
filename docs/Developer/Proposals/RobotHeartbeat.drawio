@@ -1,0 +1,80 @@
+<mxfile host="Electron" modified="2024-01-05T07:56:19.812Z" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) draw.io/22.0.2 Chrome/114.0.5735.289 Electron/25.8.4 Safari/537.36" etag="h13wzHjyvm7jVHYE1Kh2" version="22.0.2" type="device">
+  <diagram name="Page-1" id="BOfru3HTwCJ5tte5zoQF">
+    <mxGraphModel dx="1098" dy="820" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="e-nq396-IQFdacgOm5Nt-1" value="" style="whiteSpace=wrap;html=1;aspect=fixed;" parent="1" vertex="1">
+          <mxGeometry x="40" y="280" width="340" height="340" as="geometry" />
+        </mxCell>
+        <mxCell id="e-nq396-IQFdacgOm5Nt-2" value="&lt;font style=&quot;font-size: 17px;&quot;&gt;Middleware&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffe6cc;strokeColor=#d79b00;" parent="1" vertex="1">
+          <mxGeometry x="520" y="300" width="200" height="120" as="geometry" />
+        </mxCell>
+        <mxCell id="e-nq396-IQFdacgOm5Nt-4" value="&lt;font style=&quot;font-size: 17px;&quot;&gt;Central API&lt;br&gt;&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffe6cc;strokeColor=#d79b00;" parent="1" vertex="1">
+          <mxGeometry x="520" y="480" width="200" height="120" as="geometry" />
+        </mxCell>
+        <mxCell id="e-nq396-IQFdacgOm5Nt-5" value="&lt;font style=&quot;font-size: 20px;&quot;&gt;Robot&lt;/font&gt;" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;" parent="1" vertex="1">
+          <mxGeometry x="160" y="240" width="80" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="e-nq396-IQFdacgOm5Nt-6" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;" parent="1" vertex="1">
+          <mxGeometry x="60" y="300" width="120" height="300" as="geometry" />
+        </mxCell>
+        <mxCell id="e-nq396-IQFdacgOm5Nt-7" value="Heartbeat Module" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;" parent="1" vertex="1">
+          <mxGeometry x="200" y="350" width="160" height="250" as="geometry" />
+        </mxCell>
+        <mxCell id="e-nq396-IQFdacgOm5Nt-8" value="" style="shape=flexArrow;endArrow=classic;html=1;rounded=0;entryX=0;entryY=0.25;entryDx=0;entryDy=0;exitX=1;exitY=0.5;exitDx=0;exitDy=0;" parent="1" source="1kyOTiIWWCq21sIBkDhV-3" target="e-nq396-IQFdacgOm5Nt-2" edge="1">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="389" y="370" as="sourcePoint" />
+            <mxPoint x="439" y="320" as="targetPoint" />
+            <Array as="points" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="e-nq396-IQFdacgOm5Nt-9" value="&lt;font style=&quot;font-size: 13px;&quot;&gt;MW-Robot Communication&lt;/font&gt;" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" parent="e-nq396-IQFdacgOm5Nt-8" vertex="1" connectable="0">
+          <mxGeometry x="0.0745" y="-3" relative="1" as="geometry">
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="e-nq396-IQFdacgOm5Nt-10" value="" style="shape=flexArrow;endArrow=classic;html=1;rounded=0;entryX=0;entryY=0.75;entryDx=0;entryDy=0;exitX=1;exitY=0.5;exitDx=0;exitDy=0;" parent="1" source="e-nq396-IQFdacgOm5Nt-14" target="e-nq396-IQFdacgOm5Nt-2" edge="1">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="400" y="410" as="sourcePoint" />
+            <mxPoint x="450" y="360" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="e-nq396-IQFdacgOm5Nt-11" value="&lt;font style=&quot;font-size: 14px;&quot;&gt;Robot Heartbeat&lt;/font&gt;" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" parent="e-nq396-IQFdacgOm5Nt-10" vertex="1" connectable="0">
+          <mxGeometry x="-0.1189" y="-2" relative="1" as="geometry">
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="e-nq396-IQFdacgOm5Nt-12" value="" style="shape=flexArrow;endArrow=classic;html=1;rounded=0;entryX=0.005;entryY=0.617;entryDx=0;entryDy=0;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryPerimeter=0;" parent="1" edge="1" target="e-nq396-IQFdacgOm5Nt-4" source="e-nq396-IQFdacgOm5Nt-15">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="360" y="539" as="sourcePoint" />
+            <mxPoint x="519" y="541" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="e-nq396-IQFdacgOm5Nt-13" value="&lt;font style=&quot;font-size: 14px;&quot;&gt;Robot Heartbeat to CentralApi&lt;br&gt;&lt;/font&gt;" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];rotation=30;" parent="e-nq396-IQFdacgOm5Nt-12" vertex="1" connectable="0">
+          <mxGeometry x="-0.1189" y="-2" relative="1" as="geometry">
+            <mxPoint y="-2" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="e-nq396-IQFdacgOm5Nt-14" value="Robot performance&lt;br&gt;collector" style="rounded=1;whiteSpace=wrap;html=1;" parent="1" vertex="1">
+          <mxGeometry x="220" y="360" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="e-nq396-IQFdacgOm5Nt-15" value="Middleware location&lt;br&gt;detector" style="rounded=1;whiteSpace=wrap;html=1;" parent="1" vertex="1">
+          <mxGeometry x="220" y="525" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="1kyOTiIWWCq21sIBkDhV-1" value="Middleware location selector" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="70" y="530" width="100" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="1kyOTiIWWCq21sIBkDhV-2" value="" style="endArrow=classic;html=1;rounded=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;exitX=0;exitY=0.5;exitDx=0;exitDy=0;" edge="1" parent="1" source="e-nq396-IQFdacgOm5Nt-15" target="1kyOTiIWWCq21sIBkDhV-1">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="390" y="450" as="sourcePoint" />
+            <mxPoint x="440" y="400" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="1kyOTiIWWCq21sIBkDhV-3" value="NetApp Clinet" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="70" y="310" width="100" height="50" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
