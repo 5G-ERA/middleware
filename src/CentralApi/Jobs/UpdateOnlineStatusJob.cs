@@ -8,15 +8,22 @@ namespace Middleware.CentralApi.Jobs;
 public class UpdateOnlineStatusJob : BaseJob<UpdateOnlineStatusJob>
 {
     private readonly ILocationRepository _locationRepository;
+    private readonly ISystemConfigRepository _systemConfig;
 
-    public UpdateOnlineStatusJob(ILogger<UpdateOnlineStatusJob> logger, ILocationRepository locationRepository) :
+    public UpdateOnlineStatusJob(ILogger<UpdateOnlineStatusJob> logger, ILocationRepository locationRepository,
+        ISystemConfigRepository systemConfig) :
         base(logger)
     {
         _locationRepository = locationRepository;
+        _systemConfig = systemConfig;
     }
 
     protected override async Task ExecuteJobAsync(IJobExecutionContext context)
     {
+        var cfg = await _systemConfig.GetConfigAsync();
+        if (cfg is null) throw new ArgumentException("No system config was found");
+
+        var heartbeatExpiration = cfg.HeartbeatExpirationInMinutes;
         try
         {
             var locations = await _locationRepository.GetAllAsync();
@@ -26,8 +33,8 @@ public class UpdateOnlineStatusJob : BaseJob<UpdateOnlineStatusJob>
                 if (!loc.IsOnline)
                     continue;
 
-                var threeMinutesEarlier = DateTime.UtcNow.AddMinutes(-3);
-                // Check if last updated time was no later then 3 minutes ago from now.
+                var threeMinutesEarlier = DateTime.UtcNow.AddMinutes(-1 * heartbeatExpiration);
+                // Check if last updated time was no later than 3 minutes ago from now.
                 if (loc.LastUpdatedTime < threeMinutesEarlier)
                 {
                     try

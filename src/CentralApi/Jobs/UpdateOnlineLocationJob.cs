@@ -2,55 +2,63 @@
 using Middleware.DataAccess.Repositories.Abstract;
 using Middleware.Models.Domain;
 using Quartz;
-using KeyValuePair = Middleware.Models.Domain.KeyValuePair;
 
 namespace Middleware.CentralApi.Jobs;
+
 [DisallowConcurrentExecution]
 public class UpdateOnlineLocationJob : BaseJob<UpdateOnlineStatusJob>
 {
     private readonly ILogger _logger;
     private readonly IRobotRepository _robotRepository;
-    public UpdateOnlineLocationJob(ILogger<UpdateOnlineStatusJob> logger, IRobotRepository robotRepository) : base(logger)
+    private readonly ISystemConfigRepository _systemConfig;
+
+    public UpdateOnlineLocationJob(ILogger<UpdateOnlineStatusJob> logger, IRobotRepository robotRepository,
+        ISystemConfigRepository systemConfig) : base(logger)
     {
         _logger = logger;
         _robotRepository = robotRepository;
+        _systemConfig = systemConfig;
     }
 
     protected override async Task ExecuteJobAsync(IJobExecutionContext context)
     {
+        var cfg = await _systemConfig.GetConfigAsync();
+        if (cfg is null) throw new ArgumentException("No system config was found");
 
+        var heartbeatExpiration = cfg.HeartbeatExpirationInMinutes;
         // get all CAN_REACH relations
         var relations = new List<RelationModel>();
         try
         {
             relations = await _robotRepository.GetRelationsWithName("CAN_REACH");
-        } catch (Exception ex)
+        }
+        catch (Exception ex)
         {
             Logger.LogError(ex, "There was en error while getting relations: CAN_REACH;");
         }
 
         if (relations.Any())
-            // chech all relations
+            // check all relations
+        {
             foreach (var rel in relations)
             {
-
-                var relationAttributes = new List<KeyValuePair>();
-                relationAttributes = rel.RelationAttributes;
+                var relationAttributes = rel.RelationAttributes;
                 var robotId = rel.InitiatesFrom.Id;
                 var locationId = rel.PointsTo.Id;
                 if (relationAttributes != null)
-                    foreach (KeyValuePair relAtribut in relationAttributes)
+                {
+                    foreach (var relAttribute in relationAttributes)
                     {
-                        if (relAtribut.Key == "lastUpdatedTime")
+                        if (relAttribute.Key == "lastUpdatedTime")
                         {
-                            string dateInput = (string)relAtribut.Value;
+                            var dateInput = (string)relAttribute.Value;
                             var parsedDateTime = DateTime.Parse(dateInput);
 
-                            DateTime threeMinutesEarlier = DateTime.UtcNow.AddMinutes(-3);
-                            // Check if last updated time was no later then 3 minutes ago from now.
+                            var threeMinutesEarlier = DateTime.UtcNow.AddMinutes(-1 * heartbeatExpiration);
+                            // Check if last updated time was no later than 3 minutes ago from now.
                             if (parsedDateTime < threeMinutesEarlier)
                             {
-                                RelationModel relationModel = new RelationModel();
+                                var relationModel = new RelationModel();
                                 var relationName = rel.RelationName;
                                 relationModel.InitiatesFrom.Id = robotId;
                                 relationModel.InitiatesFrom.Type = rel.InitiatesFrom.Type;
@@ -62,17 +70,23 @@ public class UpdateOnlineLocationJob : BaseJob<UpdateOnlineStatusJob>
                                     var isValid = await _robotRepository.DeleteRelationAsync(relationModel);
                                     if (!isValid)
                                     {
-                                        Logger.LogError("Deleting relation did not succeed: formId: {robotId} relationName: {name} toId:{Id2}", robotId, relationName, locationId);
+                                        Logger.LogError(
+                                            "Deleting relation did not succeed: formId: {robotId} relationName: {name} toId:{Id2}",
+                                            robotId, relationName, locationId);
                                     }
                                 }
                                 catch (Exception ex)
                                 {
-                                    Logger.LogError(ex, "There was en error while deleteing relation formId: {robotId} relationName: {name} toId:{Id2}", robotId, relationName, locationId);
+                                    Logger.LogError(ex,
+                                        "There was en error while deleting relation formId: {robotId} relationName: {name} toId:{Id2}",
+                                        robotId, relationName, locationId);
                                     //throw new ArgumentException("The relation was not deleted", nameof(model));
                                 }
                             }
                         }
                     }
+                }
             }
+        }
     }
 }
