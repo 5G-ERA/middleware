@@ -22,6 +22,9 @@ public class SystemConfigDto : Dto
     [Indexed]
     public string RosInterRelayNetAppContainer { get; init; } = default!;
 
+    [Indexed]
+    public int HeartbeatExpirationInMinutes { get; set; }
+
     /// <inheritdoc />
     public override BaseModel ToModel()
     {
@@ -32,7 +35,8 @@ public class SystemConfigDto : Dto
             Name = "System Config",
             Ros1RelayContainer = d.Ros1RelayContainer,
             Ros2RelayContainer = d.Ros2RelayContainer,
-            RosInterRelayNetAppContainer = d.RosInterRelayNetAppContainer
+            RosInterRelayNetAppContainer = d.RosInterRelayNetAppContainer,
+            HeartbeatExpirationInMinutes = d.HeartbeatExpirationInMinutes
         };
     }
 }
