@@ -8,7 +8,6 @@ using Middleware.DataAccess.HostedServices;
 using Middleware.RedisInterface;
 using Middleware.RedisInterface.Services;
 using Middleware.RedisInterface.Services.Abstract;
-using Middleware.RedisInterface.Validation;
 using Newtonsoft.Json;
 using Serilog;
 
@@ -50,6 +49,7 @@ builder.Services.AddScoped<IDashboardService, DashboardService>();
 builder.Services.AddScoped<IActionService, ActionService>();
 builder.Services.AddScoped<ISliceService, SliceService>();
 builder.Services.AddScoped<ITaskService, TaskService>();
+builder.Services.AddScoped<ISystemConfigService, SystemConfigService>();
 
 var app = builder.Build();
 
