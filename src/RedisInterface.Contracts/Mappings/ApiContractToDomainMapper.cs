@@ -522,4 +522,15 @@ public static class ApiContractToDomainMapper
             Enabled = x.Enabled
         };
     }
+
+    public static SystemConfigModel ToSystemConfig(this SystemConfigRequest x)
+    {
+        return new()
+        {
+            HeartbeatExpirationInMinutes = x.HeartbeatExpirationInMinutes,
+            Ros1RelayContainer = x.Ros1RelayContainer,
+            Ros2RelayContainer = x.Ros2RelayContainer,
+            RosInterRelayNetAppContainer = x.RosInterRelayNetAppContainer
+        };
+    }
 }
