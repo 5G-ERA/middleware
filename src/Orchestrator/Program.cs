@@ -31,8 +31,11 @@ builder.ConfigureLogger();
 builder.Services.Configure<MiddlewareConfig>(builder.Configuration.GetSection(MiddlewareConfig.ConfigName));
 builder.Services.Configure<SliceConfig>(builder.Configuration.GetSection(SliceConfig.ConfigName));
 builder.Services.Configure<UserConfig>(builder.Configuration.GetSection(UserConfig.ConfigName));
-
 var mwConfig = builder.Configuration.GetSection(MiddlewareConfig.ConfigName).Get<MiddlewareConfig>();
+
+builder.Services.Configure<InfluxConfig>(builder.Configuration.GetSection(InfluxConfig.ConfigName));
+var influxConfig = builder.Configuration.GetSection(InfluxConfig.ConfigName).Get<InfluxConfig>();
+
 var centralApiHostname = Environment.GetEnvironmentVariable("CENTRAL_API_HOSTNAME");
 if (centralApiHostname is null)
     throw new ArgumentException("Environment variable not defined: CENTRAL_API_HOSTNAME", "CENTRAL_API_HOSTNAME");
@@ -53,6 +56,7 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 builder.RegisterRedis();
+builder.RegisterInflux();
 
 var rabbitmqConfig = builder.Configuration.GetSection(RabbitMqConfig.ConfigName).Get<RabbitMqConfig>();
 

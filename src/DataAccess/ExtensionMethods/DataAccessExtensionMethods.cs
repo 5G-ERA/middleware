@@ -1,10 +1,14 @@
-﻿using Microsoft.AspNetCore.Builder;
+﻿using InfluxDB.Client;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Middleware.Common.Config;
 using Middleware.DataAccess.Repositories;
 using Middleware.DataAccess.Repositories.Abstract;
+using Middleware.DataAccess.Repositories.Abstract.Influx;
+using Middleware.DataAccess.Repositories.Influx;
 using Middleware.DataAccess.Repositories.Redis;
+using Middleware.Models.Domain;
 using Redis.OM;
 using Redis.OM.Contracts;
 using RedisGraphDotNet.Client;
@@ -36,6 +40,17 @@ public static class DataAccessExtensionMethods
         return builder;
     }
 
+    public static WebApplicationBuilder RegisterInflux(this WebApplicationBuilder builder)
+    {
+        var config = builder.Configuration.GetSection(InfluxConfig.ConfigName).Get<InfluxConfig>();
+        var influxClient = new InfluxDBClient(config.Address, config.ApiKey);
+        builder.Services.AddSingleton<IInfluxDBClient>(influxClient);
+
+        builder.Services.AddScoped<IInfluxNetAppStatusRepository, InfluxNetAppStatusRepository>();
+        builder.Services.AddScoped<IInfluxRobotStatusRepository, InfluxRobotStatusRepository>();
+        return builder;
+    }
+    
     public static IServiceCollection RegisterRepositories(this IServiceCollection services)
     {
         services.AddScoped<IActionRepository, RedisActionRepository>();
