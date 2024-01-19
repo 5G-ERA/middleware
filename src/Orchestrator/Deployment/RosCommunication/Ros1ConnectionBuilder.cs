@@ -2,6 +2,7 @@ using System.Text.Json;
 using k8s.Models;
 using Middleware.Common.ExtensionMethods;
 using Middleware.Models.Domain;
+using Middleware.Models.Domain.Ros;
 
 namespace Middleware.Orchestrator.Deployment.RosCommunication;
 

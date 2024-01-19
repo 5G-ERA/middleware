@@ -1,4 +1,4 @@
-﻿using Middleware.Models.Domain;
+﻿using Middleware.Models.Domain.Ros;
 
 namespace Middleware.Models.Dto.Ros;
 
@@ -7,12 +7,12 @@ public class RosService
     public string? Name { get; init; }
     public string? Description { get; init; }
 
-    public ROSServiceModel ToModel()
+    public RosServiceModel ToModel()
     {
-        return new ROSServiceModel()
+        return new()
         {
-            Name = this.Name!,
-            Description = this.Description!
+            Name = Name!,
+            Description = Description!
         };
     }
 }

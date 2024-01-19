@@ -1,4 +1,5 @@
 ﻿using Middleware.Models.Domain;
+using Middleware.Models.Domain.Ros;
 using Middleware.Models.Domain.Slice;
 using Middleware.Models.Enums;
 using Middleware.RedisInterface.Contracts.Requests;

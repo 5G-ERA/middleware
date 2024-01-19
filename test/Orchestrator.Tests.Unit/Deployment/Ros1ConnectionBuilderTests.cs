@@ -4,6 +4,7 @@ using System.Linq;
 using FluentAssertions;
 using k8s.Models;
 using Middleware.Models.Domain;
+using Middleware.Models.Domain.Ros;
 using Middleware.Orchestrator.Deployment.RosCommunication;
 using Xunit;
 

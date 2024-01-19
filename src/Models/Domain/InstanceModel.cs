@@ -1,4 +1,5 @@
 ﻿using Middleware.Models.Domain.Contracts;
+using Middleware.Models.Domain.Ros;
 using Middleware.Models.Domain.ValueObjects;
 using Middleware.Models.Dto;
 using Middleware.Models.Enums;

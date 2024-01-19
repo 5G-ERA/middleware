@@ -1,6 +1,7 @@
 ﻿using System.Text.Json.Serialization;
 using JetBrains.Annotations;
 using Middleware.Models.Domain;
+using Middleware.Models.Domain.Ros;
 
 namespace Middleware.Orchestrator.Deployment.RosCommunication;
 
@@ -14,6 +15,12 @@ internal class RosTopicContainer
 
     [JsonPropertyName("topic_type")]
     public string Type { [UsedImplicitly] get; init; }
+
+    public string Compression { [UsedImplicitly] get; set; } = "none";
+
+    [JsonPropertyName("qos")]
+    [CanBeNull]
+    public NetAppQos Qos { get; set; }
 
     public static RosTopicContainer FromRosTopicModel(RosTopicModel topic)
     {

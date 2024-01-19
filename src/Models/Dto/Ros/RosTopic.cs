@@ -1,4 +1,4 @@
-﻿using Middleware.Models.Domain;
+﻿using Middleware.Models.Domain.Ros;
 
 namespace Middleware.Models.Dto.Ros;
 
