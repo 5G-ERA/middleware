@@ -100,6 +100,76 @@ public class NetAppStatusDto : InfluxDto
         };
     }
 
+    public override BaseModel FromInfluxDataToModel(List<FluxTable> fluxTables)
+    {
+        // Check if is not passed null value
+        if (fluxTables == null || fluxTables.Count == 0)
+        {
+            return null;
+        }
+        if (fluxTables[0].Records.Count < 1)
+        {
+            return null;
+        }
+
+        Int32 objHardLimit = 0;
+        Int32 objOptimalLimit = 0;
+        Int32 objCurrentRobotsCount = 0;
+
+
+        // static properties of all objects
+        var objName = fluxTables[0].Records[0].GetValueByKey("robot").ToString();
+        var objId = fluxTables[0].Records[0].GetValueByKey("id").ToString();
+        var objTimestamp = fluxTables[0].Records[0].GetTimeInDateTime();
+
+        // TODO: Guard extracted values
+        if (objName == null || objId == null || objTimestamp == null)
+        {
+            return null;
+        }
+
+        // dynamic properties of all objects
+        // data of one parameter is kept in a table.Records as a table and could be accessed as array or by provided methods;
+        // one sample will have as many tables as many parameters the object has;
+        foreach (var fluxTable in fluxTables)
+        {
+            foreach (var fluxrecord in fluxTable.Records)
+            {
+                var fieldNamee = fluxrecord.GetField().ToString();
+                var extractedValue = fluxrecord.GetValue();
+
+                if (extractedValue == null) return null;
+
+                var valueString = extractedValue.ToString();
+                if (valueString != null)
+                {
+                    if (fieldNamee == "HardLimit")
+                    {
+                        objHardLimit = Int32.Parse(valueString);
+                    }
+                    else if (fieldNamee == "OptimalLimit")
+                    {
+                        objOptimalLimit = Int32.Parse(valueString);
+                    }
+                    else if (fieldNamee == "CurrentRobotsCount")
+                    {
+                        objCurrentRobotsCount = Int32.Parse(valueString);
+                    }
+                }
+            }
+        }
+        // assemble object from above structure
+        return new NetAppStatusModel
+        {
+            Id = Guid.Parse(objId),
+            Name = objName,
+            HardLimit = objHardLimit,
+            OptimalLimit = objOptimalLimit,
+            CurrentRobotsCount = objCurrentRobotsCount,
+            Timestamp = (DateTimeOffset)objTimestamp
+        };
+    }
+
     public override BaseModel ToModel()
     {
         var dto = this;

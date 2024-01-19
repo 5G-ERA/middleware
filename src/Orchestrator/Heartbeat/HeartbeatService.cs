@@ -1,4 +1,5 @@
 ﻿using Middleware.DataAccess.Repositories.Abstract;
+using Middleware.DataAccess.Repositories.Abstract.Influx;
 using Middleware.Models.Domain;
 using Middleware.RedisInterface.Sdk;
 
@@ -11,13 +12,20 @@ internal class HeartbeatService : IHeartbeatService
     private readonly IRedisInterfaceClient _redisInterfaceClient;
     private readonly IRobotStatusRepository _robotStatusRepository;
 
+    private readonly IInfluxNetAppStatusRepository _influxNetAppStatusRepository;
+    private readonly IInfluxRobotStatusRepository _influxRobotStatusRepository;
+
     public HeartbeatService(IRobotStatusRepository robotStatusRepository, IRedisInterfaceClient redisInterfaceClient,
-        INetAppStatusRepository netAppStatusRepository, ILogger<HeartbeatService> logger)
+        INetAppStatusRepository netAppStatusRepository, ILogger<HeartbeatService> logger,
+        IInfluxNetAppStatusRepository influxNetAppStatusRepository,
+        IInfluxRobotStatusRepository influxRobotStatusRepository)
     {
         _robotStatusRepository = robotStatusRepository;
         _redisInterfaceClient = redisInterfaceClient;
         _netAppStatusRepository = netAppStatusRepository;
         _logger = logger;
+        _influxNetAppStatusRepository = influxNetAppStatusRepository;
+        _influxRobotStatusRepository = influxRobotStatusRepository;
     }
 
     /// <inheritdoc />

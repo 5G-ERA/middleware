@@ -15,6 +15,7 @@ public class InfluxRepository<TModel, TDto> : IInfluxRepository<TModel, TDto> wh
 {
     private const string Organization = "testorg";
     protected readonly string Bucket;
+    protected readonly string ObjectType;
     /// <summary>
     /// Logger instance
     /// </summary>
@@ -31,11 +32,12 @@ public class InfluxRepository<TModel, TDto> : IInfluxRepository<TModel, TDto> wh
     /// <param name="client">Influx client </param>
     /// <param name="logger">Logger instance</param>
     /// <exception cref="ArgumentNullException"></exception>
-    public InfluxRepository(IInfluxDBClient client, ILogger logger, string bucket)
+    public InfluxRepository(IInfluxDBClient client, ILogger logger, string bucket, string objectType)
     {
         Logger = logger ?? throw new ArgumentNullException(nameof(logger));
         Client = client ?? throw new ArgumentNullException(nameof(client));
         Bucket = bucket;
+        ObjectType = objectType;
     }
 
     public async Task AddOrgAsync(string organisationName)
@@ -82,20 +84,16 @@ public class InfluxRepository<TModel, TDto> : IInfluxRepository<TModel, TDto> wh
         await Client.GetWriteApiAsync().WritePointAsync(point: point, bucket: Bucket, org: Organization);
         return ToTModel(dto);
     }
-    public async Task<TModel?> GetLastByIdAsync(Guid id)
+    public async Task<TModel?> GetStatusByIdAsync(Guid id)
     {
         //var dto = await Collection.FindByIdAsync(id.ToString());
         //if (dto is null) return null;
         //return ToTModel(dto);
 
-        /*
-        string queryw = 'from(bucket: "NetAppStatus") |> range(start: 0) |> filter(fn: (r) => r["_measurement"] == "heartbeat") |> filter(fn: (r) => r["id"] == "3fa85f64-5717-4562-b3fc-2c963f66afa6") |> yield(name: "last")';
-        //*/
-
-        string queryw = "from(bucket: 'NetAppStatus') |> range(start: 0) |> filter(fn: (r) => r['_measurement'] == 'heartbeat') |> filter(fn: (r) => r['id'] == '3fa85f64-5717-4562-b3fc-2c963f66afa6') |> yield(name: 'last')";
-
-
-        throw new NotImplementedException();
+        var stringId = id.ToString();
+        string query = "from(bucket: \"" + ObjectType + "\") |> range(start: 0) |> filter(fn: (r) => r[\"_measurement\"] == \"heartbeat\") |> filter(fn: (r) => r[\"id\"] == \"" + stringId + "\") |> yield(name: \"last\")";
+        List<FluxTable> fluxTables = await Client.GetQueryApi().QueryAsync(query: query, org: Organization);
+        return FromInfluxDataToModel(fluxTables, fluxTables);
     }
     public async Task GetLastByIdAsyncTest()
     {
@@ -165,5 +163,10 @@ public class InfluxRepository<TModel, TDto> : IInfluxRepository<TModel, TDto> wh
     protected TModel ToTModel(TDto dto)
     {
         return dto.ToModel() as TModel ?? throw new MappingException(typeof(TDto), typeof(TModel));
+    }
+    //FromInfluxDataToModel
+    protected TModel FromInfluxDataToModel(TDto dto, List<FluxTable>  fluxTables)
+    {
+        return dto.FromInfluxDataToModel(fluxTables) as TModel ?? throw new MappingException(typeof(TDto), typeof(TModel));
     }
 }

@@ -290,7 +290,9 @@ public class StatusController : Controller
             var statuses = new List<NetAppStatusModel>();
             foreach (var instanceId in instanceIds)
             {
-                var status = await _netAppStatusRepository.GetByIdAsync(instanceId);
+                //var status = await _netAppStatusRepository.GetByIdAsync(instanceId);
+                //  NetAppStatusModel // 7
+                var status = await _influxNetAppStatusRepository.GetLastByIdAsync(instanceId);
                 if (status is not null) statuses.Add(status);
             }
 
