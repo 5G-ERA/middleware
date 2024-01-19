@@ -8,6 +8,9 @@ public class RosTopic
     public string? Type { get; set; }
     public string? Description { get; set; }
     public bool Enabled { get; set; }
+    public string Compression { get; set; } = "none";
+
+    public QosDto? Qos { get; set; }
 
     public RosTopicModel ToModel()
     {
@@ -17,7 +20,9 @@ public class RosTopic
             Name = dto.Name,
             Type = dto.Type,
             Description = dto.Description,
-            Enabled = dto.Enabled
+            Enabled = dto.Enabled,
+            Compression = dto.Compression,
+            Qos = dto.Qos?.ToModel()
         };
     }
 }

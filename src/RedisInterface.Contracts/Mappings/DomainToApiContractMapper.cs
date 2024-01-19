@@ -286,7 +286,41 @@ public static class DomainToApiContractMapper
             Name = x.Name,
             Type = x.Type,
             Description = x.Description,
-            Enabled = x.Enabled
+            Enabled = x.Enabled,
+            Compression = x.Compression,
+            Qos = x.Qos?.ToQosResponse()
+        };
+    }
+
+    public static RosQosResponse ToQosResponse(this Qos x)
+    {
+        return new()
+        {
+            Deadline = x.Deadline,
+            Depth = x.Depth,
+            Durability = x.Durability,
+            History = x.History,
+            Lease = x.Lease,
+            Lifespan = x.Lifespan,
+            Liveliness = x.Liveliness,
+            Preset = x.Preset,
+            Reliability = x.Reliability
+        };
+    }
+
+    public static RosQosRequest ToQosRequest(this Qos x)
+    {
+        return new()
+        {
+            Deadline = x.Deadline,
+            Depth = x.Depth,
+            Durability = x.Durability,
+            History = x.History,
+            Lease = x.Lease,
+            Lifespan = x.Lifespan,
+            Liveliness = x.Liveliness,
+            Preset = x.Preset,
+            Reliability = x.Reliability
         };
     }
 
@@ -297,7 +331,9 @@ public static class DomainToApiContractMapper
             Name = x.Name,
             Type = x.Type,
             Description = x.Description,
-            Enabled = x.Enabled
+            Enabled = x.Enabled,
+            Compression = x.Compression,
+            Qos = x.Qos?.ToQosRequest()
         };
     }
 

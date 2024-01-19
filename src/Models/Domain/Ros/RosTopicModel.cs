@@ -34,12 +34,15 @@ public class RosTopicModel
 
     public RosTopic ToDto()
     {
+        var domain = this;
         return new()
         {
-            Name = Name,
-            Type = Type,
-            Description = Description,
-            Enabled = Enabled
+            Name = domain.Name,
+            Type = domain.Type,
+            Description = domain.Description,
+            Enabled = domain.Enabled,
+            Compression = domain.Compression,
+            Qos = domain.Qos?.ToDto()
         };
     }
 }

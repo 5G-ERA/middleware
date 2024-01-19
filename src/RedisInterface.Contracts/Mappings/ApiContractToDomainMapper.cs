@@ -509,7 +509,9 @@ public static class ApiContractToDomainMapper
             Name = x.Name,
             Type = x.Type,
             Description = x.Description,
-            Enabled = x.Enabled
+            Enabled = x.Enabled,
+            Compression = x.Compression,
+            Qos = x.Qos?.ToQos()
         };
     }
 
@@ -520,7 +522,41 @@ public static class ApiContractToDomainMapper
             Name = x.Name,
             Type = x.Type,
             Description = x.Description,
-            Enabled = x.Enabled
+            Enabled = x.Enabled,
+            Compression = x.Compression,
+            Qos = x.Qos?.ToQos()
+        };
+    }
+
+    public static Qos ToQos(this RosQosRequest x)
+    {
+        return new()
+        {
+            Deadline = x.Deadline,
+            Depth = x.Depth,
+            Durability = x.Durability,
+            History = x.History,
+            Lease = x.Lease,
+            Lifespan = x.Lifespan,
+            Liveliness = x.Liveliness,
+            Preset = x.Preset,
+            Reliability = x.Reliability
+        };
+    }
+
+    public static Qos ToQos(this RosQosResponse x)
+    {
+        return new()
+        {
+            Deadline = x.Deadline,
+            Depth = x.Depth,
+            Durability = x.Durability,
+            History = x.History,
+            Lease = x.Lease,
+            Lifespan = x.Lifespan,
+            Liveliness = x.Liveliness,
+            Preset = x.Preset,
+            Reliability = x.Reliability
         };
     }
 }

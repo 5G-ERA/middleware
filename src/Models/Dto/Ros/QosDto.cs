@@ -16,17 +16,18 @@ public class QosDto
 
     public Qos ToModel()
     {
+        var dto = this;
         return new()
         {
-            Deadline = Deadline,
-            Depth = Depth,
-            Durability = Durability,
-            History = History,
-            Lease = Lease,
-            Lifespan = Lifespan,
-            Liveliness = Liveliness,
-            Preset = Preset,
-            Reliability = Reliability
+            Deadline = dto.Deadline,
+            Depth = dto.Depth,
+            Durability = dto.Durability,
+            History = dto.History,
+            Lease = dto.Lease,
+            Lifespan = dto.Lifespan,
+            Liveliness = dto.Liveliness,
+            Preset = dto.Preset,
+            Reliability = dto.Reliability
         };
     }
 }

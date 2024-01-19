@@ -6,4 +6,7 @@ public class RosTopicResponse
     public string Type { get; set; }
     public string Description { get; set; }
     public bool Enabled { get; set; }
+    public string Compression { get; set; } = "none";
+
+    public QosResponse Qos { get; set; }
 }
