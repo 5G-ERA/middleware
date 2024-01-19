@@ -26,6 +26,14 @@ public class InstanceModel : BaseModel, IPolicyAssignable, IHardwareRequirementC
 
     public List<RosTopicModel> RosTopicsSub { get; set; } = new(); // compulsory field
 
+    /// <summary>
+    ///     Represents list of transformations made when connecting to relay from robot
+    /// </summary>
+    public List<RosTransformsModel> TransformsToNetApp { get; set; } = new();
+
+    public List<RosTransformsModel> Actions { get; set; } = new();
+    public List<RosTransformsModel> Transforms { get; set; } = new();
+
     public int RosVersion { get; set; } // compulsory field
 
     public string? RosDistro { get; set; } // compulsory field

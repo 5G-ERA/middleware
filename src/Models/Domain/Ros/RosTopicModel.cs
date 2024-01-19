@@ -8,12 +8,11 @@ public class RosTopicModel
 
     public string? Type { get; init; }
 
-
     public string? Description { get; init; }
 
     public string Compression { get; set; } = "none";
 
-    public NetAppQos? Qos { get; set; }
+    public Qos? Qos { get; set; }
 
     public bool Enabled { get; set; }
 

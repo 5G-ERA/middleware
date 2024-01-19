@@ -12,6 +12,11 @@ internal class Ros1ConnectionBuilder : IRosConnectionBuilder
     private readonly SystemConfigModel _cfg;
     private readonly RosDistro _distro;
 
+    public int RosVersion { get; }
+
+    /// <inheritdoc />
+    public string RosDistro { get; }
+
     public Ros1ConnectionBuilder(RosDistro distro, SystemConfigModel cfg)
     {
         if (distro.RosVersion != Ros1)
@@ -25,11 +30,6 @@ internal class Ros1ConnectionBuilder : IRosConnectionBuilder
         RosVersion = distro.RosVersionInt;
         RosDistro = distro.Name;
     }
-
-    public int RosVersion { get; }
-
-    /// <inheritdoc />
-    public string RosDistro { get; }
 
     public V1Service EnableRelayNetAppCommunication(V1Service service)
     {

@@ -301,7 +301,6 @@ public static class DomainToApiContractMapper
         };
     }
 
-
     public static FullActionResponse ToFullActionResponse(this ActionModel x)
     {
         return new()
