@@ -93,7 +93,8 @@ public class InfluxRepository<TModel, TDto> : IInfluxRepository<TModel, TDto> wh
         var stringId = id.ToString();
         string query = "from(bucket: \"" + ObjectType + "\") |> range(start: 0) |> filter(fn: (r) => r[\"_measurement\"] == \"heartbeat\") |> filter(fn: (r) => r[\"id\"] == \"" + stringId + "\") |> yield(name: \"last\")";
         List<FluxTable> fluxTables = await Client.GetQueryApi().QueryAsync(query: query, org: Organization);
-        return FromInfluxDataToModel(fluxTables, fluxTables);
+        //return FromInfluxDataToModel(fluxTables, fluxTables);
+        throw new NotImplementedException();
     }
     public async Task GetLastByIdAsyncTest()
     {

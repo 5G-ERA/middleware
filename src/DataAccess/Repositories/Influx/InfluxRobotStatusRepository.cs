@@ -7,7 +7,7 @@ using ILogger = Serilog.ILogger;
 namespace Middleware.DataAccess.Repositories.Influx;
 public class InfluxRobotStatusRepository : InfluxRepository<RobotStatusModel, RobotStatusDto>, IInfluxRobotStatusRepository
 {
-    public InfluxRobotStatusRepository(IInfluxDBClient client, ILogger logger) : base(client, logger, "RobotStatus")
+    public InfluxRobotStatusRepository(IInfluxDBClient client, ILogger logger) : base(client, logger, "RobotStatus", "robot")
     {
     }
 }

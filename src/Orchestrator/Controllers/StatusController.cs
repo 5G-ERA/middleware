@@ -292,7 +292,7 @@ public class StatusController : Controller
             {
                 //var status = await _netAppStatusRepository.GetByIdAsync(instanceId);
                 //  NetAppStatusModel // 7
-                var status = await _influxNetAppStatusRepository.GetLastByIdAsync(instanceId);
+                var status = await _influxNetAppStatusRepository.GetStatusByIdAsync(instanceId);
                 if (status is not null) statuses.Add(status);
             }
 

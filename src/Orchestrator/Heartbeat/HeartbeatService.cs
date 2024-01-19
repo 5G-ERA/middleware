@@ -31,6 +31,7 @@ internal class HeartbeatService : IHeartbeatService
     /// <inheritdoc />
     public async Task<NetAppStatusModel> GetNetAppStatusByIdAsync(Guid id, bool generateFakeData = false)
     {
+        //var status = await _netAppStatusRepository.GetByIdAsync(id);
         var status = await _netAppStatusRepository.GetByIdAsync(id);
         if (status is null && generateFakeData)
         {
