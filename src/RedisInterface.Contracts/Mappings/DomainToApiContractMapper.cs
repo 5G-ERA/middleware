@@ -133,6 +133,7 @@ public static class DomainToApiContractMapper
             RosDistro = x.RosDistro,
             RosTopicPublishers = x.RosTopicsPub.Select(t => t.ToRosTopicResponse()),
             RosTopicSubscribers = x.RosTopicsSub.Select(t => t.ToRosTopicResponse()),
+            RosActions = x.Actions.Select(t => t.ToRosActionResponse()).ToList(),
             Tags = x.Tags,
             OnboardedTime = x.OnboardedTime,
             AppliedPolicies = x.AppliedPolicies
@@ -373,6 +374,7 @@ public static class DomainToApiContractMapper
             RosDistro = x.RosDistro,
             RosTopicPublishers = x.RosTopicsPub.Select(t => t.ToRosTopicResponse()),
             RosTopicSubscribers = x.RosTopicsSub.Select(t => t.ToRosTopicResponse()),
+            RosActions = x.Actions.Select(t => t.ToRosActionResponse()).ToList(),
             Tags = x.Tags,
             OnboardedTime = x.OnboardedTime,
             AppliedPolicies = x.AppliedPolicies,
@@ -494,6 +496,24 @@ public static class DomainToApiContractMapper
         return new()
         {
             Edges = x.Select(l => l.ToEdgeResponse())
+        };
+    }
+
+    public static RosActionRequest ToRosActionRequest(this RosActionModel x)
+    {
+        return new()
+        {
+            Name = x.Name,
+            Type = x.Type
+        };
+    }
+
+    public static RosActionResponse ToRosActionResponse(this RosActionModel x)
+    {
+        return new()
+        {
+            Name = x.Name,
+            Type = x.Type
         };
     }
 }

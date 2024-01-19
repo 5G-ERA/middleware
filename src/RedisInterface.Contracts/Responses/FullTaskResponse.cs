@@ -34,6 +34,7 @@ public class FullInstanceResponse
     public bool? IsReusable { get; init; }
     public IEnumerable<RosTopicResponse> RosTopicPublishers { get; init; } = Enumerable.Empty<RosTopicResponse>();
     public IEnumerable<RosTopicResponse> RosTopicSubscribers { get; init; } = Enumerable.Empty<RosTopicResponse>();
+    public IEnumerable<RosActionResponse> RosActions { get; init; } = Enumerable.Empty<RosActionResponse>();
     public int RosVersion { get; init; }
     public string RosDistro { get; init; } = default!;
     public string Family { get; init; }

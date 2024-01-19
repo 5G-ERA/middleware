@@ -175,6 +175,7 @@ public static class ApiContractToDomainMapper
             RosDistro = x.RosDistro,
             RosTopicsPub = x.RosTopicPublishers.Select(t => t.ToRosTopic()).ToList(),
             RosTopicsSub = x.RosTopicSubscribers.Select(t => t.ToRosTopic()).ToList(),
+            Actions = x.RosActions.Select(t => t.ToRosAction()).ToList(),
             AppliedPolicies = x.AppliedPolicies.ToList()
         };
     }
@@ -197,6 +198,7 @@ public static class ApiContractToDomainMapper
             RosDistro = x.RosDistro,
             RosTopicsPub = x.RosTopicPublishers.Select(t => t.ToRosTopic()).ToList(),
             RosTopicsSub = x.RosTopicSubscribers.Select(t => t.ToRosTopic()).ToList(),
+            Actions = x.RosActions.Select(t => t.ToRosAction()).ToList(),
             AppliedPolicies = x.AppliedPolicies.ToList(),
             Tags = x.Tags?.ToList(),
             OnboardedTime = x.OnboardedTime
@@ -557,6 +559,24 @@ public static class ApiContractToDomainMapper
             Liveliness = x.Liveliness,
             Preset = x.Preset,
             Reliability = x.Reliability
+        };
+    }
+
+    public static RosActionModel ToRosAction(this RosActionRequest x)
+    {
+        return new()
+        {
+            Name = x.Name,
+            Type = x.Type
+        };
+    }
+
+    public static RosActionModel ToRosAction(this RosActionResponse x)
+    {
+        return new()
+        {
+            Name = x.Name,
+            Type = x.Type
         };
     }
 }

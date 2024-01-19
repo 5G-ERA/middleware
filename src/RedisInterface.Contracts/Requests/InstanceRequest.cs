@@ -7,6 +7,7 @@ public class InstanceRequest
     public bool IsReusable { get; init; }
     public IEnumerable<RosTopicRequest> RosTopicPublishers { get; init; } = Enumerable.Empty<RosTopicRequest>();
     public IEnumerable<RosTopicRequest> RosTopicSubscribers { get; init; } = Enumerable.Empty<RosTopicRequest>();
+    public IEnumerable<RosActionRequest> RosActions { get; init; } = Enumerable.Empty<RosActionRequest>();
     public int RosVersion { get; init; }
     public string RosDistro { get; init; } = default!;
     public string Family { get; init; }
