@@ -1,6 +1,6 @@
 ﻿namespace Middleware.RedisInterface.Contracts.Responses;
 
-public class QosResponse
+public class RosQosResponse
 {
     public string Preset { get; set; } = default!;
     public string History { get; set; } = default!;

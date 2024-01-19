@@ -8,5 +8,5 @@ public class RosTopicResponse
     public bool Enabled { get; set; }
     public string Compression { get; set; } = "none";
 
-    public QosResponse Qos { get; set; }
+    public RosQosResponse Qos { get; set; }
 }
