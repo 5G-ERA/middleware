@@ -7,6 +7,5 @@ public abstract class InfluxDto : Dto
 {
     public abstract PointData ToPointData();
 
-    public abstract Dto FromInfluxDataDto(List<FluxTable> fluxTables);
-    public abstract BaseModel FromInfluxDataToModel(List<FluxTable> fluxTables);
+    public abstract Dto? FromInfluxDataToDto(List<FluxTable> fluxTables);
 }

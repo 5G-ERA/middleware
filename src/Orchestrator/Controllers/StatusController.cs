@@ -131,7 +131,7 @@ public class StatusController : Controller
         {
             //TODO: put behind service
             //await _robotStatusRepository.AddAsync(model, () => model.Id);
-            await _influxRobotStatusRepository.AddOneAsync(model);
+            await _influxRobotStatusRepository.AddAsync(model);
         }
         catch (Exception ex)
         {
@@ -233,7 +233,7 @@ public class StatusController : Controller
         {
             //TODO: put behind service
             //await _netAppStatusRepository.AddAsync(model, () => model.Id);
-            await _influxNetAppStatusRepository.AddOneAsync(model);
+            await _influxNetAppStatusRepository.AddAsync(model);
         }
         catch (Exception ex)
         {

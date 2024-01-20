@@ -10,6 +10,9 @@ namespace Middleware.Models.Dto;
 public class RobotStatusDto : InfluxDto
 {
     public const string Prefix = "RobotStatus";
+    // Need second opinion before merging
+    public const string Measurement = "Heartbeat";
+    public const string ObjectType = "Robot";
 
     [Indexed]
     [RedisIdField]
@@ -30,26 +33,21 @@ public class RobotStatusDto : InfluxDto
     [Indexed(Sortable = true)]
     public DateTimeOffset Timestamp { get; set; }
 
-    public override Dto FromInfluxDataDto(List<FluxTable> fluxTables)
+    public override Dto? FromInfluxDataToDto(List<FluxTable> fluxTables)
     {
         // Check if is not passed null value
         if (fluxTables == null || fluxTables.Count == 0)
         {
             return null;
         }
-        if (fluxTables[0].Records.Count < 1)
+        if (fluxTables[0].Records.Count < 0)
         {
             return null;
         }
 
-        var objActionSequenceId = String.Empty;
-        Int32 objCurrentlyExecutedActionIndex = 0;
-        Int32 objBatteryLevel = 0;
-
-
         // static properties of all objects
-        var objName = fluxTables[0].Records[0].GetValueByKey("robot").ToString();
-        var objId = fluxTables[0].Records[0].GetValueByKey("id").ToString();
+        var objName = fluxTables[0].Records[0].GetValueByKey(ObjectType).ToString();
+        var objId = fluxTables[0].Records[0].GetValueByKey("Id").ToString();
         var objTimestamp = fluxTables[0].Records[0].GetTimeInDateTime();
 
         // TODO: Guard extracted values
@@ -58,8 +56,12 @@ public class RobotStatusDto : InfluxDto
             return null;
         }
 
+        Timestamp = (DateTimeOffset)objTimestamp;
+        Id = objId;
+        Name = objName;
+
         // dynamic properties of all objects
-        // data of one parameter is kept in a table.Records as a table and could be accessed as array or by provided methods;
+        // data of one parameter is kept in a table.Records as a table and could be accessed as table or by provided methods;
         // one sample will have as many tables as many parameters the object has;
         foreach (var fluxTable in fluxTables)
         {
@@ -75,98 +77,20 @@ public class RobotStatusDto : InfluxDto
                 {
                     if (fieldNamee == "ActionSequenceId")
                     {
-                        objActionSequenceId = valueString.ToString();
+                        ActionSequenceId = valueString.ToString();
                     }
                     else if (fieldNamee == "CurrentlyExecutedActionIndex")
                     {
-                        objCurrentlyExecutedActionIndex = Int32.Parse(valueString);
+                        CurrentlyExecutedActionIndex = int.Parse(valueString);
                     }
                     else if (fieldNamee == "BatteryLevel")
                     {
-                        objBatteryLevel = Int32.Parse(valueString);
+                        BatteryLevel = int.Parse(valueString);
                     }
                 }
             }
         }
-        // assemble object from above structure
-        return new RobotStatusDto {
-            Id = objId,
-            Name = objName,
-            ActionSequenceId = objActionSequenceId,
-            CurrentlyExecutedActionIndex = objCurrentlyExecutedActionIndex,
-            BatteryLevel = objBatteryLevel,
-            Timestamp = (DateTimeOffset)objTimestamp
-        };
-    }
-
-    public override BaseModel FromInfluxDataToModel(List<FluxTable> fluxTables)
-    {
-        // Check if is not passed null value
-        if (fluxTables == null || fluxTables.Count == 0)
-        {
-            return null;
-        }
-        if (fluxTables[0].Records.Count < 1)
-        {
-            return null;
-        }
-
-        var objActionSequenceId = String.Empty;
-        Int32 objCurrentlyExecutedActionIndex = 0;
-        Int32 objBatteryLevel = 0;
-
-
-        // static properties of all objects
-        var objName = fluxTables[0].Records[0].GetValueByKey("robot").ToString();
-        var objId = fluxTables[0].Records[0].GetValueByKey("id").ToString();
-        var objTimestamp = fluxTables[0].Records[0].GetTimeInDateTime();
-
-        // TODO: Guard extracted values
-        if (objName == null || objId == null || objTimestamp == null)
-        {
-            return null;
-        }
-
-        // dynamic properties of all objects
-        // data of one parameter is kept in a table.Records as a table and could be accessed as array or by provided methods;
-        // one sample will have as many tables as many parameters the object has;
-        foreach (var fluxTable in fluxTables)
-        {
-            foreach (var fluxrecord in fluxTable.Records)
-            {
-                var fieldNamee = fluxrecord.GetField().ToString();
-                var extractedValue = fluxrecord.GetValue();
-
-                if (extractedValue == null) return null;
-
-                var valueString = extractedValue.ToString();
-                if (valueString != null)
-                {
-                    if (fieldNamee == "ActionSequenceId")
-                    {
-                        objActionSequenceId = valueString.ToString();
-                    }
-                    else if (fieldNamee == "CurrentlyExecutedActionIndex")
-                    {
-                        objCurrentlyExecutedActionIndex = Int32.Parse(valueString);
-                    }
-                    else if (fieldNamee == "BatteryLevel")
-                    {
-                        objBatteryLevel = Int32.Parse(valueString);
-                    }
-                }
-            }
-        }
-        // assemble object from above structure
-        return new RobotStatusModel
-        {
-            Id = Guid.Parse(objId),
-            Name = objName,
-            ActionSequenceId = Guid.Parse(objActionSequenceId),
-            CurrentlyExecutedActionIndex = objCurrentlyExecutedActionIndex,
-            BatteryLevel = objBatteryLevel,
-            Timestamp = (DateTimeOffset)objTimestamp
-        };
+        return this;
     }
 
     public override BaseModel ToModel()
@@ -185,14 +109,9 @@ public class RobotStatusDto : InfluxDto
 
     public override PointData ToPointData()
     {
-
-        var dto = this;
-        var id = Guid.Parse(dto.Id!.Replace(Prefix, ""));
-        var stringId = id.ToString();
-
-        var point = PointData.Measurement("heartbeat")
-            .Tag("id", stringId)
-            .Tag("robot", Name)
+        var point = PointData.Measurement(Measurement)
+            .Tag("Id", Id)
+            .Tag(ObjectType, Name)
             .Field("ActionSequenceId", ActionSequenceId)
             .Field("CurrentlyExecutedActionIndex", CurrentlyExecutedActionIndex)
             .Field("BatteryLevel", BatteryLevel)

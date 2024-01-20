@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System.Collections;
+using System.Collections.Generic;
+using System.Security.Cryptography;
 using InfluxDB.Client;
 using InfluxDB.Client.Api.Domain;
 using InfluxDB.Client.Core.Flux.Domain;
@@ -11,7 +13,7 @@ using ILogger = Serilog.ILogger;
 
 
 namespace Middleware.DataAccess.Repositories.Influx;
-public class InfluxRepository<TModel, TDto> : IInfluxRepository<TModel, TDto> where TModel : BaseModel where TDto : InfluxDto
+public class InfluxRepository<TModel, TDto> : IInfluxRepository<TModel, TDto> where TModel : BaseModel where TDto : InfluxDto, new()
 {
     private const string Organization = "testorg";
     protected readonly string Bucket;
@@ -36,8 +38,8 @@ public class InfluxRepository<TModel, TDto> : IInfluxRepository<TModel, TDto> wh
     {
         Logger = logger ?? throw new ArgumentNullException(nameof(logger));
         Client = client ?? throw new ArgumentNullException(nameof(client));
-        Bucket = bucket;
-        ObjectType = objectType;
+        Bucket = bucket ?? throw new ArgumentNullException(nameof(bucket));
+        ObjectType = objectType ?? throw new ArgumentNullException(nameof(objectType));
     }
 
     public async Task AddOrgAsync(string organisationName)
@@ -56,7 +58,7 @@ public class InfluxRepository<TModel, TDto> : IInfluxRepository<TModel, TDto> wh
 
     public async Task AddPointAsync(PointData point, string bucket, string org)
     {
-        //*
+        /*
         point = PointData.Measurement("heartbeat")
             .Tag("robot", "robot55")
             .Tag("id", "3fa85f64-5717-4562-b3fc-2c963f66afa6")
@@ -67,95 +69,29 @@ public class InfluxRepository<TModel, TDto> : IInfluxRepository<TModel, TDto> wh
         await Client.GetWriteApiAsync().WritePointAsync(point: point, bucket: bucket, org: org);
     }
 
-    public Task<TModel?> AddAsync(TModel model)
-    {
-        throw new NotImplementedException();
-    }
-
     /// <summary>
     ///     Add to influx a sample from model.
     /// </summary>
     /// <param name="model"></param>
     /// <returns></returns>
-    public async Task<TModel?> AddOneAsync(TModel model)
+    public async Task<TModel?> AddAsync(TModel model)
     {
-        var dto = ToTDto(model);
-        var point = dto.ToPointData();
+        var dto = ToTDto(model); 
+        var point = FromDtoToInflux(dto);
         await Client.GetWriteApiAsync().WritePointAsync(point: point, bucket: Bucket, org: Organization);
         return ToTModel(dto);
     }
+
     public async Task<TModel?> GetStatusByIdAsync(Guid id)
     {
-        //var dto = await Collection.FindByIdAsync(id.ToString());
-        //if (dto is null) return null;
-        //return ToTModel(dto);
-
         var stringId = id.ToString();
-        string query = "from(bucket: \"" + ObjectType + "\") |> range(start: 0) |> filter(fn: (r) => r[\"_measurement\"] == \"heartbeat\") |> filter(fn: (r) => r[\"id\"] == \"" + stringId + "\") |> yield(name: \"last\")";
+        string query = "from(bucket: \"" + Bucket + "\") |> range(start: 0) |> filter(fn: (r) => r[\"_measurement\"] == \"Heartbeat\") |> filter(fn: (r) => r[\"id\"] == \"" + stringId + "\") |> yield(name: \"last\")";
         List<FluxTable> fluxTables = await Client.GetQueryApi().QueryAsync(query: query, org: Organization);
-        //return FromInfluxDataToModel(fluxTables, fluxTables);
-        throw new NotImplementedException();
+        var dto = FromInfluxDataToDto(new TDto(), fluxTables);
+        var toTModel = ToTModel(dto);
+        return ToTModel(dto);
     }
-    public async Task GetLastByIdAsyncTest()
-    {
-        //var dto = await Collection.FindByIdAsync(id.ToString());
-        //if (dto is null) return null;
-        //return ToTModel(dto);
 
-        /*
-        string queryw = "from(bucket: \"RobotStatus\") |> range(start: 0) |> filter(fn: (r) => r[\"_measurement\"] == \"heartbeat\") |> filter(fn: (r) => r[\"id\"] == \"3fa85f64-5717-4562-b3fc-2c963f66afa1\") |> yield(name: \"last\")";
-        //*/
-        /*
-        from(bucket: "RobotStatus")
-  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)
-  |> filter(fn: (r) => r["_measurement"] == "heartbeat")
-  |> filter(fn: (r) => r["id"] == "3fa85f64-5717-4562-b3fc-2c963f66afa1")
-  |> aggregateWindow(every: v.windowPeriod, fn: last, createEmpty: false)
-  |> yield(name: "last")
-
-  //*/
-
-        string flux2 = "from(bucket: \"NetAppStatus\") |> range(start: 0) |> filter(fn: (r) => r[\"_measurement\"] == \"heartbeat\") |> filter(fn: (r) => r[\"id\"] == \"3fa85f64-5717-4562-b3fc-2c963f66afa9\") |> yield(name: \"last\")";
-        string queryw = "from(bucket: \"RobotStatus\") |> range(start: 0) |> filter(fn: (r) => r[\"_measurement\"] == \"heartbeat\") |> filter(fn: (r) => r[\"id\"] == \"3fa85f64-5717-4562-b3fc-2c963f66afa1\") |> yield(name: \"last\")";
-
-        //string flux = "from(bucket: 'NetAppStatus') |> range(start: 0) |> filter(fn: (r) => r['_measurement'] == 'heartbeat') |> filter(fn: (r) => r['id'] == '3fa85f64-5717-4562-b3fc-2c963f66afa6') |> yield(name: 'last')";
-        //var fluxTables = await Client.GetQueryApi().QueryAsync(query: flux2, org: Organization);
-
-        List<FluxTable> fluxTables = await Client.GetQueryApi().QueryAsync(query: queryw, org: Organization);
-        var timee1 = fluxTables[0].Records[0].GetTime().ToString();
-        var flx251 = fluxTables[0].Records[0].GetTime;
-        var flx261 = fluxTables[0].Records[0].GetTimeInDateTime;
-        var flx221 = fluxTables[0].Records[0].GetValueByKey("robot");
-        var flx2221 = fluxTables[0].Records[0].GetValueByKey("id");
-
-
-
-
-        foreach (var fluxTable in fluxTables)
-        {
-            foreach(var fluxrecord in fluxTable.Records)
-            {
-                var flx23 = fluxrecord.GetMeasurement();
-                var flx24 = fluxrecord.GetType();
-
-                var fieldNamee = fluxrecord.GetField().ToString();
-                var valuee = fluxrecord.GetValue().ToString();
-
-            }
-            //new System.Collections.Generic.ICollectionDebugView<object>(fluxrecord.Row).Items[9]
-        }
-
-        fluxTables.ForEach(fluxTable =>
-        {
-            var fluxRecords = fluxTable.Records;
-            fluxRecords.ForEach(fluxRecord =>
-            {
-                //Console.WriteLine($"{fluxRecord.GetTime()}: {fluxRecord.GetValue()}");
-            });
-        });
-
-        //throw new NotImplementedException();
-    }
     protected TDto ToTDto(TModel model)
     {
         return model.ToDto() as TDto ?? throw new MappingException(typeof(TModel), typeof(TDto));
@@ -165,9 +101,70 @@ public class InfluxRepository<TModel, TDto> : IInfluxRepository<TModel, TDto> wh
     {
         return dto.ToModel() as TModel ?? throw new MappingException(typeof(TDto), typeof(TModel));
     }
-    //FromInfluxDataToModel
-    protected TModel FromInfluxDataToModel(TDto dto, List<FluxTable>  fluxTables)
+    protected TDto FromInfluxDataToDto(TDto dto, List<FluxTable> fluxTables)
     {
-        return dto.FromInfluxDataToModel(fluxTables) as TModel ?? throw new MappingException(typeof(TDto), typeof(TModel));
+        return dto.FromInfluxDataToDto(fluxTables) as TDto ?? throw new MappingException(typeof(FluxTable), typeof(TDto));
+    }
+    protected PointData FromDtoToInflux(TDto dto)
+    {
+        return dto.ToPointData() ?? throw new MappingException(typeof(TDto), typeof(PointData));
+    }
+
+    public async Task<List<TModel>> GetAllAsync()
+    {
+        // var queryLastSample = "from(bucket: \"" + Bucket + "\") |> range(start: 0) |> filter(fn: (r) => r[\"_measurement\"] == \"Heartbeat\") |> yield(name: \"last\")";
+        var query = "from(bucket: \"" + Bucket + "\") |> range(start: 0) |> filter(fn: (r) => r[\"_measurement\"] == \"Heartbeat\")";
+        List<FluxTable> allFluxTables = await Client.GetQueryApi().QueryAsync(query: query, org: Organization);
+
+        List<FluxTable> oneObjectAllRecordsFluxTables = new();
+        List<TModel> listOfTModels = new();
+
+        var nrOfRecords = 0;
+        var currentId = allFluxTables[0].Records[0].GetValueByKey("Id").ToString();
+        foreach (var fluxTable in allFluxTables)
+        {
+            if (fluxTable.Records.Count > 0)
+            {
+                ///TODO:
+                // Need to move to next tabe if no records found
+                //return;            
+
+                if (currentId == fluxTable.Records[0].GetValueByKey("Id").ToString())
+                {
+                    oneObjectAllRecordsFluxTables.Add(fluxTable);
+                }
+                else
+                {
+                    var currentNrRecords = oneObjectAllRecordsFluxTables[0].Records.Count;
+
+                    for (var j = 0; j < nrOfRecords; j++)
+                    {
+                        List<FluxTable> oneSampleAsFluxTables = new();
+                        foreach (var table in oneObjectAllRecordsFluxTables)
+                        {
+                            var record = table.Records[j];
+                            FluxTable oneRecordAsFluxTable = new();
+                            oneRecordAsFluxTable.Records.Add(record);
+                            oneSampleAsFluxTables.Add(oneRecordAsFluxTable);
+                        }
+                        //List<TModel> listOfTModels = new();
+                        var dto = FromInfluxDataToDto(new TDto(), oneSampleAsFluxTables);
+                        var toTModel = ToTModel(dto);
+                        listOfTModels.Add(toTModel);
+                    }
+                    oneObjectAllRecordsFluxTables.Clear();
+                    currentId = fluxTable.Records[0].GetValueByKey("Id").ToString();
+                }
+            }
+        }
+        return listOfTModels;
+    }
+
+    public async Task GetAllAsyncTest()
+    {
+        var query = "from(bucket: \"" + Bucket + "\") |> range(start: 0) |> filter(fn: (r) => r[\"_measurement\"] == \"Heartbeat\")";        
+        List<FluxTable> fluxTables = await Client.GetQueryApi().QueryAsync(query: query, org: Organization);
+        var group = fluxTables.GroupBy(f=>f.GetGroupKey()).ToList();
+        //throw new NotImplementedException();
     }
 }

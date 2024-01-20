@@ -13,7 +13,6 @@ namespace Middleware.CentralApi.Controllers;
 [Route("api/v1/[controller]")]
 public class NetappController : Controller
 {
-    //protected IInfluxRepository<NetAppStatusModel, NetAppStatusDto> Client { get; }
     private readonly ILogger _logger;
     protected IInfluxNetAppStatusRepository NetAppClient;
     protected IInfluxRobotStatusRepository RobotClient;
@@ -52,7 +51,7 @@ public class NetappController : Controller
     public async Task GetLastSampleAsync()
     {
         //await NetAppClient.AddBucketAsync(bucketName, 3600);
-        await NetAppClient.GetLastByIdAsyncTest();
+        await NetAppClient.GetAllAsyncTest();
     }
 
     /// <summary>
@@ -71,7 +70,7 @@ public class NetappController : Controller
             return BadRequest(new ApiResponse((int)HttpStatusCode.BadRequest, "Parameters were not specified."));
         try
         {
-            await NetAppClient.AddOneAsync(model);
+            await NetAppClient.AddAsync(model);
         }
         catch (Exception ex)
         {
@@ -97,7 +96,7 @@ public class NetappController : Controller
             return BadRequest(new ApiResponse((int)HttpStatusCode.BadRequest, "Parameters were not specified."));
         try
         {
-            await RobotClient.AddOneAsync(model);
+            await RobotClient.AddAsync(model);
         }
         catch (Exception ex)
         {

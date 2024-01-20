@@ -10,6 +10,9 @@ namespace Middleware.Models.Dto;
 public class NetAppStatusDto : InfluxDto
 {
     public const string Prefix = "NetAppStatus";
+    // Need second opinion before merging
+    public const string Measurement = "Heartbeat";
+    public const string ObjectType = "Netapp";
 
     [Indexed]
     [RedisIdField]
@@ -30,7 +33,7 @@ public class NetAppStatusDto : InfluxDto
     [Indexed(Sortable = true)]
     public DateTimeOffset Timestamp { get; set; }
 
-    public override Dto FromInfluxDataDto(List<FluxTable> fluxTables)
+    public override Dto? FromInfluxDataToDto(List<FluxTable> fluxTables)
     {
         // Check if is not passed null value
         if (fluxTables == null || fluxTables.Count == 0)
@@ -42,14 +45,9 @@ public class NetAppStatusDto : InfluxDto
             return null;
         }
 
-        Int32 objHardLimit = 0;
-        Int32 objOptimalLimit = 0;
-        Int32 objCurrentRobotsCount = 0;
-
-
         // static properties of all objects
-        var objName = fluxTables[0].Records[0].GetValueByKey("robot").ToString();
-        var objId = fluxTables[0].Records[0].GetValueByKey("id").ToString();
+        var objName = fluxTables[0].Records[0].GetValueByKey(ObjectType).ToString();
+        var objId = fluxTables[0].Records[0].GetValueByKey("Id").ToString();
         var objTimestamp = fluxTables[0].Records[0].GetTimeInDateTime();
 
         // TODO: Guard extracted values
@@ -58,8 +56,12 @@ public class NetAppStatusDto : InfluxDto
             return null;
         }
 
+        Timestamp = (DateTimeOffset)objTimestamp;
+        Id = objId;
+        Name = objName;
+
         // dynamic properties of all objects
-        // data of one parameter is kept in a table.Records as a table and could be accessed as array or by provided methods;
+        // data of one parameter is kept in a table.Records as a table and could be accessed as table or by provided methods;
         // one sample will have as many tables as many parameters the object has;
         foreach (var fluxTable in fluxTables)
         {
@@ -75,101 +77,21 @@ public class NetAppStatusDto : InfluxDto
                 {
                     if (fieldNamee == "HardLimit")
                     {
-                        objHardLimit = Int32.Parse(valueString);
+                        HardLimit = int.Parse(valueString);
                     }
                     else if (fieldNamee == "OptimalLimit")
                     {
-                        objOptimalLimit = Int32.Parse(valueString);
+                        OptimalLimit = int.Parse(valueString);
                     }
                     else if (fieldNamee == "CurrentRobotsCount")
                     {
-                        objCurrentRobotsCount = Int32.Parse(valueString);
+                        CurrentRobotsCount = int.Parse(valueString);
                     }
                 }
             }
         }
-        // assemble object from above structure
-        return new NetAppStatusDto
-        {
-            Id = objId,
-            Name = objName,
-            HardLimit = objHardLimit,
-            OptimalLimit = objOptimalLimit,
-            CurrentRobotsCount = objCurrentRobotsCount,
-            Timestamp = (DateTimeOffset)objTimestamp
-        };
-    }
-
-    public override BaseModel FromInfluxDataToModel(List<FluxTable> fluxTables)
-    {
-        // Check if is not passed null value
-        if (fluxTables == null || fluxTables.Count == 0)
-        {
-            return null;
-        }
-        if (fluxTables[0].Records.Count < 1)
-        {
-            return null;
-        }
-
-        Int32 objHardLimit = 0;
-        Int32 objOptimalLimit = 0;
-        Int32 objCurrentRobotsCount = 0;
-
-
-        // static properties of all objects
-        var objName = fluxTables[0].Records[0].GetValueByKey("robot").ToString();
-        var objId = fluxTables[0].Records[0].GetValueByKey("id").ToString();
-        var objTimestamp = fluxTables[0].Records[0].GetTimeInDateTime();
-
-        // TODO: Guard extracted values
-        if (objName == null || objId == null || objTimestamp == null)
-        {
-            return null;
-        }
-
-        // dynamic properties of all objects
-        // data of one parameter is kept in a table.Records as a table and could be accessed as array or by provided methods;
-        // one sample will have as many tables as many parameters the object has;
-        foreach (var fluxTable in fluxTables)
-        {
-            foreach (var fluxrecord in fluxTable.Records)
-            {
-                var fieldNamee = fluxrecord.GetField().ToString();
-                var extractedValue = fluxrecord.GetValue();
-
-                if (extractedValue == null) return null;
-
-                var valueString = extractedValue.ToString();
-                if (valueString != null)
-                {
-                    if (fieldNamee == "HardLimit")
-                    {
-                        objHardLimit = Int32.Parse(valueString);
-                    }
-                    else if (fieldNamee == "OptimalLimit")
-                    {
-                        objOptimalLimit = Int32.Parse(valueString);
-                    }
-                    else if (fieldNamee == "CurrentRobotsCount")
-                    {
-                        objCurrentRobotsCount = Int32.Parse(valueString);
-                    }
-                }
-            }
-        }
-        // assemble object from above structure
-        return new NetAppStatusModel
-        {
-            Id = Guid.Parse(objId),
-            Name = objName,
-            HardLimit = objHardLimit,
-            OptimalLimit = objOptimalLimit,
-            CurrentRobotsCount = objCurrentRobotsCount,
-            Timestamp = (DateTimeOffset)objTimestamp
-        };
-    }
-
+        return this;
+    }         
     public override BaseModel ToModel()
     {
         var dto = this;
@@ -186,13 +108,9 @@ public class NetAppStatusDto : InfluxDto
 
     public override PointData ToPointData()
     {
-        var dto = this;
-        var id = Guid.Parse(dto.Id!.Replace(Prefix, ""));
-        var stringId = id.ToString();
-
-        var point = PointData.Measurement("heartbeat")
-            .Tag("id", stringId)
-            .Tag("netapp", Name)
+        var point = PointData.Measurement(Measurement)
+            .Tag("Id", Id)
+            .Tag(ObjectType, Name)
             .Field("HardLimit", HardLimit)
             .Field("OptimalLimit", OptimalLimit)
             .Field("CurrentRobotsCount", CurrentRobotsCount)

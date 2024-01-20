@@ -13,7 +13,8 @@ public interface IInfluxRepository<TModel, TDto> where TModel : class
     /// </summary>
     /// <param name="model">Model of an object to be added</param>
     /// <returns></returns>
-    Task<TModel?> AddOneAsync(TModel model);
+    Task<TModel?> AddAsync(TModel model);
     Task<TModel?> GetStatusByIdAsync(Guid id);
-    Task GetLastByIdAsyncTest();
+    Task<List<TModel>> GetAllAsync();
+    Task GetAllAsyncTest();
 }
