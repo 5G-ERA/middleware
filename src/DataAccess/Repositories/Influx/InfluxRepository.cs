@@ -112,52 +112,59 @@ public class InfluxRepository<TModel, TDto> : IInfluxRepository<TModel, TDto> wh
 
     public async Task<List<TModel>> GetAllAsync()
     {
-        // var queryLastSample = "from(bucket: \"" + Bucket + "\") |> range(start: 0) |> filter(fn: (r) => r[\"_measurement\"] == \"Heartbeat\") |> yield(name: \"last\")";
         var query = "from(bucket: \"" + Bucket + "\") |> range(start: 0) |> filter(fn: (r) => r[\"_measurement\"] == \"Heartbeat\")";
         List<FluxTable> allFluxTables = await Client.GetQueryApi().QueryAsync(query: query, org: Organization);
 
         List<FluxTable> oneObjectAllRecordsFluxTables = new();
         List<TModel> listOfTModels = new();
 
-        var nrOfRecords = 0;
         var currentId = allFluxTables[0].Records[0].GetValueByKey("Id").ToString();
         foreach (var fluxTable in allFluxTables)
         {
             if (fluxTable.Records.Count > 0)
             {
-                ///TODO:
-                // Need to move to next tabe if no records found
-                //return;            
-
                 if (currentId == fluxTable.Records[0].GetValueByKey("Id").ToString())
                 {
                     oneObjectAllRecordsFluxTables.Add(fluxTable);
                 }
                 else
                 {
-                    var currentNrRecords = oneObjectAllRecordsFluxTables[0].Records.Count;
-
-                    for (var j = 0; j < nrOfRecords; j++)
-                    {
-                        List<FluxTable> oneSampleAsFluxTables = new();
-                        foreach (var table in oneObjectAllRecordsFluxTables)
-                        {
-                            var record = table.Records[j];
-                            FluxTable oneRecordAsFluxTable = new();
-                            oneRecordAsFluxTable.Records.Add(record);
-                            oneSampleAsFluxTables.Add(oneRecordAsFluxTable);
-                        }
-                        //List<TModel> listOfTModels = new();
-                        var dto = FromInfluxDataToDto(new TDto(), oneSampleAsFluxTables);
-                        var toTModel = ToTModel(dto);
-                        listOfTModels.Add(toTModel);
-                    }
+                    listOfTModels = AppendToListOfTModels(listOfTModels, oneObjectAllRecordsFluxTables);
                     oneObjectAllRecordsFluxTables.Clear();
                     currentId = fluxTable.Records[0].GetValueByKey("Id").ToString();
+                    oneObjectAllRecordsFluxTables.Add(fluxTable);
                 }
             }
         }
         return listOfTModels;
+    }
+    private List<TModel> AppendToListOfTModels(List<TModel> listOfTModels, List<FluxTable> oneObjectAllRecordsFluxTables)
+    {
+        var currentNrRecords = oneObjectAllRecordsFluxTables[0].Records.Count;
+        if(currentNrRecords < 1) return listOfTModels;
+
+        for (var j = 0; j < currentNrRecords; j++)
+        {
+            var oneSampleAsFluxTables = GetOneSampleAsFluxTables(oneObjectAllRecordsFluxTables, recordNr: j);
+            var dto = FromInfluxDataToDto(new TDto(), oneSampleAsFluxTables);
+            var toTModel = ToTModel(dto);
+            listOfTModels.Add(toTModel);
+        }
+        return listOfTModels;
+    }
+
+    // Asumption that nr of records in each Measurement (field) is the same for everyone in given object
+    private List<FluxTable> GetOneSampleAsFluxTables(List<FluxTable> oneObjectAllRecordsFluxTables, int recordNr)
+    {
+        List<FluxTable> oneSampleAsFluxTables = new();
+        foreach (var fluxTable in oneObjectAllRecordsFluxTables)
+        {
+            var record = fluxTable.Records[recordNr];
+            FluxTable oneRecordAsFluxTable = new();
+            oneRecordAsFluxTable.Records.Add(record);
+            oneSampleAsFluxTables.Add(oneRecordAsFluxTable);
+        }
+        return oneSampleAsFluxTables;
     }
 
     public async Task GetAllAsyncTest()
