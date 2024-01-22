@@ -460,4 +460,15 @@ public static class DomainToApiContractMapper
             Edges = x.Select(l => l.ToEdgeResponse())
         };
     }
+
+    public static SystemConfigResponse ToSystemConfigResponse(this SystemConfigModel x)
+    {
+        return new()
+        {
+            HeartbeatExpirationInMinutes = x.HeartbeatExpirationInMinutes,
+            Ros1RelayContainer = x.Ros1RelayContainer,
+            Ros2RelayContainer = x.Ros2RelayContainer,
+            RosInterRelayNetAppContainer = x.RosInterRelayNetAppContainer
+        };
+    }
 }
