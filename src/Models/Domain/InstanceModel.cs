@@ -100,6 +100,7 @@ public class InstanceModel : BaseModel, IPolicyAssignable, IHardwareRequirementC
             RosTopicsSub = domain.RosTopicsSub.Select(x => x.ToDto()).ToList(),
             Actions = domain.Actions.Select(x => x.ToDto()).ToList(),
             Services = domain.Services.Select(x=>x.ToDto()).ToList(),
+            Transforms = domain.Transforms.Select(t=>t.ToDto()).ToList(),
             RosVersion = domain.RosVersion,
             ROSDistro = domain.RosDistro,
             Tags = domain.Tags ?? new List<string>(),

@@ -9,7 +9,7 @@ public class InstanceRequest
     public IEnumerable<RosTopicRequest> RosTopicSubscribers { get; init; } = Enumerable.Empty<RosTopicRequest>();
     public IEnumerable<RosActionRequest> RosActions { get; init; } = Enumerable.Empty<RosActionRequest>();
     public IEnumerable<RosServiceRequest> RosServices { get; init; } = Enumerable.Empty<RosServiceRequest>();
-    
+    public IEnumerable<RosTransformsRequest> RosTransforms { get; init; } = Enumerable.Empty<RosTransformsRequest>();
     public int RosVersion { get; init; }
     public string RosDistro { get; init; } = default!;
     public string Family { get; init; }

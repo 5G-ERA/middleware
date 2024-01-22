@@ -10,6 +10,7 @@ public class InstanceResponse
     public IEnumerable<RosTopicResponse> RosTopicSubscribers { get; init; } = Enumerable.Empty<RosTopicResponse>();
     public IEnumerable<RosActionResponse> RosActions { get; init; } = Enumerable.Empty<RosActionResponse>();
     public IEnumerable<RosServiceResponse> RosServices { get; init; } = Enumerable.Empty<RosServiceResponse>();
+    public IEnumerable<RosTransformsResponse> RosTransforms { get; init; } = Enumerable.Empty<RosTransformsResponse>();
     public int RosVersion { get; init; }
     public string RosDistro { get; init; } = default!;
     public string Family { get; init; }

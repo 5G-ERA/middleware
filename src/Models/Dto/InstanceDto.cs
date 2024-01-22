@@ -37,10 +37,12 @@ public class InstanceDto : Dto
 
     [Indexed]
     public List<RosTopic> RosTopicsSub { get; set; } = new();
-
+    [Indexed]
     public List<RosAction> Actions { get; set; } = new();
-    
+    [Indexed]
     public List<RosService> Services { get; set; } = new();
+    [Indexed]
+    public List<RosTransforms> Transforms { get; set; } = new();
 
     [Indexed(Sortable = true)]
     public int RosVersion { get; set; } = default!;
@@ -87,6 +89,7 @@ public class InstanceDto : Dto
             RosTopicsSub = dto.RosTopicsSub.Select(x => x.ToModel()).ToList(),
             Actions = dto.Actions.Select(x => x.ToModel()).ToList(),
             Services = dto.Services.Select(x=>x.ToModel()).ToList(),
+            Transforms = dto.Transforms.Select(t=>t.ToModel()).ToList(),
             RosVersion = dto.RosVersion,
             RosDistro = dto.ROSDistro,
             Tags = dto.Tags,

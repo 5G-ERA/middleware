@@ -135,6 +135,7 @@ public static class DomainToApiContractMapper
             RosTopicSubscribers = x.RosTopicsSub.Select(t => t.ToRosTopicResponse()),
             RosActions = x.Actions.Select(t => t.ToRosActionResponse()).ToList(),
             RosServices = x.Services.Select(t=>t.ToRosServiceResponse()).ToList(),
+            RosTransforms = x.Transforms.Select(t=>t.ToRosTransformsResponse()).ToList(),
             Tags = x.Tags,
             OnboardedTime = x.OnboardedTime,
             AppliedPolicies = x.AppliedPolicies
@@ -377,6 +378,7 @@ public static class DomainToApiContractMapper
             RosTopicSubscribers = x.RosTopicsSub.Select(t => t.ToRosTopicResponse()),
             RosActions = x.Actions.Select(t => t.ToRosActionResponse()).ToList(),
             RosServices = x.Services.Select(t=>t.ToRosServiceResponse()).ToList(),
+            RosTransforms = x.Transforms.Select(t=>t.ToRosTransformsResponse()).ToList(),
             Tags = x.Tags,
             OnboardedTime = x.OnboardedTime,
             AppliedPolicies = x.AppliedPolicies,
@@ -538,4 +540,26 @@ public static class DomainToApiContractMapper
             Qos = x.Qos.ToQosRequest()
         };
     } 
+    public static RosTransformsResponse ToRosTransformsResponse(this RosTransformsModel x)
+    {
+        return new()
+        {
+            AngularThres = x.AngularThres,
+            SourceFrame = x.SourceFrame,
+            TargetFrame = x.TargetFrame,
+            TransThres = x.TransThres,
+            MaxPublishPeriod = x.MaxPublishPeriod
+        };
+    }
+    public static RosTransformsRequest ToRosTransformsRequest(this RosTransformsModel x)
+    {
+        return new()
+        {
+            AngularThres = x.AngularThres,
+            SourceFrame = x.SourceFrame,
+            TargetFrame = x.TargetFrame,
+            TransThres = x.TransThres,
+            MaxPublishPeriod = x.MaxPublishPeriod
+        };
+    }
 }
