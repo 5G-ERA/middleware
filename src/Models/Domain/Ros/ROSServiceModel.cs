@@ -16,7 +16,9 @@ public class RosServiceModel
         return new()
         {
             Description = domain.Description,
-            Name = domain.Name
+            Name = domain.Name,
+            Type = domain.Type,
+            Qos = domain.Qos?.ToDto(),
         };
     }
 }

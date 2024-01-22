@@ -14,7 +14,7 @@ internal class RosTopicContainer
 
     [JsonPropertyName("topic_type")]
     public string Type { [UsedImplicitly] get; init; }
-
+    [JsonPropertyName("compression")]
     public string Compression { [UsedImplicitly] get; set; } = "none";
 
     [JsonPropertyName("qos")]

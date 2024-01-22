@@ -29,10 +29,10 @@ public class InstanceModel : BaseModel, IPolicyAssignable, IHardwareRequirementC
     /// <summary>
     ///     Represents list of transformations made when connecting to relay from robot
     /// </summary>
-    public List<RosTransformsModel> TransformsToNetApp { get; set; } = new();
+    public List<RosTransformsModel> Transforms { get; set; } = new();
 
     public List<RosActionModel> Actions { get; set; } = new();
-    public List<RosTransformsModel> Transforms { get; set; } = new();
+    public List<RosServiceModel> Services { get; set; } = new();
 
     public int RosVersion { get; set; } // compulsory field
 
@@ -99,6 +99,7 @@ public class InstanceModel : BaseModel, IPolicyAssignable, IHardwareRequirementC
             RosTopicsPub = domain.RosTopicsPub.Select(x => x.ToDto()).ToList(),
             RosTopicsSub = domain.RosTopicsSub.Select(x => x.ToDto()).ToList(),
             Actions = domain.Actions.Select(x => x.ToDto()).ToList(),
+            Services = domain.Services.Select(x=>x.ToDto()).ToList(),
             RosVersion = domain.RosVersion,
             ROSDistro = domain.RosDistro,
             Tags = domain.Tags ?? new List<string>(),

@@ -516,4 +516,24 @@ public static class DomainToApiContractMapper
             Type = x.Type
         };
     }
+    public static RosServiceResponse ToRosServiceResponse(this RosServiceModel x)
+    {
+        return new()
+        {
+            Name = x.Name,
+            Type = x.Type,
+            Description = x.Description,
+            Qos = x.Qos.ToQosResponse()
+        };
+    } 
+    public static RosServiceRequest ToRosServiceRequest(this RosServiceModel x)
+    {
+        return new()
+        {
+            Name = x.Name,
+            Type = x.Type,
+            Description = x.Description,
+            Qos = x.Qos.ToQosRequest()
+        };
+    } 
 }
