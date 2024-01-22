@@ -134,6 +134,7 @@ public static class DomainToApiContractMapper
             RosTopicPublishers = x.RosTopicsPub.Select(t => t.ToRosTopicResponse()),
             RosTopicSubscribers = x.RosTopicsSub.Select(t => t.ToRosTopicResponse()),
             RosActions = x.Actions.Select(t => t.ToRosActionResponse()).ToList(),
+            RosServices = x.Services.Select(t=>t.ToRosServiceResponse()).ToList(),
             Tags = x.Tags,
             OnboardedTime = x.OnboardedTime,
             AppliedPolicies = x.AppliedPolicies
@@ -375,6 +376,7 @@ public static class DomainToApiContractMapper
             RosTopicPublishers = x.RosTopicsPub.Select(t => t.ToRosTopicResponse()),
             RosTopicSubscribers = x.RosTopicsSub.Select(t => t.ToRosTopicResponse()),
             RosActions = x.Actions.Select(t => t.ToRosActionResponse()).ToList(),
+            RosServices = x.Services.Select(t=>t.ToRosServiceResponse()).ToList(),
             Tags = x.Tags,
             OnboardedTime = x.OnboardedTime,
             AppliedPolicies = x.AppliedPolicies,
