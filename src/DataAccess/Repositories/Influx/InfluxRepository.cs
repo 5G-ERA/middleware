@@ -1,7 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using System.Security.Cryptography;
-using InfluxDB.Client;
+﻿using InfluxDB.Client;
 using InfluxDB.Client.Api.Domain;
 using InfluxDB.Client.Core.Flux.Domain;
 using InfluxDB.Client.Writes;
@@ -76,38 +73,68 @@ public class InfluxRepository<TModel, TDto> : IInfluxRepository<TModel, TDto> wh
     /// <returns></returns>
     public async Task<TModel?> AddAsync(TModel model)
     {
-        var dto = ToTDto(model); 
+        var dto = ToTDto(model);
         var point = FromDtoToInflux(dto);
         await Client.GetWriteApiAsync().WritePointAsync(point: point, bucket: Bucket, org: Organization);
         return ToTModel(dto);
+    }
+    private async Task<List<String>> GetAllIdAsync()
+    {        
+        string query = "from(bucket: \"" + Bucket + "\") |> range(start: 0) |> keyValues(keyColumns: [\"Id\"]) |> keep(columns: [\"Id\"]) |> limit(n:1, offset: 0) |> group() ";
+        var fluxTables = await Client.GetQueryApi().QueryAsync(query: query, org: Organization);
+        List<String> ids = new List<string>();
+
+        foreach (var record in fluxTables[0].Records)
+        {
+            var id = Guid.Empty.ToString();            
+            var id2 = record.GetValueByKey("Id").ToString();
+
+            if (id2 != null && id2 != "") id = id2;
+            ids.Add(id);
+        }
+        return ids;
+    }
+    private async Task<List<TModel>> GetAllStatusByIdAsync(Guid id)
+    {
+        var stringId = id.ToString();
+        string query = "from(bucket: \"" + Bucket + "\") |> range(start: 0) |> filter(fn: (r) => r[\"_measurement\"] == \"Heartbeat\") |> filter(fn: (r) => r[\"Id\"] == \"" + stringId + "\") |> yield(name: \"all\")";
+        List<FluxTable> fluxTables = await Client.GetQueryApi().QueryAsync(query: query, org: Organization);
+
+        List<TModel> listOfTModels = new();
+        listOfTModels = AppendToListOfTModels(listOfTModels, fluxTables);
+        return listOfTModels;
+    }
+    public async Task<List<TModel>> GetAllOneByOneAsync()
+    {
+        List<TModel> listOfTModels = new();
+        var ids = await GetAllIdAsync();
+        foreach (var id  in ids)
+        {
+            var guidId= Guid.Parse(id.ToString());
+            try
+            {
+                List<TModel> listOfTModels2 = new();
+                listOfTModels2 = await GetAllStatusByIdAsync(guidId);
+                listOfTModels.AddRange(listOfTModels2);
+            } catch (Exception ex)
+            {
+                //return listOfTModels;
+            }            
+        }
+        return listOfTModels;
     }
 
     public async Task<TModel?> GetStatusByIdAsync(Guid id)
     {
         var stringId = id.ToString();
-        string query = "from(bucket: \"" + Bucket + "\") |> range(start: 0) |> filter(fn: (r) => r[\"_measurement\"] == \"Heartbeat\") |> filter(fn: (r) => r[\"id\"] == \"" + stringId + "\") |> yield(name: \"last\")";
+        string query = "from(bucket: \"" + Bucket + "\") |> range(start: 0) |> filter(fn: (r) => r[\"_measurement\"] == \"Heartbeat\") |> filter(fn: (r) => r[\"Id\"] == \"" + stringId + "\") |> yield(name: \"last\")";
         List<FluxTable> fluxTables = await Client.GetQueryApi().QueryAsync(query: query, org: Organization);
-        var dto = FromInfluxDataToDto(new TDto(), fluxTables);
-        var toTModel = ToTModel(dto);
-        return ToTModel(dto);
-    }
-
-    protected TDto ToTDto(TModel model)
-    {
-        return model.ToDto() as TDto ?? throw new MappingException(typeof(TModel), typeof(TDto));
-    }
-
-    protected TModel ToTModel(TDto dto)
-    {
-        return dto.ToModel() as TModel ?? throw new MappingException(typeof(TDto), typeof(TModel));
-    }
-    protected TDto FromInfluxDataToDto(TDto dto, List<FluxTable> fluxTables)
-    {
-        return dto.FromInfluxDataToDto(fluxTables) as TDto ?? throw new MappingException(typeof(FluxTable), typeof(TDto));
-    }
-    protected PointData FromDtoToInflux(TDto dto)
-    {
-        return dto.ToPointData() ?? throw new MappingException(typeof(TDto), typeof(PointData));
+        if (fluxTables.Count > 0)
+        {
+            var dto = FromInfluxDataToDto(new TDto(), fluxTables);
+            return ToTModel(dto);
+        }
+        else return null;
     }
 
     public async Task<List<TModel>> GetAllAsync()
@@ -136,6 +163,8 @@ public class InfluxRepository<TModel, TDto> : IInfluxRepository<TModel, TDto> wh
                 }
             }
         }
+        listOfTModels = AppendToListOfTModels(listOfTModels, oneObjectAllRecordsFluxTables);
+        oneObjectAllRecordsFluxTables.Clear();
         return listOfTModels;
     }
     private List<TModel> AppendToListOfTModels(List<TModel> listOfTModels, List<FluxTable> oneObjectAllRecordsFluxTables)
@@ -166,12 +195,21 @@ public class InfluxRepository<TModel, TDto> : IInfluxRepository<TModel, TDto> wh
         }
         return oneSampleAsFluxTables;
     }
-
-    public async Task GetAllAsyncTest()
+    protected TDto ToTDto(TModel model)
     {
-        var query = "from(bucket: \"" + Bucket + "\") |> range(start: 0) |> filter(fn: (r) => r[\"_measurement\"] == \"Heartbeat\")";        
-        List<FluxTable> fluxTables = await Client.GetQueryApi().QueryAsync(query: query, org: Organization);
-        var group = fluxTables.GroupBy(f=>f.GetGroupKey()).ToList();
-        //throw new NotImplementedException();
+        return model.ToDto() as TDto ?? throw new MappingException(typeof(TModel), typeof(TDto));
+    }
+
+    protected TModel ToTModel(TDto dto)
+    {
+        return dto.ToModel() as TModel ?? throw new MappingException(typeof(TDto), typeof(TModel));
+    }
+    protected TDto FromInfluxDataToDto(TDto dto, List<FluxTable> fluxTables)
+    {
+        return dto.FromInfluxDataToDto(fluxTables) as TDto ?? throw new MappingException(typeof(FluxTable), typeof(TDto));
+    }
+    protected PointData FromDtoToInflux(TDto dto)
+    {
+        return dto.ToPointData() ?? throw new MappingException(typeof(TDto), typeof(PointData));
     }
 }

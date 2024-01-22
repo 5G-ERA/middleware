@@ -1,7 +1,6 @@
 ﻿using System.Net;
 using Microsoft.AspNetCore.Mvc;
 using Middleware.Common.Responses;
-using Middleware.DataAccess.Repositories.Abstract;
 using Middleware.DataAccess.Repositories.Abstract.Influx;
 using Middleware.Models.Domain;
 using Middleware.Orchestrator.Heartbeat;
@@ -16,23 +15,17 @@ public class StatusController : Controller
 {
     private readonly IHeartbeatService _heartbeatService;
     private readonly ILogger _logger;
-    private readonly INetAppStatusRepository _netAppStatusRepository;
     private readonly IRedisInterfaceClient _redisInterfaceClient;
-    private readonly IRobotStatusRepository _robotStatusRepository;
     private readonly IInfluxNetAppStatusRepository _influxNetAppStatusRepository;
     private readonly IInfluxRobotStatusRepository _influxRobotStatusRepository;
 
-    public StatusController(INetAppStatusRepository netAppStatusRepository,
-        IRobotStatusRepository robotStatusRepository,
-        ILogger<StatusController> logger,
+    public StatusController(ILogger<StatusController> logger,
         IRedisInterfaceClient redisInterfaceClient,
         IHeartbeatService heartbeatService,
         IInfluxNetAppStatusRepository influxNetAppStatusRepository,
         IInfluxRobotStatusRepository influxRobotStatusRepository
     )
     {
-        _netAppStatusRepository = netAppStatusRepository;
-        _robotStatusRepository = robotStatusRepository;
         _logger = logger;
         _redisInterfaceClient = redisInterfaceClient;
         _heartbeatService = heartbeatService;

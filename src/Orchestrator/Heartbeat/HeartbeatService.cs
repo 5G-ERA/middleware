@@ -9,21 +9,17 @@ namespace Middleware.Orchestrator.Heartbeat;
 internal class HeartbeatService : IHeartbeatService
 {
     private readonly ILogger _logger;
-    private readonly INetAppStatusRepository _netAppStatusRepository;
     private readonly IRedisInterfaceClient _redisInterfaceClient;
-    private readonly IRobotStatusRepository _robotStatusRepository;
 
     private readonly IInfluxNetAppStatusRepository _influxNetAppStatusRepository;
     private readonly IInfluxRobotStatusRepository _influxRobotStatusRepository;
 
-    public HeartbeatService(IRobotStatusRepository robotStatusRepository, IRedisInterfaceClient redisInterfaceClient,
-        INetAppStatusRepository netAppStatusRepository, ILogger<HeartbeatService> logger,
+    public HeartbeatService(IRedisInterfaceClient redisInterfaceClient,
+        ILogger<HeartbeatService> logger,
         IInfluxNetAppStatusRepository influxNetAppStatusRepository,
         IInfluxRobotStatusRepository influxRobotStatusRepository)
     {
-        _robotStatusRepository = robotStatusRepository;
         _redisInterfaceClient = redisInterfaceClient;
-        _netAppStatusRepository = netAppStatusRepository;
         _logger = logger;
         _influxNetAppStatusRepository = influxNetAppStatusRepository;
         _influxRobotStatusRepository = influxRobotStatusRepository;

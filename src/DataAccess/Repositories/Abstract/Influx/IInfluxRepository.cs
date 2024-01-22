@@ -1,5 +1,4 @@
-﻿using System;
-using InfluxDB.Client.Api.Domain;
+﻿using InfluxDB.Client.Api.Domain;
 using InfluxDB.Client.Writes;
 
 namespace Middleware.DataAccess.Repositories.Abstract;
@@ -16,5 +15,5 @@ public interface IInfluxRepository<TModel, TDto> where TModel : class
     Task<TModel?> AddAsync(TModel model);
     Task<TModel?> GetStatusByIdAsync(Guid id);
     Task<List<TModel>> GetAllAsync();
-    Task GetAllAsyncTest();
+    Task<List<TModel>> GetAllOneByOneAsync();
 }
