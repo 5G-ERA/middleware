@@ -5,10 +5,8 @@ namespace Middleware.Models.Domain.Ros;
 
 public class RosActionModel
 {
-    [JsonPropertyName("name")]
     public string Name { get; set; } = default!;
-
-    [JsonPropertyName("type")]
+ 
     public string Type { get; set; } = default!;
 
     public RosAction ToDto()

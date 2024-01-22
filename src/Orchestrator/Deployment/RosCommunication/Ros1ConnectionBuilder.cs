@@ -3,6 +3,7 @@ using k8s.Models;
 using Middleware.Common.ExtensionMethods;
 using Middleware.Models.Domain;
 using Middleware.Models.Domain.Ros;
+using Middleware.Orchestrator.Deployment.RosCommunication.Structures;
 
 namespace Middleware.Orchestrator.Deployment.RosCommunication;
 
@@ -43,10 +44,9 @@ internal class Ros1ConnectionBuilder : IRosConnectionBuilder
     }
 
     /// <inheritdoc />
-    public V1Deployment EnableRosCommunication(V1Deployment dpl, IReadOnlyList<RosTopicModel> topicSubscribers,
-        IReadOnlyList<RosTopicModel> topicPublishers)
+    public V1Deployment EnableRosCommunication(V1Deployment dpl, RosSpec rosSpec)
     {
-        if (topicSubscribers is null) throw new ArgumentNullException(nameof(topicSubscribers));
+        if (rosSpec is null) throw new ArgumentNullException(nameof(rosSpec));
         if (dpl.Spec?.Template?.Spec?.Containers is null || dpl.Spec.Template.Spec.Containers.Any() == false)
             throw new ArgumentException("Missing Deployment container configuration.", nameof(dpl));
 
@@ -62,7 +62,7 @@ internal class Ros1ConnectionBuilder : IRosConnectionBuilder
 
         dpl.Spec.Template.Spec.Containers.Add(GetRosContainer());
         //MK 2023.10.20: ROS1 version of Relay only needs to know the topics FROM cloud TO robot
-        dpl.Spec.Template.Spec.Containers.Add(GetRelayNetAppContainer(topicPublishers));
+        dpl.Spec.Template.Spec.Containers.Add(GetRelayNetAppContainer(rosSpec.TopicPublishers));
 
         return dpl;
     }

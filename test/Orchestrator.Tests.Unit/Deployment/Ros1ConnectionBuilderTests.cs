@@ -39,8 +39,9 @@ public class Ros1ConnectionBuilderTests
 
         var sut = new Ros1ConnectionBuilder(distro, cfg);
         var topics = new List<RosTopicModel>();
+        var rosSpec = new RosSpec(topics, topics, null, null, null);
         //act
-        var result = sut.EnableRosCommunication(depl, topics, topics);
+        var result = sut.EnableRosCommunication(depl, rosSpec);
         //assert
         result.Spec.Template.Spec.Containers.Should()
             .HaveCount(3, "We need three containers, one RelayNetApp, one ROS core and NetApp itself");
@@ -82,8 +83,9 @@ public class Ros1ConnectionBuilderTests
                 Enabled = true // this also should not be included
             }
         };
+        var rosSpec = new RosSpec(topics, topics, null, null, null);
         //act
-        var result = sut.EnableRosCommunication(depl, topics, topics);
+        var result = sut.EnableRosCommunication(depl, rosSpec);
 
         //assert
         var relayNetAppContainer = result.Spec.Template.Spec.Containers.FirstOrDefault(c => c.Name == "relay-net-app");
