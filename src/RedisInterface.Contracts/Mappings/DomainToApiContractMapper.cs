@@ -560,7 +560,7 @@ public static class DomainToApiContractMapper
             TargetFrame = x.TargetFrame,
             TransThres = x.TransThres,
             MaxPublishPeriod = x.MaxPublishPeriod
-        }
+        };
     }
     public static SystemConfigResponse ToSystemConfigResponse(this SystemConfigModel x)
     {
