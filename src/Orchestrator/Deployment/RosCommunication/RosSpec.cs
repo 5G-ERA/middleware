@@ -16,8 +16,8 @@ public class RosSpec
         IReadOnlyList<RosTransformsModel> transformsPublishers,
         IReadOnlyList<RosActionModel> actionSubscribers)
     {
-        TopicSubscribers = topicSubscribers;
-        TopicPublishers = topicPublishers;
+        TopicSubscribers = topicSubscribers ?? throw new ArgumentNullException(nameof(topicSubscribers));
+        TopicPublishers = topicPublishers ?? throw new ArgumentNullException(nameof(topicPublishers));
         ServiceSubscribers = serviceSubscribers;
         TransformsPublishers = transformsPublishers;
         ActionSubscribers = actionSubscribers;

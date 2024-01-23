@@ -18,7 +18,7 @@ internal class Ros2ConnectionBuilder : IRosConnectionBuilder
         if (distro.RosVersion != Ros2)
         {
             throw new ArgumentException(
-                "Ros1ConnectionBuilder cannot provide connectivity for ROs version other than 1", nameof(distro));
+                "Ros2ConnectionBuilder cannot provide connectivity for ROS version other than 2", nameof(distro));
         }
 
         _distro = distro;
@@ -61,10 +61,10 @@ internal class Ros2ConnectionBuilder : IRosConnectionBuilder
     {
         var subscribersContainers = rosSpec.TopicSubscribers.Select(RosTopicContainer.FromRosTopicModel).ToList();
         var publishersContainers = rosSpec.TopicPublishers.Select(RosTopicContainer.FromRosTopicModel).ToList();
-        var serviceSubscribers = rosSpec.ServiceSubscribers.Select(RosServiceContainer.FromRosServiceModel).ToList();
+        var serviceSubscribers = rosSpec.ServiceSubscribers?.Select(RosServiceContainer.FromRosServiceModel).ToList();
         var transformsPublishers =
-            rosSpec.TransformsPublishers.Select(RosTransformsContainer.FromRosTransformsModel).ToList();
-        var actionSubscribers = rosSpec.ActionSubscribers.Select(RosActionContainer.FromRosActionModel).ToList();
+            rosSpec.TransformsPublishers?.Select(RosTransformsContainer.FromRosTransformsModel).ToList();
+        var actionSubscribers = rosSpec.ActionSubscribers?.Select(RosActionContainer.FromRosActionModel).ToList();
         var subscribersString = JsonSerializer.Serialize(subscribersContainers);
         var publishersString = JsonSerializer.Serialize(publishersContainers);
         var serviceSubscriberString = JsonSerializer.Serialize(serviceSubscribers);

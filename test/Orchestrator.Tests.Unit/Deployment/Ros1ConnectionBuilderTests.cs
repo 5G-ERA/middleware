@@ -31,7 +31,7 @@ public class Ros1ConnectionBuilderTests
     {
         //arrange
         var distro = RosDistro.Noetic;
-        var depl = CreateExampleDeployment();
+        var depl = K8SBuilder.CreateExampleDeployment();
         var cfg = new SystemConfigModel
         {
             Ros1RelayContainer = "but5gera/relay_network_application:0.4.4"
@@ -70,7 +70,7 @@ public class Ros1ConnectionBuilderTests
         {
             Ros1RelayContainer = "but5gera/relay_network_application:0.4.4"
         };
-        var depl = CreateExampleDeployment();
+        var depl = K8SBuilder.CreateExampleDeployment();
         var sut = new Ros1ConnectionBuilder(distro, cfg);
         var topicString = "[{\"topic_name\":\"/image_raw\",\"topic_type\":\"sensor_msgs/Image\",\"compression\":\"none\",\"qos\":null}]";
         var topics = new List<RosTopicModel>
@@ -135,49 +135,5 @@ public class Ros1ConnectionBuilderTests
         port80.Should().NotBeNull();
     }
 
-    private V1Deployment CreateExampleDeployment()
-    {
-        return new()
-        {
-            ApiVersion = "apps/v1",
-            Kind = "Deployment",
-            Metadata = new()
-            {
-                Name = "example",
-                Labels = new Dictionary<string, string>
-                {
-                    { "app", "example" }
-                }
-            },
-            Spec = new()
-            {
-                Template = new()
-                {
-                    Metadata = new()
-                    {
-                        Name = "example",
-                        Labels = new Dictionary<string, string>
-                        {
-                            { "app", "example" }
-                        }
-                    },
-                    Spec = new()
-                    {
-                        Containers = new List<V1Container>
-                        {
-                            new()
-                            {
-                                Name = "example",
-                                Image = "redis",
-                                Ports = new List<V1ContainerPort>
-                                {
-                                    new(6379)
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        };
-    }
+    
 }
