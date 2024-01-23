@@ -80,6 +80,10 @@ internal class Ros2ConnectionBuilder : IRosConnectionBuilder
             },
             Env = new List<V1EnvVar>
             {
+                // legacy env variables before version 0.2.0
+                new("TOPIC_LIST", publishersString),
+                new("TOPIC_TO_PUB_LIST", subscribersString),
+                // new env variables for version 0.2.0 and up 
                 new("TOPICS_TO_CLIENT",
                     publishersString), // MK 2023.10.20: TOPIC_LIST - list of topics to be sent FROM cloud TO robot
                 new("TOPICS_FROM_CLIENT",
