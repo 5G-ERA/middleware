@@ -527,7 +527,7 @@ public static class DomainToApiContractMapper
             Name = x.Name,
             Type = x.Type,
             Description = x.Description,
-            Qos = x.Qos.ToQosResponse()
+            Qos = x.Qos?.ToQosResponse()
         };
     } 
     public static RosServiceRequest ToRosServiceRequest(this RosServiceModel x)
@@ -537,7 +537,7 @@ public static class DomainToApiContractMapper
             Name = x.Name,
             Type = x.Type,
             Description = x.Description,
-            Qos = x.Qos.ToQosRequest()
+            Qos = x.Qos?.ToQosRequest()
         };
     } 
     public static RosTransformsResponse ToRosTransformsResponse(this RosTransformsModel x)
