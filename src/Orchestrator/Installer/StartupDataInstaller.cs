@@ -75,6 +75,12 @@ internal class StartupDataInstaller : IStartupDataInstaller
             cfg.RosInterRelayNetAppContainer = defaultCfg.RosInterRelayNetAppContainer;
         }
 
+        if (cfg.HeartbeatExpirationInMinutes == default)
+        {
+            isCorrect = false;
+            cfg.HeartbeatExpirationInMinutes = defaultCfg.HeartbeatExpirationInMinutes;
+        }
+
         return isCorrect;
     }
 
@@ -84,9 +90,9 @@ internal class StartupDataInstaller : IStartupDataInstaller
         {
             Ros1RelayContainer = "but5gera/relay_network_application:0.4.4",
             Ros2RelayContainer = "but5gera/ros2_relay_server:0.1.0",
-            RosInterRelayNetAppContainer = "but5gera/inter_relay_network_application:0.4.4"
+            RosInterRelayNetAppContainer = "but5gera/inter_relay_network_application:0.4.4",
+            HeartbeatExpirationInMinutes = 3
         };
-
 
         return cfg;
     }

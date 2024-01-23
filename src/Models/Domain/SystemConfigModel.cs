@@ -13,6 +13,7 @@ public class SystemConfigModel : BaseModel
     public string Ros2RelayContainer { get; set; } = default!;
     public string Ros1RelayContainer { get; set; } = default!;
     public string RosInterRelayNetAppContainer { get; set; } = default!;
+    public int HeartbeatExpirationInMinutes { get; set; }
 
     /// <inheritdoc />
     public override Dto.Dto ToDto()
@@ -23,7 +24,8 @@ public class SystemConfigModel : BaseModel
             Id = d.Id.ToString(),
             Ros1RelayContainer = d.Ros1RelayContainer,
             Ros2RelayContainer = d.Ros2RelayContainer,
-            RosInterRelayNetAppContainer = d.RosInterRelayNetAppContainer
+            RosInterRelayNetAppContainer = d.RosInterRelayNetAppContainer,
+            HeartbeatExpirationInMinutes = d.HeartbeatExpirationInMinutes
         };
     }
 }

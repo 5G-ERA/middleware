@@ -8,15 +8,21 @@ namespace Middleware.CentralApi.Jobs;
 public class UpdateOnlineStatusJob : BaseJob<UpdateOnlineStatusJob>
 {
     private readonly ILocationRepository _locationRepository;
+    private readonly ISystemConfigRepository _systemConfig;
 
-    public UpdateOnlineStatusJob(ILogger<UpdateOnlineStatusJob> logger, ILocationRepository locationRepository) :
-        base(logger)
+    public UpdateOnlineStatusJob(ILogger<UpdateOnlineStatusJob> logger, ILocationRepository locationRepository,
+        ISystemConfigRepository systemConfig) : base(logger)
     {
         _locationRepository = locationRepository;
+        _systemConfig = systemConfig;
     }
 
     protected override async Task ExecuteJobAsync(IJobExecutionContext context)
     {
+        var cfg = await _systemConfig.GetConfigAsync();
+        if (cfg is null) throw new ArgumentException("No system config was found");
+
+        var heartbeatExpiration = cfg.HeartbeatExpirationInMinutes;
         try
         {
             var locations = await _locationRepository.GetAllAsync();
@@ -26,20 +32,20 @@ public class UpdateOnlineStatusJob : BaseJob<UpdateOnlineStatusJob>
                 if (!loc.IsOnline)
                     continue;
 
-                var threeMinutesEarlier = DateTime.UtcNow.AddMinutes(-3);
-                // Check if last updated time was no later then 3 minutes ago from now.
-                if (loc.LastUpdatedTime < threeMinutesEarlier)
+                var xMinutesAgo = DateTime.UtcNow.AddMinutes(-1 * heartbeatExpiration);
+                // Check if last updated time was no later than X minutes ago from now.
+                if (loc.LastUpdatedTime >= xMinutesAgo)
+                    continue;
+
+                try
                 {
-                    try
-                    {
-                        await _locationRepository.SetCloudOnlineStatusAsync(loc.Id, false);
-                    }
-                    catch (Exception ex)
-                    {
-                        Logger.LogError(ex,
-                            "There was en error while updating the status of the cloud: {Id}",
-                            loc.Id);
-                    }
+                    await _locationRepository.SetCloudOnlineStatusAsync(loc.Id, false);
+                }
+                catch (Exception ex)
+                {
+                    Logger.LogError(ex,
+                        "There was en error while updating the status of the cloud: {Id}",
+                        loc.Id);
                 }
             }
         }
