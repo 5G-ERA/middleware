@@ -10,7 +10,7 @@ using ILogger = Serilog.ILogger;
 
 
 namespace Middleware.DataAccess.Repositories.Influx;
-public class InfluxRepository<TModel, TDto> : IInfluxRepository<TModel, TDto> where TModel : BaseModel where TDto : InfluxDto, new()
+public class InfluxRepository<TModel, TDto> : IInfluxRepository<TModel> where TModel : BaseModel where TDto : InfluxDto, new()
 {
     private const string Organization = "5G-ERA";
     protected readonly string Bucket;

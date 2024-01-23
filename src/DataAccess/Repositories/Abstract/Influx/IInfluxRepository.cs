@@ -2,7 +2,7 @@
 using InfluxDB.Client.Writes;
 
 namespace Middleware.DataAccess.Repositories.Abstract;
-public interface IInfluxRepository<TModel, TDto> where TModel : class
+public interface IInfluxRepository<TModel> where TModel : class
 {
     /// <summary>
     /// Adds a new object to the data store
