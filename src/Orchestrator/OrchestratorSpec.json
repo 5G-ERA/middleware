@@ -442,14 +442,14 @@
         "tags": [
           "Status"
         ],
-        "operationId": "RobotStatusGetById",
+        "operationId": "RobotStatusGetAll",
         "parameters": [
           {
-            "name": "id",
+            "name": "generateFakeData",
             "in": "query",
             "schema": {
-              "type": "string",
-              "format": "uuid"
+              "type": "boolean",
+              "default": false
             }
           }
         ],
@@ -459,17 +459,17 @@
             "content": {
               "text/plain": {
                 "schema": {
-                  "$ref": "#/components/schemas/RobotStatusModel"
+                  "$ref": "#/components/schemas/GetRobotStatusesResponse"
                 }
               },
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/RobotStatusModel"
+                  "$ref": "#/components/schemas/GetRobotStatusesResponse"
                 }
               },
               "text/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/RobotStatusModel"
+                  "$ref": "#/components/schemas/GetRobotStatusesResponse"
                 }
               }
             }
@@ -624,19 +624,28 @@
         }
       }
     },
-    "/api/v1/Status/netapp": {
+    "/api/v1/Status/robot/{id}": {
       "get": {
         "tags": [
           "Status"
         ],
-        "operationId": "NetAppStatusGetById",
+        "operationId": "RobotStatusGetById",
         "parameters": [
           {
             "name": "id",
-            "in": "query",
+            "in": "path",
+            "required": true,
             "schema": {
               "type": "string",
               "format": "uuid"
+            }
+          },
+          {
+            "name": "generateFakeData",
+            "in": "query",
+            "schema": {
+              "type": "boolean",
+              "default": false
             }
           }
         ],
@@ -646,17 +655,117 @@
             "content": {
               "text/plain": {
                 "schema": {
-                  "$ref": "#/components/schemas/NetAppStatusModel"
+                  "$ref": "#/components/schemas/RobotStatusModel"
                 }
               },
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/NetAppStatusModel"
+                  "$ref": "#/components/schemas/RobotStatusModel"
                 }
               },
               "text/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/NetAppStatusModel"
+                  "$ref": "#/components/schemas/RobotStatusModel"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Server Error",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/Status/netapp": {
+      "get": {
+        "tags": [
+          "Status"
+        ],
+        "operationId": "NetAppStatuses",
+        "parameters": [
+          {
+            "name": "generateFakeData",
+            "in": "query",
+            "schema": {
+              "type": "boolean",
+              "default": false
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/GetNetAppStatusesResponse"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GetNetAppStatusesResponse"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GetNetAppStatusesResponse"
                 }
               }
             }
@@ -770,6 +879,115 @@
           },
           "400": {
             "description": "Bad Request",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Server Error",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/Status/netapp/{id}": {
+      "get": {
+        "tags": [
+          "Status"
+        ],
+        "operationId": "NetAppStatusGetById",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "generateFakeData",
+            "in": "query",
+            "schema": {
+              "type": "boolean",
+              "default": false
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/NetAppStatusModel"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NetAppStatusModel"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NetAppStatusModel"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
             "content": {
               "text/plain": {
                 "schema": {
@@ -1164,6 +1382,32 @@
         },
         "additionalProperties": false
       },
+      "GetNetAppStatusesResponse": {
+        "type": "object",
+        "properties": {
+          "netApps": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/NetAppStatusModel"
+            },
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "GetRobotStatusesResponse": {
+        "type": "object",
+        "properties": {
+          "robots": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/RobotStatusModel"
+            },
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
       "GraphEntityModel": {
         "type": "object",
         "properties": {
@@ -1264,16 +1508,6 @@
           "containerImage": {
             "$ref": "#/components/schemas/ContainerImageModel"
           },
-          "minimumRam": {
-            "type": "integer",
-            "format": "int64",
-            "nullable": true
-          },
-          "minimumNumCores": {
-            "type": "integer",
-            "format": "int32",
-            "nullable": true
-          },
           "onboardedTime": {
             "type": "string",
             "format": "date-time"
@@ -1289,6 +1523,21 @@
               "type": "string"
             },
             "nullable": true
+          },
+          "ram": {
+            "$ref": "#/components/schemas/NetAppRequirement"
+          },
+          "numberOfCores": {
+            "$ref": "#/components/schemas/NetAppRequirement"
+          },
+          "diskStorage": {
+            "$ref": "#/components/schemas/NetAppRequirement"
+          },
+          "throughput": {
+            "$ref": "#/components/schemas/NetAppRequirement"
+          },
+          "latency": {
+            "$ref": "#/components/schemas/NetAppRequirement"
           }
         },
         "additionalProperties": false
@@ -1324,6 +1573,26 @@
           "type": {
             "type": "string",
             "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "NetAppRequirement": {
+        "type": "object",
+        "properties": {
+          "minimal": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "optimal": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "priority": {
+            "$ref": "#/components/schemas/ResourcePriority"
+          },
+          "ascending": {
+            "type": "boolean"
           }
         },
         "additionalProperties": false
@@ -1474,6 +1743,18 @@
           }
         },
         "additionalProperties": false
+      },
+      "ResourcePriority": {
+        "enum": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6
+        ],
+        "type": "integer",
+        "format": "int32"
       },
       "RobotModel": {
         "type": "object",
@@ -1753,7 +2034,7 @@
           "ReplanActionPlannerLocked": {
             "type": "boolean"
           },
-          "ResourceLock": {
+          "DisableResourceReuse": {
             "type": "boolean"
           },
           "TaskPriority": {

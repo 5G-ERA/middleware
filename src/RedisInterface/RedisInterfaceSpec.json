@@ -529,6 +529,14 @@
             "schema": {
               "type": "string"
             }
+          },
+          {
+            "name": "direction",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "default": "Outgoing"
+            }
           }
         ],
         "responses": {
@@ -1824,6 +1832,14 @@
             "schema": {
               "type": "string"
             }
+          },
+          {
+            "name": "direction",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "default": "Outgoing"
+            }
           }
         ],
         "responses": {
@@ -2026,17 +2042,17 @@
             "content": {
               "text/plain": {
                 "schema": {
-                  "$ref": "#/components/schemas/CloudModel"
+                  "$ref": "#/components/schemas/CloudResponse"
                 }
               },
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/CloudModel"
+                  "$ref": "#/components/schemas/CloudResponse"
                 }
               },
               "text/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/CloudModel"
+                  "$ref": "#/components/schemas/CloudResponse"
                 }
               }
             }
@@ -2764,6 +2780,168 @@
         }
       }
     },
+    "/api/v1/Config": {
+      "get": {
+        "tags": [
+          "Config"
+        ],
+        "operationId": "ConfigGet",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/SystemConfigResponse"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SystemConfigResponse"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SystemConfigResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Server Error",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Config"
+        ],
+        "operationId": "ConfigUpdate",
+        "requestBody": {
+          "content": {
+            "application/json-patch+json": {
+              "schema": {
+                "$ref": "#/components/schemas/SystemConfigRequest"
+              }
+            },
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SystemConfigRequest"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SystemConfigRequest"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/SystemConfigRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/SystemConfigResponse"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SystemConfigResponse"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SystemConfigResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Server Error",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/v1/ContainerImage": {
       "get": {
         "tags": [
@@ -3287,6 +3465,14 @@
             "required": true,
             "schema": {
               "type": "string"
+            }
+          },
+          {
+            "name": "direction",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "default": "Outgoing"
             }
           }
         ],
@@ -3964,6 +4150,66 @@
         }
       }
     },
+    "/api/v1/Dashboard/org/{orgName}": {
+      "get": {
+        "tags": [
+          "Dashboard"
+        ],
+        "parameters": [
+          {
+            "name": "orgName",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "default": "5G-ERA"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrgStructureResponse"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrgStructureResponse"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrgStructureResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Server Error",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/v1/Edge": {
       "get": {
         "tags": [
@@ -4487,6 +4733,14 @@
             "required": true,
             "schema": {
               "type": "string"
+            }
+          },
+          {
+            "name": "direction",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "default": "Outgoing"
             }
           }
         ],
@@ -6050,6 +6304,14 @@
             "schema": {
               "type": "string"
             }
+          },
+          {
+            "name": "direction",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "default": "Outgoing"
+            }
           }
         ],
         "responses": {
@@ -6270,6 +6532,1166 @@
           },
           "404": {
             "description": "Not Found",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Server Error",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/Location": {
+      "get": {
+        "tags": [
+          "Location"
+        ],
+        "operationId": "LocationGetAll",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/GetLocationsResponse"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GetLocationsResponse"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GetLocationsResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Server Error",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Location"
+        ],
+        "operationId": "LocationAdd",
+        "requestBody": {
+          "content": {
+            "application/json-patch+json": {
+              "schema": {
+                "$ref": "#/components/schemas/LocationRequest"
+              }
+            },
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LocationRequest"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LocationRequest"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/LocationRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/LocationResponse"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LocationResponse"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LocationResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Server Error",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/Location/{id}": {
+      "get": {
+        "tags": [
+          "Location"
+        ],
+        "operationId": "LocationGetById",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/LocationResponse"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LocationResponse"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LocationResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Server Error",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Location"
+        ],
+        "operationId": "LocationUpdate",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json-patch+json": {
+              "schema": {
+                "$ref": "#/components/schemas/LocationRequest"
+              }
+            },
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LocationRequest"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LocationRequest"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/LocationRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/LocationResponse"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LocationResponse"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LocationResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Server Error",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Location"
+        ],
+        "operationId": "LocationDelete",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Server Error",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/Location/AddRelation": {
+      "post": {
+        "tags": [
+          "Location"
+        ],
+        "operationId": "LocationAddRelation",
+        "requestBody": {
+          "content": {
+            "application/json-patch+json": {
+              "schema": {
+                "$ref": "#/components/schemas/RelationModel"
+              }
+            },
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RelationModel"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RelationModel"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/RelationModel"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/RelationModel"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RelationModel"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RelationModel"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Server Error",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/Location/relation/{name}": {
+      "get": {
+        "tags": [
+          "Location"
+        ],
+        "operationId": "LocationGetRelationByName",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "name",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "direction",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "default": "Outgoing"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/RelationModel"
+                  }
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/RelationModel"
+                  }
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/RelationModel"
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Server Error",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/Location/relations/{firstName}/{secondName}": {
+      "get": {
+        "tags": [
+          "Location"
+        ],
+        "operationId": "LocationGetRelationsByName",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "firstName",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "secondName",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/RelationModel"
+                  }
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/RelationModel"
+                  }
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/RelationModel"
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Server Error",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/Location/name/{name}": {
+      "get": {
+        "tags": [
+          "Location"
+        ],
+        "operationId": "LocationGetDataByName",
+        "parameters": [
+          {
+            "name": "name",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/LocationResponse"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LocationResponse"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LocationResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Server Error",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/Location/{id}/busy": {
+      "get": {
+        "tags": [
+          "Location"
+        ],
+        "operationId": "IsBusyLocationById",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "boolean"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "type": "boolean"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "type": "boolean"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Server Error",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/Location/{name}/busy": {
+      "get": {
+        "tags": [
+          "Location"
+        ],
+        "operationId": "IsBusyLocationByName",
+        "parameters": [
+          {
+            "name": "name",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "boolean"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "type": "boolean"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "type": "boolean"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Server Error",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/Location/{id}/containers/count": {
+      "get": {
+        "tags": [
+          "Location"
+        ],
+        "operationId": "GetNumLocationContainersById",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "integer",
+                  "format": "int32"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "type": "integer",
+                  "format": "int32"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "type": "integer",
+                  "format": "int32"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Server Error",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/Location/{name}/containers/count": {
+      "get": {
+        "tags": [
+          "Location"
+        ],
+        "operationId": "GetNumLocationContainersByName",
+        "parameters": [
+          {
+            "name": "name",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "integer",
+                  "format": "int32"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "type": "integer",
+                  "format": "int32"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "type": "integer",
+                  "format": "int32"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
             "content": {
               "text/plain": {
                 "schema": {
@@ -7341,6 +8763,14 @@
             "required": true,
             "schema": {
               "type": "string"
+            }
+          },
+          {
+            "name": "direction",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "default": "Outgoing"
             }
           }
         ],
@@ -9420,6 +10850,14 @@
             "schema": {
               "type": "string"
             }
+          },
+          {
+            "name": "direction",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "default": "Outgoing"
+            }
           }
         ],
         "responses": {
@@ -10048,6 +11486,16 @@
           "IsOnline": {
             "type": "boolean"
           },
+          "throughput": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "latency": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
           "Id": {
             "type": "string",
             "format": "uuid"
@@ -10124,6 +11572,16 @@
           "macAddress": {
             "type": "string",
             "nullable": true
+          },
+          "throughput": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "latency": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
           }
         },
         "additionalProperties": false
@@ -10188,6 +11646,16 @@
           "lastUpdatedTime": {
             "type": "string",
             "format": "date-time"
+          },
+          "throughput": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "latency": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
           }
         },
         "additionalProperties": false
@@ -10465,6 +11933,16 @@
           "IsOnline": {
             "type": "boolean"
           },
+          "throughput": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "latency": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
           "Id": {
             "type": "string",
             "format": "uuid"
@@ -10537,6 +12015,16 @@
             "type": "integer",
             "format": "int64",
             "nullable": true
+          },
+          "throughput": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "latency": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
           }
         },
         "additionalProperties": false
@@ -10601,6 +12089,16 @@
           "lastUpdatedTime": {
             "type": "string",
             "format": "date-time"
+          },
+          "throughput": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "latency": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
           }
         },
         "additionalProperties": false
@@ -10644,7 +12142,7 @@
             },
             "nullable": true
           },
-          "instances": {
+          "services": {
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/FullInstanceResponse"
@@ -10732,12 +12230,29 @@
           "minimumRam": {
             "type": "integer",
             "format": "int64",
-            "nullable": true
+            "nullable": true,
+            "deprecated": true
           },
           "minimumNumOfCores": {
             "type": "integer",
             "format": "int32",
-            "nullable": true
+            "nullable": true,
+            "deprecated": true
+          },
+          "ram": {
+            "$ref": "#/components/schemas/RequirementResponse"
+          },
+          "numberOfCores": {
+            "$ref": "#/components/schemas/RequirementResponse"
+          },
+          "diskStorage": {
+            "$ref": "#/components/schemas/RequirementResponse"
+          },
+          "throughput": {
+            "$ref": "#/components/schemas/RequirementResponse"
+          },
+          "latency": {
+            "$ref": "#/components/schemas/RequirementResponse"
           },
           "onboardedTime": {
             "type": "string",
@@ -10857,6 +12372,19 @@
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/InstanceResponse"
+            },
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "GetLocationsResponse": {
+        "type": "object",
+        "properties": {
+          "locations": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/LocationResponse"
             },
             "nullable": true
           }
@@ -11035,16 +12563,6 @@
           "containerImage": {
             "$ref": "#/components/schemas/ContainerImageModel"
           },
-          "minimumRam": {
-            "type": "integer",
-            "format": "int64",
-            "nullable": true
-          },
-          "minimumNumCores": {
-            "type": "integer",
-            "format": "int32",
-            "nullable": true
-          },
           "onboardedTime": {
             "type": "string",
             "format": "date-time"
@@ -11060,6 +12578,21 @@
               "type": "string"
             },
             "nullable": true
+          },
+          "ram": {
+            "$ref": "#/components/schemas/NetAppRequirement"
+          },
+          "numberOfCores": {
+            "$ref": "#/components/schemas/NetAppRequirement"
+          },
+          "diskStorage": {
+            "$ref": "#/components/schemas/NetAppRequirement"
+          },
+          "throughput": {
+            "$ref": "#/components/schemas/NetAppRequirement"
+          },
+          "latency": {
+            "$ref": "#/components/schemas/NetAppRequirement"
           }
         },
         "additionalProperties": false
@@ -11107,12 +12640,29 @@
           "minimumRam": {
             "type": "integer",
             "format": "int32",
-            "nullable": true
+            "nullable": true,
+            "deprecated": true
           },
           "minimumNumOfCores": {
             "type": "integer",
             "format": "int32",
-            "nullable": true
+            "nullable": true,
+            "deprecated": true
+          },
+          "ram": {
+            "$ref": "#/components/schemas/RequirementRequest"
+          },
+          "numberOfCores": {
+            "$ref": "#/components/schemas/RequirementRequest"
+          },
+          "diskStorage": {
+            "$ref": "#/components/schemas/RequirementRequest"
+          },
+          "throughput": {
+            "$ref": "#/components/schemas/RequirementRequest"
+          },
+          "latency": {
+            "$ref": "#/components/schemas/RequirementRequest"
           },
           "tags": {
             "type": "array",
@@ -11179,12 +12729,29 @@
           "minimumRam": {
             "type": "integer",
             "format": "int64",
-            "nullable": true
+            "nullable": true,
+            "deprecated": true
           },
           "minimumNumOfCores": {
             "type": "integer",
             "format": "int32",
-            "nullable": true
+            "nullable": true,
+            "deprecated": true
+          },
+          "ram": {
+            "$ref": "#/components/schemas/RequirementResponse"
+          },
+          "numberOfCores": {
+            "$ref": "#/components/schemas/RequirementResponse"
+          },
+          "diskStorage": {
+            "$ref": "#/components/schemas/RequirementResponse"
+          },
+          "throughput": {
+            "$ref": "#/components/schemas/RequirementResponse"
+          },
+          "latency": {
+            "$ref": "#/components/schemas/RequirementResponse"
           },
           "onboardedTime": {
             "type": "string",
@@ -11223,10 +12790,6 @@
       "LocationRequest": {
         "type": "object",
         "properties": {
-          "id": {
-            "type": "string",
-            "format": "uuid"
-          },
           "type": {
             "type": "string",
             "nullable": true
@@ -11237,6 +12800,138 @@
           },
           "organization": {
             "type": "string",
+            "nullable": true
+          },
+          "status": {
+            "type": "string",
+            "nullable": true
+          },
+          "ipAddress": {
+            "type": "string",
+            "format": "uri",
+            "nullable": true
+          },
+          "macAddress": {
+            "type": "string",
+            "nullable": true
+          },
+          "cpu": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "numberOfCores": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "ram": {
+            "type": "integer",
+            "format": "int64",
+            "nullable": true
+          },
+          "virtualRam": {
+            "type": "integer",
+            "format": "int64",
+            "nullable": true
+          },
+          "diskStorage": {
+            "type": "integer",
+            "format": "int64",
+            "nullable": true
+          },
+          "throughput": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "latency": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "LocationResponse": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "name": {
+            "type": "string",
+            "nullable": true
+          },
+          "type": {
+            "type": "string",
+            "nullable": true
+          },
+          "isOnline": {
+            "type": "boolean"
+          },
+          "organization": {
+            "type": "string",
+            "nullable": true
+          },
+          "ipAddress": {
+            "type": "string",
+            "format": "uri",
+            "nullable": true
+          },
+          "status": {
+            "type": "string",
+            "nullable": true
+          },
+          "macAddress": {
+            "type": "string",
+            "nullable": true
+          },
+          "cpu": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "numberOfCores": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "ram": {
+            "type": "integer",
+            "format": "int64",
+            "nullable": true
+          },
+          "virtualRam": {
+            "type": "integer",
+            "format": "int64",
+            "nullable": true
+          },
+          "diskStorage": {
+            "type": "integer",
+            "format": "int64",
+            "nullable": true
+          },
+          "lastUpdatedTime": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "throughput": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "latency": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "slices": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SliceResponse"
+            },
             "nullable": true
           }
         },
@@ -11364,6 +13059,26 @@
         },
         "additionalProperties": false
       },
+      "NetAppRequirement": {
+        "type": "object",
+        "properties": {
+          "minimal": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "optimal": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "priority": {
+            "$ref": "#/components/schemas/ResourcePriority"
+          },
+          "ascending": {
+            "type": "boolean"
+          }
+        },
+        "additionalProperties": false
+      },
       "NetAppsDetailsResponse": {
         "type": "object",
         "properties": {
@@ -11449,6 +13164,19 @@
           "previousPage": {
             "type": "string",
             "format": "uri",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "OrgStructureResponse": {
+        "type": "object",
+        "properties": {
+          "locations": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/LocationResponse"
+            },
             "nullable": true
           }
         },
@@ -11615,6 +13343,54 @@
           }
         },
         "additionalProperties": false
+      },
+      "RequirementRequest": {
+        "type": "object",
+        "properties": {
+          "minimum": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "optimal": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "priority": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "RequirementResponse": {
+        "type": "object",
+        "properties": {
+          "minimum": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "optimal": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "priority": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "ResourcePriority": {
+        "enum": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6
+        ],
+        "type": "integer",
+        "format": "int32"
       },
       "RobotRequest": {
         "type": "object",
@@ -12122,6 +13898,50 @@
         },
         "additionalProperties": false
       },
+      "SystemConfigRequest": {
+        "type": "object",
+        "properties": {
+          "ros2RelayContainer": {
+            "type": "string",
+            "nullable": true
+          },
+          "ros1RelayContainer": {
+            "type": "string",
+            "nullable": true
+          },
+          "rosInterRelayNetAppContainer": {
+            "type": "string",
+            "nullable": true
+          },
+          "heartbeatExpirationInMinutes": {
+            "type": "integer",
+            "format": "int32"
+          }
+        },
+        "additionalProperties": false
+      },
+      "SystemConfigResponse": {
+        "type": "object",
+        "properties": {
+          "ros2RelayContainer": {
+            "type": "string",
+            "nullable": true
+          },
+          "ros1RelayContainer": {
+            "type": "string",
+            "nullable": true
+          },
+          "rosInterRelayNetAppContainer": {
+            "type": "string",
+            "nullable": true
+          },
+          "heartbeatExpirationInMinutes": {
+            "type": "integer",
+            "format": "int32"
+          }
+        },
+        "additionalProperties": false
+      },
       "TaskModel": {
         "type": "object",
         "properties": {
@@ -12143,7 +13963,7 @@
           "ReplanActionPlannerLocked": {
             "type": "boolean"
           },
-          "ResourceLock": {
+          "DisableResourceReuse": {
             "type": "boolean"
           },
           "TaskPriority": {

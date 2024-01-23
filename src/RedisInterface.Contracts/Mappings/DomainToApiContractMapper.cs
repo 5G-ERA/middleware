@@ -560,6 +560,17 @@ public static class DomainToApiContractMapper
             TargetFrame = x.TargetFrame,
             TransThres = x.TransThres,
             MaxPublishPeriod = x.MaxPublishPeriod
+        }
+    }
+    public static SystemConfigResponse ToSystemConfigResponse(this SystemConfigModel x)
+    {
+        return new()
+        {
+            HeartbeatExpirationInMinutes = x.HeartbeatExpirationInMinutes,
+            Ros1RelayContainer = x.Ros1RelayContainer,
+            Ros2RelayContainer = x.Ros2RelayContainer,
+            RosInterRelayNetAppContainer = x.RosInterRelayNetAppContainer
+
         };
     }
 }

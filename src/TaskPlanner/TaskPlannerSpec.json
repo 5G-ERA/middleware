@@ -533,7 +533,7 @@
             "type": "string",
             "format": "uuid"
           },
-          "LockResourceReUse": {
+          "DisableResourceReuse": {
             "type": "boolean"
           },
           "ReplanActionPlannerLocked": {
@@ -567,7 +567,7 @@
             "type": "string",
             "format": "uuid"
           },
-          "LockResourceReUse": {
+          "DisableResourceReuse": {
             "type": "boolean"
           },
           "ContextKnown": {
@@ -715,16 +715,6 @@
           "containerImage": {
             "$ref": "#/components/schemas/ContainerImageModel"
           },
-          "minimumRam": {
-            "type": "integer",
-            "format": "int64",
-            "nullable": true
-          },
-          "minimumNumCores": {
-            "type": "integer",
-            "format": "int32",
-            "nullable": true
-          },
           "onboardedTime": {
             "type": "string",
             "format": "date-time"
@@ -739,6 +729,21 @@
             "items": {
               "type": "string"
             }
+          },
+          "ram": {
+            "$ref": "#/components/schemas/NetAppRequirement"
+          },
+          "numberOfCores": {
+            "$ref": "#/components/schemas/NetAppRequirement"
+          },
+          "diskStorage": {
+            "$ref": "#/components/schemas/NetAppRequirement"
+          },
+          "throughput": {
+            "$ref": "#/components/schemas/NetAppRequirement"
+          },
+          "latency": {
+            "$ref": "#/components/schemas/NetAppRequirement"
           }
         },
         "additionalProperties": false
@@ -750,6 +755,26 @@
             "type": "string"
           },
           "value": { }
+        },
+        "additionalProperties": false
+      },
+      "NetAppRequirement": {
+        "type": "object",
+        "properties": {
+          "minimal": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "optimal": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "priority": {
+            "$ref": "#/components/schemas/ResourcePriority"
+          },
+          "ascending": {
+            "type": "boolean"
+          }
         },
         "additionalProperties": false
       },
@@ -797,6 +822,18 @@
         },
         "additionalProperties": false
       },
+      "ResourcePriority": {
+        "enum": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6
+        ],
+        "type": "integer",
+        "format": "int32"
+      },
       "RosTopicModel": {
         "type": "object",
         "properties": {
@@ -837,7 +874,7 @@
           "ReplanActionPlannerLocked": {
             "type": "boolean"
           },
-          "ResourceLock": {
+          "DisableResourceReuse": {
             "type": "boolean"
           },
           "TaskPriority": {
