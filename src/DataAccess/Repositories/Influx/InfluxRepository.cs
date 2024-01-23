@@ -12,9 +12,9 @@ using ILogger = Serilog.ILogger;
 namespace Middleware.DataAccess.Repositories.Influx;
 public class InfluxRepository<TModel, TDto> : IInfluxRepository<TModel, TDto> where TModel : BaseModel where TDto : InfluxDto, new()
 {
-    private const string Organization = "testorg";
+    private const string Organization = "5G-ERA";
     protected readonly string Bucket;
-    protected readonly string ObjectType;
+    protected readonly string Measurement;
     /// <summary>
     /// Logger instance
     /// </summary>
@@ -31,12 +31,12 @@ public class InfluxRepository<TModel, TDto> : IInfluxRepository<TModel, TDto> wh
     /// <param name="client">Influx client </param>
     /// <param name="logger">Logger instance</param>
     /// <exception cref="ArgumentNullException"></exception>
-    public InfluxRepository(IInfluxDBClient client, ILogger logger, string bucket, string objectType)
+    public InfluxRepository(IInfluxDBClient client, ILogger logger, string bucket, string measurement)
     {
         Logger = logger ?? throw new ArgumentNullException(nameof(logger));
         Client = client ?? throw new ArgumentNullException(nameof(client));
         Bucket = bucket ?? throw new ArgumentNullException(nameof(bucket));
-        ObjectType = objectType ?? throw new ArgumentNullException(nameof(objectType));
+        Measurement = measurement ?? throw new ArgumentNullException(nameof(measurement));
     }
 
     public async Task AddOrgAsync(string organisationName)
@@ -97,7 +97,7 @@ public class InfluxRepository<TModel, TDto> : IInfluxRepository<TModel, TDto> wh
     private async Task<List<TModel>> GetAllStatusByIdAsync(Guid id)
     {
         var stringId = id.ToString();
-        string query = "from(bucket: \"" + Bucket + "\") |> range(start: 0) |> filter(fn: (r) => r[\"_measurement\"] == \"Heartbeat\") |> filter(fn: (r) => r[\"Id\"] == \"" + stringId + "\") |> yield(name: \"all\")";
+        string query = "from(bucket: \"" + Bucket + "\") |> range(start: 0) |> filter(fn: (r) => r[\"_measurement\"] == \""+ Measurement + "\") |> filter(fn: (r) => r[\"Id\"] == \"" + stringId + "\") |> yield(name: \"all\")";
         List<FluxTable> fluxTables = await Client.GetQueryApi().QueryAsync(query: query, org: Organization);
 
         List<TModel> listOfTModels = new();
@@ -127,7 +127,7 @@ public class InfluxRepository<TModel, TDto> : IInfluxRepository<TModel, TDto> wh
     public async Task<TModel?> GetStatusByIdAsync(Guid id)
     {
         var stringId = id.ToString();
-        string query = "from(bucket: \"" + Bucket + "\") |> range(start: 0) |> filter(fn: (r) => r[\"_measurement\"] == \"Heartbeat\") |> filter(fn: (r) => r[\"Id\"] == \"" + stringId + "\") |> yield(name: \"last\")";
+        string query = "from(bucket: \"" + Bucket + "\") |> range(start: 0) |> filter(fn: (r) => r[\"_measurement\"] == \""+ Measurement + "\") |> filter(fn: (r) => r[\"Id\"] == \"" + stringId + "\") |> yield(name: \"last\")";
         List<FluxTable> fluxTables = await Client.GetQueryApi().QueryAsync(query: query, org: Organization);
         if (fluxTables.Count > 0)
         {
@@ -139,11 +139,13 @@ public class InfluxRepository<TModel, TDto> : IInfluxRepository<TModel, TDto> wh
 
     public async Task<List<TModel>> GetAllAsync()
     {
-        var query = "from(bucket: \"" + Bucket + "\") |> range(start: 0) |> filter(fn: (r) => r[\"_measurement\"] == \"Heartbeat\")";
+        var query = "from(bucket: \"" + Bucket + "\") |> range(start: 0) |> filter(fn: (r) => r[\"_measurement\"] == \""+ Measurement + "\")";
+        List<TModel> listOfTModels = new();
         List<FluxTable> allFluxTables = await Client.GetQueryApi().QueryAsync(query: query, org: Organization);
+        if (!allFluxTables.Any()) return listOfTModels;
 
         List<FluxTable> oneObjectAllRecordsFluxTables = new();
-        List<TModel> listOfTModels = new();
+        
 
         var currentId = allFluxTables[0].Records[0].GetValueByKey("Id").ToString();
         foreach (var fluxTable in allFluxTables)

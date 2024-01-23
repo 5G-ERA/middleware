@@ -10,9 +10,8 @@ namespace Middleware.Models.Dto;
 public class NetAppStatusDto : InfluxDto
 {
     public const string Prefix = "NetAppStatus";
-    // Need second opinion before merging
     public const string Measurement = "Heartbeat";
-    public const string ObjectType = "Netapp";
+    private const string ObjectType = "Netapp";
 
     [Indexed]
     [RedisIdField]

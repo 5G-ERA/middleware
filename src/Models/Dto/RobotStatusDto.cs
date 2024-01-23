@@ -10,9 +10,8 @@ namespace Middleware.Models.Dto;
 public class RobotStatusDto : InfluxDto
 {
     public const string Prefix = "RobotStatus";
-    // Need second opinion before merging
     public const string Measurement = "Heartbeat";
-    public const string ObjectType = "Robot";
+    private const string ObjectType = "Robot";
 
     [Indexed]
     [RedisIdField]
