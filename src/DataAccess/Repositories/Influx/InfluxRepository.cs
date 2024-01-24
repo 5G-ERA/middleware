@@ -83,6 +83,7 @@ public class InfluxRepository<TModel, TDto> : IInfluxRepository<TModel> where TM
         string query = "from(bucket: \"" + Bucket + "\") |> range(start: 0) |> keyValues(keyColumns: [\"Id\"]) |> keep(columns: [\"Id\"]) |> limit(n:1, offset: 0) |> group() ";
         var fluxTables = await Client.GetQueryApi().QueryAsync(query: query, org: Organization);
         List<String> ids = new List<string>();
+        if (fluxTables == null || fluxTables.Count < 1) { return ids; }
 
         foreach (var record in fluxTables[0].Records)
         {
