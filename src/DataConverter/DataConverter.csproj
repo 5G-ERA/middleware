@@ -7,6 +7,7 @@
         <Nullable>enable</Nullable>
         <UserSecretsId>0f82ab47-cd19-459e-92cb-32b7327b7867</UserSecretsId>
         <ProduceReferenceAssembly>False</ProduceReferenceAssembly>
+	    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
     </PropertyGroup>
 
     <ItemGroup>
