@@ -87,7 +87,7 @@ internal class HeartbeatService : IHeartbeatService
             Id = id,
             Name = name,
             Timestamp = DateTimeOffset.Now - TimeSpan.FromSeconds(Random.Shared.Next(1, 10)),
-            CurrentRobotsCount = Random.Shared.Next(0, 3),
+            CurrentRobotsCount = Random.Shared.Next(0, 6),
             OptimalLimit = Random.Shared.Next(2, 4),
             HardLimit = Random.Shared.Next(4, 6)
         };

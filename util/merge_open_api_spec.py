@@ -21,7 +21,7 @@ prefixes = {"RedisInterface": "data",
 
 def set_properties(template_info: dict) -> None:
     template_info["title"] = "5G-ERA Middleware"
-    template_info["version"] = "0.1"
+    template_info["version"] = "0.9"
 
 
 def add_routes(template: dict, routes: dict, api: str) -> None:
