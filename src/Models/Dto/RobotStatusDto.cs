@@ -10,6 +10,7 @@ namespace Middleware.Models.Dto;
 public class RobotStatusDto : InfluxDto
 {
     public const string Prefix = "RobotStatus";
+    public const string Bucket = "RobotStatus";
     public const string Measurement = "Heartbeat";
     private const string ObjectType = "Robot";
 

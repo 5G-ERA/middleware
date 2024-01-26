@@ -8,7 +8,6 @@ using Middleware.DataAccess.Repositories.Abstract;
 using Middleware.DataAccess.Repositories.Abstract.Influx;
 using Middleware.DataAccess.Repositories.Influx;
 using Middleware.DataAccess.Repositories.Redis;
-using Middleware.Models.Domain;
 using Redis.OM;
 using Redis.OM.Contracts;
 using RedisGraphDotNet.Client;
@@ -43,7 +42,11 @@ public static class DataAccessExtensionMethods
     public static WebApplicationBuilder RegisterInflux(this WebApplicationBuilder builder)
     {
         var config = builder.Configuration.GetSection(InfluxConfig.ConfigName).Get<InfluxConfig>();
-        var influxClient = new InfluxDBClient(config.Address, config.ApiKey);
+        var address = config.Address;
+
+        var address2 = "http://" + address + ":8086";
+        //var influxClient = new InfluxDBClient(config.Address, config.ApiKey);
+        var influxClient = new InfluxDBClient(address2, config.ApiKey);
         builder.Services.AddSingleton<IInfluxDBClient>(influxClient);
 
         builder.Services.AddScoped<IInfluxNetAppStatusRepository, InfluxNetAppStatusRepository>();

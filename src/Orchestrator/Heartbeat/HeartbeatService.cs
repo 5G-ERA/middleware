@@ -1,6 +1,4 @@
-﻿using Middleware.DataAccess.Repositories.Abstract;
-using Middleware.DataAccess.Repositories.Abstract.Influx;
-using Middleware.DataAccess.Repositories.Influx;
+﻿using Middleware.DataAccess.Repositories.Abstract.Influx;
 using Middleware.Models.Domain;
 using Middleware.RedisInterface.Sdk;
 

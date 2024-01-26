@@ -10,6 +10,7 @@ namespace Middleware.Models.Dto;
 public class NetAppStatusDto : InfluxDto
 {
     public const string Prefix = "NetAppStatus";
+    public const string Bucket = "NetAppStatus";
     public const string Measurement = "Heartbeat";
     private const string ObjectType = "Netapp";
 

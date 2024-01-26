@@ -2,6 +2,7 @@
 using InfluxDB.Client.Api.Domain;
 using InfluxDB.Client.Core.Flux.Domain;
 using InfluxDB.Client.Writes;
+using Microsoft.AspNetCore.Mvc;
 using Middleware.DataAccess.Repositories.Abstract;
 using Middleware.Models.Domain;
 using Middleware.Models.Dto;
@@ -44,7 +45,7 @@ public class InfluxRepository<TModel, TDto> : IInfluxRepository<TModel> where TM
         await Client.GetOrganizationsApi().CreateOrganizationAsync(name: organisationName);
     }
 
-    public async Task<Bucket> AddBucketAsync(string bucketName, int retentionTime)
+    public async Task<Bucket> AddBucketAsync(string bucketName, int retentionTime = 2592000)
     {
         var org = Organization;
         var orgId = (await Client.GetOrganizationsApi().FindOrganizationsAsync(org: org)).First().Id;
@@ -52,6 +53,17 @@ public class InfluxRepository<TModel, TDto> : IInfluxRepository<TModel> where TM
         var bucket = await Client.GetBucketsApi().CreateBucketAsync(bucketName, retention, orgId);
         return bucket;
     }
+
+    public async Task<string> GetBucketByNameAsync(string bucketName)
+    {
+        var bucket = await Client.GetBucketsApi().FindBucketByNameAsync(bucketName);
+        if(bucket != null)
+        {
+            return bucket.Name.ToString();
+        }
+        else return string.Empty;
+    }
+
 
     public async Task AddPointAsync(PointData point, string bucket, string org)
     {
