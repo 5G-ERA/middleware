@@ -1,4 +1,5 @@
 ﻿using Middleware.Models.Domain.Contracts;
+using Middleware.Models.Domain.Ros;
 using Middleware.Models.Domain.ValueObjects;
 using Middleware.Models.Dto;
 using Middleware.Models.Enums;
@@ -24,6 +25,14 @@ public class InstanceModel : BaseModel, IPolicyAssignable, IHardwareRequirementC
     public List<RosTopicModel> RosTopicsPub { get; set; } = new(); // compulsory field
 
     public List<RosTopicModel> RosTopicsSub { get; set; } = new(); // compulsory field
+
+    /// <summary>
+    ///     Represents list of transformations made when connecting to relay from robot
+    /// </summary>
+    public List<RosTransformsModel> Transforms { get; set; } = new();
+
+    public List<RosActionModel> Actions { get; set; } = new();
+    public List<RosServiceModel> Services { get; set; } = new();
 
     public int RosVersion { get; set; } // compulsory field
 
@@ -89,6 +98,9 @@ public class InstanceModel : BaseModel, IPolicyAssignable, IHardwareRequirementC
             ServiceUrl = domain.ServiceUrl,
             RosTopicsPub = domain.RosTopicsPub.Select(x => x.ToDto()).ToList(),
             RosTopicsSub = domain.RosTopicsSub.Select(x => x.ToDto()).ToList(),
+            Actions = domain.Actions.Select(x => x.ToDto()).ToList(),
+            Services = domain.Services.Select(x=>x.ToDto()).ToList(),
+            Transforms = domain.Transforms.Select(t=>t.ToDto()).ToList(),
             RosVersion = domain.RosVersion,
             ROSDistro = domain.RosDistro,
             Tags = domain.Tags ?? new List<string>(),

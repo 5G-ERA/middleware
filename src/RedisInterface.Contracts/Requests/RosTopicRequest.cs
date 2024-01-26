@@ -9,4 +9,7 @@ public class RosTopicRequest
 
     public string Description { get; set; }
     public bool Enabled { get; set; }
+    public string Compression { get; set; }
+
+    public RosQosRequest Qos { get; set; }
 }
