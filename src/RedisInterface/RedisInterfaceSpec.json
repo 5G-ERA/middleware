@@ -12215,6 +12215,27 @@
             },
             "nullable": true
           },
+          "rosActions": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/RosActionResponse"
+            },
+            "nullable": true
+          },
+          "rosServices": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/RosServiceResponse"
+            },
+            "nullable": true
+          },
+          "rosTransforms": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/RosTransformsResponse"
+            },
+            "nullable": true
+          },
           "rosVersion": {
             "type": "integer",
             "format": "int32"
@@ -12533,6 +12554,27 @@
             },
             "nullable": true
           },
+          "transforms": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/RosTransformsModel"
+            },
+            "nullable": true
+          },
+          "actions": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/RosActionModel"
+            },
+            "nullable": true
+          },
+          "services": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/RosServiceModel"
+            },
+            "nullable": true
+          },
           "rosVersion": {
             "type": "integer",
             "format": "int32"
@@ -12625,6 +12667,27 @@
             },
             "nullable": true
           },
+          "rosActions": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/RosActionRequest"
+            },
+            "nullable": true
+          },
+          "rosServices": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/RosServiceRequest"
+            },
+            "nullable": true
+          },
+          "rosTransforms": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/RosTransformsRequest"
+            },
+            "nullable": true
+          },
           "rosVersion": {
             "type": "integer",
             "format": "int32"
@@ -12711,6 +12774,27 @@
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/RosTopicResponse"
+            },
+            "nullable": true
+          },
+          "rosActions": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/RosActionResponse"
+            },
+            "nullable": true
+          },
+          "rosServices": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/RosServiceResponse"
+            },
+            "nullable": true
+          },
+          "rosTransforms": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/RosTransformsResponse"
             },
             "nullable": true
           },
@@ -13260,45 +13344,43 @@
         },
         "additionalProperties": false
       },
-      "ROSNodeModel": {
+      "Qos": {
         "type": "object",
         "properties": {
-          "name": {
+          "preset": {
             "type": "string",
             "nullable": true
           },
-          "publications": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/RosTopicModel"
-            },
-            "nullable": true
-          },
-          "subscriptions": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/RosTopicModel"
-            },
-            "nullable": true
-          },
-          "services": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/ROSServiceModel"
-            },
-            "nullable": true
-          }
-        },
-        "additionalProperties": false
-      },
-      "ROSServiceModel": {
-        "type": "object",
-        "properties": {
-          "name": {
+          "history": {
             "type": "string",
             "nullable": true
           },
-          "description": {
+          "depth": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "reliability": {
+            "type": "string",
+            "nullable": true
+          },
+          "durability": {
+            "type": "string",
+            "nullable": true
+          },
+          "deadline": {
+            "type": "string",
+            "nullable": true
+          },
+          "lifespan": {
+            "type": "string",
+            "nullable": true
+          },
+          "liveliness": {
+            "type": "string",
+            "nullable": true
+          },
+          "lease": {
             "type": "string",
             "nullable": true
           }
@@ -13447,7 +13529,7 @@
           "rosNodes": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/ROSNodeModel"
+              "$ref": "#/components/schemas/RosNodeModel"
             },
             "nullable": true
           },
@@ -13586,7 +13668,7 @@
           "rosNodes": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/ROSNodeModel"
+              "$ref": "#/components/schemas/RosNodeModel"
             },
             "nullable": true
           },
@@ -13674,6 +13756,228 @@
         },
         "additionalProperties": false
       },
+      "RosActionModel": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "nullable": true
+          },
+          "type": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "RosActionRequest": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "nullable": true
+          },
+          "type": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "RosActionResponse": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "nullable": true
+          },
+          "type": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "RosNodeModel": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "nullable": true
+          },
+          "publications": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/RosTopicModel"
+            },
+            "nullable": true
+          },
+          "subscriptions": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/RosTopicModel"
+            },
+            "nullable": true
+          },
+          "services": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/RosServiceModel"
+            },
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "RosQosRequest": {
+        "type": "object",
+        "properties": {
+          "preset": {
+            "type": "string",
+            "nullable": true
+          },
+          "history": {
+            "type": "string",
+            "nullable": true
+          },
+          "depth": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "reliability": {
+            "type": "string",
+            "nullable": true
+          },
+          "durability": {
+            "type": "string",
+            "nullable": true
+          },
+          "deadline": {
+            "type": "string",
+            "nullable": true
+          },
+          "lifespan": {
+            "type": "string",
+            "nullable": true
+          },
+          "liveliness": {
+            "type": "string",
+            "nullable": true
+          },
+          "lease": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "RosQosResponse": {
+        "type": "object",
+        "properties": {
+          "preset": {
+            "type": "string",
+            "nullable": true
+          },
+          "history": {
+            "type": "string",
+            "nullable": true
+          },
+          "depth": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "reliability": {
+            "type": "string",
+            "nullable": true
+          },
+          "durability": {
+            "type": "string",
+            "nullable": true
+          },
+          "deadline": {
+            "type": "string",
+            "nullable": true
+          },
+          "lifespan": {
+            "type": "string",
+            "nullable": true
+          },
+          "liveliness": {
+            "type": "string",
+            "nullable": true
+          },
+          "lease": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "RosServiceModel": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "nullable": true
+          },
+          "type": {
+            "type": "string",
+            "nullable": true
+          },
+          "description": {
+            "type": "string",
+            "nullable": true
+          },
+          "qos": {
+            "$ref": "#/components/schemas/Qos"
+          }
+        },
+        "additionalProperties": false
+      },
+      "RosServiceRequest": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "nullable": true
+          },
+          "type": {
+            "type": "string",
+            "nullable": true
+          },
+          "description": {
+            "type": "string",
+            "nullable": true
+          },
+          "qos": {
+            "$ref": "#/components/schemas/RosQosRequest"
+          }
+        },
+        "additionalProperties": false
+      },
+      "RosServiceResponse": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "nullable": true
+          },
+          "type": {
+            "type": "string",
+            "nullable": true
+          },
+          "description": {
+            "type": "string",
+            "nullable": true
+          },
+          "qos": {
+            "$ref": "#/components/schemas/RosQosResponse"
+          }
+        },
+        "additionalProperties": false
+      },
       "RosTopicModel": {
         "type": "object",
         "properties": {
@@ -13688,6 +13992,13 @@
           "description": {
             "type": "string",
             "nullable": true
+          },
+          "compression": {
+            "type": "string",
+            "nullable": true
+          },
+          "qos": {
+            "$ref": "#/components/schemas/Qos"
           },
           "enabled": {
             "type": "boolean"
@@ -13712,6 +14023,13 @@
           },
           "enabled": {
             "type": "boolean"
+          },
+          "compression": {
+            "type": "string",
+            "nullable": true
+          },
+          "qos": {
+            "$ref": "#/components/schemas/RosQosRequest"
           }
         },
         "additionalProperties": false
@@ -13733,6 +14051,91 @@
           },
           "enabled": {
             "type": "boolean"
+          },
+          "compression": {
+            "type": "string",
+            "nullable": true
+          },
+          "qos": {
+            "$ref": "#/components/schemas/RosQosResponse"
+          }
+        },
+        "additionalProperties": false
+      },
+      "RosTransformsModel": {
+        "type": "object",
+        "properties": {
+          "source_frame": {
+            "type": "string",
+            "nullable": true
+          },
+          "target_frame": {
+            "type": "string",
+            "nullable": true
+          },
+          "angular_thres": {
+            "type": "number",
+            "format": "double"
+          },
+          "trans_thres": {
+            "type": "number",
+            "format": "double"
+          },
+          "max_publish_period": {
+            "type": "number",
+            "format": "double"
+          }
+        },
+        "additionalProperties": false
+      },
+      "RosTransformsRequest": {
+        "type": "object",
+        "properties": {
+          "sourceFrame": {
+            "type": "string",
+            "nullable": true
+          },
+          "targetFrame": {
+            "type": "string",
+            "nullable": true
+          },
+          "angularThres": {
+            "type": "number",
+            "format": "double"
+          },
+          "transThres": {
+            "type": "number",
+            "format": "double"
+          },
+          "maxPublishPeriod": {
+            "type": "number",
+            "format": "double"
+          }
+        },
+        "additionalProperties": false
+      },
+      "RosTransformsResponse": {
+        "type": "object",
+        "properties": {
+          "sourceFrame": {
+            "type": "string",
+            "nullable": true
+          },
+          "targetFrame": {
+            "type": "string",
+            "nullable": true
+          },
+          "angularThres": {
+            "type": "number",
+            "format": "double"
+          },
+          "transThres": {
+            "type": "number",
+            "format": "double"
+          },
+          "maxPublishPeriod": {
+            "type": "number",
+            "format": "double"
           }
         },
         "additionalProperties": false
