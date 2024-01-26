@@ -6,6 +6,14 @@
 		<Nullable>disable</Nullable>
 		<RootNamespace>Middleware.Common</RootNamespace>
 	</PropertyGroup>
+
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+	  <GenerateAssemblyInfo>False</GenerateAssemblyInfo>
+	</PropertyGroup>
+
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+	  <GenerateAssemblyInfo>False</GenerateAssemblyInfo>
+	</PropertyGroup>
 	<ItemGroup>
 		<Content Include="LuaQueries\**">
 			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
@@ -14,6 +22,10 @@
 
 	<ItemGroup>
 		<None Remove="LuaQueries\GetActivePolicies.lua" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <Compile Include="..\..\SharedAssemblyInfo.cs" Link="SharedAssemblyInfo.cs" />
 	</ItemGroup>
 
 	<ItemGroup>

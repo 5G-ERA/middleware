@@ -1,59 +1,64 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
-  <PropertyGroup>
-    <TargetFramework>net6.0</TargetFramework>
-    <Nullable>disable</Nullable>
-    <ImplicitUsings>enable</ImplicitUsings>
-    <UserSecretsId>8fb52c47-9623-4ecb-9ea8-b839bf622277</UserSecretsId>
-    <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
-	<RootNamespace>Middleware.RedisInterface</RootNamespace>
-    <DockerfileContext>..\..</DockerfileContext>
-    <DockerComposeProjectPath>..\..\docker-compose.dcproj</DockerComposeProjectPath>
-  </PropertyGroup>
+	<PropertyGroup>
+		<TargetFramework>net6.0</TargetFramework>
+		<Nullable>disable</Nullable>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<UserSecretsId>8fb52c47-9623-4ecb-9ea8-b839bf622277</UserSecretsId>
+		<DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
+		<RootNamespace>Middleware.RedisInterface</RootNamespace>
+		<DockerfileContext>..\..</DockerfileContext>
+		<DockerComposeProjectPath>..\..\docker-compose.dcproj</DockerComposeProjectPath>
+		<ProduceReferenceAssembly>False</ProduceReferenceAssembly>
+		<GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+	</PropertyGroup>
 
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
-    <Optimize>False</Optimize>
-  </PropertyGroup>
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+		<Optimize>False</Optimize>
+	</PropertyGroup>
 
 	<ItemGroup>
 		<InternalsVisibleTo Include="RedisInterface.Tests.Unit" />
 	</ItemGroup>
 
-  <ItemGroup>
-    <PackageReference Include="AutoMapper" Version="12.0.0" />
-    <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="12.0.0" />
-    <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="6.0.12" />
-    <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.15.0" />
-    <PackageReference Include="NReJSON" Version="4.0.0" />
-    <PackageReference Include="RedisGraphDotNet.Client" Version="0.1.0-alpha" />
-    <PackageReference Include="StackExchange.Redis" Version="2.6.90" />
-    <PackageReference Include="Swashbuckle.AspNetCore" Version="6.4.0" />
-    <PackageReference Include="System.Collections" Version="4.3.0" />
-  </ItemGroup>
+	<ItemGroup>
+		<PackageReference Include="AutoMapper" Version="12.0.0" />
+		<PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="12.0.0" />
+		<PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="6.0.12" />
+		<PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.15.0" />
+		<PackageReference Include="NReJSON" Version="4.0.0" />
+		<PackageReference Include="RedisGraphDotNet.Client" Version="0.1.0-alpha" />
+		<PackageReference Include="StackExchange.Redis" Version="2.6.90" />
+		<PackageReference Include="Swashbuckle.AspNetCore" Version="6.4.0" />
+		<PackageReference Include="System.Collections" Version="4.3.0" />
+	</ItemGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\CentralApi.Sdk\CentralApi.Sdk.csproj" />
-    <ProjectReference Include="..\Common\Common.csproj" />
-    <ProjectReference Include="..\DataAccess\DataAccess.csproj" />
-    <ProjectReference Include="..\RedisInterface.Contracts\RedisInterface.Contracts.csproj" />
-  </ItemGroup>
+	<ItemGroup>
+		<ProjectReference Include="..\CentralApi.Sdk\CentralApi.Sdk.csproj" />
+		<ProjectReference Include="..\Common\Common.csproj" />
+		<ProjectReference Include="..\DataAccess\DataAccess.csproj" />
+		<ProjectReference Include="..\RedisInterface.Contracts\RedisInterface.Contracts.csproj" />
+	</ItemGroup>
 
-  <ItemGroup>
-    <Content Include="LuaQueries\*.*">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-  </ItemGroup>
+	<ItemGroup>
+		<Content Include="LuaQueries\*.*">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</Content>
+	</ItemGroup>
 
-  <ItemGroup>
-    <None Remove="LuaQueries\GetKeys.lua" />
-    <None Remove="LuaQueries\GetPlanByRobotId.lua" />
-    <None Remove="LuaQueries\GetResourceCloudData.lua" />
-    <None Remove="LuaQueries\GetResourceEdgeData.lua" />
-    <None Remove="LuaQueries\GetSameFamilyAction.lua" />
-  </ItemGroup>
+	<ItemGroup>
+		<None Remove="LuaQueries\GetKeys.lua" />
+		<None Remove="LuaQueries\GetPlanByRobotId.lua" />
+		<None Remove="LuaQueries\GetResourceCloudData.lua" />
+		<None Remove="LuaQueries\GetResourceEdgeData.lua" />
+		<None Remove="LuaQueries\GetSameFamilyAction.lua" />
+	</ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Contracts" />
-  </ItemGroup> 
+	<ItemGroup>
+		<Compile Include="..\..\SharedAssemblyInfo.cs" Link="SharedAssemblyInfo.cs" />
+	</ItemGroup>
 
+	<ItemGroup>
+		<Folder Include="Contracts" />
+	</ItemGroup>
 </Project>

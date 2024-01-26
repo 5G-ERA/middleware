@@ -51,7 +51,12 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RedisInterface.Tests.Unit",
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ResourcePlanner.Tests.Unit", "test\ResourcePlanner.Tests.Unit\ResourcePlanner.Tests.Unit.csproj", "{EC6519DC-9F2B-49C9-B3C1-7174DE64FE58}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestCommon", "test\TestCommon\TestCommon.csproj", "{57C2F3D6-2621-424F-94B0-354E505C2D42}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TestCommon", "test\TestCommon\TestCommon.csproj", "{57C2F3D6-2621-424F-94B0-354E505C2D42}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{DBF1E2EE-7524-4D2D-BB2B-70A585C4C731}"
+	ProjectSection(SolutionItems) = preProject
+		SharedAssemblyInfo.cs = SharedAssemblyInfo.cs
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

@@ -11,6 +11,18 @@
 		<DockerComposeProjectPath>..\..\docker-compose.dcproj</DockerComposeProjectPath>
 	</PropertyGroup>
 
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+	  <GenerateAssemblyInfo>False</GenerateAssemblyInfo>
+	</PropertyGroup>
+
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+	  <GenerateAssemblyInfo>False</GenerateAssemblyInfo>
+	</PropertyGroup>
+
+	<ItemGroup>
+	  <Compile Include="..\..\SharedAssemblyInfo.cs" Link="SharedAssemblyInfo.cs" />
+	</ItemGroup>
+
 	<ItemGroup>
 
 		<OpenApiReference Include="..\ResourcePlanner\ResourcePlannerSpec.json" CodeGenerator="NSwagCSharp" ClassName="ResourcePlannerApiClient" Link="OpenAPIs\ResourcePlannerSpec.json">
@@ -46,5 +58,4 @@
 		<ProjectReference Include="..\Common\Common.csproj" />
 		<ProjectReference Include="..\RedisInterface.Sdk\RedisInterface.Sdk.csproj" />
 	</ItemGroup>
-
 </Project>

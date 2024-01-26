@@ -11,11 +11,23 @@
 		<DockerComposeProjectPath>..\..\docker-compose.dcproj</DockerComposeProjectPath>
 	</PropertyGroup>
 
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+	  <GenerateAssemblyInfo>False</GenerateAssemblyInfo>
+	</PropertyGroup>
+
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+	  <GenerateAssemblyInfo>False</GenerateAssemblyInfo>
+	</PropertyGroup>
+
 	<ItemGroup>
 	  <Compile Remove="Exceptions\**" />
 	  <Content Remove="Exceptions\**" />
 	  <EmbeddedResource Remove="Exceptions\**" />
 	  <None Remove="Exceptions\**" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <Compile Include="..\..\SharedAssemblyInfo.cs" Link="SharedAssemblyInfo.cs" />
 	</ItemGroup>
 
 	<ItemGroup>
@@ -53,5 +65,4 @@
 		<ProjectReference Include="..\DataAccess\DataAccess.csproj" />
 		<ProjectReference Include="..\RedisInterface.Sdk\RedisInterface.Sdk.csproj" />
 	</ItemGroup>
-
 </Project>
