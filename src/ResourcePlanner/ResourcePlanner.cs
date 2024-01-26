@@ -3,6 +3,7 @@ using AutoMapper;
 using Middleware.Common.Config;
 using Middleware.Common.Enums;
 using Middleware.Models.Domain;
+using Middleware.Models.Enums;
 using Middleware.RedisInterface.Contracts.Mappings;
 using Middleware.RedisInterface.Sdk;
 using Middleware.ResourcePlanner.ApiReference;
@@ -11,6 +12,7 @@ using Middleware.ResourcePlanner.Policies;
 using ActionModel = Middleware.Models.Domain.ActionModel;
 using ApiResponse = Middleware.Common.Responses.ApiResponse;
 using InstanceModel = Middleware.Models.Domain.InstanceModel;
+using NetAppStatusModel = Middleware.Models.Domain.NetAppStatusModel;
 using RelationModel = Middleware.Models.Domain.RelationModel;
 using RobotModel = Middleware.Models.Domain.RobotModel;
 using TaskModel = Middleware.Models.Domain.TaskModel;
@@ -560,16 +562,23 @@ internal class ResourcePlanner : IResourcePlanner
                 return instance;
             }
 
-            var percentageUsage = statuses.Select(s =>
+            var percentageUsage = statuses.Select(s=>new NetAppStatusModel()
+                {
+                    Id = s.Id,
+                    CurrentRobotsCount = s.CurrentRobotsCount,
+                    Name = s.Name,
+                    HardLimit = s.HardLimit,
+                    OptimalLimit = s.OptimalLimit,
+                    Timestamp = s.Timestamp
+                }).Select(s =>
                     new
                     {
                         s.Id,
                         Percentage = s.CurrentRobotsCount / (decimal)s.HardLimit * 100,
                         // TODO: this will have to be expanded based on the resource prediction
                         // for example if the edge can accommodate another instance
-                        Recommendation = s.CurrentRobotsCount < s.OptimalLimit ? NetAppStatus.Green :
-                            s.CurrentRobotsCount >= s.HardLimit ? NetAppStatus.Red : NetAppStatus.Yellow
-                    }).Where(s => s.Recommendation != NetAppStatus.Red)
+                        Recommendation = s.GetColourCodedStatus()
+                    }).Where(s => s.Recommendation != ColourCode.Red)
                 .OrderBy(s => s.Recommendation).ThenBy(s => s.Percentage).ToList();
 
             // need for the deployment of the new service no to overload one in the red zone
