@@ -11,6 +11,7 @@ using Middleware.Models.Domain;
 using Middleware.Models.Domain.Contracts;
 using Middleware.Models.Enums;
 using Middleware.Models.ExtensionMethods;
+using Middleware.Orchestrator.Deployment.RosCommunication;
 using Middleware.Orchestrator.Exceptions;
 using Middleware.Orchestrator.Helpers;
 using Middleware.Orchestrator.Models;
@@ -534,9 +535,13 @@ internal class DeploymentService : IDeploymentService
 
         if (builder is not null)
         {
-            var topicPub = instance.RosTopicsPub.CreateCopy();
-            var topicSub = instance.RosTopicsSub.CreateCopy();
-            deployment = builder.EnableRosCommunication(deployment, topicSub, topicPub);
+            var rosSpec = new RosSpec(instance.RosTopicsSub,
+                instance.RosTopicsPub,
+                instance.Services,
+                instance.Transforms,
+                instance.Actions);
+            
+            deployment = builder.EnableRosCommunication(deployment, rosSpec);
         }
 
         var service = string.IsNullOrWhiteSpace(cim.K8SService)

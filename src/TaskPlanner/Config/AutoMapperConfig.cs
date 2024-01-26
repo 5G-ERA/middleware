@@ -1,6 +1,18 @@
-﻿using Middleware.Common.Responses;
-using Middleware.Models.Domain;
+﻿using Middleware.Models.Domain.Ros;
+using Middleware.TaskPlanner.ResourcePlanner;
+using ActionModel = Middleware.Models.Domain.ActionModel;
+using ActuatorModel = Middleware.Models.Domain.ActuatorModel;
+using ApiResponse = Middleware.Common.Responses.ApiResponse;
+using ContainerImageModel = Middleware.Models.Domain.ContainerImageModel;
+using DialogueModel = Middleware.Models.Domain.DialogueModel;
+using GraphEntityModel = Middleware.Models.Domain.GraphEntityModel;
+using InstanceModel = Middleware.Models.Domain.InstanceModel;
 using KeyValuePair = Middleware.Models.Domain.KeyValuePair;
+using RelationModel = Middleware.Models.Domain.RelationModel;
+using RobotModel = Middleware.Models.Domain.RobotModel;
+using RosTopicModel = Middleware.Models.Domain.Ros.RosTopicModel;
+using SensorModel = Middleware.Models.Domain.SensorModel;
+using TaskModel = Middleware.Models.Domain.TaskModel;
 
 namespace Middleware.TaskPlanner.Config;
 
@@ -23,9 +35,9 @@ public static class AutoMapperConfig
             cfg.CreateMap<InstanceModel, ResourcePlanner.InstanceModel>().ReverseMap();
             cfg.CreateMap<RobotModel, ResourcePlanner.RobotModel>().ReverseMap();
 
-            cfg.CreateMap<ROSNodeModel, ResourcePlanner.ROSNodeModel>().ReverseMap();
+            cfg.CreateMap<RosNodeModel, ROSNodeModel>().ReverseMap();
             cfg.CreateMap<RosTopicModel, ResourcePlanner.RosTopicModel>().ReverseMap();
-            cfg.CreateMap<ROSServiceModel, ResourcePlanner.ROSServiceModel>().ReverseMap();
+            cfg.CreateMap<RosServiceModel, ROSServiceModel>().ReverseMap();
             cfg.CreateMap<SensorModel, ResourcePlanner.SensorModel>().ReverseMap();
             cfg.CreateMap<ActuatorModel, ResourcePlanner.ActuatorModel>().ReverseMap();
             //cfg.CreateMap<ManipulatorModel, ResourcePlanner.RobotManipulatorModel>().ReverseMap();

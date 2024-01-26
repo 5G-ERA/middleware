@@ -1,4 +1,5 @@
 ﻿using Middleware.Models.Domain;
+using Middleware.Models.Domain.Ros;
 using Middleware.Models.Domain.Slice;
 using Middleware.Models.Enums;
 using Middleware.RedisInterface.Contracts.Requests;
@@ -174,6 +175,9 @@ public static class ApiContractToDomainMapper
             RosDistro = x.RosDistro,
             RosTopicsPub = x.RosTopicPublishers.Select(t => t.ToRosTopic()).ToList(),
             RosTopicsSub = x.RosTopicSubscribers.Select(t => t.ToRosTopic()).ToList(),
+            Actions = x.RosActions.Select(t => t.ToRosAction()).ToList(),
+            Services = x.RosServices.Select(t=>t.ToRosService()).ToList(),
+            Transforms = x.RosTransforms.Select(t=>t.ToRosTransforms()).ToList(),
             AppliedPolicies = x.AppliedPolicies.ToList()
         };
     }
@@ -196,6 +200,9 @@ public static class ApiContractToDomainMapper
             RosDistro = x.RosDistro,
             RosTopicsPub = x.RosTopicPublishers.Select(t => t.ToRosTopic()).ToList(),
             RosTopicsSub = x.RosTopicSubscribers.Select(t => t.ToRosTopic()).ToList(),
+            Actions = x.RosActions.Select(t => t.ToRosAction()).ToList(),
+            Services = x.RosServices.Select(t=>t.ToRosService()).ToList(),
+            Transforms = x.RosTransforms.Select(t=>t.ToRosTransforms()).ToList(),
             AppliedPolicies = x.AppliedPolicies.ToList(),
             Tags = x.Tags?.ToList(),
             OnboardedTime = x.OnboardedTime
@@ -508,7 +515,9 @@ public static class ApiContractToDomainMapper
             Name = x.Name,
             Type = x.Type,
             Description = x.Description,
-            Enabled = x.Enabled
+            Enabled = x.Enabled,
+            Compression = x.Compression,
+            Qos = x.Qos?.ToQos()
         };
     }
 
@@ -519,7 +528,102 @@ public static class ApiContractToDomainMapper
             Name = x.Name,
             Type = x.Type,
             Description = x.Description,
-            Enabled = x.Enabled
+            Enabled = x.Enabled,
+            Compression = x.Compression,
+            Qos = x.Qos?.ToQos()
+        };
+    }
+
+    public static Qos ToQos(this RosQosRequest x)
+    {
+        return new()
+        {
+            Deadline = x.Deadline,
+            Depth = x.Depth,
+            Durability = x.Durability,
+            History = x.History,
+            Lease = x.Lease,
+            Lifespan = x.Lifespan,
+            Liveliness = x.Liveliness,
+            Preset = x.Preset,
+            Reliability = x.Reliability
+        };
+    }
+
+    public static Qos ToQos(this RosQosResponse x)
+    {
+        return new()
+        {
+            Deadline = x.Deadline,
+            Depth = x.Depth,
+            Durability = x.Durability,
+            History = x.History,
+            Lease = x.Lease,
+            Lifespan = x.Lifespan,
+            Liveliness = x.Liveliness,
+            Preset = x.Preset,
+            Reliability = x.Reliability
+        };
+    }
+
+    public static RosActionModel ToRosAction(this RosActionRequest x)
+    {
+        return new()
+        {
+            Name = x.Name,
+            Type = x.Type
+        };
+    }
+    
+    public static RosActionModel ToRosAction(this RosActionResponse x)
+    {
+        return new()
+        {
+            Name = x.Name,
+            Type = x.Type
+        };
+    }
+
+    public static RosServiceModel ToRosService(this RosServiceRequest x)
+    {
+        return new()
+        {
+            Name = x.Name,
+            Type = x.Type,
+            Description = x.Description,
+            Qos = x.Qos?.ToQos()
+        };
+    }
+    public static RosServiceModel ToRosService(this RosServiceResponse x)
+    {
+        return new()
+        {
+            Name = x.Name,
+            Type = x.Type,
+            Description = x.Description,
+            Qos = x.Qos?.ToQos()
+        };
+    }
+    public static RosTransformsModel ToRosTransforms(this RosTransformsRequest x)
+    {
+        return new()
+        {
+            AngularThres = x.AngularThres,
+            SourceFrame = x.SourceFrame,
+            TargetFrame = x.TargetFrame,
+            TransThres = x.TransThres,
+            MaxPublishPeriod = x.MaxPublishPeriod
+        };
+    }
+    public static RosTransformsModel ToRosTransforms(this RosTransformsResponse x)
+    {
+        return new()
+        {
+            AngularThres = x.AngularThres,
+            SourceFrame = x.SourceFrame,
+            TargetFrame = x.TargetFrame,
+            TransThres = x.TransThres,
+            MaxPublishPeriod = x.MaxPublishPeriod
         };
     }
 

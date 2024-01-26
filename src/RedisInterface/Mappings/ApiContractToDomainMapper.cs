@@ -97,7 +97,10 @@ public static class ApiContractToDomainMapper
             RosVersion = x.Instance.RosVersion,
             RosDistro = x.Instance.RosDistro,
             RosTopicsPub = x.Instance.RosTopicPublishers.Select(t => t.ToRosTopic()).ToList(),
-            RosTopicsSub = x.Instance.RosTopicSubscribers.Select(t => t.ToRosTopic()).ToList()
+            RosTopicsSub = x.Instance.RosTopicSubscribers.Select(t => t.ToRosTopic()).ToList(),
+            Actions = x.Instance.RosActions.Select(t=>t.ToRosAction()).ToList(),
+            Services = x.Instance.RosServices.Select(t=>t.ToRosService()).ToList(),
+            Transforms = x.Instance.RosTransforms.Select(t=>t.ToRosTransforms()).ToList()
         };
     }
 
