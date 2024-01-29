@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using Middleware.Models.Dto;
+using Middleware.Models.Enums;
 
 namespace Middleware.Models.Domain;
 
@@ -35,6 +36,28 @@ public class NetAppStatusModel : BaseModel
     ///     Timestamp of the update
     /// </summary>
     public DateTimeOffset Timestamp { get; set; }
+
+    public string Colour
+    {
+        get { return GetColourCodedStatus().ToString().ToLower(); }
+    }
+
+    public ColourCode GetColourCodedStatus()
+    {
+        var retVal = ColourCode.Yellow;
+        if (CurrentRobotsCount < OptimalLimit)
+        {
+            retVal = ColourCode.Green;
+        }
+
+        if (CurrentRobotsCount >= HardLimit)
+        {
+            retVal = ColourCode.Red;
+        }
+
+        return retVal;
+    }
+
 
     public bool IsValid()
     {
