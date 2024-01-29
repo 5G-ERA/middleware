@@ -23,7 +23,6 @@ builder.Services.AddSwaggerGen();
 if (builder.Environment.IsDevelopment() == false)
     builder.Services.AddHostedService<IndexCreationService>();
 
-
 builder.Services.RegisterCentralApiRepositories();
 builder.Services.AddScoped<IRobotService, RobotService>();
 

@@ -1,4 +1,4 @@
-﻿using Middleware.DataAccess.Repositories.Abstract;
+﻿using Middleware.DataAccess.Repositories.Abstract.Influx;
 using Middleware.Models.Domain;
 using Middleware.RedisInterface.Sdk;
 
@@ -7,23 +7,27 @@ namespace Middleware.Orchestrator.Heartbeat;
 internal class HeartbeatService : IHeartbeatService
 {
     private readonly ILogger _logger;
-    private readonly INetAppStatusRepository _netAppStatusRepository;
     private readonly IRedisInterfaceClient _redisInterfaceClient;
-    private readonly IRobotStatusRepository _robotStatusRepository;
 
-    public HeartbeatService(IRobotStatusRepository robotStatusRepository, IRedisInterfaceClient redisInterfaceClient,
-        INetAppStatusRepository netAppStatusRepository, ILogger<HeartbeatService> logger)
+    private readonly IInfluxNetAppStatusRepository _influxNetAppStatusRepository;
+    private readonly IInfluxRobotStatusRepository _influxRobotStatusRepository;
+
+    public HeartbeatService(IRedisInterfaceClient redisInterfaceClient,
+        ILogger<HeartbeatService> logger,
+        IInfluxNetAppStatusRepository influxNetAppStatusRepository,
+        IInfluxRobotStatusRepository influxRobotStatusRepository)
     {
-        _robotStatusRepository = robotStatusRepository;
         _redisInterfaceClient = redisInterfaceClient;
-        _netAppStatusRepository = netAppStatusRepository;
         _logger = logger;
+        _influxNetAppStatusRepository = influxNetAppStatusRepository;
+        _influxRobotStatusRepository = influxRobotStatusRepository;
     }
 
     /// <inheritdoc />
     public async Task<NetAppStatusModel> GetNetAppStatusByIdAsync(Guid id, bool generateFakeData = false)
     {
-        var status = await _netAppStatusRepository.GetByIdAsync(id);
+        //var status = await _netAppStatusRepository.GetByIdAsync(id);
+        var status = await _influxNetAppStatusRepository.GetStatusByIdAsync(id);// .GetByIdAsync(id);
         if (status is null && generateFakeData)
         {
             var robotResp = await _redisInterfaceClient.InstanceGetByIdAsync(id);
@@ -37,7 +41,8 @@ internal class HeartbeatService : IHeartbeatService
     /// <inheritdoc />
     public async Task<RobotStatusModel> GetRobotStatusByIdAsync(Guid id, bool generateFakeData = false)
     {
-        var status = await _robotStatusRepository.GetByIdAsync(id);
+        //var status = await _robotStatusRepository.GetByIdAsync(id);
+        var status = await _influxRobotStatusRepository.GetStatusByIdAsync(id);
         if (status is null && generateFakeData)
         {
             var robotResp = await _redisInterfaceClient.RobotGetByIdAsync(id);
@@ -51,7 +56,8 @@ internal class HeartbeatService : IHeartbeatService
     /// <inheritdoc />
     public async Task<IReadOnlyList<NetAppStatusModel>> GetAllAppStatusesAsync(bool generateFakeData)
     {
-        var statuses = await _netAppStatusRepository.GetAllAsync();
+        //var statuses = await _netAppStatusRepository.GetAllAsync();
+        var statuses = await _influxNetAppStatusRepository.GetAllAsync();
         if (!statuses.Any() && generateFakeData) return await CreateFakeNetAppStatusList();
         return statuses;
     }
@@ -59,7 +65,8 @@ internal class HeartbeatService : IHeartbeatService
     /// <inheritdoc />
     public async Task<IReadOnlyList<RobotStatusModel>> GetAllRobotStatusesAsync(bool generateFakeData = false)
     {
-        var statuses = await _robotStatusRepository.GetAllAsync();
+        //var statuses = await _robotStatusRepository.GetAllAsync();
+        var statuses = await _influxRobotStatusRepository.GetAllAsync();
         if (!statuses.Any() && generateFakeData) return await CreateFakeRobotStatusList();
         return statuses;
     }

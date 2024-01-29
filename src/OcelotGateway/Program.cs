@@ -52,7 +52,6 @@ builder.Services.AddAuthentication(options =>
         ClockSkew = TimeSpan.Zero
     };
 });
-
 builder.RegisterRedis();
 
 builder.Services.AddScoped<IUserRepository, RedisUserRepository>();

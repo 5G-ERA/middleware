@@ -2,7 +2,9 @@
 using Middleware.Common.Config;
 using Middleware.Common.Helpers;
 using Middleware.DataAccess.Repositories.Abstract;
+using Middleware.DataAccess.Repositories.Abstract.Influx;
 using Middleware.Models.Domain;
+using Middleware.Models.Dto;
 using Middleware.Models.Enums;
 
 namespace Middleware.Orchestrator.Installer;
@@ -13,15 +15,20 @@ internal class StartupDataInstaller : IStartupDataInstaller
     private readonly ISystemConfigRepository _systemConfigRepository;
     private readonly IOptions<UserConfig> _userConfig;
     private readonly IUserRepository _userRepository;
+    private readonly IInfluxRobotStatusRepository _influxRobotStatusRepository;
+    private readonly ILogger<StartupDataInstaller> _logger;
 
     public StartupDataInstaller(IUserRepository userRepository, IPolicyRepository policyRepository,
         ISystemConfigRepository systemConfigRepository,
-        IOptions<UserConfig> userConfig)
+        IOptions<UserConfig> userConfig,
+        IInfluxRobotStatusRepository influxNetAppStatusRepository, ILogger<StartupDataInstaller> logger)
     {
         _userRepository = userRepository;
         _policyRepository = policyRepository;
         _systemConfigRepository = systemConfigRepository;
         _userConfig = userConfig;
+        _influxRobotStatusRepository = influxNetAppStatusRepository;
+        _logger = logger;
     }
 
     /// <inheritdoc />
@@ -50,6 +57,39 @@ internal class StartupDataInstaller : IStartupDataInstaller
         var existingResourcePolicy = await _policyRepository.GetByIdAsync(resourcePolicy.Id);
         if (existingResourcePolicy is null)
             await _policyRepository.AddAsync(resourcePolicy);
+
+        await CheckBucketsExist();
+    }
+
+    private async Task<Exception> CheckBucketsExist()
+    {
+        var netappBucketName = NetAppStatusDto.Bucket;
+        try
+        {
+            var netappBucketExist = await _influxRobotStatusRepository.GetBucketByNameAsync(netappBucketName);
+            if (netappBucketName != netappBucketExist)
+            {
+                await CreateBucket(netappBucketName);
+            }
+            var robotBucketName = RobotStatusDto.Bucket;
+            var robotBucketExist = await _influxRobotStatusRepository.GetBucketByNameAsync(robotBucketName);
+            if (robotBucketName != robotBucketExist)
+            {
+                await CreateBucket(robotBucketName);
+            }
+            return null;
+
+        }
+        catch (Exception ex)
+        {
+            _logger.LogCritical(ex.ToString());
+            return ex;
+        }
+    }
+    private async Task CreateBucket(string bucketName)
+    {
+        await _influxRobotStatusRepository.AddBucketAsync(bucketName, 2592000);
+
     }
 
     private bool IsConfigCorrect(SystemConfigModel cfg)

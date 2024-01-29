@@ -1,7 +1,7 @@
 ﻿using System.Net;
 using Microsoft.AspNetCore.Mvc;
 using Middleware.Common.Responses;
-using Middleware.DataAccess.Repositories.Abstract;
+using Middleware.DataAccess.Repositories.Abstract.Influx;
 using Middleware.Models.Domain;
 using Middleware.Orchestrator.Heartbeat;
 using Middleware.Orchestrator.Models.Responses;
@@ -15,22 +15,22 @@ public class StatusController : Controller
 {
     private readonly IHeartbeatService _heartbeatService;
     private readonly ILogger _logger;
-    private readonly INetAppStatusRepository _netAppStatusRepository;
     private readonly IRedisInterfaceClient _redisInterfaceClient;
-    private readonly IRobotStatusRepository _robotStatusRepository;
+    private readonly IInfluxNetAppStatusRepository _influxNetAppStatusRepository;
+    private readonly IInfluxRobotStatusRepository _influxRobotStatusRepository;
 
-    public StatusController(INetAppStatusRepository netAppStatusRepository,
-        IRobotStatusRepository robotStatusRepository,
-        ILogger<StatusController> logger,
+    public StatusController(ILogger<StatusController> logger,
         IRedisInterfaceClient redisInterfaceClient,
-        IHeartbeatService heartbeatService
+        IHeartbeatService heartbeatService,
+        IInfluxNetAppStatusRepository influxNetAppStatusRepository,
+        IInfluxRobotStatusRepository influxRobotStatusRepository
     )
     {
-        _netAppStatusRepository = netAppStatusRepository;
-        _robotStatusRepository = robotStatusRepository;
         _logger = logger;
         _redisInterfaceClient = redisInterfaceClient;
         _heartbeatService = heartbeatService;
+        _influxNetAppStatusRepository = influxNetAppStatusRepository;
+        _influxRobotStatusRepository = influxRobotStatusRepository;
     }
 
 
@@ -123,7 +123,8 @@ public class StatusController : Controller
         try
         {
             //TODO: put behind service
-            await _robotStatusRepository.AddAsync(model, () => model.Id);
+            //await _robotStatusRepository.AddAsync(model, () => model.Id);
+            await _influxRobotStatusRepository.AddAsync(model);
         }
         catch (Exception ex)
         {
@@ -224,7 +225,8 @@ public class StatusController : Controller
         try
         {
             //TODO: put behind service
-            await _netAppStatusRepository.AddAsync(model, () => model.Id);
+            //await _netAppStatusRepository.AddAsync(model, () => model.Id);
+            await _influxNetAppStatusRepository.AddAsync(model);
         }
         catch (Exception ex)
         {
@@ -281,7 +283,9 @@ public class StatusController : Controller
             var statuses = new List<NetAppStatusModel>();
             foreach (var instanceId in instanceIds)
             {
-                var status = await _netAppStatusRepository.GetByIdAsync(instanceId);
+                //var status = await _netAppStatusRepository.GetByIdAsync(instanceId);
+                //  NetAppStatusModel // 7
+                var status = await _influxNetAppStatusRepository.GetStatusByIdAsync(instanceId);
                 if (status is not null) statuses.Add(status);
             }
 
