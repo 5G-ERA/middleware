@@ -151,7 +151,6 @@ public class StatusController : Controller
         try
         {
             var status = await _heartbeatService.GetAllAppStatusesAsync(generateFakeData);
-            if (status == null) return BadRequest();
             if (status is null || !status.Any())
             {
                 return NotFound(new ApiResponse((int)HttpStatusCode.NotFound,
