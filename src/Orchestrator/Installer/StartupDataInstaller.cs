@@ -47,7 +47,7 @@ internal class StartupDataInstaller : IStartupDataInstaller
             await _policyRepository.AddAsync(urllcPolicy);
 
         var resourcePolicy = CreateResourceSelectionPolicy();
-        var existingResourcePolicy = await _policyRepository.GetByIdAsync(urllcPolicy.Id);
+        var existingResourcePolicy = await _policyRepository.GetByIdAsync(resourcePolicy.Id);
         if (existingResourcePolicy is null)
             await _policyRepository.AddAsync(resourcePolicy);
     }
