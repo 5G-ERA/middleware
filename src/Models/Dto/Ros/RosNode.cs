@@ -1,4 +1,4 @@
-﻿using Middleware.Models.Domain;
+﻿using Middleware.Models.Domain.Ros;
 using Redis.OM.Modeling;
 
 namespace Middleware.Models.Dto.Ros;
@@ -20,14 +20,14 @@ public class RosNode
     [Searchable(JsonPath = "$.Description")]
     public List<RosService> Services { get; init; } = new();
 
-    public ROSNodeModel ToModel()
+    public RosNodeModel ToModel()
     {
-        return new ROSNodeModel()
+        return new()
         {
-            Name = this.Name!,
-            Publications = this.Publications.Select(x => x.ToModel()).ToList(),
-            Services = this.Services.Select(x => x.ToModel()).ToList(),
-            Subscriptions = this.Subscriptions.Select(x => x.ToModel()).ToList()
+            Name = Name!,
+            Publications = Publications.Select(x => x.ToModel()).ToList(),
+            Services = Services.Select(x => x.ToModel()).ToList(),
+            Subscriptions = Subscriptions.Select(x => x.ToModel()).ToList()
         };
     }
 }

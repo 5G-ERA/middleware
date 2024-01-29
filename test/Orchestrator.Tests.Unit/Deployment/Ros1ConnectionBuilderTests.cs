@@ -4,6 +4,7 @@ using System.Linq;
 using FluentAssertions;
 using k8s.Models;
 using Middleware.Models.Domain;
+using Middleware.Models.Domain.Ros;
 using Middleware.Orchestrator.Deployment.RosCommunication;
 using Xunit;
 
@@ -30,7 +31,7 @@ public class Ros1ConnectionBuilderTests
     {
         //arrange
         var distro = RosDistro.Noetic;
-        var depl = CreateExampleDeployment();
+        var depl = K8SBuilder.CreateExampleDeployment();
         var cfg = new SystemConfigModel
         {
             Ros1RelayContainer = "but5gera/relay_network_application:0.4.4"
@@ -38,8 +39,9 @@ public class Ros1ConnectionBuilderTests
 
         var sut = new Ros1ConnectionBuilder(distro, cfg);
         var topics = new List<RosTopicModel>();
+        var rosSpec = new RosSpec(topics, topics, null, null, null);
         //act
-        var result = sut.EnableRosCommunication(depl, topics, topics);
+        var result = sut.EnableRosCommunication(depl, rosSpec);
         //assert
         result.Spec.Template.Spec.Containers.Should()
             .HaveCount(3, "We need three containers, one RelayNetApp, one ROS core and NetApp itself");
@@ -68,9 +70,9 @@ public class Ros1ConnectionBuilderTests
         {
             Ros1RelayContainer = "but5gera/relay_network_application:0.4.4"
         };
-        var depl = CreateExampleDeployment();
+        var depl = K8SBuilder.CreateExampleDeployment();
         var sut = new Ros1ConnectionBuilder(distro, cfg);
-        var topicString = "[{\"topic_name\":\"/image_raw\",\"topic_type\":\"sensor_msgs/Image\"}]";
+        var topicString = "[{\"topic_name\":\"/image_raw\",\"topic_type\":\"sensor_msgs/Image\",\"compression\":\"none\",\"qos\":null}]";
         var topics = new List<RosTopicModel>
         {
             new()
@@ -81,8 +83,9 @@ public class Ros1ConnectionBuilderTests
                 Enabled = true // this also should not be included
             }
         };
+        var rosSpec = new RosSpec(topics, topics, null, null, null);
         //act
-        var result = sut.EnableRosCommunication(depl, topics, topics);
+        var result = sut.EnableRosCommunication(depl, rosSpec);
 
         //assert
         var relayNetAppContainer = result.Spec.Template.Spec.Containers.FirstOrDefault(c => c.Name == "relay-net-app");
@@ -132,49 +135,5 @@ public class Ros1ConnectionBuilderTests
         port80.Should().NotBeNull();
     }
 
-    private V1Deployment CreateExampleDeployment()
-    {
-        return new()
-        {
-            ApiVersion = "apps/v1",
-            Kind = "Deployment",
-            Metadata = new()
-            {
-                Name = "example",
-                Labels = new Dictionary<string, string>
-                {
-                    { "app", "example" }
-                }
-            },
-            Spec = new()
-            {
-                Template = new()
-                {
-                    Metadata = new()
-                    {
-                        Name = "example",
-                        Labels = new Dictionary<string, string>
-                        {
-                            { "app", "example" }
-                        }
-                    },
-                    Spec = new()
-                    {
-                        Containers = new List<V1Container>
-                        {
-                            new()
-                            {
-                                Name = "example",
-                                Image = "redis",
-                                Ports = new List<V1ContainerPort>
-                                {
-                                    new(6379)
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        };
-    }
+    
 }

@@ -1,4 +1,5 @@
 ﻿using Middleware.Models.Domain;
+using Middleware.Models.Domain.Ros;
 
 namespace Middleware.RedisInterface.Contracts.Responses;
 
@@ -16,7 +17,7 @@ public class RobotResponse
     public long? MaximumRotationalVelocity { get; init; }
     public long? RobotWeight { get; init; }
     public Uri RosRepo { get; init; }
-    public IEnumerable<ROSNodeModel> RosNodes { get; init; }
+    public IEnumerable<RosNodeModel> RosNodes { get; init; }
     public string Manufacturer { get; init; }
     public Uri ManufacturerUrl { get; init; }
     public string MacAddress { get; init; }

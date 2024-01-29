@@ -1,4 +1,5 @@
 ﻿using System.Text.Json.Serialization;
+using Middleware.Models.Domain.Ros;
 using Middleware.Models.Dto;
 using Middleware.Models.Enums;
 
@@ -34,7 +35,7 @@ public class RobotModel : BaseModel
     public Uri? ROSRepo { get; set; }
 
     [JsonPropertyName("ROSNodes")]
-    public List<ROSNodeModel>? ROSNodes { get; set; }
+    public List<RosNodeModel>? ROSNodes { get; set; }
 
     [JsonPropertyName("Manufacturer")]
     public string? Manufacturer { get; set; }

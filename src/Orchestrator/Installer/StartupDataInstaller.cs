@@ -54,7 +54,7 @@ internal class StartupDataInstaller : IStartupDataInstaller
             await _policyRepository.AddAsync(urllcPolicy);
 
         var resourcePolicy = CreateResourceSelectionPolicy();
-        var existingResourcePolicy = await _policyRepository.GetByIdAsync(urllcPolicy.Id);
+        var existingResourcePolicy = await _policyRepository.GetByIdAsync(resourcePolicy.Id);
         if (existingResourcePolicy is null)
             await _policyRepository.AddAsync(resourcePolicy);
 
@@ -129,7 +129,7 @@ internal class StartupDataInstaller : IStartupDataInstaller
         var cfg = new SystemConfigModel
         {
             Ros1RelayContainer = "but5gera/relay_network_application:0.4.4",
-            Ros2RelayContainer = "but5gera/ros2_relay_server:0.1.0",
+            Ros2RelayContainer = "but5gera/ros2_relay_server:0.2.0",
             RosInterRelayNetAppContainer = "but5gera/inter_relay_network_application:0.4.4",
             HeartbeatExpirationInMinutes = 3
         };

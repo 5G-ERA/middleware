@@ -1,4 +1,5 @@
 ﻿using Middleware.Models.Domain;
+using Middleware.Models.Domain.Ros;
 using Middleware.Models.Domain.Slice;
 using Middleware.Models.Enums;
 using Middleware.RedisInterface.Contracts.Requests;
@@ -132,6 +133,9 @@ public static class DomainToApiContractMapper
             RosDistro = x.RosDistro,
             RosTopicPublishers = x.RosTopicsPub.Select(t => t.ToRosTopicResponse()),
             RosTopicSubscribers = x.RosTopicsSub.Select(t => t.ToRosTopicResponse()),
+            RosActions = x.Actions.Select(t => t.ToRosActionResponse()).ToList(),
+            RosServices = x.Services.Select(t=>t.ToRosServiceResponse()).ToList(),
+            RosTransforms = x.Transforms.Select(t=>t.ToRosTransformsResponse()).ToList(),
             Tags = x.Tags,
             OnboardedTime = x.OnboardedTime,
             AppliedPolicies = x.AppliedPolicies
@@ -285,7 +289,41 @@ public static class DomainToApiContractMapper
             Name = x.Name,
             Type = x.Type,
             Description = x.Description,
-            Enabled = x.Enabled
+            Enabled = x.Enabled,
+            Compression = x.Compression,
+            Qos = x.Qos?.ToQosResponse()
+        };
+    }
+
+    public static RosQosResponse ToQosResponse(this Qos x)
+    {
+        return new()
+        {
+            Deadline = x.Deadline,
+            Depth = x.Depth,
+            Durability = x.Durability,
+            History = x.History,
+            Lease = x.Lease,
+            Lifespan = x.Lifespan,
+            Liveliness = x.Liveliness,
+            Preset = x.Preset,
+            Reliability = x.Reliability
+        };
+    }
+
+    public static RosQosRequest ToQosRequest(this Qos x)
+    {
+        return new()
+        {
+            Deadline = x.Deadline,
+            Depth = x.Depth,
+            Durability = x.Durability,
+            History = x.History,
+            Lease = x.Lease,
+            Lifespan = x.Lifespan,
+            Liveliness = x.Liveliness,
+            Preset = x.Preset,
+            Reliability = x.Reliability
         };
     }
 
@@ -296,10 +334,11 @@ public static class DomainToApiContractMapper
             Name = x.Name,
             Type = x.Type,
             Description = x.Description,
-            Enabled = x.Enabled
+            Enabled = x.Enabled,
+            Compression = x.Compression,
+            Qos = x.Qos?.ToQosRequest()
         };
     }
-
 
     public static FullActionResponse ToFullActionResponse(this ActionModel x)
     {
@@ -337,6 +376,9 @@ public static class DomainToApiContractMapper
             RosDistro = x.RosDistro,
             RosTopicPublishers = x.RosTopicsPub.Select(t => t.ToRosTopicResponse()),
             RosTopicSubscribers = x.RosTopicsSub.Select(t => t.ToRosTopicResponse()),
+            RosActions = x.Actions.Select(t => t.ToRosActionResponse()).ToList(),
+            RosServices = x.Services.Select(t=>t.ToRosServiceResponse()).ToList(),
+            RosTransforms = x.Transforms.Select(t=>t.ToRosTransformsResponse()).ToList(),
             Tags = x.Tags,
             OnboardedTime = x.OnboardedTime,
             AppliedPolicies = x.AppliedPolicies,
@@ -461,6 +503,65 @@ public static class DomainToApiContractMapper
         };
     }
 
+    public static RosActionRequest ToRosActionRequest(this RosActionModel x)
+    {
+        return new()
+        {
+            Name = x.Name,
+            Type = x.Type
+        };
+    }
+
+    public static RosActionResponse ToRosActionResponse(this RosActionModel x)
+    {
+        return new()
+        {
+            Name = x.Name,
+            Type = x.Type
+        };
+    }
+    public static RosServiceResponse ToRosServiceResponse(this RosServiceModel x)
+    {
+        return new()
+        {
+            Name = x.Name,
+            Type = x.Type,
+            Description = x.Description,
+            Qos = x.Qos?.ToQosResponse()
+        };
+    } 
+    public static RosServiceRequest ToRosServiceRequest(this RosServiceModel x)
+    {
+        return new()
+        {
+            Name = x.Name,
+            Type = x.Type,
+            Description = x.Description,
+            Qos = x.Qos?.ToQosRequest()
+        };
+    } 
+    public static RosTransformsResponse ToRosTransformsResponse(this RosTransformsModel x)
+    {
+        return new()
+        {
+            AngularThres = x.AngularThres,
+            SourceFrame = x.SourceFrame,
+            TargetFrame = x.TargetFrame,
+            TransThres = x.TransThres,
+            MaxPublishPeriod = x.MaxPublishPeriod
+        };
+    }
+    public static RosTransformsRequest ToRosTransformsRequest(this RosTransformsModel x)
+    {
+        return new()
+        {
+            AngularThres = x.AngularThres,
+            SourceFrame = x.SourceFrame,
+            TargetFrame = x.TargetFrame,
+            TransThres = x.TransThres,
+            MaxPublishPeriod = x.MaxPublishPeriod
+        };
+    }
     public static SystemConfigResponse ToSystemConfigResponse(this SystemConfigModel x)
     {
         return new()
@@ -469,6 +570,7 @@ public static class DomainToApiContractMapper
             Ros1RelayContainer = x.Ros1RelayContainer,
             Ros2RelayContainer = x.Ros2RelayContainer,
             RosInterRelayNetAppContainer = x.RosInterRelayNetAppContainer
+
         };
     }
 }
