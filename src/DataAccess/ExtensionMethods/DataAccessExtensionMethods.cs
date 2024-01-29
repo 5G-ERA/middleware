@@ -42,11 +42,7 @@ public static class DataAccessExtensionMethods
     public static WebApplicationBuilder RegisterInflux(this WebApplicationBuilder builder)
     {
         var config = builder.Configuration.GetSection(InfluxConfig.ConfigName).Get<InfluxConfig>();
-        var address = config.Address;
-
-        var address2 = "http://" + address + ":8086";
-        //var influxClient = new InfluxDBClient(config.Address, config.ApiKey);
-        var influxClient = new InfluxDBClient(address2, config.ApiKey);
+        var influxClient = new InfluxDBClient(config.Address, config.ApiKey);
         builder.Services.AddSingleton<IInfluxDBClient>(influxClient);
 
         builder.Services.AddScoped<IInfluxNetAppStatusRepository, InfluxNetAppStatusRepository>();
