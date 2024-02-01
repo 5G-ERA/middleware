@@ -132,16 +132,37 @@ kubectl apply -f orchestrator_role_binding.yaml
 ---
 
 ## Middleware deployment
+There are two ways of deploying the Middleware. They are used in different scenarios:
+1. When you connect to existing Middleware infrastructure, you use deployment with AWS Secrets Manager
+2. When you're deploying on new infrastructure without Secrets Manager, look for manual deployment
 
-### Deployment
+### Configuration with AWS Secrets Manager
 
-The last step is to prepare the deployment script for the middleware. It can be found [here](../../k8s/orchestrator/orchestrator.yaml). In the `orchestrator.yaml` file there are environment variables that must be set to ensure the correct work of the Orchestrator. The needed variables are:
+When using AWS Secrets Manager, the Middleware requires minimal configuration which consists of specifying the following variables:
 
 1. IMAGE_REGISTRY – contains the address of the registry in which the Middleware images are stored. By default this value is `ghcr.io/5g-era`
 2. Middleware__Organization – the organization to which this middleware belongs. The organization is an artificial group of Middlewares that can cooperate.
 3. Middleware__InstanceName – a **unique** name of the Middleware.
 4. Middleware__InstanceType – Either Edge/Cloud.
-5. Middleware__Address - The entry point for the middleware usually the gateway address ex: 10.10.18.17:80 
+5. Middleware__Address - The entry point for the middleware is usually the gateway address ex: 10.10.18.17:80 
+6. CENTRAL_API_HOSTNAME - Address of the CentralAPI that is responsible for authenticating the Middleware instances during the startup. For more information refer to the [CentralAPI documentation](CentralApi).
+7. AWS_ACCESS_KEY_ID - Aws access key ID used to access the services in AWS like Secret Manager.
+8. AWS_SECRET_ACCESS_KEY - Aws secret used to authenticate the access key.
+
+In the [orchestrator.yaml](../../k8s/orchestrator/orchestrator.yaml) file, remove commented lines that are required only for the deployment without Secrets Manager.
+
+### Manual Configuration
+
+The last step is to prepare the deployment script for the middleware. It can be found [here](../../k8s/orchestrator/orchestrator.yaml). In the `orchestrator.yaml` file there are environment variables that must be set to ensure the correct work of the Orchestrator. 
+
+
+The required variables are:
+
+1. IMAGE_REGISTRY – contains the address of the registry in which the Middleware images are stored. By default this value is `ghcr.io/5g-era`
+2. Middleware__Organization – the organization to which this middleware belongs. The organization is an artificial group of Middlewares that can cooperate.
+3. Middleware__InstanceName – a **unique** name of the Middleware.
+4. Middleware__InstanceType – Either Edge/Cloud.
+5. Middleware__Address - The entry point for the middleware is usually the gateway address ex: 10.10.18.17:80 
 6. CustomLogger__LoggerName - Either Loki/Elasticsearch.
 7. CustomLogger__Url - The url of the logger.
 8. CustomLogger__User - The username for the logger.
@@ -155,8 +176,15 @@ The last step is to prepare the deployment script for the middleware. It can be 
 16. AWS_SECRET_ACCESS_KEY - Aws secret used to authenticate the access key.
 17. Redis__ClusterHostname - The address of the redis backend.
 18. Redis__Password - The password for the redis backend.
+19. InfluxDB__Address - Address to which connect to InfluxDB, includes protocol, address, and port
+20. InfluxDB__ApiKey - Api key to access InfluxDB
 
-The most up-to-date Middleware version is `v0.4`.
+## Middleware version
+The most up-to-date Middleware version is `v0.9.0`. Remember to set this tag in the `orchestrator.yaml` file in the `spec -> template -> spec -> containers -> image`. 
+
+Until the Middleware releases version `1.0`, we recommend using the `latest` tag, as it is not guaranteed to provide backward compatibility. From versions `1.0` and later, backward compatibility will be ensured.
+
+## Middleware deployment 
 
 After all the values are set, the Middleware can be deployed. Start with the deployment of the Orchestrator:
 

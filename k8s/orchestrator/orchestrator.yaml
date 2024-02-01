@@ -10,9 +10,6 @@ spec:
     - port: 80
       targetPort: 80
       name: http
-    - port: 433
-      targetPort: 433
-      name: https
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -35,14 +32,14 @@ spec:
         - name: awsecr-cred
       containers:
         - name: orchestrator-api
-          image: ghcr.io/5g-era/orchestrator-api:v0.2.2
+          image: ghcr.io/5g-era/orchestrator-api:v0.8.0
           imagePullPolicy: Always
           resources: {}
           env:
             - name: IMAGE_REGISTRY
-              value: ghcr.io/5g-era # to be replaced with real value
+              value: ghcr.io/5g-era 
             - name: REDIS_INTERFACE_API_SERVICE_HOST
-              value: redis-interface-api # to be replaced with real value
+              value: redis-interface-api 
             - name: REDIS_INTERFACE_API_SERVICE_PORT
               value: "80"
             - name: Middleware__Organization
@@ -51,10 +48,18 @@ spec:
               value: MiddlewareBED # to be replaced with real value
             - name: Middleware__InstanceType
               value: Edge # to be replaced with real value
+            - name: Middleware__Address
+              value: 192.168.0.1 # to be replaced with real value
+            - name: AWS_ACCESS_KEY_ID
+              value: my_aws_secret_key
+            - name: AWS_SECRET_ACCESS_KEY
+              value: my_aws_access_key
+            - name: CENTRAL_API_HOSTNAME
+              value: central.api
             - name: CustomLogger__LoggerName
               value: Loki # user can choose between Loki or Elasticsearch
             - name: CustomLogger__Url
-              value: http://to.be.replaced.with.real.value.com # to be replaced with real value
+              value: http://to.be.replaced.with.real.value.com 
             - name: CustomLogger__User
               value: myuser # to be replaced with real value
             - name: CustomLogger__Password
@@ -67,13 +72,11 @@ spec:
               value: myuser # to be replaced with real value
             - name: RabbitMQ__Pass
               value: mypassword # to be replaced with real value
-            - name: CENTRAL_API_HOSTNAME
-              value: central.api
-            - name: AWS_ACCESS_KEY_ID
-              value: my_aws_secret_key
-            - name: AWS_SECRET_ACCESS_KEY
-              value: my_aws_access_key
             - name: Redis__ClusterHostname
               value: redis.to.be.replaced.with.real.value # to be replaced with real value
             - name: Redis__Password
               value: mypassword # to be replaced with real value
+            - name: InfluxDB__Address
+              value: myaddress # to be replaced with real value
+            - name: InfluxDB__ApiKey
+              value: myApiKey # to be replaced with real value
