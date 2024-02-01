@@ -1,5 +1,23 @@
 # Changelog
 
+## [0.9.0](https://github.com/5G-ERA/middleware/compare/v0.8.0...v0.9.0) (2024-02-01)
+
+
+### Features
+
+* access systemconfig from the api ([#259](https://github.com/5G-ERA/middleware/issues/259)) ([6b7a045](https://github.com/5G-ERA/middleware/commit/6b7a0452956d8ca814d863b48ed9d1bbac72c829))
+* allow heartbeat expiration to be configured from db ([#253](https://github.com/5G-ERA/middleware/issues/253)) ([26363f5](https://github.com/5G-ERA/middleware/commit/26363f5466277dc93f6ff825be5520052916be10))
+* changes in ros2 relay configuration ([#264](https://github.com/5G-ERA/middleware/issues/264)) ([2deddd1](https://github.com/5G-ERA/middleware/commit/2deddd1564ab65bb5794fa2678b0878865ad4c8b))
+* heartbeat colour coding the netapp status heartbeat responses ([#266](https://github.com/5G-ERA/middleware/issues/266)) ([789fa5a](https://github.com/5G-ERA/middleware/commit/789fa5ac8c82e2d98d8e5bd22582e1c86e7e0f9d))
+* heartbeat data storage implemented with influxdb ([#263](https://github.com/5G-ERA/middleware/issues/263)) ([29c46d4](https://github.com/5G-ERA/middleware/commit/29c46d4d71673e250666f47ff0a0ca761bf11f6c))
+
+
+### Bug Fixes
+
+* incorrect check if policy exists ([ab2247b](https://github.com/5G-ERA/middleware/commit/ab2247bf85528eaf2090bdf4ea39185ecc5fb143))
+* missing function names in RedisInterfaceClient logging ([01141a6](https://github.com/5G-ERA/middleware/commit/01141a67f90552f279eb0ffef7061b278cbba022))
+* task response when requesting a plan ([1cef9c0](https://github.com/5G-ERA/middleware/commit/1cef9c049c5117457f55d2264d439d6dfc187bc0))
+
 ## [0.8.0](https://github.com/5G-ERA/middleware/compare/v0.7.1...v0.8.0) (2023-12-22)
 
 
