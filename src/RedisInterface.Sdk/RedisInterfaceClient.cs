@@ -99,10 +99,10 @@ public class RedisInterfaceClient : IRedisInterfaceClient
 
 
         var entity = source.GetType().GetModelName();
-        var result = await _api.RelationGet(entity, relationName, source.Id, direction);
+        var result = await _api.RelationGet(entity, relationName, source.Id, direction!);
 
         if (!result.IsSuccessStatusCode)
-            _logger.LogError(result.Error, "{} - unsuccessful API call", nameof(GetRelationAsync));
+            _logger.LogError(result.Error, "{funcName} - unsuccessful API call, StackTrace: {stackTrace}", nameof(GetRelationAsync), Environment.StackTrace);
 
         return result.IsSuccessStatusCode ? result.Content : null;
     }
@@ -118,7 +118,7 @@ public class RedisInterfaceClient : IRedisInterfaceClient
         var result = await _api.InstanceGetAll();
 
         if (!result.IsSuccessStatusCode)
-            _logger.LogError(result.Error, "{} - unsuccessful API call", nameof(InstanceGetAllAsync));
+            _logger.LogError(result.Error, "{funcName} - unsuccessful API call, StackTrace: {stackTrace}", nameof(InstanceGetAllAsync), Environment.StackTrace);
 
         return result.IsSuccessStatusCode ? result.Content : null;
     }
@@ -133,7 +133,7 @@ public class RedisInterfaceClient : IRedisInterfaceClient
         var result = await _api.PolicyGetActive();
 
         if (!result.IsSuccessStatusCode)
-            _logger.LogError(result.Error, "{} - unsuccessful API call", nameof(PolicyGetActiveAsync));
+            _logger.LogError(result.Error, "{funcName} - unsuccessful API call, StackTrace: {stackTrace}", nameof(PolicyGetActiveAsync), Environment.StackTrace);
 
         return result.IsSuccessStatusCode ? result.Content : null;
     }
@@ -146,7 +146,7 @@ public class RedisInterfaceClient : IRedisInterfaceClient
 
         var result = await _api.RobotGetConnectedClouds(robotId);
         if (!result.IsSuccessStatusCode)
-            _logger.LogError(result.Error, "{} - unsuccessful API call", nameof(RobotGetConnectedCloudsAsync));
+            _logger.LogError(result.Error, "{funcName} - unsuccessful API call, StackTrace: {stackTrace}", nameof(RobotGetConnectedCloudsAsync), Environment.StackTrace);
 
         return result.IsSuccessStatusCode ? result.Content : null;
     }
@@ -159,7 +159,7 @@ public class RedisInterfaceClient : IRedisInterfaceClient
 
         var result = await _api.CloudGetFree(availableClouds);
         if (!result.IsSuccessStatusCode)
-            _logger.LogError(result.Error, "{} - unsuccessful API call", nameof(GetFreeCloudIdsAsync));
+            _logger.LogError(result.Error, "{funcName} - unsuccessful API call, StackTrace: {stackTrace}", nameof(GetFreeCloudIdsAsync), Environment.StackTrace);
 
         return result.IsSuccessStatusCode ? result.Content : null;
     }
@@ -168,11 +168,11 @@ public class RedisInterfaceClient : IRedisInterfaceClient
     public async Task<GetCloudsResponse?> GetLessBusyCloudsAsync(List<CloudModel> riconnectedClouds)
     {
         if (riconnectedClouds is null || riconnectedClouds.Any() == false)
-            throw new ArgumentException(nameof(riconnectedClouds));
+            throw new ArgumentException(null, nameof(riconnectedClouds));
 
         var result = await _api.CloudGetLessBusy(riconnectedClouds);
         if (!result.IsSuccessStatusCode)
-            _logger.LogError(result.Error, "{} - unsuccessful API call", nameof(GetLessBusyCloudsAsync));
+            _logger.LogError(result.Error, "{funcName} - unsuccessful API call, StackTrace: {stackTrace}", nameof(GetLessBusyCloudsAsync), Environment.StackTrace);
 
         return result.IsSuccessStatusCode ? result.Content : null;
     }
@@ -184,7 +184,7 @@ public class RedisInterfaceClient : IRedisInterfaceClient
 
         var result = await _api.CloudGetByName(cloudName);
         if (!result.IsSuccessStatusCode)
-            _logger.LogError(result.Error, "{} - unsuccessful API call", nameof(CloudGetByNameAsync));
+            _logger.LogError(result.Error, "{funcName} - unsuccessful API call, StackTrace: {stackTrace}", nameof(CloudGetByNameAsync), Environment.StackTrace);
 
         return result.IsSuccessStatusCode ? result.Content : null;
     }
@@ -197,7 +197,7 @@ public class RedisInterfaceClient : IRedisInterfaceClient
 
         var result = await _api.RobotGetConnectedEdges(robotId);
         if (!result.IsSuccessStatusCode)
-            _logger.LogError(result.Error, "{} - unsuccessful API call", nameof(RobotGetConnectedEdgesIdsAsync));
+            _logger.LogError(result.Error, "{funcName} - unsuccessful API call, StackTrace: {stackTrace}", nameof(RobotGetConnectedEdgesIdsAsync), Environment.StackTrace);
 
         return result.IsSuccessStatusCode ? result.Content : null;
     }
@@ -210,7 +210,7 @@ public class RedisInterfaceClient : IRedisInterfaceClient
 
         var result = await _api.EdgeGetFree(connectedEdges);
         if (!result.IsSuccessStatusCode)
-            _logger.LogError(result.Error, "{} - unsuccessful API call", nameof(GetFreeEdgesIdsAsync));
+            _logger.LogError(result.Error, "{funcName} - unsuccessful API call, StackTrace: {stackTrace}", nameof(GetFreeEdgesIdsAsync), Environment.StackTrace);
 
         return result.IsSuccessStatusCode ? result.Content : null;
     }
@@ -223,7 +223,7 @@ public class RedisInterfaceClient : IRedisInterfaceClient
 
         var result = await _api.EdgeGetLessBusy(connectedEdges);
         if (!result.IsSuccessStatusCode)
-            _logger.LogError(result.Error, "{} - unsuccessful API call", nameof(GetLessBusyEdgesAsync));
+            _logger.LogError(result.Error, "{funcName} - unsuccessful API call, StackTrace: {stackTrace}", nameof(GetLessBusyEdgesAsync), Environment.StackTrace);
 
         return result.IsSuccessStatusCode ? result.Content : null;
     }
@@ -235,7 +235,7 @@ public class RedisInterfaceClient : IRedisInterfaceClient
 
         var result = await _api.EdgeGetByName(edgeName);
         if (!result.IsSuccessStatusCode)
-            _logger.LogError(result.Error, "{} - unsuccessful API call", nameof(EdgeGetByNameAsync));
+            _logger.LogError(result.Error, "{funcName} - unsuccessful API call, StackTrace: {stackTrace}", nameof(EdgeGetByNameAsync), Environment.StackTrace);
 
         return result.IsSuccessStatusCode ? result.Content : null;
     }
@@ -249,7 +249,7 @@ public class RedisInterfaceClient : IRedisInterfaceClient
         var result = await _api.PolicyGetByName(policyName);
 
         if (!result.IsSuccessStatusCode)
-            _logger.LogError(result.Error, "{0} - unsuccessful API call", nameof(GetPolicyByNameAsync));
+            _logger.LogError(result.Error, "{funcName} - unsuccessful API call, StackTrace: {stackTrace}", nameof(GetPolicyByNameAsync), Environment.StackTrace);
 
         return result.IsSuccessStatusCode ? result.Content : null;
     }
@@ -260,7 +260,7 @@ public class RedisInterfaceClient : IRedisInterfaceClient
         var result = await _api.SliceGetAll();
 
         if (!result.IsSuccessStatusCode)
-            _logger.LogError(result.Error, "{0} - unsuccessful API call", nameof(SliceGetAllAsync));
+            _logger.LogError(result.Error, "{funcName} - unsuccessful API call, StackTrace: {stackTrace}", nameof(SliceGetAllAsync), Environment.StackTrace);
 
         return result.IsSuccessStatusCode ? result.Content : null;
     }
@@ -274,7 +274,7 @@ public class RedisInterfaceClient : IRedisInterfaceClient
         var result = await _api.SliceGetById(id);
 
         if (!result.IsSuccessStatusCode)
-            _logger.LogError(result.Error, "{} - unsuccessful API call", nameof(SliceGetByIdAsync));
+            _logger.LogError(result.Error, "{funcName} - unsuccessful API call, StackTrace: {stackTrace}", nameof(SliceGetByIdAsync), Environment.StackTrace);
 
         return result.IsSuccessStatusCode ? result.Content : null;
     }
@@ -307,7 +307,7 @@ public class RedisInterfaceClient : IRedisInterfaceClient
 
         var result = await _api.GetBySliceIdAsync(id);
         if (!result.IsSuccessStatusCode)
-            _logger.LogError(result.Error, "{} - unsuccessful API call", nameof(GetBySliceIdAsync));
+            _logger.LogError(result.Error, "{funcName} - unsuccessful API call, StackTrace: {stackTrace}", nameof(GetBySliceIdAsync), Environment.StackTrace);
 
         return result.IsSuccessStatusCode ? result.Content : null;
     }
@@ -320,7 +320,7 @@ public class RedisInterfaceClient : IRedisInterfaceClient
         var result = await _api.SliceAddAsync(slice);
 
         if (!result.IsSuccessStatusCode)
-            _logger.LogError(result.Error, "{} - unsuccessful API call", nameof(ActionPlanAddAsync));
+            _logger.LogError(result.Error, "{funcName} - unsuccessful API call, StackTrace: {stackTrace}", nameof(ActionPlanAddAsync), Environment.StackTrace);
 
         return result.IsSuccessStatusCode;
     }
@@ -331,7 +331,7 @@ public class RedisInterfaceClient : IRedisInterfaceClient
         var result = await _api.RobotGetAll();
 
         if (!result.IsSuccessStatusCode)
-            _logger.LogError(result.Error, "{} - unsuccessful API call", nameof(RobotGetAllAsync));
+            _logger.LogError(result.Error, "{funcName} - unsuccessful API call, StackTrace: {stackTrace}", nameof(RobotGetAllAsync), Environment.StackTrace);
 
         return result.IsSuccessStatusCode ? result.Content : null;
     }
@@ -344,7 +344,7 @@ public class RedisInterfaceClient : IRedisInterfaceClient
 
         var result = await _api.LocationGetByName(name);
         if (!result.IsSuccessStatusCode)
-            _logger.LogError(result.Error, "{} - unsuccessful API call", nameof(GetLocationByNameAsync));
+            _logger.LogError(result.Error, "{funcName} - unsuccessful API call, StackTrace: {stackTrace}", nameof(GetLocationByNameAsync), Environment.StackTrace);
 
         return result.IsSuccessStatusCode ? result.Content : null;
     }
@@ -357,7 +357,7 @@ public class RedisInterfaceClient : IRedisInterfaceClient
 
         var result = await _api.LocationGetById(id);
         if (!result.IsSuccessStatusCode)
-            _logger.LogError(result.Error, "{} - unsuccessful API call", nameof(GetLocationByIdAsync));
+            _logger.LogError(result.Error, "{funcName} - unsuccessful API call, StackTrace: {stackTrace}", nameof(GetLocationByIdAsync), Environment.StackTrace);
 
         return result.IsSuccessStatusCode ? result.Content : null;
     }
@@ -370,7 +370,7 @@ public class RedisInterfaceClient : IRedisInterfaceClient
 
         var result = await _api.LocationGetFree(availableLocations);
         if (!result.IsSuccessStatusCode)
-            _logger.LogError(result.Error, "{} - unsuccessful API call", nameof(GetFreeLocationIdsAsync));
+            _logger.LogError(result.Error, "{funcName} - unsuccessful API call, StackTrace: {stackTrace}", nameof(GetFreeLocationIdsAsync), Environment.StackTrace);
 
         return result.IsSuccessStatusCode ? result.Content : null;
     }
@@ -383,7 +383,7 @@ public class RedisInterfaceClient : IRedisInterfaceClient
 
         var result = await _api.LocationGetLessBusy(availableLocations);
         if (!result.IsSuccessStatusCode)
-            _logger.LogError(result.Error, "{} - unsuccessful API call", nameof(GetLessBusyLocationsAsync));
+            _logger.LogError(result.Error, "{funcName} - unsuccessful API call, StackTrace: {stackTrace}", nameof(GetLessBusyLocationsAsync), Environment.StackTrace);
 
         return result.IsSuccessStatusCode ? result.Content : null;
     }
@@ -393,7 +393,7 @@ public class RedisInterfaceClient : IRedisInterfaceClient
     {
         var result = await _api.LocationGetAll();
         if (!result.IsSuccessStatusCode)
-            _logger.LogError(result.Error, "{0} - unsuccessful API call", nameof(GetLessBusyLocationsAsync));
+            _logger.LogError(result.Error, "{funcName} - unsuccessful API call, StackTrace: {stackTrace}", nameof(GetLessBusyLocationsAsync), Environment.StackTrace);
 
         return result.IsSuccessStatusCode ? result.Content : null;
     }
@@ -415,7 +415,7 @@ public class RedisInterfaceClient : IRedisInterfaceClient
         var result = await _api.ActionPlanGetById(id);
 
         if (!result.IsSuccessStatusCode)
-            _logger.LogError(result.Error, "{} - unsuccessful API call", nameof(ActionPlanGetByIdAsync));
+            _logger.LogError(result.Error, "{funcName} - unsuccessful API call, StackTrace: {stackTrace}", nameof(ActionPlanGetByIdAsync), Environment.StackTrace);
 
         return result.IsSuccessStatusCode ? result.Content : null;
     }
@@ -425,7 +425,7 @@ public class RedisInterfaceClient : IRedisInterfaceClient
         var result = await _api.ActionPlanGetAllAsync();
 
         if (!result.IsSuccessStatusCode)
-            _logger.LogError(result.Error, "{} - unsuccessful API call", nameof(ActionPlanGetAllAsync));
+            _logger.LogError(result.Error, "{funcName} - unsuccessful API call, StackTrace: {stackTrace}", nameof(ActionPlanGetAllAsync), Environment.StackTrace);
 
         return result.IsSuccessStatusCode ? result.Content : null;
     }
@@ -438,7 +438,7 @@ public class RedisInterfaceClient : IRedisInterfaceClient
         var result = await _api.ActionPlanAddAsync(actionPlan);
 
         if (!result.IsSuccessStatusCode)
-            _logger.LogError(result.Error, "{} - unsuccessful API call", nameof(ActionPlanAddAsync));
+            _logger.LogError(result.Error, "{funcName} - unsuccessful API call, StackTrace: {stackTrace}", nameof(ActionPlanAddAsync), Environment.StackTrace);
 
         return result.IsSuccessStatusCode;
     }
@@ -460,7 +460,7 @@ public class RedisInterfaceClient : IRedisInterfaceClient
         var result = await _api.RobotGetById(robotId);
 
         if (!result.IsSuccessStatusCode)
-            _logger.LogError(result.Error, "{} - unsuccessful API call", nameof(RobotGetByIdAsync));
+            _logger.LogError(result.Error, "{funcName} - unsuccessful API call, StackTrace: {stackTrace}", nameof(RobotGetByIdAsync), Environment.StackTrace);
 
         return result.IsSuccessStatusCode ? result.Content : null;
     }
@@ -473,7 +473,7 @@ public class RedisInterfaceClient : IRedisInterfaceClient
         var result = await _api.TaskGetById(taskId);
 
         if (!result.IsSuccessStatusCode)
-            _logger.LogError(result.Error, "{} - unsuccessful API call", nameof(TaskGetByIdAsync));
+            _logger.LogError(result.Error, "{funcName} - unsuccessful API call, StackTrace: {stackTrace}", nameof(TaskGetByIdAsync), Environment.StackTrace);
 
         return result.IsSuccessStatusCode ? result.Content : null;
     }
@@ -486,7 +486,7 @@ public class RedisInterfaceClient : IRedisInterfaceClient
         var result = await _api.InstanceGetAlternative(instanceId);
 
         if (!result.IsSuccessStatusCode)
-            _logger.LogError(result.Error, "{} - unsuccessful API call", nameof(GetInstanceAlternativeAsync));
+            _logger.LogError(result.Error, "{funcName} - unsuccessful API call, StackTrace: {stackTrace}", nameof(GetInstanceAlternativeAsync), Environment.StackTrace);
 
         return result.IsSuccessStatusCode ? result.Content : null;
     }
@@ -498,7 +498,7 @@ public class RedisInterfaceClient : IRedisInterfaceClient
 
         var result = await _api.InstanceGetById(id);
         if (!result.IsSuccessStatusCode)
-            _logger.LogError(result.Error, "{} - unsuccessful API call", nameof(InstanceGetByIdAsync));
+            _logger.LogError(result.Error, "{funcName} - unsuccessful API call, StackTrace: {stackTrace}", nameof(InstanceGetByIdAsync), Environment.StackTrace);
 
         return result.IsSuccessStatusCode ? result.Content : null;
     }
@@ -510,7 +510,7 @@ public class RedisInterfaceClient : IRedisInterfaceClient
 
         var result = await _api.ContainerImageGetForInstance(id);
         if (!result.IsSuccessStatusCode)
-            _logger.LogError(result.Error, "{} - unsuccessful API call", nameof(ContainerImageGetForInstanceAsync));
+            _logger.LogError(result.Error, "{funcName} - unsuccessful API call, StackTrace: {stackTrace}", nameof(ContainerImageGetForInstanceAsync), Environment.StackTrace);
 
         return result.IsSuccessStatusCode ? result.Content : null;
     }
@@ -523,7 +523,7 @@ public class RedisInterfaceClient : IRedisInterfaceClient
         var result = await _api.ActionGetById(id);
 
         if (!result.IsSuccessStatusCode)
-            _logger.LogError(result.Error, "{} - unsuccessful API call", nameof(ActionGetByIdAsync));
+            _logger.LogError(result.Error, "{funcName} - unsuccessful API call, StackTrace: {stackTrace}", nameof(ActionGetByIdAsync), Environment.StackTrace);
 
         return result.IsSuccessStatusCode ? result.Content : null;
     }
@@ -535,7 +535,7 @@ public class RedisInterfaceClient : IRedisInterfaceClient
 
         var result = await _api.ActionPlanGetLatestByRobotId(robotId);
         if (!result.IsSuccessStatusCode)
-            _logger.LogError(result.Error, "{} - unsuccessful API call", nameof(GetLatestActionPlanByRobotIdAsync));
+            _logger.LogError(result.Error, "{funcName} - unsuccessful API call, StackTrace: {stackTrace}", nameof(GetLatestActionPlanByRobotIdAsync), Environment.StackTrace);
 
         return result.IsSuccessStatusCode ? result.Content : null;
     }
@@ -547,7 +547,7 @@ public class RedisInterfaceClient : IRedisInterfaceClient
 
         var result = await _api.EdgeGetByName(name);
         if (!result.IsSuccessStatusCode)
-            _logger.LogError(result.Error, "{} - unsuccessful API call", nameof(GetEdgeByNameAsync));
+            _logger.LogError(result.Error, "{funcName} - unsuccessful API call, StackTrace: {stackTrace}", nameof(GetEdgeByNameAsync), Environment.StackTrace);
 
         return result.IsSuccessStatusCode ? result.Content : null;
     }
@@ -559,7 +559,7 @@ public class RedisInterfaceClient : IRedisInterfaceClient
 
         var result = await _api.CloudGetByName(name);
         if (!result.IsSuccessStatusCode)
-            _logger.LogError(result.Error, "{} - unsuccessful API call", nameof(GetCloudByNameAsync));
+            _logger.LogError(result.Error, "{funcName} - unsuccessful API call, StackTrace: {stackTrace}", nameof(GetCloudByNameAsync), Environment.StackTrace);
 
         return result.IsSuccessStatusCode ? result.Content : null;
     }

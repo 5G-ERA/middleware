@@ -216,6 +216,7 @@ public class ActionController : ControllerBase
     /// </summary>
     /// <param name="id"></param>
     /// <param name="name"></param>
+    /// <param name="direction"></param>
     /// <returns></returns>
     [HttpGet]
     [Route("relation/{name}", Name = "ActionGetRelationByName")]
@@ -233,8 +234,8 @@ public class ActionController : ControllerBase
         {
             return BadRequest(new ApiResponse((int)HttpStatusCode.BadRequest, "Relation ID not specified"));
         }
-        RelationDirection directionEnum;
-        if (Enum.TryParse<RelationDirection>(direction, out directionEnum) == false)
+
+        if (Enum.TryParse<RelationDirection>(direction, out var directionEnum) == false)
         {
             return BadRequest(new ApiResponse((int)HttpStatusCode.BadRequest, "Wrong Relation direction specified"));
         }
@@ -304,7 +305,7 @@ public class ActionController : ControllerBase
         try
         {
             var plans = await _actionPlanRepository.GetAllAsync();
-            if (plans == null || plans.Any() == false)
+            if (plans.Any() == false)
             {
                 return NotFound(new ApiResponse((int)HttpStatusCode.NotFound, "No plans have been found."));
             }
