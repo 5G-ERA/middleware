@@ -76,7 +76,7 @@ public class PlanController : ControllerBase
 
             await _publishService.PublishPlanAsync(resourcePlan.Task, robot2);
 
-            return Ok(resourcePlan);
+            return Ok(resourcePlan.Task);
         }
         catch (Orchestrator.ResourcePlannerApiClient.ApiException<ResourcePlanner.ApiResponse> apiEx)
         {
