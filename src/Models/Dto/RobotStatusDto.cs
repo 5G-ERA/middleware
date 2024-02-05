@@ -22,13 +22,17 @@ public class RobotStatusDto : InfluxDto
     public string Name { get; set; } = default!;
 
     [Indexed]
-    public string ActionSequenceId { get; set; } = default!;
+    public string? ActionSequenceId { get; set; }
 
     [Indexed]
     public int? CurrentlyExecutedActionIndex { get; set; }
 
     [Indexed]
     public int BatteryLevel { get; set; }
+
+    public double CpuUtilisation { get; set; }
+
+    public double RamUtilisation { get; set; }
 
     [Indexed(Sortable = true)]
     public DateTimeOffset Timestamp { get; set; }
@@ -40,6 +44,7 @@ public class RobotStatusDto : InfluxDto
         {
             return null;
         }
+
         if (fluxTables[0].Records.Count < 0)
         {
             return null;
@@ -71,25 +76,33 @@ public class RobotStatusDto : InfluxDto
                 var extractedValue = fluxrecord.GetValue();
 
                 if (extractedValue == null) return null;
-                
+
                 var valueString = extractedValue.ToString();
-                if (valueString != null)
+                if (valueString == null) continue;
+                
+                if (fieldNamee == "ActionSequenceId")
                 {
-                    if (fieldNamee == "ActionSequenceId")
-                    {
-                        ActionSequenceId = valueString.ToString();
-                    }
-                    else if (fieldNamee == "CurrentlyExecutedActionIndex")
-                    {
-                        CurrentlyExecutedActionIndex = int.Parse(valueString);
-                    }
-                    else if (fieldNamee == "BatteryLevel")
-                    {
-                        BatteryLevel = int.Parse(valueString);
-                    }
+                    ActionSequenceId = valueString;
+                }
+                else if (fieldNamee == "CurrentlyExecutedActionIndex")
+                {
+                    CurrentlyExecutedActionIndex = int.Parse(valueString);
+                }
+                else if (fieldNamee == "BatteryLevel")
+                {
+                    BatteryLevel = int.Parse(valueString);
+                }
+                else if (fieldNamee == "CpuUtilisation")
+                {
+                    CpuUtilisation = double.Parse(valueString);
+                }
+                else if (fieldNamee == "RamUtilisation")
+                {
+                    CpuUtilisation = double.Parse(valueString);
                 }
             }
         }
+
         return this;
     }
 
@@ -103,7 +116,9 @@ public class RobotStatusDto : InfluxDto
             ActionSequenceId = Guid.Parse(dto.ActionSequenceId!),
             CurrentlyExecutedActionIndex = dto.CurrentlyExecutedActionIndex,
             BatteryLevel = dto.BatteryLevel,
-            Timestamp = dto.Timestamp.DateTime
+            CpuUtilisation = dto.CpuUtilisation,
+            RamUtilisation = dto.RamUtilisation,
+            Timestamp = dto.Timestamp
         };
     }
 
@@ -115,6 +130,8 @@ public class RobotStatusDto : InfluxDto
             .Field("ActionSequenceId", ActionSequenceId)
             .Field("CurrentlyExecutedActionIndex", CurrentlyExecutedActionIndex)
             .Field("BatteryLevel", BatteryLevel)
+            .Field("CpuUtilisation", CpuUtilisation)
+            .Field("RamUtilisation", RamUtilisation)
             .Timestamp(DateTime.UtcNow, WritePrecision.Ns);
         return point;
     }

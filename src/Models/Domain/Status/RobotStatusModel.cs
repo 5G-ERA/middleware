@@ -19,19 +19,27 @@ public class RobotStatusModel : BaseModel
     /// <summary>
     ///     Identifier of the currently executed action sequence
     /// </summary>
-    [Required]
-    public Guid ActionSequenceId { get; set; }
+    public Guid? ActionSequenceId { get; set; }
 
     /// <summary>
     ///     Index of the currently executed action
     /// </summary>
-    [Required]
     public int? CurrentlyExecutedActionIndex { get; set; }
 
     /// <summary>
     ///     Battery level in %
     /// </summary>
     public int BatteryLevel { get; set; }
+
+    /// <summary>
+    ///  Current CPU utilisation of the robot
+    /// </summary>
+    public double CpuUtilisation { get; set; }
+
+    /// <summary>
+    ///  Current RAM utilisation of the robot
+    /// </summary>
+    public double RamUtilisation { get; set; }
 
     /// <summary>
     ///     Timestamp of the update
@@ -50,9 +58,11 @@ public class RobotStatusModel : BaseModel
         {
             Id = domain.Id.ToString(),
             Name = domain.Name,
-            ActionSequenceId = domain.ActionSequenceId.ToString(),
+            ActionSequenceId = domain.ActionSequenceId?.ToString(),
             CurrentlyExecutedActionIndex = domain.CurrentlyExecutedActionIndex,
             BatteryLevel = domain.BatteryLevel,
+            CpuUtilisation = domain.CpuUtilisation,
+            RamUtilisation = domain.RamUtilisation,
             Timestamp = domain.Timestamp
         };
     }
