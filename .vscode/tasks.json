@@ -8,7 +8,7 @@
             "args": [
                 "build",
                 "${workspaceFolder}/src/Orchestrator/Orchestrator.csproj",
-                "/property:GenerateFullPaths=true",
+                //"/property:GenerateFullPaths=true",
                 "/consoleloggerparameters:NoSummary"
             ],
             "problemMatcher": "$msCompile"
@@ -47,7 +47,8 @@
             ],
             "targetCluster": "minikube",
             "targetNamespace": "middleware",
-            "useKubernetesServiceEnvironmentVariables": true
+            "useKubernetesServiceEnvironmentVariables": true,
+            "targetContainer": "orchestrator-api"
         },
         {
             "label": "bridge-to-kubernetes.compound",
