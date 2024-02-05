@@ -3,7 +3,9 @@ using Microsoft.AspNetCore.Mvc;
 using Middleware.Common.Responses;
 using Middleware.DataAccess.Repositories.Abstract.Influx;
 using Middleware.Models.Domain;
+using Middleware.Orchestrator.ExtensionMethods;
 using Middleware.Orchestrator.Heartbeat;
+using Middleware.Orchestrator.Models;
 using Middleware.Orchestrator.Models.Responses;
 using Middleware.RedisInterface.Sdk;
 
@@ -106,20 +108,18 @@ public class StatusController : Controller
     /// <summary>
     ///     Add a new RobotStatusModel entity
     /// </summary>
-    /// <param name="model"></param>
+    /// <param name="request"></param>
     /// <returns> the newly created RobotStatusModel entity </returns>
     [HttpPost]
     [Route("robot", Name = "RobotStatusAdd")]
     [ProducesResponseType(typeof(RobotStatusModel), (int)HttpStatusCode.OK)]
     [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.BadRequest)]
     [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.InternalServerError)]
-    public async Task<ActionResult<RobotStatusModel>> AddRobotStatusAsync([FromBody] RobotStatusModel model)
+    public async Task<ActionResult<RobotStatusModel>> AddRobotStatusAsync([FromBody] RobotStatusRequest request)
     {
-        if (model.IsValid() == false)
-            return BadRequest(new ApiResponse((int)HttpStatusCode.BadRequest, "Parameters were not specified."));
         try
         {
-            var result = await _heartbeatService.AddRobotStatus(model);
+            var result = await _heartbeatService.AddRobotStatus(request.ToRobotStatus());
             if (result.IsSuccess == false && result.NotFound)
             {
                 return NotFound(new ApiResponse((int)HttpStatusCode.NotFound, result.ErrMessage));

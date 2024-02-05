@@ -58,7 +58,6 @@
 
     <ItemGroup>
       <Folder Include="Handlers\Slice\" />
-      <Folder Include="ExtensionMethods\" />
       <Folder Include="Publishers\" />
     </ItemGroup>
 
