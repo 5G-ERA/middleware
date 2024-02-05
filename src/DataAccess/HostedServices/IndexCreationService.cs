@@ -112,22 +112,6 @@ public class IndexCreationService : BackgroundService
             await _provider.Connection.CreateIndexAsync(typeof(UserDto));
         }
 
-        if (info.Any(x => x == "robotStatus-idx") == false)
-            await _provider.Connection.CreateIndexAsync(typeof(RobotStatusDto));
-        else
-        {
-            await _provider.Connection.DropIndexAsync(typeof(RobotStatusDto));
-            await _provider.Connection.CreateIndexAsync(typeof(RobotStatusDto));
-        }
-
-        if (info.Any(x => x == "netAppStatus-idx") == false)
-            await _provider.Connection.CreateIndexAsync(typeof(NetAppStatusDto));
-        else
-        {
-            await _provider.Connection.DropIndexAsync(typeof(NetAppStatusDto));
-            await _provider.Connection.CreateIndexAsync(typeof(NetAppStatusDto));
-        }
-
         if (info.Any(x => x == "slice-idx") == false)
             await _provider.Connection.CreateIndexAsync(typeof(SliceDto));
         else
