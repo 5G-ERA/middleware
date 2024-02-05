@@ -122,9 +122,18 @@ public class StatusController : Controller
             return BadRequest(new ApiResponse((int)HttpStatusCode.BadRequest, "Parameters were not specified."));
         try
         {
-            //TODO: put behind service
-            //await _robotStatusRepository.AddAsync(model, () => model.Id);
-            await _influxRobotStatusRepository.AddAsync(model);
+            var result = await _heartbeatService.AddRobotStatus(model);
+            if (result.IsSuccess == false && result.NotFound)
+            {
+                return NotFound(new ApiResponse((int)HttpStatusCode.NotFound, result.ErrMessage));
+            }
+
+            if (result.IsSuccess == false && result.NotFound == false)
+            {
+                return BadRequest(new ApiResponse((int)HttpStatusCode.BadRequest, result.ErrMessage));
+            }
+
+            return Ok(result.Value);
         }
         catch (Exception ex)
         {
@@ -132,8 +141,6 @@ public class StatusController : Controller
             _logger.LogError(ex, "An error occurred:");
             return StatusCode(statusCode, new ApiResponse(statusCode, $"An error has occurred: {ex.Message}"));
         }
-
-        return Ok(model);
     }
 
     /// <summary>

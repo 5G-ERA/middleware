@@ -48,7 +48,7 @@ public class RobotStatusModel : BaseModel
 
     public bool IsValid()
     {
-        return Id != Guid.Empty && ActionSequenceId != Guid.Empty && CurrentlyExecutedActionIndex.HasValue;
+        return Id != Guid.Empty;
     }
 
     public override Dto.Dto ToDto()
