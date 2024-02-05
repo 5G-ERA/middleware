@@ -17,20 +17,17 @@ public class StatusController : Controller
     private readonly ILogger _logger;
     private readonly IRedisInterfaceClient _redisInterfaceClient;
     private readonly IInfluxNetAppStatusRepository _influxNetAppStatusRepository;
-    private readonly IInfluxRobotStatusRepository _influxRobotStatusRepository;
 
     public StatusController(ILogger<StatusController> logger,
         IRedisInterfaceClient redisInterfaceClient,
         IHeartbeatService heartbeatService,
-        IInfluxNetAppStatusRepository influxNetAppStatusRepository,
-        IInfluxRobotStatusRepository influxRobotStatusRepository
+        IInfluxNetAppStatusRepository influxNetAppStatusRepository
     )
     {
         _logger = logger;
         _redisInterfaceClient = redisInterfaceClient;
         _heartbeatService = heartbeatService;
         _influxNetAppStatusRepository = influxNetAppStatusRepository;
-        _influxRobotStatusRepository = influxRobotStatusRepository;
     }
 
 
