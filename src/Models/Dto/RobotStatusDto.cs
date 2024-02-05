@@ -2,44 +2,38 @@
 using InfluxDB.Client.Core.Flux.Domain;
 using InfluxDB.Client.Writes;
 using Middleware.Models.Domain;
-using Redis.OM.Modeling;
 
 namespace Middleware.Models.Dto;
 
-[Document(IndexName = "robotStatus-idx", StorageType = StorageType.Json, Prefixes = new[] { Prefix })]
 public class RobotStatusDto : InfluxDto
 {
-    public const string Prefix = "RobotStatus";
+    private const string Prefix = "RobotStatus";
     public const string Bucket = "RobotStatus";
     public const string Measurement = "Heartbeat";
     private const string ObjectType = "Robot";
-
-    [Indexed]
-    [RedisIdField]
     public override string Id { get; set; } = default!;
 
-    [Indexed]
     public string Name { get; set; } = default!;
 
-    [Indexed]
-    public string ActionSequenceId { get; set; } = default!;
+    public string? ActionSequenceId { get; set; }
 
-    [Indexed]
     public int? CurrentlyExecutedActionIndex { get; set; }
 
-    [Indexed]
     public int BatteryLevel { get; set; }
 
-    [Indexed(Sortable = true)]
+    public double CpuUtilisation { get; set; }
+
+    public double RamUtilisation { get; set; }
+
     public DateTimeOffset Timestamp { get; set; }
 
     public override Dto? FromInfluxDataToDto(List<FluxTable> fluxTables)
     {
-        // Check if is not passed null value
-        if (fluxTables == null || fluxTables.Count == 0)
+        if (fluxTables.Count == 0)
         {
             return null;
         }
+
         if (fluxTables[0].Records.Count < 0)
         {
             return null;
@@ -50,7 +44,6 @@ public class RobotStatusDto : InfluxDto
         var objId = fluxTables[0].Records[0].GetValueByKey("Id").ToString();
         var objTimestamp = fluxTables[0].Records[0].GetTimeInDateTime();
 
-        // TODO: Guard extracted values
         if (objName == null || objId == null || objTimestamp == null)
         {
             return null;
@@ -65,28 +58,33 @@ public class RobotStatusDto : InfluxDto
         // one sample will have as many tables as many parameters the object has;
         foreach (var fluxTable in fluxTables)
         {
-            foreach (var fluxrecord in fluxTable.Records)
+            foreach (var record in fluxTable.Records)
             {
-                var fieldNamee = fluxrecord.GetField().ToString();
-                var extractedValue = fluxrecord.GetValue();
+                var fieldName = record.GetField();
+                var extractedValue = record.GetValue();
 
-                if (extractedValue == null) return null;
-                
+                if (extractedValue == null || string.IsNullOrEmpty(fieldName)) continue;
+
                 var valueString = extractedValue.ToString();
-                if (valueString != null)
+                if (valueString == null) continue;
+
+                switch (fieldName)
                 {
-                    if (fieldNamee == "ActionSequenceId")
-                    {
-                        ActionSequenceId = valueString.ToString();
-                    }
-                    else if (fieldNamee == "CurrentlyExecutedActionIndex")
-                    {
+                    case "ActionSequenceId":
+                        ActionSequenceId = valueString;
+                        break;
+                    case "CurrentlyExecutedActionIndex":
                         CurrentlyExecutedActionIndex = int.Parse(valueString);
-                    }
-                    else if (fieldNamee == "BatteryLevel")
-                    {
+                        break;
+                    case "BatteryLevel":
                         BatteryLevel = int.Parse(valueString);
-                    }
+                        break;
+                    case "CpuUtilisation":
+                        CpuUtilisation = double.Parse(valueString);
+                        break;
+                    case "RamUtilisation":
+                        RamUtilisation = double.Parse(valueString);
+                        break;
                 }
             }
         }
@@ -98,12 +96,14 @@ public class RobotStatusDto : InfluxDto
         var dto = this;
         return new RobotStatusModel
         {
-            Id = Guid.Parse(dto.Id!.Replace(Prefix, "")),
+            Id = Guid.Parse(dto.Id.Replace(Prefix, "")),
             Name = dto.Name,
             ActionSequenceId = Guid.Parse(dto.ActionSequenceId!),
             CurrentlyExecutedActionIndex = dto.CurrentlyExecutedActionIndex,
             BatteryLevel = dto.BatteryLevel,
-            Timestamp = dto.Timestamp.DateTime
+            CpuUtilisation = dto.CpuUtilisation,
+            RamUtilisation = dto.RamUtilisation,
+            Timestamp = dto.Timestamp
         };
     }
 
@@ -115,6 +115,8 @@ public class RobotStatusDto : InfluxDto
             .Field("ActionSequenceId", ActionSequenceId)
             .Field("CurrentlyExecutedActionIndex", CurrentlyExecutedActionIndex)
             .Field("BatteryLevel", BatteryLevel)
+            .Field("CpuUtilisation", CpuUtilisation)
+            .Field("RamUtilisation", RamUtilisation)
             .Timestamp(DateTime.UtcNow, WritePrecision.Ns);
         return point;
     }
