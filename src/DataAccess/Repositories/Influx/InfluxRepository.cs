@@ -2,7 +2,6 @@
 using InfluxDB.Client.Api.Domain;
 using InfluxDB.Client.Core.Flux.Domain;
 using InfluxDB.Client.Writes;
-using Microsoft.AspNetCore.Mvc;
 using Middleware.DataAccess.Repositories.Abstract;
 using Middleware.Models.Domain;
 using Middleware.Models.Dto;
@@ -11,11 +10,14 @@ using ILogger = Serilog.ILogger;
 
 
 namespace Middleware.DataAccess.Repositories.Influx;
-public class InfluxRepository<TModel, TDto> : IInfluxRepository<TModel> where TModel : BaseModel where TDto : InfluxDto, new()
+
+public class InfluxRepository<TModel, TDto> : IInfluxRepository<TModel>
+    where TModel : BaseModel where TDto : InfluxDto, new()
 {
     private const string Organization = "5G-ERA";
     protected readonly string Bucket;
     protected readonly string Measurement;
+
     /// <summary>
     /// Logger instance
     /// </summary>
@@ -31,6 +33,8 @@ public class InfluxRepository<TModel, TDto> : IInfluxRepository<TModel> where TM
     /// </summary>
     /// <param name="client">Influx client </param>
     /// <param name="logger">Logger instance</param>
+    /// <param name="bucket">Name of the bucket in which data will be saved</param>
+    /// <param name="measurement">Name of the measurement to distinguish value sets</param>
     /// <exception cref="ArgumentNullException"></exception>
     public InfluxRepository(IInfluxDBClient client, ILogger logger, string bucket, string measurement)
     {
@@ -57,11 +61,12 @@ public class InfluxRepository<TModel, TDto> : IInfluxRepository<TModel> where TM
     public async Task<string> GetBucketByNameAsync(string bucketName)
     {
         var bucket = await Client.GetBucketsApi().FindBucketByNameAsync(bucketName);
-        if(bucket != null)
+        if (bucket != null)
         {
-            return bucket.Name.ToString();
+            return bucket.Name;
         }
-        else return string.Empty;
+
+        return string.Empty;
     }
 
 
@@ -90,75 +95,91 @@ public class InfluxRepository<TModel, TDto> : IInfluxRepository<TModel> where TM
         await Client.GetWriteApiAsync().WritePointAsync(point: point, bucket: Bucket, org: Organization);
         return ToTModel(dto);
     }
+
     private async Task<List<String>> GetAllIdAsync()
-    {        
-        string query = "from(bucket: \"" + Bucket + "\") |> range(start: 0) |> keyValues(keyColumns: [\"Id\"]) |> keep(columns: [\"Id\"]) |> limit(n:1, offset: 0) |> group() ";
+    {
+        string query = "from(bucket: \"" + Bucket +
+                       "\") |> range(start: 0) |> keyValues(keyColumns: [\"Id\"]) |> keep(columns: [\"Id\"]) |> limit(n:1, offset: 0) |> group() ";
         var fluxTables = await Client.GetQueryApi().QueryAsync(query: query, org: Organization);
         List<String> ids = new List<string>();
-        if (fluxTables == null || fluxTables.Count < 1) { return ids; }
+        if (fluxTables == null || fluxTables.Count < 1)
+        {
+            return ids;
+        }
 
         foreach (var record in fluxTables[0].Records)
         {
-            var id = Guid.Empty.ToString();            
+            var id = Guid.Empty.ToString();
             var id2 = record.GetValueByKey("Id").ToString();
 
             if (id2 != null && id2 != "") id = id2;
             ids.Add(id);
         }
+
         return ids;
     }
+
     private async Task<List<TModel>> GetAllStatusByIdAsync(Guid id)
     {
         var stringId = id.ToString();
-        string query = "from(bucket: \"" + Bucket + "\") |> range(start: 0) |> filter(fn: (r) => r[\"_measurement\"] == \""+ Measurement + "\") |> filter(fn: (r) => r[\"Id\"] == \"" + stringId + "\") |> yield(name: \"all\")";
+        string query = "from(bucket: \"" + Bucket +
+                       "\") |> range(start: 0) |> filter(fn: (r) => r[\"_measurement\"] == \"" + Measurement +
+                       "\") |> filter(fn: (r) => r[\"Id\"] == \"" + stringId + "\") |> yield(name: \"all\")";
         List<FluxTable> fluxTables = await Client.GetQueryApi().QueryAsync(query: query, org: Organization);
 
         List<TModel> listOfTModels = new();
         listOfTModels = AppendToListOfTModels(listOfTModels, fluxTables);
         return listOfTModels;
     }
+
+    // ReSharper disable once UnusedMember.Global
     public async Task<List<TModel>> GetAllOneByOneAsync()
     {
         List<TModel> listOfTModels = new();
         var ids = await GetAllIdAsync();
-        foreach (var id  in ids)
+        foreach (var id in ids)
         {
-            var guidId= Guid.Parse(id.ToString());
+            var guidId = Guid.Parse(id);
             try
             {
-                List<TModel> listOfTModels2 = new();
-                listOfTModels2 = await GetAllStatusByIdAsync(guidId);
+                var listOfTModels2 = await GetAllStatusByIdAsync(guidId);
                 listOfTModels.AddRange(listOfTModels2);
-            } catch (Exception ex)
+            }
+            catch (Exception)
             {
                 //return listOfTModels;
-            }            
+            }
         }
+
         return listOfTModels;
     }
 
     public async Task<TModel?> GetStatusByIdAsync(Guid id)
     {
         var stringId = id.ToString();
-        string query = "from(bucket: \"" + Bucket + "\") |> range(start: 0) |> filter(fn: (r) => r[\"_measurement\"] == \""+ Measurement + "\") |> filter(fn: (r) => r[\"Id\"] == \"" + stringId + "\") |> yield(name: \"last\")";
+        string query = "from(bucket: \"" + Bucket +
+                       "\") |> range(start: 0) |> filter(fn: (r) => r[\"_measurement\"] == \"" + Measurement +
+                       "\") |> filter(fn: (r) => r[\"Id\"] == \"" + stringId + "\") |> yield(name: \"last\")";
         List<FluxTable> fluxTables = await Client.GetQueryApi().QueryAsync(query: query, org: Organization);
         if (fluxTables.Count > 0)
         {
-            var dto = FromInfluxDataToDto(new TDto(), fluxTables);
+            var dto = FromInfluxDataToDto(new(), fluxTables);
             return ToTModel(dto);
         }
-        else return null;
+
+        return null;
     }
 
     public async Task<List<TModel>> GetAllAsync()
     {
-        var query = "from(bucket: \"" + Bucket + "\") |> range(start: 0) |> filter(fn: (r) => r[\"_measurement\"] == \""+ Measurement + "\")";
+        var query = "from(bucket: \"" + Bucket +
+                    "\") |> range(start: 0) |> filter(fn: (r) => r[\"_measurement\"] == \"" + Measurement + "\")";
         List<TModel> listOfTModels = new();
         List<FluxTable> allFluxTables = await Client.GetQueryApi().QueryAsync(query: query, org: Organization);
         if (!allFluxTables.Any()) return listOfTModels;
 
         List<FluxTable> oneObjectAllRecordsFluxTables = new();
-        
+
 
         var currentId = allFluxTables[0].Records[0].GetValueByKey("Id").ToString();
         foreach (var fluxTable in allFluxTables)
@@ -178,14 +199,17 @@ public class InfluxRepository<TModel, TDto> : IInfluxRepository<TModel> where TM
                 }
             }
         }
+
         listOfTModels = AppendToListOfTModels(listOfTModels, oneObjectAllRecordsFluxTables);
         oneObjectAllRecordsFluxTables.Clear();
         return listOfTModels;
     }
-    private List<TModel> AppendToListOfTModels(List<TModel> listOfTModels, List<FluxTable> oneObjectAllRecordsFluxTables)
+
+    private List<TModel> AppendToListOfTModels(List<TModel> listOfTModels,
+        List<FluxTable> oneObjectAllRecordsFluxTables)
     {
         var currentNrRecords = oneObjectAllRecordsFluxTables[0].Records.Count;
-        if(currentNrRecords < 1) return listOfTModels;
+        if (currentNrRecords < 1) return listOfTModels;
 
         for (var j = 0; j < currentNrRecords; j++)
         {
@@ -194,6 +218,7 @@ public class InfluxRepository<TModel, TDto> : IInfluxRepository<TModel> where TM
             var toTModel = ToTModel(dto);
             listOfTModels.Add(toTModel);
         }
+
         return listOfTModels;
     }
 
@@ -208,8 +233,10 @@ public class InfluxRepository<TModel, TDto> : IInfluxRepository<TModel> where TM
             oneRecordAsFluxTable.Records.Add(record);
             oneSampleAsFluxTables.Add(oneRecordAsFluxTable);
         }
+
         return oneSampleAsFluxTables;
     }
+
     protected TDto ToTDto(TModel model)
     {
         return model.ToDto() as TDto ?? throw new MappingException(typeof(TModel), typeof(TDto));
@@ -219,10 +246,13 @@ public class InfluxRepository<TModel, TDto> : IInfluxRepository<TModel> where TM
     {
         return dto.ToModel() as TModel ?? throw new MappingException(typeof(TDto), typeof(TModel));
     }
+
     protected TDto FromInfluxDataToDto(TDto dto, List<FluxTable> fluxTables)
     {
-        return dto.FromInfluxDataToDto(fluxTables) as TDto ?? throw new MappingException(typeof(FluxTable), typeof(TDto));
+        return dto.FromInfluxDataToDto(fluxTables) as TDto ??
+               throw new MappingException(typeof(FluxTable), typeof(TDto));
     }
+
     protected PointData FromDtoToInflux(TDto dto)
     {
         return dto.ToPointData() ?? throw new MappingException(typeof(TDto), typeof(PointData));
