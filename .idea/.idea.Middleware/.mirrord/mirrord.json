@@ -1,7 +1,19 @@
 {
+    "target": {       
+        "namespace": "middleware",
+        "path": "deploy/orchestrator-api"
+    },
     "feature": {
         "network": {
-            "incoming": "mirror",
+            "incoming": {
+                "mode": "steal",
+                "port_mapping": [
+                    [
+                        4036,
+                        80
+                    ]
+                ]
+            },
             "outgoing": true
         },
         "fs": "read",
