@@ -28,6 +28,7 @@ public class LocationService : ILocationService
 
         // make it online & return info about location based on matched edge
         loc!.IsOnline = true;
+        loc!.Address = location.Address;
         await _locationRepository.UpdateAsync(loc);
         return loc;
     }
