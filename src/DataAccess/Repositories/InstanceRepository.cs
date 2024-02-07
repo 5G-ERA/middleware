@@ -1,9 +1,12 @@
-﻿using System.Text.Json;
+﻿using System.Linq.Expressions;
+using System.Text.Json;
 using Microsoft.Extensions.Logging;
 using Middleware.DataAccess.Repositories.Abstract;
 using Middleware.Models.Domain;
+using Middleware.Models.Dto;
 using Middleware.Models.Enums;
 using NReJSON;
+using Redis.OM.Searching;
 using RedisGraphDotNet.Client;
 using StackExchange.Redis;
 
@@ -64,5 +67,29 @@ public class InstanceRepository : BaseRepository<InstanceModel>, IInstanceReposi
         }
 
         return instanceCandidatesFinal.FirstOrDefault();
+    }
+
+    /// <inheritdoc />
+    public Task DeleteAsync(InstanceModel model)
+    {
+        throw new NotImplementedException();
+    }
+
+    /// <inheritdoc />
+    public Task<List<InstanceModel>> FindAsync(Expression<Func<InstanceDto, bool>> predicate)
+    {
+        throw new NotImplementedException();
+    }
+
+    /// <inheritdoc />
+    public Task<InstanceModel?> FindSingleAsync(Expression<Func<InstanceDto, bool>> predicate)
+    {
+        throw new NotImplementedException();
+    }
+
+    /// <inheritdoc />
+    public IRedisCollection<InstanceDto> FindQuery(Expression<Func<InstanceDto, bool>> predicate)
+    {
+        throw new NotImplementedException();
     }
 }

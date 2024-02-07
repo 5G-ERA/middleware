@@ -1,9 +1,12 @@
-﻿using System.Text.Json;
+﻿using System.Linq.Expressions;
+using System.Text.Json;
 using Microsoft.Extensions.Logging;
 using Middleware.DataAccess.Repositories.Abstract;
 using Middleware.Models.Domain;
+using Middleware.Models.Dto;
 using Middleware.Models.Enums;
 using NReJSON;
+using Redis.OM.Searching;
 using RedisGraphDotNet.Client;
 using StackExchange.Redis;
 
@@ -143,5 +146,28 @@ namespace Middleware.DataAccess.Repositories
             return clouds;
         }
 
+        /// <inheritdoc />
+        public Task DeleteAsync(RobotModel model)
+        {
+            throw new NotImplementedException();
+        }
+
+        /// <inheritdoc />
+        public Task<List<RobotModel>> FindAsync(Expression<Func<RobotDto, bool>> predicate)
+        {
+            throw new NotImplementedException();
+        }
+
+        /// <inheritdoc />
+        public Task<RobotModel?> FindSingleAsync(Expression<Func<RobotDto, bool>> predicate)
+        {
+            throw new NotImplementedException();
+        }
+
+        /// <inheritdoc />
+        public IRedisCollection<RobotDto> FindQuery(Expression<Func<RobotDto, bool>> predicate)
+        {
+            throw new NotImplementedException();
+        }
     }
 }
