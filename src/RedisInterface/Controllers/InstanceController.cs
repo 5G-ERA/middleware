@@ -96,6 +96,13 @@ public class InstanceController : ControllerBase
         try
         {
             var model = request.ToInstance();
+            var existingInstance = await _instanceRepository.FindSingleAsync(i=>i.Name == model.Name);
+            if (existingInstance is not null)
+            {
+                return StatusCode((int)HttpStatusCode.BadRequest,
+                    new ApiResponse((int)HttpStatusCode.BadRequest,
+                        "Instance with specified name already exists"));
+            }
             var instance = await _instanceRepository.AddAsync(model);
             if (instance is null)
             {

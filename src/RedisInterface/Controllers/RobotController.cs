@@ -97,6 +97,13 @@ public class RobotController : ControllerBase
         try
         {
             var model = request.ToRobot();
+            var existingRobot = await _robotRepository.FindSingleAsync(r=>r.Name == model.Name);
+            if (existingRobot is not null)
+            {
+                return StatusCode((int)HttpStatusCode.BadRequest,
+                    new ApiResponse((int)HttpStatusCode.BadRequest,
+                        "Robot with specified name already exists"));
+            }
             model.OnboardedTime = model.LastUpdatedTime;
             var robot = await _robotRepository.AddAsync(model);
             if (robot is null)

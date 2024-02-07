@@ -100,6 +100,13 @@ namespace Middleware.RedisInterface.Controllers
             try
             {
                 var model = request.ToContainer();
+                var existingLoc = await _containerImageRepository.FindSingleAsync(c=>c.Name == model.Name);
+                if (existingLoc is not null)
+                {
+                    return StatusCode((int)HttpStatusCode.BadRequest,
+                        new ApiResponse((int)HttpStatusCode.BadRequest,
+                            "ContainerImage with specified name already exists"));
+                }
                 ContainerImageModel cim = await _containerImageRepository.AddAsync(model);
                 if (cim is null)
                 {

@@ -104,6 +104,13 @@ public class ActionController : ControllerBase
     {
         try
         {
+            var existingTask = await _actionRepository.FindSingleAsync(t=>t.Name == request.Name);
+            if (existingTask is not null)
+            {
+                return StatusCode((int)HttpStatusCode.BadRequest,
+                    new ApiResponse((int)HttpStatusCode.BadRequest,
+                        "Action with specified name already exists"));
+            }
             var action  = await _actionService.AddAsync(request.ToAction());
             return Ok(action.ToActionResponse());
         }

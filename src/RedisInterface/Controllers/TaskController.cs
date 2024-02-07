@@ -113,6 +113,13 @@ public class TaskController : ControllerBase
         try
         {
             var model = request.ToTask();
+            var existingTask = await _taskRepository.FindSingleAsync(t=>t.Name == model.Name);
+            if (existingTask is not null)
+            {
+                return StatusCode((int)HttpStatusCode.BadRequest,
+                    new ApiResponse((int)HttpStatusCode.BadRequest,
+                        "Task with specified name already exists"));
+            }
             var task = await _taskRepository.AddAsync(model);
             if (task is null)
             {
@@ -350,8 +357,15 @@ public class TaskController : ControllerBase
             return BadRequest(new ApiResponse((int)HttpStatusCode.BadRequest,
                 "This task ID has already been used, please specify a new Task ID."));
         }
+        var existingTask = await _taskRepository.FindSingleAsync(t=>t.Name == model.Name);
+        if (existingTask is not null)
+        {
+            return StatusCode((int)HttpStatusCode.BadRequest,
+                new ApiResponse((int)HttpStatusCode.BadRequest,
+                    "Task with specified name already exists"));
+        }
 
-        if (!model.ActionSequence.Any())
+        if (!model.ActionSequence!.Any())
         {
             return BadRequest(new ApiResponse((int)HttpStatusCode.BadRequest,
                 "Parameters for ActionSequence were not specified."));
