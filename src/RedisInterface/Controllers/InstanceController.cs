@@ -241,8 +241,8 @@ public class InstanceController : ControllerBase
         catch (Exception ex)
         {
             var statusCode = (int)HttpStatusCode.InternalServerError;
-            _logger.LogError(ex, "An error occurred:");
-            return StatusCode(statusCode, new ApiResponse(statusCode, $"An error has occurred: {ex.Message}"));
+            _logger.LogError(ex, "An error occurred: {ex}", ex);
+            return StatusCode(statusCode, new ApiResponse(statusCode, $"An error has occurred: {ex}"));
         }
 
         return Ok();
