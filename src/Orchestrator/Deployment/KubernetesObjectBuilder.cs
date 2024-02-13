@@ -33,7 +33,7 @@ internal class KubernetesObjectBuilder : IKubernetesObjectBuilder
     private readonly IEnvironment _env;
     private readonly ISystemConfigRepository _systemConfigRepository;
 
-    public KubernetesObjectBuilder(IEnvironment env, IConfiguration config,
+    public KubernetesObjectBuilder(IEnvironment env, IConfiguration config, 
         ISystemConfigRepository systemConfigRepository)
     {
         _env = env;
@@ -60,11 +60,11 @@ internal class KubernetesObjectBuilder : IKubernetesObjectBuilder
         return obj;
     }
 
-    public V1Service CreateStartupService(string serviceImageName, K8SServiceKind kind, V1ObjectMeta meta)
+    public V1Service CreateStartupService(string serviceImageName, K8SServiceKind kind, V1ObjectMeta meta, int? nodePort = null)
     {
         var spec = new V1ServiceSpec
         {
-            Ports = CreateDefaultHttpPorts(),
+            Ports = CreateDefaultHttpPorts(nodePort),
             Selector = new Dictionary<string, string> { { "app", serviceImageName } },
             Type = kind.GetStringValue()
         };
@@ -339,13 +339,12 @@ internal class KubernetesObjectBuilder : IKubernetesObjectBuilder
         return ports.Select(p => new V1ServicePort(p.Port, p.Protocol, p.Name)).ToList();
     }
 
-    private static List<V1ServicePort> CreateDefaultHttpPorts()
+    private List<V1ServicePort> CreateDefaultHttpPorts(int? nodePort = null)
     {
         return new()
         {
-            new(80, "TCP", "http", null, "TCP", 80),
-            new(443, "TCP", "https", null, "TCP", 80)
-        };
+            new(80, "TCP", "http", nodePort, "TCP", 80)
+        };       
     }
 
     /// <summary>
