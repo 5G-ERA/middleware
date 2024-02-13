@@ -33,7 +33,7 @@ internal class KubernetesObjectBuilder : IKubernetesObjectBuilder
     private readonly IEnvironment _env;
     private readonly ISystemConfigRepository _systemConfigRepository;
 
-    public KubernetesObjectBuilder(IEnvironment env, IConfiguration config, 
+    public KubernetesObjectBuilder(IEnvironment env, IConfiguration config,
         ISystemConfigRepository systemConfigRepository)
     {
         _env = env;

@@ -30,7 +30,7 @@ public class MiddlewareStartupJob : BaseJob<MiddlewareStartupJob>
     }
 
     protected override async Task ExecuteJobAsync(IJobExecutionContext context)
-    {       
+    {
         Logger.LogInformation("Executed");
         try
         {
@@ -101,7 +101,7 @@ public class MiddlewareStartupJob : BaseJob<MiddlewareStartupJob>
                     else if(instanceType == LocationType.Edge.ToString())
                     {
                         kind = K8SServiceKind.NodePort;
-                        if (nodePort > 30000 && nodePort < 32767) { useNodePort = true; }
+                        if (nodePort >= 30000 && nodePort <= 32767) { useNodePort = true; }
                     } 
                     else
                     {
