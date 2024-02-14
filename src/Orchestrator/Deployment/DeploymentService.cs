@@ -78,9 +78,9 @@ internal class DeploymentService : IDeploymentService
     }
 
     /// <inheritdoc />
-    public V1Service CreateStartupService(string serviceImageName, K8SServiceKind kind, V1ObjectMeta meta)
+    public V1Service CreateStartupService(string serviceImageName, K8SServiceKind kind, V1ObjectMeta meta, int? nodePort = null)
     {
-        return _kubeObjectBuilder.CreateStartupService(serviceImageName, kind, meta);
+        return _kubeObjectBuilder.CreateStartupService(serviceImageName, kind, meta, nodePort);
     }
 
     /// <inheritdoc />

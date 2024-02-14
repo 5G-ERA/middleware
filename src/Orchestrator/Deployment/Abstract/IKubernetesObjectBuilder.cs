@@ -52,7 +52,7 @@ internal interface IKubernetesObjectBuilder
     /// <param name="kind">Kind of the Kubernetes Service</param>
     /// <param name="meta">Metadata of the deployment to be exposed</param>
     /// <returns></returns>
-    V1Service CreateStartupService(string serviceImageName, K8SServiceKind kind, V1ObjectMeta meta);
+    V1Service CreateStartupService(string serviceImageName, K8SServiceKind kind, V1ObjectMeta meta, int? nodePort = null);
 
     /// <summary>
     ///     Configures cross NetApp communication by providing the addresses via environment variables

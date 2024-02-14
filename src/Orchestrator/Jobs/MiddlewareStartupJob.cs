@@ -8,6 +8,8 @@ using Middleware.Orchestrator.Deployment;
 using Middleware.Orchestrator.Exceptions;
 using Quartz;
 using Middleware.Common.Job;
+using Microsoft.Extensions.Options;
+using Middleware.Models.Enums;
 
 namespace Middleware.Orchestrator.Jobs;
 
@@ -15,12 +17,16 @@ public class MiddlewareStartupJob : BaseJob<MiddlewareStartupJob>
 {
     private readonly IDeploymentService _deploymentService;
     private readonly IKubernetesBuilder _kubeBuilder;
+    private readonly IOptions<GatewayConfig> _gatewayConfig;
+    private readonly IOptions<MiddlewareConfig> _middlewareConfig;
 
-    public MiddlewareStartupJob(ILogger<MiddlewareStartupJob> logger, IKubernetesBuilder kubeBuilder,
+    public MiddlewareStartupJob(ILogger<MiddlewareStartupJob> logger, IKubernetesBuilder kubeBuilder, IOptions<GatewayConfig> gatewayConfig, IOptions<MiddlewareConfig> middlewareConfig,
         IDeploymentService deploymentService) : base(logger)
     {
         _kubeBuilder = kubeBuilder;
         _deploymentService = deploymentService;
+        _gatewayConfig = gatewayConfig ?? throw new ArgumentNullException(nameof(gatewayConfig));
+        _middlewareConfig = middlewareConfig ?? throw new ArgumentNullException(nameof(middlewareConfig));
     }
 
     protected override async Task ExecuteJobAsync(IJobExecutionContext context)
@@ -80,10 +86,30 @@ public class MiddlewareStartupJob : BaseJob<MiddlewareStartupJob>
                         AppConfig.K8SNamespaceName,
                         shouldDryRun ? "All" : null);
                 }
+                var nodePort = _gatewayConfig.Value.NodePort;
+                var isIngress = _gatewayConfig.Value.IsIngress;
+                var instanceType = _middlewareConfig.Value.InstanceType;
+                bool useNodePort = false;
 
-                var kind = service != "gateway" ? K8SServiceKind.ClusterIp : K8SServiceKind.LoadBalancer;
+                K8SServiceKind kind;
+                if(service != "gateway") { kind = K8SServiceKind.ClusterIp; }
+                else { 
+                    if(isIngress) 
+                    {
+                        kind = K8SServiceKind.ClusterIp; 
+                    }
+                    else if(instanceType == LocationType.Edge.ToString())
+                    {
+                        kind = K8SServiceKind.NodePort;
+                        if (nodePort >= 30000 && nodePort <= 32767) { useNodePort = true; }
+                    } 
+                    else
+                    {
+                        kind = K8SServiceKind.LoadBalancer;
+                    }
+                }
 
-                var lbService = _deploymentService.CreateStartupService(service, kind, deployment.Metadata);
+                var lbService = _deploymentService.CreateStartupService(service, kind, deployment.Metadata, nodePort: useNodePort ? nodePort : null);
                 if (serviceNames.Contains(lbService.Metadata.Name) == false)
                 {
                     lbService = await kubeClient.CoreV1.CreateNamespacedServiceAsync(lbService,
