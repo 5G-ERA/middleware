@@ -102,6 +102,13 @@ public class CloudController : ControllerBase
         if (model == null) return BadRequest("Parameters were not specified.");
         try
         {
+            var existingLoc = await _locationRepository.GetByNameAsync(model.Name);
+            if (existingLoc is not null)
+            {
+                return StatusCode((int)HttpStatusCode.BadRequest,
+                    new ApiResponse((int)HttpStatusCode.BadRequest,
+                        "Location with specified name already exists"));
+            }
             var location = await _locationRepository.AddAsync(model.ToLocation());
             if (location is null)
             {

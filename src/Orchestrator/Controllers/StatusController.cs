@@ -3,7 +3,9 @@ using Microsoft.AspNetCore.Mvc;
 using Middleware.Common.Responses;
 using Middleware.DataAccess.Repositories.Abstract.Influx;
 using Middleware.Models.Domain;
+using Middleware.Orchestrator.ExtensionMethods;
 using Middleware.Orchestrator.Heartbeat;
+using Middleware.Orchestrator.Models;
 using Middleware.Orchestrator.Models.Responses;
 using Middleware.RedisInterface.Sdk;
 
@@ -17,20 +19,17 @@ public class StatusController : Controller
     private readonly ILogger _logger;
     private readonly IRedisInterfaceClient _redisInterfaceClient;
     private readonly IInfluxNetAppStatusRepository _influxNetAppStatusRepository;
-    private readonly IInfluxRobotStatusRepository _influxRobotStatusRepository;
 
     public StatusController(ILogger<StatusController> logger,
         IRedisInterfaceClient redisInterfaceClient,
         IHeartbeatService heartbeatService,
-        IInfluxNetAppStatusRepository influxNetAppStatusRepository,
-        IInfluxRobotStatusRepository influxRobotStatusRepository
+        IInfluxNetAppStatusRepository influxNetAppStatusRepository
     )
     {
         _logger = logger;
         _redisInterfaceClient = redisInterfaceClient;
         _heartbeatService = heartbeatService;
         _influxNetAppStatusRepository = influxNetAppStatusRepository;
-        _influxRobotStatusRepository = influxRobotStatusRepository;
     }
 
 
@@ -109,22 +108,29 @@ public class StatusController : Controller
     /// <summary>
     ///     Add a new RobotStatusModel entity
     /// </summary>
-    /// <param name="model"></param>
+    /// <param name="request"></param>
     /// <returns> the newly created RobotStatusModel entity </returns>
     [HttpPost]
     [Route("robot", Name = "RobotStatusAdd")]
     [ProducesResponseType(typeof(RobotStatusModel), (int)HttpStatusCode.OK)]
     [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.BadRequest)]
     [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.InternalServerError)]
-    public async Task<ActionResult<RobotStatusModel>> AddRobotStatusAsync([FromBody] RobotStatusModel model)
+    public async Task<ActionResult<RobotStatusModel>> AddRobotStatusAsync([FromBody] RobotStatusRequest request)
     {
-        if (model.IsValid() == false)
-            return BadRequest(new ApiResponse((int)HttpStatusCode.BadRequest, "Parameters were not specified."));
         try
         {
-            //TODO: put behind service
-            //await _robotStatusRepository.AddAsync(model, () => model.Id);
-            await _influxRobotStatusRepository.AddAsync(model);
+            var result = await _heartbeatService.AddRobotStatus(request.ToRobotStatus());
+            if (result.IsSuccess == false && result.NotFound)
+            {
+                return NotFound(new ApiResponse((int)HttpStatusCode.NotFound, result.ErrMessage));
+            }
+
+            if (result.IsSuccess == false && result.NotFound == false)
+            {
+                return BadRequest(new ApiResponse((int)HttpStatusCode.BadRequest, result.ErrMessage));
+            }
+
+            return Ok(result.Value);
         }
         catch (Exception ex)
         {
@@ -132,8 +138,6 @@ public class StatusController : Controller
             _logger.LogError(ex, "An error occurred:");
             return StatusCode(statusCode, new ApiResponse(statusCode, $"An error has occurred: {ex.Message}"));
         }
-
-        return Ok(model);
     }
 
     /// <summary>

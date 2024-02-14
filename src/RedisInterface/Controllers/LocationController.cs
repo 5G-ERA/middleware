@@ -98,6 +98,13 @@ public class LocationController : ControllerBase
         try
         {
             var model = request.ToLocation();
+            var existingLoc = await _locationRepository.GetByNameAsync(model.Name);
+            if (existingLoc is not null)
+            {
+                return StatusCode((int)HttpStatusCode.BadRequest,
+                    new ApiResponse((int)HttpStatusCode.BadRequest,
+                        "Location with specified name already exists"));
+            }
             var location = await _locationRepository.AddAsync(model);
             if (location is null)
             {

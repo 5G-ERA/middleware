@@ -89,31 +89,6 @@ internal class DeploymentService : IDeploymentService
         var retVal = true;
         try
         {
-            //Delete the LOCATED_AT relationships between instance and edge/cloud.
-            // TODO: refactor so RedisInterfaceClient can take ILocation as parameter to adding the relation
-            var actionTempList = actionPlan.ActionSequence;
-            foreach (var action in actionTempList!)
-            {
-                BaseModel placement;
-                if (action.PlacementType!.ToUpper().Contains("CLOUD"))
-                {
-                    var cloud = (await _redisInterfaceClient.GetCloudByNameAsync(action.Placement!))?.ToCloud();
-                    placement = cloud;
-                }
-                else
-                {
-                    var edge = (await _redisInterfaceClient.GetEdgeByNameAsync(action.Placement!)).ToEdge();
-                    placement = edge;
-                }
-
-                if (placement is null) continue;
-                foreach (var instance in action.Services)
-                {
-                    //delete all the located_at relationships between all instances of 1 action and the resources been edge/cloud
-                    await _redisInterfaceClient.DeleteRelationAsync(instance, placement, "LOCATED_AT");
-                }
-            }
-
             foreach (var action in actionPlan.ActionSequence!)
             {
                 var relayShouldBeDeleted = true;
@@ -483,18 +458,20 @@ internal class DeploymentService : IDeploymentService
     private async Task<ILocation> GetCurrentLocationAsync()
     {
         _logger.LogDebug("Retrieving location details (cloud or edge)");
-        return _mwConfig.Value.InstanceType.ToLower() == "cloud"
-            ? (await _redisInterfaceClient.GetCloudByNameAsync(_mwConfig.Value.InstanceName)).ToCloud()
-            : (await _redisInterfaceClient.GetEdgeByNameAsync(_mwConfig.Value.InstanceName)).ToEdge();
+        return (await _redisInterfaceClient.GetLocationByNameAsync(_mwConfig.Value.InstanceName)).ToLocation();
+        // _mwConfig.Value.InstanceType.ToLower() == "cloud"
+        // ? (await _redisInterfaceClient.GetCloudByNameAsync(_mwConfig.Value.InstanceName)).ToCloud()
+        // : (await _redisInterfaceClient.GetEdgeByNameAsync(_mwConfig.Value.InstanceName)).ToEdge();
     }
 
     private async Task<ILocation> GetLocationAsync(LocationType type, string name)
     {
         _logger.LogDebug("Retrieving location details (cloud or edge) for type {type}, name: {name}", type.ToString(),
             name);
-        return type == LocationType.Cloud
-            ? (await _redisInterfaceClient.GetCloudByNameAsync(name)).ToCloud()
-            : (await _redisInterfaceClient.GetEdgeByNameAsync(name)).ToEdge();
+        return (await _redisInterfaceClient.GetLocationByNameAsync(_mwConfig.Value.InstanceName)).ToLocation(); 
+            // type == LocationType.Cloud
+            // ? (await _redisInterfaceClient.GetCloudByNameAsync(name)).ToCloud()
+            // : (await _redisInterfaceClient.GetEdgeByNameAsync(name)).ToEdge();
     }
 
     /// <summary>

@@ -4,10 +4,7 @@ services:
   redisinterface:
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
-      - ASPNETCORE_URLS=https://+:443;http://+:80
-      - ASPNETCORE_HTTPS_PORT=7091
-      #- ASPNETCORE_Kestrel__Certificates__Default__Password=ros
-      #- ASPNETCORE_Kestrel__Certificates__Default__Path=/https/aspnetapp.pfx
+      - ASPNETCORE_URLS=http://+:80      
       - REDIS_HOSTNAME=${REDIS_HOSTNAME}
       - REDIS_PORT=${REDIS_PORT}
       - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
@@ -19,17 +16,11 @@ services:
     ports:
       - "5091:80"
       - "7091:443"
-    volumes:
-      - ${APPDATA}/Microsoft/UserSecrets:/root/.microsoft/usersecrets:ro
-      - ${APPDATA}/ASP.NET/Https:/root/.aspnet/https:ro
-      #- ~/.aspnet/https:/https:ro
+      
   orchestrator:
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
-      - ASPNETCORE_URLS=https://+:443;http://+:80
-      - ASPNETCORE_HTTPS_PORT=7026
-      #- ASPNETCORE_Kestrel__Certificates__Default__Password=ros
-      #- ASPNETCORE_Kestrel__Certificates__Default__Path=/https/aspnetapp.pfx 
+      - ASPNETCORE_URLS=http://+:80       
       - REDIS_INTERFACE_API_SERVICE_HOST=redisinterface.api
       - AWS_IMAGE_REGISTRY=${AWS_IMAGE_REGISTRY}
       - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
@@ -41,19 +32,14 @@ services:
       - Middleware__InstanceName=BB
       - Middleware__InstanceType=Edge
       - Middleware__Address=localhost:5047
-
     ports:
       - "5036:80"
-      - "7036:443"
-    volumes:
-      - ${APPDATA}/Microsoft/UserSecrets:/root/.microsoft/usersecrets:ro
-      - ${APPDATA}/ASP.NET/Https:/root/.aspnet/https:ro
-      #- ~/.aspnet/https:/https:ro
+      - "7036:443"    
 
   taskplanner:
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
-      - ASPNETCORE_URLS=https://+:443;http://+:80
+      - ASPNETCORE_URLS=http://+:80
       - REDIS_INTERFACE_API_SERVICE_HOST=redisinterface.api
       - RESOURCE_PLANNER_API_SERVICE_HOST=resourceplanner.api
       - ORCHESTRATOR_API_SERVICE_HOST=orchestrator.api
@@ -65,15 +51,12 @@ services:
       - Middleware__InstanceType=Edge
     ports:
       - "5143:80"
-      - "7094:443"
-    volumes:
-      - ${APPDATA}/Microsoft/UserSecrets:/root/.microsoft/usersecrets:ro
-      - ${APPDATA}/ASP.NET/Https:/root/.aspnet/https:ro
+      - "7094:443"    
 
   resourceplanner:
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
-      - ASPNETCORE_URLS=https://+:443;http://+:80
+      - ASPNETCORE_URLS=http://+:80
       - REDIS_INTERFACE_API_SERVICE_HOST=redisinterface.api
       - ORCHESTRATOR_API_SERVICE_HOST=orchestrator.api
       - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
@@ -84,16 +67,12 @@ services:
       - Middleware__InstanceType=Edge
     ports:
       - "5263:80"
-      - "7263:443"
-    volumes:
-      - ${APPDATA}/Microsoft/UserSecrets:/root/.microsoft/usersecrets:ro
-      - ${APPDATA}/ASP.NET/Https:/root/.aspnet/https:ro
+      - "7263:443"    
 
   ocelotgateway:
-
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
-      - ASPNETCORE_URLS=https://+:443;http://+:80
+      - ASPNETCORE_URLS=http://+:80
       - REDIS_INTERFACE_API_SERVICE_HOST=redisinterface.api
       - REDIS_HOSTNAME=${REDIS_HOSTNAME}
       - REDIS_PORT=${REDIS_PORT}
@@ -104,21 +83,14 @@ services:
       - Middleware__InstanceType=Edge
     ports:
       - "5047:80"
-      - "7047:443"
-    volumes:
-      - ${APPDATA}/Microsoft/UserSecrets:/root/.microsoft/usersecrets:ro
-      - ${APPDATA}/ASP.NET/Https:/root/.aspnet/https:ro
+      - "7047:443"    
 
   centralapi:
-
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
-      - ASPNETCORE_URLS=https://+:443;http://+:80
+      - ASPNETCORE_URLS=http://+:80
       - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
       - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
     ports:
       - "5058:80"
-      - "7058:443"
-    volumes:
-      - ${APPDATA}/Microsoft/UserSecrets:/root/.microsoft/usersecrets:ro
-      - ${APPDATA}/ASP.NET/Https:/root/.aspnet/https:ro
+      - "7058:443"    

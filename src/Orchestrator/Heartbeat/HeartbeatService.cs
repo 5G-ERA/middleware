@@ -71,6 +71,21 @@ internal class HeartbeatService : IHeartbeatService
         return statuses;
     }
 
+    /// <inheritdoc />
+    public async Task<HeartbeatResult<RobotStatusModel>> AddRobotStatus(RobotStatusModel status)
+    {
+        var robot = await _redisInterfaceClient.RobotGetByIdAsync(status.Id);
+        if (robot is null)
+        {
+            return new("Robot not found", true);
+        }
+
+        status.Name = robot.Name;
+        var res = await _influxRobotStatusRepository.AddAsync(status);
+
+        return new(res);
+    }
+
     private async Task<IReadOnlyList<RobotStatusModel>> CreateFakeRobotStatusList()
     {
         var robotsResponse = await _redisInterfaceClient.RobotGetAllAsync();

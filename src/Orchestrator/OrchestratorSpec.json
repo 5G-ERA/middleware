@@ -1478,6 +1478,27 @@
             },
             "nullable": true
           },
+          "transforms": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/RosTransformsModel"
+            },
+            "nullable": true
+          },
+          "actions": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/RosActionModel"
+            },
+            "nullable": true
+          },
+          "services": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/RosServiceModel"
+            },
+            "nullable": true
+          },
           "rosVersion": {
             "type": "integer",
             "format": "int32"
@@ -1681,45 +1702,43 @@
         },
         "additionalProperties": { }
       },
-      "ROSNodeModel": {
+      "Qos": {
         "type": "object",
         "properties": {
-          "name": {
+          "preset": {
             "type": "string",
             "nullable": true
           },
-          "publications": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/RosTopicModel"
-            },
-            "nullable": true
-          },
-          "subscriptions": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/RosTopicModel"
-            },
-            "nullable": true
-          },
-          "services": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/ROSServiceModel"
-            },
-            "nullable": true
-          }
-        },
-        "additionalProperties": false
-      },
-      "ROSServiceModel": {
-        "type": "object",
-        "properties": {
-          "name": {
+          "history": {
             "type": "string",
             "nullable": true
           },
-          "description": {
+          "depth": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "reliability": {
+            "type": "string",
+            "nullable": true
+          },
+          "durability": {
+            "type": "string",
+            "nullable": true
+          },
+          "deadline": {
+            "type": "string",
+            "nullable": true
+          },
+          "lifespan": {
+            "type": "string",
+            "nullable": true
+          },
+          "liveliness": {
+            "type": "string",
+            "nullable": true
+          },
+          "lease": {
             "type": "string",
             "nullable": true
           }
@@ -1815,7 +1834,7 @@
           "ROSNodes": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/ROSNodeModel"
+              "$ref": "#/components/schemas/RosNodeModel"
             },
             "nullable": true
           },
@@ -1928,8 +1947,6 @@
       },
       "RobotStatusModel": {
         "required": [
-          "actionSequenceId",
-          "currentlyExecutedActionIndex",
           "id"
         ],
         "type": "object",
@@ -1951,19 +1968,95 @@
           },
           "actionSequenceId": {
             "type": "string",
-            "format": "uuid"
+            "format": "uuid",
+            "nullable": true
           },
           "currentlyExecutedActionIndex": {
             "type": "integer",
-            "format": "int32"
+            "format": "int32",
+            "nullable": true
           },
           "batteryLevel": {
             "type": "integer",
             "format": "int32"
           },
+          "cpuUtilisation": {
+            "type": "number",
+            "format": "double"
+          },
+          "ramUtilisation": {
+            "type": "number",
+            "format": "double"
+          },
           "timestamp": {
             "type": "string",
             "format": "date-time"
+          }
+        },
+        "additionalProperties": false
+      },
+      "RosActionModel": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "nullable": true
+          },
+          "type": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "RosNodeModel": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "nullable": true
+          },
+          "publications": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/RosTopicModel"
+            },
+            "nullable": true
+          },
+          "subscriptions": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/RosTopicModel"
+            },
+            "nullable": true
+          },
+          "services": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/RosServiceModel"
+            },
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "RosServiceModel": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "nullable": true
+          },
+          "type": {
+            "type": "string",
+            "nullable": true
+          },
+          "description": {
+            "type": "string",
+            "nullable": true
+          },
+          "qos": {
+            "$ref": "#/components/schemas/Qos"
           }
         },
         "additionalProperties": false
@@ -1983,8 +2076,41 @@
             "type": "string",
             "nullable": true
           },
+          "compression": {
+            "type": "string",
+            "nullable": true
+          },
+          "qos": {
+            "$ref": "#/components/schemas/Qos"
+          },
           "enabled": {
             "type": "boolean"
+          }
+        },
+        "additionalProperties": false
+      },
+      "RosTransformsModel": {
+        "type": "object",
+        "properties": {
+          "source_frame": {
+            "type": "string",
+            "nullable": true
+          },
+          "target_frame": {
+            "type": "string",
+            "nullable": true
+          },
+          "angular_thres": {
+            "type": "number",
+            "format": "double"
+          },
+          "trans_thres": {
+            "type": "number",
+            "format": "double"
+          },
+          "max_publish_period": {
+            "type": "number",
+            "format": "double"
           }
         },
         "additionalProperties": false

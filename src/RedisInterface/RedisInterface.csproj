@@ -50,10 +50,6 @@
     <None Remove="LuaQueries\GetResourceCloudData.lua" />
     <None Remove="LuaQueries\GetResourceEdgeData.lua" />
     <None Remove="LuaQueries\GetSameFamilyAction.lua" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Contracts" />
   </ItemGroup> 
 
 </Project>

@@ -1,9 +1,12 @@
-﻿using System.Text.Json;
+﻿using System.Linq.Expressions;
+using System.Text.Json;
 using Microsoft.Extensions.Logging;
 using Middleware.DataAccess.Repositories.Abstract;
 using Middleware.Models.Domain;
+using Middleware.Models.Dto;
 using Middleware.Models.Enums;
 using NReJSON;
+using Redis.OM.Searching;
 using RedisGraphDotNet.Client;
 using StackExchange.Redis;
 
@@ -46,6 +49,30 @@ namespace Middleware.DataAccess.Repositories
             await Db.JsonSetAsync(id.ToString(), JsonSerializer.Serialize(currentModel));
             return currentModel;
 
+        }
+
+        /// <inheritdoc />
+        public Task DeleteAsync(TaskModel model)
+        {
+            throw new NotImplementedException();
+        }
+
+        /// <inheritdoc />
+        public Task<List<TaskModel>> FindAsync(Expression<Func<TaskDto, bool>> predicate)
+        {
+            throw new NotImplementedException();
+        }
+
+        /// <inheritdoc />
+        public Task<TaskModel?> FindSingleAsync(Expression<Func<TaskDto, bool>> predicate)
+        {
+            throw new NotImplementedException();
+        }
+
+        /// <inheritdoc />
+        public IRedisCollection<TaskDto> FindQuery(Expression<Func<TaskDto, bool>> predicate)
+        {
+            throw new NotImplementedException();
         }
     }
 }

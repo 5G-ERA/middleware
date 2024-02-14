@@ -8,4 +8,6 @@ public interface IHeartbeatService
     Task<RobotStatusModel> GetRobotStatusByIdAsync(Guid id, bool generateFakeData = false);
     Task<IReadOnlyList<NetAppStatusModel>> GetAllAppStatusesAsync(bool generateFakeData = false);
     Task<IReadOnlyList<RobotStatusModel>> GetAllRobotStatusesAsync(bool generateFakeData = false);
+
+    Task<HeartbeatResult<RobotStatusModel>> AddRobotStatus(RobotStatusModel status);
 }

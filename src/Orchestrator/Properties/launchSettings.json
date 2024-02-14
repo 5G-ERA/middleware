@@ -5,7 +5,8 @@
       "launchBrowser": true,
       "launchUrl": "swagger",
       "environmentVariables": {
-        "ASPNETCORE_ENVIRONMENT": "Development"
+        "ASPNETCORE_ENVIRONMENT": "Development",
+        "CENTRAL_API_HOSTNAME": "central-api.5gera.net"
       },
       "applicationUrl": "https://localhost:3036;http://localhost:4036",
       "dotnetRunMessages": true

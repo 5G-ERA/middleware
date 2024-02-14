@@ -1,8 +1,9 @@
 ﻿using Middleware.Models.Domain;
+using Middleware.Models.Dto;
 
 namespace Middleware.DataAccess.Repositories.Abstract
 {
-    public interface IRobotRepository : IBaseRepository<RobotModel>, IRelationRepository
+    public interface IRobotRepository : IRedisRepository<RobotModel, RobotDto>
     {
         Task<RobotModel> PatchRobotAsync(Guid id, RobotModel patch);
 

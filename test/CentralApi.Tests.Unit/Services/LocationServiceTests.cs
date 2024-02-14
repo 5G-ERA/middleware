@@ -21,14 +21,15 @@ public class LocationServiceTests
     }
 
     [Fact]
-    public async Task RegisterLocation_ShouldMakeLocationOnline_WhenLocationExists()
+    public async Task RegisterLocation_ShouldMakeLocationOnlineAndUpdateAddress_WhenLocationExists()
     {
         // arrange
         var paramLocation = new Location
         {
             Name = "TestCloud",
             Organization = "MiddlewareTesting",
-            Type = LocationType.Cloud
+            Type = LocationType.Cloud,
+            Address = new("https://xkcd.com/927/")
         };
         var id = Guid.NewGuid();
         var cloud = new Location
