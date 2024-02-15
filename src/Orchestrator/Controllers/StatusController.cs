@@ -231,9 +231,9 @@ public class StatusController : Controller
             var model = request.ToNetAppStatus();
             //TODO: put behind service
             //await _netAppStatusRepository.AddAsync(model, () => model.Id);
-            await _influxNetAppStatusRepository.AddAsync(model);
+            var res = await _influxNetAppStatusRepository.AddAsync(model);
 
-            var resp = model.ToNetAppHeartbeatResponse();
+            var resp = res?.ToNetAppHeartbeatResponse();
             return Ok(resp);
         }
         catch (Exception ex)

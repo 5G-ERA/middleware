@@ -44,6 +44,10 @@ public class NetAppStatusModel : BaseModel
     public ColourCode GetColourCodedStatus()
     {
         var retVal = ColourCode.Yellow;
+        if (CurrentRobotsCount is null)
+        {
+            retVal = ColourCode.Green;
+        }
         if (CurrentRobotsCount < OptimalLimit)
         {
             retVal = ColourCode.Green;
