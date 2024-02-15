@@ -60,7 +60,8 @@ internal class KubernetesObjectBuilder : IKubernetesObjectBuilder
         return obj;
     }
 
-    public V1Service CreateStartupService(string serviceImageName, K8SServiceKind kind, V1ObjectMeta meta, int? nodePort = null)
+    public V1Service CreateStartupService(string serviceImageName, K8SServiceKind kind, V1ObjectMeta meta,
+        int? nodePort = null)
     {
         var spec = new V1ServiceSpec
         {
@@ -238,7 +239,7 @@ internal class KubernetesObjectBuilder : IKubernetesObjectBuilder
                 : new List<V1EnvVar>();
 
             envVars.Add(new("NETAPP_ID", serviceInstanceId.ToString()));
-            envVars.Add(new("MIDDLEWARE_ADDRESS", thisLocation.GetNetAppStatusReportAddress()));
+            envVars.Add(new("MIDDLEWARE_ADDRESS", "http://" + thisLocation.GetNetAppStatusReportAddress()));
             envVars.Add(new("MIDDLEWARE_REPORT_INTERVAL", ReportIntervalInSeconds.ToString()));
 
             container.Env = envVars;
@@ -344,7 +345,7 @@ internal class KubernetesObjectBuilder : IKubernetesObjectBuilder
         return new()
         {
             new(80, "TCP", "http", nodePort, "TCP", 80)
-        };       
+        };
     }
 
     /// <summary>
