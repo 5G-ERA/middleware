@@ -3,10 +3,12 @@ using Microsoft.AspNetCore.Mvc;
 using Middleware.Common.Responses;
 using Middleware.DataAccess.Repositories.Abstract.Influx;
 using Middleware.Models.Domain;
+using Middleware.Orchestrator.Contracts.Mappings;
+using Middleware.Orchestrator.Contracts.Requests;
+using Middleware.Orchestrator.Contracts.Responses;
 using Middleware.Orchestrator.ExtensionMethods;
 using Middleware.Orchestrator.Heartbeat;
 using Middleware.Orchestrator.Models;
-using Middleware.Orchestrator.Models.Responses;
 using Middleware.RedisInterface.Sdk;
 
 namespace Middleware.Orchestrator.Controllers;
@@ -39,7 +41,7 @@ public class StatusController : Controller
     /// <returns> the list of RobotStatusModel entities </returns>
     [HttpGet]
     [Route("robot", Name = "RobotStatusGetAll")]
-    [ProducesResponseType(typeof(GetRobotStatusesResponse), (int)HttpStatusCode.OK)]
+    [ProducesResponseType(typeof(GetRobotsHeartbeatResponse), (int)HttpStatusCode.OK)]
     [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.BadRequest)]
     [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.NotFound)]
     [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.InternalServerError)]
@@ -54,10 +56,7 @@ public class StatusController : Controller
                     "No robot statuses were found."));
             }
 
-            var resp = new GetRobotStatusesResponse
-            {
-                Robots = status
-            };
+            var resp = status.ToRobotsHeartbeatResponse();
             return Ok(resp);
         }
         catch (Exception ex)
@@ -74,11 +73,12 @@ public class StatusController : Controller
     /// <returns> the list of RobotStatusModel entities </returns>
     [HttpGet]
     [Route("robot/{id}", Name = "RobotStatusGetById")]
-    [ProducesResponseType(typeof(RobotStatusModel), (int)HttpStatusCode.OK)]
+    [ProducesResponseType(typeof(GetRobotHeartbeatResponse), (int)HttpStatusCode.OK)]
     [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.BadRequest)]
     [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.NotFound)]
     [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.InternalServerError)]
-    public async Task<ActionResult<RobotStatusModel>> GetRobotStatusByIdAsync(Guid id, bool generateFakeData = false)
+    public async Task<ActionResult<GetRobotHeartbeatResponse>> GetRobotStatusByIdAsync(Guid id,
+        bool generateFakeData = false)
     {
         if (id == Guid.Empty)
         {
@@ -95,7 +95,8 @@ public class StatusController : Controller
                     "Status for the specified robot was not found."));
             }
 
-            return Ok(status);
+            var resp = status.ToRobotHeartbeatResponse();
+            return Ok(resp);
         }
         catch (Exception ex)
         {
@@ -112,10 +113,11 @@ public class StatusController : Controller
     /// <returns> the newly created RobotStatusModel entity </returns>
     [HttpPost]
     [Route("robot", Name = "RobotStatusAdd")]
-    [ProducesResponseType(typeof(RobotStatusModel), (int)HttpStatusCode.OK)]
+    [ProducesResponseType(typeof(GetRobotHeartbeatResponse), (int)HttpStatusCode.OK)]
     [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.BadRequest)]
     [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.InternalServerError)]
-    public async Task<ActionResult<RobotStatusModel>> AddRobotStatusAsync([FromBody] RobotStatusRequest request)
+    public async Task<ActionResult<GetRobotHeartbeatResponse>> AddRobotStatusAsync(
+        [FromBody] CreateRobotHeartbeatRequest request)
     {
         try
         {
@@ -130,7 +132,8 @@ public class StatusController : Controller
                 return BadRequest(new ApiResponse((int)HttpStatusCode.BadRequest, result.ErrMessage));
             }
 
-            return Ok(result.Value);
+            var resp = result.Value.ToRobotHeartbeatResponse();
+            return Ok(resp);
         }
         catch (Exception ex)
         {
@@ -146,11 +149,11 @@ public class StatusController : Controller
     /// <returns> the list of RobotStatusModel entities </returns>
     [HttpGet]
     [Route("netapp", Name = "NetAppStatuses")]
-    [ProducesResponseType(typeof(GetNetAppStatusesResponse), (int)HttpStatusCode.OK)]
+    [ProducesResponseType(typeof(GetNetAppsHeartbeatResponse), (int)HttpStatusCode.OK)]
     [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.BadRequest)]
     [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.NotFound)]
     [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.InternalServerError)]
-    public async Task<ActionResult<NetAppStatusModel>> GetNetAppStatusesAsync(bool generateFakeData = false)
+    public async Task<ActionResult<GetNetAppsHeartbeatResponse>> GetNetAppStatusesAsync(bool generateFakeData = false)
     {
         try
         {
@@ -161,10 +164,7 @@ public class StatusController : Controller
                     "No NetApp statuses were found."));
             }
 
-            var resp = new GetNetAppStatusesResponse
-            {
-                NetApps = status
-            };
+            var resp = status.ToNetAppsHeartbeatResponse();
             return Ok(resp);
         }
         catch (Exception ex)
@@ -181,11 +181,11 @@ public class StatusController : Controller
     /// <returns> the list of RobotStatusModel entities </returns>
     [HttpGet]
     [Route("netapp/{id}", Name = "NetAppStatusGetById")]
-    [ProducesResponseType(typeof(NetAppStatusModel), (int)HttpStatusCode.OK)]
+    [ProducesResponseType(typeof(GetNetAppHeartbeatResponse), (int)HttpStatusCode.OK)]
     [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.BadRequest)]
     [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.NotFound)]
     [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.InternalServerError)]
-    public async Task<ActionResult<NetAppStatusModel>> GetNetAppStatusByIdAsync(Guid id, bool generateFakeData = false)
+    public async Task<ActionResult<GetNetAppHeartbeatResponse>> GetNetAppStatusByIdAsync(Guid id, bool generateFakeData = false)
     {
         if (id == Guid.Empty)
         {
@@ -202,7 +202,8 @@ public class StatusController : Controller
                     "Status for the specified NetApp was not found."));
             }
 
-            return Ok(status);
+            var resp = status.ToNetAppHeartbeatResponse();
+            return Ok(resp);
         }
         catch (Exception ex)
         {
@@ -215,22 +216,25 @@ public class StatusController : Controller
     /// <summary>
     ///     Add a new RobotStatusModel entity
     /// </summary>
-    /// <param name="model"></param>
+    /// <param name="request"></param>
     /// <returns> the newly created RobotStatusModel entity </returns>
     [HttpPost]
     [Route("netapp", Name = "NetAppStatusAdd")]
-    [ProducesResponseType(typeof(NetAppStatusModel), (int)HttpStatusCode.OK)]
+    [ProducesResponseType(typeof(GetNetAppHeartbeatResponse), (int)HttpStatusCode.OK)]
     [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.BadRequest)]
     [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.InternalServerError)]
-    public async Task<ActionResult<NetAppStatusModel>> AddNetAppStatusAsync([FromBody] NetAppStatusModel model)
+    public async Task<ActionResult<GetNetAppHeartbeatResponse>> AddNetAppStatusAsync(
+        [FromBody] CreateNetAppHeartbeatRequest request)
     {
-        if (model.IsValid() == false)
-            return BadRequest(new ApiResponse((int)HttpStatusCode.BadRequest, "Parameters were not specified."));
         try
         {
+            var model = request.ToNetAppStatus();
             //TODO: put behind service
             //await _netAppStatusRepository.AddAsync(model, () => model.Id);
-            await _influxNetAppStatusRepository.AddAsync(model);
+            var res = await _influxNetAppStatusRepository.AddAsync(model);
+
+            var resp = res?.ToNetAppHeartbeatResponse();
+            return Ok(resp);
         }
         catch (Exception ex)
         {
@@ -238,8 +242,6 @@ public class StatusController : Controller
             _logger.LogError(ex, "An error occurred:");
             return StatusCode(statusCode, new ApiResponse(statusCode, $"An error has occurred: {ex.Message}"));
         }
-
-        return Ok(model);
     }
 
     /// <summary>
