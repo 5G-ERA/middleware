@@ -216,6 +216,65 @@
                 },
                 "additionalProperties": false
             },
+            "CreateNetAppHeartbeatRequest": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "string",
+                        "format": "uuid"
+                    },
+                    "name": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "hardLimit": {
+                        "type": "integer",
+                        "format": "int32"
+                    },
+                    "optimalLimit": {
+                        "type": "integer",
+                        "format": "int32"
+                    },
+                    "currentRobotsCount": {
+                        "type": "integer",
+                        "format": "int32",
+                        "nullable": true
+                    }
+                },
+                "additionalProperties": false
+            },
+            "CreateRobotHeartbeatRequest": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "string",
+                        "format": "uuid"
+                    },
+                    "actionSequenceId": {
+                        "type": "string",
+                        "format": "uuid",
+                        "nullable": true
+                    },
+                    "currentlyExecutedActionIndex": {
+                        "type": "integer",
+                        "format": "int32",
+                        "nullable": true
+                    },
+                    "batteryLevel": {
+                        "type": "integer",
+                        "format": "int32"
+                    },
+                    "cpuUtilisation": {
+                        "type": "number",
+                        "format": "double"
+                    },
+                    "ramUtilisation": {
+                        "type": "number",
+                        "format": "double"
+                    }
+                },
+                "additionalProperties": false
+            },
             "DialogueModel": {
                 "type": "object",
                 "properties": {
@@ -247,26 +306,101 @@
                 },
                 "additionalProperties": false
             },
-            "GetNetAppStatusesResponse": {
+            "GetNetAppHeartbeatResponse": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "string",
+                        "format": "uuid"
+                    },
+                    "name": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "hardLimit": {
+                        "type": "integer",
+                        "format": "int32"
+                    },
+                    "optimalLimit": {
+                        "type": "integer",
+                        "format": "int32"
+                    },
+                    "currentRobotsCount": {
+                        "type": "integer",
+                        "format": "int32",
+                        "nullable": true
+                    },
+                    "timestamp": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "colour": {
+                        "type": "string",
+                        "nullable": true
+                    }
+                },
+                "additionalProperties": false
+            },
+            "GetNetAppsHeartbeatResponse": {
                 "type": "object",
                 "properties": {
                     "netApps": {
                         "type": "array",
                         "items": {
-                            "$ref": "#/components/schemas/NetAppStatusModel"
+                            "$ref": "#/components/schemas/GetNetAppHeartbeatResponse"
                         },
                         "nullable": true
                     }
                 },
                 "additionalProperties": false
             },
-            "GetRobotStatusesResponse": {
+            "GetRobotHeartbeatResponse": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "string",
+                        "format": "uuid"
+                    },
+                    "name": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "actionSequenceId": {
+                        "type": "string",
+                        "format": "uuid",
+                        "nullable": true
+                    },
+                    "currentlyExecutedActionIndex": {
+                        "type": "integer",
+                        "format": "int32",
+                        "nullable": true
+                    },
+                    "batteryLevel": {
+                        "type": "integer",
+                        "format": "int32"
+                    },
+                    "cpuUtilisation": {
+                        "type": "number",
+                        "format": "double"
+                    },
+                    "ramUtilisation": {
+                        "type": "number",
+                        "format": "double"
+                    },
+                    "timestamp": {
+                        "type": "string",
+                        "format": "date-time"
+                    }
+                },
+                "additionalProperties": false
+            },
+            "GetRobotsHeartbeatResponse": {
                 "type": "object",
                 "properties": {
                     "robots": {
                         "type": "array",
                         "items": {
-                            "$ref": "#/components/schemas/RobotStatusModel"
+                            "$ref": "#/components/schemas/GetRobotHeartbeatResponse"
                         },
                         "nullable": true
                     }
@@ -340,6 +474,27 @@
                         "type": "array",
                         "items": {
                             "$ref": "#/components/schemas/RosTopicModel"
+                        },
+                        "nullable": true
+                    },
+                    "transforms": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/RosTransformsModel"
+                        },
+                        "nullable": true
+                    },
+                    "actions": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/RosActionModel"
+                        },
+                        "nullable": true
+                    },
+                    "services": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/RosServiceModel"
                         },
                         "nullable": true
                     },
@@ -463,9 +618,6 @@
                 "additionalProperties": false
             },
             "NetAppStatusModel": {
-                "required": [
-                    "currentRobotsCount"
-                ],
                 "type": "object",
                 "properties": {
                     "relations": {
@@ -493,7 +645,8 @@
                     },
                     "currentRobotsCount": {
                         "type": "integer",
-                        "format": "int32"
+                        "format": "int32",
+                        "nullable": true
                     },
                     "timestamp": {
                         "type": "string",
@@ -546,45 +699,43 @@
                 },
                 "additionalProperties": {}
             },
-            "ROSNodeModel": {
+            "Qos": {
                 "type": "object",
                 "properties": {
-                    "name": {
+                    "preset": {
                         "type": "string",
                         "nullable": true
                     },
-                    "publications": {
-                        "type": "array",
-                        "items": {
-                            "$ref": "#/components/schemas/RosTopicModel"
-                        },
-                        "nullable": true
-                    },
-                    "subscriptions": {
-                        "type": "array",
-                        "items": {
-                            "$ref": "#/components/schemas/RosTopicModel"
-                        },
-                        "nullable": true
-                    },
-                    "services": {
-                        "type": "array",
-                        "items": {
-                            "$ref": "#/components/schemas/ROSServiceModel"
-                        },
-                        "nullable": true
-                    }
-                },
-                "additionalProperties": false
-            },
-            "ROSServiceModel": {
-                "type": "object",
-                "properties": {
-                    "name": {
+                    "history": {
                         "type": "string",
                         "nullable": true
                     },
-                    "description": {
+                    "depth": {
+                        "type": "integer",
+                        "format": "int32",
+                        "nullable": true
+                    },
+                    "reliability": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "durability": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "deadline": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "lifespan": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "liveliness": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "lease": {
                         "type": "string",
                         "nullable": true
                     }
@@ -680,7 +831,7 @@
                     "ROSNodes": {
                         "type": "array",
                         "items": {
-                            "$ref": "#/components/schemas/ROSNodeModel"
+                            "$ref": "#/components/schemas/RosNodeModel"
                         },
                         "nullable": true
                     },
@@ -791,44 +942,68 @@
                 },
                 "additionalProperties": false
             },
-            "RobotStatusModel": {
-                "required": [
-                    "actionSequenceId",
-                    "currentlyExecutedActionIndex",
-                    "id"
-                ],
+            "RosActionModel": {
                 "type": "object",
                 "properties": {
-                    "relations": {
-                        "type": "array",
-                        "items": {
-                            "$ref": "#/components/schemas/RelationModel"
-                        },
-                        "nullable": true
-                    },
-                    "id": {
-                        "type": "string",
-                        "format": "uuid"
-                    },
                     "name": {
                         "type": "string",
                         "nullable": true
                     },
-                    "actionSequenceId": {
+                    "type": {
                         "type": "string",
-                        "format": "uuid"
-                    },
-                    "currentlyExecutedActionIndex": {
-                        "type": "integer",
-                        "format": "int32"
-                    },
-                    "batteryLevel": {
-                        "type": "integer",
-                        "format": "int32"
-                    },
-                    "timestamp": {
+                        "nullable": true
+                    }
+                },
+                "additionalProperties": false
+            },
+            "RosNodeModel": {
+                "type": "object",
+                "properties": {
+                    "name": {
                         "type": "string",
-                        "format": "date-time"
+                        "nullable": true
+                    },
+                    "publications": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/RosTopicModel"
+                        },
+                        "nullable": true
+                    },
+                    "subscriptions": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/RosTopicModel"
+                        },
+                        "nullable": true
+                    },
+                    "services": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/RosServiceModel"
+                        },
+                        "nullable": true
+                    }
+                },
+                "additionalProperties": false
+            },
+            "RosServiceModel": {
+                "type": "object",
+                "properties": {
+                    "name": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "type": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "description": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "qos": {
+                        "$ref": "#/components/schemas/Qos"
                     }
                 },
                 "additionalProperties": false
@@ -848,8 +1023,41 @@
                         "type": "string",
                         "nullable": true
                     },
+                    "compression": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "qos": {
+                        "$ref": "#/components/schemas/Qos"
+                    },
                     "enabled": {
                         "type": "boolean"
+                    }
+                },
+                "additionalProperties": false
+            },
+            "RosTransformsModel": {
+                "type": "object",
+                "properties": {
+                    "source_frame": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "target_frame": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "angular_thres": {
+                        "type": "number",
+                        "format": "double"
+                    },
+                    "trans_thres": {
+                        "type": "number",
+                        "format": "double"
+                    },
+                    "max_publish_period": {
+                        "type": "number",
+                        "format": "double"
                     }
                 },
                 "additionalProperties": false
@@ -2702,49 +2910,6 @@
                 },
                 "additionalProperties": false
             },
-            "Qos": {
-                "type": "object",
-                "properties": {
-                    "preset": {
-                        "type": "string",
-                        "nullable": true
-                    },
-                    "history": {
-                        "type": "string",
-                        "nullable": true
-                    },
-                    "depth": {
-                        "type": "integer",
-                        "format": "int32",
-                        "nullable": true
-                    },
-                    "reliability": {
-                        "type": "string",
-                        "nullable": true
-                    },
-                    "durability": {
-                        "type": "string",
-                        "nullable": true
-                    },
-                    "deadline": {
-                        "type": "string",
-                        "nullable": true
-                    },
-                    "lifespan": {
-                        "type": "string",
-                        "nullable": true
-                    },
-                    "liveliness": {
-                        "type": "string",
-                        "nullable": true
-                    },
-                    "lease": {
-                        "type": "string",
-                        "nullable": true
-                    }
-                },
-                "additionalProperties": false
-            },
             "RegisterSlicesRequest": {
                 "type": "object",
                 "properties": {
@@ -3079,20 +3244,6 @@
                 },
                 "additionalProperties": false
             },
-            "RosActionModel": {
-                "type": "object",
-                "properties": {
-                    "name": {
-                        "type": "string",
-                        "nullable": true
-                    },
-                    "type": {
-                        "type": "string",
-                        "nullable": true
-                    }
-                },
-                "additionalProperties": false
-            },
             "RosActionRequest": {
                 "type": "object",
                 "properties": {
@@ -3116,37 +3267,6 @@
                     },
                     "type": {
                         "type": "string",
-                        "nullable": true
-                    }
-                },
-                "additionalProperties": false
-            },
-            "RosNodeModel": {
-                "type": "object",
-                "properties": {
-                    "name": {
-                        "type": "string",
-                        "nullable": true
-                    },
-                    "publications": {
-                        "type": "array",
-                        "items": {
-                            "$ref": "#/components/schemas/RosTopicModel"
-                        },
-                        "nullable": true
-                    },
-                    "subscriptions": {
-                        "type": "array",
-                        "items": {
-                            "$ref": "#/components/schemas/RosTopicModel"
-                        },
-                        "nullable": true
-                    },
-                    "services": {
-                        "type": "array",
-                        "items": {
-                            "$ref": "#/components/schemas/RosServiceModel"
-                        },
                         "nullable": true
                     }
                 },
@@ -3234,27 +3354,6 @@
                     "lease": {
                         "type": "string",
                         "nullable": true
-                    }
-                },
-                "additionalProperties": false
-            },
-            "RosServiceModel": {
-                "type": "object",
-                "properties": {
-                    "name": {
-                        "type": "string",
-                        "nullable": true
-                    },
-                    "type": {
-                        "type": "string",
-                        "nullable": true
-                    },
-                    "description": {
-                        "type": "string",
-                        "nullable": true
-                    },
-                    "qos": {
-                        "$ref": "#/components/schemas/Qos"
                     }
                 },
                 "additionalProperties": false
@@ -3353,32 +3452,6 @@
                     },
                     "qos": {
                         "$ref": "#/components/schemas/RosQosResponse"
-                    }
-                },
-                "additionalProperties": false
-            },
-            "RosTransformsModel": {
-                "type": "object",
-                "properties": {
-                    "source_frame": {
-                        "type": "string",
-                        "nullable": true
-                    },
-                    "target_frame": {
-                        "type": "string",
-                        "nullable": true
-                    },
-                    "angular_thres": {
-                        "type": "number",
-                        "format": "double"
-                    },
-                    "trans_thres": {
-                        "type": "number",
-                        "format": "double"
-                    },
-                    "max_publish_period": {
-                        "type": "number",
-                        "format": "double"
                     }
                 },
                 "additionalProperties": false
@@ -4388,17 +4461,17 @@
                         "content": {
                             "text/plain": {
                                 "schema": {
-                                    "$ref": "#/components/schemas/GetRobotStatusesResponse"
+                                    "$ref": "#/components/schemas/GetRobotsHeartbeatResponse"
                                 }
                             },
                             "application/json": {
                                 "schema": {
-                                    "$ref": "#/components/schemas/GetRobotStatusesResponse"
+                                    "$ref": "#/components/schemas/GetRobotsHeartbeatResponse"
                                 }
                             },
                             "text/json": {
                                 "schema": {
-                                    "$ref": "#/components/schemas/GetRobotStatusesResponse"
+                                    "$ref": "#/components/schemas/GetRobotsHeartbeatResponse"
                                 }
                             }
                         }
@@ -4474,17 +4547,17 @@
                     "content": {
                         "application/json": {
                             "schema": {
-                                "$ref": "#/components/schemas/RobotStatusModel"
+                                "$ref": "#/components/schemas/CreateRobotHeartbeatRequest"
                             }
                         },
                         "text/json": {
                             "schema": {
-                                "$ref": "#/components/schemas/RobotStatusModel"
+                                "$ref": "#/components/schemas/CreateRobotHeartbeatRequest"
                             }
                         },
                         "application/*+json": {
                             "schema": {
-                                "$ref": "#/components/schemas/RobotStatusModel"
+                                "$ref": "#/components/schemas/CreateRobotHeartbeatRequest"
                             }
                         }
                     }
@@ -4495,17 +4568,17 @@
                         "content": {
                             "text/plain": {
                                 "schema": {
-                                    "$ref": "#/components/schemas/RobotStatusModel"
+                                    "$ref": "#/components/schemas/GetRobotHeartbeatResponse"
                                 }
                             },
                             "application/json": {
                                 "schema": {
-                                    "$ref": "#/components/schemas/RobotStatusModel"
+                                    "$ref": "#/components/schemas/GetRobotHeartbeatResponse"
                                 }
                             },
                             "text/json": {
                                 "schema": {
-                                    "$ref": "#/components/schemas/RobotStatusModel"
+                                    "$ref": "#/components/schemas/GetRobotHeartbeatResponse"
                                 }
                             }
                         }
@@ -4584,17 +4657,17 @@
                         "content": {
                             "text/plain": {
                                 "schema": {
-                                    "$ref": "#/components/schemas/RobotStatusModel"
+                                    "$ref": "#/components/schemas/GetRobotHeartbeatResponse"
                                 }
                             },
                             "application/json": {
                                 "schema": {
-                                    "$ref": "#/components/schemas/RobotStatusModel"
+                                    "$ref": "#/components/schemas/GetRobotHeartbeatResponse"
                                 }
                             },
                             "text/json": {
                                 "schema": {
-                                    "$ref": "#/components/schemas/RobotStatusModel"
+                                    "$ref": "#/components/schemas/GetRobotHeartbeatResponse"
                                 }
                             }
                         }
@@ -4684,17 +4757,17 @@
                         "content": {
                             "text/plain": {
                                 "schema": {
-                                    "$ref": "#/components/schemas/GetNetAppStatusesResponse"
+                                    "$ref": "#/components/schemas/GetNetAppsHeartbeatResponse"
                                 }
                             },
                             "application/json": {
                                 "schema": {
-                                    "$ref": "#/components/schemas/GetNetAppStatusesResponse"
+                                    "$ref": "#/components/schemas/GetNetAppsHeartbeatResponse"
                                 }
                             },
                             "text/json": {
                                 "schema": {
-                                    "$ref": "#/components/schemas/GetNetAppStatusesResponse"
+                                    "$ref": "#/components/schemas/GetNetAppsHeartbeatResponse"
                                 }
                             }
                         }
@@ -4770,17 +4843,17 @@
                     "content": {
                         "application/json": {
                             "schema": {
-                                "$ref": "#/components/schemas/NetAppStatusModel"
+                                "$ref": "#/components/schemas/CreateNetAppHeartbeatRequest"
                             }
                         },
                         "text/json": {
                             "schema": {
-                                "$ref": "#/components/schemas/NetAppStatusModel"
+                                "$ref": "#/components/schemas/CreateNetAppHeartbeatRequest"
                             }
                         },
                         "application/*+json": {
                             "schema": {
-                                "$ref": "#/components/schemas/NetAppStatusModel"
+                                "$ref": "#/components/schemas/CreateNetAppHeartbeatRequest"
                             }
                         }
                     }
@@ -4791,17 +4864,17 @@
                         "content": {
                             "text/plain": {
                                 "schema": {
-                                    "$ref": "#/components/schemas/NetAppStatusModel"
+                                    "$ref": "#/components/schemas/GetNetAppHeartbeatResponse"
                                 }
                             },
                             "application/json": {
                                 "schema": {
-                                    "$ref": "#/components/schemas/NetAppStatusModel"
+                                    "$ref": "#/components/schemas/GetNetAppHeartbeatResponse"
                                 }
                             },
                             "text/json": {
                                 "schema": {
-                                    "$ref": "#/components/schemas/NetAppStatusModel"
+                                    "$ref": "#/components/schemas/GetNetAppHeartbeatResponse"
                                 }
                             }
                         }
@@ -4880,17 +4953,17 @@
                         "content": {
                             "text/plain": {
                                 "schema": {
-                                    "$ref": "#/components/schemas/NetAppStatusModel"
+                                    "$ref": "#/components/schemas/GetNetAppHeartbeatResponse"
                                 }
                             },
                             "application/json": {
                                 "schema": {
-                                    "$ref": "#/components/schemas/NetAppStatusModel"
+                                    "$ref": "#/components/schemas/GetNetAppHeartbeatResponse"
                                 }
                             },
                             "text/json": {
                                 "schema": {
-                                    "$ref": "#/components/schemas/NetAppStatusModel"
+                                    "$ref": "#/components/schemas/GetNetAppHeartbeatResponse"
                                 }
                             }
                         }

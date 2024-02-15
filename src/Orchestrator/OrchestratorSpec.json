@@ -459,17 +459,17 @@
             "content": {
               "text/plain": {
                 "schema": {
-                  "$ref": "#/components/schemas/GetRobotStatusesResponse"
+                  "$ref": "#/components/schemas/GetRobotsHeartbeatResponse"
                 }
               },
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/GetRobotStatusesResponse"
+                  "$ref": "#/components/schemas/GetRobotsHeartbeatResponse"
                 }
               },
               "text/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/GetRobotStatusesResponse"
+                  "$ref": "#/components/schemas/GetRobotsHeartbeatResponse"
                 }
               }
             }
@@ -545,17 +545,17 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/RobotStatusModel"
+                "$ref": "#/components/schemas/CreateRobotHeartbeatRequest"
               }
             },
             "text/json": {
               "schema": {
-                "$ref": "#/components/schemas/RobotStatusModel"
+                "$ref": "#/components/schemas/CreateRobotHeartbeatRequest"
               }
             },
             "application/*+json": {
               "schema": {
-                "$ref": "#/components/schemas/RobotStatusModel"
+                "$ref": "#/components/schemas/CreateRobotHeartbeatRequest"
               }
             }
           }
@@ -566,17 +566,17 @@
             "content": {
               "text/plain": {
                 "schema": {
-                  "$ref": "#/components/schemas/RobotStatusModel"
+                  "$ref": "#/components/schemas/GetRobotHeartbeatResponse"
                 }
               },
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/RobotStatusModel"
+                  "$ref": "#/components/schemas/GetRobotHeartbeatResponse"
                 }
               },
               "text/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/RobotStatusModel"
+                  "$ref": "#/components/schemas/GetRobotHeartbeatResponse"
                 }
               }
             }
@@ -655,17 +655,17 @@
             "content": {
               "text/plain": {
                 "schema": {
-                  "$ref": "#/components/schemas/RobotStatusModel"
+                  "$ref": "#/components/schemas/GetRobotHeartbeatResponse"
                 }
               },
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/RobotStatusModel"
+                  "$ref": "#/components/schemas/GetRobotHeartbeatResponse"
                 }
               },
               "text/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/RobotStatusModel"
+                  "$ref": "#/components/schemas/GetRobotHeartbeatResponse"
                 }
               }
             }
@@ -755,17 +755,17 @@
             "content": {
               "text/plain": {
                 "schema": {
-                  "$ref": "#/components/schemas/GetNetAppStatusesResponse"
+                  "$ref": "#/components/schemas/GetNetAppsHeartbeatResponse"
                 }
               },
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/GetNetAppStatusesResponse"
+                  "$ref": "#/components/schemas/GetNetAppsHeartbeatResponse"
                 }
               },
               "text/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/GetNetAppStatusesResponse"
+                  "$ref": "#/components/schemas/GetNetAppsHeartbeatResponse"
                 }
               }
             }
@@ -841,17 +841,17 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/NetAppStatusModel"
+                "$ref": "#/components/schemas/CreateNetAppHeartbeatRequest"
               }
             },
             "text/json": {
               "schema": {
-                "$ref": "#/components/schemas/NetAppStatusModel"
+                "$ref": "#/components/schemas/CreateNetAppHeartbeatRequest"
               }
             },
             "application/*+json": {
               "schema": {
-                "$ref": "#/components/schemas/NetAppStatusModel"
+                "$ref": "#/components/schemas/CreateNetAppHeartbeatRequest"
               }
             }
           }
@@ -862,17 +862,17 @@
             "content": {
               "text/plain": {
                 "schema": {
-                  "$ref": "#/components/schemas/NetAppStatusModel"
+                  "$ref": "#/components/schemas/GetNetAppHeartbeatResponse"
                 }
               },
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/NetAppStatusModel"
+                  "$ref": "#/components/schemas/GetNetAppHeartbeatResponse"
                 }
               },
               "text/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/NetAppStatusModel"
+                  "$ref": "#/components/schemas/GetNetAppHeartbeatResponse"
                 }
               }
             }
@@ -951,17 +951,17 @@
             "content": {
               "text/plain": {
                 "schema": {
-                  "$ref": "#/components/schemas/NetAppStatusModel"
+                  "$ref": "#/components/schemas/GetNetAppHeartbeatResponse"
                 }
               },
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/NetAppStatusModel"
+                  "$ref": "#/components/schemas/GetNetAppHeartbeatResponse"
                 }
               },
               "text/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/NetAppStatusModel"
+                  "$ref": "#/components/schemas/GetNetAppHeartbeatResponse"
                 }
               }
             }
@@ -1351,6 +1351,65 @@
         },
         "additionalProperties": false
       },
+      "CreateNetAppHeartbeatRequest": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "name": {
+            "type": "string",
+            "nullable": true
+          },
+          "hardLimit": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "optimalLimit": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "currentRobotsCount": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "CreateRobotHeartbeatRequest": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "actionSequenceId": {
+            "type": "string",
+            "format": "uuid",
+            "nullable": true
+          },
+          "currentlyExecutedActionIndex": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "batteryLevel": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "cpuUtilisation": {
+            "type": "number",
+            "format": "double"
+          },
+          "ramUtilisation": {
+            "type": "number",
+            "format": "double"
+          }
+        },
+        "additionalProperties": false
+      },
       "DialogueModel": {
         "type": "object",
         "properties": {
@@ -1382,26 +1441,101 @@
         },
         "additionalProperties": false
       },
-      "GetNetAppStatusesResponse": {
+      "GetNetAppHeartbeatResponse": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "name": {
+            "type": "string",
+            "nullable": true
+          },
+          "hardLimit": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "optimalLimit": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "currentRobotsCount": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "timestamp": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "colour": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "GetNetAppsHeartbeatResponse": {
         "type": "object",
         "properties": {
           "netApps": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/NetAppStatusModel"
+              "$ref": "#/components/schemas/GetNetAppHeartbeatResponse"
             },
             "nullable": true
           }
         },
         "additionalProperties": false
       },
-      "GetRobotStatusesResponse": {
+      "GetRobotHeartbeatResponse": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "name": {
+            "type": "string",
+            "nullable": true
+          },
+          "actionSequenceId": {
+            "type": "string",
+            "format": "uuid",
+            "nullable": true
+          },
+          "currentlyExecutedActionIndex": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "batteryLevel": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "cpuUtilisation": {
+            "type": "number",
+            "format": "double"
+          },
+          "ramUtilisation": {
+            "type": "number",
+            "format": "double"
+          },
+          "timestamp": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "additionalProperties": false
+      },
+      "GetRobotsHeartbeatResponse": {
         "type": "object",
         "properties": {
           "robots": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/RobotStatusModel"
+              "$ref": "#/components/schemas/GetRobotHeartbeatResponse"
             },
             "nullable": true
           }
@@ -1619,9 +1753,6 @@
         "additionalProperties": false
       },
       "NetAppStatusModel": {
-        "required": [
-          "currentRobotsCount"
-        ],
         "type": "object",
         "properties": {
           "relations": {
@@ -1649,7 +1780,8 @@
           },
           "currentRobotsCount": {
             "type": "integer",
-            "format": "int32"
+            "format": "int32",
+            "nullable": true
           },
           "timestamp": {
             "type": "string",
@@ -1941,56 +2073,6 @@
           "simCardNumber": {
             "type": "string",
             "nullable": true
-          }
-        },
-        "additionalProperties": false
-      },
-      "RobotStatusModel": {
-        "required": [
-          "id"
-        ],
-        "type": "object",
-        "properties": {
-          "relations": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/RelationModel"
-            },
-            "nullable": true
-          },
-          "id": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "name": {
-            "type": "string",
-            "nullable": true
-          },
-          "actionSequenceId": {
-            "type": "string",
-            "format": "uuid",
-            "nullable": true
-          },
-          "currentlyExecutedActionIndex": {
-            "type": "integer",
-            "format": "int32",
-            "nullable": true
-          },
-          "batteryLevel": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "cpuUtilisation": {
-            "type": "number",
-            "format": "double"
-          },
-          "ramUtilisation": {
-            "type": "number",
-            "format": "double"
-          },
-          "timestamp": {
-            "type": "string",
-            "format": "date-time"
           }
         },
         "additionalProperties": false
