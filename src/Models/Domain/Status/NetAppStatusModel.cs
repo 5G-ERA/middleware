@@ -29,7 +29,6 @@ public class NetAppStatusModel : BaseModel
     /// <summary>
     ///     Number of robots the NetApp currently works for
     /// </summary>
-    [Required]
     public int? CurrentRobotsCount { get; set; }
 
     /// <summary>

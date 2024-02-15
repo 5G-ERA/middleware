@@ -98,7 +98,7 @@ public class RobotStatusDto : InfluxDto
         {
             Id = Guid.Parse(dto.Id.Replace(Prefix, "")),
             Name = dto.Name,
-            ActionSequenceId = Guid.Parse(dto.ActionSequenceId!),
+            ActionSequenceId = string.IsNullOrEmpty(dto.ActionSequenceId) ? null : Guid.Parse(dto.ActionSequenceId),
             CurrentlyExecutedActionIndex = dto.CurrentlyExecutedActionIndex,
             BatteryLevel = dto.BatteryLevel,
             CpuUtilisation = dto.CpuUtilisation,

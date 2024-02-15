@@ -1,6 +1,6 @@
-﻿namespace Middleware.Orchestrator.Models;
+﻿namespace Middleware.Orchestrator.Contracts.Requests;
 
-public class RobotStatusRequest
+public class CreateRobotHeartbeatRequest
 {
     public Guid Id { get; set; }
     

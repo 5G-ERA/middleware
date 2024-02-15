@@ -53,6 +53,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ResourcePlanner.Tests.Unit"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestCommon", "test\TestCommon\TestCommon.csproj", "{57C2F3D6-2621-424F-94B0-354E505C2D42}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Orchestrator.Contracts", "src\Orchestrator.Contracts\Orchestrator.Contracts.csproj", "{2633B743-E1BC-4014-B7F1-47FB7D6DE561}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -151,6 +153,10 @@ Global
 		{57C2F3D6-2621-424F-94B0-354E505C2D42}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{57C2F3D6-2621-424F-94B0-354E505C2D42}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{57C2F3D6-2621-424F-94B0-354E505C2D42}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2633B743-E1BC-4014-B7F1-47FB7D6DE561}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2633B743-E1BC-4014-B7F1-47FB7D6DE561}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2633B743-E1BC-4014-B7F1-47FB7D6DE561}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2633B743-E1BC-4014-B7F1-47FB7D6DE561}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -178,6 +184,7 @@ Global
 		{867BA738-ECDA-4211-878D-6221EB2C0D52} = {DC46C51D-7FF6-4D97-A265-F6AFCE56253D}
 		{EC6519DC-9F2B-49C9-B3C1-7174DE64FE58} = {DC46C51D-7FF6-4D97-A265-F6AFCE56253D}
 		{57C2F3D6-2621-424F-94B0-354E505C2D42} = {DC46C51D-7FF6-4D97-A265-F6AFCE56253D}
+		{2633B743-E1BC-4014-B7F1-47FB7D6DE561} = {96C1E2A9-733B-49C1-966F-C3B3C8102E09}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {A330B2DD-CDFB-4AD1-AFC0-430F33D039FB}
