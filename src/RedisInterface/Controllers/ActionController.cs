@@ -1,6 +1,6 @@
-﻿using System.Linq.Expressions;
-using System.Net;
+﻿using System.Net;
 using Microsoft.AspNetCore.Mvc;
+using Middleware.Common;
 using Middleware.Common.Attributes;
 using Middleware.Common.Enums;
 using Middleware.Common.Responses;
@@ -17,7 +17,7 @@ namespace Middleware.RedisInterface.Controllers;
 
 [Route("api/v1/[controller]")]
 [ApiController]
-public class ActionController : ControllerBase
+public class ActionController : MiddlewareController
 {
     private readonly IActionRepository _actionRepository;
     private readonly IActionPlanRepository _actionPlanRepository;
@@ -50,15 +50,14 @@ public class ActionController : ControllerBase
             List<ActionModel> models = await _actionRepository.GetAllAsync();
             if (models.Any() == false)
             {
-                return NotFound(new ApiResponse((int)HttpStatusCode.NotFound, "No actions were found."));
+                return ErrorMessageResponse(HttpStatusCode.NotFound, "action", "No actions were found.");
             }
             return Ok(models.ToActionsResponse());
         }
         catch (Exception ex)
         {
-            int statusCode = (int)HttpStatusCode.InternalServerError;
             _logger.LogError(ex, "An error occurred:");
-            return StatusCode(statusCode, new ApiResponse(statusCode, $"An error has occurred: {ex.Message}"));
+            return ErrorMessageResponse(HttpStatusCode.InternalServerError, "system", $"An error has occurred: {ex.Message}");
         }
     }
     
@@ -79,15 +78,14 @@ public class ActionController : ControllerBase
             ActionModel model = await _actionService.GetByIdAsync(id);
             if (model == null)
             {
-                return NotFound(new ApiResponse((int)HttpStatusCode.NotFound, $"Action with id: '{id}' was not found."));
+                return ErrorMessageResponse(HttpStatusCode.NotFound, nameof(id), $"Action with id: '{id}' was not found.");
             }
             return Ok(model.ToActionResponse());
         }
         catch (Exception ex)
         {
-            int statusCode = (int)HttpStatusCode.InternalServerError;
             _logger.LogError(ex, "An error occurred:");
-            return StatusCode(statusCode, new ApiResponse(statusCode, $"An error has occurred: {ex.Message}"));
+            return ErrorMessageResponse(HttpStatusCode.InternalServerError, "system", $"An error has occurred: {ex.Message}");
         }
     }
 
@@ -107,18 +105,15 @@ public class ActionController : ControllerBase
             var existingTask = await _actionRepository.FindSingleAsync(t=>t.Name == request.Name);
             if (existingTask is not null)
             {
-                return StatusCode((int)HttpStatusCode.BadRequest,
-                    new ApiResponse((int)HttpStatusCode.BadRequest,
-                        "Action with specified name already exists"));
+                return ErrorMessageResponse(HttpStatusCode.NotFound, "name", "Action with specified name already exists");
             }
             var action  = await _actionService.AddAsync(request.ToAction());
             return Ok(action.ToActionResponse());
         }
         catch (Exception ex)
         {
-            int statusCode = (int)HttpStatusCode.InternalServerError;
             _logger.LogError(ex, "An error occurred:");
-            return StatusCode(statusCode, new ApiResponse(statusCode, $"An error has occurred: {ex.Message}"));
+            return ErrorMessageResponse(HttpStatusCode.InternalServerError, "system", $"An error has occurred: {ex.Message}");
         }
     }
 
@@ -138,7 +133,7 @@ public class ActionController : ControllerBase
             var existingAction = await _actionService.GetByIdAsync(request.Id);
             if (existingAction is null)
             {
-                return NotFound(new ApiResponse((int)HttpStatusCode.NotFound, "Object to be updated was not found."));
+                return ErrorMessageResponse(HttpStatusCode.NotFound, nameof(request), "Object to be updated was not found.");
             }
 
             var action = request.ToAction();
@@ -149,9 +144,8 @@ public class ActionController : ControllerBase
         }
         catch (Exception ex)
         {
-            int statusCode = (int)HttpStatusCode.InternalServerError;
             _logger.LogError(ex, "An error occurred:");
-            return StatusCode(statusCode, new ApiResponse(statusCode, $"An error has occurred: {ex.Message}"));
+            return ErrorMessageResponse(HttpStatusCode.InternalServerError, "system", $"An error has occurred: {ex.Message}");
         }
     }
 
@@ -165,57 +159,55 @@ public class ActionController : ControllerBase
     [ProducesResponseType(typeof(void), (int)HttpStatusCode.OK)]
     [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.NotFound)]
     [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.InternalServerError)]
-    public async Task<ActionResult> DeleteByIdAsync(Guid id)
+    public async Task<IActionResult> DeleteByIdAsync(Guid id)
     {
         try
         {
             var exists = await _actionService.GetByIdAsync(id);
             if (exists is null)
             {
-                return NotFound(new ApiResponse((int)HttpStatusCode.NotFound, "The specified Action has not been found."));
+                return ErrorMessageResponse(HttpStatusCode.NotFound, nameof(id), "The specified Action was not found.");
             }
             await _actionService.DeleteAsync(id);
             return Ok();
         }
         catch (Exception ex)
         {
-            int statusCode = (int)HttpStatusCode.InternalServerError;
             _logger.LogError(ex, "An error occurred:");
-            return StatusCode(statusCode, new ApiResponse(statusCode, $"An error has occurred: {ex.Message}"));
+            return ErrorMessageResponse(HttpStatusCode.InternalServerError, "system", $"An error has occurred: {ex.Message}");
         }
     }
 
     /// <summary>
     /// Creates a new relation between two models
     /// </summary>
-    /// <param name="model"></param>
+    /// <param name="request"></param>
     /// <returns></returns>
     [HttpPost]
     [Route("AddRelation", Name = "ActionAddRelation")]
     [ProducesResponseType(typeof(RelationModel), (int)HttpStatusCode.OK)]
     [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.BadRequest)]
     [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.InternalServerError)]
-    public async Task<ActionResult<RelationModel>> AddRelationAsync([FromBody] RelationModel model)
+    public async Task<IActionResult> AddRelationAsync([FromBody] RelationModel request)
     {
-        if (model == null)
+        if (request == null)
         {
-            return BadRequest("Parameters were not specified.");
+            return ErrorMessageResponse(HttpStatusCode.NotFound, nameof(request), "The request body was not specified.");
         }
         try
         {
-            bool isValid = await _actionRepository.AddRelationAsync(model);
+            bool isValid = await _actionRepository.AddRelationAsync(request);
             if (!isValid)
             {
-                return StatusCode((int)HttpStatusCode.InternalServerError, new ApiResponse((int)HttpStatusCode.InternalServerError, "The relation was not created"));
+                return ErrorMessageResponse(HttpStatusCode.BadRequest, nameof(request), "The relation was not created");
             }
         }
         catch (Exception ex)
         {
-            int statusCode = (int)HttpStatusCode.InternalServerError;
             _logger.LogError(ex, "An error occurred:");
-            return StatusCode(statusCode, new ApiResponse(statusCode, $"An error has occurred: {ex.Message}"));
+            return ErrorMessageResponse(HttpStatusCode.InternalServerError, "system", $"An error has occurred: {ex.Message}");
         }
-        return Ok(model);
+        return Ok(request);
     }
 
     /// <summary>
@@ -235,16 +227,16 @@ public class ActionController : ControllerBase
 
         if (string.IsNullOrWhiteSpace(name))
         {
-            return BadRequest(new ApiResponse((int) HttpStatusCode.BadRequest, "Relation name not specified"));
+            return ErrorMessageResponse(HttpStatusCode.BadRequest, nameof(name), "Relation name not specified");
         }
         if (id == Guid.Empty)
         {
-            return BadRequest(new ApiResponse((int)HttpStatusCode.BadRequest, "Relation ID not specified"));
+            return ErrorMessageResponse(HttpStatusCode.BadRequest, nameof(id), "Relation ID not specified");
         }
 
         if (Enum.TryParse<RelationDirection>(direction, out var directionEnum) == false)
         {
-            return BadRequest(new ApiResponse((int)HttpStatusCode.BadRequest, "Wrong Relation direction specified"));
+            return ErrorMessageResponse(HttpStatusCode.BadRequest, nameof(direction), "Wrong Relation direction specified");
         }
         var inputDirection = directionEnum;
         try
@@ -252,15 +244,14 @@ public class ActionController : ControllerBase
             var relations = await _actionRepository.GetRelation(id, name, inputDirection);
             if (!relations.Any())
             {
-                return NotFound(new ApiResponse((int)HttpStatusCode.NotFound, "Relations were not found."));
+                return ErrorMessageResponse(HttpStatusCode.NotFound, "relation", "Relations were not found.");
             }
             return Ok(relations);
         }
         catch (Exception ex)
         {
-            int statusCode = (int)HttpStatusCode.InternalServerError;
             _logger.LogError(ex, "An error occurred:");
-            return StatusCode(statusCode, new ApiResponse(statusCode, $"An error has occurred: {ex.Message}"));
+            return ErrorMessageResponse(HttpStatusCode.InternalServerError, "system", $"An error has occurred: {ex.Message}");
         }
     }
 
@@ -284,15 +275,14 @@ public class ActionController : ControllerBase
             var relations = await _actionRepository.GetRelations(id, relationNames);
             if (!relations.Any())
             {
-                return NotFound(new ApiResponse((int)HttpStatusCode.NotFound, "Relations were not found"));
+                return ErrorMessageResponse(HttpStatusCode.NotFound, "relation", "Relations were not found.");
             }
             return Ok(relations);
         }
         catch (Exception ex)
         {
-            int statusCode = (int)HttpStatusCode.InternalServerError;
             _logger.LogError(ex, "An error occurred:");
-            return StatusCode(statusCode, new ApiResponse(statusCode, $"An error has occurred: {ex.Message}"));
+            return ErrorMessageResponse(HttpStatusCode.InternalServerError, "system", $"An error has occurred: {ex.Message}");
         }
     }
 
@@ -314,15 +304,14 @@ public class ActionController : ControllerBase
             var plans = await _actionPlanRepository.GetAllAsync();
             if (plans.Any() == false)
             {
-                return NotFound(new ApiResponse((int)HttpStatusCode.NotFound, "No plans have been found."));
+                return ErrorMessageResponse(HttpStatusCode.NotFound, "actionPlan", "No plans have been found.");
             }
             return Ok(plans);
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "An error occurred:");
-            int statusCode = (int)HttpStatusCode.InternalServerError;
-            return StatusCode(statusCode, new ApiResponse(statusCode, ex.Message));
+            return ErrorMessageResponse(HttpStatusCode.InternalServerError, "system", $"An error has occurred: {ex.Message}");
         }
     }
 
@@ -343,48 +332,42 @@ public class ActionController : ControllerBase
             var plan = await _actionPlanRepository.GetByIdAsync(id);
             if (plan == null)
             {
-                return NotFound(new ApiResponse((int)HttpStatusCode.NotFound, "Specified plan was not found."));
+                return ErrorMessageResponse(HttpStatusCode.NotFound, nameof(id), "Specified plan was not found.");
             }
             return Ok(plan);
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "An error occurred:");
-            int statusCode = (int)HttpStatusCode.InternalServerError;
-            return StatusCode(statusCode, new ApiResponse(statusCode, ex.Message));
+            return ErrorMessageResponse(HttpStatusCode.InternalServerError, "system", $"An error has occurred: {ex.Message}");
         }
     }
 
     /// <summary>
     /// Creates new ActionPlan
     /// </summary>
-    /// <param name="actionPlan"></param>
+    /// <param name="request"></param>
     /// <returns></returns>
     [HttpPost]
     [Route("plan", Name = "ActionPlanAdd")]
     [ProducesResponseType(typeof(ActionPlanModel), (int)HttpStatusCode.OK)]
     [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.BadRequest)]
     [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.InternalServerError)]
-    public async Task<IActionResult> AddActionPlanAsync(ActionPlanModel actionPlan)
+    public async Task<IActionResult> AddActionPlanAsync(ActionPlanModel request)
     {
         try
         {
-            if (actionPlan == null)
+            if (request == null)
             {
-                return BadRequest(new ApiResponse((int)HttpStatusCode.BadRequest, "Plan cannot be null"));
+                return ErrorMessageResponse(HttpStatusCode.NotFound, nameof(request), "Plan must be specified");
             }
-            var plan = await _actionPlanRepository.AddAsync(actionPlan, () => actionPlan.Id);
-            if (plan == null)
-            {
-                return BadRequest(new ApiResponse((int)HttpStatusCode.BadRequest, "The specified plan has not been added."));
-            }
+            var plan = await _actionPlanRepository.AddAsync(request, () => request.Id);
             return Ok(plan);
         }
         catch (Exception ex)
         {
-            int statusCode = (int)HttpStatusCode.InternalServerError;
             _logger.LogError(ex, "An error occurred:");
-            return StatusCode(statusCode, new ApiResponse(statusCode, $"An error has occurred: {ex.Message}"));
+            return ErrorMessageResponse(HttpStatusCode.InternalServerError, "system", $"An error has occurred: {ex.Message}");
         }
     }
 
@@ -405,15 +388,14 @@ public class ActionController : ControllerBase
             var deleted = await _actionPlanRepository.DeleteByIdAsync(id);
             if (deleted == false)
             {
-                return NotFound(new ApiResponse((int)HttpStatusCode.NotFound, "The specified plan has not been found."));
+                return ErrorMessageResponse(HttpStatusCode.NotFound, nameof(id), "The specified plan was not found.");
             }
             return Ok();
         }
         catch (Exception ex)
         {
-            int statusCode = (int)HttpStatusCode.InternalServerError;
             _logger.LogError(ex, "An error occurred:");
-            return StatusCode(statusCode, new ApiResponse(statusCode, $"An error has occurred: {ex.Message}"));
+            return ErrorMessageResponse(HttpStatusCode.InternalServerError, "system", $"An error has occurred: {ex.Message}");
         }
     }
 
@@ -435,12 +417,12 @@ public class ActionController : ControllerBase
         {
             if (actionPlan == null || id == Guid.Empty)
             {
-                return BadRequest(new ApiResponse((int)HttpStatusCode.BadRequest, "Id or updated object has not been specified"));
+                return ErrorMessageResponse(HttpStatusCode.BadRequest, nameof(id), "Id or updated object has not been specified");
             }
             var deleted = await _actionPlanRepository.DeleteByIdAsync(id);
             if (deleted == false)
             {
-                return NotFound(new ApiResponse((int)HttpStatusCode.NotFound, "The specified plan has not been found."));
+                return ErrorMessageResponse(HttpStatusCode.NotFound, nameof(id), "The specified plan was not found.");
             }
 
             var updatedPlan = await _actionPlanRepository.AddAsync(actionPlan, () => id);
@@ -448,42 +430,39 @@ public class ActionController : ControllerBase
         }
         catch (Exception ex)
         {
-            int statusCode = (int)HttpStatusCode.InternalServerError;
             _logger.LogError(ex, "An error occurred:");
-            return StatusCode(statusCode, new ApiResponse(statusCode, $"An error has occurred: {ex.Message}"));
+            return ErrorMessageResponse(HttpStatusCode.InternalServerError, "system", $"An error has occurred: {ex.Message}");
         }
     }
     /// <summary>
     /// Get action plan given robot Id.
     /// </summary>
-    /// <returns>List<ActionPlanModel></returns>
     [HttpGet]
-    [Route("plan/robot/{robotId}", Name = "GetActionPlanByRobotIdAsync")]
+    [Route("plan/robot/{id}", Name = "GetActionPlanByRobotIdAsync")]
     [ProducesResponseType(typeof(List<ActionPlanModel>), (int)HttpStatusCode.OK)]
     [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.NotFound)]
     [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.InternalServerError)]
-    public async Task<IActionResult> GetActionPlanByRobotIdAsync(Guid robotId)
+    public async Task<IActionResult> GetActionPlanByRobotIdAsync(Guid id)
     {
         try
         {
-            if (robotId == Guid.Empty)
+            if (id == Guid.Empty)
             {
-                return BadRequest(new ApiResponse((int)HttpStatusCode.BadRequest, "Robot id has not been specified"));
+                return ErrorMessageResponse(HttpStatusCode.BadRequest, nameof(id), "Robot id was not specified");
             }
             // Get list of actionPlans from specific robotId.
-            List<ActionPlanModel> actionPlans = await _actionPlanRepository.GetRobotActionPlans(robotId);
-            if (actionPlans == null)
+            List<ActionPlanModel> actionPlans = await _actionPlanRepository.GetRobotActionPlans(id);
+            if (actionPlans.Any() == false)
             {
-                return NotFound(new ApiResponse((int)HttpStatusCode.NotFound, "Object was not found."));
+                return ErrorMessageResponse(HttpStatusCode.NotFound, nameof(id), "No ActionPlans for robot were found");
             }
             //List<ActionPlanModel> activePoliciesRecords = actionPlans.Select(p => new ActionPlanModel(p.Id, p.Name, p.Description)).ToList();
             return Ok(actionPlans);
         }
         catch (Exception ex)
         {
-            int statusCode = (int)HttpStatusCode.InternalServerError;
             _logger.LogError(ex, "An error occurred:");
-            return StatusCode(statusCode, new ApiResponse(statusCode, $"An error has occurred: {ex.Message}"));
+            return ErrorMessageResponse(HttpStatusCode.InternalServerError, "system", $"An error has occurred: {ex.Message}");
         }
     }
     #endregion
@@ -491,26 +470,29 @@ public class ActionController : ControllerBase
     /// <summary>
     /// Get latest action plan given robot Id.
     /// </summary>
-    /// <returns>List<ActionPlanModel></returns>
     [HttpGet]
-    [Route("plan/robot/{robotId}/latest", Name = "GetLatestActionPlanByRobotIdAsync")]
+    [Route("plan/robot/{id}/latest", Name = "GetLatestActionPlanByRobotIdAsync")]
     [ProducesResponseType(typeof(ActionPlanModel), (int)HttpStatusCode.OK)]
+    [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.BadRequest)]
     [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.NotFound)]
     [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.InternalServerError)]
-    public async Task<IActionResult> GetLatestActionPlanByRobotIdAsync(Guid robotId)
+    public async Task<IActionResult> GetLatestActionPlanByRobotIdAsync(Guid id)
     {
         try
         {
-            if (robotId == Guid.Empty)
+            if (id == Guid.Empty)
             {
-                return BadRequest(new ApiResponse((int)HttpStatusCode.BadRequest, "Robot id has not been specified"));
+                return ErrorMessageResponse(HttpStatusCode.BadRequest, nameof(id), "Robot id was not specified");
             }
             // Get list of actionPlans from specific robotId.
-            List<ActionPlanModel> actionPlans = await _actionPlanRepository.GetRobotActionPlans(robotId);
-
+            List<ActionPlanModel> actionPlans = await _actionPlanRepository.GetRobotActionPlans(id);
+            if (actionPlans.Any() == false)
+            {
+                return ErrorMessageResponse(HttpStatusCode.NotFound, nameof(id), "No ActionPlans for robot were found");
+            }
             //Get the newest task of robot.
             Dictionary<ActionPlanModel, DateTime> tempDic = new Dictionary<ActionPlanModel, DateTime>();
-            Dictionary<ActionPlanModel, DateTime> OrderedTempDic = new Dictionary<ActionPlanModel, DateTime>();
+            Dictionary<ActionPlanModel, DateTime> orderedTempDic = new Dictionary<ActionPlanModel, DateTime>();
 
             // Complete tempDic
             foreach (ActionPlanModel plan in actionPlans)
@@ -523,24 +505,15 @@ public class ActionController : ControllerBase
             // Order a new dictionary
             foreach (KeyValuePair<ActionPlanModel, DateTime> pair in tempDic.OrderByDescending(p => p.Value))
             {
-                OrderedTempDic.Add(pair.Key, pair.Value);
+                orderedTempDic.Add(pair.Key, pair.Value);
             }
-
-            // Get last item which is the latest plan.
-            ActionPlanModel last = OrderedTempDic.Keys.First();
-
-            if (actionPlans == null)
-            {
-                return NotFound(new ApiResponse((int)HttpStatusCode.NotFound, "Object was not found."));
-            }
-            //List<ActionPlanModel> activePoliciesRecords = actionPlans.Select(p => new ActionPlanModel(p.Id, p.Name, p.Description)).ToList();
+            ActionPlanModel last = orderedTempDic.Keys.FirstOrDefault();
             return Ok(last);
         }
         catch (Exception ex)
         {
-            int statusCode = (int)HttpStatusCode.InternalServerError;
             _logger.LogError(ex, "An error occurred:");
-            return StatusCode(statusCode, new ApiResponse(statusCode, $"An error has occurred: {ex.Message}"));
+            return ErrorMessageResponse(HttpStatusCode.InternalServerError, "system", $"An error has occurred: {ex.Message}");
         }
     }
 
