@@ -7,7 +7,6 @@ using Middleware.Common;
 using Middleware.Common.Config;
 using Middleware.Common.Enums;
 using Middleware.Common.ExtensionMethods;
-using Middleware.DataAccess.Repositories.Abstract;
 using Middleware.Models.Domain;
 using Middleware.Models.Domain.Contracts;
 using Middleware.Models.ExtensionMethods;
@@ -31,14 +30,11 @@ internal class KubernetesObjectBuilder : IKubernetesObjectBuilder
     private readonly string _containerRegistryName;
 
     private readonly IEnvironment _env;
-    private readonly ISystemConfigRepository _systemConfigRepository;
 
-    public KubernetesObjectBuilder(IEnvironment env, IConfiguration config,
-        ISystemConfigRepository systemConfigRepository)
+    public KubernetesObjectBuilder(IEnvironment env, IConfiguration config)
     {
         _env = env;
         _config = config;
-        _systemConfigRepository = systemConfigRepository;
         _containerRegistryName = _env.GetEnvVariable("IMAGE_REGISTRY")?.TrimEnd('/') ?? "ghcr.io/5g-era";
     }
 
@@ -228,7 +224,7 @@ internal class KubernetesObjectBuilder : IKubernetesObjectBuilder
         var sanitized = deploymentStr.SanitizeAsK8SYaml();
         var obj = KubernetesYaml.Deserialize<V1Deployment>(sanitized);
 
-        if (obj is null) throw new UnableToParseYamlConfigException(name, nameof(ContainerImageModel.K8SService));
+        if (obj is null) throw new UnableToParseYamlConfigException(name, nameof(ContainerImageModel.K8SDeployment));
 
         obj.Metadata.SetServiceLabel(serviceInstanceId);
         obj.Metadata.Name = name.SanitizeAsK8sObjectName();
@@ -239,6 +235,7 @@ internal class KubernetesObjectBuilder : IKubernetesObjectBuilder
                 : new List<V1EnvVar>();
 
             envVars.Add(new("NETAPP_ID", serviceInstanceId.ToString()));
+            envVars.Add(new("NETAPP_NAME", name));
             envVars.Add(new("MIDDLEWARE_ADDRESS", "http://" + thisLocation.GetNetAppStatusReportAddress()));
             envVars.Add(new("MIDDLEWARE_REPORT_INTERVAL", ReportIntervalInSeconds.ToString()));
 
@@ -363,7 +360,7 @@ internal class KubernetesObjectBuilder : IKubernetesObjectBuilder
         ///     Do not remove, will be used to support ROS services
         /// </summary>
         [JsonPropertyName("services")]
-        public List<string> Services { get; set; } = new();
+        public List<string> Services { [UsedImplicitly]get; set; } = new();
     }
 }
 
