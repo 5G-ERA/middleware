@@ -1,5 +1,6 @@
 ﻿using System.Net;
 using Microsoft.AspNetCore.Mvc;
+using Middleware.Common;
 using Middleware.Common.Enums;
 using Middleware.Common.Responses;
 using Middleware.Models.Domain;
@@ -12,7 +13,7 @@ namespace Middleware.RedisInterface.Controllers;
 
 [Route("api/v1/[controller]")]
 [ApiController]
-public class SliceController : ControllerBase
+public class SliceController : MiddlewareController
 {
     private readonly ILogger<SliceController> _logger;
     private readonly ISliceService _sliceService;
@@ -40,9 +41,9 @@ public class SliceController : ControllerBase
         }
         catch (Exception ex)
         {
-            var statusCode = (int)HttpStatusCode.InternalServerError;
             _logger.LogError(ex, "An error occurred:");
-            return StatusCode(statusCode, new ApiResponse(statusCode, $"An error has occurred: {ex.Message}"));
+            return ErrorMessageResponse(HttpStatusCode.InternalServerError, "system",
+                $"An error has occurred: {ex.Message}");
         }
     }
 
@@ -83,9 +84,9 @@ public class SliceController : ControllerBase
         }
         catch (Exception ex)
         {
-            var statusCode = (int)HttpStatusCode.InternalServerError;
             _logger.LogError(ex, "An error occurred:");
-            return StatusCode(statusCode, new ApiResponse(statusCode, $"An error has occurred: {ex.Message}"));
+            return ErrorMessageResponse(HttpStatusCode.InternalServerError, "system",
+                $"An error has occurred: {ex.Message}");
         }
     }
 
@@ -97,14 +98,12 @@ public class SliceController : ControllerBase
     [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.InternalServerError)]
     public async Task<IActionResult> SliceGetById(Guid id)
     {
-        var statusCode = HttpStatusCode.InternalServerError;
         try
         {
             var slice = await _sliceService.GetByIdAsync(id);
             if (slice is null)
             {
-                statusCode = HttpStatusCode.NotFound;
-                return StatusCode((int)statusCode, new ApiResponse((int)statusCode, "Specified Slice was not found."));
+                return ErrorMessageResponse(HttpStatusCode.NotFound, nameof(id), $"Slice with id {id} was not found.");
             }
 
             var response = slice.ToSliceResponse();
@@ -114,8 +113,8 @@ public class SliceController : ControllerBase
         catch (Exception ex)
         {
             _logger.LogError(ex, "An error occurred:");
-            return StatusCode((int)statusCode,
-                new ApiResponse((int)statusCode, $"An error has occurred: {ex.Message}"));
+            return ErrorMessageResponse(HttpStatusCode.InternalServerError, "system",
+                $"An error has occurred: {ex.Message}");
         }
     }
 
@@ -127,14 +126,13 @@ public class SliceController : ControllerBase
     [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.InternalServerError)]
     public async Task<IActionResult> GetBySliceIdAsync(string id)
     {
-        var statusCode = HttpStatusCode.InternalServerError;
         try
         {
             var slice = await _sliceService.GetBySliceIdAsync(id);
             if (slice is null)
             {
-                statusCode = HttpStatusCode.NotFound;
-                return StatusCode((int)statusCode, new ApiResponse((int)statusCode, "Specified Slice was not found."));
+                return ErrorMessageResponse(HttpStatusCode.NotFound, nameof(id),
+                    $"Slice with id '{id}' was not found.");
             }
 
             var response = slice.ToSliceResponse();
@@ -144,8 +142,8 @@ public class SliceController : ControllerBase
         catch (Exception ex)
         {
             _logger.LogError(ex, "An error occurred:");
-            return StatusCode((int)statusCode,
-                new ApiResponse((int)statusCode, $"An error has occurred: {ex.Message}"));
+            return ErrorMessageResponse(HttpStatusCode.InternalServerError, "system",
+                $"An error has occurred: {ex.Message}");
         }
     }
 
@@ -168,24 +166,23 @@ public class SliceController : ControllerBase
         if (Enum.TryParse(direction, true, out RelationDirection directionEnum) == false)
         {
             var availableValues = Enum.GetValues(typeof(RelationDirection));
-            return StatusCode(400,
-                new ApiResponse(400,
-                    $"Specified parameter value direction='{direction}' is incorrect available values are: {string.Join(", ", availableValues)}"));
+            return ErrorMessageResponse(HttpStatusCode.BadRequest, nameof(direction),
+                $"Specified parameter value direction='{direction}' is incorrect available values are: {string.Join(", ", availableValues)}");
         }
-
 
         try
         {
             var relations = await _sliceService.GetRelationAsync(id, name, directionEnum);
             if (!relations.Any())
-                return NotFound(new ApiResponse((int)HttpStatusCode.NotFound, "Relations were not found."));
+                return ErrorMessageResponse(HttpStatusCode.NotFound, "relation", $"Relations were not found.");
+                
             return Ok(relations);
         }
         catch (Exception ex)
         {
-            var statusCode = (int)HttpStatusCode.InternalServerError;
             _logger.LogError(ex, "An error occurred:");
-            return StatusCode(statusCode, new ApiResponse(statusCode, $"An error has occurred: {ex.Message}"));
+            return ErrorMessageResponse(HttpStatusCode.InternalServerError, "system",
+                $"An error has occurred: {ex.Message}");
         }
     }
 
@@ -210,9 +207,9 @@ public class SliceController : ControllerBase
         }
         catch (Exception ex)
         {
-            var statusCode = (int)HttpStatusCode.InternalServerError;
             _logger.LogError(ex, "An error occurred:");
-            return StatusCode(statusCode, new ApiResponse(statusCode, $"An error has occurred: {ex.Message}"));
+            return ErrorMessageResponse(HttpStatusCode.InternalServerError, "system",
+                $"An error has occurred: {ex.Message}");
         }
     }
 
@@ -237,9 +234,9 @@ public class SliceController : ControllerBase
         }
         catch (Exception ex)
         {
-            var statusCode = (int)HttpStatusCode.InternalServerError;
             _logger.LogError(ex, "An error occurred:");
-            return StatusCode(statusCode, new ApiResponse(statusCode, $"An error has occurred: {ex.Message}"));
+            return ErrorMessageResponse(HttpStatusCode.InternalServerError, "system",
+                $"An error has occurred: {ex.Message}");
         }
     }
 
@@ -252,7 +249,8 @@ public class SliceController : ControllerBase
     {
         var existingSlice = await _sliceService.GetBySliceIdAsync(embbSlice.SliceId);
         if (existingSlice is null)
-            return NotFound(new ApiResponse((int)HttpStatusCode.NotFound, "Slice to be updated was not found."));
+            return ErrorMessageResponse(HttpStatusCode.NotFound, nameof(embbSlice.SliceId), $"Slice with id '{embbSlice.SliceId}' was not found.");
+            
         try
         {
             await _sliceService.SliceUpdateAsync(embbSlice.ToSlice(existingSlice.Id));
@@ -260,9 +258,9 @@ public class SliceController : ControllerBase
         }
         catch (Exception ex)
         {
-            var statusCode = (int)HttpStatusCode.InternalServerError;
             _logger.LogError(ex, "An error occurred:");
-            return StatusCode(statusCode, new ApiResponse(statusCode, $"An error has occurred: {ex.Message}"));
+            return ErrorMessageResponse(HttpStatusCode.InternalServerError, "system",
+                $"An error has occurred: {ex.Message}");
         }
     }
 
@@ -275,7 +273,7 @@ public class SliceController : ControllerBase
     {
         var existingSlice = await _sliceService.GetBySliceIdAsync(urllcSlice.SliceId);
         if (existingSlice is null)
-            return NotFound(new ApiResponse((int)HttpStatusCode.NotFound, "Slice to be updated was not found."));
+            return ErrorMessageResponse(HttpStatusCode.NotFound, nameof(urllcSlice.SliceId), $"Slice with id '{urllcSlice.SliceId}' was not found.");
         try
         {
             await _sliceService.SliceUpdateAsync(urllcSlice.ToSlice(existingSlice.Id));
@@ -283,9 +281,9 @@ public class SliceController : ControllerBase
         }
         catch (Exception ex)
         {
-            var statusCode = (int)HttpStatusCode.InternalServerError;
             _logger.LogError(ex, "An error occurred:");
-            return StatusCode(statusCode, new ApiResponse(statusCode, $"An error has occurred: {ex.Message}"));
+            return ErrorMessageResponse(HttpStatusCode.InternalServerError, "system",
+                $"An error has occurred: {ex.Message}");
         }
     }
 
@@ -295,7 +293,7 @@ public class SliceController : ControllerBase
     [ProducesResponseType(typeof(void), (int)HttpStatusCode.OK)]
     [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.NotFound)]
     [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.InternalServerError)]
-    public async Task<ActionResult> SliceDeleteEmbb(string id)
+    public async Task<IActionResult> SliceDeleteEmbb(string id)
     {
         try
         {
@@ -304,9 +302,9 @@ public class SliceController : ControllerBase
         }
         catch (Exception ex)
         {
-            var statusCode = (int)HttpStatusCode.InternalServerError;
             _logger.LogError(ex, "An error occurred:");
-            return StatusCode(statusCode, new ApiResponse(statusCode, $"An error has occurred: {ex.Message}"));
+            return ErrorMessageResponse(HttpStatusCode.InternalServerError, "system",
+                $"An error has occurred: {ex.Message}");
         }
     }
 
@@ -316,7 +314,7 @@ public class SliceController : ControllerBase
     [ProducesResponseType(typeof(void), (int)HttpStatusCode.OK)]
     [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.NotFound)]
     [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.InternalServerError)]
-    public async Task<ActionResult> SliceDeleteUrllc(string id)
+    public async Task<IActionResult> SliceDeleteUrllc(string id)
     {
         try
         {
@@ -325,9 +323,9 @@ public class SliceController : ControllerBase
         }
         catch (Exception ex)
         {
-            var statusCode = (int)HttpStatusCode.InternalServerError;
             _logger.LogError(ex, "An error occurred:");
-            return StatusCode(statusCode, new ApiResponse(statusCode, $"An error has occurred: {ex.Message}"));
+            return ErrorMessageResponse(HttpStatusCode.InternalServerError, "system",
+                $"An error has occurred: {ex.Message}");
         }
     }
 }

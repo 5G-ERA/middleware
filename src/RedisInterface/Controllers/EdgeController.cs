@@ -1,5 +1,6 @@
 ﻿using System.Net;
 using Microsoft.AspNetCore.Mvc;
+using Middleware.Common;
 using Middleware.Common.Attributes;
 using Middleware.Common.Enums;
 using Middleware.Common.Responses;
@@ -17,7 +18,7 @@ namespace Middleware.RedisInterface.Controllers;
 
 [Route("api/v1/[controller]")]
 [ApiController]
-public class EdgeController : ControllerBase
+public class EdgeController : MiddlewareController
 {
     private readonly ILocationRepository _locationRepository;
     private readonly ILogger _logger;
@@ -43,16 +44,16 @@ public class EdgeController : ControllerBase
             var edgeType = LocationType.Edge.ToString();
             var models = await _locationRepository.FindAsync(e => e.Type == edgeType);
             if (models.Any() == false)
-                return NotFound(new ApiResponse((int)HttpStatusCode.NotFound, "Objects were not found."));
+                return ErrorMessageResponse(HttpStatusCode.NotFound, "edge", "No Edges were found");
 
             var response = models.ToEdgesResponse();
             return Ok(response);
         }
         catch (Exception ex)
         {
-            var statusCode = (int)HttpStatusCode.InternalServerError;
             _logger.LogError(ex, "An error occurred:");
-            return StatusCode(statusCode, new ApiResponse(statusCode, $"An error has occurred: {ex.Message}"));
+            return ErrorMessageResponse(HttpStatusCode.InternalServerError, "system",
+                $"An error has occurred: {ex.Message}");
         }
     }
 
@@ -70,18 +71,21 @@ public class EdgeController : ControllerBase
     {
         try
         {
+            var idStr = id.ToString();
+            var type = LocationType.Edge.ToString();
             var model = await _locationRepository.FindSingleAsync(e =>
-                e.Id == id.ToString() && e.Type == LocationType.Edge.ToString());
-            if (model == null) return NotFound(new ApiResponse((int)HttpStatusCode.NotFound, "Object was not found."));
+                e.Id == idStr && e.Type == type);
+            if (model == null)
+                return ErrorMessageResponse(HttpStatusCode.NotFound, nameof(id), $"Edge with specified id: {id} was not found");
 
             var response = model.ToEdgeResponse();
             return Ok(response);
         }
         catch (Exception ex)
         {
-            var statusCode = (int)HttpStatusCode.InternalServerError;
             _logger.LogError(ex, "An error occurred:");
-            return StatusCode(statusCode, new ApiResponse(statusCode, $"An error has occurred: {ex.Message}"));
+            return ErrorMessageResponse(HttpStatusCode.InternalServerError, "system",
+                $"An error has occurred: {ex.Message}");
         }
     }
 
@@ -97,7 +101,7 @@ public class EdgeController : ControllerBase
     public async Task<IActionResult> AddAsync([FromBody] EdgeRequest request)
     {
         if (request == null)
-            return BadRequest(new ApiResponse((int)HttpStatusCode.BadRequest, "Parameters were not specified."));
+            return ErrorMessageResponse(HttpStatusCode.NotFound, nameof(request), "Request body was not specified");
 
         try
         {
@@ -105,16 +109,12 @@ public class EdgeController : ControllerBase
             var existingLoc = await _locationRepository.GetByNameAsync(model.Name);
             if (existingLoc is not null)
             {
-                return StatusCode((int)HttpStatusCode.BadRequest,
-                    new ApiResponse((int)HttpStatusCode.BadRequest,
-                        "Location with specified name already exists"));
+                return ErrorMessageResponse(HttpStatusCode.BadRequest, nameof(request.Name), "Location with specified name already exists");
             }
             var edge = await _locationRepository.AddAsync(model);
             if (edge is null)
             {
-                return StatusCode((int)HttpStatusCode.InternalServerError,
-                    new ApiResponse((int)HttpStatusCode.NotFound,
-                        "Problem while adding the Edge to the data store"));
+                return ErrorMessageResponse(HttpStatusCode.BadRequest, nameof(request), "Problem while adding the Edge to the data store");
             }
 
             var response = edge.ToEdgeResponse();
@@ -122,9 +122,9 @@ public class EdgeController : ControllerBase
         }
         catch (Exception ex)
         {
-            var statusCode = (int)HttpStatusCode.InternalServerError;
             _logger.LogError(ex, "An error occurred:");
-            return StatusCode(statusCode, new ApiResponse(statusCode, $"An error has occurred: {ex.Message}"));
+            return ErrorMessageResponse(HttpStatusCode.InternalServerError, "system",
+                $"An error has occurred: {ex.Message}");
         }
     }
 
@@ -136,14 +136,14 @@ public class EdgeController : ControllerBase
     [HttpPut]
     [Route("{id}", Name = "EdgePatch")]
     [ProducesResponseType(typeof(EdgeResponse), (int)HttpStatusCode.OK)]
+    [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.BadRequest)]
     [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.NotFound)]
     [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.InternalServerError)]
     public async Task<IActionResult> PatchEdgeAsync([FromMultiSource] UpdateEdgeRequest request)
     {
         if (request is null)
         {
-            return BadRequest(new ApiResponse((int)HttpStatusCode.BadRequest,
-                "Parameters were not specified or wrongly specified."));
+            return ErrorMessageResponse(HttpStatusCode.BadRequest, nameof(request), "Request body was not specified");
         }
 
         try
@@ -152,8 +152,7 @@ public class EdgeController : ControllerBase
             var exists = await _locationRepository.GetByIdAsync(edge.Id);
             if (exists is null)
             {
-                return NotFound(
-                    new ApiResponse((int)HttpStatusCode.NotFound, "Object to be updated was not found."));
+                return ErrorMessageResponse(HttpStatusCode.NotFound, nameof(request.Id), "Object to be updated was not found.");
             }
 
             await _locationRepository.UpdateAsync(edge);
@@ -162,9 +161,9 @@ public class EdgeController : ControllerBase
         }
         catch (Exception ex)
         {
-            var statusCode = (int)HttpStatusCode.InternalServerError;
             _logger.LogError(ex, "An error occurred:");
-            return StatusCode(statusCode, new ApiResponse(statusCode, $"An error has occurred: {ex.Message}"));
+            return ErrorMessageResponse(HttpStatusCode.InternalServerError, "system",
+                $"An error has occurred: {ex.Message}");
         }
     }
 
@@ -185,15 +184,13 @@ public class EdgeController : ControllerBase
         {
             if (id == Guid.Empty)
             {
-                return NotFound(new ApiResponse((int)HttpStatusCode.NotFound,
-                    "The id cannot be empty"));
+                return ErrorMessageResponse(HttpStatusCode.BadRequest, nameof(id), "The id cannot be empty");
             }
 
             var exists = await _locationRepository.GetByIdAsync(id);
             if (exists is null)
             {
-                return NotFound(new ApiResponse((int)HttpStatusCode.NotFound,
-                    "The specified Edge has not been found."));
+                return ErrorMessageResponse(HttpStatusCode.NotFound, nameof(id), "The specified Edge has not been found.");
             }
 
             await _locationRepository.DeleteByIdAsync(id);
@@ -201,44 +198,43 @@ public class EdgeController : ControllerBase
         }
         catch (Exception ex)
         {
-            var statusCode = (int)HttpStatusCode.InternalServerError;
             _logger.LogError(ex, "An error occurred:");
-            return StatusCode(statusCode, new ApiResponse(statusCode, $"An error has occurred: {ex.Message}"));
+            return ErrorMessageResponse(HttpStatusCode.InternalServerError, "system",
+                $"An error has occurred: {ex.Message}");
         }
     }
 
     /// <summary>
     ///     Creates a new relation between two models
     /// </summary>
-    /// <param name="model"></param>
+    /// <param name="request"></param>
     /// <returns></returns>
     [HttpPost]
     [Route("AddRelation", Name = "EdgeAddRelation")]
     [ProducesResponseType(typeof(RelationModel), (int)HttpStatusCode.OK)]
     [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.BadRequest)]
     [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.InternalServerError)]
-    public async Task<ActionResult<RelationModel>> AddRelationAsync([FromBody] RelationModel model)
+    public async Task<IActionResult> AddRelationAsync([FromBody] RelationModel request)
     {
-        if (model == null)
-            return BadRequest(new ApiResponse((int)HttpStatusCode.BadRequest, "Parameters were not specified."));
+        if (request == null)
+            return ErrorMessageResponse(HttpStatusCode.BadRequest, nameof(request), "Request body was not specified");
 
         try
         {
-            var isValid = await _locationRepository.AddRelationAsync(model);
+            var isValid = await _locationRepository.AddRelationAsync(request);
             if (!isValid)
             {
-                return StatusCode((int)HttpStatusCode.InternalServerError,
-                    new ApiResponse((int)HttpStatusCode.InternalServerError, "The relation was not created"));
+                return ErrorMessageResponse(HttpStatusCode.BadRequest, nameof(request), "The relation was not created");
             }
         }
         catch (Exception ex)
         {
-            var statusCode = (int)HttpStatusCode.InternalServerError;
             _logger.LogError(ex, "An error occurred:");
-            return StatusCode(statusCode, new ApiResponse(statusCode, $"An error has occurred: {ex.Message}"));
+            return ErrorMessageResponse(HttpStatusCode.InternalServerError, "system",
+                $"An error has occurred: {ex.Message}");
         }
 
-        return Ok(model);
+        return Ok(request);
     }
 
     /// <summary>
@@ -246,6 +242,7 @@ public class EdgeController : ControllerBase
     /// </summary>
     /// <param name="id"></param>
     /// <param name="name"></param>
+    /// <param name="direction"></param>
     /// <returns></returns>
     [HttpGet]
     [Route("relation/{name}", Name = "EdgeGetRelationByName")]
@@ -255,26 +252,27 @@ public class EdgeController : ControllerBase
     public async Task<IActionResult> GetRelationAsync(Guid id, string name, string direction = "Outgoing")
     {
         if (string.IsNullOrWhiteSpace(name))
-            return BadRequest(new ApiResponse((int)HttpStatusCode.BadRequest, "Relation name not specified"));
+            return ErrorMessageResponse(HttpStatusCode.BadRequest, nameof(name), "Relation name not specified");
+        
         if (id == Guid.Empty)
-            return BadRequest(new ApiResponse((int)HttpStatusCode.BadRequest, "Relation ID not specified"));
-        RelationDirection directionEnum;
-        if (Enum.TryParse(direction, out directionEnum) == false)
-            return BadRequest(new ApiResponse((int)HttpStatusCode.BadRequest, "Wrong Relation direction specified"));
+            return ErrorMessageResponse(HttpStatusCode.BadRequest, nameof(id), "Edge Id was not specified");
+        
+        if (Enum.TryParse(direction, out RelationDirection directionEnum) == false)
+            return ErrorMessageResponse(HttpStatusCode.BadRequest, nameof(direction), "Wrong Relation direction specified");
         var inputDirection = directionEnum;
         try
         {
             var relations = await _locationRepository.GetRelation(id, name, inputDirection);
             if (!relations.Any())
-                return NotFound(new ApiResponse((int)HttpStatusCode.NotFound, "Relations were not found."));
+                return ErrorMessageResponse(HttpStatusCode.NotFound, "relation", "Relation was not found");
 
             return Ok(relations);
         }
         catch (Exception ex)
         {
-            var statusCode = (int)HttpStatusCode.InternalServerError;
             _logger.LogError(ex, "An error occurred:");
-            return StatusCode(statusCode, new ApiResponse(statusCode, $"An error has occurred: {ex.Message}"));
+            return ErrorMessageResponse(HttpStatusCode.InternalServerError, "system",
+                $"An error has occurred: {ex.Message}");
         }
     }
 
@@ -297,16 +295,15 @@ public class EdgeController : ControllerBase
             var relationNames = new List<string> { firstName, secondName };
             var relations = await _locationRepository.GetRelations(id, relationNames);
             if (!relations.Any())
-                return NotFound(new ApiResponse((int)HttpStatusCode.NotFound, "Relations were not found"));
-
+                return ErrorMessageResponse(HttpStatusCode.NotFound, "relation", "Relations were not found");
 
             return Ok(relations);
         }
         catch (Exception ex)
         {
-            var statusCode = (int)HttpStatusCode.InternalServerError;
             _logger.LogError(ex, "An error occurred:");
-            return StatusCode(statusCode, new ApiResponse(statusCode, $"An error has occurred: {ex.Message}"));
+            return ErrorMessageResponse(HttpStatusCode.InternalServerError, "system",
+                $"An error has occurred: {ex.Message}");
         }
     }
 
@@ -316,18 +313,17 @@ public class EdgeController : ControllerBase
     [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.NotFound)]
     [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.BadRequest)]
     [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.InternalServerError)]
-    public async Task<IActionResult> GetFreeEdgesIdsAsync(List<EdgeModel> edgesToCheck)
+    public async Task<IActionResult> GetFreeEdgesIdsAsync(List<EdgeModel> request)
     {
         try
         {
-            if (!edgesToCheck.Any())
-                return BadRequest(new ApiResponse((int)HttpStatusCode.BadRequest, "No Edge ids were provided"));
+            if (!request.Any())
+                return ErrorMessageResponse(HttpStatusCode.BadRequest, nameof(request), "Request body was not specified");
 
-            var edgeFree = await _locationRepository.FilterFreeLocationsAsync(edgesToCheck.ToLocations());
+            var edgeFree = await _locationRepository.FilterFreeLocationsAsync(request.ToLocations());
             if (!edgeFree.Any())
             {
-                return NotFound(new ApiResponse((int)HttpStatusCode.BadRequest,
-                    "There are no edges connected to the Robot"));
+                return ErrorMessageResponse(HttpStatusCode.NotFound, nameof(request), "There are no edges connected to the Robot");
             }
 
             var response = edgeFree.ToEdgesResponse();
@@ -335,9 +331,9 @@ public class EdgeController : ControllerBase
         }
         catch (Exception ex)
         {
-            var statusCode = (int)HttpStatusCode.InternalServerError;
             _logger.LogError(ex, "An error occurred:");
-            return StatusCode(statusCode, new ApiResponse(statusCode, $"An error has occurred: {ex.Message}"));
+            return ErrorMessageResponse(HttpStatusCode.InternalServerError, "system",
+                $"An error has occurred: {ex.Message}");
         }
     }
 
@@ -347,25 +343,25 @@ public class EdgeController : ControllerBase
     [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.NotFound)]
     [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.BadRequest)]
     [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.InternalServerError)]
-    public async Task<IActionResult> GetLessBusyEdgesAsync(List<EdgeModel> edgesToCheck)
+    public async Task<IActionResult> GetLessBusyEdgesAsync(List<EdgeModel> request)
     {
         try
         {
-            if (!edgesToCheck.Any())
-                return BadRequest(new ApiResponse((int)HttpStatusCode.BadRequest, "No Edge ids were provided"));
+            if (!request.Any())
+                return ErrorMessageResponse(HttpStatusCode.BadRequest, nameof(request), "Request body was not specified");
 
-            var lessBusyEdge = await _locationRepository.OrderLocationsByUtilizationAsync(edgesToCheck.ToLocations());
+            var lessBusyEdge = await _locationRepository.OrderLocationsByUtilizationAsync(request.ToLocations());
             if (!lessBusyEdge.Any())
-                return NotFound(new ApiResponse((int)HttpStatusCode.BadRequest, "There are no busy edges"));
+                return ErrorMessageResponse(HttpStatusCode.NotFound, "edges", "There are no busy edges");
 
             var response = lessBusyEdge.ToEdgesResponse();
             return Ok(response);
         }
         catch (Exception ex)
         {
-            var statusCode = (int)HttpStatusCode.InternalServerError;
             _logger.LogError(ex, "An error occurred:");
-            return StatusCode(statusCode, new ApiResponse(statusCode, $"An error has occurred: {ex.Message}"));
+            return ErrorMessageResponse(HttpStatusCode.InternalServerError, "system",
+                $"An error has occurred: {ex.Message}");
         }
     }
 
@@ -380,41 +376,41 @@ public class EdgeController : ControllerBase
         {
             var edgeResource = await _locationRepository.GetByNameAsync(name);
             if (edgeResource is null)
-                return NotFound(new ApiResponse((int)HttpStatusCode.NotFound, "Object was not found."));
+                return ErrorMessageResponse(HttpStatusCode.NotFound, nameof(name), "Edge with specified name was not found.");
 
             var response = edgeResource.ToEdgeResponse();
             return Ok(response);
         }
         catch (Exception ex)
         {
-            var statusCode = (int)HttpStatusCode.InternalServerError;
             _logger.LogError(ex, "An error occurred:");
-            return StatusCode(statusCode, new ApiResponse(statusCode, $"An error has occurred: {ex.Message}"));
+            return ErrorMessageResponse(HttpStatusCode.InternalServerError, "system",
+                $"An error has occurred: {ex.Message}");
         }
     }
 
     /// <summary>
     ///     Check if a edge is busy by Id.
     /// </summary>
-    /// <param name="edgeId"></param>
+    /// <param name="id"></param>
     /// <returns>bool</returns>
     [HttpGet]
     [Route("{id}/busy", Name = "IsBusyEdgeById")]
     [ProducesResponseType(typeof(bool), (int)HttpStatusCode.OK)]
     [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.NotFound)]
     [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.InternalServerError)]
-    public async Task<ActionResult<bool>> IsBusyEdgeById(Guid edgeId)
+    public async Task<IActionResult> IsBusyEdgeById(Guid id)
     {
         try
         {
-            var busy = await _locationRepository.IsBusyAsync(edgeId);
+            var busy = await _locationRepository.IsBusyAsync(id);
             return Ok(busy);
         }
         catch (Exception ex)
         {
-            var statusCode = (int)HttpStatusCode.InternalServerError;
             _logger.LogError(ex, "An error occurred:");
-            return StatusCode(statusCode, new ApiResponse(statusCode, $"An error has occurred: {ex.Message}"));
+            return ErrorMessageResponse(HttpStatusCode.InternalServerError, "system",
+                $"An error has occurred: {ex.Message}");
         }
     }
 
@@ -437,9 +433,9 @@ public class EdgeController : ControllerBase
         }
         catch (Exception ex)
         {
-            var statusCode = (int)HttpStatusCode.InternalServerError;
             _logger.LogError(ex, "An error occurred:");
-            return StatusCode(statusCode, new ApiResponse(statusCode, $"An error has occurred: {ex.Message}"));
+            return ErrorMessageResponse(HttpStatusCode.InternalServerError, "system",
+                $"An error has occurred: {ex.Message}");
         }
     }
 
@@ -447,7 +443,7 @@ public class EdgeController : ControllerBase
     /// <summary>
     ///     Returns the number of containers that are deployed in a cloud entity base on cloud Id.
     /// </summary>
-    /// <param name="edgeId"></param>
+    /// <param name="id"></param>
     /// <returns>int</returns>
     [HttpGet]
     [Route("{id}/containers/count", Name = "GetNumEdgeContainersById")]
@@ -455,18 +451,18 @@ public class EdgeController : ControllerBase
     [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.NotFound)]
     [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.BadRequest)]
     [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.InternalServerError)]
-    public async Task<IActionResult> GetNumEdgeContainersById(Guid edgeId)
+    public async Task<IActionResult> GetNumEdgeContainersById(Guid id)
     {
         try
         {
-            var countContainers = await _locationRepository.GetDeployedInstancesCountAsync(edgeId);
+            var countContainers = await _locationRepository.GetDeployedInstancesCountAsync(id);
             return Ok(countContainers);
         }
         catch (Exception ex)
         {
-            var statusCode = (int)HttpStatusCode.InternalServerError;
             _logger.LogError(ex, "An error occurred:");
-            return StatusCode(statusCode, new ApiResponse(statusCode, $"An error has occurred: {ex.Message}"));
+            return ErrorMessageResponse(HttpStatusCode.InternalServerError, "system",
+                $"An error has occurred: {ex.Message}");
         }
     }
 
@@ -482,7 +478,7 @@ public class EdgeController : ControllerBase
     [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.NotFound)]
     [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.BadRequest)]
     [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.InternalServerError)]
-    public async Task<ActionResult<int>> GetNumEdgeContainersByName(string edgeName)
+    public async Task<IActionResult> GetNumEdgeContainersByName(string edgeName)
     {
         try
         {
@@ -491,9 +487,9 @@ public class EdgeController : ControllerBase
         }
         catch (Exception ex)
         {
-            var statusCode = (int)HttpStatusCode.InternalServerError;
             _logger.LogError(ex, "An error occurred:");
-            return StatusCode(statusCode, new ApiResponse(statusCode, $"An error has occurred: {ex.Message}"));
+            return ErrorMessageResponse(HttpStatusCode.InternalServerError, "system",
+                $"An error has occurred: {ex.Message}");
         }
     }
 }

@@ -1,5 +1,6 @@
 ﻿using System.Net;
 using Microsoft.AspNetCore.Mvc;
+using Middleware.Common;
 using Middleware.Common.Attributes;
 using Middleware.Common.Enums;
 using Middleware.Common.Responses;
@@ -15,7 +16,7 @@ namespace Middleware.RedisInterface.Controllers;
 
 [Route("api/v1/[controller]")]
 [ApiController]
-public class InstanceController : ControllerBase
+public class InstanceController : MiddlewareController
 {
     private readonly IInstanceRepository _instanceRepository;
     private readonly ILogger _logger;
@@ -40,16 +41,16 @@ public class InstanceController : ControllerBase
         {
             var models = await _instanceRepository.GetAllAsync();
             if (models.Any() == false)
-                return NotFound(new ApiResponse((int)HttpStatusCode.NotFound, "Objects were not found."));
+                return ErrorMessageResponse(HttpStatusCode.NotFound, "instance", $"No instances found");
 
             var response = models.ToInstancesResponse();
             return Ok(response);
         }
         catch (Exception ex)
         {
-            var statusCode = (int)HttpStatusCode.InternalServerError;
             _logger.LogError(ex, "An error occurred:");
-            return StatusCode(statusCode, new ApiResponse(statusCode, $"An error has occurred: {ex.Message}"));
+            return ErrorMessageResponse(HttpStatusCode.InternalServerError, "system",
+                $"An error has occurred: {ex.Message}");
         }
     }
 
@@ -59,7 +60,7 @@ public class InstanceController : ControllerBase
     /// <param name="id"></param>
     /// <returns> the InstanceModel entity for the specified id </returns>
     [HttpGet]
-    [Route("{id}", Name = "InstanceGetById")]
+    [Route("{id:guid}", Name = "InstanceGetById")]
     [ProducesResponseType(typeof(InstanceResponse), (int)HttpStatusCode.OK)]
     [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.NotFound)]
     [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.InternalServerError)]
@@ -68,16 +69,17 @@ public class InstanceController : ControllerBase
         try
         {
             var model = await _instanceRepository.GetByIdAsync(id);
-            if (model == null) return NotFound(new ApiResponse((int)HttpStatusCode.NotFound, "Object was not found."));
+            if (model == null)
+                return ErrorMessageResponse(HttpStatusCode.NotFound, nameof(id), $"Instance with id {id} not found");
 
             var response = model.ToInstanceResponse();
             return Ok(response);
         }
         catch (Exception ex)
         {
-            var statusCode = (int)HttpStatusCode.InternalServerError;
             _logger.LogError(ex, "An error occurred:");
-            return StatusCode(statusCode, new ApiResponse(statusCode, $"An error has occurred: {ex.Message}"));
+            return ErrorMessageResponse(HttpStatusCode.InternalServerError, "system",
+                $"An error has occurred: {ex.Message}");
         }
     }
 
@@ -92,23 +94,23 @@ public class InstanceController : ControllerBase
     [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.InternalServerError)]
     public async Task<IActionResult> AddAsync([FromBody] InstanceRequest request)
     {
-        if (request == null) return BadRequest("Parameters were not specified.");
+        if (request == null)
+            return ErrorMessageResponse(HttpStatusCode.BadRequest, nameof(request), "Request body was not specified.");
         try
         {
             var model = request.ToInstance();
-            var existingInstance = await _instanceRepository.FindSingleAsync(i=>i.Name == model.Name);
+            var existingInstance = await _instanceRepository.FindSingleAsync(i => i.Name == model.Name);
             if (existingInstance is not null)
             {
-                return StatusCode((int)HttpStatusCode.BadRequest,
-                    new ApiResponse((int)HttpStatusCode.BadRequest,
-                        "Instance with specified name already exists"));
+                return ErrorMessageResponse(HttpStatusCode.BadRequest, nameof(request.Name),
+                    "Instance with specified name already exists");
             }
+
             var instance = await _instanceRepository.AddAsync(model);
             if (instance is null)
             {
-                return StatusCode((int)HttpStatusCode.InternalServerError,
-                    new ApiResponse((int)HttpStatusCode.InternalServerError,
-                        "Could not add the instance to the data store"));
+                return ErrorMessageResponse(HttpStatusCode.BadRequest, nameof(request),
+                    $"Could not add the instance to the data store.");
             }
 
             var response = instance.ToInstanceResponse();
@@ -116,17 +118,16 @@ public class InstanceController : ControllerBase
         }
         catch (Exception ex)
         {
-            var statusCode = (int)HttpStatusCode.InternalServerError;
             _logger.LogError(ex, "An error occurred:");
-            return StatusCode(statusCode, new ApiResponse(statusCode, $"An error has occurred: {ex.Message}"));
+            return ErrorMessageResponse(HttpStatusCode.InternalServerError, "system",
+                $"An error has occurred: {ex.Message}");
         }
     }
 
     /// <summary>
     ///     Partially update an existing InstanceModel entity
     /// </summary>
-    /// <param name="patch"></param>
-    /// <param name="id"></param>
+    /// <param name="request"></param>
     /// <returns> the modified InstanceModel entity </returns>
     [HttpPut]
     [Route("{id}", Name = "InstancePatch")]
@@ -140,16 +141,18 @@ public class InstanceController : ControllerBase
             var model = request.ToInstance();
             var exists = await _instanceRepository.GetByIdAsync(model.Id);
             if (exists is null)
-                return NotFound(new ApiResponse((int)HttpStatusCode.NotFound, "Object to be updated was not found."));
+                return ErrorMessageResponse(HttpStatusCode.NotFound, nameof(request.Id),
+                    $"Instance with id {request.Id} not found");
+
             await _instanceRepository.UpdateAsync(model);
             var response = model.ToInstanceResponse();
             return Ok(response);
         }
         catch (Exception ex)
         {
-            var statusCode = (int)HttpStatusCode.InternalServerError;
             _logger.LogError(ex, "An error occurred:");
-            return StatusCode(statusCode, new ApiResponse(statusCode, $"An error has occurred: {ex.Message}"));
+            return ErrorMessageResponse(HttpStatusCode.InternalServerError, "system",
+                $"An error has occurred: {ex.Message}");
         }
     }
 
@@ -169,80 +172,81 @@ public class InstanceController : ControllerBase
         {
             var exists = await _instanceRepository.GetByIdAsync(id);
             if (exists is null)
-                return NotFound(new ApiResponse((int)HttpStatusCode.NotFound,
-                    "The specified Instance has not been found."));
+                return ErrorMessageResponse(HttpStatusCode.NotFound, nameof(id), $"Instance with id {id} not found");
+
             await _instanceRepository.DeleteByIdAsync(id);
             return Ok();
         }
         catch (Exception ex)
         {
-            var statusCode = (int)HttpStatusCode.InternalServerError;
             _logger.LogError(ex, "An error occurred:");
-            return StatusCode(statusCode, new ApiResponse(statusCode, $"An error has occurred: {ex.Message}"));
+            return ErrorMessageResponse(HttpStatusCode.InternalServerError, "system",
+                $"An error has occurred: {ex.Message}");
         }
     }
 
     /// <summary>
     ///     Creates a new relation between two models
     /// </summary>
-    /// <param name="model"></param>
+    /// <param name="request"></param>
     /// <returns></returns>
     [HttpPost]
     [Route("AddRelation", Name = "InstanceAddRelation")]
     [ProducesResponseType(typeof(RelationModel), (int)HttpStatusCode.OK)]
     [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.BadRequest)]
     [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.InternalServerError)]
-    public async Task<ActionResult<RelationModel>> AddRelationAsync([FromBody] RelationModel model)
+    public async Task<IActionResult> AddRelationAsync([FromBody] RelationModel request)
     {
-        if (model == null)
-            return BadRequest(new ApiResponse((int)HttpStatusCode.BadRequest, "Parameters were not specified."));
+        if (request == null)
+            return ErrorMessageResponse(HttpStatusCode.BadRequest, nameof(request), $"Request body was not specified.");
+
         try
         {
-            var isValid = await _instanceRepository.AddRelationAsync(model);
+            var isValid = await _instanceRepository.AddRelationAsync(request);
             if (!isValid)
-                return StatusCode((int)HttpStatusCode.InternalServerError,
-                    new ApiResponse((int)HttpStatusCode.NotFound, "The relation was not created"));
+                return ErrorMessageResponse(HttpStatusCode.BadRequest, nameof(request),
+                    $"The relation was not created.");
         }
         catch (Exception ex)
         {
-            var statusCode = (int)HttpStatusCode.InternalServerError;
             _logger.LogError(ex, "An error occurred:");
-            return StatusCode(statusCode, new ApiResponse(statusCode, $"An error has occurred: {ex.Message}"));
+            return ErrorMessageResponse(HttpStatusCode.InternalServerError, "system",
+                $"An error has occurred: {ex.Message}");
         }
 
-        return Ok(model);
+        return Ok(request);
     }
 
 
     /// <summary>
     ///     Deletes a new relation between two models
     /// </summary>
-    /// <param name="model"></param>
+    /// <param name="request"></param>
     /// <returns></returns>
     [HttpDelete]
     [Route("DeleteRelation", Name = "InstanceDeleteRelation")]
     [ProducesResponseType(typeof(RelationModel), (int)HttpStatusCode.OK)]
     [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.BadRequest)]
     [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.InternalServerError)]
-    public async Task<IActionResult> DeleteRelationAsync([FromBody] RelationModel model)
+    public async Task<IActionResult> DeleteRelationAsync([FromBody] RelationModel request)
     {
-        if (model == null)
-            return BadRequest(new ApiResponse((int)HttpStatusCode.BadRequest, "Parameters were not specified."));
+        if (request == null)
+            return ErrorMessageResponse(HttpStatusCode.BadRequest, nameof(request), $"Request body was not specified.");
+
         try
         {
-            var isValid = await _instanceRepository.DeleteRelationAsync(model);
+            var isValid = await _instanceRepository.DeleteRelationAsync(request);
             if (!isValid)
             {
-                _logger.LogWarning("An error occurred:");
-                return StatusCode((int)HttpStatusCode.InternalServerError,
-                    new ApiResponse((int)HttpStatusCode.NotFound, "The relation was not deleted"));
+                return ErrorMessageResponse(HttpStatusCode.BadRequest, nameof(request),
+                    $"The relation was not deleted");
             }
         }
         catch (Exception ex)
         {
-            var statusCode = (int)HttpStatusCode.InternalServerError;
             _logger.LogError(ex, "An error occurred:");
-            return StatusCode(statusCode, new ApiResponse(statusCode, $"An error has occurred: {ex.Message}"));
+            return ErrorMessageResponse(HttpStatusCode.InternalServerError, "system",
+                $"An error has occurred: {ex.Message}");
         }
 
         return Ok();
@@ -253,6 +257,7 @@ public class InstanceController : ControllerBase
     /// </summary>
     /// <param name="id"></param>
     /// <param name="name"></param>
+    /// <param name="direction"></param>
     /// <returns></returns>
     [HttpGet]
     [Route("relation/{name}", Name = "InstanceGetRelationByName")]
@@ -263,30 +268,34 @@ public class InstanceController : ControllerBase
     {
         if (string.IsNullOrWhiteSpace(name))
         {
-            return BadRequest(new ApiResponse((int)HttpStatusCode.BadRequest, "Relation name not specified"));
+            return ErrorMessageResponse(HttpStatusCode.BadRequest, nameof(name), $"The relation was not specified.");
         }
+
         if (id == Guid.Empty)
         {
-            return BadRequest(new ApiResponse((int)HttpStatusCode.BadRequest, "Relation ID not specified"));
+            return ErrorMessageResponse(HttpStatusCode.BadRequest, nameof(id), $"Instance ID not specified.");
         }
-        RelationDirection directionEnum;
-        if (Enum.TryParse<RelationDirection>(direction, out directionEnum) == false)
+
+        if (Enum.TryParse<RelationDirection>(direction, out var directionEnum) == false)
         {
-            return BadRequest(new ApiResponse((int)HttpStatusCode.BadRequest, "Wrong Relation direction specified"));
+            return ErrorMessageResponse(HttpStatusCode.BadRequest, nameof(direction),
+                $"Wrong Relation direction specified");
         }
+
         var inputDirection = directionEnum;
         try
         {
             var relations = await _instanceRepository.GetRelation(id, name, inputDirection);
             if (!relations.Any())
-                return NotFound(new ApiResponse((int)HttpStatusCode.NotFound, "Relations were not found."));
+                return ErrorMessageResponse(HttpStatusCode.NotFound, "relation", $"The relation was not found.");
+
             return Ok(relations);
         }
         catch (Exception ex)
         {
-            var statusCode = (int)HttpStatusCode.InternalServerError;
             _logger.LogError(ex, "An error occurred:");
-            return StatusCode(statusCode, new ApiResponse(statusCode, $"An error has occurred: {ex.Message}"));
+            return ErrorMessageResponse(HttpStatusCode.InternalServerError, "system",
+                $"An error has occurred: {ex.Message}");
         }
     }
 
@@ -309,21 +318,22 @@ public class InstanceController : ControllerBase
             var relationNames = new List<string> { firstName, secondName };
             var relations = await _instanceRepository.GetRelations(id, relationNames);
             if (!relations.Any())
-                return NotFound(new ApiResponse((int)HttpStatusCode.NotFound, "Relations were not found"));
+                return ErrorMessageResponse(HttpStatusCode.NotFound, "relations", $"The relations were not found.");
+
             return Ok(relations);
         }
         catch (Exception ex)
         {
-            var statusCode = (int)HttpStatusCode.InternalServerError;
             _logger.LogError(ex, "An error occurred:");
-            return StatusCode(statusCode, new ApiResponse(statusCode, $"An error has occurred: {ex.Message}"));
+            return ErrorMessageResponse(HttpStatusCode.InternalServerError, "system",
+                $"An error has occurred: {ex.Message}");
         }
     }
 
     /// <summary>
     ///     Return alternative instance of the same instance family of the provided Instance Id.
     /// </summary>
-    /// <param name="instanceId"></param>
+    /// <param name="id"></param>
     /// <returns>InstanceModel</returns>
     [HttpGet]
     [Route("alternative/{id}", Name = "InstanceGetAlternative")]
@@ -333,21 +343,22 @@ public class InstanceController : ControllerBase
     public async Task<IActionResult> FindAlternativeInstance(Guid id)
     {
         if (id == Guid.Empty)
-            return BadRequest(new ApiResponse((int)HttpStatusCode.BadRequest, "Parameters were not specified."));
+            return ErrorMessageResponse(HttpStatusCode.BadRequest, nameof(id), $"Instance ID not specified.");
+
         try
         {
             var alternativeInstance = await _instanceRepository.FindAlternativeInstance(id);
             if (alternativeInstance == null)
-                return NotFound(new ApiResponse((int)HttpStatusCode.NotFound, "Object to be updated was not found."));
+                return ErrorMessageResponse(HttpStatusCode.BadRequest, nameof(id), $"No alternative instance found.");
 
             var response = alternativeInstance.ToInstanceResponse();
             return Ok(response);
         }
         catch (Exception ex)
         {
-            var statusCode = (int)HttpStatusCode.InternalServerError;
             _logger.LogError(ex, "An error occurred:");
-            return StatusCode(statusCode, new ApiResponse(statusCode, $"An error has occurred: {ex.Message}"));
+            return ErrorMessageResponse(HttpStatusCode.InternalServerError, "system",
+                $"An error has occurred: {ex.Message}");
         }
     }
 }

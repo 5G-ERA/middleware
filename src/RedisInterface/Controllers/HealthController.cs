@@ -1,11 +1,12 @@
 ﻿using System.Net;
 using Microsoft.AspNetCore.Mvc;
+using Middleware.Common;
 
 namespace Middleware.RedisInterface.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class HealthController : ControllerBase
+    public class HealthController : MiddlewareController
     {
         private readonly HttpClient _client;
 
