@@ -40,9 +40,9 @@ public class RobotStatusDto : InfluxDto
         }
 
         // static properties of all objects
-        var objName = fluxTables[0].Records[0].GetValueByKey(ObjectType).ToString();
-        var objId = fluxTables[0].Records[0].GetValueByKey("Id").ToString();
-        var objTimestamp = fluxTables[0].Records[0].GetTimeInDateTime();
+        var objName = fluxTables[0].Records[0].GetValueByKey(ObjectType)?.ToString();
+        var objId = fluxTables[0].Records[0].GetValueByKey("Id")?.ToString();
+        var objTimestamp = fluxTables[0].Records[0]?.GetTimeInDateTime();
 
         if (objName == null || objId == null || objTimestamp == null)
         {
