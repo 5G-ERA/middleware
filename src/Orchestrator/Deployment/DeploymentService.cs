@@ -78,7 +78,8 @@ internal class DeploymentService : IDeploymentService
     }
 
     /// <inheritdoc />
-    public V1Service CreateStartupService(string serviceImageName, K8SServiceKind kind, V1ObjectMeta meta, int? nodePort = null)
+    public V1Service CreateStartupService(string serviceImageName, K8SServiceKind kind, V1ObjectMeta meta,
+        int? nodePort = null)
     {
         return _kubeObjectBuilder.CreateStartupService(serviceImageName, kind, meta, nodePort);
     }
@@ -218,10 +219,11 @@ internal class DeploymentService : IDeploymentService
                     await _publisher.PublishGatewayAddNetAppEntryAsync(thisLocation, pair.Name, actionPlan.Id,
                         pair.InstanceId);
                     var address = thisLocation.GetNetAppAddress(pair.Name);
-                    if (address.StartsWith("http"))
+                    if (address.StartsWith("http") == false)
                     {
                         address = "http://" + address;
                     }
+
                     pair.Instance!.SetNetAppAddress(address);
                 }
 
@@ -246,10 +248,11 @@ internal class DeploymentService : IDeploymentService
             foreach (var pair in deploymentPairs)
             {
                 var address = thisLocation.GetNetAppAddress(interRelay.Name);
-                if (address.StartsWith("http"))
+                if (address.StartsWith("http") == false)
                 {
                     address = "http://" + address;
                 }
+
                 pair.Instance!.SetNetAppAddress(address);
             }
 
@@ -301,10 +304,11 @@ internal class DeploymentService : IDeploymentService
                 {
                     var netAppAddress = location.GetNetAppAddress(relay.Name);
                     _logger.LogDebug("{netAppName} NetApp address to be set: {address}", pair.Name, netAppAddress);
-                    if (netAppAddress.StartsWith("http"))
+                    if (netAppAddress.StartsWith("http") == false)
                     {
                         netAppAddress = "http://" + netAppAddress;
                     }
+
                     pair.Instance!.SetNetAppAddress(netAppAddress);
                 }
             }
@@ -323,10 +327,11 @@ internal class DeploymentService : IDeploymentService
                             pair.InstanceId);
                         var netAppAddress = location.GetNetAppAddress(pair.Name);
                         _logger.LogDebug("NetApp address to be set: {address}", netAppAddress);
-                        if (netAppAddress.StartsWith("http"))
+                        if (netAppAddress.StartsWith("http") == false)
                         {
                             netAppAddress = "http://" + netAppAddress;
                         }
+
                         pair.Instance!.SetNetAppAddress(netAppAddress);
                     }
 
@@ -486,10 +491,10 @@ internal class DeploymentService : IDeploymentService
     {
         _logger.LogDebug("Retrieving location details (cloud or edge) for type {type}, name: {name}", type.ToString(),
             name);
-        return (await _redisInterfaceClient.GetLocationByNameAsync(_mwConfig.Value.InstanceName)).ToLocation(); 
-            // type == LocationType.Cloud
-            // ? (await _redisInterfaceClient.GetCloudByNameAsync(name)).ToCloud()
-            // : (await _redisInterfaceClient.GetEdgeByNameAsync(name)).ToEdge();
+        return (await _redisInterfaceClient.GetLocationByNameAsync(_mwConfig.Value.InstanceName)).ToLocation();
+        // type == LocationType.Cloud
+        // ? (await _redisInterfaceClient.GetCloudByNameAsync(name)).ToCloud()
+        // : (await _redisInterfaceClient.GetEdgeByNameAsync(name)).ToEdge();
     }
 
     /// <summary>
@@ -535,7 +540,7 @@ internal class DeploymentService : IDeploymentService
                 instance.Services,
                 instance.Transforms,
                 instance.Actions);
-            
+
             deployment = builder.EnableRosCommunication(deployment, rosSpec);
         }
 
