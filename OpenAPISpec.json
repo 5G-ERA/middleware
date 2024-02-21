@@ -6272,7 +6272,7 @@
                 }
             }
         },
-        "/data/action/plan/robot/{robotid}": {
+        "/data/action/plan/robot/{id}": {
             "get": {
                 "tags": [
                     "Action"
@@ -6280,7 +6280,7 @@
                 "operationId": "GetActionPlanByRobotIdAsync",
                 "parameters": [
                     {
-                        "name": "robotId",
+                        "name": "id",
                         "in": "path",
                         "required": true,
                         "schema": {
@@ -6362,7 +6362,7 @@
                 }
             }
         },
-        "/data/action/plan/robot/{robotid}/latest": {
+        "/data/action/plan/robot/{id}/latest": {
             "get": {
                 "tags": [
                     "Action"
@@ -6370,7 +6370,7 @@
                 "operationId": "GetLatestActionPlanByRobotIdAsync",
                 "parameters": [
                     {
-                        "name": "robotId",
+                        "name": "id",
                         "in": "path",
                         "required": true,
                         "schema": {
@@ -6396,6 +6396,26 @@
                             "text/json": {
                                 "schema": {
                                     "$ref": "#/components/schemas/ActionPlanModel"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "content": {
+                            "text/plain": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                }
+                            },
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                }
+                            },
+                            "text/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
                                 }
                             }
                         }
@@ -9648,6 +9668,26 @@
                             }
                         }
                     },
+                    "400": {
+                        "description": "Bad Request",
+                        "content": {
+                            "text/plain": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                }
+                            },
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                }
+                            },
+                            "text/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                }
+                            }
+                        }
+                    },
                     "404": {
                         "description": "Not Found",
                         "content": {
@@ -10397,19 +10437,12 @@
                 "operationId": "IsBusyEdgeById",
                 "parameters": [
                     {
-                        "name": "edgeId",
-                        "in": "query",
-                        "schema": {
-                            "type": "string",
-                            "format": "uuid"
-                        }
-                    },
-                    {
                         "name": "id",
                         "in": "path",
                         "required": true,
                         "schema": {
-                            "type": "string"
+                            "type": "string",
+                            "format": "uuid"
                         }
                     }
                 ],
@@ -10565,19 +10598,12 @@
                 "operationId": "GetNumEdgeContainersById",
                 "parameters": [
                     {
-                        "name": "edgeId",
-                        "in": "query",
-                        "schema": {
-                            "type": "string",
-                            "format": "uuid"
-                        }
-                    },
-                    {
                         "name": "id",
                         "in": "path",
                         "required": true,
                         "schema": {
-                            "type": "string"
+                            "type": "string",
+                            "format": "uuid"
                         }
                     }
                 ],
@@ -14087,7 +14113,7 @@
                 }
             }
         },
-        "/data/robot/{robotid}/edges/connected": {
+        "/data/robot/{id}/edges/connected": {
             "get": {
                 "tags": [
                     "Robot"
@@ -14095,7 +14121,7 @@
                 "operationId": "RobotGetConnectedEdgesIds",
                 "parameters": [
                     {
-                        "name": "robotId",
+                        "name": "id",
                         "in": "path",
                         "required": true,
                         "schema": {
@@ -14188,7 +14214,7 @@
                 }
             }
         },
-        "/data/robot/{robotid}/clouds/connected": {
+        "/data/robot/{id}/clouds/connected": {
             "get": {
                 "tags": [
                     "Robot"
@@ -14196,7 +14222,7 @@
                 "operationId": "RobotGetConnectedCloudsIds",
                 "parameters": [
                     {
-                        "name": "robotId",
+                        "name": "id",
                         "in": "path",
                         "required": true,
                         "schema": {
@@ -15747,6 +15773,26 @@
                     },
                     "404": {
                         "description": "Not Found",
+                        "content": {
+                            "text/plain": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                }
+                            },
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                }
+                            },
+                            "text/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
                         "content": {
                             "text/plain": {
                                 "schema": {
