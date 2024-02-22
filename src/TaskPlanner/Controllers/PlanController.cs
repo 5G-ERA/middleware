@@ -72,7 +72,7 @@ public class PlanController : ControllerBase
             }
 
             if (dryRun)
-                return Ok(resourcePlan);
+                return Ok(resourcePlan.Task);
 
             await _publishService.PublishPlanAsync(resourcePlan.Task, robot2);
 
