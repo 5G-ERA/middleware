@@ -78,7 +78,8 @@ internal class DeploymentService : IDeploymentService
     }
 
     /// <inheritdoc />
-    public V1Service CreateStartupService(string serviceImageName, K8SServiceKind kind, V1ObjectMeta meta, int? nodePort = null)
+    public V1Service CreateStartupService(string serviceImageName, K8SServiceKind kind, V1ObjectMeta meta,
+        int? nodePort = null)
     {
         return _kubeObjectBuilder.CreateStartupService(serviceImageName, kind, meta, nodePort);
     }
@@ -217,7 +218,13 @@ internal class DeploymentService : IDeploymentService
                 {
                     await _publisher.PublishGatewayAddNetAppEntryAsync(thisLocation, pair.Name, actionPlan.Id,
                         pair.InstanceId);
-                    pair.Instance!.SetNetAppAddress($"http://{thisLocation.GetNetAppAddress(pair.Name)}");
+                    var address = thisLocation.GetNetAppAddress(pair.Name);
+                    if (address.StartsWith("http") == false)
+                    {
+                        address = "http://" + address;
+                    }
+
+                    pair.Instance!.SetNetAppAddress(address);
                 }
 
                 _logger.LogDebug("Adding new relation between instance and current location");
@@ -240,7 +247,13 @@ internal class DeploymentService : IDeploymentService
 
             foreach (var pair in deploymentPairs)
             {
-                pair.Instance!.SetNetAppAddress($"http://{thisLocation.GetNetAppAddress(interRelay.Name)}");
+                var address = thisLocation.GetNetAppAddress(interRelay.Name);
+                if (address.StartsWith("http") == false)
+                {
+                    address = "http://" + address;
+                }
+
+                pair.Instance!.SetNetAppAddress(address);
             }
 
             await _publisher.PublishGatewayAddNetAppEntryAsync(thisLocation, interRelay.Name, actionPlanId, action.Id);
@@ -291,7 +304,12 @@ internal class DeploymentService : IDeploymentService
                 {
                     var netAppAddress = location.GetNetAppAddress(relay.Name);
                     _logger.LogDebug("{netAppName} NetApp address to be set: {address}", pair.Name, netAppAddress);
-                    pair.Instance!.SetNetAppAddress($"http://{netAppAddress}");
+                    if (netAppAddress.StartsWith("http") == false)
+                    {
+                        netAppAddress = "http://" + netAppAddress;
+                    }
+
+                    pair.Instance!.SetNetAppAddress(netAppAddress);
                 }
             }
 
@@ -309,7 +327,12 @@ internal class DeploymentService : IDeploymentService
                             pair.InstanceId);
                         var netAppAddress = location.GetNetAppAddress(pair.Name);
                         _logger.LogDebug("NetApp address to be set: {address}", netAppAddress);
-                        pair.Instance!.SetNetAppAddress($"http://{netAppAddress}");
+                        if (netAppAddress.StartsWith("http") == false)
+                        {
+                            netAppAddress = "http://" + netAppAddress;
+                        }
+
+                        pair.Instance!.SetNetAppAddress(netAppAddress);
                     }
 
                     _logger.LogDebug("Adding new relation between instance and current location");
@@ -468,10 +491,10 @@ internal class DeploymentService : IDeploymentService
     {
         _logger.LogDebug("Retrieving location details (cloud or edge) for type {type}, name: {name}", type.ToString(),
             name);
-        return (await _redisInterfaceClient.GetLocationByNameAsync(_mwConfig.Value.InstanceName)).ToLocation(); 
-            // type == LocationType.Cloud
-            // ? (await _redisInterfaceClient.GetCloudByNameAsync(name)).ToCloud()
-            // : (await _redisInterfaceClient.GetEdgeByNameAsync(name)).ToEdge();
+        return (await _redisInterfaceClient.GetLocationByNameAsync(_mwConfig.Value.InstanceName)).ToLocation();
+        // type == LocationType.Cloud
+        // ? (await _redisInterfaceClient.GetCloudByNameAsync(name)).ToCloud()
+        // : (await _redisInterfaceClient.GetEdgeByNameAsync(name)).ToEdge();
     }
 
     /// <summary>
@@ -517,7 +540,7 @@ internal class DeploymentService : IDeploymentService
                 instance.Services,
                 instance.Transforms,
                 instance.Actions);
-            
+
             deployment = builder.EnableRosCommunication(deployment, rosSpec);
         }
 

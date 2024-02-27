@@ -67,7 +67,7 @@ public class PlanController : MiddlewareController
                 return ErrorMessageResponse(HttpStatusCode.BadRequest, nameof(request), $"Error while preparing ResourcePlan: {resourcePlan.Error}");
 
             if (dryRun)
-                return Ok(resourcePlan);
+                return Ok(resourcePlan.Task);
 
             await _publishService.PublishPlanAsync(resourcePlan.Task, robot2);
 

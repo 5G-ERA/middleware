@@ -107,9 +107,11 @@ internal class ResourceBasedLocation : ILocationSelectionPolicy
 
                 score += (int)latScore * (int)hwClaim.Latency.Priority;
             }
-
-            //location with the highest score must be the best
-            scores.Add(loc, score);
+            
+            if (score > 0)
+            {
+                scores.Add(loc, score);    
+            }
         }
 
         KeyValuePair<Location, int>? maxScore = null;
@@ -120,7 +122,6 @@ internal class ResourceBasedLocation : ILocationSelectionPolicy
         }
 
         if (maxScore is null) return null;
-
         FoundMatchingLocation = true;
         var finalLoc = maxScore.Value.Key;
         var hwSpec = new HardwareSpec
