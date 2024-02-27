@@ -47,7 +47,7 @@ public class LocationsControllerTests
         var location = "myOrganization";
         _locationService.GetAvailableLocations(location).Returns(new NotFound());
         // act
-        var result = (NotFoundResult)await _sut.GetAvailableLocations(location);
+        var result = (NotFoundObjectResult)await _sut.GetAvailableLocations(location);
         // assert
         result.StatusCode.Should().Be(404);
     }

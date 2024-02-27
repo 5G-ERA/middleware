@@ -1,5 +1,6 @@
 ﻿using System.Net;
 using Microsoft.AspNetCore.Mvc;
+using Middleware.Common;
 using Middleware.Common.Responses;
 using Middleware.Models.Domain;
 using Middleware.Orchestrator.Deployment;
@@ -9,7 +10,7 @@ namespace Middleware.Orchestrator.Controllers;
 
 [ApiController]
 [Route("api/v1/[controller]")]
-public class OrchestrateController : Controller
+public class OrchestrateController : MiddlewareController
 {
     private readonly IDeploymentService _deploymentService;
     private readonly ILogger _logger;
@@ -27,38 +28,34 @@ public class OrchestrateController : Controller
     /// <summary>
     ///     Request orchestration of the resources defied in the plan
     /// </summary>
-    /// <param name="task"></param>
+    /// <param name="request"></param>
     /// <returns></returns>
     [HttpPost]
     [Route("plan", Name = "InstantiateNewPlan")]
     [ProducesResponseType(typeof(TaskModel), (int)HttpStatusCode.OK)]
     [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.InternalServerError)]
-    public async Task<IActionResult> InstantiateNewPlan([FromBody] OrchestratorResourceInput task)
+    public async Task<IActionResult> InstantiateNewPlan([FromBody] OrchestratorResourceInput request)
     {
-        var statusCode = (int)HttpStatusCode.BadRequest;
-        if (task is null) return BadRequest("Plan is not specified");
-
+        if (request is null)
+            return ErrorMessageResponse(HttpStatusCode.BadRequest, nameof(request), "Plan is not specified");
         try
         {
-            statusCode = (int)HttpStatusCode.OK;
-            var result = await _deploymentService.DeployActionPlanAsync(task.Task, task.Robot.Id);
+            var result = await _deploymentService.DeployActionPlanAsync(request.Task, request.Robot.Id);
             if (result == false)
             {
-                statusCode = (int)HttpStatusCode.InternalServerError;
                 //TODO: provide more detailed information on what went wrong with the deployment of the task
-                return StatusCode(statusCode,
-                    new ApiResponse(statusCode, "There was a problem while deploying the task instance"));
+                return ErrorMessageResponse(HttpStatusCode.BadRequest, "plan",
+                    "There was a problem while deploying the task instance");
             }
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "There was a problem while deploying the task instance: {task}", task);
-            statusCode = (int)HttpStatusCode.InternalServerError;
-            return StatusCode(statusCode,
-                new ApiResponse(statusCode, $"There was a problem while deploying the task instance: {ex.Message}"));
+            _logger.LogError(ex, "There was a problem while deploying the task instance: {task}", request);
+            return ErrorMessageResponse(HttpStatusCode.BadRequest, "plan",
+                $"There was a problem while deploying the task instance: {ex.Message}");
         }
 
-        return Ok(task);
+        return Ok(request);
     }
 
     /// <summary>
@@ -136,34 +133,23 @@ public class OrchestrateController : Controller
     [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.NotFound)]
     [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.BadRequest)]
     [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.InternalServerError)]
-    public async Task<ActionResult> DeletePlanById(Guid id)
+    public async Task<IActionResult> DeletePlanById(Guid id)
     {
         if (id == Guid.Empty)
-            return BadRequest(new ApiResponse((int)HttpStatusCode.BadRequest, "Id of the plan  has to be specified"));
-
+            return ErrorMessageResponse(HttpStatusCode.BadRequest, nameof(id), "Id of the plan must be specified");
         try
         {
             var actionPlan = await _redisInterfaceClient.ActionPlanGetByIdAsync(id);
             if (actionPlan is null)
             {
-                return NotFound(new ApiResponse((int)HttpStatusCode.NotFound,
-                    $"Could not find the Action Plan with specified id: {id}"));
+                return ErrorMessageResponse(HttpStatusCode.NotFound, nameof(id),
+                    $"Could not find the Action Plan with specified id: {id}");
             }
 
             var isSuccess = await _deploymentService.DeletePlanAsync(actionPlan);
-
-
-            ////Delete the relationship OWNS between the robot for the task that has been completed.
-            //var tempRobotObject = (await _redisInterfaceClient.RobotGetByIdAsync(actionPlan.RobotId)).ToRobot();
-            //var tempTaskObject = (await _redisInterfaceClient.TaskGetByIdAsync(actionPlan.TaskId)).ToTask();
-
-            //await _redisInterfaceClient.DeleteRelationAsync(tempRobotObject, tempTaskObject, "OWNS");
-
             if (isSuccess == false)
             {
-                var statusCode = (int)HttpStatusCode.BadRequest;
-                return StatusCode(statusCode,
-                    new ApiResponse(statusCode, $"Unable to delete the services for the action plan with id {id}"));
+                return ErrorMessageResponse(HttpStatusCode.BadRequest, "plan", $"Unable to delete the services for the action plan with id {id}");
             }
 
             await _redisInterfaceClient.ActionPlanDeleteAsync(id);
@@ -172,9 +158,7 @@ public class OrchestrateController : Controller
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error while deleting the specified action plan with id {id}", id);
-            var statusCode = (int)HttpStatusCode.InternalServerError;
-            return StatusCode(statusCode,
-                new ApiResponse(statusCode, $"Could not delete the action plan with id: {id}"));
+            return ErrorMessageResponse(HttpStatusCode.BadRequest, "plan", $"Could not delete the action plan with id: {id}");
         }
     }
 

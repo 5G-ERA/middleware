@@ -25,7 +25,7 @@ public class RobotService : IRobotService
     public async Task <List<string>>CreateRelation(RelationToLocationRequest data)
     {
         List<LocationNames> relGraph2s = data.Locations;
-        // check if name of robot can be retreived
+        // check if name of robot can be retrieved
         var robotName = await GetRobotNameByIdAsync(data.RobotId);
         if (robotName == null)
             throw new ArgumentNullException(nameof(robotName));

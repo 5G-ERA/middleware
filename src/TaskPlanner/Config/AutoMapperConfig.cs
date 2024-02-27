@@ -10,6 +10,8 @@ using InstanceModel = Middleware.Models.Domain.InstanceModel;
 using KeyValuePair = Middleware.Models.Domain.KeyValuePair;
 using RelationModel = Middleware.Models.Domain.RelationModel;
 using RobotModel = Middleware.Models.Domain.RobotModel;
+using RosNodeModel = Middleware.Models.Domain.Ros.RosNodeModel;
+using RosServiceModel = Middleware.Models.Domain.Ros.RosServiceModel;
 using RosTopicModel = Middleware.Models.Domain.Ros.RosTopicModel;
 using SensorModel = Middleware.Models.Domain.SensorModel;
 using TaskModel = Middleware.Models.Domain.TaskModel;
@@ -35,9 +37,9 @@ public static class AutoMapperConfig
             cfg.CreateMap<InstanceModel, ResourcePlanner.InstanceModel>().ReverseMap();
             cfg.CreateMap<RobotModel, ResourcePlanner.RobotModel>().ReverseMap();
 
-            cfg.CreateMap<RosNodeModel, ROSNodeModel>().ReverseMap();
+            cfg.CreateMap<RosNodeModel, ResourcePlanner.RosNodeModel>().ReverseMap();
             cfg.CreateMap<RosTopicModel, ResourcePlanner.RosTopicModel>().ReverseMap();
-            cfg.CreateMap<RosServiceModel, ROSServiceModel>().ReverseMap();
+            cfg.CreateMap<RosServiceModel, ResourcePlanner.RosServiceModel>().ReverseMap();
             cfg.CreateMap<SensorModel, ResourcePlanner.SensorModel>().ReverseMap();
             cfg.CreateMap<ActuatorModel, ResourcePlanner.ActuatorModel>().ReverseMap();
             //cfg.CreateMap<ManipulatorModel, ResourcePlanner.RobotManipulatorModel>().ReverseMap();

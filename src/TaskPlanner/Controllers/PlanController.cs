@@ -1,6 +1,7 @@
 ﻿using System.Net;
 using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
+using Middleware.Common;
 using Middleware.TaskPlanner.ApiReference;
 using Middleware.TaskPlanner.Contracts.Requests;
 using Middleware.TaskPlanner.Exceptions;
@@ -13,7 +14,7 @@ namespace Middleware.TaskPlanner.Controllers;
 
 [ApiController]
 [Route("api/v1/[controller]")]
-public class PlanController : ControllerBase
+public class PlanController : MiddlewareController
 {
     private readonly IActionPlanner _actionPlanner;
     private readonly ILogger<PlanController> _logger;
@@ -37,21 +38,20 @@ public class PlanController : ControllerBase
     [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.NotFound)]
     [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.BadRequest)]
     [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.InternalServerError)]
-    public async Task<ActionResult<TaskModel>> GetPlan([FromBody] CreatePlanRequest inputModel,
+    public async Task<IActionResult> GetPlan([FromBody] CreatePlanRequest request,
         bool dryRun = false)
     {
-        if (inputModel == null)
-            return BadRequest("Parameters were not specified.");
+        if (request == null)
+            return ErrorMessageResponse(HttpStatusCode.BadRequest, nameof(request), $"Request body not specified.");
 
-        if (inputModel.IsValid() == false)
+        if (request.IsValid() == false)
         {
-            return BadRequest(new ApiResponse((int)HttpStatusCode.BadRequest,
-                "Parameters were not specified or wrongly specified."));
+            return ErrorMessageResponse(HttpStatusCode.BadRequest, nameof(request), $"Robot Id or Task Id were not specified.");
         }
 
-        var id = inputModel.Id;
-        var lockResource = inputModel.DisableResourceReuse;
-        var robotId = inputModel.RobotId;
+        var id = request.Id;
+        var lockResource = request.DisableResourceReuse;
+        var robotId = request.RobotId;
 
         try
         {
@@ -64,12 +64,7 @@ public class PlanController : ControllerBase
             var resourcePlan = await _publishService.RequestResourcePlan(plan, robot2);
 
             if (!resourcePlan.IsSuccess)
-            {
-                var statusCode = (int)HttpStatusCode.BadRequest;
-                return StatusCode(statusCode,
-                    new ApiResponse(statusCode,
-                        $"Error while preparing ResourcePlan: {resourcePlan.Error}"));
-            }
+                return ErrorMessageResponse(HttpStatusCode.BadRequest, nameof(request), $"Error while preparing ResourcePlan: {resourcePlan.Error}");
 
             if (dryRun)
                 return Ok(resourcePlan.Task);
@@ -80,17 +75,19 @@ public class PlanController : ControllerBase
         }
         catch (Orchestrator.ResourcePlannerApiClient.ApiException<ResourcePlanner.ApiResponse> apiEx)
         {
-            return StatusCode(apiEx.StatusCode, _mapper.Map<ApiResponse>(apiEx.Result));
+            _logger.LogError(apiEx, "An error occurred:");
+            return ErrorMessageResponse((HttpStatusCode)apiEx.StatusCode, "request", $"Error while preparing ResourcePlan: {apiEx.Result.Message}");
         }
         catch (Orchestrator.ResourcePlannerApiClient.ApiException<ApiResponse> apiEx)
         {
+            _logger.LogError(apiEx, "An error occurred:");
             return StatusCode(apiEx.StatusCode, _mapper.Map<ApiResponse>(apiEx.Result));
         }
         catch (Exception ex)
         {
-            var statusCode = (int)HttpStatusCode.InternalServerError;
-            return StatusCode(statusCode,
-                new ApiResponse(statusCode, $"There was an error while preparing the task plan: {ex.Message}"));
+            _logger.LogError(ex, "An error occurred:");
+            return ErrorMessageResponse(HttpStatusCode.InternalServerError, "system",
+                $"There was an error while preparing the task plan: {ex.Message}");
         }
     }
 
@@ -99,7 +96,7 @@ public class PlanController : ControllerBase
     [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.NotFound)]
     [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.BadRequest)]
     [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.InternalServerError)]
-    public async Task<ActionResult<TaskModel>> GetSemanticPlan([FromBody] CreatePlanRequest inputModel,
+    public async Task<IActionResult> GetSemanticPlan([FromBody] CreatePlanRequest inputModel,
         bool dryRun = false)
     {
         if (inputModel == null)
@@ -154,9 +151,9 @@ public class PlanController : ControllerBase
         }
         catch (Exception ex)
         {
-            var statusCode = (int)HttpStatusCode.InternalServerError;
-            return StatusCode(statusCode,
-                new ApiResponse(statusCode, $"There was an error while preparing the task plan: {ex.Message}"));
+            _logger.LogError(ex, "An error occurred:");
+            return ErrorMessageResponse(HttpStatusCode.InternalServerError, "system",
+                $"There was an error while preparing the task plan: {ex.Message}");
         }
     }
 
@@ -178,7 +175,15 @@ public class PlanController : ControllerBase
             _logger.LogInformation(
                 "Attempted to obtain non existing Middleware within organization. Name: {0}, Type: {1}",
                 ex.LocationName, ex.LocationType);
-            return BadRequest(new ApiResponse((int)HttpStatusCode.BadRequest, ex.Message));
+            
+            return ErrorMessageResponse(HttpStatusCode.InternalServerError, "system",
+                $"There was an error while preparing the task plan: {ex.Message}");
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "An error occurred:");
+            return ErrorMessageResponse(HttpStatusCode.InternalServerError, "system",
+                $"There was an error while preparing switchover for task plan: {ex.Message}");
         }
     }
 }

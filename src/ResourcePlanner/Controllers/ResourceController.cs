@@ -1,6 +1,7 @@
 ﻿using System.Net;
 using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
+using Middleware.Common;
 using Middleware.ResourcePlanner.Models;
 using Middleware.ResourcePlanner.Orchestrator;
 using ApiResponse = Middleware.Common.Responses.ApiResponse;
@@ -10,7 +11,7 @@ namespace Middleware.ResourcePlanner.Controllers;
 
 [ApiController]
 [Route("api/v1/[controller]")]
-public class ResourceController : ControllerBase
+public class ResourceController : MiddlewareController
 {
     private readonly ILogger _logger;
     private readonly IMapper _mapper;
@@ -33,7 +34,7 @@ public class ResourceController : ControllerBase
     [ProducesResponseType(typeof(TaskModel), (int)HttpStatusCode.OK)]
     [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.NotFound)]
     [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.InternalServerError)]
-    public async Task<ActionResult<TaskModel>> GetResource([FromBody] ResourceInput resource)
+    public async Task<IActionResult> GetResource([FromBody] ResourceInput resource)
     {
         try
         {
@@ -47,9 +48,9 @@ public class ResourceController : ControllerBase
         }
         catch (Exception ex)
         {
-            var statusCode = (int)HttpStatusCode.InternalServerError;
-            return StatusCode(statusCode,
-                new ApiResponse(statusCode, $"There was an error while collecting the resources: {ex.Message}"));
+            _logger.LogError(ex, "An error occurred:");
+            return ErrorMessageResponse(HttpStatusCode.InternalServerError, "system",
+                $"There was an error while collecting the resources: {ex.Message}");
         }
     }
 
@@ -62,7 +63,7 @@ public class ResourceController : ControllerBase
     [ProducesResponseType(typeof(TaskModel), (int)HttpStatusCode.OK)]
     [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.NotFound)]
     [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.InternalServerError)]
-    public async Task<ActionResult<TaskModel>> GetSemanticResourcePlan([FromBody] ResourceInput resource)
+    public async Task<IActionResult> GetSemanticResourcePlan([FromBody] ResourceInput resource)
     {
         try
         {
@@ -76,9 +77,9 @@ public class ResourceController : ControllerBase
         }
         catch (Exception ex)
         {
-            var statusCode = (int)HttpStatusCode.InternalServerError;
-            return StatusCode(statusCode,
-                new ApiResponse(statusCode, $"There was an error while collecting the resources: {ex.Message}"));
+            _logger.LogError(ex, "An error occurred:");
+            return ErrorMessageResponse(HttpStatusCode.InternalServerError, "system",
+                $"There was an error while collecting the resources: {ex.Message}");
         }
     }
 }

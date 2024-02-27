@@ -685,6 +685,24 @@
               "$ref": "#/components/schemas/RosTopicModel"
             }
           },
+          "transforms": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/RosTransformsModel"
+            }
+          },
+          "actions": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/RosActionModel"
+            }
+          },
+          "services": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/RosServiceModel"
+            }
+          },
           "rosVersion": {
             "type": "integer",
             "format": "int32"
@@ -800,6 +818,49 @@
         },
         "additionalProperties": false
       },
+      "Qos": {
+        "type": "object",
+        "properties": {
+          "preset": {
+            "type": "string",
+            "nullable": true
+          },
+          "history": {
+            "type": "string",
+            "nullable": true
+          },
+          "depth": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "reliability": {
+            "type": "string",
+            "nullable": true
+          },
+          "durability": {
+            "type": "string",
+            "nullable": true
+          },
+          "deadline": {
+            "type": "string",
+            "nullable": true
+          },
+          "lifespan": {
+            "type": "string",
+            "nullable": true
+          },
+          "liveliness": {
+            "type": "string",
+            "nullable": true
+          },
+          "lease": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
       "RelationModel": {
         "type": "object",
         "properties": {
@@ -834,6 +895,37 @@
         "type": "integer",
         "format": "int32"
       },
+      "RosActionModel": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      },
+      "RosServiceModel": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string",
+            "nullable": true
+          },
+          "qos": {
+            "$ref": "#/components/schemas/Qos"
+          }
+        },
+        "additionalProperties": false
+      },
       "RosTopicModel": {
         "type": "object",
         "properties": {
@@ -848,8 +940,38 @@
             "type": "string",
             "nullable": true
           },
+          "compression": {
+            "type": "string"
+          },
+          "qos": {
+            "$ref": "#/components/schemas/Qos"
+          },
           "enabled": {
             "type": "boolean"
+          }
+        },
+        "additionalProperties": false
+      },
+      "RosTransformsModel": {
+        "type": "object",
+        "properties": {
+          "source_frame": {
+            "type": "string"
+          },
+          "target_frame": {
+            "type": "string"
+          },
+          "angular_thres": {
+            "type": "number",
+            "format": "double"
+          },
+          "trans_thres": {
+            "type": "number",
+            "format": "double"
+          },
+          "max_publish_period": {
+            "type": "number",
+            "format": "double"
           }
         },
         "additionalProperties": false

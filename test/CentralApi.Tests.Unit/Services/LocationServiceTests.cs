@@ -58,7 +58,6 @@ public class LocationServiceTests
 
         result.IsT0.Should().BeTrue();
         result.IsT1.Should().BeFalse();
-        result.IsT2.Should().BeFalse();
 
         var resultType = result.AsT0;
         resultType.Should().BeEquivalentTo(expectedLocation);
@@ -84,7 +83,6 @@ public class LocationServiceTests
         // assert
         result.IsT0.Should().BeTrue();
         result.IsT1.Should().BeFalse();
-        result.IsT2.Should().BeFalse();
 
         var resultType = result.AsT0;
         resultType.Should().BeOfType<Location>();
@@ -149,7 +147,6 @@ public class LocationServiceTests
     {
         // arrange
         var org = "testOrganization";
-        var locations = ImmutableList<Location>.Empty;
         _locationRepository.GetLocationsByOrganizationAsync(org).Returns(ImmutableList<Location>.Empty);
 
         // act

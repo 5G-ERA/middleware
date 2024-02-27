@@ -1,21 +1,20 @@
 ﻿using System.Net;
 using Microsoft.AspNetCore.Mvc;
+using Middleware.Common;
 using Middleware.Common.Responses;
 using Middleware.DataAccess.Repositories.Abstract.Influx;
 using Middleware.Models.Domain;
 using Middleware.Orchestrator.Contracts.Mappings;
 using Middleware.Orchestrator.Contracts.Requests;
 using Middleware.Orchestrator.Contracts.Responses;
-using Middleware.Orchestrator.ExtensionMethods;
 using Middleware.Orchestrator.Heartbeat;
-using Middleware.Orchestrator.Models;
 using Middleware.RedisInterface.Sdk;
 
 namespace Middleware.Orchestrator.Controllers;
 
 [Route("api/v1/[controller]")]
 [ApiController]
-public class StatusController : Controller
+public class StatusController : MiddlewareController
 {
     private readonly IHeartbeatService _heartbeatService;
     private readonly ILogger _logger;
@@ -45,15 +44,14 @@ public class StatusController : Controller
     [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.BadRequest)]
     [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.NotFound)]
     [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.InternalServerError)]
-    public async Task<ActionResult<RobotStatusModel>> GetRobotStatusesAsync(bool generateFakeData = false)
+    public async Task<IActionResult> GetRobotStatusesAsync(bool generateFakeData = false)
     {
         try
         {
             var status = await _heartbeatService.GetAllRobotStatusesAsync(generateFakeData);
             if (status is null || !status.Any())
             {
-                return NotFound(new ApiResponse((int)HttpStatusCode.NotFound,
-                    "No robot statuses were found."));
+                return ErrorMessageResponse(HttpStatusCode.NotFound, "plan", $"No robot statuses were found.");
             }
 
             var resp = status.ToRobotsHeartbeatResponse();
@@ -61,9 +59,9 @@ public class StatusController : Controller
         }
         catch (Exception ex)
         {
-            var statusCode = (int)HttpStatusCode.InternalServerError;
             _logger.LogError(ex, "An error occurred:");
-            return StatusCode(statusCode, new ApiResponse(statusCode, $"An error has occurred: {ex.Message}"));
+            return ErrorMessageResponse(HttpStatusCode.InternalServerError, "system",
+                $"An error has occurred: {ex.Message}");
         }
     }
 
@@ -77,13 +75,13 @@ public class StatusController : Controller
     [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.BadRequest)]
     [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.NotFound)]
     [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.InternalServerError)]
-    public async Task<ActionResult<GetRobotHeartbeatResponse>> GetRobotStatusByIdAsync(Guid id,
+    public async Task<IActionResult> GetRobotStatusByIdAsync(Guid id,
         bool generateFakeData = false)
     {
         if (id == Guid.Empty)
         {
-            return BadRequest(new ApiResponse((int)HttpStatusCode.BadRequest,
-                "Identifier of the robot must be specified"));
+            return ErrorMessageResponse(HttpStatusCode.BadRequest, nameof(id),
+                "Identifier of the robot must be specified");
         }
 
         try
@@ -91,8 +89,8 @@ public class StatusController : Controller
             var status = await _heartbeatService.GetRobotStatusByIdAsync(id, generateFakeData);
             if (status is null)
             {
-                return NotFound(new ApiResponse((int)HttpStatusCode.NotFound,
-                    "Status for the specified robot was not found."));
+                return ErrorMessageResponse(HttpStatusCode.NotFound, nameof(id),
+                    "Status for the specified robot was not found.");
             }
 
             var resp = status.ToRobotHeartbeatResponse();
@@ -100,9 +98,9 @@ public class StatusController : Controller
         }
         catch (Exception ex)
         {
-            var statusCode = (int)HttpStatusCode.InternalServerError;
             _logger.LogError(ex, "An error occurred:");
-            return StatusCode(statusCode, new ApiResponse(statusCode, $"An error has occurred: {ex.Message}"));
+            return ErrorMessageResponse(HttpStatusCode.InternalServerError, "system",
+                $"An error has occurred: {ex.Message}");
         }
     }
 
@@ -116,7 +114,7 @@ public class StatusController : Controller
     [ProducesResponseType(typeof(GetRobotHeartbeatResponse), (int)HttpStatusCode.OK)]
     [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.BadRequest)]
     [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.InternalServerError)]
-    public async Task<ActionResult<GetRobotHeartbeatResponse>> AddRobotStatusAsync(
+    public async Task<IActionResult> AddRobotStatusAsync(
         [FromBody] CreateRobotHeartbeatRequest request)
     {
         try
@@ -124,12 +122,12 @@ public class StatusController : Controller
             var result = await _heartbeatService.AddRobotStatus(request.ToRobotStatus());
             if (result.IsSuccess == false && result.NotFound)
             {
-                return NotFound(new ApiResponse((int)HttpStatusCode.NotFound, result.ErrMessage));
+                return ErrorMessageResponse(HttpStatusCode.NotFound, nameof(request.Id), result.ErrMessage);
             }
 
             if (result.IsSuccess == false && result.NotFound == false)
             {
-                return BadRequest(new ApiResponse((int)HttpStatusCode.BadRequest, result.ErrMessage));
+                return ErrorMessageResponse(HttpStatusCode.BadRequest, nameof(request.Id), result.ErrMessage);
             }
 
             var resp = result.Value.ToRobotHeartbeatResponse();
@@ -137,9 +135,8 @@ public class StatusController : Controller
         }
         catch (Exception ex)
         {
-            var statusCode = (int)HttpStatusCode.InternalServerError;
             _logger.LogError(ex, "An error occurred:");
-            return StatusCode(statusCode, new ApiResponse(statusCode, $"An error has occurred: {ex.Message}"));
+            return ErrorMessageResponse(HttpStatusCode.NotFound, "system", $"An error has occurred: {ex.Message}");
         }
     }
 
@@ -153,15 +150,14 @@ public class StatusController : Controller
     [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.BadRequest)]
     [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.NotFound)]
     [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.InternalServerError)]
-    public async Task<ActionResult<GetNetAppsHeartbeatResponse>> GetNetAppStatusesAsync(bool generateFakeData = false)
+    public async Task<IActionResult> GetNetAppStatusesAsync(bool generateFakeData = false)
     {
         try
         {
             var status = await _heartbeatService.GetAllAppStatusesAsync(generateFakeData);
             if (status is null || !status.Any())
             {
-                return NotFound(new ApiResponse((int)HttpStatusCode.NotFound,
-                    "No NetApp statuses were found."));
+                return ErrorMessageResponse(HttpStatusCode.NotFound, "netApp", "No NetApp statuses were found.");
             }
 
             var resp = status.ToNetAppsHeartbeatResponse();
@@ -169,9 +165,9 @@ public class StatusController : Controller
         }
         catch (Exception ex)
         {
-            var statusCode = (int)HttpStatusCode.InternalServerError;
             _logger.LogError(ex, "An error occurred:");
-            return StatusCode(statusCode, new ApiResponse(statusCode, $"An error has occurred: {ex.Message}"));
+            return ErrorMessageResponse(HttpStatusCode.InternalServerError, "system",
+                $"An error has occurred: {ex.Message}");
         }
     }
 
@@ -185,12 +181,13 @@ public class StatusController : Controller
     [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.BadRequest)]
     [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.NotFound)]
     [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.InternalServerError)]
-    public async Task<ActionResult<GetNetAppHeartbeatResponse>> GetNetAppStatusByIdAsync(Guid id, bool generateFakeData = false)
+    public async Task<IActionResult> GetNetAppStatusByIdAsync(Guid id,
+        bool generateFakeData = false)
     {
         if (id == Guid.Empty)
         {
-            return BadRequest(new ApiResponse((int)HttpStatusCode.BadRequest,
-                "Identifier of the NetApp must be specified"));
+            return ErrorMessageResponse(HttpStatusCode.BadRequest, nameof(id),
+                "Identifier of the NetApp must be specified");
         }
 
         try
@@ -198,8 +195,8 @@ public class StatusController : Controller
             var status = await _heartbeatService.GetNetAppStatusByIdAsync(id, generateFakeData);
             if (status is null)
             {
-                return NotFound(new ApiResponse((int)HttpStatusCode.NotFound,
-                    "Status for the specified NetApp was not found."));
+                return ErrorMessageResponse(HttpStatusCode.NotFound, nameof(id),
+                    "Status for the specified NetApp was not found.");
             }
 
             var resp = status.ToNetAppHeartbeatResponse();
@@ -207,9 +204,9 @@ public class StatusController : Controller
         }
         catch (Exception ex)
         {
-            var statusCode = (int)HttpStatusCode.InternalServerError;
             _logger.LogError(ex, "An error occurred:");
-            return StatusCode(statusCode, new ApiResponse(statusCode, $"An error has occurred: {ex.Message}"));
+            return ErrorMessageResponse(HttpStatusCode.InternalServerError, "system",
+                $"An error has occurred: {ex.Message}");
         }
     }
 
@@ -223,8 +220,7 @@ public class StatusController : Controller
     [ProducesResponseType(typeof(GetNetAppHeartbeatResponse), (int)HttpStatusCode.OK)]
     [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.BadRequest)]
     [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.InternalServerError)]
-    public async Task<ActionResult<GetNetAppHeartbeatResponse>> AddNetAppStatusAsync(
-        [FromBody] CreateNetAppHeartbeatRequest request)
+    public async Task<IActionResult> AddNetAppStatusAsync([FromBody] CreateNetAppHeartbeatRequest request)
     {
         try
         {
@@ -238,9 +234,9 @@ public class StatusController : Controller
         }
         catch (Exception ex)
         {
-            var statusCode = (int)HttpStatusCode.InternalServerError;
             _logger.LogError(ex, "An error occurred:");
-            return StatusCode(statusCode, new ApiResponse(statusCode, $"An error has occurred: {ex.Message}"));
+            return ErrorMessageResponse(HttpStatusCode.InternalServerError, "system",
+                $"An error has occurred: {ex.Message}");
         }
     }
 
@@ -255,23 +251,21 @@ public class StatusController : Controller
     [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.BadRequest)]
     [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.NotFound)]
     [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.InternalServerError)]
-    public async Task<ActionResult<List<NetAppStatusModel>>> GetNetAppStatusByInstanceAsync(Guid id)
+    public async Task<IActionResult> GetNetAppStatusByInstanceAsync(Guid id)
     {
         if (id == Guid.Empty)
         {
-            return BadRequest(new ApiResponse((int)HttpStatusCode.BadRequest,
-                "Identifier of the instance definition must be specified"));
+            return ErrorMessageResponse(HttpStatusCode.BadRequest, nameof(id),
+                "Identifier of the instance definition must be specified");
         }
 
         try
         {
             //TODO: put behind service
-
             var allActionPlans = await _redisInterfaceClient.ActionPlanGetAllAsync();
             if (allActionPlans is null)
             {
-                return NotFound(new ApiResponse((int)HttpStatusCode.NotFound,
-                    "No action plans were found"));
+                return ErrorMessageResponse(HttpStatusCode.NotFound, nameof(id), "No action plans were found");
             }
 
             var instanceIds = allActionPlans
@@ -282,8 +276,8 @@ public class StatusController : Controller
 
             if (instanceIds.Any() == false)
             {
-                return NotFound(new ApiResponse((int)HttpStatusCode.NotFound,
-                    $"No deployed instances of {id} were found"));
+                return ErrorMessageResponse(HttpStatusCode.NotFound, nameof(id),
+                    $"No deployed instances of {id} were found");
             }
 
             var statuses = new List<NetAppStatusModel>();
@@ -299,9 +293,9 @@ public class StatusController : Controller
         }
         catch (Exception ex)
         {
-            var statusCode = (int)HttpStatusCode.InternalServerError;
             _logger.LogError(ex, "An error occurred:");
-            return StatusCode(statusCode, new ApiResponse(statusCode, $"An error has occurred: {ex.Message}"));
+            return ErrorMessageResponse(HttpStatusCode.InternalServerError, "system",
+                $"An error has occurred: {ex.Message}");
         }
     }
 }

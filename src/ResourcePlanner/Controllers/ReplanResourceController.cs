@@ -1,6 +1,7 @@
 ﻿using System.Net;
 using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
+using Middleware.Common;
 using Middleware.ResourcePlanner.Models;
 using Middleware.ResourcePlanner.Orchestrator;
 using ApiResponse = Middleware.Common.Responses.ApiResponse;
@@ -10,9 +11,8 @@ namespace Middleware.ResourcePlanner.Controllers;
 
 [ApiController]
 [Route("api/v1/[controller]")]
-public class ReplanResourceController : ControllerBase
+public class ReplanResourceController : MiddlewareController
 {
-    private readonly ILogger _logger;
     private readonly IMapper _mapper;
     private readonly IResourcePlanner _resourcePlanner;
 
@@ -22,13 +22,11 @@ public class ReplanResourceController : ControllerBase
     /// </summary>
     /// <param name="resourcePlanner"></param>
     /// <param name="mapper"></param>
-    /// <param name="logger"></param>
     public ReplanResourceController(IResourcePlanner resourcePlanner,
-        IMapper mapper, ILogger<ResourceController> logger)
+        IMapper mapper)
     {
         _resourcePlanner = resourcePlanner;
         _mapper = mapper;
-        _logger = logger;
     }
 
     [HttpPost(Name = "GetResourceRePlan")]
@@ -44,7 +42,7 @@ public class ReplanResourceController : ControllerBase
 
             return Ok(updatedTask);
         }
-        catch (Orchestrator.ApiException<ApiResponse> apiEx)
+        catch (ApiException<ApiResponse> apiEx)
         {
             return StatusCode(apiEx.StatusCode, _mapper.Map<ApiResponse>(apiEx.Result));
         }

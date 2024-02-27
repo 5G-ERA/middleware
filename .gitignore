@@ -623,4 +623,4 @@ override.tf.json
 # Ignore CLI configuration files
 .terraformrc
 terraform.rc
-.idea/.idea.Middleware/.idea/aws.xml
+.idea/.idea.Middleware/.idea

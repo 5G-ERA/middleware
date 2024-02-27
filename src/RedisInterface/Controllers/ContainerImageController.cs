@@ -1,5 +1,6 @@
 ﻿using System.Net;
 using Microsoft.AspNetCore.Mvc;
+using Middleware.Common;
 using Middleware.Common.Attributes;
 using Middleware.Common.Enums;
 using Middleware.Common.Responses;
@@ -15,14 +16,16 @@ namespace Middleware.RedisInterface.Controllers
 {
     [Route("api/v1/[controller]")]
     [ApiController]
-    public class ContainerImageController : ControllerBase
+    public class ContainerImageController : MiddlewareController
     {
         private readonly IContainerImageRepository _containerImageRepository;
         private readonly ILogger _logger;
 
-        public ContainerImageController(IContainerImageRepository containerImageRepository, ILogger<ActionController> logger)
+        public ContainerImageController(IContainerImageRepository containerImageRepository,
+            ILogger<ActionController> logger)
         {
-            _containerImageRepository = containerImageRepository ?? throw new ArgumentNullException(nameof(containerImageRepository));
+            _containerImageRepository = containerImageRepository ??
+                                        throw new ArgumentNullException(nameof(containerImageRepository));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
@@ -41,7 +44,8 @@ namespace Middleware.RedisInterface.Controllers
                 List<ContainerImageModel> models = await _containerImageRepository.GetAllAsync();
                 if (models.Any() == false)
                 {
-                    return NotFound(new ApiResponse((int)HttpStatusCode.NotFound, "Objects were not found."));
+                    return ErrorMessageResponse(HttpStatusCode.NotFound, "container",
+                        "ContainerImages were not found.");
                 }
 
                 var response = models.ToContainersResponse();
@@ -49,9 +53,9 @@ namespace Middleware.RedisInterface.Controllers
             }
             catch (Exception ex)
             {
-                int statusCode = (int)HttpStatusCode.InternalServerError;
                 _logger.LogError(ex, "An error occurred:");
-                return StatusCode(statusCode, new ApiResponse(statusCode, $"An error has occurred: {ex.Message}"));
+                return ErrorMessageResponse(HttpStatusCode.InternalServerError, "system",
+                    $"An error has occurred: {ex.Message}");
             }
         }
 
@@ -72,7 +76,8 @@ namespace Middleware.RedisInterface.Controllers
                 ContainerImageModel model = await _containerImageRepository.GetByIdAsync(id);
                 if (model == null)
                 {
-                    return NotFound(new ApiResponse((int)HttpStatusCode.NotFound, "Object was not found."));
+                    return ErrorMessageResponse(HttpStatusCode.NotFound, nameof(id),
+                        $"ContainerImage with id: {id} was not found.");
                 }
 
                 var response = model.ToContainerResponse();
@@ -80,9 +85,9 @@ namespace Middleware.RedisInterface.Controllers
             }
             catch (Exception ex)
             {
-                int statusCode = (int)HttpStatusCode.InternalServerError;
                 _logger.LogError(ex, "An error occurred:");
-                return StatusCode(statusCode, new ApiResponse(statusCode, $"An error has occurred: {ex.Message}"));
+                return ErrorMessageResponse(HttpStatusCode.InternalServerError, "system",
+                    $"An error has occurred: {ex.Message}");
             }
         }
 
@@ -100,19 +105,18 @@ namespace Middleware.RedisInterface.Controllers
             try
             {
                 var model = request.ToContainer();
-                var existingLoc = await _containerImageRepository.FindSingleAsync(c=>c.Name == model.Name);
+                var existingLoc = await _containerImageRepository.FindSingleAsync(c => c.Name == model.Name);
                 if (existingLoc is not null)
                 {
-                    return StatusCode((int)HttpStatusCode.BadRequest,
-                        new ApiResponse((int)HttpStatusCode.BadRequest,
-                            "ContainerImage with specified name already exists"));
+                    return ErrorMessageResponse(HttpStatusCode.BadRequest, nameof(request.Name),
+                        "ContainerImage with specified name already exists");
                 }
+
                 ContainerImageModel cim = await _containerImageRepository.AddAsync(model);
                 if (cim is null)
                 {
-                    return StatusCode((int) HttpStatusCode.InternalServerError,
-                        new ApiResponse((int) HttpStatusCode.InternalServerError,
-                            "Could not add ContainerImage to the data store"));
+                    return ErrorMessageResponse(HttpStatusCode.BadRequest, nameof(request),
+                        "Could not add ContainerImage to the data store");
                 }
 
                 var response = cim.ToContainerResponse();
@@ -120,9 +124,9 @@ namespace Middleware.RedisInterface.Controllers
             }
             catch (Exception ex)
             {
-                int statusCode = (int)HttpStatusCode.InternalServerError;
                 _logger.LogError(ex, "An error occurred:");
-                return StatusCode(statusCode, new ApiResponse(statusCode, $"An error has occurred: {ex.Message}"));
+                return ErrorMessageResponse(HttpStatusCode.InternalServerError, "system",
+                    $"An error has occurred: {ex.Message}");
             }
         }
 
@@ -130,7 +134,6 @@ namespace Middleware.RedisInterface.Controllers
         /// Partially update an existing ContainerImageModel entity
         /// </summary>
         /// <param name="request"></param>
-        /// <param name="id"></param>
         /// <returns> the modified ContainerImageModel entity </returns>
         [HttpPut]
         [Route("{id}", Name = "ContainerImagePatch")]
@@ -145,17 +148,19 @@ namespace Middleware.RedisInterface.Controllers
                 var exists = await _containerImageRepository.GetByIdAsync(model.Id);
                 if (exists is null)
                 {
-                    return NotFound(new ApiResponse((int)HttpStatusCode.NotFound, "Object to be updated was not found."));
+                    return ErrorMessageResponse(HttpStatusCode.NotFound, nameof(request.Id),
+                        $"ContainerImage with id: {request.Id} was not found.");
                 }
+
                 await _containerImageRepository.UpdateAsync(model);
                 var response = model.ToContainerResponse();
                 return Ok(response);
             }
             catch (Exception ex)
             {
-                int statusCode = (int)HttpStatusCode.InternalServerError;
                 _logger.LogError(ex, "An error occurred:");
-                return StatusCode(statusCode, new ApiResponse(statusCode, $"An error has occurred: {ex.Message}"));
+                return ErrorMessageResponse(HttpStatusCode.InternalServerError, "system",
+                    $"An error has occurred: {ex.Message}");
             }
         }
 
@@ -177,51 +182,56 @@ namespace Middleware.RedisInterface.Controllers
                 var exists = await _containerImageRepository.GetByIdAsync(id);
                 if (exists is null)
                 {
-                    return NotFound(new ApiResponse((int)HttpStatusCode.NotFound, "The specified ContainerImage has not been found."));
+                    return ErrorMessageResponse(HttpStatusCode.NotFound, nameof(id),
+                        $"ContainerImage with id: {id} was not found.");
                 }
+
                 await _containerImageRepository.DeleteByIdAsync(id);
                 return Ok();
             }
             catch (Exception ex)
             {
-                int statusCode = (int)HttpStatusCode.InternalServerError;
                 _logger.LogError(ex, "An error occurred:");
-                return StatusCode(statusCode, new ApiResponse(statusCode, $"An error has occurred: {ex.Message}"));
+                return ErrorMessageResponse(HttpStatusCode.InternalServerError, "system",
+                    $"An error has occurred: {ex.Message}");
             }
         }
 
         /// <summary>
         /// Creates a new relation between two models
         /// </summary>
-        /// <param name="model"></param>
+        /// <param name="request"></param>
         /// <returns></returns>
         [HttpPost]
         [Route("AddRelation", Name = "ContainerImageAddRelation")]
         [ProducesResponseType(typeof(RelationModel), (int)HttpStatusCode.OK)]
         [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.BadRequest)]
         [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.InternalServerError)]
-        public async Task<ActionResult<RelationModel>> AddRelationAsync([FromBody] RelationModel model)
+        public async Task<IActionResult> AddRelationAsync([FromBody] RelationModel request)
         {
-            if (model == null)
+            if (request == null)
             {
-                return BadRequest("Parameters were not specified.");
+                return ErrorMessageResponse(HttpStatusCode.NotFound, nameof(request),
+                    $"Request body was not specified.");
             }
+
             try
             {
-                bool isValid = await _containerImageRepository.AddRelationAsync(model);
+                bool isValid = await _containerImageRepository.AddRelationAsync(request);
                 if (!isValid)
                 {
-                    return StatusCode((int) HttpStatusCode.InternalServerError,
-                        new ApiResponse((int) HttpStatusCode.InternalServerError, "The relation was not created"));
+                    return ErrorMessageResponse(HttpStatusCode.BadRequest, nameof(request),
+                        $"Relation was not created");
                 }
             }
             catch (Exception ex)
             {
-                int statusCode = (int)HttpStatusCode.InternalServerError;
                 _logger.LogError(ex, "An error occurred:");
-                return StatusCode(statusCode, new ApiResponse(statusCode, $"An error has occurred: {ex.Message}"));
+                return ErrorMessageResponse(HttpStatusCode.InternalServerError, "system",
+                    $"An error has occurred: {ex.Message}");
             }
-            return Ok(model);
+
+            return Ok(request);
         }
 
         /// <summary>
@@ -229,6 +239,7 @@ namespace Middleware.RedisInterface.Controllers
         /// </summary>
         /// <param name="id"></param>
         /// <param name="name"></param>
+        /// <param name="direction"></param>
         /// <returns></returns>
         [HttpGet]
         [Route("relation/{name}", Name = "ContainerImageGetRelationByName")]
@@ -239,32 +250,37 @@ namespace Middleware.RedisInterface.Controllers
         {
             if (string.IsNullOrWhiteSpace(name))
             {
-                return BadRequest(new ApiResponse((int)HttpStatusCode.BadRequest, "Relation name not specified"));
+                return ErrorMessageResponse(HttpStatusCode.BadRequest, nameof(name), $"Relation name not specified");
             }
+
             if (id == Guid.Empty)
             {
-                return BadRequest(new ApiResponse((int)HttpStatusCode.BadRequest, "Relation ID not specified"));
+                return ErrorMessageResponse(HttpStatusCode.BadRequest, nameof(id), $"ContainerImage id not specified");
             }
-            RelationDirection directionEnum;
-            if (Enum.TryParse<RelationDirection>(direction, out directionEnum) == false)
+
+            if (Enum.TryParse<RelationDirection>(direction, out var directionEnum) == false)
             {
-                return BadRequest(new ApiResponse((int)HttpStatusCode.BadRequest, "Wrong Relation direction specified"));
+                return ErrorMessageResponse(HttpStatusCode.BadRequest, nameof(direction),
+                    $"Wrong Relation direction specified");
             }
+
             var inputDirection = directionEnum;
             try
             {
                 var relations = await _containerImageRepository.GetRelation(id, name, inputDirection);
                 if (!relations.Any())
                 {
-                    return NotFound(new ApiResponse((int)HttpStatusCode.NotFound, "Relations were not found."));
+                    return ErrorMessageResponse(HttpStatusCode.NotFound, nameof(id),
+                        $"Relations with name: {name} were not found.");
                 }
+
                 return Ok(relations);
             }
             catch (Exception ex)
             {
-                int statusCode = (int)HttpStatusCode.InternalServerError;
                 _logger.LogError(ex, "An error occurred:");
-                return StatusCode(statusCode, new ApiResponse(statusCode, $"An error has occurred: {ex.Message}"));
+                return ErrorMessageResponse(HttpStatusCode.InternalServerError, "system",
+                    $"An error has occurred: {ex.Message}");
             }
         }
 
@@ -288,15 +304,16 @@ namespace Middleware.RedisInterface.Controllers
                 var relations = await _containerImageRepository.GetRelations(id, relationNames);
                 if (!relations.Any())
                 {
-                    return NotFound(new ApiResponse((int)HttpStatusCode.NotFound, "Relations were not found"));
+                    return ErrorMessageResponse(HttpStatusCode.NotFound, "relation", $"Relations were not found");
                 }
+
                 return Ok(relations);
             }
             catch (Exception ex)
             {
-                int statusCode = (int)HttpStatusCode.InternalServerError;
                 _logger.LogError(ex, "An error occurred:");
-                return StatusCode(statusCode, new ApiResponse(statusCode, $"An error has occurred: {ex.Message}"));
+                return ErrorMessageResponse(HttpStatusCode.InternalServerError, "system",
+                    $"An error has occurred: {ex.Message}");
             }
         }
 
@@ -317,15 +334,17 @@ namespace Middleware.RedisInterface.Controllers
                 var images = await _containerImageRepository.GetImagesForInstanceAsync(id);
                 if (images.Any() == false)
                 {
-                    return NotFound(new ApiResponse((int)HttpStatusCode.NotFound, $"Container Image for instance with id: '{id}' has not ben found"));
+                    return ErrorMessageResponse(HttpStatusCode.NotFound, nameof(id),
+                        $"Container Image for instance with id: '{id}' has not ben found");
                 }
+
                 return Ok(images.ToContainersResponse());
             }
             catch (Exception ex)
             {
-                int statusCode = (int)HttpStatusCode.InternalServerError;
                 _logger.LogError(ex, "An error occurred:");
-                return StatusCode(statusCode, new ApiResponse(statusCode, $"An error has occurred: {ex.Message}"));
+                return ErrorMessageResponse(HttpStatusCode.InternalServerError, "system",
+                    $"An error has occurred: {ex.Message}");
             }
         }
     }
