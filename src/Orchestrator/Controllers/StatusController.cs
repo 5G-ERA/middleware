@@ -225,11 +225,18 @@ public class StatusController : MiddlewareController
         try
         {
             var model = request.ToNetAppStatus();
-            //TODO: put behind service
-            //await _netAppStatusRepository.AddAsync(model, () => model.Id);
-            var res = await _influxNetAppStatusRepository.AddAsync(model);
+            var result = await _heartbeatService.AddNetAppStatus(model);
+            if (result.IsSuccess == false && result.NotFound)
+            {
+                return ErrorMessageResponse(HttpStatusCode.NotFound, nameof(request.Id), result.ErrMessage);
+            }
 
-            var resp = res?.ToNetAppHeartbeatResponse();
+            if (result.IsSuccess == false && result.NotFound == false)
+            {
+                return ErrorMessageResponse(HttpStatusCode.BadRequest, nameof(request.Id), result.ErrMessage);
+            }
+
+            var resp = result.Value.ToNetAppHeartbeatResponse();
             return Ok(resp);
         }
         catch (Exception ex)

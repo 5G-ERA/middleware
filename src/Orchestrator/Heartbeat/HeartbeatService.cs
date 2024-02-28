@@ -81,7 +81,24 @@ internal class HeartbeatService : IHeartbeatService
         }
 
         status.Name = robot.Name;
+        status.Timestamp = DateTimeOffset.Now;
         var res = await _influxRobotStatusRepository.AddAsync(status);
+
+        return new(res);
+    }
+
+    /// <inheritdoc />
+    public async Task<HeartbeatResult<NetAppStatusModel>> AddNetAppStatus(NetAppStatusModel status)
+    {
+        var netapp = await _redisInterfaceClient.InstanceGetByIdAsync(status.Id);
+        if (netapp is null)
+        {
+            return new("Robot not found", true);
+        }
+
+        status.Name = netapp.Name;
+        status.Timestamp = DateTimeOffset.Now;
+        var res = await _influxNetAppStatusRepository.AddAsync(status);
 
         return new(res);
     }
