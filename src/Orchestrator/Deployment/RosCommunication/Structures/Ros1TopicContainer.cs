@@ -7,7 +7,7 @@ namespace Middleware.Orchestrator.Deployment.RosCommunication.Structures;
 /// <summary>
 ///     Temporary class to parse the RosTopicModel into the correct format
 /// </summary>
-internal class RosTopicContainer
+internal class Ros1TopicContainer
 {
     [JsonPropertyName("topic_name")]
     public string Name { [UsedImplicitly] get; init; }
@@ -20,9 +20,9 @@ internal class RosTopicContainer
 
     [JsonPropertyName("qos")]
     [CanBeNull]
-    public Qos Qos { get; set; }
+    public Qos Qos { [UsedImplicitly]get; set; }
 
-    public static RosTopicContainer FromRosTopicModel(RosTopicModel topic)
+    public static Ros1TopicContainer FromRosTopicModel(RosTopicModel topic)
     {
         return new()
         {

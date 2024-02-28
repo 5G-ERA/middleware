@@ -59,8 +59,8 @@ internal class Ros2ConnectionBuilder : IRosConnectionBuilder
 
     private V1Container GetRelayNetAppContainer(RosSpec rosSpec)
     {
-        var subscribersContainers = rosSpec.TopicSubscribers.Select(RosTopicContainer.FromRosTopicModel).ToList();
-        var publishersContainers = rosSpec.TopicPublishers.Select(RosTopicContainer.FromRosTopicModel).ToList();
+        var subscribersContainers = rosSpec.TopicSubscribers.Select(Ros2TopicContainer.FromRosTopicModel).ToList();
+        var publishersContainers = rosSpec.TopicPublishers.Select(Ros2TopicContainer.FromRosTopicModel).ToList();
         var serviceSubscribers = rosSpec.ServiceSubscribers?.Select(RosServiceContainer.FromRosServiceModel).ToList();
         var transformsPublishers =
             rosSpec.TransformsPublishers?.Select(RosTransformsContainer.FromRosTransformsModel).ToList();
