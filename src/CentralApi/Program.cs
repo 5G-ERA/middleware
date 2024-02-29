@@ -3,7 +3,6 @@ using Middleware.CentralApi.Services;
 using Middleware.Common.ExtensionMethods;
 using Middleware.Common.Validation;
 using Middleware.DataAccess.ExtensionMethods;
-using Middleware.CentralApi.Services.Abstract;
 using Middleware.DataAccess.HostedServices;
 
 var builder = WebApplication.CreateBuilder(args);

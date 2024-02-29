@@ -16,9 +16,11 @@ internal class Ros1TopicContainer
     public string Type { [UsedImplicitly] get; init; }
 
     [JsonPropertyName("compression")]
-    public string Compression { [UsedImplicitly] get; set; } = "none";
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public string Compression { [UsedImplicitly] get; set; }
 
     [JsonPropertyName("qos")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     [CanBeNull]
     public Qos Qos { [UsedImplicitly]get; set; }
 

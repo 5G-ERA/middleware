@@ -1,7 +1,6 @@
 ﻿using Middleware.CentralApi.Contracts.Responses;
-using Middleware.Models.Domain;
 
-namespace Middleware.CentralApi.Services.Abstract;
+namespace Middleware.CentralApi.Services;
 
 public interface IRobotService
 {

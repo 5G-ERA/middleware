@@ -10,7 +10,7 @@ public class RosTopicModel
 
     public string? Description { get; init; }
 
-    public string Compression { get; set; } = "none";
+    public string? Compression { get; set; }
 
     public Qos? Qos { get; set; }
 
