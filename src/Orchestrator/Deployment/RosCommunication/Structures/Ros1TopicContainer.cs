@@ -22,7 +22,7 @@ internal class Ros1TopicContainer
     [JsonPropertyName("qos")]
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     [CanBeNull]
-    public Qos Qos { [UsedImplicitly]get; set; }
+    public QosContainer Qos { [UsedImplicitly]get; set; }
 
     public static Ros1TopicContainer FromRosTopicModel(RosTopicModel topic)
     {
@@ -31,7 +31,7 @@ internal class Ros1TopicContainer
             Name = topic.Name,
             Type = topic.Type,
             Compression = topic.Compression,
-            Qos = topic.Qos
+            Qos = QosContainer.FromQosModel(topic.Qos) 
         };
     }
 }
