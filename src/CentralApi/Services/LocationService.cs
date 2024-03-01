@@ -18,7 +18,7 @@ public class LocationService : ILocationService
     public async Task<OneOf<Location, NotFound>> RegisterLocation(Location location)
     {
         // when location not found in db
-        var (found, loc) = await _locationRepository.ExistsAsync(location.Name);
+        var (found, loc) = await _locationRepository.ExistsAsync(location.Name, location.Organization);
 
 
         if (found == false)

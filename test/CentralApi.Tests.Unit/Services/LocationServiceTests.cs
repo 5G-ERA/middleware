@@ -49,7 +49,7 @@ public class LocationServiceTests
             Type = LocationType.Cloud,
             IsOnline = true
         };
-        _locationRepository.ExistsAsync(Arg.Any<string>()).Returns((true, cloud));
+        _locationRepository.ExistsAsync(Arg.Any<string>(), Arg.Any<string>()).Returns((true, cloud));
 
         _locationRepository.AddAsync(Arg.Any<Location>()).ReturnsForAnyArgs(cloud);
         // act
@@ -76,7 +76,7 @@ public class LocationServiceTests
             Organization = "MiddlewareTesting",
             Type = LocationType.Cloud
         };
-        _locationRepository.ExistsAsync(Arg.Any<string>()).Returns((false, null));
+        _locationRepository.ExistsAsync(Arg.Any<string>(), Arg.Any<string>()).Returns((false, null));
 
         // act
         var result = await _sut.RegisterLocation(paramLocation);
