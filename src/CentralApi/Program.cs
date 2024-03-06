@@ -1,3 +1,4 @@
+using System.Reflection;
 using Middleware.CentralApi.ExtensionMethods;
 using Middleware.CentralApi.Services;
 using Middleware.Common.ExtensionMethods;
@@ -6,6 +7,10 @@ using Middleware.DataAccess.ExtensionMethods;
 using Middleware.DataAccess.HostedServices;
 
 var builder = WebApplication.CreateBuilder(args);
+
+builder.Configuration
+    .AddEnvironmentVariables()
+    .AddUserSecrets(Assembly.GetExecutingAssembly(), true);
 
 // Add services to the container.
 builder.RegisterSecretsManager();
