@@ -467,7 +467,7 @@ internal class DeploymentService : IDeploymentService
 
         _logger.LogDebug("Preparing the image {ImageName}", service.Name);
 
-        if (deploymentNames.Contains(service.Name)) service.Name = service.Name.GetNewImageNameWithSuffix();
+        if (deploymentNames.Contains(service.Name)) service.Name = service.Name.AddRandomSuffix();
 
         deploymentNames.Add(service.Name);
         var pair = await ConfigureDeploymentObjects(service, thisLocation);

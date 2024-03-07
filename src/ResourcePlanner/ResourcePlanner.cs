@@ -1,9 +1,9 @@
 ﻿using System.Net;
 using AutoMapper;
 using Middleware.Common.Config;
-using Middleware.Common.Enums;
 using Middleware.Models.Domain;
 using Middleware.Models.Enums;
+using Middleware.Models.ExtensionMethods;
 using Middleware.RedisInterface.Contracts.Mappings;
 using Middleware.RedisInterface.Sdk;
 using Middleware.ResourcePlanner.ApiReference;
@@ -56,7 +56,7 @@ internal class ResourcePlanner : IResourcePlanner
         var actionSequence = taskModel.ActionSequence;
         if (actionSequence == null || actionSequence.Count == 0)
             throw new ArgumentException("Action sequence cannot be empty");
-
+        var requiresPersistence = false;
         foreach (var action in actionSequence)
         {
             var images = await _redisInterfaceClient.GetRelationAsync(action, "NEEDS");
@@ -69,6 +69,11 @@ internal class ResourcePlanner : IResourcePlanner
                 var instanceResp = await _redisInterfaceClient.InstanceGetByIdAsync(relation.PointsTo.Id);
                 var instance = instanceResp.ToInstance();
 
+                if (instance.IsPersistent && requiresPersistence == false)
+                {
+                    requiresPersistence = true;
+                }
+                
                 if (instance.CanBeReused() && !taskModel.DisableResourceReuse)
                 {
                     var reusedInstance = await GetInstanceToReuse(instance, orchestratorApiClient);
@@ -85,7 +90,16 @@ internal class ResourcePlanner : IResourcePlanner
             action.SetNewLocationForPlan(location);
         }
 
+        if (requiresPersistence && string.IsNullOrEmpty(taskModel.NetAppDataKey))
+        {
+            taskModel.NetAppDataKey = GenerateDataKey(taskModel.Name);
+        }
         return taskModel;
+    }
+
+    private string GenerateDataKey(string netAppName)
+    {
+        return netAppName.AddRandomSuffix();
     }
 
 

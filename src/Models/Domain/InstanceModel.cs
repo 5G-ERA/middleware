@@ -18,7 +18,7 @@ public class InstanceModel : BaseModel, IPolicyAssignable, IHardwareRequirementC
 
     public bool? IsReusable { get; set; }
 
-    public bool IsPersistent { get; set; } = false;
+    public bool IsPersistent { get; set; }
     public string? DesiredStatus { get; set; }
 
     public string? ServiceUrl { get; set; }
