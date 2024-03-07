@@ -18,6 +18,7 @@ public class InstanceModel : BaseModel, IPolicyAssignable, IHardwareRequirementC
 
     public bool? IsReusable { get; set; }
 
+    public bool IsPersistent { get; set; } = false;
     public string? DesiredStatus { get; set; }
 
     public string? ServiceUrl { get; set; }
@@ -94,6 +95,7 @@ public class InstanceModel : BaseModel, IPolicyAssignable, IHardwareRequirementC
             ServiceInstanceId = domain.ServiceInstanceId.ToString(),
             ServiceType = domain.ServiceType,
             IsReusable = domain.IsReusable,
+            IsPersistent = domain.IsPersistent,
             DesiredStatus = domain.DesiredStatus,
             ServiceUrl = domain.ServiceUrl,
             RosTopicsPub = domain.RosTopicsPub.Select(x => x.ToDto()).ToList(),
