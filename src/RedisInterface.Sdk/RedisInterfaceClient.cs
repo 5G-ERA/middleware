@@ -413,7 +413,7 @@ public class RedisInterfaceClient : IRedisInterfaceClient
             throw new ArgumentNullException(nameof(id));
 
         var result = await _api.ActionPlanGetById(id);
-
+        
         if (!result.IsSuccessStatusCode)
             _logger.LogError(result.Error, "{funcName} - unsuccessful API call, StackTrace: {stackTrace}", nameof(ActionPlanGetByIdAsync), Environment.StackTrace);
 

@@ -60,6 +60,7 @@ public class PlanController : MiddlewareController
             var (plan, robot2) =
                 await _actionPlanner.Plan(id, robotId);
             plan.DisableResourceReuse = lockResource;
+            plan.NetAppDataKey = request.NetAppDataKey;
 
             var resourcePlan = await _publishService.RequestResourcePlan(plan, robot2);
 

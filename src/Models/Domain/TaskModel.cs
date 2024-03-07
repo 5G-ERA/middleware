@@ -34,6 +34,9 @@ public class TaskModel : BaseModel
     [JsonPropertyName("ActionPlanId")]
     public Guid ActionPlanId { get; set; }
 
+    [JsonPropertyName("NetAppDataKey")]
+    public string? NetAppDataKey { get; set; }
+
     [JsonPropertyName("FullReplan")]
     public bool FullReplan { get; set; }
 
@@ -53,11 +56,9 @@ public class TaskModel : BaseModel
     public bool MarkovianProcess { get; set; }
 
     [JsonPropertyName("ActionSequence")]
-    //[JsonIgnore]
     public List<ActionModel>? ActionSequence { get; set; }
 
-    [JsonPropertyName("Tags")] //TODO: define allows tags
-    //[JsonIgnore]
+    [JsonPropertyName("Tags")]
     public List<string>? Tags { get; set; }
 
     public TaskModel()

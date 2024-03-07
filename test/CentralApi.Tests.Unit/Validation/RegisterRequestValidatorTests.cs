@@ -17,7 +17,7 @@ public class RegisterRequestValidatorTests
     [Fact]
     public void RegisterRequestValidator_ShouldHaveError_WhenLocationNameIsNull()
     {
-        var model = new RegisterRequest { Name = null };
+        var model = new RegisterRequest { Name = null! };
         var result = _sut.TestValidate(model);
         result.ShouldHaveValidationErrorFor(request => request.Name);
     }
