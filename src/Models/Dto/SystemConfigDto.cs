@@ -24,7 +24,12 @@ public class SystemConfigDto : Dto
 
     [Indexed]
     public int HeartbeatExpirationInMinutes { get; set; }
-
+    [Indexed]
+    public string HermesContainer { get; set; } = default!;
+    [Indexed]
+    public string S3DataPersistenceRegion { get; set; } = default!;
+    [Indexed]
+    public string S3DataPersistenceBucketName { get; set; } = default!;
     /// <inheritdoc />
     public override BaseModel ToModel()
     {
@@ -36,7 +41,10 @@ public class SystemConfigDto : Dto
             Ros1RelayContainer = d.Ros1RelayContainer,
             Ros2RelayContainer = d.Ros2RelayContainer,
             RosInterRelayNetAppContainer = d.RosInterRelayNetAppContainer,
-            HeartbeatExpirationInMinutes = d.HeartbeatExpirationInMinutes
+            HeartbeatExpirationInMinutes = d.HeartbeatExpirationInMinutes,
+            HermesContainer = d.HermesContainer,
+            S3DataPersistenceRegion = d.S3DataPersistenceRegion,
+            S3DataPersistenceBucketName = d.S3DataPersistenceBucketName
         };
     }
 }

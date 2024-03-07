@@ -515,8 +515,9 @@ internal class DeploymentService : IDeploymentService
         return result;
     }
 
-    private async Task<DeploymentPair> ConfigureDeploymentObjects(InstanceModel instance, ILocation thisLocation)
+    private async Task<DeploymentPair> ConfigureDeploymentObjects(InstanceModel instance, ILocation thisLocation, [CanBeNull] string netAppDataKey = null)
     {
+        var config = await _systemConfigRepository.GetConfigAsync();
         var cim = instance.ContainerImage;
         var instanceName = instance.Name;
         var instanceId = Guid.NewGuid();
@@ -525,6 +526,11 @@ internal class DeploymentService : IDeploymentService
             _kubeObjectBuilder.DeserializeAndConfigureDeployment(cim!.K8SDeployment, instanceId, instanceName,
                 thisLocation);
 
+        if (instance.IsPersistent && string.IsNullOrWhiteSpace(netAppDataKey) == false)
+        {
+            deployment = _kubeObjectBuilder.EnableDataPersistence(deployment, config, netAppDataKey);
+        }
+        
         IRosConnectionBuilder builder = null;
 
         if (instance.RosDistro is not null)
@@ -543,7 +549,7 @@ internal class DeploymentService : IDeploymentService
 
             deployment = builder.EnableRosCommunication(deployment, rosSpec);
         }
-
+        
         var service = string.IsNullOrWhiteSpace(cim.K8SService)
             ? _kubeObjectBuilder.CreateDefaultService(instanceName, instanceId, deployment)
             : _kubeObjectBuilder.DeserializeAndConfigureService(cim.K8SService, instanceName, instanceId);
