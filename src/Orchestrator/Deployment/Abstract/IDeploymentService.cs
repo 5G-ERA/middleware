@@ -1,6 +1,6 @@
 ﻿using k8s.Models;
 using Middleware.Common.Enums;
-using Middleware.Common.Structs;
+using Middleware.Common.Result;
 using Middleware.Models.Domain;
 
 namespace Middleware.Orchestrator.Deployment;
@@ -30,10 +30,10 @@ public interface IDeploymentService
     /// </summary>
     /// <param name="actionPlan">Action Plan to be deleted</param>
     /// <returns>Has the operation succeeded</returns>
-    Task<bool> DeletePlanAsync(ActionPlanModel actionPlan);
+    Task<Result> DeletePlanAsync(ActionPlanModel actionPlan);
 
     Task DeleteActionAsync(Guid actionPlanId, Guid actionId);
 
     Task DeployActionAsync(Guid actionPlanId, Guid actionId);
-    Task<Result<bool>> DeployActionPlanAsync(TaskModel task, Guid robotId);
+    Task<Result> DeployActionPlanAsync(TaskModel task, Guid robotId);
 }

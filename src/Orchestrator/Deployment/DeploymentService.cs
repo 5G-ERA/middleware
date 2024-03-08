@@ -6,7 +6,7 @@ using Microsoft.Extensions.Options;
 using Middleware.Common.Config;
 using Middleware.Common.Enums;
 using Middleware.Common.ExtensionMethods;
-using Middleware.Common.Structs;
+using Middleware.Common.Result;
 using Middleware.DataAccess.Repositories.Abstract;
 using Middleware.Models.Domain;
 using Middleware.Models.Domain.Contracts;
@@ -87,9 +87,9 @@ internal class DeploymentService : IDeploymentService
     }
 
     /// <inheritdoc />
-    public async Task<bool> DeletePlanAsync(ActionPlanModel actionPlan)
+    public async Task<Result> DeletePlanAsync(ActionPlanModel actionPlan)
     {
-        var retVal = true;
+        var retVal = new Result();
         try
         {
             foreach (var action in actionPlan.ActionSequence!)
@@ -107,8 +107,10 @@ internal class DeploymentService : IDeploymentService
                         continue;
                     }
 
-                    retVal &= await TerminateNetAppByIdAsync(srv.ServiceInstanceId);
-                    await _redisInterfaceClient.DeleteRelationAsync(srv, actionLoc.ToBaseLocation(), "LOCATED_AT");
+                    retVal += await TerminateNetAppByIdAsync(srv.ServiceInstanceId);
+                    retVal += await _redisInterfaceClient.DeleteRelationAsync(srv, actionLoc.ToBaseLocation(),
+                        "LOCATED_AT");
+
                     if (ShouldDeployInterRelay(srv, action) == false)
                     {
                         await _publisher.PublishGatewayDeleteNetAppEntryAsync(actionLoc, srv.Name, actionPlan.Id,
@@ -124,25 +126,27 @@ internal class DeploymentService : IDeploymentService
                 }
             }
         }
-        catch (NotInK8SEnvironmentException)
+        catch (NotInK8SEnvironmentException ex)
         {
             _logger.LogInformation("The instantiation of the kubernetes client has failed in {env} environment.",
                 AppConfig.AppConfiguration);
 
-            retVal = AppConfig.AppConfiguration == AppVersionEnum.Dev.GetStringValue();
-            if (retVal)
+            retVal = AppConfig.AppConfiguration == AppVersionEnum.Dev.GetStringValue()
+                ? Result.Success()
+                : Result.Failure(ex.Message);
+            if (retVal.IsSuccess == false)
                 _logger.LogWarning("Deployment of the services has been skipped in the Development environment");
         }
         catch (HttpOperationException ex)
         {
             _logger.LogError(ex, "There was an error while deleting the service caused by {reason}",
                 ex.Response.Content);
-            retVal = false;
+            retVal = ex.Response.Content;
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "The deletion of the Action Plan has failed!");
-            retVal = false;
+            retVal = ex.Message;
         }
 
         return retVal;
@@ -251,7 +255,7 @@ internal class DeploymentService : IDeploymentService
             var interRelay =
                 _kubeObjectBuilder.CreateInterRelayNetAppDeploymentConfig(actionPlanId, action, deploymentPairs,
                     systemCfg);
-            await DeployInterRelayNetApp(interRelay);
+            await DeployNetApp(interRelay);
 
             foreach (var pair in deploymentPairs)
             {
@@ -277,12 +281,13 @@ internal class DeploymentService : IDeploymentService
         return _kubeObjectBuilder.CreateStartupDeployment(name, tag);
     }
 
-    public async Task<Result<bool>> DeployActionPlanAsync(TaskModel task, Guid robotId)
+    public async Task<Result> DeployActionPlanAsync(TaskModel task, Guid robotId)
     {
+        var retVal = Result.Success();
         _logger.LogDebug("Entered DeploymentService.DeployAsync");
         // TODO: BIG BOI, needs refactoring!!
         if (_kube is null)
-            return new NotInK8SEnvironmentException();
+            return NotInK8SEnvironmentException.DefaultMessage;
         var systemConfig = await _systemConfigRepository.GetConfigAsync();
         var location = await GetCurrentLocationAsync();
 
@@ -297,26 +302,77 @@ internal class DeploymentService : IDeploymentService
         var robotResp = await _redisInterfaceClient.RobotGetByIdAsync(robotId);
         var robot = robotResp.ToRobot();
 
-        var isSuccess = true;
-        var deploymentQueue = new Dictionary<ActionModel, IReadOnlyList<DeploymentPair>>();
         try
         {
-            var relays = new Dictionary<Guid, DeploymentPair>();
-            foreach (var action in task.ActionSequence!)
+            var (deploymentQueue, relays)
+                = await DeploymentQueue(task, config);
+
+            retVal = await DeployQueue(task, deploymentQueue, location);
+
+            await DeployRelays(task, relays, location);
+
+            retVal += await SaveActionSequence(task, robot);
+        }
+        catch (NotInK8SEnvironmentException)
+        {
+            _logger.LogInformation("The instantiation of the kubernetes client has failed in {env} environment.",
+                AppConfig.AppConfiguration);
+
+            var isSuccess = AppConfig.AppConfiguration == AppVersionEnum.Dev.GetStringValue();
+
+            if (isSuccess)
             {
-                var dplTmp = await ConstructDeployments(action, config);
-                deploymentQueue.Add(action, dplTmp);
+                retVal += await SaveActionSequence(task, robot);
+                _logger.LogWarning("Deployment of the services has been skipped in the Development environment");
+            }
 
-                if (action.ShouldUseInterRelayForRosNetApps() == false) continue;
+            return retVal;
+        }
+        catch (HttpOperationException ex)
+        {
+            _logger.LogError(ex, "There was an error while deploying the service caused by {reason}",
+                ex.Response.Content);
+            return ex.Response.Content;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "The deployment of the Action Plan has failed!");
+            return ex.Message;
+        }
 
-                _logger.LogDebug("Current deployments: {deployments}", string.Join(", ", deploymentNames));
-                var relay = _kubeObjectBuilder.CreateInterRelayNetAppDeploymentConfig(task.ActionPlanId, action,
-                    dplTmp, systemConfig);
-                relays[action.Id] = relay;
-                foreach (var pair in dplTmp)
+        return retVal;
+    }
+
+    private async Task DeployRelays(TaskModel task, Dictionary<Guid, DeploymentPair> relays, ILocation location)
+    {
+        foreach (var kvp in relays)
+        {
+            _logger.LogDebug("Deploying Inter Relay NetApp '{Name}' for action: {actionId}", kvp.Value.Name,
+                kvp.Key);
+            await DeployNetApp(kvp.Value);
+            await _publisher.PublishGatewayAddNetAppEntryAsync(location, kvp.Value.Name, task.ActionPlanId,
+                kvp.Key);
+        }
+    }
+
+    private async Task<Result> DeployQueue(TaskModel task,
+        Dictionary<ActionModel, IReadOnlyList<DeploymentPair>> deploymentQueue, ILocation location)
+    {
+        var retVal = Result.Success();
+        foreach (var item in deploymentQueue)
+        {
+            foreach (var pair in item.Value)
+            {
+                _logger.LogDebug("Deploying instance '{Name}', with serviceInstanceId '{ServiceInstanceId}'",
+                    pair.Instance!.Name, pair.InstanceId);
+                await DeployNetApp(pair);
+
+                if (ShouldDeployInterRelay(pair.Instance, item.Key) == false)
                 {
-                    var netAppAddress = location.GetNetAppAddress(relay.Name);
-                    _logger.LogDebug("{netAppName} NetApp address to be set: {address}", pair.Name, netAppAddress);
+                    await _publisher.PublishGatewayAddNetAppEntryAsync(location, pair.Name, task.ActionPlanId,
+                        pair.InstanceId);
+                    var netAppAddress = location.GetNetAppAddress(pair.Name);
+                    _logger.LogDebug("NetApp address to be set: {address}", netAppAddress);
                     if (netAppAddress.StartsWith("http") == false)
                     {
                         netAppAddress = "http://" + netAppAddress;
@@ -324,76 +380,48 @@ internal class DeploymentService : IDeploymentService
 
                     pair.Instance!.SetNetAppAddress(netAppAddress);
                 }
-            }
 
-            foreach (var item in deploymentQueue)
+                _logger.LogDebug("Adding new relation between instance and current location");
+                retVal += await _redisInterfaceClient.AddRelationAsync(pair.Instance!, location.ToBaseLocation(),
+                    "LOCATED_AT");
+                pair.Instance.SetStatus(ServiceStatus.Active);
+            }
+        }
+
+        return retVal;
+    }
+
+    private async Task<(Dictionary<ActionModel, IReadOnlyList<DeploymentPair>> deploymentQueue,
+            Dictionary<Guid, DeploymentPair> relays)>
+        DeploymentQueue(TaskModel task, Config.Config config)
+    {
+        var deploymentQueue = new Dictionary<ActionModel, IReadOnlyList<DeploymentPair>>();
+        var relays = new Dictionary<Guid, DeploymentPair>();
+        foreach (var action in task.ActionSequence!)
+        {
+            var dplTmp = await ConstructDeployments(action, config);
+            deploymentQueue.Add(action, dplTmp);
+
+            if (action.ShouldUseInterRelayForRosNetApps() == false) continue;
+
+            _logger.LogDebug("Current deployments: {deployments}", string.Join(", ", config.DeploymentNames));
+            var relay = _kubeObjectBuilder.CreateInterRelayNetAppDeploymentConfig(task.ActionPlanId, action,
+                dplTmp, config.System);
+            relays[action.Id] = relay;
+            foreach (var pair in dplTmp)
             {
-                foreach (var pair in item.Value)
+                var netAppAddress = config.Location.GetNetAppAddress(relay.Name);
+                _logger.LogDebug("{netAppName} NetApp address to be set: {address}", pair.Name, netAppAddress);
+                if (netAppAddress.StartsWith("http") == false)
                 {
-                    _logger.LogDebug("Deploying instance '{Name}', with serviceInstanceId '{ServiceInstanceId}'",
-                        pair.Instance!.Name, pair.InstanceId);
-                    await DeployNetApp(pair);
-
-                    if (ShouldDeployInterRelay(pair.Instance, item.Key) == false)
-                    {
-                        await _publisher.PublishGatewayAddNetAppEntryAsync(location, pair.Name, task.ActionPlanId,
-                            pair.InstanceId);
-                        var netAppAddress = location.GetNetAppAddress(pair.Name);
-                        _logger.LogDebug("NetApp address to be set: {address}", netAppAddress);
-                        if (netAppAddress.StartsWith("http") == false)
-                        {
-                            netAppAddress = "http://" + netAppAddress;
-                        }
-
-                        pair.Instance!.SetNetAppAddress(netAppAddress);
-                    }
-
-                    _logger.LogDebug("Adding new relation between instance and current location");
-                    await _redisInterfaceClient.AddRelationAsync(pair.Instance!, location.ToBaseLocation(),
-                        "LOCATED_AT");
-                    pair.Instance.SetStatus(ServiceStatus.Active);
+                    netAppAddress = "http://" + netAppAddress;
                 }
+
+                pair.Instance!.SetNetAppAddress(netAppAddress);
             }
-
-            foreach (var kvp in relays)
-            {
-                _logger.LogDebug("Deploying Inter Relay NetApp '{Name}' for action: {actionId}", kvp.Value.Name,
-                    kvp.Key);
-                await DeployInterRelayNetApp(kvp.Value);
-                await _publisher.PublishGatewayAddNetAppEntryAsync(location, kvp.Value.Name, task.ActionPlanId,
-                    kvp.Key);
-            }
-
-            isSuccess &= await SaveActionSequence(task, robot);
-        }
-        catch (NotInK8SEnvironmentException ex)
-        {
-            _logger.LogInformation("The instantiation of the kubernetes client has failed in {env} environment.",
-                AppConfig.AppConfiguration);
-
-            isSuccess = AppConfig.AppConfiguration == AppVersionEnum.Dev.GetStringValue();
-
-            if (isSuccess)
-            {
-                isSuccess &= await SaveActionSequence(task, robot);
-                _logger.LogWarning("Deployment of the services has been skipped in the Development environment");
-            }
-
-            return isSuccess ? true : ex;
-        }
-        catch (HttpOperationException ex)
-        {
-            _logger.LogError(ex, "There was an error while deploying the service caused by {reason}",
-                ex.Response.Content);
-            return ex;
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "The deployment of the Action Plan has failed!");
-            return ex;
         }
 
-        return isSuccess;
+        return (deploymentQueue, relays);
     }
 
     private async Task<bool> IsServiceUsedInOtherActionPlans(Guid actionPlanId, Guid serviceInstanceId)
@@ -416,12 +444,6 @@ internal class DeploymentService : IDeploymentService
     }
 
     private async Task DeployNetApp(DeploymentPair netApp)
-    {
-        await _kube.CoreV1.CreateNamespacedServiceAsync(netApp.Service, AppConfig.K8SNamespaceName);
-        await _kube.AppsV1.CreateNamespacedDeploymentAsync(netApp.Deployment, AppConfig.K8SNamespaceName);
-    }
-
-    private async Task DeployInterRelayNetApp(DeploymentPair netApp)
     {
         await _kube.CoreV1.CreateNamespacedServiceAsync(netApp.Service, AppConfig.K8SNamespaceName);
         await _kube.AppsV1.CreateNamespacedDeploymentAsync(netApp.Deployment, AppConfig.K8SNamespaceName);
@@ -504,7 +526,7 @@ internal class DeploymentService : IDeploymentService
     /// <param name="task"></param>
     /// <param name="robot"></param>
     /// <returns></returns>
-    private async Task<bool> SaveActionSequence(TaskModel task, RobotModel robot)
+    private async Task<Result> SaveActionSequence(TaskModel task, RobotModel robot)
     {
         var actionPlan = new ActionPlanModel(task.ActionPlanId, task.Id, task.Name, task.ActionSequence!, robot.Id);
         actionPlan.SetStatus("active");
@@ -513,7 +535,7 @@ internal class DeploymentService : IDeploymentService
         var result = await _redisInterfaceClient.ActionPlanAddAsync(actionPlan);
         //await _redisInterfaceClient.AddRelationAsync(robot, actionPlan, "OWNS");
         if (result) _logger.LogInformation("Successfully saved action plan with Id {id}", actionPlan.Id);
-        return result;
+        return result ? Result.Success() : Result.Failure("Could not save action plan");
     }
 
     private async Task<DeploymentPair> ConfigureDeploymentObjects(InstanceModel instance, Config.Config config)
@@ -564,7 +586,7 @@ internal class DeploymentService : IDeploymentService
     /// </summary>
     /// <param name="instanceId"></param>
     /// <returns></returns>
-    private async Task<bool> TerminateNetAppByIdAsync(Guid instanceId)
+    private async Task<Result> TerminateNetAppByIdAsync(Guid instanceId)
     {
         var deployments = await _kube.AppsV1.ListNamespacedDeploymentAsync(AppConfig.K8SNamespaceName,
             labelSelector: KubernetesObjectExtensions.GetNetAppLabelSelector(instanceId));
@@ -599,14 +621,16 @@ internal class DeploymentService : IDeploymentService
         return relayName;
     }
 
-    private async Task<bool> Terminate(V1DeploymentList deployments, V1ServiceList services)
+    private async Task<Result> Terminate(V1DeploymentList deployments, V1ServiceList services)
     {
-        var retVal = true;
+        var retVal = new Result();
+
         foreach (var deployment in deployments.Items)
         {
             var status =
                 await _kube.AppsV1.DeleteNamespacedDeploymentAsync(deployment.Name(), AppConfig.K8SNamespaceName);
-            retVal &= status.Status == OutcomeType.Successful;
+            if (status.Status != OutcomeType.Successful)
+                retVal += $"Failed to delete deployment {deployment.Name()}";
         }
 
         foreach (var service in services.Items)
@@ -617,7 +641,7 @@ internal class DeploymentService : IDeploymentService
             }
             catch
             {
-                // ignored
+                retVal += $"Failed to delete service {service.Name()}";
             }
         }
 

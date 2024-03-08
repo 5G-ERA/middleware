@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.Logging;
+using Middleware.Common.Result;
 using Middleware.Models.Domain;
 using Middleware.Models.ExtensionMethods;
 using Middleware.RedisInterface.Contracts.Requests;
@@ -18,7 +19,7 @@ public class RedisInterfaceClient : IRedisInterfaceClient
         _logger = logger;
     }
 
-    public async Task<bool> AddRelationAsync<TSource, TDirection>(TSource source, TDirection direction, string name)
+    public async Task<Result> AddRelationAsync<TSource, TDirection>(TSource source, TDirection direction, string name)
         where TSource : BaseModel where TDirection : BaseModel
     {
         if (source is null) throw new ArgumentNullException(nameof(source));
@@ -27,12 +28,12 @@ public class RedisInterfaceClient : IRedisInterfaceClient
 
         var entity = source.GetType().GetModelName();
         var relation = CreateRelation(source, direction, name);
-        await _api.RelationAdd(entity, relation);
+        var result = await _api.RelationAdd(entity, relation);
 
-        return true;
+        return result.IsSuccessStatusCode ? Result.Success() : Result.Failure($"Could not create relation: {result.Error!.Message}");
     }
 
-    public async Task<bool> DeleteRelationAsync<TSource, TDirection>(TSource source, TDirection direction,
+    public async Task<Result> DeleteRelationAsync<TSource, TDirection>(TSource source, TDirection direction,
         string name) where TSource : BaseModel where TDirection : BaseModel
     {
         if (source is null) throw new ArgumentNullException(nameof(source));
@@ -42,8 +43,14 @@ public class RedisInterfaceClient : IRedisInterfaceClient
         var entity = source.GetType().GetModelName();
         var relation = CreateRelation(source, direction, name);
 
-        await _api.RelationDelete(entity, relation);
-        return true;
+        var result = await _api.RelationDelete(entity, relation);
+        if (result.IsSuccessStatusCode == false)
+        {
+            _logger.LogError(result.Error, "{funcName} - unsuccessful API call, Error: {error}", nameof(DeleteRelationAsync), result.Error!.Message);
+            return $"Could not delete relation. {result.Error.Message}";
+        }
+        
+        return Result.Success();
     }
 
     public Task<ActionPlanModel?> ActionPlanGetByIdAsync(Guid id)

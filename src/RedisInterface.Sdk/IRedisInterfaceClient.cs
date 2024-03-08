@@ -1,3 +1,4 @@
+using Middleware.Common.Result;
 using Middleware.Models.Domain;
 using Middleware.RedisInterface.Contracts.Requests;
 using Middleware.RedisInterface.Contracts.Responses;
@@ -48,10 +49,10 @@ public interface IRedisInterfaceClient
     /// <typeparam name="TSource">Object that derives from <see cref="BaseModel" /></typeparam>
     /// <typeparam name="TDirection">Object that derives from <see cref="BaseModel" /></typeparam>
     /// <returns>Have relation been created</returns>
-    Task<bool> AddRelationAsync<TSource, TDirection>(TSource source, TDirection direction, string name)
+    Task<Result> AddRelationAsync<TSource, TDirection>(TSource source, TDirection direction, string name)
         where TSource : BaseModel where TDirection : BaseModel;
 
-    Task<bool> DeleteRelationAsync<TSource, TDirection>(TSource source, TDirection direction, string name)
+    Task<Result> DeleteRelationAsync<TSource, TDirection>(TSource source, TDirection direction, string name)
         where TSource : BaseModel where TDirection : BaseModel;
 
     /// <summary>
