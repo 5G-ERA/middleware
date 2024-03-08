@@ -6,11 +6,13 @@ using Microsoft.Extensions.Options;
 using Middleware.Common.Config;
 using Middleware.Common.Enums;
 using Middleware.Common.ExtensionMethods;
+using Middleware.Common.Structs;
 using Middleware.DataAccess.Repositories.Abstract;
 using Middleware.Models.Domain;
 using Middleware.Models.Domain.Contracts;
 using Middleware.Models.Enums;
 using Middleware.Models.ExtensionMethods;
+using Middleware.Orchestrator.Config;
 using Middleware.Orchestrator.Deployment.RosCommunication;
 using Middleware.Orchestrator.Exceptions;
 using Middleware.Orchestrator.Helpers;
@@ -201,12 +203,17 @@ internal class DeploymentService : IDeploymentService
         if (action is null)
             return;
 
-        var cfg = await _systemConfigRepository.GetConfigAsync();
-        var deploymentNames = await GetCurrentlyDeployedAppNames();
-
+        var systemCfg = await _systemConfigRepository.GetConfigAsync();
         var thisLocation = await GetCurrentLocationAsync();
+        var deploymentNames = await GetCurrentlyDeployedAppNames();
+        var cfg = Config.Config.NewConfig
+            .WithSystem(systemCfg)
+            .WithLocation(thisLocation)
+            .WithMiddleware(_mwConfig.Value)
+            .WithDeploymentNames(deploymentNames);
 
-        var deploymentPairs = await ConstructDeployments(action, deploymentNames, thisLocation);
+
+        var deploymentPairs = await ConstructDeployments(action, cfg);
 
         foreach (var pair in deploymentPairs)
         {
@@ -242,7 +249,8 @@ internal class DeploymentService : IDeploymentService
         if (action.ShouldUseInterRelayForRosNetApps())
         {
             var interRelay =
-                _kubeObjectBuilder.CreateInterRelayNetAppDeploymentConfig(actionPlanId, action, deploymentPairs, cfg);
+                _kubeObjectBuilder.CreateInterRelayNetAppDeploymentConfig(actionPlanId, action, deploymentPairs,
+                    systemCfg);
             await DeployInterRelayNetApp(interRelay);
 
             foreach (var pair in deploymentPairs)
@@ -269,36 +277,41 @@ internal class DeploymentService : IDeploymentService
         return _kubeObjectBuilder.CreateStartupDeployment(name, tag);
     }
 
-    public async Task<bool> DeployActionPlanAsync(TaskModel task, Guid robotId)
+    public async Task<Result<bool>> DeployActionPlanAsync(TaskModel task, Guid robotId)
     {
+        _logger.LogDebug("Entered DeploymentService.DeployAsync");
         // TODO: BIG BOI, needs refactoring!!
         if (_kube is null)
-            return true;
+            return new NotInK8SEnvironmentException();
+        var systemConfig = await _systemConfigRepository.GetConfigAsync();
+        var location = await GetCurrentLocationAsync();
+
+        var deploymentNames = await GetCurrentlyDeployedAppNames();
+        var config = Config.Config.NewConfig
+            .WithSystem(systemConfig)
+            .WithLocation(location)
+            .WithMiddleware(_mwConfig.Value)
+            .WithNetAppDataKey(task.NetAppDataKey)
+            .WithDeploymentNames(deploymentNames);
 
         var robotResp = await _redisInterfaceClient.RobotGetByIdAsync(robotId);
         var robot = robotResp.ToRobot();
-
-        var cfg = await _systemConfigRepository.GetConfigAsync();
 
         var isSuccess = true;
         var deploymentQueue = new Dictionary<ActionModel, IReadOnlyList<DeploymentPair>>();
         try
         {
-            _logger.LogDebug("Entered DeploymentService.DeployAsync");
-            var deploymentNames = await GetCurrentlyDeployedAppNames();
-
-            var location = await GetCurrentLocationAsync();
             var relays = new Dictionary<Guid, DeploymentPair>();
             foreach (var action in task.ActionSequence!)
             {
-                var dplTmp = await ConstructDeployments(action, deploymentNames, location);
+                var dplTmp = await ConstructDeployments(action, config);
                 deploymentQueue.Add(action, dplTmp);
 
                 if (action.ShouldUseInterRelayForRosNetApps() == false) continue;
 
                 _logger.LogDebug("Current deployments: {deployments}", string.Join(", ", deploymentNames));
                 var relay = _kubeObjectBuilder.CreateInterRelayNetAppDeploymentConfig(task.ActionPlanId, action,
-                    dplTmp, cfg);
+                    dplTmp, systemConfig);
                 relays[action.Id] = relay;
                 foreach (var pair in dplTmp)
                 {
@@ -353,7 +366,7 @@ internal class DeploymentService : IDeploymentService
 
             isSuccess &= await SaveActionSequence(task, robot);
         }
-        catch (NotInK8SEnvironmentException)
+        catch (NotInK8SEnvironmentException ex)
         {
             _logger.LogInformation("The instantiation of the kubernetes client has failed in {env} environment.",
                 AppConfig.AppConfiguration);
@@ -365,17 +378,19 @@ internal class DeploymentService : IDeploymentService
                 isSuccess &= await SaveActionSequence(task, robot);
                 _logger.LogWarning("Deployment of the services has been skipped in the Development environment");
             }
+
+            return isSuccess ? true : ex;
         }
         catch (HttpOperationException ex)
         {
             _logger.LogError(ex, "There was an error while deploying the service caused by {reason}",
                 ex.Response.Content);
-            isSuccess = false;
+            return ex;
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "The deployment of the Action Plan has failed!");
-            isSuccess = false;
+            return ex;
         }
 
         return isSuccess;
@@ -400,22 +415,16 @@ internal class DeploymentService : IDeploymentService
         return string.IsNullOrWhiteSpace(instance.RosDistro) == false && action.SingleNetAppEntryPoint;
     }
 
-    public async Task<DeploymentPair> DeployNetApp(DeploymentPair netApp)
+    private async Task DeployNetApp(DeploymentPair netApp)
     {
-        var service = await _kube.CoreV1.CreateNamespacedServiceAsync(netApp.Service, AppConfig.K8SNamespaceName);
-        var deployment =
-            await _kube.AppsV1.CreateNamespacedDeploymentAsync(netApp.Deployment, AppConfig.K8SNamespaceName);
-
-        return new(deployment, service, netApp.InstanceId, netApp.Instance!);
+        await _kube.CoreV1.CreateNamespacedServiceAsync(netApp.Service, AppConfig.K8SNamespaceName);
+        await _kube.AppsV1.CreateNamespacedDeploymentAsync(netApp.Deployment, AppConfig.K8SNamespaceName);
     }
 
-    public async Task<DeploymentPair> DeployInterRelayNetApp(DeploymentPair netApp)
+    private async Task DeployInterRelayNetApp(DeploymentPair netApp)
     {
-        var service = await _kube.CoreV1.CreateNamespacedServiceAsync(netApp.Service, AppConfig.K8SNamespaceName);
-        var deployment =
-            await _kube.AppsV1.CreateNamespacedDeploymentAsync(netApp.Deployment, AppConfig.K8SNamespaceName);
-
-        return new(netApp.Name, deployment, service, netApp.InstanceId);
+        await _kube.CoreV1.CreateNamespacedServiceAsync(netApp.Service, AppConfig.K8SNamespaceName);
+        await _kube.AppsV1.CreateNamespacedDeploymentAsync(netApp.Deployment, AppConfig.K8SNamespaceName);
     }
 
     private async Task<List<string>> GetCurrentlyDeployedAppNames()
@@ -426,8 +435,7 @@ internal class DeploymentService : IDeploymentService
         return deploymentNames;
     }
 
-    private async Task<IReadOnlyList<DeploymentPair>> ConstructDeployments(ActionModel action,
-        ICollection<string> deploymentNames, ILocation thisLocation)
+    private async Task<IReadOnlyList<DeploymentPair>> ConstructDeployments(ActionModel action, Config.Config config)
     {
         var deployments = new List<DeploymentPair>();
         foreach (var service in action.Services)
@@ -437,7 +445,7 @@ internal class DeploymentService : IDeploymentService
                 // BB: service can be reused, to be decided by the resource planner
                 if (service.ServiceInstanceId != Guid.Empty)
                     continue;
-                var pair = await PrepareDeploymentPair(service, deploymentNames, thisLocation);
+                var pair = await PrepareDeploymentPair(service, config);
                 deployments.Add(pair);
             }
             catch (Exception ex)
@@ -451,29 +459,28 @@ internal class DeploymentService : IDeploymentService
         return deployments;
     }
 
-    private async Task<DeploymentPair> PrepareDeploymentPair(InstanceModel service, ICollection<string> deploymentNames,
-        ILocation thisLocation)
+    private async Task<DeploymentPair> PrepareDeploymentPair(InstanceModel instance, Config.Config config)
     {
-        _logger.LogDebug("Querying for the images for service {Id}", service.Id);
-        var imagesResponse = await _redisInterfaceClient.ContainerImageGetForInstanceAsync(service.Id);
+        _logger.LogDebug("Querying for the images for service {Id}", instance.Id);
+        var imagesResponse = await _redisInterfaceClient.ContainerImageGetForInstanceAsync(instance.Id);
 
         var images = imagesResponse.ToContainersList();
         if (images is null || images.Any() == false)
             throw new IncorrectDataException("Image is not defined for the Instance deployment");
 
-        _logger.LogDebug("Retrieved service with Id: {Id}", service.Id);
+        _logger.LogDebug("Retrieved service with Id: {Id}", instance.Id);
 
-        service.ContainerImage = images.First();
+        instance.ContainerImage = images.First();
 
-        _logger.LogDebug("Preparing the image {ImageName}", service.Name);
+        _logger.LogDebug("Preparing the image {ImageName}", instance.Name);
 
-        if (deploymentNames.Contains(service.Name)) service.Name = service.Name.AddRandomSuffix();
+        if (config.DeploymentNames.Contains(instance.Name)) instance.Name = instance.Name.AddRandomSuffix();
 
-        deploymentNames.Add(service.Name);
-        var pair = await ConfigureDeploymentObjects(service, thisLocation);
+        config.DeploymentNames.Add(instance.Name);
+        var pair = await ConfigureDeploymentObjects(instance, config);
 
-        service.SetStatus(ServiceStatus.Instantiating);
-        service.ServiceInstanceId = pair.InstanceId;
+        instance.SetStatus(ServiceStatus.Instantiating);
+        instance.ServiceInstanceId = pair.InstanceId;
 
         return pair;
     }
@@ -482,9 +489,6 @@ internal class DeploymentService : IDeploymentService
     {
         _logger.LogDebug("Retrieving location details (cloud or edge)");
         return (await _redisInterfaceClient.GetLocationByNameAsync(_mwConfig.Value.InstanceName)).ToLocation();
-        // _mwConfig.Value.InstanceType.ToLower() == "cloud"
-        // ? (await _redisInterfaceClient.GetCloudByNameAsync(_mwConfig.Value.InstanceName)).ToCloud()
-        // : (await _redisInterfaceClient.GetEdgeByNameAsync(_mwConfig.Value.InstanceName)).ToEdge();
     }
 
     private async Task<ILocation> GetLocationAsync(LocationType type, string name)
@@ -492,9 +496,6 @@ internal class DeploymentService : IDeploymentService
         _logger.LogDebug("Retrieving location details (cloud or edge) for type {type}, name: {name}", type.ToString(),
             name);
         return (await _redisInterfaceClient.GetLocationByNameAsync(_mwConfig.Value.InstanceName)).ToLocation();
-        // type == LocationType.Cloud
-        // ? (await _redisInterfaceClient.GetCloudByNameAsync(name)).ToCloud()
-        // : (await _redisInterfaceClient.GetEdgeByNameAsync(name)).ToEdge();
     }
 
     /// <summary>
@@ -515,22 +516,21 @@ internal class DeploymentService : IDeploymentService
         return result;
     }
 
-    private async Task<DeploymentPair> ConfigureDeploymentObjects(InstanceModel instance, ILocation thisLocation, [CanBeNull] string netAppDataKey = null)
+    private async Task<DeploymentPair> ConfigureDeploymentObjects(InstanceModel instance, Config.Config config)
     {
-        var config = await _systemConfigRepository.GetConfigAsync();
         var cim = instance.ContainerImage;
         var instanceName = instance.Name;
         var instanceId = Guid.NewGuid();
 
         var deployment =
             _kubeObjectBuilder.DeserializeAndConfigureDeployment(cim!.K8SDeployment, instanceId, instanceName,
-                thisLocation);
+                config.Location);
 
-        if (instance.IsPersistent && string.IsNullOrWhiteSpace(netAppDataKey) == false)
+        if (instance.IsPersistent && string.IsNullOrWhiteSpace(config.NetAppDataKey) == false)
         {
-            deployment = _kubeObjectBuilder.EnableDataPersistence(deployment, config, netAppDataKey);
+            deployment = _kubeObjectBuilder.EnableDataPersistence(deployment, config.System, config.NetAppDataKey);
         }
-        
+
         IRosConnectionBuilder builder = null;
 
         if (instance.RosDistro is not null)
@@ -549,7 +549,7 @@ internal class DeploymentService : IDeploymentService
 
             deployment = builder.EnableRosCommunication(deployment, rosSpec);
         }
-        
+
         var service = string.IsNullOrWhiteSpace(cim.K8SService)
             ? _kubeObjectBuilder.CreateDefaultService(instanceName, instanceId, deployment)
             : _kubeObjectBuilder.DeserializeAndConfigureService(cim.K8SService, instanceName, instanceId);

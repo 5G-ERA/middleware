@@ -6,8 +6,8 @@ namespace Middleware.Orchestrator.Heartbeat;
 
 internal class HeartbeatService : IHeartbeatService
 {
-    private readonly ILogger _logger;
     private readonly IRedisInterfaceClient _redisInterfaceClient;
+    private readonly ILogger<HeartbeatService> _logger;
 
     private readonly IInfluxNetAppStatusRepository _influxNetAppStatusRepository;
     private readonly IInfluxRobotStatusRepository _influxRobotStatusRepository;

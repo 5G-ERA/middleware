@@ -31,7 +31,7 @@ public class KubernetesBuilderTests
             .Returns(new List<string>
             {
                 KubernetesBuilder.ServiceAccountNamespaceFileName,
-                KubernetesBuilder.ServiceAccountRootCAKeyFileName,
+                KubernetesBuilder.ServiceAccountRootCaKeyFileName,
                 KubernetesBuilder.ServiceAccountTokenKeyFileName
             });
         // act

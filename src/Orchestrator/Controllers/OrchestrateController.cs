@@ -41,11 +41,9 @@ public class OrchestrateController : MiddlewareController
         try
         {
             var result = await _deploymentService.DeployActionPlanAsync(request.Task, request.Robot.Id);
-            if (result == false)
+            if (result.IsSuccess == false)
             {
-                //TODO: provide more detailed information on what went wrong with the deployment of the task
-                return ErrorMessageResponse(HttpStatusCode.BadRequest, "plan",
-                    "There was a problem while deploying the task instance");
+                return ErrorMessageResponse(HttpStatusCode.BadRequest, "plan", result.ErrorMessage);
             }
         }
         catch (Exception ex)

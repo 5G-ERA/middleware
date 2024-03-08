@@ -3,11 +3,11 @@ using System.Text.Json.Serialization;
 using JetBrains.Annotations;
 using k8s;
 using k8s.Models;
+using Microsoft.Extensions.Options;
 using Middleware.Common;
 using Middleware.Common.Config;
 using Middleware.Common.Enums;
 using Middleware.Common.ExtensionMethods;
-using Middleware.DataAccess.Repositories.Abstract;
 using Middleware.Models.Domain;
 using Middleware.Models.Domain.Contracts;
 using Middleware.Models.ExtensionMethods;
@@ -22,8 +22,8 @@ internal class KubernetesObjectBuilder : IKubernetesObjectBuilder
     ///     Defines an interval in which the NetApps report heartbeat to the Middleware
     /// </summary>
     private const int ReportIntervalInSeconds = 5;
-
-    private readonly IConfiguration _config;
+    
+    private readonly IOptions<MiddlewareConfig> _mwConfig;
 
     /// <summary>
     ///     Name of the container registry used
@@ -32,10 +32,10 @@ internal class KubernetesObjectBuilder : IKubernetesObjectBuilder
 
     private readonly IEnvironment _env;
     
-    public KubernetesObjectBuilder(IEnvironment env, IConfiguration config)
+    public KubernetesObjectBuilder(IEnvironment env, IOptions<MiddlewareConfig> mwConfig)
     {
         _env = env;
-        _config = config;
+        _mwConfig = mwConfig;
         _containerRegistryName = _env.GetEnvVariable("IMAGE_REGISTRY")?.TrimEnd('/') ?? "ghcr.io/5g-era";
     }
 
@@ -195,7 +195,6 @@ internal class KubernetesObjectBuilder : IKubernetesObjectBuilder
 
     public V1Deployment CreateStartupDeployment(string name, string tag)
     {
-        var mwConfig = _config.GetSection(MiddlewareConfig.ConfigName).Get<MiddlewareConfig>();
         var selector = new V1LabelSelector
         {
             MatchLabels = new Dictionary<string, string> { { "app", name } }
@@ -210,10 +209,10 @@ internal class KubernetesObjectBuilder : IKubernetesObjectBuilder
         };
         var envList = new List<V1EnvVar>
         {
-            new("Middleware__Organization", mwConfig.Organization),
-            new("Middleware__Organization", mwConfig.Organization),
-            new("Middleware__InstanceName", mwConfig.InstanceName),
-            new("Middleware__InstanceType", mwConfig.InstanceType),
+            new("Middleware__Organization", _mwConfig.Value.Organization),
+            new("Middleware__Organization", _mwConfig.Value.Organization),
+            new("Middleware__InstanceName", _mwConfig.Value.InstanceName),
+            new("Middleware__InstanceType", _mwConfig.Value.InstanceType),
             new("CustomLogger__LoggerName", _env.GetEnvVariable("CustomLogger__LoggerName")),
             new("CustomLogger__Url", _env.GetEnvVariable("CustomLogger__Url")),
             new("CustomLogger__User", _env.GetEnvVariable("CustomLogger__User")),

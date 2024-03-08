@@ -1,5 +1,6 @@
 ﻿using k8s.Models;
 using Middleware.Common.Enums;
+using Middleware.Common.Structs;
 using Middleware.Models.Domain;
 
 namespace Middleware.Orchestrator.Deployment;
@@ -20,6 +21,7 @@ public interface IDeploymentService
     /// <param name="serviceImageName">Name of the service to be deployed</param>
     /// <param name="kind">Kind of the service to be deployed</param>
     /// <param name="meta">Metadata for the service from the existing deployment</param>
+    /// <param name="nodePort"></param>
     /// <returns>Service of the specified type. Service has not been deployed</returns>
     V1Service CreateStartupService(string serviceImageName, K8SServiceKind kind, V1ObjectMeta meta, int? nodePort = null);
 
@@ -33,5 +35,5 @@ public interface IDeploymentService
     Task DeleteActionAsync(Guid actionPlanId, Guid actionId);
 
     Task DeployActionAsync(Guid actionPlanId, Guid actionId);
-    Task<bool> DeployActionPlanAsync(TaskModel task, Guid robotId);
+    Task<Result<bool>> DeployActionPlanAsync(TaskModel task, Guid robotId);
 }

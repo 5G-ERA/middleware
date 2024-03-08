@@ -6,7 +6,7 @@ namespace Middleware.Orchestrator.Deployment;
 public class KubernetesBuilder : IKubernetesBuilder
 {
     internal const string ServiceAccountTokenKeyFileName = "token";
-    internal const string ServiceAccountRootCAKeyFileName = "ca.crt";
+    internal const string ServiceAccountRootCaKeyFileName = "ca.crt";
     internal const string ServiceAccountNamespaceFileName = "namespace";
 
     private const string KubernetesServiceHost = "KUBERNETES_SERVICE_HOST";
@@ -61,7 +61,7 @@ public class KubernetesBuilder : IKubernetesBuilder
         var fileNames = _env.GetFileNamesInDir(ServiceAccountPath);
 
         var filesExist = fileNames.Contains(ServiceAccountTokenKeyFileName)
-                         && fileNames.Contains(ServiceAccountRootCAKeyFileName)
+                         && fileNames.Contains(ServiceAccountRootCaKeyFileName)
                          && fileNames.Contains(ServiceAccountNamespaceFileName);
 
         _logger.LogTrace("K8s ServiceAccount files exist {filesExist}", filesExist);
