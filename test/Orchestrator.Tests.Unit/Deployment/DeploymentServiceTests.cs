@@ -1,5 +1,7 @@
 ﻿using System;
+using System.IO;
 using System.Linq;
+using System.Text.Json;
 using System.Threading.Tasks;
 using k8s;
 using Microsoft.Extensions.Logging;
@@ -44,53 +46,66 @@ public class DeploymentServiceTests
             _rosConnection, _publishingService, _settingsRepo, _kubeWrapper);
     }
 
+    /* Also to be tested for deployment:
+     *  - data persistence
+     *  - inter-relay deployment
+     *  - setting netapp address
+     *  - name change if netapp with specified name is already deployed
+     *  - error handling
+     * 
+     */
     [Fact(Skip = "Test not ready due to the complexity of the used functionalities")]
-    public async Task DeletePlanAsync_ShouldAlwaysDeleteActionPlan_WhenCalled()
+    public async Task DeployPlanAsync_ShouldCreateAndDeploySimpleActionPlan_WhenContainerImagesAreConfiguredCorrectly()
     {
         //arrange
-        var actionPlan = CreateActionPlan();
+        var actionPlan = GetActionPlan();
+        /*to collect:
+         * robot definition
+         *  system config
+         * current location definition
+         * netappDataKey
+         * currently running deployment names
+         */
+        
+        /* in function runtime:
+         * 
+         *  - retrieve container image relation to current task
+         *  - netapp deployment 
+         *  - publishing netapp entry messages
+         *  - adding relation
+         *  - save actionSequence to redis
+         *  - inter-realy deployment
+         */
+        
         var instanceId = actionPlan.ActionSequence!.First().Services.First().ServiceInstanceId;
-        //_kube.AppsV1
-        //    .ListNamespacedDeploymentAsync("middleware",
-        //        labelSelector: KubernetesObjectExtensions.GetNetAppLabelSelector(instanceId))
-        //    .Returns(new V1DeploymentList());
+        
+        // act
+        
         //act
-
+        await _sut.DeployActionPlanAsync(actionPlan, /*TODO: update robot id*/ Guid.Empty);
         //assert
-        await _redisInterface.Received(1).ActionPlanDeleteAsync(actionPlan.Id);
+        /*
+         * validate functions called
+         * validate the result
+         * check logs
+         * 
+         */
+        
+        /* Additional improvements:
+         *  - cache read files
+         *  - add IDisposable to the test class
+         * 
+         */
     }
 
-    private ActionPlanModel CreateActionPlan()
+    private TaskModel? GetActionPlan()
     {
-        return new()
-        {
-            Id = Guid.NewGuid(),
-            Name = "TST",
-            RobotId = Guid.NewGuid(),
-            TaskId = Guid.NewGuid(),
-            TaskStartedAt = DateTime.Now,
-            ActionSequence = new()
-            {
-                new()
-                {
-                    Name = "Action1",
-                    Id = Guid.NewGuid(),
-                    Placement = "test-MW",
-                    PlacementType = "Edge",
-                    SingleNetAppEntryPoint = true,
-                    Services = new()
-                    {
-                        new()
-                        {
-                            Id = Guid.NewGuid(),
-                            Name = "Instance1",
-                            RosDistro = RosDistro.Foxy.ToString(),
-                            IsReusable = true,
-                            ServiceInstanceId = Guid.NewGuid()
-                        }
-                    }
-                }
-            }
-        };
+        string filePath = "files/actionPlan.json";
+
+        // Read the JSON file
+        string json = File.ReadAllText(filePath);
+
+        // Parse JSON content into a Person object
+        return JsonSerializer.Deserialize<TaskModel>(json);
     }
 }

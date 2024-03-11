@@ -1,0 +1,7 @@
+{
+    "Id": "06ac766b-d2a4-4c6f-b8f5-ae426acbfeed",
+    "Name": "ros-object-detection",
+    "Description": "The example network application onboarding for the webinar",
+    "K8SDeployment": "apiVersion: apps/v1\nkind: Deployment\nmetadata:\n  name: ros-object-detection\nspec:\n  selector:\n    matchLabels:\n      app: ros-object-detection\n  replicas: 1\n  template:\n    metadata:\n      labels:\n        app: ros-object-detection\n    spec:\n      containers:\n        - name: object-detection\n          resources: {}\n          image: but5gera/ros_object_detection:0.1.0\n          env:\n            - name: NETAPP_TORCH_DEVICE\n              value: cpu",
+    "K8SService": null
+}

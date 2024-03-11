@@ -21,7 +21,7 @@ public class KubernetesWrapper : IKubernetesWrapper
     }
 
     /// <inheritdoc />
-    public async Task<Result<List<string>>> GetCurrentlyDeployedNetAppsAsync()
+    public async Task<List<string>> GetCurrentlyDeployedNetApps()
     {
         var deployments = await _kubernetes.AppsV1.ListNamespacedDeploymentAsync(AppConfig.K8SNamespaceName);
         var deploymentNames = deployments.GetDeploymentNames().ToList();
@@ -30,7 +30,7 @@ public class KubernetesWrapper : IKubernetesWrapper
     }
 
     /// <inheritdoc />
-    public async Task<Result> DeployNetAppAsync(DeploymentPair netApp)
+    public async Task<Result> DeployNetApp(DeploymentPair netApp)
     {
         try
         {
@@ -44,7 +44,7 @@ public class KubernetesWrapper : IKubernetesWrapper
         }
     }
 
-    public async Task<Result> TerminateNetAppByIdAsync(Guid instanceId)
+    public async Task<Result> TerminateNetAppById(Guid instanceId)
     {
         var deployments = await _kubernetes.AppsV1.ListNamespacedDeploymentAsync(AppConfig.K8SNamespaceName,
             labelSelector: KubernetesObjectExtensions.GetNetAppLabelSelector(instanceId));
@@ -66,6 +66,12 @@ public class KubernetesWrapper : IKubernetesWrapper
         if (string.IsNullOrEmpty(relayName))
         {
             return Result.Failure("Relay to delete not found");
+        }
+        
+        var terminateResult = await Terminate(deployments, services);
+        if (terminateResult.IsFailure)
+        {
+            return terminateResult;
         }
 
         await Terminate(deployments, services);

@@ -1,5 +1,8 @@
 namespace Middleware.Common.Result;
 
+/// <summary>
+/// Operation result determining if the operation was successful or not. If operation was not successful, the error message is provided
+/// </summary>
 public class Result : IResult
 {
     /// <inheritdoc />

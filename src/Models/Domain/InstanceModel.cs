@@ -135,6 +135,10 @@ public class InstanceModel : BaseModel, IPolicyAssignable, IHardwareRequirementC
 
     public void SetNetAppAddress(string netAppAddress)
     {
+        if (netAppAddress.StartsWith("http") == false)
+        {
+            netAppAddress = "http://" + netAppAddress;
+        }
         if (!Uri.IsWellFormedUriString(netAppAddress, UriKind.Absolute))
             throw new ArgumentException("Specified NetApp address is not a valid Url string", nameof(netAppAddress));
 

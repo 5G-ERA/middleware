@@ -1,0 +1,48 @@
+{
+    "Id": "8b96277b-83ff-43ee-88be-aae512c270ff",
+    "Name": "ros-object-detection",
+    "TaskPriority": 1,
+    "ActionSequence": [
+        {
+            "Id": "cf040dda-c21c-47d7-b38d-19359c664c96",
+            "Name": "ros-object-detection",
+            "Order": 1,
+            "ActionPriority": "Normal",
+            "ActionStatus": "None",
+            "MinimumRam": 1,
+            "MinimumNumCores": 4,
+            "Services": [
+                {
+                    "Id": "ef978162-db4c-4341-816d-fb02619ac249",
+                    "Name": "ros-object-detection",
+                    "IsReusable": false,
+                    "MinimumRam": 1,
+                    "MinimumNumCores": 4,
+                    "RosTopicsPub": [
+                        {
+                            "name": "/results",
+                            "type": "std_msgs/String",
+                            "description": "Topic that publishes the results of the NetApp",
+                            "enabled": true
+                        }
+                    ],
+                    "RosTopicsSub": [
+                        {
+                            "name": "/image_raw",
+                            "type": "sensor_msgs/Image",
+                            "description": "culpa sit",
+                            "enabled": true
+                        }
+                    ],
+                    "ROSVersion": 1,
+                    "ROSDistro": "Noetic"
+                }
+            ]
+        }
+    ],
+    "Tags": [
+        "Athens",
+        "5G-ERA",
+        "object detection"
+    ]
+}

@@ -1,5 +1,9 @@
 ﻿namespace Middleware.Common.Result;
 
+/// <summary>
+/// Operation result determining if the operation was successful or not.
+/// The return value of the operation is provided if operation was successful, if operation was not successful, the error message is provided
+/// </summary>
 public readonly struct Result<T> : IResult<T>
 {
     /// <inheritdoc />

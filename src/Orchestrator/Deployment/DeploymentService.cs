@@ -92,7 +92,7 @@ internal class DeploymentService : IDeploymentService
                         continue;
                     }
 
-                    retVal += await _kubernetesWrapper.TerminateNetAppByIdAsync(srv.ServiceInstanceId);
+                    retVal += await _kubernetesWrapper.TerminateNetAppById(srv.ServiceInstanceId);
                     retVal += await _redisInterfaceClient.DeleteRelationAsync(srv, actionLoc.ToBaseLocation(),
                         "LOCATED_AT");
 
@@ -162,7 +162,7 @@ internal class DeploymentService : IDeploymentService
             _logger.LogDebug("Deleting instance '{instanceName}', with serviceInstanceId '{serviceInstanceId}'",
                 instance.Name, instance.ServiceInstanceId);
 
-            await _kubernetesWrapper.TerminateNetAppByIdAsync(instance.ServiceInstanceId);
+            await _kubernetesWrapper.TerminateNetAppById(instance.ServiceInstanceId);
 
             if (ShouldDeployInterRelay(instance, action) == false)
             {
@@ -204,12 +204,12 @@ internal class DeploymentService : IDeploymentService
 
         var systemCfg = await _systemConfigRepository.GetConfigAsync();
         var thisLocation = await GetCurrentLocationAsync();
-        var deploymentNames = await _kubernetesWrapper.GetCurrentlyDeployedNetAppsAsync();
+        var deploymentNames = await _kubernetesWrapper.GetCurrentlyDeployedNetApps();
         var cfg = Config.Config.NewConfig
             .WithSystem(systemCfg)
             .WithLocation(thisLocation)
             .WithMiddleware(_mwConfig.Value)
-            .WithDeploymentNames(deploymentNames.Value);
+            .WithDeploymentNames(deploymentNames);
 
 
         var deploymentPairs = await ConstructDeployments(action, cfg);
@@ -218,18 +218,14 @@ internal class DeploymentService : IDeploymentService
         {
             try
             {
-                await _kubernetesWrapper.DeployNetAppAsync(pair);
+                await _kubernetesWrapper.DeployNetApp(pair);
 
                 if (ShouldDeployInterRelay(pair.Instance, action) == false)
                 {
                     await _publisher.PublishGatewayAddNetAppEntryAsync(thisLocation, pair.Name, actionPlan.Id,
                         pair.InstanceId);
                     var address = thisLocation.GetNetAppAddress(pair.Name);
-                    if (address.StartsWith("http") == false)
-                    {
-                        address = "http://" + address;
-                    }
-
+                    
                     pair.Instance!.SetNetAppAddress(address);
                 }
 
@@ -250,16 +246,12 @@ internal class DeploymentService : IDeploymentService
             var interRelay =
                 _kubeObjectBuilder.CreateInterRelayNetAppDeploymentConfig(actionPlanId, action, deploymentPairs,
                     systemCfg);
-            await _kubernetesWrapper.DeployNetAppAsync(interRelay);
+            await _kubernetesWrapper.DeployNetApp(interRelay);
 
             foreach (var pair in deploymentPairs)
             {
                 var address = thisLocation.GetNetAppAddress(interRelay.Name);
-                if (address.StartsWith("http") == false)
-                {
-                    address = "http://" + address;
-                }
-
+                
                 pair.Instance!.SetNetAppAddress(address);
             }
 
@@ -279,13 +271,13 @@ internal class DeploymentService : IDeploymentService
         var systemConfig = await _systemConfigRepository.GetConfigAsync();
         var location = await GetCurrentLocationAsync();
 
-        var deploymentNames = await _kubernetesWrapper.GetCurrentlyDeployedNetAppsAsync();
+        var deploymentNames = await _kubernetesWrapper.GetCurrentlyDeployedNetApps();
         var config = Config.Config.NewConfig
             .WithSystem(systemConfig)
             .WithLocation(location)
             .WithMiddleware(_mwConfig.Value)
             .WithNetAppDataKey(task.NetAppDataKey)
-            .WithDeploymentNames(deploymentNames.Value);
+            .WithDeploymentNames(deploymentNames);
 
         var robotResp = await _redisInterfaceClient.RobotGetByIdAsync(robotId);
         var robot = robotResp.ToRobot();
@@ -337,7 +329,7 @@ internal class DeploymentService : IDeploymentService
         {
             _logger.LogDebug("Deploying Inter Relay NetApp '{Name}' for action: {actionId}", kvp.Value.Name,
                 kvp.Key);
-            await _kubernetesWrapper.DeployNetAppAsync(kvp.Value);
+            await _kubernetesWrapper.DeployNetApp(kvp.Value);
             await _publisher.PublishGatewayAddNetAppEntryAsync(location, kvp.Value.Name, task.ActionPlanId,
                 kvp.Key);
         }
@@ -353,7 +345,7 @@ internal class DeploymentService : IDeploymentService
             {
                 _logger.LogDebug("Deploying instance '{Name}', with serviceInstanceId '{ServiceInstanceId}'",
                     pair.Instance!.Name, pair.InstanceId);
-                await _kubernetesWrapper.DeployNetAppAsync(pair);
+                await _kubernetesWrapper.DeployNetApp(pair);
 
                 if (ShouldDeployInterRelay(pair.Instance, item.Key) == false)
                 {
@@ -361,11 +353,7 @@ internal class DeploymentService : IDeploymentService
                         pair.InstanceId);
                     var netAppAddress = location.GetNetAppAddress(pair.Name);
                     _logger.LogDebug("NetApp address to be set: {address}", netAppAddress);
-                    if (netAppAddress.StartsWith("http") == false)
-                    {
-                        netAppAddress = "http://" + netAppAddress;
-                    }
-
+                    
                     pair.Instance!.SetNetAppAddress(netAppAddress);
                 }
 
@@ -400,11 +388,6 @@ internal class DeploymentService : IDeploymentService
             {
                 var netAppAddress = config.Location.GetNetAppAddress(relay.Name);
                 _logger.LogDebug("{netAppName} NetApp address to be set: {address}", pair.Name, netAppAddress);
-                if (netAppAddress.StartsWith("http") == false)
-                {
-                    netAppAddress = "http://" + netAppAddress;
-                }
-
                 pair.Instance!.SetNetAppAddress(netAppAddress);
             }
         }
@@ -441,6 +424,7 @@ internal class DeploymentService : IDeploymentService
                 // BB: service can be reused, to be decided by the resource planner
                 if (service.ServiceInstanceId != Guid.Empty)
                     continue;
+                
                 var pair = await PrepareDeploymentPair(service, config);
                 deployments.Add(pair);
             }
