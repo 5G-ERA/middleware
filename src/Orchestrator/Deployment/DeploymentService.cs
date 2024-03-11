@@ -1,7 +1,4 @@
-﻿using JetBrains.Annotations;
-using k8s;
-using k8s.Autorest;
-using k8s.Models;
+﻿using k8s.Autorest;
 using Microsoft.Extensions.Options;
 using Middleware.Common.Config;
 using Middleware.Common.Enums;
@@ -15,7 +12,6 @@ using Middleware.Models.ExtensionMethods;
 using Middleware.Orchestrator.Config;
 using Middleware.Orchestrator.Deployment.RosCommunication;
 using Middleware.Orchestrator.Exceptions;
-using Middleware.Orchestrator.Helpers;
 using Middleware.Orchestrator.Models;
 using Middleware.Orchestrator.Publishers;
 using Middleware.RedisInterface.Contracts.Mappings;
@@ -25,11 +21,6 @@ namespace Middleware.Orchestrator.Deployment;
 
 internal class DeploymentService : IDeploymentService
 {
-    /// <summary>
-    ///     Kubernetes client instance
-    /// </summary>
-    private readonly IKubernetes _kube;
-
     /// <summary>
     ///     Builds and configures the kubernetes objects
     /// </summary>
@@ -61,13 +52,14 @@ internal class DeploymentService : IDeploymentService
     private readonly IRosConnectionBuilderFactory _rosConnectionBuilderFactory;
 
     private readonly ISystemConfigRepository _systemConfigRepository;
+    private readonly IKubernetesWrapper _kubernetesWrapper;
 
-    public DeploymentService(IKubernetesBuilder kubernetesClientBuilder,
-        ILogger<DeploymentService> logger,
+    public DeploymentService(ILogger<DeploymentService> logger,
         IRedisInterfaceClient redisInterfaceClient,
         IOptions<MiddlewareConfig> mwConfig,
         IKubernetesObjectBuilder kubeObjectBuilder, IRosConnectionBuilderFactory rosConnectionBuilderFactory,
-        IPublishingService publisher, ISystemConfigRepository systemConfigRepository)
+        IPublishingService publisher, ISystemConfigRepository systemConfigRepository,
+        IKubernetesWrapper kubernetesWrapper)
     {
         _logger = logger;
         _redisInterfaceClient = redisInterfaceClient;
@@ -76,14 +68,7 @@ internal class DeploymentService : IDeploymentService
         _rosConnectionBuilderFactory = rosConnectionBuilderFactory;
         _publisher = publisher;
         _systemConfigRepository = systemConfigRepository;
-        _kube = kubernetesClientBuilder.CreateKubernetesClient();
-    }
-
-    /// <inheritdoc />
-    public V1Service CreateStartupService(string serviceImageName, K8SServiceKind kind, V1ObjectMeta meta,
-        int? nodePort = null)
-    {
-        return _kubeObjectBuilder.CreateStartupService(serviceImageName, kind, meta, nodePort);
+        _kubernetesWrapper = kubernetesWrapper;
     }
 
     /// <inheritdoc />
@@ -107,7 +92,7 @@ internal class DeploymentService : IDeploymentService
                         continue;
                     }
 
-                    retVal += await TerminateNetAppByIdAsync(srv.ServiceInstanceId);
+                    retVal += await _kubernetesWrapper.TerminateNetAppByIdAsync(srv.ServiceInstanceId);
                     retVal += await _redisInterfaceClient.DeleteRelationAsync(srv, actionLoc.ToBaseLocation(),
                         "LOCATED_AT");
 
@@ -120,9 +105,14 @@ internal class DeploymentService : IDeploymentService
 
                 if (relayShouldBeDeleted && action.ShouldUseInterRelayForRosNetApps())
                 {
-                    var deletedRelayName = await TerminateInterRelayNetApp(actionPlan.Id, action.Id);
-                    await _publisher.PublishGatewayDeleteNetAppEntryAsync(actionLoc, deletedRelayName, actionPlan.Id,
-                        action.Id);
+                    var labels = _kubeObjectBuilder.CreateInterRelayNetAppLabels(actionPlan.Id, action.Id);
+                    var deleteRelayResult = await _kubernetesWrapper.TerminateInterRelayNetApp(labels);
+                    if (deleteRelayResult.IsSuccess)
+                    {
+                        await _publisher.PublishGatewayDeleteNetAppEntryAsync(actionLoc, deleteRelayResult.Value,
+                            actionPlan.Id,
+                            action.Id);
+                    }
                 }
             }
         }
@@ -172,7 +162,7 @@ internal class DeploymentService : IDeploymentService
             _logger.LogDebug("Deleting instance '{instanceName}', with serviceInstanceId '{serviceInstanceId}'",
                 instance.Name, instance.ServiceInstanceId);
 
-            await TerminateNetAppByIdAsync(instance.ServiceInstanceId);
+            await _kubernetesWrapper.TerminateNetAppByIdAsync(instance.ServiceInstanceId);
 
             if (ShouldDeployInterRelay(instance, action) == false)
             {
@@ -188,9 +178,14 @@ internal class DeploymentService : IDeploymentService
 
         if (action.ShouldUseInterRelayForRosNetApps())
         {
-            var deletedRelayName = await TerminateInterRelayNetApp(actionPlan.Id, action.Id);
-            await _publisher.PublishGatewayDeleteNetAppEntryAsync(thisLocation, deletedRelayName, actionPlan.Id,
-                action.Id);
+            var labels = _kubeObjectBuilder.CreateInterRelayNetAppLabels(actionPlanId, actionId);
+            var deleteRelayResult = await _kubernetesWrapper.TerminateInterRelayNetApp(labels);
+            if (deleteRelayResult.IsSuccess)
+            {
+                await _publisher.PublishGatewayDeleteNetAppEntryAsync(thisLocation, deleteRelayResult.Value,
+                    actionPlan.Id,
+                    action.Id);
+            }
         }
     }
 
@@ -209,12 +204,12 @@ internal class DeploymentService : IDeploymentService
 
         var systemCfg = await _systemConfigRepository.GetConfigAsync();
         var thisLocation = await GetCurrentLocationAsync();
-        var deploymentNames = await GetCurrentlyDeployedAppNames();
+        var deploymentNames = await _kubernetesWrapper.GetCurrentlyDeployedNetAppsAsync();
         var cfg = Config.Config.NewConfig
             .WithSystem(systemCfg)
             .WithLocation(thisLocation)
             .WithMiddleware(_mwConfig.Value)
-            .WithDeploymentNames(deploymentNames);
+            .WithDeploymentNames(deploymentNames.Value);
 
 
         var deploymentPairs = await ConstructDeployments(action, cfg);
@@ -223,7 +218,7 @@ internal class DeploymentService : IDeploymentService
         {
             try
             {
-                await DeployNetApp(pair);
+                await _kubernetesWrapper.DeployNetAppAsync(pair);
 
                 if (ShouldDeployInterRelay(pair.Instance, action) == false)
                 {
@@ -255,7 +250,7 @@ internal class DeploymentService : IDeploymentService
             var interRelay =
                 _kubeObjectBuilder.CreateInterRelayNetAppDeploymentConfig(actionPlanId, action, deploymentPairs,
                     systemCfg);
-            await DeployNetApp(interRelay);
+            await _kubernetesWrapper.DeployNetAppAsync(interRelay);
 
             foreach (var pair in deploymentPairs)
             {
@@ -275,29 +270,22 @@ internal class DeploymentService : IDeploymentService
         await _redisInterfaceClient.ActionPlanAddAsync(actionPlan);
     }
 
-    /// <inheritdoc />
-    public V1Deployment CreateStartupDeployment(string name, string tag)
-    {
-        return _kubeObjectBuilder.CreateStartupDeployment(name, tag);
-    }
-
     public async Task<Result> DeployActionPlanAsync(TaskModel task, Guid robotId)
     {
         var retVal = Result.Success();
         _logger.LogDebug("Entered DeploymentService.DeployAsync");
         // TODO: BIG BOI, needs refactoring!!
-        if (_kube is null)
-            return NotInK8SEnvironmentException.DefaultMessage;
+        
         var systemConfig = await _systemConfigRepository.GetConfigAsync();
         var location = await GetCurrentLocationAsync();
 
-        var deploymentNames = await GetCurrentlyDeployedAppNames();
+        var deploymentNames = await _kubernetesWrapper.GetCurrentlyDeployedNetAppsAsync();
         var config = Config.Config.NewConfig
             .WithSystem(systemConfig)
             .WithLocation(location)
             .WithMiddleware(_mwConfig.Value)
             .WithNetAppDataKey(task.NetAppDataKey)
-            .WithDeploymentNames(deploymentNames);
+            .WithDeploymentNames(deploymentNames.Value);
 
         var robotResp = await _redisInterfaceClient.RobotGetByIdAsync(robotId);
         var robot = robotResp.ToRobot();
@@ -349,7 +337,7 @@ internal class DeploymentService : IDeploymentService
         {
             _logger.LogDebug("Deploying Inter Relay NetApp '{Name}' for action: {actionId}", kvp.Value.Name,
                 kvp.Key);
-            await DeployNetApp(kvp.Value);
+            await _kubernetesWrapper.DeployNetAppAsync(kvp.Value);
             await _publisher.PublishGatewayAddNetAppEntryAsync(location, kvp.Value.Name, task.ActionPlanId,
                 kvp.Key);
         }
@@ -365,7 +353,7 @@ internal class DeploymentService : IDeploymentService
             {
                 _logger.LogDebug("Deploying instance '{Name}', with serviceInstanceId '{ServiceInstanceId}'",
                     pair.Instance!.Name, pair.InstanceId);
-                await DeployNetApp(pair);
+                await _kubernetesWrapper.DeployNetAppAsync(pair);
 
                 if (ShouldDeployInterRelay(pair.Instance, item.Key) == false)
                 {
@@ -441,20 +429,6 @@ internal class DeploymentService : IDeploymentService
     private static bool ShouldDeployInterRelay(InstanceModel instance, ActionModel action)
     {
         return string.IsNullOrWhiteSpace(instance.RosDistro) == false && action.SingleNetAppEntryPoint;
-    }
-
-    private async Task DeployNetApp(DeploymentPair netApp)
-    {
-        await _kube.CoreV1.CreateNamespacedServiceAsync(netApp.Service, AppConfig.K8SNamespaceName);
-        await _kube.AppsV1.CreateNamespacedDeploymentAsync(netApp.Deployment, AppConfig.K8SNamespaceName);
-    }
-
-    private async Task<List<string>> GetCurrentlyDeployedAppNames()
-    {
-        var deployments = await _kube.AppsV1.ListNamespacedDeploymentAsync(AppConfig.K8SNamespaceName);
-        var deploymentNames = deployments.GetDeploymentNames().ToList();
-        _logger.LogDebug("Current deployments: {deployments}", string.Join(", ", deploymentNames));
-        return deploymentNames;
     }
 
     private async Task<IReadOnlyList<DeploymentPair>> ConstructDeployments(ActionModel action, Config.Config config)
@@ -579,72 +553,5 @@ internal class DeploymentService : IDeploymentService
         if (builder is not null) service = builder.EnableRelayNetAppCommunication(service);
 
         return new(deployment, service, instanceId, instance);
-    }
-
-    /// <summary>
-    ///     Deletes the instance specified. The deletion includes associated deployment and service
-    /// </summary>
-    /// <param name="instanceId"></param>
-    /// <returns></returns>
-    private async Task<Result> TerminateNetAppByIdAsync(Guid instanceId)
-    {
-        var deployments = await _kube.AppsV1.ListNamespacedDeploymentAsync(AppConfig.K8SNamespaceName,
-            labelSelector: KubernetesObjectExtensions.GetNetAppLabelSelector(instanceId));
-        var services = await _kube.CoreV1.ListNamespacedServiceAsync(AppConfig.K8SNamespaceName,
-            labelSelector: KubernetesObjectExtensions.GetNetAppLabelSelector(instanceId));
-
-
-        return await Terminate(deployments, services);
-    }
-
-    /// <summary>
-    ///     Terminates the Inter Relay NetApp based on the Action Plan Id and Action Id
-    /// </summary>
-    /// <param name="actionPlanId"></param>
-    /// <param name="actionId"></param>
-    /// <returns>Name of the deleted relay if deleted</returns>
-    [ItemCanBeNull]
-    private async Task<string> TerminateInterRelayNetApp(Guid actionPlanId, Guid actionId)
-    {
-        var labels = _kubeObjectBuilder.CreateInterRelayNetAppLabels(actionPlanId, actionId)
-            .ToLabelSelectorString();
-        _logger.LogDebug("Identified labelString: {labels}", labels);
-        var deployments = await _kube.AppsV1.ListNamespacedDeploymentAsync(AppConfig.K8SNamespaceName,
-            labelSelector: labels);
-        var services = await _kube.CoreV1.ListNamespacedServiceAsync(AppConfig.K8SNamespaceName,
-            labelSelector: labels);
-
-        _logger.LogDebug("Identified deployments: {dpl}", string.Join(", ", deployments.Items.Select(d => d.Name())));
-        var relayName = deployments.Items.FirstOrDefault()?.Name();
-        await Terminate(deployments, services);
-
-        return relayName;
-    }
-
-    private async Task<Result> Terminate(V1DeploymentList deployments, V1ServiceList services)
-    {
-        var retVal = new Result();
-
-        foreach (var deployment in deployments.Items)
-        {
-            var status =
-                await _kube.AppsV1.DeleteNamespacedDeploymentAsync(deployment.Name(), AppConfig.K8SNamespaceName);
-            if (status.Status != OutcomeType.Successful)
-                retVal += $"Failed to delete deployment {deployment.Name()}";
-        }
-
-        foreach (var service in services.Items)
-        {
-            try
-            {
-                await _kube.CoreV1.DeleteNamespacedServiceAsync(service.Name(), AppConfig.K8SNamespaceName);
-            }
-            catch
-            {
-                retVal += $"Failed to delete service {service.Name()}";
-            }
-        }
-
-        return retVal;
     }
 }

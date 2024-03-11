@@ -7,7 +7,7 @@ using Middleware.Orchestrator.Models;
 
 namespace Middleware.Orchestrator.Deployment;
 
-internal interface IKubernetesObjectBuilder
+public interface IKubernetesObjectBuilder
 {
     /// <summary>
     ///     Creates startup deployment for specified middleware component and specified version

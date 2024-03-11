@@ -88,6 +88,15 @@ public readonly struct Result<T> : IResult<T>
     {
         return new Result<T>(error);
     }
+    public static implicit operator Result<T>(Result result)
+    {
+        if (result.IsFailure)
+        {
+            return new Result<T>(result.Error);    
+        }
+
+        return new Result<T>(default!, null!, true);
+    }
 
     public static Result<T> Combine(params Result<T>[] results)
     {
@@ -100,5 +109,6 @@ public readonly struct Result<T> : IResult<T>
             ? new Result<T>(results.Select(r => r.Error).Aggregate((a, b) => $"{a}, {b}"))
             : new Result<T>(results.Select(r => r.Value).First());
     }
+    public static Result<T> Success(T value) => new Result<T>(value);
     
 }

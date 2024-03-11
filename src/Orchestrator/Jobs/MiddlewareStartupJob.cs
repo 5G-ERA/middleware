@@ -15,16 +15,17 @@ namespace Middleware.Orchestrator.Jobs;
 
 public class MiddlewareStartupJob : BaseJob<MiddlewareStartupJob>
 {
-    private readonly IDeploymentService _deploymentService;
+    private readonly IKubernetesObjectBuilder _kubernetesObjectBuilder;
     private readonly IKubernetesBuilder _kubeBuilder;
     private readonly IOptions<GatewayConfig> _gatewayConfig;
     private readonly IOptions<MiddlewareConfig> _middlewareConfig;
 
-    public MiddlewareStartupJob(ILogger<MiddlewareStartupJob> logger, IKubernetesBuilder kubeBuilder, IOptions<GatewayConfig> gatewayConfig, IOptions<MiddlewareConfig> middlewareConfig,
-        IDeploymentService deploymentService) : base(logger)
+    public MiddlewareStartupJob(ILogger<MiddlewareStartupJob> logger, IKubernetesBuilder kubeBuilder, 
+        IOptions<GatewayConfig> gatewayConfig, IOptions<MiddlewareConfig> middlewareConfig,
+        IKubernetesObjectBuilder kubernetesObjectBuilder) : base(logger)
     {
         _kubeBuilder = kubeBuilder;
-        _deploymentService = deploymentService;
+        _kubernetesObjectBuilder = kubernetesObjectBuilder;
         _gatewayConfig = gatewayConfig ?? throw new ArgumentNullException(nameof(gatewayConfig));
         _middlewareConfig = middlewareConfig ?? throw new ArgumentNullException(nameof(middlewareConfig));
     }
@@ -78,7 +79,7 @@ public class MiddlewareStartupJob : BaseJob<MiddlewareStartupJob>
             {
                 Logger.LogDebug("Started deployment of {service}", service);
 
-                var deployment = _deploymentService.CreateStartupDeployment(service, tag);
+                var deployment = _kubernetesObjectBuilder.CreateStartupDeployment(service, tag);
 
                 if (deploymentNames.Contains(deployment.Metadata.Name) == false)
                 {
@@ -109,7 +110,7 @@ public class MiddlewareStartupJob : BaseJob<MiddlewareStartupJob>
                     }
                 }
 
-                var lbService = _deploymentService.CreateStartupService(service, kind, deployment.Metadata, nodePort: useNodePort ? nodePort : null);
+                var lbService = _kubernetesObjectBuilder.CreateStartupService(service, kind, deployment.Metadata, nodePort: useNodePort ? nodePort : null);
                 if (serviceNames.Contains(lbService.Metadata.Name) == false)
                 {
                     lbService = await kubeClient.CoreV1.CreateNamespacedServiceAsync(lbService,

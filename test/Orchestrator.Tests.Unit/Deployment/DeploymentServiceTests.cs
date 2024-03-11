@@ -33,14 +33,15 @@ public class DeploymentServiceTests
     private readonly IRedisInterfaceClient _redisInterface = Substitute.For<IRedisInterfaceClient>();
     private readonly IRosConnectionBuilderFactory _rosConnection = Substitute.For<IRosConnectionBuilderFactory>();
     private readonly ISystemConfigRepository _settingsRepo = Substitute.For<ISystemConfigRepository>();
+    private readonly IKubernetesWrapper _kubeWrapper = Substitute.For<IKubernetesWrapper>();
 
     private readonly DeploymentService _sut;
 
     public DeploymentServiceTests()
     {
         _kubeBuilder.CreateKubernetesClient().Returns(_kube);
-        _sut = new(_kubeBuilder, _logger, _redisInterface, _mwConfig, _kubernetesObjectBuilder,
-            _rosConnection, _publishingService, _settingsRepo);
+        _sut = new(_logger, _redisInterface, _mwConfig, _kubernetesObjectBuilder,
+            _rosConnection, _publishingService, _settingsRepo, _kubeWrapper);
     }
 
     [Fact(Skip = "Test not ready due to the complexity of the used functionalities")]
