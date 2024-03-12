@@ -1,0 +1,109 @@
+{
+    "Id": "8b96277b-83ff-43ee-88be-aae512c270ff",
+    "Name": "ros-object-detection",
+    "ReplanActionPlannerLocked": false,
+    "DisableResourceReuse": true,
+    "TaskPriority": 1,
+    "ActionPlanId": "4b118989-653b-4703-a23d-dd06015a85c8",
+    "NetAppDataKey": null,
+    "FullReplan": false,
+    "PartialRePlan": false,
+    "DeterministicTask": false,
+    "MarkovianProcess": false,
+	"NetAppDataKey": "netAppTestKey",
+    "ActionSequence": [
+        {
+            "Id": "cf040dda-c21c-47d7-b38d-19359c664c96",
+            "Name": "ros-object-detection",
+            "Tags": [],
+            "Order": 0,
+            "Placement": "MiddlewareAWS",
+            "PlacementType": "Cloud",
+            "ActionPriority": "Normal",
+            "ActionStatus": null,
+            "Services": [
+                {
+                    "Id": "ef978162-db4c-4341-816d-fb02619ac249",
+                    "Name": "ros-object-detection",
+                    "ServiceInstanceId": "00000000-0000-0000-0000-000000000000",
+                    "ServiceType": null,
+                    "IsReusable": false,
+                    "IsPersistent": false,
+                    "DesiredStatus": null,
+                    "ServiceUrl": null,
+                    "RosTopicsPub": [
+                        {
+                            "name": "/results",
+                            "type": "std_msgs/String",
+                            "description": "Topic that publishes the results of the NetApp",
+                            "compression": null,
+                            "qos": null,
+                            "enabled": true
+                        }
+                    ],
+                    "RosTopicsSub": [
+                        {
+                            "name": "/image_raw",
+                            "type": "sensor_msgs/Image",
+                            "description": "culpa sit",
+                            "compression": null,
+                            "qos": null,
+                            "enabled": true
+                        }
+                    ],
+                    "Transforms": [],
+                    "Actions": [],
+                    "Services": [],
+                    "RosVersion": 0,
+                    "RosDistro": "",
+                    "Tags": [],
+                    "InstanceFamily": null,
+                    "SuccessRate": 0,
+                    "ServiceStatus": null,
+                    "ContainerImage": null,
+                    "OnboardedTime": "2023-11-21T11:02:23.6162101",
+                    "LastStatusChange": null,
+                    "AppliedPolicies": [],
+                    "Ram": {
+                        "minimal": 1,
+                        "optimal": 0,
+                        "priority": 1,
+                        "ascending": true
+                    },
+                    "NumberOfCores": {
+                        "minimal": 0,
+                        "optimal": 0,
+                        "priority": 1,
+                        "ascending": true
+                    },
+                    "DiskStorage": {
+                        "minimal": 0,
+                        "optimal": 0,
+                        "priority": 1,
+                        "ascending": true
+                    },
+                    "Throughput": {
+                        "minimal": 0,
+                        "optimal": 0,
+                        "priority": 1,
+                        "ascending": true
+                    },
+                    "Latency": {
+                        "minimal": 0,
+                        "optimal": 0,
+                        "priority": 1,
+                        "ascending": false
+                    },
+                    "Relations": null
+                }
+            ],
+            "MinimumRam": 1,
+            "MinimumNumCores": null,
+            "networkSlice": null,
+            "singleNetAppEntryPoint": false,
+            "relations": null
+        }
+    ],
+    "Tags": [],
+    "relations": null
+}

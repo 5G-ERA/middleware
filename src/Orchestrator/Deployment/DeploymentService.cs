@@ -266,7 +266,6 @@ internal class DeploymentService : IDeploymentService
     {
         var retVal = Result.Success();
         _logger.LogDebug("Entered DeploymentService.DeployAsync");
-        // TODO: BIG BOI, needs refactoring!!
         
         var systemConfig = await _systemConfigRepository.GetConfigAsync();
         var location = await GetCurrentLocationAsync();
@@ -513,7 +512,7 @@ internal class DeploymentService : IDeploymentService
 
         IRosConnectionBuilder builder = null;
 
-        if (instance.RosDistro is not null)
+        if (string.IsNullOrEmpty(instance.RosDistro) == false)
         {
             var distroEnum = RosDistroHelper.FromName(instance.RosDistro);
             builder = await _rosConnectionBuilderFactory.CreateConnectionBuilder(distroEnum);
