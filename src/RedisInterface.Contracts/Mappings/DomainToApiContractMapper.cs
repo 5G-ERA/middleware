@@ -571,8 +571,10 @@ public static class DomainToApiContractMapper
             HeartbeatExpirationInMinutes = x.HeartbeatExpirationInMinutes,
             Ros1RelayContainer = x.Ros1RelayContainer,
             Ros2RelayContainer = x.Ros2RelayContainer,
-            RosInterRelayNetAppContainer = x.RosInterRelayNetAppContainer
-
+            RosInterRelayNetAppContainer = x.RosInterRelayNetAppContainer,
+            HermesContainer = x.HermesContainer,
+            S3DataPersistenceRegion = x.S3DataPersistenceRegion,
+            S3DataPersistenceBucketName = x.S3DataPersistenceBucketName
         };
     }
 }
