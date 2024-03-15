@@ -53,6 +53,9 @@ internal class KubernetesObjectBuilder : IKubernetesObjectBuilder
         dpl.Spec.Template.Spec.Volumes.Add(volume);
         
         var hermesFetch = CreateHermesFetchContainer(netAppDataKey, config);
+        if (dpl.Spec.Template.Spec.InitContainers is null)
+            dpl.Spec.Template.Spec.InitContainers = new List<V1Container>();
+        
         dpl.Spec.Template.Spec.InitContainers.Add(hermesFetch);
         
         //update existing container
@@ -120,7 +123,8 @@ internal class KubernetesObjectBuilder : IKubernetesObjectBuilder
                 new("AWS_REGION", config.S3DataPersistenceRegion),
                 new("AWS_BUCKET", config.S3DataPersistenceBucketName),
                 new("NETAPP_KEY", netAppDataKey)
-            }
+            },
+            Args = new List<string>()
         };
         return hermes;
     }
