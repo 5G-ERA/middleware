@@ -36,7 +36,7 @@ jobs:
           docker tag $ECR_REPOSITORY $IMAGE_ID:$IMAGE_TAG
           docker push $IMAGE_ID:$IMAGE_TAG
 
-          if [[ ${{ steps.get-version.outputs.VERSION }} != *rc* ]] && [[ ${{ steps.get-version.outputs.VERSION }} != *beta* ]]; then
+          if [[ ${{ steps.get-version.outputs.VERSION }} != *rc* && ${{ steps.get-version.outputs.VERSION }} != *beta*]]; then
             docker tag $IMAGE_ID:$IMAGE_TAG $IMAGE_ID:latest
             docker push $IMAGE_ID:latest
           fi
