@@ -47,6 +47,9 @@ internal class KubernetesObjectBuilder : IKubernetesObjectBuilder
             Name = "shared",
             EmptyDir = new()
         };
+        if (dpl.Spec.Template.Spec.Volumes is null)
+            dpl.Spec.Template.Spec.Volumes = new List<V1Volume>();
+        
         dpl.Spec.Template.Spec.Volumes.Add(volume);
         
         var hermesFetch = CreateHermesFetchContainer(netAppDataKey, config);
