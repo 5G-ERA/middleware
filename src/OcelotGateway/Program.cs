@@ -42,7 +42,7 @@ builder.Services.AddAuthentication(options =>
 {
     options.TokenValidationParameters = new()
     {
-        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(config.Key)),
+        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(string.IsNullOrEmpty(config.Key)? "noawsdefaultkeygenerator" : config.Key)),
         NameClaimType = JwtClaimTypes.Name,
         RoleClaimType = JwtClaimTypes.Role,
         ValidAudience = "redisinterfaceAudience",
