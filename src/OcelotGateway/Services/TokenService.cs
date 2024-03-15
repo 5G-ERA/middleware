@@ -21,7 +21,7 @@ namespace Middleware.OcelotGateway.Services
 
         public TokenModel GenerateToken(Guid id, string userRole) 
         {
-            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(string.IsNullOrEmpty(_jwtConfig.Key) ? "noawsdefaultkeygenerator" : _jwtConfig.Key));
+            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(string.IsNullOrEmpty(_jwtConfig.Key) ? "vub21ZNuFLJL2W1qjNOiiIqsL051BW82Xp4dLuRw777" : _jwtConfig.Key));
             var credentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha256Signature);
             var expirationDate = DateTime.UtcNow.AddHours(4);
             
