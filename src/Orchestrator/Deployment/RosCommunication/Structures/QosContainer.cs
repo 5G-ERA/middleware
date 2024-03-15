@@ -16,7 +16,7 @@ internal class QosContainer
     public string History { get; set; } = default!;
     [JsonPropertyName("depth")]
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-    public int? Depth { get; set; } = default!;
+    public int? Depth { get; set; }
     [JsonPropertyName("reliability")]
     [CanBeNull]
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]

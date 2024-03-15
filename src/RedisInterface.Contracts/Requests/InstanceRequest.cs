@@ -5,6 +5,7 @@ public class InstanceRequest
     public string Name { get; init; }
     public string Type { get; init; }
     public bool IsReusable { get; init; }
+    public bool IsPersistent { get; init; }
     public IEnumerable<RosTopicRequest> RosTopicPublishers { get; init; } = Enumerable.Empty<RosTopicRequest>();
     public IEnumerable<RosTopicRequest> RosTopicSubscribers { get; init; } = Enumerable.Empty<RosTopicRequest>();
     public IEnumerable<RosActionRequest> RosActions { get; init; } = Enumerable.Empty<RosActionRequest>();

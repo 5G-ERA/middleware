@@ -84,6 +84,7 @@ public static class ApiContractToDomainMapper
             InstanceFamily = x.Instance.Family,
             Tags = x.Instance.Tags?.ToList(),
             IsReusable = x.Instance.IsReusable,
+            IsPersistent = x.Instance.IsPersistent,
             ServiceType = x.Instance.Type,
             Ram = new(x.Instance.Ram.Minimum, x.Instance.Ram.Optimal, x.Instance.Ram.Priority, true),
             NumberOfCores = new(x.Instance.NumberOfCores.Minimum, x.Instance.NumberOfCores.Optimal,

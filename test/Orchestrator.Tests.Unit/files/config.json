@@ -1,0 +1,9 @@
+{
+	"ros2RelayContainer": "but5gera/ros2_relay_server:1.2.2",
+    "ros1RelayContainer": "but5gera/relay_network_application:0.4.4",
+    "rosInterRelayNetAppContainer": "but5gera/inter_relay_network_application:0.4.4",
+    "heartbeatExpirationInMinutes": 3,
+    "hermesContainer": "ghcr.io/5g-era/hermes:v1.0.0",
+    "s3DataPersistenceRegion": "eu-west-2",
+    "s3DataPersistenceBucketName": "middleware-netapps"
+}

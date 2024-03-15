@@ -41,11 +41,9 @@ public class OrchestrateController : MiddlewareController
         try
         {
             var result = await _deploymentService.DeployActionPlanAsync(request.Task, request.Robot.Id);
-            if (result == false)
+            if (result.IsSuccess == false)
             {
-                //TODO: provide more detailed information on what went wrong with the deployment of the task
-                return ErrorMessageResponse(HttpStatusCode.BadRequest, "plan",
-                    "There was a problem while deploying the task instance");
+                return ErrorMessageResponse(HttpStatusCode.BadRequest, "plan", result.Error);
             }
         }
         catch (Exception ex)
@@ -146,10 +144,10 @@ public class OrchestrateController : MiddlewareController
                     $"Could not find the Action Plan with specified id: {id}");
             }
 
-            var isSuccess = await _deploymentService.DeletePlanAsync(actionPlan);
-            if (isSuccess == false)
+            var result = await _deploymentService.DeletePlanAsync(actionPlan);
+            if (result.IsSuccess == false)
             {
-                return ErrorMessageResponse(HttpStatusCode.BadRequest, "plan", $"Unable to delete the services for the action plan with id {id}");
+                return ErrorMessageResponse(HttpStatusCode.BadRequest, "plan", $"Unable to delete the services for the action plan with id: {id} because: {result.Error}");
             }
 
             await _redisInterfaceClient.ActionPlanDeleteAsync(id);

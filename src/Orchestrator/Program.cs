@@ -76,6 +76,7 @@ builder.Services.AddScoped<IPublisher<GatewayAddNetAppEntryMessage>, GatewayAddN
 builder.Services.AddScoped<IPublisher<GatewayDeleteNetAppEntryMessage>, GatewayDeleteNetAppEntryPublisher>();
 builder.Services.AddScoped<IHeartbeatService, HeartbeatService>();
 builder.Services.AddScoped<IStartupDataInstaller, StartupDataInstaller>();
+builder.Services.AddScoped<IKubernetesWrapper, KubernetesWrapper>();
 
 builder.Services.AddRedisInterfaceClient();
 

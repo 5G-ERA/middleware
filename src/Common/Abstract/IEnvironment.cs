@@ -7,7 +7,7 @@ public interface IEnvironment
     /// </summary>
     /// <param name="name">name of the environment variable</param>
     /// <returns></returns>
-    string GetEnvVariable(string name);
+    string? GetEnvVariable(string name);
     /// <summary>
     /// Sets the value of the environment variable
     /// </summary>

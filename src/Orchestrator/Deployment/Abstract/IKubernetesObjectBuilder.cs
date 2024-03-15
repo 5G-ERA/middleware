@@ -7,7 +7,7 @@ using Middleware.Orchestrator.Models;
 
 namespace Middleware.Orchestrator.Deployment;
 
-internal interface IKubernetesObjectBuilder
+public interface IKubernetesObjectBuilder
 {
     /// <summary>
     ///     Creates startup deployment for specified middleware component and specified version
@@ -23,10 +23,19 @@ internal interface IKubernetesObjectBuilder
     /// <param name="deployment"></param>
     /// <param name="serviceInstanceId"></param>
     /// <param name="name"></param>
+    /// <param name="thisLocation"></param>
     /// <returns></returns>
     V1Deployment DeserializeAndConfigureDeployment(string deployment, Guid serviceInstanceId, string name,
         ILocation thisLocation);
 
+    /// <summary>
+    /// Enable data persistence for nhe NetApp using AWS S3
+    /// </summary>
+    /// <param name="dpl"></param>
+    /// <param name="config"></param>
+    /// <param name="netAppDataKey"></param>
+    /// <returns></returns>
+    V1Deployment EnableDataPersistence(V1Deployment dpl, SystemConfigModel config, string netAppDataKey);
     /// <summary>
     ///     Deserializes string to the service definition that will be used to expose the NetApp internally or externally
     /// </summary>
@@ -51,6 +60,7 @@ internal interface IKubernetesObjectBuilder
     /// <param name="serviceImageName">Name of the service</param>
     /// <param name="kind">Kind of the Kubernetes Service</param>
     /// <param name="meta">Metadata of the deployment to be exposed</param>
+    /// <param name="nodePort"></param>
     /// <returns></returns>
     V1Service CreateStartupService(string serviceImageName, K8SServiceKind kind, V1ObjectMeta meta, int? nodePort = null);
 

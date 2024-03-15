@@ -1,5 +1,6 @@
 ﻿namespace Middleware.Orchestrator.Heartbeat;
 
+//TODO: create generic result class and use it in the Middleware. Or use the pattern matching with Either or OneOf
 public class HeartbeatResult<T>
 {
     public bool IsSuccess { get; }

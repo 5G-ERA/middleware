@@ -3,6 +3,7 @@ using System.Text.Json.Serialization;
 using JetBrains.Annotations;
 using k8s;
 using k8s.Models;
+using Microsoft.Extensions.Options;
 using Middleware.Common;
 using Middleware.Common.Config;
 using Middleware.Common.Enums;
@@ -21,8 +22,8 @@ internal class KubernetesObjectBuilder : IKubernetesObjectBuilder
     ///     Defines an interval in which the NetApps report heartbeat to the Middleware
     /// </summary>
     private const int ReportIntervalInSeconds = 5;
-
-    private readonly IConfiguration _config;
+    
+    private readonly IOptions<MiddlewareConfig> _mwConfig;
 
     /// <summary>
     ///     Name of the container registry used
@@ -30,13 +31,104 @@ internal class KubernetesObjectBuilder : IKubernetesObjectBuilder
     private readonly string _containerRegistryName;
 
     private readonly IEnvironment _env;
-
-    public KubernetesObjectBuilder(IEnvironment env, IConfiguration config)
+    
+    public KubernetesObjectBuilder(IEnvironment env, IOptions<MiddlewareConfig> mwConfig)
     {
         _env = env;
-        _config = config;
+        _mwConfig = mwConfig;
         _containerRegistryName = _env.GetEnvVariable("IMAGE_REGISTRY")?.TrimEnd('/') ?? "ghcr.io/5g-era";
     }
+
+    /// <inheritdoc />
+    public V1Deployment EnableDataPersistence(V1Deployment dpl, SystemConfigModel config, string netAppDataKey)
+    {
+        var volume = new V1Volume()
+        {
+            Name = "shared",
+            EmptyDir = new()
+        };
+        if (dpl.Spec.Template.Spec.Volumes is null)
+            dpl.Spec.Template.Spec.Volumes = new List<V1Volume>();
+        
+        dpl.Spec.Template.Spec.Volumes.Add(volume);
+        
+        var hermesFetch = CreateHermesFetchContainer(netAppDataKey, config);
+        if (dpl.Spec.Template.Spec.InitContainers is null)
+            dpl.Spec.Template.Spec.InitContainers = new List<V1Container>();
+        
+        dpl.Spec.Template.Spec.InitContainers.Add(hermesFetch);
+        
+        //update existing container
+        var netApp = dpl.Spec.Template.Spec.Containers.First();
+        netApp.Env.Add(new("NETAPP_DATA_DIR", "/data/" + netAppDataKey));
+        netApp.Env.Add(new("NETAPP_KEY", netAppDataKey));
+        netApp.VolumeMounts = new List<V1VolumeMount>
+        {
+            new()
+            {
+                Name = "shared",
+                MountPath = "/data"
+            }
+        };
+        var hermesPost = CreateHermesPostContainer(netAppDataKey, config);
+        dpl.Spec.Template.Spec.Containers.Add(hermesPost);
+        
+        return dpl;
+    }
+
+    private V1Container CreateHermesPostContainer(string netAppKey, SystemConfigModel config)
+    {
+        const string dir = "/data/upload";
+        var hermes = CreateHermesContainer(netAppKey, config);
+        hermes.Name += "-post";
+        hermes.Env.Add(new("POST_DIR",dir));
+        hermes.Args.Add("post");
+        hermes.VolumeMounts = new List<V1VolumeMount>
+        {
+            new()
+            {
+                Name = "shared",
+                MountPath = dir
+            }
+        };
+        return hermes;
+    }
+    private V1Container CreateHermesFetchContainer(string netAppKey, SystemConfigModel config)
+    {
+        const string dir = "/data/download";
+        var hermes = CreateHermesContainer(netAppKey, config);
+        hermes.Name += "-fetch";
+        hermes.Env.Add(new("FETCH_DIR",dir));
+        hermes.Args.Add("fetch");
+        hermes.VolumeMounts = new List<V1VolumeMount>
+        {
+            new()
+            {
+                Name = "shared",
+                MountPath = dir
+            }
+        };
+        return hermes;
+    }
+    private V1Container CreateHermesContainer(string netAppDataKey, SystemConfigModel config)
+    {
+        var hermes = new V1Container
+        {
+            Name = "hermes",
+            Image = config.HermesContainer,
+            Env = new List<V1EnvVar>
+            {
+                new("AWS_ACCESS_KEY_ID", _env.GetEnvVariable("AWS_ACCESS_KEY_ID")),
+                new("AWS_SECRET_ACCESS_KEY", _env.GetEnvVariable("AWS_SECRET_ACCESS_KEY")),
+                new("AWS_REGION", config.S3DataPersistenceRegion),
+                new("AWS_BUCKET", config.S3DataPersistenceBucketName),
+                new("NETAPP_KEY", netAppDataKey)
+            },
+            Args = new List<string>()
+        };
+        return hermes;
+    }
+    
 
     /// <inheritdoc />
     public V1Service DeserializeAndConfigureService(string service, string name, Guid serviceInstanceId)
@@ -110,7 +202,6 @@ internal class KubernetesObjectBuilder : IKubernetesObjectBuilder
 
     public V1Deployment CreateStartupDeployment(string name, string tag)
     {
-        var mwConfig = _config.GetSection(MiddlewareConfig.ConfigName).Get<MiddlewareConfig>();
         var selector = new V1LabelSelector
         {
             MatchLabels = new Dictionary<string, string> { { "app", name } }
@@ -125,10 +216,10 @@ internal class KubernetesObjectBuilder : IKubernetesObjectBuilder
         };
         var envList = new List<V1EnvVar>
         {
-            new("Middleware__Organization", mwConfig.Organization),
-            new("Middleware__Organization", mwConfig.Organization),
-            new("Middleware__InstanceName", mwConfig.InstanceName),
-            new("Middleware__InstanceType", mwConfig.InstanceType),
+            new("Middleware__Organization", _mwConfig.Value.Organization),
+            new("Middleware__Organization", _mwConfig.Value.Organization),
+            new("Middleware__InstanceName", _mwConfig.Value.InstanceName),
+            new("Middleware__InstanceType", _mwConfig.Value.InstanceType),
             new("CustomLogger__LoggerName", _env.GetEnvVariable("CustomLogger__LoggerName")),
             new("CustomLogger__Url", _env.GetEnvVariable("CustomLogger__Url")),
             new("CustomLogger__User", _env.GetEnvVariable("CustomLogger__User")),
@@ -287,7 +378,7 @@ internal class KubernetesObjectBuilder : IKubernetesObjectBuilder
     private V1Deployment CreateInterRelayDeploymentDefinition(Guid actionPlanId, Guid actionId,
         string configString, SystemConfigModel cfg)
     {
-        var relayName = "inter-relay-netapp".GetNewImageNameWithSuffix();
+        var relayName = "inter-relay-netapp".AddRandomSuffix();
         var matchLabels = CreateInterRelayNetAppMatchLabels(relayName);
         return new()
         {

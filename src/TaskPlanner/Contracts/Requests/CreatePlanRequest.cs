@@ -22,6 +22,11 @@ public class CreatePlanRequest
 
     [JsonPropertyName("TaskDescription")]
     public string TaskDescription { get; set; }
+    /// <summary>
+    /// Data persistence Key that holds the data for the task
+    /// </summary>
+    [JsonPropertyName("NetAppDataKey")]
+    public string NetAppDataKey { get; set; }
 
     /// <summary>
     ///     Use the hardcoded action plan if true, use the semantic planning if false

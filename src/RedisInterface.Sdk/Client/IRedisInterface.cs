@@ -62,14 +62,14 @@ public interface IRedisInterface
     Task<ApiResponse<GetPoliciesResponse>> PolicyGetActive();
 
     [Post("/api/v1/{entity}/AddRelation")]
-    Task RelationAdd(string entity, [Body] RelationModel payload);
+    Task<IApiResponse> RelationAdd(string entity, [Body] RelationModel payload);
 
     [Get("/api/v1/{entity}/relation/{name}")]
     Task<ApiResponse<List<RelationModel>?>> RelationGet(string entity, [AliasAs("name")] string relationName, Guid id,
         string direction);
 
     [Delete("/api/v1/{entity}/DeleteRelation")]
-    Task RelationDelete(string entity, [Body] RelationModel payload);
+    Task<IApiResponse> RelationDelete(string entity, [Body] RelationModel payload);
 
     [Get("/api/v1/robot/{id}")]
     Task<ApiResponse<RobotResponse?>> RobotGetById(Guid id);

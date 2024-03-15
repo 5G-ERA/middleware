@@ -3,7 +3,9 @@ using System.Linq;
 using FluentAssertions;
 using k8s.Models;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Options;
 using Middleware.Common;
+using Middleware.Common.Config;
 using Middleware.Common.Enums;
 using Middleware.Common.ExtensionMethods;
 using Middleware.DataAccess.Repositories.Abstract;
@@ -23,7 +25,13 @@ public class KubernetesObjectBuilderTests
 
     public KubernetesObjectBuilderTests()
     {
-        _sut = new(_environment, _configuration);
+        _sut = new(_environment, Options.Create(new MiddlewareConfig()
+        {
+            Address = "127.0.0.1",
+            InstanceName = "test",
+            InstanceType = "Edge",
+            Organization = "TestOrg"
+        }));
     }
 
     [Theory]
