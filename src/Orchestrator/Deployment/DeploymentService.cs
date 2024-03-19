@@ -212,7 +212,7 @@ internal class DeploymentService : IDeploymentService
             .WithDeploymentNames(deploymentNames);
 
 
-        var deploymentPairs = await ConstructDeployments(action, cfg);
+        var deploymentPairs = await ConstructDeployments(action, cfg, true);
 
         foreach (var pair in deploymentPairs)
         {
@@ -413,16 +413,22 @@ internal class DeploymentService : IDeploymentService
         return string.IsNullOrWhiteSpace(instance.RosDistro) == false && action.SingleNetAppEntryPoint;
     }
 
-    private async Task<IReadOnlyList<DeploymentPair>> ConstructDeployments(ActionModel action, Config.Config config)
+    private async Task<IReadOnlyList<DeploymentPair>> ConstructDeployments(ActionModel action, Config.Config config, bool isSwitchover = false)
     {
+        _logger.LogDebug("Entered DeploymentService.ConstructDeployments for action {action}", action.Name);
         var deployments = new List<DeploymentPair>();
         foreach (var service in action.Services)
         {
             try
             {
                 // BB: service can be reused, to be decided by the resource planner
-                if (service.ServiceInstanceId != Guid.Empty)
+                if (service.ServiceInstanceId != Guid.Empty && isSwitchover == false)
+                {
+                    _logger.LogInformation("Skipping deployment of service {service} as it is already deployed",
+                        service.Name);
                     continue;
+                }
+                    
                 
                 var pair = await PrepareDeploymentPair(service, config);
                 deployments.Add(pair);

@@ -106,6 +106,45 @@ public class DeploymentServiceTests
         currentlyRunningDeployments.Should().Contain(container.Name);
     }
 
+    [Fact]
+    public async Task DeployActionAsync_ShouldDeploySingleActionFromActionPlan_WhenRequestIsReceived()
+    {
+        //arrange
+        var task = GetTask();
+        var robot = GetRobot();
+        var systemConfig = GetSystemConfig();
+        var location = GetLocation();
+        var container = GetContainer();
+        var currentlyRunningDeployments = new List<string>() { "non-existing-deployment1", "non-existing-deployment2" };
+        
+        _systemConfigRepo.GetConfigAsync().Returns(systemConfig);
+        _kubeWrapper.GetCurrentlyDeployedNetApps().Returns(currentlyRunningDeployments);
+        _redisInterface.GetLocationByNameAsync(_mwConfig.Value.InstanceName).Returns(location.ToLocationResponse());
+        _redisInterface.RobotGetByIdAsync(robot.Id).Returns(robot.ToRobotResponse());
+        
+        var instance = task!.ActionSequence!.First().Services.First();
+        _redisInterface.ContainerImageGetForInstanceAsync(instance.Id).Returns(new GetContainersResponse()
+            { Containers = new[] { container.ToContainerResponse() } });
+        _redisInterface.AddRelationAsync(Arg.Any<InstanceModel>(), Arg.Any<Location>(), "LOCATED_AT")
+            .Returns(Result.Success());
+         _redisInterface.ActionPlanAddAsync(Arg.Any<ActionPlanModel>()).Returns(true);
+        // act
+
+        //act
+        var result = await _sut.DeployActionPlanAsync(task, robot.Id);
+        
+        //assert
+        result.Error.Should().BeNullOrEmpty();
+        result.IsSuccess.Should().BeTrue();
+        await _redisInterface.Received(1).ContainerImageGetForInstanceAsync(instance.Id);
+        await _redisInterface.Received(1).AddRelationAsync(Arg.Any<InstanceModel>(), Arg.Any<Location>(), "LOCATED_AT");
+        await _redisInterface.Received(1).ActionPlanAddAsync(Arg.Any<ActionPlanModel>());
+        await _publishingService.Received(1)
+            .PublishGatewayAddNetAppEntryAsync(Arg.Any<Location>(), Arg.Any<string>(), task.ActionPlanId, Arg.Any<Guid>());
+        await _kubeWrapper.Received(1).DeployNetApp(Arg.Any<DeploymentPair>());
+        currentlyRunningDeployments.Should().Contain(container.Name);
+    }
+
     private static TaskModel? _task;
 
     private static TaskModel GetTask()
