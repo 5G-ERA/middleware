@@ -10,7 +10,7 @@ In the same directory where the python script is located, paste the two k8 yaml 
 
 ## Step 2: Add Task template
 
-Make sure to have the openAPI specs with you so it will be easy to follow from here. Check the task add template, it should be similar to the example below. Here many items are created, an action, and instance and a ContainerImage. All together make the task representation. Unique identifiers (GUID) will be required for each of the Id fields. What is important also is that in the **ContainerImage section** both **K8SDeployment** and **K8SService** need to be completed with the output of the python utility script.
+Make sure to have the OpenAPI specs with you so it will be easy to follow from here. Check the task add template, it should be similar to the example below. Here many items are created, an action, and instance and a ContainerImage. All together make the task representation. Unique identifiers (GUID) will be required for each of the Id fields. What is important also is that in the **ContainerImage section** both **K8SDeployment** and **K8SService** need to be completed with the output of the python utility script.
 
 ```
 {
@@ -50,10 +50,10 @@ Make sure to have the openAPI specs with you so it will be easy to follow from h
 }
 ```
 
-Now lets look at the configuration requried from postman. Remember that all onboarding process can also be done from the 5G-ERA Dashboard. The endpoint to call is:
+Now let's look at the configuration required by Postman. Remember that all onboarding processes can also be done from the 5G-ERA Dashboard. The endpoint to call is:
 
 ```
-http://localhost:5047/data/task
+http://localhost:5047/data/task/importTask
 ```
 Remember to change localhost and port to the proper address of your middleware. This is a POST request.
 

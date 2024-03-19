@@ -83,7 +83,7 @@ public class DeploymentServiceTests
         _redisInterface.GetLocationByNameAsync(_mwConfig.Value.InstanceName).Returns(location.ToLocationResponse());
         _redisInterface.RobotGetByIdAsync(robot.Id).Returns(robot.ToRobotResponse());
         
-        var instance = task!.ActionSequence!.First().Services.First();
+        var instance = task.ActionSequence!.First().Services.First();
         _redisInterface.ContainerImageGetForInstanceAsync(instance.Id).Returns(new GetContainersResponse()
             { Containers = new[] { container.ToContainerResponse() } });
         _redisInterface.AddRelationAsync(Arg.Any<InstanceModel>(), Arg.Any<Location>(), "LOCATED_AT")
