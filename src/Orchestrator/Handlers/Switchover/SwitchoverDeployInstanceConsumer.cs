@@ -23,7 +23,7 @@ public class SwitchoverDeployInstanceConsumer : IConsumer<SwitchoverDeployAction
 
     public async Task Consume(ConsumeContext<SwitchoverDeployAction> context)
     {
-        _logger.LogInformation("Started processing DeployPlanMessage");
+        _logger.LogInformation("Started processing SwitchoverDeployAction");
         var payload = context.Message;
         var mwConfig = _mwConfig.Value;
         _logger.LogDebug("Location {0}-{1} received message request addressed to {2}", mwConfig.InstanceName,

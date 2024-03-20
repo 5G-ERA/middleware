@@ -1,0 +1,112 @@
+{
+  "Id": "d59cdda1-96af-469e-ac0f-701855981455",
+  "TaskId": "8b96277b-83ff-43ee-88be-aae512c270ff",
+  "Name": "ros-object-detection",
+  "Status": "active",
+  "IsReplan": false,
+  "LastStatusChange": "2024-03-19T13:04:55.9476915",
+  "ActionSequence": [
+    {
+      "Id": "cf040dda-c21c-47d7-b38d-19359c664c96",
+      "Name": "ros-object-detection",
+      "Tags": [],
+      "Order": 0,
+      "Placement": "MiddlewareBB",
+      "PlacementType": "Edge",
+      "ActionPriority": "Normal",
+      "ActionStatus": null,
+      "Services": [
+        {
+          "Id": "ef978162-db4c-4341-816d-fb02619ac249",
+          "Name": "ros-object-detection",
+          "ServiceInstanceId": "79366df3-e9d1-4a90-b469-0d9721361df1",
+          "ServiceType": null,
+          "IsReusable": false,
+          "IsPersistent": false,
+          "DesiredStatus": null,
+          "ServiceUrl": "http://192.168.0.100:31000//ros-object-detection",
+          "RosTopicsPub": [
+            {
+              "name": "/results",
+              "type": "std_msgs/String",
+              "description": "Topic that publishes the results of the NetApp",
+              "compression": null,
+              "qos": null,
+              "enabled": true
+            }
+          ],
+          "RosTopicsSub": [
+            {
+              "name": "/image_raw",
+              "type": "sensor_msgs/Image",
+              "description": "culpa sit",
+              "compression": null,
+              "qos": null,
+              "enabled": true
+            }
+          ],
+          "Transforms": [],
+          "Actions": [],
+          "Services": [],
+          "RosVersion": 0,
+          "RosDistro": "",
+          "Tags": [],
+          "InstanceFamily": null,
+          "SuccessRate": 0,
+          "ServiceStatus": "Down",
+          "ContainerImage": {
+            "Id": "95e86e31-88bf-40e5-8a96-c2667c03eae4",
+            "Name": "ros-object-detection",
+            "Timestamp": "2024-03-19T13:04:54.988+00:00",
+            "Description": "The example network application onboarding for the webinar",
+            "K8SDeployment": "apiVersion: apps/v1\nkind: Deployment\nmetadata:\n  name: ros-object-detection\nspec:\n  selector:\n    matchLabels:\n      app: ros-object-detection\n  replicas: 1\n  template:\n    metadata:\n      labels:\n        app: ros-object-detection\n    spec:\n      containers:\n        - name: object-detection\n          resources: {}\n          image: but5gera/ros_object_detection:0.1.0\n          env:\n            - name: NETAPP_TORCH_DEVICE\n              value: cpu",
+            "K8SService": null,
+            "relations": null
+          },
+          "OnboardedTime": "2023-11-21T11:02:23.616+00:00",
+          "LastStatusChange": "2024-03-19T13:06:30.0463049+00:00",
+          "AppliedPolicies": [],
+          "Ram": {
+            "minimal": 1,
+            "optimal": 0,
+            "priority": 1,
+            "ascending": true
+          },
+          "NumberOfCores": {
+            "minimal": 0,
+            "optimal": 0,
+            "priority": 1,
+            "ascending": true
+          },
+          "DiskStorage": {
+            "minimal": 0,
+            "optimal": 0,
+            "priority": 1,
+            "ascending": true
+          },
+          "Throughput": {
+            "minimal": 0,
+            "optimal": 0,
+            "priority": 1,
+            "ascending": true
+          },
+          "Latency": {
+            "minimal": 0,
+            "optimal": 0,
+            "priority": 1,
+            "ascending": false
+          },
+          "Relations": null
+        }
+      ],
+      "MinimumRam": 1,
+      "MinimumNumCores": null,
+      "NetworkSlice": null,
+      "SingleNetAppEntryPoint": false,
+      "Relations": null
+    }
+  ],
+  "RobotId": "300c719a-1c06-4500-a13a-c2e20592b273",
+  "TaskStartedAt": "2024-03-19T13:04:55.947614",
+  "Relations": null
+}
