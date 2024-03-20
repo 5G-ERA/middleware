@@ -219,7 +219,7 @@ internal class DeploymentService : IDeploymentService
             try
             {
                 await _kubernetesWrapper.DeployNetApp(pair);
-
+                // add relation between instance and location
                 if (ShouldDeployInterRelay(pair.Instance, action) == false)
                 {
                     await _publisher.PublishGatewayAddNetAppEntryAsync(thisLocation, pair.Name, actionPlan.Id,
