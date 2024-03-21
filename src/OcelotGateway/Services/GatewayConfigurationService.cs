@@ -1,4 +1,9 @@
-﻿using Middleware.Common.MessageContracts;
+﻿using System.Security.Policy;
+using System.Text;
+using MassTransit.Configuration;
+using Microsoft.Extensions.Options;
+using Middleware.Common.Config;
+using Middleware.Common.MessageContracts;
 using Middleware.Models.ExtensionMethods;
 using Yarp.ReverseProxy.Configuration;
 using Yarp.ReverseProxy.Transforms;
@@ -9,11 +14,13 @@ public class GatewayConfigurationService
 {
     private readonly InMemoryConfigProvider _inMemoryConfigProvider;
     private readonly ILogger<GatewayConfigurationService> _logger;
+    private readonly IOptions<MiddlewareConfig> _mwConfig;
 
     public GatewayConfigurationService(IProxyConfigProvider inMemoryConfigProvider,
-        ILogger<GatewayConfigurationService> logger)
+        ILogger<GatewayConfigurationService> logger, IOptions<MiddlewareConfig> mwConfig)
     {
         _logger = logger;
+        _mwConfig = mwConfig;
         if (inMemoryConfigProvider is InMemoryConfigProvider imcp)
             _inMemoryConfigProvider = imcp;
     }
@@ -41,14 +48,21 @@ public class GatewayConfigurationService
             address);
         var path = msg.Route.SanitizeToUriPath();
         _logger.LogInformation("Opening new route with path: {path}", path);
+        string mwAddress = _mwConfig.Value.Address;
+        int position = 7;
+        StringBuilder stringBuilder = new StringBuilder(mwAddress);
+        stringBuilder.Insert(position, path+".");
+        string newHost = stringBuilder.ToString();
         var routeCfg = new RouteConfig
         {
             RouteId = msg.NetAppName + "-Route",
             Match = new()
             {
-                Path = "/" + path + "/{**remainder}"
+                //ros-object-detection.middleware.net
+                //Path = "/" + path + "/{**remainder}",
+                Hosts = new[] {newHost}            
             },
-            ClusterId = clusterCfg.ClusterId //
+            ClusterId = clusterCfg.ClusterId
         };
         var routeSocketIoCfg = new RouteConfig
         {
