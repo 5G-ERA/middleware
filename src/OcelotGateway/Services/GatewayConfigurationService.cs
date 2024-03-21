@@ -45,7 +45,7 @@ public class GatewayConfigurationService
         {
             RouteId = msg.NetAppName + "-Route",
             Match = new()
-            {
+            { 
                 Path = "/" + path + "/{**remainder}"
             },
             ClusterId = clusterCfg.ClusterId //
