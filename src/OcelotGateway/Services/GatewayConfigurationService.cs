@@ -1,4 +1,5 @@
-﻿using System.Security.Policy;
+﻿using System.Data.SqlTypes;
+using System.Security.Policy;
 using System.Text;
 using MassTransit.Configuration;
 using Microsoft.Extensions.Options;
@@ -48,19 +49,22 @@ public class GatewayConfigurationService
             address);
         var path = msg.Route.SanitizeToUriPath();
         _logger.LogInformation("Opening new route with path: {path}", path);
-        string mwAddress = _mwConfig.Value.Address.Replace(":30009", "");
+        string mwAddress = _mwConfig.Value.Address.ToString();
+        //var mwAddress = "http://middleware.local";
         int position = 7;
         StringBuilder stringBuilder = new StringBuilder(mwAddress);
         stringBuilder.Insert(position, path+".");
         string newHost = stringBuilder.ToString();
+        Uri uri = new Uri(newHost);
+        var validHost = uri.Host;
         var routeCfg = new RouteConfig
         {
             RouteId = msg.NetAppName + "-Route",
             Match = new()
-            {
+            {                
                 //ros-object-detection.middleware.net
                 //Path = "/" + path + "/{**remainder}",
-                Hosts = new[] {newHost}            
+                Hosts = new[] { validHost }            
             },
             ClusterId = clusterCfg.ClusterId
         };
