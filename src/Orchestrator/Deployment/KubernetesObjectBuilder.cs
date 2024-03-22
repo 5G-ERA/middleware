@@ -216,7 +216,7 @@ internal class KubernetesObjectBuilder : IKubernetesObjectBuilder
         };
         var envList = new List<V1EnvVar>
         {
-            new("Middleware__Organization", _mwConfig.Value.Organization),
+            new("Middleware__Address", _mwConfig.Value.Address),
             new("Middleware__Organization", _mwConfig.Value.Organization),
             new("Middleware__InstanceName", _mwConfig.Value.InstanceName),
             new("Middleware__InstanceType", _mwConfig.Value.InstanceType),
