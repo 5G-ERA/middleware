@@ -48,7 +48,7 @@ public class GatewayConfigurationService
             address);
         var path = msg.Route.SanitizeToUriPath();
         _logger.LogInformation("Opening new route with path: {path}", path);
-        string mwAddress = _mwConfig.Value.Address;
+        string mwAddress = _mwConfig.Value.Address.Replace(":30009", "");
         int position = 7;
         StringBuilder stringBuilder = new StringBuilder(mwAddress);
         stringBuilder.Insert(position, path+".");
