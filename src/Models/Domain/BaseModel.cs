@@ -16,7 +16,13 @@ public abstract class BaseModel
     protected string GetNetAppAddress(string netAppName, Uri address)
     {
         var sanitized = netAppName.SanitizeToUriPath();
-        return $"{address}/{sanitized}";
+        string protocol = address.Scheme;
+        string domain = address.Host;
+        int port = address.Port;
+
+        string modifiedAddress = $"{protocol}://{sanitized}.{domain}:{port}";
+
+        return modifiedAddress;
     }
 
     protected string GetNetAppReportAddress(Uri address)
