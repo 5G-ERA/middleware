@@ -327,7 +327,7 @@ internal class KubernetesObjectBuilder : IKubernetesObjectBuilder
 
             envVars.Add(new("NETAPP_ID", serviceInstanceId.ToString()));
             envVars.Add(new("NETAPP_NAME", name));
-            envVars.Add(new("MIDDLEWARE_ADDRESS", "http://" + thisLocation.GetNetAppStatusReportAddress()));
+            envVars.Add(new("MIDDLEWARE_ADDRESS", thisLocation.GetNetAppStatusReportAddress()));
             envVars.Add(new("MIDDLEWARE_REPORT_INTERVAL", ReportIntervalInSeconds.ToString()));
 
             container.Env = envVars;
