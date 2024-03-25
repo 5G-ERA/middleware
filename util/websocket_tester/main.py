@@ -22,9 +22,10 @@ def main():
     netapps = data['netapps']
 
     #namespaces_to_connect = ["/data", "/control", "/results"]
-    io = socketio.Client()
+    #io = socketio.Client()
     for netapp in netapps:
         try:
+            io = socketio.Client()
             address = 'http://' + netapp + '.' + host
             io.connect(address, wait_timeout=5)
             print(f'{netapp}: Connected')
