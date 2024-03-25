@@ -16,9 +16,9 @@ public abstract class BaseModel
     protected string GetNetAppAddress(string netAppName, Uri address)
     {
         var sanitized = netAppName.SanitizeToUriPath();
-        string protocol = address.Scheme;
-        string domain = address.Host;
-        int port = address.Port;
+        var protocol = address.IsAbsoluteUri ? address.Scheme : "http";
+        var domain = address.IsAbsoluteUri ? address.Host : address.ToString();
+        int port = address.IsAbsoluteUri ? address.Port : 80;
 
         string modifiedAddress = $"{protocol}://{sanitized}.{domain}:{port}";
 

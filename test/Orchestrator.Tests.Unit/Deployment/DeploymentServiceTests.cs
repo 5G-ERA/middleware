@@ -35,7 +35,8 @@ public class DeploymentServiceTests
     {
         InstanceName = "test-MW",
         InstanceType = "Edge",
-        Organization = "5G-ERA-TST"
+        Organization = "5G-ERA-TST",
+        Address = "https://crop.5gera.net",
     });
 
     private readonly IPublishingService _publishingService = Substitute.For<IPublishingService>();
