@@ -2,6 +2,7 @@
 using System.Security.Policy;
 using System.Text;
 using MassTransit.Configuration;
+using Microsoft.AspNetCore;
 using Microsoft.Extensions.Options;
 using Middleware.Common.Config;
 using Middleware.Common.MessageContracts;
@@ -49,40 +50,29 @@ public class GatewayConfigurationService
             address);
         var path = msg.Route.SanitizeToUriPath();
         _logger.LogInformation("Opening new route with path: {path}", path);
-        string mwAddress = _mwConfig.Value.Address.ToString();
-        //var mwAddress = "http://middleware.local";
-        int position = 7;
-        StringBuilder stringBuilder = new StringBuilder(mwAddress);
-        stringBuilder.Insert(position, path+".");
-        string newHost = stringBuilder.ToString();
-        Uri uri = new Uri(newHost);
+        var sanitized = msg.NetAppName.SanitizeToUriPath();
+        var mwAddress = new Uri(_mwConfig.Value.Address);
+        var protocol = mwAddress.IsAbsoluteUri ? mwAddress.Scheme : "http";
+        var domain = mwAddress.IsAbsoluteUri ? mwAddress.Host : mwAddress.ToString();
+        int port = mwAddress.IsAbsoluteUri ? mwAddress.Port : 80;
+
+        string modifiedAddress = $"{protocol}://{sanitized}.{domain}:{port}";
+
+        Uri uri = new Uri(modifiedAddress);
         var validHost = uri.Host;
+
         var routeCfg = new RouteConfig
         {
             RouteId = msg.NetAppName + "-Route",
             Match = new()
             {                
-                //ros-object-detection.middleware.net
-                //Path = "/" + path + "/{**remainder}",
                 Hosts = new[] { validHost }            
             },
             ClusterId = clusterCfg.ClusterId
         };
-        // var routeSocketIoCfg = new RouteConfig
-        // {
-        //     RouteId = msg.NetAppName + "SocketIO-Route",
-        //     Match = new()
-        //     {
-        //         Path = "/socket.io/{**remainder}"
-        //     },
-        //     ClusterId = clusterCfg.ClusterId //
-        // };
-        // transforms allow us to change the path that is requested like below to replace direct forwarding
-        //routeCfg = routeCfg.WithTransformPathRemovePrefix($"/{msg.NetAppName}");
 
         clusterList.Add(clusterCfg);
         routeList.Add(routeCfg);
-        //routeList.Add(routeSocketIoCfg);
 
         _inMemoryConfigProvider.Update(routeList, clusterList);
 

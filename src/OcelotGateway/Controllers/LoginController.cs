@@ -21,16 +21,14 @@ public class LoginController : MiddlewareController
     private readonly IOptions<JwtConfig> _jwtConfig;
     private readonly ILogger _logger;
     private readonly IUserRepository _userRepository;
-    private readonly GatewayConfigurationService _service;
 
 
     public LoginController(IUserRepository userRepository, IOptions<JwtConfig> jwtConfig,
-        ILogger<LoginController> logger, GatewayConfigurationService service)
+        ILogger<LoginController> logger)
     {
         _userRepository = userRepository ?? throw new ArgumentNullException(nameof(userRepository));
         _jwtConfig = jwtConfig ?? throw new ArgumentNullException(nameof(jwtConfig));
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-        _service = service;
     }
 
 
@@ -133,14 +131,5 @@ public class LoginController : MiddlewareController
             _logger.LogError(ex, "An error has occured during the authentication process");
             return new(false, null);
         }
-    }
-
-    [AllowAnonymous]
-    [HttpPost]
-    [Route("route", Name = "Route")]
-
-    public async Task Route([FromBody]GatewayAddNetAppEntryMessage msg) 
-    {
-        _service.CreateDynamicRoute(msg);
     }
 }
