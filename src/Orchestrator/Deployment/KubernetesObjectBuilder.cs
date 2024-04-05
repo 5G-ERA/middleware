@@ -228,6 +228,7 @@ internal class KubernetesObjectBuilder : IKubernetesObjectBuilder
             new("RabbitMQ__Address", _env.GetEnvVariable("RabbitMQ__Address")),
             new("RabbitMQ__User", _env.GetEnvVariable("RabbitMQ__User")),
             new("RabbitMQ__Pass", _env.GetEnvVariable("RabbitMQ__Pass")),
+            new("RabbitMQ__Port", _env.GetEnvVariable("RabbitMQ__Port")),
             new("CENTRAL_API_HOSTNAME", _env.GetEnvVariable("CENTRAL_API_HOSTNAME")),
             new("AWS_ACCESS_KEY_ID", _env.GetEnvVariable("AWS_ACCESS_KEY_ID")),
             new("AWS_SECRET_ACCESS_KEY", _env.GetEnvVariable("AWS_SECRET_ACCESS_KEY"))
