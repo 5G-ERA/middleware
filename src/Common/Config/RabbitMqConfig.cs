@@ -10,6 +10,11 @@ public class RabbitMqConfig
     /// RabbitMQ broker address
     /// </summary>
     public string Address { get; set; }
+
+    /// <summary>
+    /// Password
+    /// </summary>
+    public ushort? Port { get; set; }
     /// <summary>
     /// User
     /// </summary>
