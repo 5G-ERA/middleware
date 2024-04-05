@@ -67,6 +67,17 @@ public class GatewayConfigurationService
             Match = new()
             {                
                 Hosts = new[] { validHost }            
+            { 
+                Path = "/" + path + "/{**remainder}"
+            },
+            ClusterId = clusterCfg.ClusterId //
+        };
+        var routeSocketIoCfg = new RouteConfig
+        {
+            RouteId = msg.NetAppName + "SocketIO-Route",
+            Match = new()
+            {
+                Path = "/socket.io/{**remainder}"
             },
             ClusterId = clusterCfg.ClusterId
         };

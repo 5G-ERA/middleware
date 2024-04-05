@@ -93,7 +93,7 @@ internal class DeploymentService : IDeploymentService
                     }
 
                     retVal += await _kubernetesWrapper.TerminateNetAppById(srv.ServiceInstanceId);
-                    retVal += await _redisInterfaceClient.DeleteRelationAsync(srv, actionLoc.ToBaseLocation(),
+                    await _redisInterfaceClient.DeleteRelationAsync(srv, actionLoc.ToBaseLocation(),
                         "LOCATED_AT");
 
                     if (ShouldDeployInterRelay(srv, action) == false)
