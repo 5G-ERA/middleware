@@ -1,5 +1,33 @@
 # Changelog
 
+## [1.0.0](https://github.com/5G-ERA/middleware/compare/v0.10.0...v1.0.0) (2024-04-08)
+
+
+### ⚠ BREAKING CHANGES
+
+* subdomain based netapp routing (#295)
+
+### Features
+
+* statefull netapp support ([#292](https://github.com/5G-ERA/middleware/issues/292)) ([24569c8](https://github.com/5G-ERA/middleware/commit/24569c81bd7a2da00e8ecb0a7d24040f51856bcf))
+
+
+### Bug Fixes
+
+* added null check for tokenservice generatetoken ([2baa80e](https://github.com/5G-ERA/middleware/commit/2baa80e2450e9d139c04cd17620d1d5b2c1b7246))
+* adjusted keygen size ([04ba654](https://github.com/5G-ERA/middleware/commit/04ba6549228bce7a191772dc3bee151106bcfb99))
+* changed redis port ([c9b7813](https://github.com/5G-ERA/middleware/commit/c9b7813f43fb64dd25151301bb34a43285c07d54))
+* correct ros2 relay server default version ([338920b](https://github.com/5G-ERA/middleware/commit/338920b9f842836d76196d63841a81566c913952))
+* do not include the relation deletion to deletion result ([79483ed](https://github.com/5G-ERA/middleware/commit/79483edacbc185b7b76e5233529cc40ac5500e27))
+* edge switchover deployment ([95c8533](https://github.com/5G-ERA/middleware/commit/95c8533fc901bf69c5829c74cf620d5454431567))
+* included environment variables in central api configuration ([4f4905c](https://github.com/5G-ERA/middleware/commit/4f4905c3cc09931653c32da44f0c861bdde18101))
+* moved socket client inside the loop ([2c6dbde](https://github.com/5G-ERA/middleware/commit/2c6dbdeca1cb8aa98a4f2e14110d1b36afe0e747))
+* null check adjusted for jwt key ([175713e](https://github.com/5G-ERA/middleware/commit/175713ea5be2f02064f710a4d8f4e182ea3de376))
+* subdomain based netapp routing ([#295](https://github.com/5G-ERA/middleware/issues/295)) ([c8f6c9e](https://github.com/5G-ERA/middleware/commit/c8f6c9ebb0024d868c038182f63d24fc46d199b2))
+* updated masstransit nuget package ([f05caf5](https://github.com/5G-ERA/middleware/commit/f05caf5606ea4fac9ab3ce75b27e8619e60ddf1b))
+* updated masstransit nuget package ([b155c2a](https://github.com/5G-ERA/middleware/commit/b155c2ae0dacbfbfcaf9cff1f67fd5f97e9df4eb))
+* use default key without aws secrets ([e0fa09b](https://github.com/5G-ERA/middleware/commit/e0fa09b3564ad7177b8c5edbf9cc197cec9acab7))
+
 ## [0.10.0](https://github.com/5G-ERA/middleware/compare/v0.9.0...v0.10.0) (2024-03-01)
 
 
