@@ -67,8 +67,6 @@ public class GatewayConfigurationService
             Match = new()
             {                
                 Hosts = new[] { validHost }            
-            { 
-                Path = "/" + path + "/{**remainder}"
             },
             ClusterId = clusterCfg.ClusterId //
         };
