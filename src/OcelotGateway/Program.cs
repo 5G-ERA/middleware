@@ -91,6 +91,6 @@ app.UseEndpoints(endpoints =>
 
 await app.UseOcelot(ocelotConfig);
 
-app.MapGet("/", () => "OcelotGateway is functional!");
+app.MapGet("/", () => "Welcome to 5G-ERA Middleware");
 
 app.Run();
