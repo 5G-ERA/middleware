@@ -31,6 +31,8 @@ builder.Services.DecorateClaimAuthoriser();
 
 var config = builder.Configuration.GetSection(JwtConfig.ConfigName).Get<JwtConfig>();
 builder.Services.Configure<JwtConfig>(builder.Configuration.GetSection(JwtConfig.ConfigName));
+//var mwConfig = builder.Configuration.GetSection(MiddlewareConfig.ConfigName).Get<MiddlewareConfig>();
+builder.Services.Configure<MiddlewareConfig>(builder.Configuration.GetSection(MiddlewareConfig.ConfigName));
 
 builder.Services.AddAuthentication(options =>
     {

@@ -15,7 +15,8 @@ public static class ServiceCollectionExtensions
         {
             x.UsingRabbitMq((busRegistrationContext, mqBusFactoryConfigurator) =>
             {
-                mqBusFactoryConfigurator.Host(mqConfig.Address, "/", hostConfig =>
+                var port = mqConfig.Port ?? 5672;
+                mqBusFactoryConfigurator.Host(mqConfig.Address, port, "/", hostConfig =>
                 {
                     hostConfig.Username(mqConfig.User);
                     hostConfig.Password(mqConfig.Pass);

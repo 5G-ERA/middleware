@@ -216,7 +216,7 @@ internal class KubernetesObjectBuilder : IKubernetesObjectBuilder
         };
         var envList = new List<V1EnvVar>
         {
-            new("Middleware__Organization", _mwConfig.Value.Organization),
+            new("Middleware__Address", _mwConfig.Value.Address),
             new("Middleware__Organization", _mwConfig.Value.Organization),
             new("Middleware__InstanceName", _mwConfig.Value.InstanceName),
             new("Middleware__InstanceType", _mwConfig.Value.InstanceType),
@@ -228,6 +228,7 @@ internal class KubernetesObjectBuilder : IKubernetesObjectBuilder
             new("RabbitMQ__Address", _env.GetEnvVariable("RabbitMQ__Address")),
             new("RabbitMQ__User", _env.GetEnvVariable("RabbitMQ__User")),
             new("RabbitMQ__Pass", _env.GetEnvVariable("RabbitMQ__Pass")),
+            new("RabbitMQ__Port", _env.GetEnvVariable("RabbitMQ__Port")),
             new("CENTRAL_API_HOSTNAME", _env.GetEnvVariable("CENTRAL_API_HOSTNAME")),
             new("AWS_ACCESS_KEY_ID", _env.GetEnvVariable("AWS_ACCESS_KEY_ID")),
             new("AWS_SECRET_ACCESS_KEY", _env.GetEnvVariable("AWS_SECRET_ACCESS_KEY"))
@@ -327,7 +328,7 @@ internal class KubernetesObjectBuilder : IKubernetesObjectBuilder
 
             envVars.Add(new("NETAPP_ID", serviceInstanceId.ToString()));
             envVars.Add(new("NETAPP_NAME", name));
-            envVars.Add(new("MIDDLEWARE_ADDRESS", "http://" + thisLocation.GetNetAppStatusReportAddress()));
+            envVars.Add(new("MIDDLEWARE_ADDRESS", thisLocation.GetNetAppStatusReportAddress()));
             envVars.Add(new("MIDDLEWARE_REPORT_INTERVAL", ReportIntervalInSeconds.ToString()));
 
             container.Env = envVars;

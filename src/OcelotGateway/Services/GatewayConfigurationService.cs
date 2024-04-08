@@ -1,4 +1,11 @@
-﻿using Middleware.Common.MessageContracts;
+﻿using System.Data.SqlTypes;
+using System.Security.Policy;
+using System.Text;
+using MassTransit.Configuration;
+using Microsoft.AspNetCore;
+using Microsoft.Extensions.Options;
+using Middleware.Common.Config;
+using Middleware.Common.MessageContracts;
 using Middleware.Models.ExtensionMethods;
 using Yarp.ReverseProxy.Configuration;
 using Yarp.ReverseProxy.Transforms;
@@ -9,11 +16,13 @@ public class GatewayConfigurationService
 {
     private readonly InMemoryConfigProvider _inMemoryConfigProvider;
     private readonly ILogger<GatewayConfigurationService> _logger;
+    private readonly IOptions<MiddlewareConfig> _mwConfig;
 
     public GatewayConfigurationService(IProxyConfigProvider inMemoryConfigProvider,
-        ILogger<GatewayConfigurationService> logger)
+        ILogger<GatewayConfigurationService> logger, IOptions<MiddlewareConfig> mwConfig)
     {
         _logger = logger;
+        _mwConfig = mwConfig;
         if (inMemoryConfigProvider is InMemoryConfigProvider imcp)
             _inMemoryConfigProvider = imcp;
     }
@@ -41,12 +50,23 @@ public class GatewayConfigurationService
             address);
         var path = msg.Route.SanitizeToUriPath();
         _logger.LogInformation("Opening new route with path: {path}", path);
+        var sanitized = msg.NetAppName.SanitizeToUriPath();
+        var mwAddress = new Uri(_mwConfig.Value.Address);
+        var protocol = mwAddress.IsAbsoluteUri ? mwAddress.Scheme : "http";
+        var domain = mwAddress.IsAbsoluteUri ? mwAddress.Host : mwAddress.ToString();
+        int port = mwAddress.IsAbsoluteUri ? mwAddress.Port : 80;
+
+        string modifiedAddress = $"{protocol}://{sanitized}.{domain}:{port}";
+
+        Uri uri = new Uri(modifiedAddress);
+        var validHost = uri.Host;
+
         var routeCfg = new RouteConfig
         {
             RouteId = msg.NetAppName + "-Route",
             Match = new()
-            { 
-                Path = "/" + path + "/{**remainder}"
+            {                
+                Hosts = new[] { validHost }            
             },
             ClusterId = clusterCfg.ClusterId //
         };
@@ -57,14 +77,11 @@ public class GatewayConfigurationService
             {
                 Path = "/socket.io/{**remainder}"
             },
-            ClusterId = clusterCfg.ClusterId //
+            ClusterId = clusterCfg.ClusterId
         };
-        // transforms allow us to change the path that is requested like below to replace direct forwarding
-        routeCfg = routeCfg.WithTransformPathRemovePrefix($"/{msg.NetAppName}");
 
         clusterList.Add(clusterCfg);
         routeList.Add(routeCfg);
-        routeList.Add(routeSocketIoCfg);
 
         _inMemoryConfigProvider.Update(routeList, clusterList);
 

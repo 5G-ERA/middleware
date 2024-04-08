@@ -5,6 +5,7 @@ using Microsoft.Extensions.Options;
 using Middleware.Common;
 using Middleware.Common.Config;
 using Middleware.Common.Helpers;
+using Middleware.Common.MessageContracts;
 using Middleware.Common.Responses;
 using Middleware.DataAccess.Repositories.Abstract;
 using Middleware.Models.Domain;
