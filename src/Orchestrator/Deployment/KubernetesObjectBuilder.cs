@@ -327,7 +327,8 @@ internal class KubernetesObjectBuilder : IKubernetesObjectBuilder
         {
             obj.Spec.Selector.MatchLabels[key] = name.SanitizeAsK8sObjectName();
         }
-        
+
+        obj.Spec.Template.Metadata.Labels = obj.Spec.Selector.MatchLabels;
         obj.Metadata.SetServiceLabel(serviceInstanceId);
         obj.Metadata.Name = name.SanitizeAsK8sObjectName();
         foreach (var container in obj.Spec.Template.Spec.Containers)
