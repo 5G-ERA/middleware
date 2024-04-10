@@ -279,7 +279,7 @@ internal class KubernetesObjectBuilder : IKubernetesObjectBuilder
         var spec = new V1ServiceSpec
         {
             Ports = servicePorts,
-            Selector = depl.Metadata.Labels,
+            Selector = depl.Spec.Selector.MatchLabels,
             Type = K8SServiceKind.ClusterIp.GetStringValue()
         };
 
