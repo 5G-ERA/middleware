@@ -279,7 +279,7 @@ internal class KubernetesObjectBuilder : IKubernetesObjectBuilder
         var spec = new V1ServiceSpec
         {
             Ports = servicePorts,
-            Selector = depl.Spec.Selector.MatchLabels,
+            Selector = depl.Metadata.Labels,
             Type = K8SServiceKind.ClusterIp.GetStringValue()
         };
 
@@ -317,7 +317,17 @@ internal class KubernetesObjectBuilder : IKubernetesObjectBuilder
         var obj = KubernetesYaml.Deserialize<V1Deployment>(sanitized);
 
         if (obj is null) throw new UnableToParseYamlConfigException(name, nameof(ContainerImageModel.K8SDeployment));
-
+        var keysToModify = new List<string>();
+        foreach (var kvp in obj.Spec.Selector.MatchLabels)
+        {
+            if (kvp.Value == obj.Metadata.Name)
+                keysToModify.Add(kvp.Key);
+        }
+        foreach (var key in keysToModify)
+        {
+            obj.Spec.Selector.MatchLabels[key] = name.SanitizeAsK8sObjectName();
+        }
+        
         obj.Metadata.SetServiceLabel(serviceInstanceId);
         obj.Metadata.Name = name.SanitizeAsK8sObjectName();
         foreach (var container in obj.Spec.Template.Spec.Containers)
