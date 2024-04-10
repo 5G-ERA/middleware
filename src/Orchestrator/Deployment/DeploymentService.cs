@@ -344,7 +344,7 @@ internal class DeploymentService : IDeploymentService
             {
                 _logger.LogDebug("Deploying instance '{Name}', with serviceInstanceId '{ServiceInstanceId}'",
                     pair.Instance!.Name, pair.InstanceId);
-                await _kubernetesWrapper.DeployNetApp(pair);
+                retVal += await _kubernetesWrapper.DeployNetApp(pair);
 
                 if (ShouldDeployInterRelay(pair.Instance, item.Key) == false)
                 {
@@ -526,6 +526,7 @@ internal class DeploymentService : IDeploymentService
 
         if (builder is not null)
         {
+            
             var rosSpec = new RosSpec(instance.RosTopicsSub,
                 instance.RosTopicsPub,
                 instance.Services,
