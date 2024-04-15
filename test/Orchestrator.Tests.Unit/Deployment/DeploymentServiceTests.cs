@@ -81,6 +81,7 @@ public class DeploymentServiceTests
         
         _systemConfigRepo.GetConfigAsync().Returns(systemConfig);
         _kubeWrapper.GetCurrentlyDeployedNetApps().Returns(currentlyRunningDeployments);
+        _kubeWrapper.DeployNetApp(Arg.Any<DeploymentPair>()).Returns(Result.Success());
         _redisInterface.GetLocationByNameAsync(_mwConfig.Value.InstanceName).Returns(location.ToLocationResponse());
         _redisInterface.RobotGetByIdAsync(robot.Id).Returns(robot.ToRobotResponse());
         
