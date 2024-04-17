@@ -1,5 +1,12 @@
 # Changelog
 
+### [1.0.1](https://github.com/5G-ERA/middleware/compare/v1.0.0...v1.0.1) (2024-04-17)
+
+
+### Bug Fixes
+
+* labels in netapps with changed names ([#297](https://github.com/5G-ERA/middleware/issues/297)) ([fd765d4](https://github.com/5G-ERA/middleware/commit/fd765d4b2f500e15176f8527ec2f9e152b0f3fcc))
+
 ## [1.0.0](https://github.com/5G-ERA/middleware/compare/v0.10.0...v1.0.0) (2024-04-08)
 
 
