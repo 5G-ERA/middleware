@@ -32,7 +32,7 @@ spec:
         - name: awsecr-cred
       containers:
         - name: orchestrator-api
-          image: ghcr.io/5g-era/orchestrator-api:v0.8.0
+          image: ghcr.io/5g-era/orchestrator-api:v1.0.1
           imagePullPolicy: Always
           resources: {}
           env:
