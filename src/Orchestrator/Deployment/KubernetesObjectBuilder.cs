@@ -447,6 +447,13 @@ internal class KubernetesObjectBuilder : IKubernetesObjectBuilder
             new(80, "TCP", "http", nodePort, "TCP", 80)
         };
     }
+    
+    public V1Deployment AddLinkerdAnnotation(V1Deployment deployment)
+    {
+        deployment.Spec.Template.SetAnnotation("linkerd.io/inject", "enabled");
+        deployment.SetAnnotation("linkerd.io/inject", "enabled");
+        return deployment;
+    }
 
     /// <summary>
     ///     This class is used to represent the config for the MultiRelayNetApp

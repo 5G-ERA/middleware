@@ -536,7 +536,8 @@ internal class DeploymentService : IDeploymentService
             deployment = builder.EnableRosCommunication(deployment, rosSpec);
         }
 
-        deployment = AddLinkerdAnnotation(deployment);
+        deployment = _kubeObjectBuilder.AddLinkerdAnnotation(deployment);
+        
         var service = string.IsNullOrWhiteSpace(cim.K8SService)
             ? _kubeObjectBuilder.CreateDefaultService(instanceName, instanceId, deployment)
             : _kubeObjectBuilder.DeserializeAndConfigureService(cim.K8SService, instanceName, instanceId);
@@ -547,10 +548,5 @@ internal class DeploymentService : IDeploymentService
     }
 
 
-    private V1Deployment AddLinkerdAnnotation(V1Deployment deployment)
-    {
-        deployment.Spec.Template.SetAnnotation("linkerd.io/inject", "enabled");
-        deployment.SetAnnotation("linkerd.io/inject", "enabled");
-        return deployment;
-    }
+    
 }
