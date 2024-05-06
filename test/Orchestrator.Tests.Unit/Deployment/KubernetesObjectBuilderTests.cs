@@ -3,7 +3,9 @@ using System.Linq;
 using FluentAssertions;
 using k8s.Models;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Options;
 using Middleware.Common;
+using Middleware.Common.Config;
 using Middleware.Common.Enums;
 using Middleware.Common.ExtensionMethods;
 using Middleware.DataAccess.Repositories.Abstract;
@@ -20,11 +22,16 @@ public class KubernetesObjectBuilderTests
     private readonly IConfiguration _configuration = Substitute.For<IConfiguration>();
     private readonly IEnvironment _environment = Substitute.For<IEnvironment>();
     private readonly KubernetesObjectBuilder _sut;
-    private readonly ISystemConfigRepository _systemConfigRepository = Substitute.For<ISystemConfigRepository>();
 
     public KubernetesObjectBuilderTests()
     {
-        _sut = new(_environment, _configuration, _systemConfigRepository);
+        _sut = new(_environment, Options.Create(new MiddlewareConfig()
+        {
+            Address = "127.0.0.1",
+            InstanceName = "test",
+            InstanceType = "Edge",
+            Organization = "TestOrg"
+        }));
     }
 
     [Theory]
@@ -110,7 +117,7 @@ public class KubernetesObjectBuilderTests
             Metadata = new()
             {
                 Name = instance.Name,
-                Labels = CreateDefaultSelector(instance.Name!)
+                Labels = CreateDefaultSelector(instance.Name)
             },
             ApiVersion = "v1",
             Kind = "Service",

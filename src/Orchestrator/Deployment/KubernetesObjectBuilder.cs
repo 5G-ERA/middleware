@@ -3,11 +3,11 @@ using System.Text.Json.Serialization;
 using JetBrains.Annotations;
 using k8s;
 using k8s.Models;
+using Microsoft.Extensions.Options;
 using Middleware.Common;
 using Middleware.Common.Config;
 using Middleware.Common.Enums;
 using Middleware.Common.ExtensionMethods;
-using Middleware.DataAccess.Repositories.Abstract;
 using Middleware.Models.Domain;
 using Middleware.Models.Domain.Contracts;
 using Middleware.Models.ExtensionMethods;
@@ -22,8 +22,8 @@ internal class KubernetesObjectBuilder : IKubernetesObjectBuilder
     ///     Defines an interval in which the NetApps report heartbeat to the Middleware
     /// </summary>
     private const int ReportIntervalInSeconds = 5;
-
-    private readonly IConfiguration _config;
+    
+    private readonly IOptions<MiddlewareConfig> _mwConfig;
 
     /// <summary>
     ///     Name of the container registry used
@@ -31,16 +31,104 @@ internal class KubernetesObjectBuilder : IKubernetesObjectBuilder
     private readonly string _containerRegistryName;
 
     private readonly IEnvironment _env;
-    private readonly ISystemConfigRepository _systemConfigRepository;
-
-    public KubernetesObjectBuilder(IEnvironment env, IConfiguration config,
-        ISystemConfigRepository systemConfigRepository)
+    
+    public KubernetesObjectBuilder(IEnvironment env, IOptions<MiddlewareConfig> mwConfig)
     {
         _env = env;
-        _config = config;
-        _systemConfigRepository = systemConfigRepository;
+        _mwConfig = mwConfig;
         _containerRegistryName = _env.GetEnvVariable("IMAGE_REGISTRY")?.TrimEnd('/') ?? "ghcr.io/5g-era";
     }
+
+    /// <inheritdoc />
+    public V1Deployment EnableDataPersistence(V1Deployment dpl, SystemConfigModel config, string netAppDataKey)
+    {
+        var volume = new V1Volume()
+        {
+            Name = "shared",
+            EmptyDir = new()
+        };
+        if (dpl.Spec.Template.Spec.Volumes is null)
+            dpl.Spec.Template.Spec.Volumes = new List<V1Volume>();
+        
+        dpl.Spec.Template.Spec.Volumes.Add(volume);
+        
+        var hermesFetch = CreateHermesFetchContainer(netAppDataKey, config);
+        if (dpl.Spec.Template.Spec.InitContainers is null)
+            dpl.Spec.Template.Spec.InitContainers = new List<V1Container>();
+        
+        dpl.Spec.Template.Spec.InitContainers.Add(hermesFetch);
+        
+        //update existing container
+        var netApp = dpl.Spec.Template.Spec.Containers.First();
+        netApp.Env.Add(new("NETAPP_DATA_DIR", "/data/" + netAppDataKey));
+        netApp.Env.Add(new("NETAPP_KEY", netAppDataKey));
+        netApp.VolumeMounts = new List<V1VolumeMount>
+        {
+            new()
+            {
+                Name = "shared",
+                MountPath = "/data"
+            }
+        };
+        var hermesPost = CreateHermesPostContainer(netAppDataKey, config);
+        dpl.Spec.Template.Spec.Containers.Add(hermesPost);
+        
+        return dpl;
+    }
+
+    private V1Container CreateHermesPostContainer(string netAppKey, SystemConfigModel config)
+    {
+        const string dir = "/data/upload";
+        var hermes = CreateHermesContainer(netAppKey, config);
+        hermes.Name += "-post";
+        hermes.Env.Add(new("POST_DIR",dir));
+        hermes.Args.Add("post");
+        hermes.VolumeMounts = new List<V1VolumeMount>
+        {
+            new()
+            {
+                Name = "shared",
+                MountPath = dir
+            }
+        };
+        return hermes;
+    }
+    private V1Container CreateHermesFetchContainer(string netAppKey, SystemConfigModel config)
+    {
+        const string dir = "/data/download";
+        var hermes = CreateHermesContainer(netAppKey, config);
+        hermes.Name += "-fetch";
+        hermes.Env.Add(new("FETCH_DIR",dir));
+        hermes.Args.Add("fetch");
+        hermes.VolumeMounts = new List<V1VolumeMount>
+        {
+            new()
+            {
+                Name = "shared",
+                MountPath = dir
+            }
+        };
+        return hermes;
+    }
+    private V1Container CreateHermesContainer(string netAppDataKey, SystemConfigModel config)
+    {
+        var hermes = new V1Container
+        {
+            Name = "hermes",
+            Image = config.HermesContainer,
+            Env = new List<V1EnvVar>
+            {
+                new("AWS_ACCESS_KEY_ID", _env.GetEnvVariable("AWS_ACCESS_KEY_ID")),
+                new("AWS_SECRET_ACCESS_KEY", _env.GetEnvVariable("AWS_SECRET_ACCESS_KEY")),
+                new("AWS_REGION", config.S3DataPersistenceRegion),
+                new("AWS_BUCKET", config.S3DataPersistenceBucketName),
+                new("NETAPP_KEY", netAppDataKey)
+            },
+            Args = new List<string>()
+        };
+        return hermes;
+    }
+    
 
     /// <inheritdoc />
     public V1Service DeserializeAndConfigureService(string service, string name, Guid serviceInstanceId)
@@ -60,11 +148,12 @@ internal class KubernetesObjectBuilder : IKubernetesObjectBuilder
         return obj;
     }
 
-    public V1Service CreateStartupService(string serviceImageName, K8SServiceKind kind, V1ObjectMeta meta)
+    public V1Service CreateStartupService(string serviceImageName, K8SServiceKind kind, V1ObjectMeta meta,
+        int? nodePort = null)
     {
         var spec = new V1ServiceSpec
         {
-            Ports = CreateDefaultHttpPorts(),
+            Ports = CreateDefaultHttpPorts(nodePort),
             Selector = new Dictionary<string, string> { { "app", serviceImageName } },
             Type = kind.GetStringValue()
         };
@@ -113,7 +202,6 @@ internal class KubernetesObjectBuilder : IKubernetesObjectBuilder
 
     public V1Deployment CreateStartupDeployment(string name, string tag)
     {
-        var mwConfig = _config.GetSection(MiddlewareConfig.ConfigName).Get<MiddlewareConfig>();
         var selector = new V1LabelSelector
         {
             MatchLabels = new Dictionary<string, string> { { "app", name } }
@@ -128,10 +216,10 @@ internal class KubernetesObjectBuilder : IKubernetesObjectBuilder
         };
         var envList = new List<V1EnvVar>
         {
-            new("Middleware__Organization", mwConfig.Organization),
-            new("Middleware__Organization", mwConfig.Organization),
-            new("Middleware__InstanceName", mwConfig.InstanceName),
-            new("Middleware__InstanceType", mwConfig.InstanceType),
+            new("Middleware__Address", _mwConfig.Value.Address),
+            new("Middleware__Organization", _mwConfig.Value.Organization),
+            new("Middleware__InstanceName", _mwConfig.Value.InstanceName),
+            new("Middleware__InstanceType", _mwConfig.Value.InstanceType),
             new("CustomLogger__LoggerName", _env.GetEnvVariable("CustomLogger__LoggerName")),
             new("CustomLogger__Url", _env.GetEnvVariable("CustomLogger__Url")),
             new("CustomLogger__User", _env.GetEnvVariable("CustomLogger__User")),
@@ -140,6 +228,7 @@ internal class KubernetesObjectBuilder : IKubernetesObjectBuilder
             new("RabbitMQ__Address", _env.GetEnvVariable("RabbitMQ__Address")),
             new("RabbitMQ__User", _env.GetEnvVariable("RabbitMQ__User")),
             new("RabbitMQ__Pass", _env.GetEnvVariable("RabbitMQ__Pass")),
+            new("RabbitMQ__Port", _env.GetEnvVariable("RabbitMQ__Port")),
             new("CENTRAL_API_HOSTNAME", _env.GetEnvVariable("CENTRAL_API_HOSTNAME")),
             new("AWS_ACCESS_KEY_ID", _env.GetEnvVariable("AWS_ACCESS_KEY_ID")),
             new("AWS_SECRET_ACCESS_KEY", _env.GetEnvVariable("AWS_SECRET_ACCESS_KEY"))
@@ -227,8 +316,19 @@ internal class KubernetesObjectBuilder : IKubernetesObjectBuilder
         var sanitized = deploymentStr.SanitizeAsK8SYaml();
         var obj = KubernetesYaml.Deserialize<V1Deployment>(sanitized);
 
-        if (obj is null) throw new UnableToParseYamlConfigException(name, nameof(ContainerImageModel.K8SService));
+        if (obj is null) throw new UnableToParseYamlConfigException(name, nameof(ContainerImageModel.K8SDeployment));
+        var keysToModify = new List<string>();
+        foreach (var kvp in obj.Spec.Selector.MatchLabels)
+        {
+            if (kvp.Value == obj.Metadata.Name)
+                keysToModify.Add(kvp.Key);
+        }
+        foreach (var key in keysToModify)
+        {
+            obj.Spec.Selector.MatchLabels[key] = name.SanitizeAsK8sObjectName();
+        }
 
+        obj.Spec.Template.Metadata.Labels = obj.Spec.Selector.MatchLabels;
         obj.Metadata.SetServiceLabel(serviceInstanceId);
         obj.Metadata.Name = name.SanitizeAsK8sObjectName();
         foreach (var container in obj.Spec.Template.Spec.Containers)
@@ -238,6 +338,7 @@ internal class KubernetesObjectBuilder : IKubernetesObjectBuilder
                 : new List<V1EnvVar>();
 
             envVars.Add(new("NETAPP_ID", serviceInstanceId.ToString()));
+            envVars.Add(new("NETAPP_NAME", name));
             envVars.Add(new("MIDDLEWARE_ADDRESS", thisLocation.GetNetAppStatusReportAddress()));
             envVars.Add(new("MIDDLEWARE_REPORT_INTERVAL", ReportIntervalInSeconds.ToString()));
 
@@ -289,7 +390,7 @@ internal class KubernetesObjectBuilder : IKubernetesObjectBuilder
     private V1Deployment CreateInterRelayDeploymentDefinition(Guid actionPlanId, Guid actionId,
         string configString, SystemConfigModel cfg)
     {
-        var relayName = "inter-relay-netapp".GetNewImageNameWithSuffix();
+        var relayName = "inter-relay-netapp".AddRandomSuffix();
         var matchLabels = CreateInterRelayNetAppMatchLabels(relayName);
         return new()
         {
@@ -339,12 +440,11 @@ internal class KubernetesObjectBuilder : IKubernetesObjectBuilder
         return ports.Select(p => new V1ServicePort(p.Port, p.Protocol, p.Name)).ToList();
     }
 
-    private static List<V1ServicePort> CreateDefaultHttpPorts()
+    private List<V1ServicePort> CreateDefaultHttpPorts(int? nodePort = null)
     {
         return new()
         {
-            new(80, "TCP", "http", null, "TCP", 80),
-            new(443, "TCP", "https", null, "TCP", 80)
+            new(80, "TCP", "http", nodePort, "TCP", 80)
         };
     }
 
@@ -363,7 +463,7 @@ internal class KubernetesObjectBuilder : IKubernetesObjectBuilder
         ///     Do not remove, will be used to support ROS services
         /// </summary>
         [JsonPropertyName("services")]
-        public List<string> Services { get; set; } = new();
+        public List<string> Services { [UsedImplicitly]get; set; } = new();
     }
 }
 

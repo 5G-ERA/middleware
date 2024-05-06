@@ -4,6 +4,7 @@ using Middleware.Common;
 using Middleware.Common.Config;
 using Middleware.Common.ExtensionMethods;
 using Middleware.Common.MessageContracts;
+using Middleware.Common.Validation;
 using Middleware.RedisInterface.Sdk;
 using Middleware.TaskPlanner.ApiReference;
 using Middleware.TaskPlanner.Config;
@@ -22,6 +23,7 @@ builder.Configuration
 builder.RegisterSecretsManager();
 
 builder.ConfigureLogger();
+
 var mqConfig = builder.Configuration.GetSection(RabbitMqConfig.ConfigName).Get<RabbitMqConfig>();
 var mwConfig = builder.Configuration.GetSection(MiddlewareConfig.ConfigName).Get<MiddlewareConfig>();
 builder.Services.Configure<MiddlewareConfig>(builder.Configuration.GetSection(MiddlewareConfig.ConfigName));
@@ -32,6 +34,8 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(s => { s.SupportNonNullableReferenceTypes(); });
 builder.Services.ConfigureAutoMapper();
+
+builder.Services.AddFluentValidation(typeof(Program));
 
 builder.Services.AddHttpClient("healthCheckClient");
 builder.Services.AddHttpClient("resourcePlannerApiClient");
@@ -60,7 +64,7 @@ if (app.Environment.IsDevelopment())
 }
 
 //app.UseHttpsRedirection();
-
+app.UseMiddleware<ValidationExceptionMiddleware>();
 app.UseAuthorization();
 
 app.MapControllers();

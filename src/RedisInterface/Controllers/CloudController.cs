@@ -1,5 +1,6 @@
 ﻿using System.Net;
 using Microsoft.AspNetCore.Mvc;
+using Middleware.Common;
 using Middleware.Common.Attributes;
 using Middleware.Common.Enums;
 using Middleware.Common.Responses;
@@ -17,7 +18,7 @@ namespace Middleware.RedisInterface.Controllers;
 
 [Route("api/v1/[controller]")]
 [ApiController]
-public class CloudController : ControllerBase
+public class CloudController : MiddlewareController
 {
     private readonly ILocationRepository _locationRepository;
     private readonly ILogger _logger;
@@ -43,14 +44,14 @@ public class CloudController : ControllerBase
             var cloudType = LocationType.Cloud.ToString();
             var models = await _locationRepository.FindAsync(c => c.Type == cloudType);
             if (models.Any() == false)
-                return NotFound(new ApiResponse((int)HttpStatusCode.NotFound, "Clouds were not found."));
+                return ErrorMessageResponse(HttpStatusCode.NotFound, "cloud", $"No Clouds were found.");
+            
             return Ok(models.ToCloudsResponse());
         }
         catch (Exception ex)
         {
-            var statusCode = (int)HttpStatusCode.InternalServerError;
             _logger.LogError(ex, "An error occurred:");
-            return StatusCode(statusCode, new ApiResponse(statusCode, $"An error has occurred: {ex.Message}"));
+            return ErrorMessageResponse(HttpStatusCode.InternalServerError, "system", $"An error has occurred: {ex.Message}");
         }
     }
 
@@ -73,17 +74,15 @@ public class CloudController : ControllerBase
                 l.Id == id.ToString() && l.Type == cloudType);
             if (model is null)
             {
-                return NotFound(new ApiResponse((int)HttpStatusCode.NotFound,
-                    $"Cloud with specified id: '{id}' was not found."));
+                return ErrorMessageResponse(HttpStatusCode.NotFound, nameof(id), $"Cloud with specified id: '{id}' was not found.");
             }
 
             return Ok(model.ToCloudResponse());
         }
         catch (Exception ex)
         {
-            var statusCode = (int)HttpStatusCode.InternalServerError;
             _logger.LogError(ex, "An error occurred:");
-            return StatusCode(statusCode, new ApiResponse(statusCode, $"An error has occurred: {ex.Message}"));
+            return ErrorMessageResponse(HttpStatusCode.InternalServerError, "system", $"An error has occurred: {ex.Message}");
         }
     }
 
@@ -91,39 +90,36 @@ public class CloudController : ControllerBase
     /// <summary>
     ///     Add a new CloudModel entity
     /// </summary>
-    /// <param name="model"></param>
+    /// <param name="request"></param>
     /// <returns> the newly created CloudModel entity </returns>
     [HttpPost(Name = "CloudAdd")]
     [ProducesResponseType(typeof(CloudResponse), (int)HttpStatusCode.OK)]
     [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.BadRequest)]
     [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.InternalServerError)]
-    public async Task<IActionResult> AddAsync([FromBody] CloudRequest model)
+    public async Task<IActionResult> AddAsync([FromBody] CloudRequest request)
     {
-        if (model == null) return BadRequest("Parameters were not specified.");
+        if (request == null)
+            return ErrorMessageResponse(HttpStatusCode.BadRequest, nameof(request), $"The request body was not specified");
+        
         try
         {
-            var existingLoc = await _locationRepository.GetByNameAsync(model.Name);
+            var existingLoc = await _locationRepository.GetByNameAsync(request.Name);
             if (existingLoc is not null)
             {
-                return StatusCode((int)HttpStatusCode.BadRequest,
-                    new ApiResponse((int)HttpStatusCode.BadRequest,
-                        "Location with specified name already exists"));
+                return ErrorMessageResponse(HttpStatusCode.BadRequest, nameof(request.Name), "Location with specified name already exists");
             }
-            var location = await _locationRepository.AddAsync(model.ToLocation());
+            var location = await _locationRepository.AddAsync(request.ToLocation());
             if (location is null)
             {
-                return StatusCode((int)HttpStatusCode.InternalServerError,
-                    new ApiResponse((int)HttpStatusCode.InternalServerError,
-                        "Could not add the cloud to the data store"));
+                return ErrorMessageResponse(HttpStatusCode.BadRequest, nameof(request), "Could not add the cloud to the data store");
             }
 
             return Ok(location.ToCloudResponse());
         }
         catch (Exception ex)
         {
-            var statusCode = (int)HttpStatusCode.InternalServerError;
             _logger.LogError(ex, "An error occurred:");
-            return StatusCode(statusCode, new ApiResponse(statusCode, $"An error has occurred: {ex.Message}"));
+            return ErrorMessageResponse(HttpStatusCode.InternalServerError, "system", $"An error has occurred: {ex.Message}");
         }
     }
 
@@ -148,9 +144,8 @@ public class CloudController : ControllerBase
         }
         catch (Exception ex)
         {
-            var statusCode = (int)HttpStatusCode.InternalServerError;
             _logger.LogError(ex, "An error occurred:");
-            return StatusCode(statusCode, new ApiResponse(statusCode, $"An error has occurred: {ex.Message}"));
+            return ErrorMessageResponse(HttpStatusCode.InternalServerError, "system", $"An error has occurred: {ex.Message}");
         }
     }
 
@@ -164,53 +159,52 @@ public class CloudController : ControllerBase
     [ProducesResponseType(typeof(void), (int)HttpStatusCode.OK)]
     [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.NotFound)]
     [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.InternalServerError)]
-    public async Task<ActionResult> DeleteByIdAsync(Guid id)
+    public async Task<IActionResult> DeleteByIdAsync(Guid id)
     {
         try
         {
             var deleted = await _locationRepository.DeleteByIdAsync(id);
             if (deleted == false)
             {
-                return NotFound(
-                    new ApiResponse((int)HttpStatusCode.NotFound, "The specified Cloud has not been found."));
+                return ErrorMessageResponse(HttpStatusCode.NotFound, nameof(id), $"Cloud with specified id: '{id}' was not found.");
             }
 
             return Ok();
         }
         catch (Exception ex)
         {
-            var statusCode = (int)HttpStatusCode.InternalServerError;
             _logger.LogError(ex, "An error occurred:");
-            return StatusCode(statusCode, new ApiResponse(statusCode, $"An error has occurred: {ex.Message}"));
+            return ErrorMessageResponse(HttpStatusCode.InternalServerError, "system", $"An error has occurred: {ex.Message}");
         }
     }
 
     /// <summary>
     ///     Creates a new relation between two models
     /// </summary>
-    /// <param name="model"></param>
+    /// <param name="request"></param>
     /// <returns></returns>
     [HttpPost]
     [Route("AddRelation", Name = "CloudAddRelation")]
     [ProducesResponseType(typeof(RelationModel), (int)HttpStatusCode.OK)]
     [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.BadRequest)]
     [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.InternalServerError)]
-    public async Task<ActionResult<RelationModel>> AddRelationAsync([FromBody] RelationModel model)
+    public async Task<IActionResult> AddRelationAsync([FromBody] RelationModel request)
     {
-        if (model == null) return BadRequest("Parameters were not specified.");
+        if (request == null)
+            return ErrorMessageResponse(HttpStatusCode.BadRequest, nameof(request), $"Request body was not specified");
         try
         {
-            var isValid = await _locationRepository.AddRelationAsync(model);
-            if (!isValid) return Problem("The relation was not created");
+            var isValid = await _locationRepository.AddRelationAsync(request);
+            if (!isValid)
+                return ErrorMessageResponse(HttpStatusCode.BadRequest, nameof(request), $"The relation was not created");
         }
         catch (Exception ex)
         {
-            var statusCode = (int)HttpStatusCode.InternalServerError;
             _logger.LogError(ex, "An error occurred:");
-            return StatusCode(statusCode, new ApiResponse(statusCode, $"An error has occurred: {ex.Message}"));
+            return ErrorMessageResponse(HttpStatusCode.InternalServerError, "system", $"An error has occurred: {ex.Message}");
         }
 
-        return Ok(model);
+        return Ok(request);
     }
 
     /// <summary>
@@ -218,6 +212,7 @@ public class CloudController : ControllerBase
     /// </summary>
     /// <param name="id"></param>
     /// <param name="name"></param>
+    /// <param name="direction"></param>
     /// <returns></returns>
     [HttpGet]
     [Route("relation/{name}", Name = "CloudGetRelationByName")]
@@ -227,25 +222,25 @@ public class CloudController : ControllerBase
     public async Task<IActionResult> GetRelationAsync(Guid id, string name, string direction = "Outgoing")
     {
         if (string.IsNullOrWhiteSpace(name))
-            return BadRequest(new ApiResponse((int)HttpStatusCode.BadRequest, "Relation name not specified"));
+            return ErrorMessageResponse(HttpStatusCode.BadRequest, nameof(name), $"Relation name not specified");
         if (id == Guid.Empty)
-            return BadRequest(new ApiResponse((int)HttpStatusCode.BadRequest, "Relation ID not specified"));
-        RelationDirection directionEnum;
-        if (Enum.TryParse(direction, out directionEnum) == false)
-            return BadRequest(new ApiResponse((int)HttpStatusCode.BadRequest, "Wrong Relation direction specified"));
+            return ErrorMessageResponse(HttpStatusCode.BadRequest, nameof(id), $"Relation id not specified");
+        if (Enum.TryParse(direction, out RelationDirection directionEnum) == false)
+            return ErrorMessageResponse(HttpStatusCode.BadRequest, nameof(direction), $"Wrong Relation direction specified");
+        
         var inputDirection = directionEnum;
         try
         {
             var relations = await _locationRepository.GetRelation(id, name, inputDirection);
             if (!relations.Any())
-                return NotFound(new ApiResponse((int)HttpStatusCode.NotFound, "Relations were not found."));
+                return ErrorMessageResponse(HttpStatusCode.NotFound, nameof(name), $"No relation was found.");
+                
             return Ok(relations);
         }
         catch (Exception ex)
         {
-            var statusCode = (int)HttpStatusCode.InternalServerError;
             _logger.LogError(ex, "An error occurred:");
-            return StatusCode(statusCode, new ApiResponse(statusCode, $"An error has occurred: {ex.Message}"));
+            return ErrorMessageResponse(HttpStatusCode.InternalServerError, "system", $"An error has occurred: {ex.Message}");
         }
     }
 
@@ -268,14 +263,14 @@ public class CloudController : ControllerBase
             var relationNames = new List<string> { firstName, secondName };
             var relations = await _locationRepository.GetRelations(id, relationNames);
             if (!relations.Any())
-                return NotFound(new ApiResponse((int)HttpStatusCode.NotFound, "Relations were not found"));
+                return ErrorMessageResponse(HttpStatusCode.NotFound, "relation", $"No relations were found.");
+                
             return Ok(relations);
         }
         catch (Exception ex)
         {
-            var statusCode = (int)HttpStatusCode.InternalServerError;
             _logger.LogError(ex, "An error occurred:");
-            return StatusCode(statusCode, new ApiResponse(statusCode, $"An error has occurred: {ex.Message}"));
+            return ErrorMessageResponse(HttpStatusCode.InternalServerError, "system", $"An error has occurred: {ex.Message}");
         }
     }
 
@@ -290,21 +285,21 @@ public class CloudController : ControllerBase
         {
             var cloudResource = await _locationRepository.GetByNameAsync(name);
             if (cloudResource is null)
-                return NotFound(new ApiResponse((int)HttpStatusCode.NotFound, "Object was not found."));
+                return ErrorMessageResponse(HttpStatusCode.NotFound, nameof(name), $"No cloud was found.");
+                
             return Ok(cloudResource.ToCloudResponse());
         }
         catch (Exception ex)
         {
-            var statusCode = (int)HttpStatusCode.InternalServerError;
             _logger.LogError(ex, "An error occurred:");
-            return StatusCode(statusCode, new ApiResponse(statusCode, $"An error has occurred: {ex.Message}"));
+            return ErrorMessageResponse(HttpStatusCode.InternalServerError, "system", $"An error has occurred: {ex.Message}");
         }
     }
 
     /// <summary>
     ///     Get the free clouds that have connectivity to the robot
     /// </summary>
-    /// <param name="cloudsToCheck"></param>
+    /// <param name="request"></param>
     /// <returns>list of cloudModel</returns>
     [HttpGet]
     [Route("free", Name = "GetFreeCloudIds")]
@@ -312,25 +307,24 @@ public class CloudController : ControllerBase
     [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.NotFound)]
     [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.BadRequest)]
     [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.InternalServerError)]
-    public async Task<ActionResult<List<CloudModel>>> GetFreeCloudsIdsAsync(List<CloudModel> cloudsToCheck)
+    public async Task<IActionResult> GetFreeCloudsIdsAsync(List<CloudModel> request)
     {
         try
         {
-            if (!cloudsToCheck.Any())
-                return BadRequest(new ApiResponse((int)HttpStatusCode.BadRequest, "No Edge ids were provided"));
+            if (!request.Any())
+                return ErrorMessageResponse(HttpStatusCode.BadRequest, nameof(request), $"No cloud were specified.");
 
-            var freeClouds = await _locationRepository.FilterFreeLocationsAsync(cloudsToCheck.ToLocations());
+            var freeClouds = await _locationRepository.FilterFreeLocationsAsync(request.ToLocations());
             if (!freeClouds.Any())
-                return NotFound(new ApiResponse((int)HttpStatusCode.BadRequest, "There are no busy edges"));
+                return ErrorMessageResponse(HttpStatusCode.NotFound, "clouds", $"There are no free clouds");
 
             var response = freeClouds.ToCloudsResponse();
             return Ok(response);
         }
         catch (Exception ex)
         {
-            var statusCode = (int)HttpStatusCode.InternalServerError;
             _logger.LogError(ex, "An error occurred:");
-            return StatusCode(statusCode, new ApiResponse(statusCode, $"An error has occurred: {ex.Message}"));
+            return ErrorMessageResponse(HttpStatusCode.InternalServerError, "system", $"An error has occurred: {ex.Message}");
         }
     }
 
@@ -340,14 +334,15 @@ public class CloudController : ControllerBase
     [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.NotFound)]
     [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.BadRequest)]
     [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.InternalServerError)]
-    public async Task<IActionResult> GetLessBusyCloudsAsync(List<CloudModel> cloudsToCheck)
+    public async Task<IActionResult> GetLessBusyCloudsAsync(List<CloudModel> request)
     {
         try
         {
-            if (!cloudsToCheck.Any())
-                return BadRequest(new ApiResponse((int)HttpStatusCode.BadRequest, "No Cloud ids were provided"));
+            if (!request.Any())
+                return ErrorMessageResponse(HttpStatusCode.BadRequest, nameof(request), $"No Cloud ids were provided");
+                
 
-            var lessBusyCloud = await _locationRepository.OrderLocationsByUtilizationAsync(cloudsToCheck.ToLocations());
+            var lessBusyCloud = await _locationRepository.OrderLocationsByUtilizationAsync(request.ToLocations());
             if (!lessBusyCloud.Any())
                 return NotFound(new ApiResponse((int)HttpStatusCode.BadRequest, "There are no busy edges"));
 
@@ -356,9 +351,8 @@ public class CloudController : ControllerBase
         }
         catch (Exception ex)
         {
-            var statusCode = (int)HttpStatusCode.InternalServerError;
             _logger.LogError(ex, "An error occurred:");
-            return StatusCode(statusCode, new ApiResponse(statusCode, $"An error has occurred: {ex.Message}"));
+            return ErrorMessageResponse(HttpStatusCode.InternalServerError, "system", $"An error has occurred: {ex.Message}");
         }
     }
 
@@ -382,9 +376,8 @@ public class CloudController : ControllerBase
         }
         catch (Exception ex)
         {
-            var statusCode = (int)HttpStatusCode.InternalServerError;
             _logger.LogError(ex, "An error occurred:");
-            return StatusCode(statusCode, new ApiResponse(statusCode, $"An error has occurred: {ex.Message}"));
+            return ErrorMessageResponse(HttpStatusCode.InternalServerError, "system", $"An error has occurred: {ex.Message}");
         }
     }
 
@@ -408,9 +401,8 @@ public class CloudController : ControllerBase
         }
         catch (Exception ex)
         {
-            var statusCode = (int)HttpStatusCode.InternalServerError;
             _logger.LogError(ex, "An error occurred:");
-            return StatusCode(statusCode, new ApiResponse(statusCode, $"An error has occurred: {ex.Message}"));
+            return ErrorMessageResponse(HttpStatusCode.InternalServerError, "system", $"An error has occurred: {ex.Message}");
         }
     }
 
@@ -437,9 +429,8 @@ public class CloudController : ControllerBase
         }
         catch (Exception ex)
         {
-            var statusCode = (int)HttpStatusCode.InternalServerError;
             _logger.LogError(ex, "An error occurred:");
-            return StatusCode(statusCode, new ApiResponse(statusCode, $"An error has occurred: {ex.Message}"));
+            return ErrorMessageResponse(HttpStatusCode.InternalServerError, "system", $"An error has occurred: {ex.Message}");
         }
     }
 
@@ -463,9 +454,8 @@ public class CloudController : ControllerBase
         }
         catch (Exception ex)
         {
-            var statusCode = (int)HttpStatusCode.InternalServerError;
             _logger.LogError(ex, "An error occurred:");
-            return StatusCode(statusCode, new ApiResponse(statusCode, $"An error has occurred: {ex.Message}"));
+            return ErrorMessageResponse(HttpStatusCode.InternalServerError, "system", $"An error has occurred: {ex.Message}");
         }
     }
 }

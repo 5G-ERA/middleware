@@ -1,5 +1,69 @@
 # Changelog
 
+### [1.0.1](https://github.com/5G-ERA/middleware/compare/v1.0.0...v1.0.1) (2024-04-17)
+
+
+### Bug Fixes
+
+* labels in netapps with changed names ([#297](https://github.com/5G-ERA/middleware/issues/297)) ([fd765d4](https://github.com/5G-ERA/middleware/commit/fd765d4b2f500e15176f8527ec2f9e152b0f3fcc))
+
+## [1.0.0](https://github.com/5G-ERA/middleware/compare/v0.10.0...v1.0.0) (2024-04-08)
+
+
+### ⚠ BREAKING CHANGES
+
+* subdomain based netapp routing (#295)
+
+### Features
+
+* statefull netapp support ([#292](https://github.com/5G-ERA/middleware/issues/292)) ([24569c8](https://github.com/5G-ERA/middleware/commit/24569c81bd7a2da00e8ecb0a7d24040f51856bcf))
+
+
+### Bug Fixes
+
+* added null check for tokenservice generatetoken ([2baa80e](https://github.com/5G-ERA/middleware/commit/2baa80e2450e9d139c04cd17620d1d5b2c1b7246))
+* adjusted keygen size ([04ba654](https://github.com/5G-ERA/middleware/commit/04ba6549228bce7a191772dc3bee151106bcfb99))
+* changed redis port ([c9b7813](https://github.com/5G-ERA/middleware/commit/c9b7813f43fb64dd25151301bb34a43285c07d54))
+* correct ros2 relay server default version ([338920b](https://github.com/5G-ERA/middleware/commit/338920b9f842836d76196d63841a81566c913952))
+* do not include the relation deletion to deletion result ([79483ed](https://github.com/5G-ERA/middleware/commit/79483edacbc185b7b76e5233529cc40ac5500e27))
+* edge switchover deployment ([95c8533](https://github.com/5G-ERA/middleware/commit/95c8533fc901bf69c5829c74cf620d5454431567))
+* included environment variables in central api configuration ([4f4905c](https://github.com/5G-ERA/middleware/commit/4f4905c3cc09931653c32da44f0c861bdde18101))
+* moved socket client inside the loop ([2c6dbde](https://github.com/5G-ERA/middleware/commit/2c6dbdeca1cb8aa98a4f2e14110d1b36afe0e747))
+* null check adjusted for jwt key ([175713e](https://github.com/5G-ERA/middleware/commit/175713ea5be2f02064f710a4d8f4e182ea3de376))
+* subdomain based netapp routing ([#295](https://github.com/5G-ERA/middleware/issues/295)) ([c8f6c9e](https://github.com/5G-ERA/middleware/commit/c8f6c9ebb0024d868c038182f63d24fc46d199b2))
+* updated masstransit nuget package ([f05caf5](https://github.com/5G-ERA/middleware/commit/f05caf5606ea4fac9ab3ce75b27e8619e60ddf1b))
+* updated masstransit nuget package ([b155c2a](https://github.com/5G-ERA/middleware/commit/b155c2ae0dacbfbfcaf9cff1f67fd5f97e9df4eb))
+* use default key without aws secrets ([e0fa09b](https://github.com/5G-ERA/middleware/commit/e0fa09b3564ad7177b8c5edbf9cc197cec9acab7))
+
+## [0.10.0](https://github.com/5G-ERA/middleware/compare/v0.9.0...v0.10.0) (2024-03-01)
+
+
+### Features
+
+* dynamically adjusts the gateway's exposure based on the instance type —cloud or edge— ([#278](https://github.com/5G-ERA/middleware/issues/278)) ([cff90ef](https://github.com/5G-ERA/middleware/commit/cff90efba9f14a46dc5172d8620f9975251a3745))
+* new robot heartbeat properties ([#273](https://github.com/5G-ERA/middleware/issues/273)) ([34bd19b](https://github.com/5G-ERA/middleware/commit/34bd19bb3bcc81a055c845959ec4c19a4d695c77))
+
+
+### Bug Fixes
+
+* add netApp name as env variable for deployed NetApp ([7679798](https://github.com/5G-ERA/middleware/commit/7679798738e6bb4a5f7359b3d62f0caa073430ad))
+* check for duplicate names when adding new object ([#276](https://github.com/5G-ERA/middleware/issues/276)) ([df5a942](https://github.com/5G-ERA/middleware/commit/df5a942aa91eed0284dad999c004bdec5d1a27d9))
+* check if protocol exists in netapp address ([672465f](https://github.com/5G-ERA/middleware/commit/672465fbdd1e8a0875f4ae28d1139e8ea8896a11))
+* consolidate error messages across middleware ([#284](https://github.com/5G-ERA/middleware/issues/284)) ([7d086bd](https://github.com/5G-ERA/middleware/commit/7d086bd45aa2485a0a3b1dc3e4ad1b56a971fffc))
+* correct and differentiate topic schema naming between ros1 and ros2 ([5e14b0f](https://github.com/5G-ERA/middleware/commit/5e14b0f163b6e863e207f4272f5307ba235624b8))
+* correct timestamps when creating new heartbeat records ([c6e7bcc](https://github.com/5G-ERA/middleware/commit/c6e7bcc8a7d78c6c63350de6dd4f52bd54b9b3f1))
+* corrected protocol assignment ([671bef0](https://github.com/5G-ERA/middleware/commit/671bef0bc4e38a7b4b19f3cc04a3d32b95d60e6a))
+* heartbeat protocol fixes ([#282](https://github.com/5G-ERA/middleware/issues/282)) ([5d58920](https://github.com/5G-ERA/middleware/commit/5d58920ccc2e616b1250b6d5aa087620573f051a))
+* make Compression in Ros topics optional ([c5bf34a](https://github.com/5G-ERA/middleware/commit/c5bf34af31aa722e7dcde03177a63d8ed7ca81b3))
+* mapping of the wrong qos property in topics ([4d32bc5](https://github.com/5G-ERA/middleware/commit/4d32bc52c3e7a79d1370062b085fc8c66f95d2a6))
+* only matching locations are selected when looking for resource based location ([#285](https://github.com/5G-ERA/middleware/issues/285)) ([a50d7e9](https://github.com/5G-ERA/middleware/commit/a50d7e9fbe277b85f3ba47a9d1c502ad3bc11121))
+* property mapping in CentralApi contracts ([7a49087](https://github.com/5G-ERA/middleware/commit/7a49087a05e3478fd41c91d23ac469cd9a95207b))
+* recreation of unused indexes ([a1dc257](https://github.com/5G-ERA/middleware/commit/a1dc2575cd2cb3507fce83f2635aa6f0a464511c))
+* request properties ([47e82f1](https://github.com/5G-ERA/middleware/commit/47e82f14a659aae668b9b1d7d4129e881bdf51b2))
+* retrieve only location instead of edge and cloud ([bcc83d0](https://github.com/5G-ERA/middleware/commit/bcc83d0a5f4fa3895eaa4b6833a509b54f66421c))
+* retrieving heartbeat statuses when data is not compleate; return only latest records ([d0fbf7c](https://github.com/5G-ERA/middleware/commit/d0fbf7c35eee171ae1098817b6e9ca6a1c8ce29c))
+* update address of the existing location when registering ([6aa3e55](https://github.com/5G-ERA/middleware/commit/6aa3e55adc27817dfc7916727dc012304b9d7bc7))
+
 ## [0.9.0](https://github.com/5G-ERA/middleware/compare/v0.8.0...v0.9.0) (2024-02-01)
 
 

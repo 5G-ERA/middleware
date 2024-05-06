@@ -31,6 +31,8 @@ builder.Services.DecorateClaimAuthoriser();
 
 var config = builder.Configuration.GetSection(JwtConfig.ConfigName).Get<JwtConfig>();
 builder.Services.Configure<JwtConfig>(builder.Configuration.GetSection(JwtConfig.ConfigName));
+//var mwConfig = builder.Configuration.GetSection(MiddlewareConfig.ConfigName).Get<MiddlewareConfig>();
+builder.Services.Configure<MiddlewareConfig>(builder.Configuration.GetSection(MiddlewareConfig.ConfigName));
 
 builder.Services.AddAuthentication(options =>
     {
@@ -42,7 +44,7 @@ builder.Services.AddAuthentication(options =>
 {
     options.TokenValidationParameters = new()
     {
-        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(config.Key)),
+        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(string.IsNullOrEmpty(config.Key)? "vub21ZNuFLJL2W1qjNOiiIqsL051BW82Xp4dLuRw777" : config.Key)),
         NameClaimType = JwtClaimTypes.Name,
         RoleClaimType = JwtClaimTypes.Role,
         ValidAudience = "redisinterfaceAudience",
@@ -89,6 +91,6 @@ app.UseEndpoints(endpoints =>
 
 await app.UseOcelot(ocelotConfig);
 
-app.MapGet("/", () => "OcelotGateway is functional!");
+app.MapGet("/", () => "Welcome to 5G-ERA Middleware");
 
 app.Run();

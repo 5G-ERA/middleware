@@ -1,5 +1,6 @@
 ﻿using System.Net;
 using Microsoft.AspNetCore.Mvc;
+using Middleware.Common;
 using Middleware.Common.Attributes;
 using Middleware.Common.Enums;
 using Middleware.Common.Responses;
@@ -15,7 +16,7 @@ namespace Middleware.RedisInterface.Controllers;
 
 [Route("api/v1/[controller]")]
 [ApiController]
-public class LocationController : ControllerBase
+public class LocationController : MiddlewareController
 {
     private readonly ILocationRepository _locationRepository;
     private readonly ILogger _logger;
@@ -40,16 +41,16 @@ public class LocationController : ControllerBase
         {
             var models = await _locationRepository.GetAllAsync();
             if (models.Any() == false)
-                return NotFound(new ApiResponse((int)HttpStatusCode.NotFound, "Objects were not found."));
+                return ErrorMessageResponse(HttpStatusCode.NotFound, "locations", $"Locations were not found.");
 
             var response = models.ToLocationsResponse();
             return Ok(response);
         }
         catch (Exception ex)
         {
-            var statusCode = (int)HttpStatusCode.InternalServerError;
             _logger.LogError(ex, "An error occurred:");
-            return StatusCode(statusCode, new ApiResponse(statusCode, $"An error has occurred: {ex.Message}"));
+            return ErrorMessageResponse(HttpStatusCode.InternalServerError, "system",
+                $"An error has occurred: {ex.Message}");
         }
     }
 
@@ -68,16 +69,18 @@ public class LocationController : ControllerBase
         try
         {
             var model = await _locationRepository.GetByIdAsync(id);
-            if (model == null) return NotFound(new ApiResponse((int)HttpStatusCode.NotFound, "Object was not found."));
+            if (model == null)
+                return ErrorMessageResponse(HttpStatusCode.NotFound, nameof(id),
+                    $"Location with id {id} was not found.");
 
             var response = model.ToLocationResponse();
             return Ok(response);
         }
         catch (Exception ex)
         {
-            var statusCode = (int)HttpStatusCode.InternalServerError;
             _logger.LogError(ex, "An error occurred:");
-            return StatusCode(statusCode, new ApiResponse(statusCode, $"An error has occurred: {ex.Message}"));
+            return ErrorMessageResponse(HttpStatusCode.InternalServerError, "system",
+                $"An error has occurred: {ex.Message}");
         }
     }
 
@@ -93,7 +96,7 @@ public class LocationController : ControllerBase
     public async Task<IActionResult> AddAsync([FromBody] LocationRequest request)
     {
         if (request == null)
-            return BadRequest(new ApiResponse((int)HttpStatusCode.BadRequest, "Parameters were not specified."));
+            return ErrorMessageResponse(HttpStatusCode.BadRequest, nameof(request), $"Request body was not specified.");
 
         try
         {
@@ -101,16 +104,15 @@ public class LocationController : ControllerBase
             var existingLoc = await _locationRepository.GetByNameAsync(model.Name);
             if (existingLoc is not null)
             {
-                return StatusCode((int)HttpStatusCode.BadRequest,
-                    new ApiResponse((int)HttpStatusCode.BadRequest,
-                        "Location with specified name already exists"));
+                return ErrorMessageResponse(HttpStatusCode.BadRequest, nameof(request.Name),
+                    $"Location with specified name already exists.");
             }
+
             var location = await _locationRepository.AddAsync(model);
             if (location is null)
             {
-                return StatusCode((int)HttpStatusCode.InternalServerError,
-                    new ApiResponse((int)HttpStatusCode.NotFound,
-                        "Problem while adding the Location to the data store"));
+                return ErrorMessageResponse(HttpStatusCode.BadRequest, nameof(request),
+                    $"Problem while adding the Location to the data store");
             }
 
             var response = location.ToLocationResponse();
@@ -118,9 +120,9 @@ public class LocationController : ControllerBase
         }
         catch (Exception ex)
         {
-            var statusCode = (int)HttpStatusCode.InternalServerError;
             _logger.LogError(ex, "An error occurred:");
-            return StatusCode(statusCode, new ApiResponse(statusCode, $"An error has occurred: {ex.Message}"));
+            return ErrorMessageResponse(HttpStatusCode.InternalServerError, "system",
+                $"An error has occurred: {ex.Message}");
         }
     }
 
@@ -138,8 +140,7 @@ public class LocationController : ControllerBase
     {
         if (request is null)
         {
-            return BadRequest(new ApiResponse((int)HttpStatusCode.BadRequest,
-                "Parameters were not specified or wrongly specified."));
+            return ErrorMessageResponse(HttpStatusCode.BadRequest, nameof(request), $"Request body was not specified.");
         }
 
         try
@@ -148,8 +149,8 @@ public class LocationController : ControllerBase
             var exists = await _locationRepository.GetByIdAsync(location.Id);
             if (exists is null)
             {
-                return NotFound(
-                    new ApiResponse((int)HttpStatusCode.NotFound, "Object to be updated was not found."));
+                return ErrorMessageResponse(HttpStatusCode.NotFound, nameof(location.Id),
+                    $"Location with id {location.Id} was not found.");
             }
 
             await _locationRepository.UpdateAsync(location);
@@ -158,9 +159,9 @@ public class LocationController : ControllerBase
         }
         catch (Exception ex)
         {
-            var statusCode = (int)HttpStatusCode.InternalServerError;
             _logger.LogError(ex, "An error occurred:");
-            return StatusCode(statusCode, new ApiResponse(statusCode, $"An error has occurred: {ex.Message}"));
+            return ErrorMessageResponse(HttpStatusCode.InternalServerError, "system",
+                $"An error has occurred: {ex.Message}");
         }
     }
 
@@ -181,8 +182,7 @@ public class LocationController : ControllerBase
         {
             if (id == Guid.Empty)
             {
-                return NotFound(new ApiResponse((int)HttpStatusCode.NotFound,
-                    "The id cannot be empty"));
+                return ErrorMessageResponse(HttpStatusCode.BadRequest, nameof(id), $"The id cannot be empty.");
             }
 
             await _locationRepository.DeleteByIdAsync(id);
@@ -190,44 +190,44 @@ public class LocationController : ControllerBase
         }
         catch (Exception ex)
         {
-            var statusCode = (int)HttpStatusCode.InternalServerError;
             _logger.LogError(ex, "An error occurred:");
-            return StatusCode(statusCode, new ApiResponse(statusCode, $"An error has occurred: {ex.Message}"));
+            return ErrorMessageResponse(HttpStatusCode.InternalServerError, "system",
+                $"An error has occurred: {ex.Message}");
         }
     }
 
     /// <summary>
     ///     Creates a new relation between two models
     /// </summary>
-    /// <param name="model"></param>
+    /// <param name="request"></param>
     /// <returns></returns>
     [HttpPost]
     [Route("AddRelation", Name = "LocationAddRelation")]
     [ProducesResponseType(typeof(RelationModel), (int)HttpStatusCode.OK)]
     [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.BadRequest)]
     [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.InternalServerError)]
-    public async Task<ActionResult<RelationModel>> AddRelationAsync([FromBody] RelationModel model)
+    public async Task<IActionResult> AddRelationAsync([FromBody] RelationModel request)
     {
-        if (model == null)
-            return BadRequest(new ApiResponse((int)HttpStatusCode.BadRequest, "Parameters were not specified."));
+        if (request == null)
+            return ErrorMessageResponse(HttpStatusCode.BadRequest, nameof(request), $"Request body was not specified.");
 
         try
         {
-            var isValid = await _locationRepository.AddRelationAsync(model);
+            var isValid = await _locationRepository.AddRelationAsync(request);
             if (!isValid)
             {
-                return StatusCode((int)HttpStatusCode.InternalServerError,
-                    new ApiResponse((int)HttpStatusCode.InternalServerError, "The relation was not created"));
+                return ErrorMessageResponse(HttpStatusCode.BadRequest, nameof(request),
+                    $"The relation was not created.");
             }
         }
         catch (Exception ex)
         {
-            var statusCode = (int)HttpStatusCode.InternalServerError;
             _logger.LogError(ex, "An error occurred:");
-            return StatusCode(statusCode, new ApiResponse(statusCode, $"An error has occurred: {ex.Message}"));
+            return ErrorMessageResponse(HttpStatusCode.InternalServerError, "system",
+                $"An error has occurred: {ex.Message}");
         }
 
-        return Ok(model);
+        return Ok(request);
     }
 
     /// <summary>
@@ -235,6 +235,7 @@ public class LocationController : ControllerBase
     /// </summary>
     /// <param name="id"></param>
     /// <param name="name"></param>
+    /// <param name="direction"></param>
     /// <returns></returns>
     [HttpGet]
     [Route("relation/{name}", Name = "LocationGetRelationByName")]
@@ -245,31 +246,34 @@ public class LocationController : ControllerBase
     {
         if (string.IsNullOrWhiteSpace(name))
         {
-            return BadRequest(new ApiResponse((int)HttpStatusCode.BadRequest, "Relation name not specified"));
+            return ErrorMessageResponse(HttpStatusCode.BadRequest, nameof(name), $"Relation name was not specified.");
         }
+
         if (id == Guid.Empty)
         {
-            return BadRequest(new ApiResponse((int)HttpStatusCode.BadRequest, "Relation ID not specified"));
+            return ErrorMessageResponse(HttpStatusCode.BadRequest, nameof(id), $"Location ID not specified.");
         }
-        RelationDirection directionEnum;
-        if (Enum.TryParse<RelationDirection>(direction, out directionEnum) == false)
+
+        if (Enum.TryParse<RelationDirection>(direction, out var directionEnum) == false)
         {
-            return BadRequest(new ApiResponse((int)HttpStatusCode.BadRequest, "Wrong Relation direction specified"));
+            return ErrorMessageResponse(HttpStatusCode.BadRequest, nameof(direction),
+                $"Wrong Relation direction specified");
         }
+
         var inputDirection = directionEnum;
         try
         {
             var relations = await _locationRepository.GetRelation(id, name, inputDirection);
             if (!relations.Any())
-                return NotFound(new ApiResponse((int)HttpStatusCode.NotFound, "Relations were not found."));
+                return ErrorMessageResponse(HttpStatusCode.NotFound, "relation", $"The relation was not found.");
 
             return Ok(relations);
         }
         catch (Exception ex)
         {
-            var statusCode = (int)HttpStatusCode.InternalServerError;
             _logger.LogError(ex, "An error occurred:");
-            return StatusCode(statusCode, new ApiResponse(statusCode, $"An error has occurred: {ex.Message}"));
+            return ErrorMessageResponse(HttpStatusCode.InternalServerError, "system",
+                $"An error has occurred: {ex.Message}");
         }
     }
 
@@ -292,15 +296,15 @@ public class LocationController : ControllerBase
             var relationNames = new List<string> { firstName, secondName };
             var relations = await _locationRepository.GetRelations(id, relationNames);
             if (!relations.Any())
-                return NotFound(new ApiResponse((int)HttpStatusCode.NotFound, "Relations were not found"));
+                return ErrorMessageResponse(HttpStatusCode.NotFound, "relations", $"Request body was not specified.");
 
             return Ok(relations);
         }
         catch (Exception ex)
         {
-            var statusCode = (int)HttpStatusCode.InternalServerError;
             _logger.LogError(ex, "An error occurred:");
-            return StatusCode(statusCode, new ApiResponse(statusCode, $"An error has occurred: {ex.Message}"));
+            return ErrorMessageResponse(HttpStatusCode.InternalServerError, "system",
+                $"An error has occurred: {ex.Message}");
         }
     }
 
@@ -316,16 +320,17 @@ public class LocationController : ControllerBase
         {
             var location = await _locationRepository.GetByNameAsync(name);
             if (location is null)
-                return NotFound(new ApiResponse((int)HttpStatusCode.NotFound, "Object was not found."));
+                return ErrorMessageResponse(HttpStatusCode.NotFound, nameof(name),
+                    $"Location with name {name} was not found.");
 
             var response = location.ToLocationResponse();
             return Ok(response);
         }
         catch (Exception ex)
         {
-            var statusCode = (int)HttpStatusCode.InternalServerError;
             _logger.LogError(ex, "An error occurred:");
-            return StatusCode(statusCode, new ApiResponse(statusCode, $"An error has occurred: {ex.Message}"));
+            return ErrorMessageResponse(HttpStatusCode.InternalServerError, "system",
+                $"An error has occurred: {ex.Message}");
         }
     }
 
@@ -339,7 +344,7 @@ public class LocationController : ControllerBase
     [ProducesResponseType(typeof(bool), (int)HttpStatusCode.OK)]
     [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.NotFound)]
     [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.InternalServerError)]
-    public async Task<ActionResult<bool>> IsBusyLocationById(Guid id)
+    public async Task<IActionResult> IsBusyLocationById(Guid id)
     {
         try
         {
@@ -348,9 +353,9 @@ public class LocationController : ControllerBase
         }
         catch (Exception ex)
         {
-            var statusCode = (int)HttpStatusCode.InternalServerError;
             _logger.LogError(ex, "An error occurred:");
-            return StatusCode(statusCode, new ApiResponse(statusCode, $"An error has occurred: {ex.Message}"));
+            return ErrorMessageResponse(HttpStatusCode.InternalServerError, "system",
+                $"An error has occurred: {ex.Message}");
         }
     }
 
@@ -373,9 +378,9 @@ public class LocationController : ControllerBase
         }
         catch (Exception ex)
         {
-            var statusCode = (int)HttpStatusCode.InternalServerError;
             _logger.LogError(ex, "An error occurred:");
-            return StatusCode(statusCode, new ApiResponse(statusCode, $"An error has occurred: {ex.Message}"));
+            return ErrorMessageResponse(HttpStatusCode.InternalServerError, "system",
+                $"An error has occurred: {ex.Message}");
         }
     }
 
@@ -400,9 +405,9 @@ public class LocationController : ControllerBase
         }
         catch (Exception ex)
         {
-            var statusCode = (int)HttpStatusCode.InternalServerError;
             _logger.LogError(ex, "An error occurred:");
-            return StatusCode(statusCode, new ApiResponse(statusCode, $"An error has occurred: {ex.Message}"));
+            return ErrorMessageResponse(HttpStatusCode.InternalServerError, "system",
+                $"An error has occurred: {ex.Message}");
         }
     }
 
@@ -418,7 +423,7 @@ public class LocationController : ControllerBase
     [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.NotFound)]
     [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.BadRequest)]
     [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.InternalServerError)]
-    public async Task<ActionResult<int>> GetNumLocationContainersByName(string name)
+    public async Task<IActionResult> GetNumLocationContainersByName(string name)
     {
         try
         {
@@ -427,9 +432,9 @@ public class LocationController : ControllerBase
         }
         catch (Exception ex)
         {
-            var statusCode = (int)HttpStatusCode.InternalServerError;
             _logger.LogError(ex, "An error occurred:");
-            return StatusCode(statusCode, new ApiResponse(statusCode, $"An error has occurred: {ex.Message}"));
+            return ErrorMessageResponse(HttpStatusCode.InternalServerError, "system",
+                $"An error has occurred: {ex.Message}");
         }
     }
 }

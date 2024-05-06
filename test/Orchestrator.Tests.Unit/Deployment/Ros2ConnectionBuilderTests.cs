@@ -63,7 +63,7 @@ public class Ros2ConnectionBuilderTests
         };
         var depl = K8SBuilder.CreateExampleDeployment();
         var sut = new Ros2ConnectionBuilder(distro, cfg);
-        var topicString = "[{\"topic_name\":\"/image_raw\",\"topic_type\":\"sensor_msgs/Image\",\"compression\":\"none\",\"qos\":null}]";
+        var topicString = "[{\"name\":\"/image_raw\",\"type\":\"sensor_msgs/Image\"}]";
         var topics = new List<RosTopicModel>
         {
             new()
@@ -158,8 +158,7 @@ public class Ros2ConnectionBuilderTests
         var depl = K8SBuilder.CreateExampleDeployment();
         var sut = new Ros2ConnectionBuilder(distro, cfg);
         var serviceStringWithQos = "[{\"name\":\"/test_srvs\",\"type\":\"/std_srvs/SetBool\"," +
-                "\"qos\":{\"preset\":\"string\",\"history\":\"string\",\"depth\":12,\"reliability\":null," +
-                "\"durability\":null,\"deadline\":null,\"lifespan\":null,\"liveliness\":null,\"lease\":\"string\"}}]";
+                "\"qos\":{\"preset\":\"string\",\"history\":\"string\",\"depth\":12,\"lease\":\"string\"}}]";
         var topics = new List<RosTopicModel>()
         {
             new()

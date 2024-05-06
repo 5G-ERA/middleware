@@ -43,7 +43,7 @@ public static class StringExtensions
             .ToLower().Trim();
     }
 
-    public static string GetNewImageNameWithSuffix(this string name)
+    public static string AddRandomSuffix(this string name)
     {
         var guidSuffix = Guid.NewGuid().ToString().Split('-')[0];
         return $"{name}-{guidSuffix}";

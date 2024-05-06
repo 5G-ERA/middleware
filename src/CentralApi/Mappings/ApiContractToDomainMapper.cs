@@ -12,7 +12,8 @@ public static class ApiContractToDomainMapper
         {
             Name = x.Name,
             Organization = x.Organization,
-            Type = Enum.Parse<LocationType>(x.Type)
+            Type = Enum.Parse<LocationType>(x.Type),
+            Address = new (x.Address)
         };
     }
 }

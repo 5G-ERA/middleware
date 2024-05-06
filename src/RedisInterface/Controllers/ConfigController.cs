@@ -1,5 +1,6 @@
 ﻿using System.Net;
 using Microsoft.AspNetCore.Mvc;
+using Middleware.Common;
 using Middleware.Common.Responses;
 using Middleware.RedisInterface.Contracts.Mappings;
 using Middleware.RedisInterface.Contracts.Requests;
@@ -10,7 +11,7 @@ namespace Middleware.RedisInterface.Controllers;
 
 [Route("api/v1/[controller]")]
 [ApiController]
-public class ConfigController : ControllerBase
+public class ConfigController : MiddlewareController
 {
     private readonly ILogger<ConfigController> _logger;
     private readonly ISystemConfigService _systemConfigService;
@@ -35,15 +36,15 @@ public class ConfigController : ControllerBase
         {
             var cfg = await _systemConfigService.GetConfig();
 
-            if (cfg is null) return NotFound(new ApiResponse((int)HttpStatusCode.NotFound, "System Config not found."));
+            if (cfg is null)
+                return ErrorMessageResponse(HttpStatusCode.NotFound, "config", $"System Config not found.");
 
             return Ok(cfg.ToSystemConfigResponse());
         }
         catch (Exception ex)
         {
-            var statusCode = (int)HttpStatusCode.InternalServerError;
             _logger.LogError(ex, "An error occurred:");
-            return StatusCode(statusCode, new ApiResponse(statusCode, $"An error has occurred: {ex.Message}"));
+            return ErrorMessageResponse(HttpStatusCode.InternalServerError, "system", $"An error has occurred: {ex.Message}");
         }
     }
 
@@ -63,16 +64,14 @@ public class ConfigController : ControllerBase
             var (resultCfg, err) = await _systemConfigService.UpdateConfig(cfg);
 
             if (string.IsNullOrEmpty(err) == false)
-                return BadRequest(new ApiResponse((int)HttpStatusCode.NotFound, err));
-
+                return ErrorMessageResponse(HttpStatusCode.NotFound, "config", err);
 
             return Ok(resultCfg.ToSystemConfigResponse());
         }
         catch (Exception ex)
         {
-            var statusCode = (int)HttpStatusCode.InternalServerError;
             _logger.LogError(ex, "An error occurred:");
-            return StatusCode(statusCode, new ApiResponse(statusCode, $"An error has occurred: {ex.Message}"));
+            return ErrorMessageResponse(HttpStatusCode.InternalServerError, "system", $"An error has occurred: {ex.Message}");
         }
     }
 }

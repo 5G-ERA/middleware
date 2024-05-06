@@ -29,7 +29,6 @@ public class NetAppStatusModel : BaseModel
     /// <summary>
     ///     Number of robots the NetApp currently works for
     /// </summary>
-    [Required]
     public int? CurrentRobotsCount { get; set; }
 
     /// <summary>
@@ -45,6 +44,10 @@ public class NetAppStatusModel : BaseModel
     public ColourCode GetColourCodedStatus()
     {
         var retVal = ColourCode.Yellow;
+        if (CurrentRobotsCount is null)
+        {
+            retVal = ColourCode.Green;
+        }
         if (CurrentRobotsCount < OptimalLimit)
         {
             retVal = ColourCode.Green;

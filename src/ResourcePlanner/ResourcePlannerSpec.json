@@ -332,8 +332,7 @@
             "format": "uuid"
           },
           "Name": {
-            "type": "string",
-            "nullable": true
+            "type": "string"
           },
           "Tags": {
             "type": "array",
@@ -366,8 +365,7 @@
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/InstanceModel"
-            },
-            "nullable": true
+            }
           },
           "MinimumRam": {
             "type": "integer",
@@ -393,12 +391,10 @@
         "type": "object",
         "properties": {
           "name": {
-            "type": "string",
-            "nullable": true
+            "type": "string"
           },
           "type": {
-            "type": "string",
-            "nullable": true
+            "type": "string"
           },
           "number": {
             "type": "integer",
@@ -408,8 +404,7 @@
             "type": "array",
             "items": {
               "type": "string"
-            },
-            "nullable": true
+            }
           }
         },
         "additionalProperties": false
@@ -424,7 +419,6 @@
           },
           "message": {
             "type": "string",
-            "nullable": true,
             "readOnly": true
           },
           "timeStamp": {
@@ -454,8 +448,7 @@
             "format": "uuid"
           },
           "Name": {
-            "type": "string",
-            "nullable": true
+            "type": "string"
           },
           "Timestamp": {
             "type": "string",
@@ -466,8 +459,7 @@
             "nullable": true
           },
           "K8SDeployment": {
-            "type": "string",
-            "nullable": true
+            "type": "string"
           },
           "K8SService": {
             "type": "string",
@@ -491,8 +483,7 @@
             "format": "uuid"
           },
           "Name": {
-            "type": "string",
-            "nullable": true
+            "type": "string"
           },
           "IsSingleAnswer": {
             "type": "boolean"
@@ -515,12 +506,10 @@
             "format": "uuid"
           },
           "type": {
-            "type": "string",
-            "nullable": true
+            "type": "string"
           },
           "name": {
-            "type": "string",
-            "nullable": true
+            "type": "string"
           }
         },
         "additionalProperties": false
@@ -540,8 +529,7 @@
             "format": "uuid"
           },
           "name": {
-            "type": "string",
-            "nullable": true
+            "type": "string"
           },
           "serviceInstanceId": {
             "type": "string",
@@ -567,15 +555,31 @@
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/RosTopicModel"
-            },
-            "nullable": true
+            }
           },
           "rosTopicsSub": {
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/RosTopicModel"
-            },
-            "nullable": true
+            }
+          },
+          "transforms": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/RosTransformsModel"
+            }
+          },
+          "actions": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/RosActionModel"
+            }
+          },
+          "services": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/RosServiceModel"
+            }
           },
           "rosVersion": {
             "type": "integer",
@@ -605,18 +609,7 @@
             "nullable": true
           },
           "containerImage": {
-            "$ref": "#/components/schemas/ContainerImageModel",
-			"nullable": true
-          },
-          "minimumRam": {
-            "type": "integer",
-            "format": "int64",
-            "nullable": true
-          },
-          "minimumNumCores": {
-            "type": "integer",
-            "format": "int32",
-            "nullable": true
+            "$ref": "#/components/schemas/ContainerImageModel"
           },
           "onboardedTime": {
             "type": "string",
@@ -631,8 +624,22 @@
             "type": "array",
             "items": {
               "type": "string"
-            },
-            "nullable": true
+            }
+          },
+          "ram": {
+            "$ref": "#/components/schemas/NetAppRequirement"
+          },
+          "numberOfCores": {
+            "$ref": "#/components/schemas/NetAppRequirement"
+          },
+          "diskStorage": {
+            "$ref": "#/components/schemas/NetAppRequirement"
+          },
+          "throughput": {
+            "$ref": "#/components/schemas/NetAppRequirement"
+          },
+          "latency": {
+            "$ref": "#/components/schemas/NetAppRequirement"
           }
         },
         "additionalProperties": false
@@ -641,12 +648,9 @@
         "type": "object",
         "properties": {
           "key": {
-            "type": "string",
-            "nullable": true
+            "type": "string"
           },
-          "value": {
-            "nullable": true
-          }
+          "value": { }
         },
         "additionalProperties": false
       },
@@ -654,8 +658,7 @@
         "type": "object",
         "properties": {
           "actuatorName": {
-            "type": "string",
-            "nullable": true
+            "type": "string"
           },
           "dof": {
             "type": "integer",
@@ -666,51 +669,68 @@
             "format": "int32"
           },
           "type": {
-            "type": "string",
-            "nullable": true
+            "type": "string"
           }
         },
         "additionalProperties": false
       },
-      "ROSNodeModel": {
+      "NetAppRequirement": {
         "type": "object",
         "properties": {
-          "name": {
-            "type": "string",
-            "nullable": true
+          "minimal": {
+            "type": "integer",
+            "format": "int64"
           },
-          "publications": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/RosTopicModel"
-            },
-            "nullable": true
+          "optimal": {
+            "type": "integer",
+            "format": "int64"
           },
-          "subscriptions": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/RosTopicModel"
-            },
-            "nullable": true
+          "priority": {
+            "$ref": "#/components/schemas/ResourcePriority"
           },
-          "services": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/ROSServiceModel"
-            },
-            "nullable": true
+          "ascending": {
+            "type": "boolean"
           }
         },
         "additionalProperties": false
       },
-      "ROSServiceModel": {
+      "Qos": {
         "type": "object",
         "properties": {
-          "name": {
+          "preset": {
             "type": "string",
             "nullable": true
           },
-          "description": {
+          "history": {
+            "type": "string",
+            "nullable": true
+          },
+          "depth": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "reliability": {
+            "type": "string",
+            "nullable": true
+          },
+          "durability": {
+            "type": "string",
+            "nullable": true
+          },
+          "deadline": {
+            "type": "string",
+            "nullable": true
+          },
+          "lifespan": {
+            "type": "string",
+            "nullable": true
+          },
+          "liveliness": {
+            "type": "string",
+            "nullable": true
+          },
+          "lease": {
             "type": "string",
             "nullable": true
           }
@@ -724,8 +744,7 @@
             "$ref": "#/components/schemas/GraphEntityModel"
           },
           "relationName": {
-            "type": "string",
-            "nullable": true
+            "type": "string"
           },
           "relationAttributes": {
             "type": "array",
@@ -754,6 +773,18 @@
           }
         },
         "additionalProperties": false
+      },
+      "ResourcePriority": {
+        "enum": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6
+        ],
+        "type": "integer",
+        "format": "int32"
       },
       "ResourceReplanInputModel": {
         "type": "object",
@@ -788,8 +819,7 @@
             "format": "uuid"
           },
           "Name": {
-            "type": "string",
-            "nullable": true
+            "type": "string"
           },
           "RosVersion": {
             "type": "integer",
@@ -827,7 +857,7 @@
           "ROSNodes": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/ROSNodeModel"
+              "$ref": "#/components/schemas/RosNodeModel"
             },
             "nullable": true
           },
@@ -938,12 +968,70 @@
         },
         "additionalProperties": false
       },
-      "RosTopicModel": {
+      "RosActionModel": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      },
+      "RosNodeModel": {
         "type": "object",
         "properties": {
           "name": {
             "type": "string",
             "nullable": true
+          },
+          "publications": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/RosTopicModel"
+            }
+          },
+          "subscriptions": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/RosTopicModel"
+            }
+          },
+          "services": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/RosServiceModel"
+            }
+          }
+        },
+        "additionalProperties": false
+      },
+      "RosServiceModel": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string",
+            "nullable": true
+          },
+          "qos": {
+            "$ref": "#/components/schemas/Qos"
+          }
+        },
+        "additionalProperties": false
+      },
+      "RosTopicModel": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
           },
           "type": {
             "type": "string",
@@ -953,8 +1041,38 @@
             "type": "string",
             "nullable": true
           },
+          "compression": {
+            "type": "string"
+          },
+          "qos": {
+            "$ref": "#/components/schemas/Qos"
+          },
           "enabled": {
             "type": "boolean"
+          }
+        },
+        "additionalProperties": false
+      },
+      "RosTransformsModel": {
+        "type": "object",
+        "properties": {
+          "source_frame": {
+            "type": "string"
+          },
+          "target_frame": {
+            "type": "string"
+          },
+          "angular_thres": {
+            "type": "number",
+            "format": "double"
+          },
+          "trans_thres": {
+            "type": "number",
+            "format": "double"
+          },
+          "max_publish_period": {
+            "type": "number",
+            "format": "double"
           }
         },
         "additionalProperties": false
@@ -963,12 +1081,10 @@
         "type": "object",
         "properties": {
           "name": {
-            "type": "string",
-            "nullable": true
+            "type": "string"
           },
           "type": {
-            "type": "string",
-            "nullable": true
+            "type": "string"
           },
           "description": {
             "type": "string",
@@ -978,8 +1094,7 @@
             "type": "array",
             "items": {
               "type": "string"
-            },
-            "nullable": true
+            }
           },
           "number": {
             "type": "integer",
@@ -1003,13 +1118,12 @@
             "format": "uuid"
           },
           "Name": {
-            "type": "string",
-            "nullable": true
+            "type": "string"
           },
           "ReplanActionPlannerLocked": {
             "type": "boolean"
           },
-          "ResourceLock": {
+          "DisableResourceReuse": {
             "type": "boolean"
           },
           "TaskPriority": {

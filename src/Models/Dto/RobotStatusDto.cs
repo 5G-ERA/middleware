@@ -40,9 +40,9 @@ public class RobotStatusDto : InfluxDto
         }
 
         // static properties of all objects
-        var objName = fluxTables[0].Records[0].GetValueByKey(ObjectType).ToString();
-        var objId = fluxTables[0].Records[0].GetValueByKey("Id").ToString();
-        var objTimestamp = fluxTables[0].Records[0].GetTimeInDateTime();
+        var objName = fluxTables[0].Records[0].GetValueByKey(ObjectType)?.ToString();
+        var objId = fluxTables[0].Records[0].GetValueByKey("Id")?.ToString();
+        var objTimestamp = fluxTables[0].Records[0]?.GetTimeInDateTime();
 
         if (objName == null || objId == null || objTimestamp == null)
         {
@@ -98,7 +98,7 @@ public class RobotStatusDto : InfluxDto
         {
             Id = Guid.Parse(dto.Id.Replace(Prefix, "")),
             Name = dto.Name,
-            ActionSequenceId = Guid.Parse(dto.ActionSequenceId!),
+            ActionSequenceId = string.IsNullOrEmpty(dto.ActionSequenceId) ? null : Guid.Parse(dto.ActionSequenceId),
             CurrentlyExecutedActionIndex = dto.CurrentlyExecutedActionIndex,
             BatteryLevel = dto.BatteryLevel,
             CpuUtilisation = dto.CpuUtilisation,

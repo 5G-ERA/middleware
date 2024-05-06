@@ -27,6 +27,9 @@ public class InstanceDto : Dto
     public bool? IsReusable { get; set; } = default!;
 
     [Indexed]
+    public bool IsPersistent { get; set; } = default!;
+    
+    [Indexed]
     public string? DesiredStatus { get; set; } = default!;
 
     [Indexed]
@@ -83,6 +86,7 @@ public class InstanceDto : Dto
                 : Guid.Parse(dto.ServiceInstanceId),
             ServiceType = dto.ServiceType,
             IsReusable = dto.IsReusable,
+            IsPersistent = dto.IsPersistent,
             DesiredStatus = dto.DesiredStatus,
             ServiceUrl = dto.ServiceUrl,
             RosTopicsPub = dto.RosTopicsPub.Select(x => x.ToModel()).ToList(),

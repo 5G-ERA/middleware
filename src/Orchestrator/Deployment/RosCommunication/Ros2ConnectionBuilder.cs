@@ -1,8 +1,8 @@
 ﻿using System.Text.Json;
+using JetBrains.Annotations;
 using k8s.Models;
 using Middleware.Common.ExtensionMethods;
 using Middleware.Models.Domain;
-using Middleware.Models.Domain.Ros;
 using Middleware.Orchestrator.Deployment.RosCommunication.Structures;
 
 namespace Middleware.Orchestrator.Deployment.RosCommunication;
@@ -11,6 +11,7 @@ internal class Ros2ConnectionBuilder : IRosConnectionBuilder
 {
     private const RosVersion Ros2 = Middleware.Models.Domain.RosVersion.Ros2;
     private readonly SystemConfigModel _cfg;
+    [UsedImplicitly]
     private readonly RosDistro _distro;
 
     public Ros2ConnectionBuilder(RosDistro distro, SystemConfigModel cfg)
@@ -59,8 +60,8 @@ internal class Ros2ConnectionBuilder : IRosConnectionBuilder
 
     private V1Container GetRelayNetAppContainer(RosSpec rosSpec)
     {
-        var subscribersContainers = rosSpec.TopicSubscribers.Select(RosTopicContainer.FromRosTopicModel).ToList();
-        var publishersContainers = rosSpec.TopicPublishers.Select(RosTopicContainer.FromRosTopicModel).ToList();
+        var subscribersContainers = rosSpec.TopicSubscribers.Select(Ros2TopicContainer.FromRosTopicModel).ToList();
+        var publishersContainers = rosSpec.TopicPublishers.Select(Ros2TopicContainer.FromRosTopicModel).ToList();
         var serviceSubscribers = rosSpec.ServiceSubscribers?.Select(RosServiceContainer.FromRosServiceModel).ToList();
         var transformsPublishers =
             rosSpec.TransformsPublishers?.Select(RosTransformsContainer.FromRosTransformsModel).ToList();

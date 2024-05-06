@@ -6,6 +6,8 @@ public class InstanceResponse
     public string Name { get; init; }
     public string Type { get; init; }
     public bool? IsReusable { get; init; }
+    
+    public bool IsPersistent { get; init; }
     public IEnumerable<RosTopicResponse> RosTopicPublishers { get; init; } = Enumerable.Empty<RosTopicResponse>();
     public IEnumerable<RosTopicResponse> RosTopicSubscribers { get; init; } = Enumerable.Empty<RosTopicResponse>();
     public IEnumerable<RosActionResponse> RosActions { get; init; } = Enumerable.Empty<RosActionResponse>();

@@ -10,4 +10,6 @@ public interface IHeartbeatService
     Task<IReadOnlyList<RobotStatusModel>> GetAllRobotStatusesAsync(bool generateFakeData = false);
 
     Task<HeartbeatResult<RobotStatusModel>> AddRobotStatus(RobotStatusModel status);
+
+    Task<HeartbeatResult<NetAppStatusModel>> AddNetAppStatus(NetAppStatusModel status);
 }

@@ -45,7 +45,7 @@ public interface ILocationRepository : IRedisRepository<Location, LocationDto>
     Task<bool> IsBusyAsync(Guid id);
     Task<ImmutableList<Location>> GetLocationsByOrganizationAsync(string organization);
 
-    Task<(bool, Location?)> ExistsAsync(string name);
+    Task<(bool, Location?)> ExistsAsync(string name, string organization);
 
     Task<(bool, Location?)> ExistsAsync(Guid id);
     

@@ -1,8 +1,6 @@
-﻿using Middleware.CentralApi.Services.Abstract;
-using Middleware.DataAccess.Repositories.Abstract;
+﻿using Middleware.DataAccess.Repositories.Abstract;
 using Middleware.Models.Domain;
 using Middleware.CentralApi.Contracts.Responses;
-using Middleware.Common.Enums;
 using KeyValuePair = Middleware.Models.Domain.KeyValuePair;
 
 namespace Middleware.CentralApi.Services;
@@ -24,20 +22,19 @@ public class RobotService : IRobotService
 
     public async Task <List<string>>CreateRelation(RelationToLocationRequest data)
     {
-        List<LocationNames> relGraph2s = data.Locations;
-        // check if name of robot can be retreived
+        List<LocationNames> relGraph2S = data.Locations;
+        // check if name of robot can be retrieved
         var robotName = await GetRobotNameByIdAsync(data.RobotId);
         if (robotName == null)
             throw new ArgumentNullException(nameof(robotName));
         
 
         List<string> errorsList = new List<string>();
-        List<RelationModel> availableRrelations = new();
         var relationName = "CAN_REACH";
 
-        availableRrelations = await _robotRepository.GetRelation(data.RobotId, relationName);
+        var availableRelations = await _robotRepository.GetRelation(data.RobotId, relationName);
 
-        foreach (LocationNames relGraph2 in relGraph2s)
+        foreach (LocationNames relGraph2 in relGraph2S)
         {
             if (relGraph2 != null)
             {
@@ -71,7 +68,7 @@ public class RobotService : IRobotService
                             listRelationAttributes.Add(lastUpdatedTime);
                             model.RelationAttributes = listRelationAttributes;
 
-                            foreach (RelationModel availableRelation in availableRrelations)
+                            foreach (RelationModel availableRelation in availableRelations)
                             {
                                 if (availableRelation.PointsTo.Id == location.Id)
                                 {

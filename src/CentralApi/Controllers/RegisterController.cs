@@ -4,13 +4,14 @@ using Middleware.CentralApi.Contracts.Requests;
 using Middleware.CentralApi.Contracts.Responses;
 using Middleware.CentralApi.Mappings;
 using Middleware.CentralApi.Services;
+using Middleware.Common;
 using Middleware.Common.Responses;
 
 namespace Middleware.CentralApi.Controllers;
 
 [ApiController]
 [Route("api/v1/[controller]")]
-public class RegisterController : ControllerBase
+public class RegisterController : MiddlewareController
 {
     private readonly ILocationService _locationService;
 
@@ -32,9 +33,7 @@ public class RegisterController : ControllerBase
 
         return result.Match<IActionResult>(
             loc => Ok(loc.ToLocationResponse()),
-            exception => BadRequest(new ApiResponse((int)HttpStatusCode.BadRequest,
-                $"There were problems with the request: {string.Join("; ", exception.Errors)}")),
-            _ => NotFound(new ApiResponse((int)HttpStatusCode.NotFound, "The specified location was not found")));
-
+            _ => ErrorMessageResponse(HttpStatusCode.NotFound, nameof(location),
+                "The specified location does not exist"));
     }
 }

@@ -72,7 +72,7 @@ public class Ros1ConnectionBuilderTests
         };
         var depl = K8SBuilder.CreateExampleDeployment();
         var sut = new Ros1ConnectionBuilder(distro, cfg);
-        var topicString = "[{\"topic_name\":\"/image_raw\",\"topic_type\":\"sensor_msgs/Image\",\"compression\":\"none\",\"qos\":null}]";
+        var topicString = "[{\"topic_name\":\"/image_raw\",\"topic_type\":\"sensor_msgs/Image\"}]";
         var topics = new List<RosTopicModel>
         {
             new()

@@ -84,7 +84,7 @@ internal class Ros1ConnectionBuilder : IRosConnectionBuilder
 
     private V1Container GetRelayNetAppContainer(IReadOnlyList<RosTopicModel> rosTopics)
     {
-        var rosTopicContainers = rosTopics.Select(RosTopicContainer.FromRosTopicModel).ToList();
+        var rosTopicContainers = rosTopics.Select(Ros1TopicContainer.FromRosTopicModel).ToList();
         var topicsString = JsonSerializer.Serialize(rosTopicContainers);
         var container = new V1Container
         {

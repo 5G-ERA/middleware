@@ -31,7 +31,7 @@ services:
       - Middleware__Organization=5G-ERA-DEV
       - Middleware__InstanceName=BB
       - Middleware__InstanceType=Edge
-      - Middleware__Address=localhost:5047
+      - Middleware__Address=http://localhost:5047
     ports:
       - "5036:80"
       - "7036:443"    
@@ -81,6 +81,7 @@ services:
       - Middleware__Organization=5G-ERA-DEV
       - Middleware__InstanceName=BB
       - Middleware__InstanceType=Edge
+      - Middleware__Address=http://localhost:5047 
     ports:
       - "5047:80"
       - "7047:443"    

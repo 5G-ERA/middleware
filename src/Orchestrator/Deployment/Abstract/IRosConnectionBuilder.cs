@@ -1,5 +1,4 @@
 using k8s.Models;
-using Middleware.Models.Domain.Ros;
 using Middleware.Orchestrator.Deployment.RosCommunication;
 
 namespace Middleware.Orchestrator.Deployment;

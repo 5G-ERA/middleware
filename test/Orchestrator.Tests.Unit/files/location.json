@@ -1,0 +1,19 @@
+{
+    "Id": "6d1877fd-ecc8-4833-ad7e-549ee6208bce",
+    "Name": "MiddlewareAWS",
+    "Type": 1,
+    "IsOnline": true,
+    "Organization": "5G-ERA",
+    "Address": "crop.5gera.net",
+    "Status": null,
+    "MacAddress": null,
+    "Cpu": 1,
+    "NumberOfCores": 2,
+    "Ram": 4096,
+    "VirtualRam": null,
+    "DiskStorage": 30,
+    "LastUpdatedTime": "2024-03-12T09:29:00.9068478",
+    "Throughput": 1000,
+    "Latency": 100,
+    "Slices": []
+}

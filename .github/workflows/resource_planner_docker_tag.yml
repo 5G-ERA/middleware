@@ -36,5 +36,7 @@ jobs:
         IMAGE_ID=$(echo $IMAGE_ID | tr '[A-Z]' '[a-z]')          
         docker tag $IMAGE_REPOSITORY $IMAGE_ID:$IMAGE_TAG
         docker push $IMAGE_ID:$IMAGE_TAG
-        docker tag $IMAGE_ID:$IMAGE_TAG $IMAGE_ID:latest
-        docker push $IMAGE_ID:latest
+        if [[ ${{ steps.get_version.outputs.VERSION }} != *rc* && ${{ steps.get_version.outputs.VERSION }} != *beta* ]]; then
+            docker tag $IMAGE_ID:$IMAGE_TAG $IMAGE_ID:latest
+            docker push $IMAGE_ID:latest
+        fi

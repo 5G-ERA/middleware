@@ -3,7 +3,7 @@
 public class MiddlewareEnvironment : IEnvironment
 {
     /// <inheritdoc />
-    public string GetEnvVariable(string name)
+    public string? GetEnvVariable(string name)
     {
         return Environment.GetEnvironmentVariable(name);
     }

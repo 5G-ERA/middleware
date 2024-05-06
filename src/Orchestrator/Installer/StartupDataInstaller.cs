@@ -61,7 +61,7 @@ internal class StartupDataInstaller : IStartupDataInstaller
         await CheckBucketsExist();
     }
 
-    private async Task<Exception> CheckBucketsExist()
+    private async Task CheckBucketsExist()
     {
         var netappBucketName = NetAppStatusDto.Bucket;
         try
@@ -77,13 +77,10 @@ internal class StartupDataInstaller : IStartupDataInstaller
             {
                 await CreateBucket(robotBucketName);
             }
-            return null;
-
         }
         catch (Exception ex)
         {
-            _logger.LogCritical(ex.ToString());
-            return ex;
+            _logger.LogCritical(ex, "Error while checking buckets exist");
         }
     }
     private async Task CreateBucket(string bucketName)
@@ -121,6 +118,24 @@ internal class StartupDataInstaller : IStartupDataInstaller
             cfg.HeartbeatExpirationInMinutes = defaultCfg.HeartbeatExpirationInMinutes;
         }
 
+        if (string.IsNullOrEmpty(cfg.HermesContainer))
+        {
+            isCorrect = false;
+            cfg.HermesContainer = defaultCfg.HermesContainer;
+        }
+
+        if (string.IsNullOrEmpty(cfg.S3DataPersistenceRegion))
+        {
+            isCorrect = false;
+            cfg.S3DataPersistenceRegion = defaultCfg.S3DataPersistenceRegion;
+        }
+
+        if (string.IsNullOrEmpty(cfg.S3DataPersistenceBucketName))
+        {
+            isCorrect = false;
+            cfg.S3DataPersistenceBucketName = defaultCfg.S3DataPersistenceBucketName;
+        }
+
         return isCorrect;
     }
 
@@ -129,9 +144,12 @@ internal class StartupDataInstaller : IStartupDataInstaller
         var cfg = new SystemConfigModel
         {
             Ros1RelayContainer = "but5gera/relay_network_application:0.4.4",
-            Ros2RelayContainer = "but5gera/ros2_relay_server:0.2.0",
+            Ros2RelayContainer = "but5gera/ros2_relay_server:1.2.2",
             RosInterRelayNetAppContainer = "but5gera/inter_relay_network_application:0.4.4",
-            HeartbeatExpirationInMinutes = 3
+            HeartbeatExpirationInMinutes = 3,
+            S3DataPersistenceBucketName = "middleware-netapps",
+            S3DataPersistenceRegion = "eu-west-2",
+            HermesContainer = "ghcr.io/5g-era/hermes:v1.0.0"
         };
 
         return cfg;

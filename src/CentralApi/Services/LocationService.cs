@@ -1,5 +1,4 @@
 ﻿using System.Collections.Immutable;
-using FluentValidation;
 using Middleware.DataAccess.Repositories.Abstract;
 using Middleware.Models.Domain;
 using OneOf;
@@ -11,16 +10,15 @@ public class LocationService : ILocationService
 {
     private readonly ILocationRepository _locationRepository;
 
-
     public LocationService(ILocationRepository locationRepository)
     {
         _locationRepository = locationRepository;
     }
 
-    public async Task<OneOf<Location, ValidationException, NotFound>> RegisterLocation(Location location)
+    public async Task<OneOf<Location, NotFound>> RegisterLocation(Location location)
     {
         // when location not found in db
-        var (found, loc) = await _locationRepository.ExistsAsync(location.Name);
+        var (found, loc) = await _locationRepository.ExistsAsync(location.Name, location.Organization);
 
 
         if (found == false)
@@ -28,7 +26,7 @@ public class LocationService : ILocationService
 
         // make it online & return info about location based on matched edge
         loc!.IsOnline = true;
-        loc!.Address = location.Address;
+        loc.Address = location.Address;
         await _locationRepository.UpdateAsync(loc);
         return loc;
     }

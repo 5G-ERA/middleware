@@ -32,6 +32,7 @@ builder.Services.Configure<MiddlewareConfig>(builder.Configuration.GetSection(Mi
 builder.Services.Configure<SliceConfig>(builder.Configuration.GetSection(SliceConfig.ConfigName));
 builder.Services.Configure<InfluxConfig>(builder.Configuration.GetSection(InfluxConfig.ConfigName));
 builder.Services.Configure<UserConfig>(builder.Configuration.GetSection(UserConfig.ConfigName));
+builder.Services.Configure<GatewayConfig>(builder.Configuration.GetSection(GatewayConfig.ConfigName));
 var mwConfig = builder.Configuration.GetSection(MiddlewareConfig.ConfigName).Get<MiddlewareConfig>();
 
 var centralApiHostname = Environment.GetEnvironmentVariable("CENTRAL_API_HOSTNAME");
@@ -75,6 +76,7 @@ builder.Services.AddScoped<IPublisher<GatewayAddNetAppEntryMessage>, GatewayAddN
 builder.Services.AddScoped<IPublisher<GatewayDeleteNetAppEntryMessage>, GatewayDeleteNetAppEntryPublisher>();
 builder.Services.AddScoped<IHeartbeatService, HeartbeatService>();
 builder.Services.AddScoped<IStartupDataInstaller, StartupDataInstaller>();
+builder.Services.AddScoped<IKubernetesWrapper, KubernetesWrapper>();
 
 builder.Services.AddRedisInterfaceClient();
 

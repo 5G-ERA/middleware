@@ -49,7 +49,7 @@ public class LocationServiceTests
             Type = LocationType.Cloud,
             IsOnline = true
         };
-        _locationRepository.ExistsAsync(Arg.Any<string>()).Returns((true, cloud));
+        _locationRepository.ExistsAsync(Arg.Any<string>(), Arg.Any<string>()).Returns((true, cloud));
 
         _locationRepository.AddAsync(Arg.Any<Location>()).ReturnsForAnyArgs(cloud);
         // act
@@ -58,7 +58,6 @@ public class LocationServiceTests
 
         result.IsT0.Should().BeTrue();
         result.IsT1.Should().BeFalse();
-        result.IsT2.Should().BeFalse();
 
         var resultType = result.AsT0;
         resultType.Should().BeEquivalentTo(expectedLocation);
@@ -77,14 +76,13 @@ public class LocationServiceTests
             Organization = "MiddlewareTesting",
             Type = LocationType.Cloud
         };
-        _locationRepository.ExistsAsync(Arg.Any<string>()).Returns((false, null));
+        _locationRepository.ExistsAsync(Arg.Any<string>(), Arg.Any<string>()).Returns((false, null));
 
         // act
         var result = await _sut.RegisterLocation(paramLocation);
         // assert
         result.IsT0.Should().BeTrue();
         result.IsT1.Should().BeFalse();
-        result.IsT2.Should().BeFalse();
 
         var resultType = result.AsT0;
         resultType.Should().BeOfType<Location>();
@@ -149,7 +147,6 @@ public class LocationServiceTests
     {
         // arrange
         var org = "testOrganization";
-        var locations = ImmutableList<Location>.Empty;
         _locationRepository.GetLocationsByOrganizationAsync(org).Returns(ImmutableList<Location>.Empty);
 
         // act

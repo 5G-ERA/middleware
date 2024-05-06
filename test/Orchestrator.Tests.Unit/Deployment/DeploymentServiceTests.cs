@@ -1,14 +1,23 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Text.Json;
 using System.Threading.Tasks;
+using FluentAssertions;
 using k8s;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using Middleware.Common;
 using Middleware.Common.Config;
+using Middleware.Common.Result;
 using Middleware.DataAccess.Repositories.Abstract;
 using Middleware.Models.Domain;
 using Middleware.Orchestrator.Deployment;
+using Middleware.Orchestrator.Models;
 using Middleware.Orchestrator.Publishers;
+using Middleware.RedisInterface.Contracts.Mappings;
+using Middleware.RedisInterface.Contracts.Responses;
 using Middleware.RedisInterface.Sdk;
 using NSubstitute;
 using Xunit;
@@ -19,77 +28,212 @@ public class DeploymentServiceTests
 {
     private readonly IKubernetes _kube = Substitute.For<IKubernetes>();
     private readonly IKubernetesBuilder _kubeBuilder = Substitute.For<IKubernetesBuilder>();
-    private readonly IKubernetesObjectBuilder _kubernetesObjectBuilder = Substitute.For<IKubernetesObjectBuilder>();
+    
     private readonly ILogger<DeploymentService> _logger = Substitute.For<ILogger<DeploymentService>>();
 
     private readonly IOptions<MiddlewareConfig> _mwConfig = Options.Create(new MiddlewareConfig
     {
         InstanceName = "test-MW",
         InstanceType = "Edge",
-        Organization = "5G-ERA-TST"
+        Organization = "5G-ERA-TST",
+        Address = "https://crop.5gera.net",
     });
 
     private readonly IPublishingService _publishingService = Substitute.For<IPublishingService>();
     private readonly IRedisInterfaceClient _redisInterface = Substitute.For<IRedisInterfaceClient>();
     private readonly IRosConnectionBuilderFactory _rosConnection = Substitute.For<IRosConnectionBuilderFactory>();
-    private readonly ISystemConfigRepository _settingsRepo = Substitute.For<ISystemConfigRepository>();
-
+    private readonly ISystemConfigRepository _systemConfigRepo = Substitute.For<ISystemConfigRepository>();
+    private readonly IKubernetesWrapper _kubeWrapper = Substitute.For<IKubernetesWrapper>();
+    private readonly IEnvironment _env = Substitute.For<IEnvironment>();
     private readonly DeploymentService _sut;
 
     public DeploymentServiceTests()
     {
+        var kubernetesObjectBuilder = new KubernetesObjectBuilder(_env, _mwConfig);
         _kubeBuilder.CreateKubernetesClient().Returns(_kube);
-        _sut = new(_kubeBuilder, _logger, _redisInterface, _mwConfig, _kubernetesObjectBuilder,
-            _rosConnection, _publishingService, _settingsRepo);
+        _sut = new(_logger, _redisInterface, _mwConfig, kubernetesObjectBuilder,
+            _rosConnection, _publishingService, _systemConfigRepo, _kubeWrapper);
     }
 
-    [Fact(Skip = "Test not ready due to the complexity of the used functionalities")]
-    public async Task DeletePlanAsync_ShouldAlwaysDeleteActionPlan_WhenCalled()
+    /* Also to be tested for deployment:
+     *  - data persistence
+     *  - inter-relay deployment
+     *  - setting netapp address
+     *  - name change if netapp with specified name is already deployed
+     *  - error handling
+     *  - ros-based NetApp deployment
+     */
+    /* Additional improvements:
+     *  - cache read files
+     *  - add IDisposable to the test class
+     *
+     */
+    [Fact]
+    public async Task DeployPlanAsync_ShouldCreateAndDeploySimpleActionPlan_WhenNetAppIsNotRosBased()
     {
         //arrange
-        var actionPlan = CreateActionPlan();
-        var instanceId = actionPlan.ActionSequence!.First().Services.First().ServiceInstanceId;
-        //_kube.AppsV1
-        //    .ListNamespacedDeploymentAsync("middleware",
-        //        labelSelector: KubernetesObjectExtensions.GetNetAppLabelSelector(instanceId))
-        //    .Returns(new V1DeploymentList());
-        //act
+        var task = GetTask();
+        var robot = GetRobot();
+        var systemConfig = GetSystemConfig();
+        var location = GetLocation();
+        var container = GetContainer();
+        var currentlyRunningDeployments = new List<string>() { "non-existing-deployment1", "non-existing-deployment2" };
+        
+        _systemConfigRepo.GetConfigAsync().Returns(systemConfig);
+        _kubeWrapper.GetCurrentlyDeployedNetApps().Returns(currentlyRunningDeployments);
+        _kubeWrapper.DeployNetApp(Arg.Any<DeploymentPair>()).Returns(Result.Success());
+        _redisInterface.GetLocationByNameAsync(_mwConfig.Value.InstanceName).Returns(location.ToLocationResponse());
+        _redisInterface.RobotGetByIdAsync(robot.Id).Returns(robot.ToRobotResponse());
+        
+        var instance = task.ActionSequence!.First().Services.First();
+        _redisInterface.ContainerImageGetForInstanceAsync(instance.Id).Returns(new GetContainersResponse()
+            { Containers = new[] { container.ToContainerResponse() } });
+        _redisInterface.AddRelationAsync(Arg.Any<InstanceModel>(), Arg.Any<Location>(), "LOCATED_AT")
+            .Returns(Result.Success());
+         _redisInterface.ActionPlanAddAsync(Arg.Any<ActionPlanModel>()).Returns(true);
+        // act
 
+        //act
+        var result = await _sut.DeployActionPlanAsync(task, robot.Id);
+        
         //assert
-        await _redisInterface.Received(1).ActionPlanDeleteAsync(actionPlan.Id);
+        result.Error.Should().BeNullOrEmpty();
+        result.IsSuccess.Should().BeTrue();
+        await _redisInterface.Received(1).ContainerImageGetForInstanceAsync(instance.Id);
+        await _redisInterface.Received(1).AddRelationAsync(Arg.Any<InstanceModel>(), Arg.Any<Location>(), "LOCATED_AT");
+        await _redisInterface.Received(1).ActionPlanAddAsync(Arg.Any<ActionPlanModel>());
+        await _publishingService.Received(1)
+            .PublishGatewayAddNetAppEntryAsync(Arg.Any<Location>(), Arg.Any<string>(), task.ActionPlanId, Arg.Any<Guid>());
+        await _kubeWrapper.Received(1).DeployNetApp(Arg.Any<DeploymentPair>());
+        currentlyRunningDeployments.Should().Contain(container.Name);
     }
 
-    private ActionPlanModel CreateActionPlan()
+    [Fact]
+    public async Task DeployActionAsync_ShouldDeploySingleActionFromActionPlan_WhenRequestIsReceived()
     {
-        return new()
+        //arrange
+        var actionPlan = GetActionPlan();
+        var robot = GetRobot();
+        var systemConfig = GetSystemConfig();
+        var location = GetLocation();
+        var container = GetContainer();
+        var currentlyRunningDeployments = new List<string>() { "non-existing-deployment1", "non-existing-deployment2" };
+        var action = actionPlan.ActionSequence!.First();
+        
+        _systemConfigRepo.GetConfigAsync().Returns(systemConfig);
+        _kubeWrapper.GetCurrentlyDeployedNetApps().Returns(currentlyRunningDeployments);
+        _redisInterface.GetLocationByNameAsync(_mwConfig.Value.InstanceName).Returns(location.ToLocationResponse());
+        _redisInterface.RobotGetByIdAsync(robot.Id).Returns(robot.ToRobotResponse());
+        _redisInterface.ActionPlanGetByIdAsync(actionPlan.Id).Returns(actionPlan);
+        
+        var instance = actionPlan.ActionSequence!.First().Services.First();
+        _redisInterface.ContainerImageGetForInstanceAsync(instance.Id).Returns(new GetContainersResponse()
+            { Containers = new[] { container.ToContainerResponse() } });
+        _redisInterface.AddRelationAsync(Arg.Any<InstanceModel>(), Arg.Any<Location>(), "LOCATED_AT")
+            .Returns(Result.Success());
+        _redisInterface.ActionPlanAddAsync(Arg.Any<ActionPlanModel>()).Returns(true);
+        // act
+
+        //act
+        await _sut.DeployActionAsync(actionPlan.Id, action.Id);
+        
+        //assert
+        await _redisInterface.Received(1).ContainerImageGetForInstanceAsync(instance.Id);
+        await _redisInterface.Received(1).AddRelationAsync(Arg.Any<InstanceModel>(), Arg.Any<Location>(), "LOCATED_AT");
+        await _redisInterface.Received(1).ActionPlanAddAsync(Arg.Any<ActionPlanModel>());
+        await _publishingService.Received(1)
+            .PublishGatewayAddNetAppEntryAsync(Arg.Any<Location>(), Arg.Any<string>(), actionPlan.Id, Arg.Any<Guid>());
+        await _kubeWrapper.Received(1).DeployNetApp(Arg.Any<DeploymentPair>());
+        currentlyRunningDeployments.Should().Contain(container.Name);
+    }
+
+    private static TaskModel? _task;
+
+    private static TaskModel GetTask()
+    {
+        if (_task is not null)
         {
-            Id = Guid.NewGuid(),
-            Name = "TST",
-            RobotId = Guid.NewGuid(),
-            TaskId = Guid.NewGuid(),
-            TaskStartedAt = DateTime.Now,
-            ActionSequence = new()
-            {
-                new()
-                {
-                    Name = "Action1",
-                    Id = Guid.NewGuid(),
-                    Placement = "test-MW",
-                    PlacementType = "Edge",
-                    SingleNetAppEntryPoint = true,
-                    Services = new()
-                    {
-                        new()
-                        {
-                            Id = Guid.NewGuid(),
-                            Name = "Instance1",
-                            RosDistro = RosDistro.Foxy.ToString(),
-                            IsReusable = true,
-                            ServiceInstanceId = Guid.NewGuid()
-                        }
-                    }
-                }
-            }
-        };
+            return _task;
+        }
+
+        _task = ReadJsonFile<TaskModel>("files/task.json");
+        return _task;
+    }
+
+    private static RobotModel? _robot;
+
+    private static RobotModel GetRobot()
+    {
+        if (_robot is not null)
+        {
+            return _robot;
+        }
+
+        _robot = ReadJsonFile<RobotModel>("files/robot.json");
+
+        return _robot;
+    }
+
+    private static SystemConfigModel? _systemConfig;
+
+    private static SystemConfigModel GetSystemConfig()
+    {
+        if (_systemConfig is not null)
+        {
+            return _systemConfig;
+        }
+
+        _systemConfig = ReadJsonFile<SystemConfigModel>("files/config.json");
+
+        return _systemConfig;
+    }
+
+    private static Location? _location;
+
+    private static Location GetLocation()
+    {
+        if (_location is not null)
+        {
+            return _location;
+        }
+
+        _location = ReadJsonFile<Location>("files/location.json");
+
+        return _location;
+    }
+
+    private static ContainerImageModel? _container;
+
+    private static ContainerImageModel GetContainer()
+    {
+        if (_container is not null)
+        {
+            return _container;
+        }
+
+        _container = ReadJsonFile<ContainerImageModel>("files/container-image.json");
+
+        return _container;
+    }
+    private static ActionPlanModel? _actionPlan;
+
+    private static ActionPlanModel GetActionPlan()
+    {
+        if (_actionPlan is not null)
+        {
+            return _actionPlan;
+        }
+
+        _actionPlan = ReadJsonFile<ActionPlanModel>("files/actionPlan.json");
+
+        return _actionPlan;
+    }
+
+    private static T ReadJsonFile<T>(string filePath)
+    {
+        var correctedPath = Path.Combine("../../../", filePath);
+        string json = File.ReadAllText(correctedPath);
+
+        return JsonSerializer.Deserialize<T>(json)!;
     }
 }

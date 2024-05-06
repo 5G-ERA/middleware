@@ -6,8 +6,8 @@ namespace Middleware.Orchestrator.Heartbeat;
 
 internal class HeartbeatService : IHeartbeatService
 {
-    private readonly ILogger _logger;
     private readonly IRedisInterfaceClient _redisInterfaceClient;
+    private readonly ILogger<HeartbeatService> _logger;
 
     private readonly IInfluxNetAppStatusRepository _influxNetAppStatusRepository;
     private readonly IInfluxRobotStatusRepository _influxRobotStatusRepository;
@@ -81,7 +81,24 @@ internal class HeartbeatService : IHeartbeatService
         }
 
         status.Name = robot.Name;
+        status.Timestamp = DateTimeOffset.Now;
         var res = await _influxRobotStatusRepository.AddAsync(status);
+
+        return new(res);
+    }
+
+    /// <inheritdoc />
+    public async Task<HeartbeatResult<NetAppStatusModel>> AddNetAppStatus(NetAppStatusModel status)
+    {
+        var netapp = await _redisInterfaceClient.InstanceGetByIdAsync(status.Id);
+        if (netapp is null)
+        {
+            return new("Robot not found", true);
+        }
+
+        status.Name = netapp.Name;
+        status.Timestamp = DateTimeOffset.Now;
+        var res = await _influxNetAppStatusRepository.AddAsync(status);
 
         return new(res);
     }

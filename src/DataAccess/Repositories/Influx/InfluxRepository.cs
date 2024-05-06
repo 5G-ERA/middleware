@@ -164,7 +164,8 @@ public class InfluxRepository<TModel, TDto> : IInfluxRepository<TModel>
         if (fluxTables.Count > 0)
         {
             var dto = FromInfluxDataToDto(new(), fluxTables);
-            return ToTModel(dto);
+            if (dto is not null)
+                return ToTModel(dto);
         }
 
         return null;
@@ -173,7 +174,7 @@ public class InfluxRepository<TModel, TDto> : IInfluxRepository<TModel>
     public async Task<List<TModel>> GetAllAsync()
     {
         var query = "from(bucket: \"" + Bucket +
-                    "\") |> range(start: 0) |> filter(fn: (r) => r[\"_measurement\"] == \"" + Measurement + "\")";
+                    "\") |> range(start: 0) |> filter(fn: (r) => r[\"_measurement\"] == \"" + Measurement + "\") |> last()";
         List<TModel> listOfTModels = new();
         List<FluxTable> allFluxTables = await Client.GetQueryApi().QueryAsync(query: query, org: Organization);
         if (!allFluxTables.Any()) return listOfTModels;
@@ -215,6 +216,9 @@ public class InfluxRepository<TModel, TDto> : IInfluxRepository<TModel>
         {
             var oneSampleAsFluxTables = GetOneSampleAsFluxTables(oneObjectAllRecordsFluxTables, recordNr: j);
             var dto = FromInfluxDataToDto(new TDto(), oneSampleAsFluxTables);
+            if (dto is null)
+                continue;
+
             var toTModel = ToTModel(dto);
             listOfTModels.Add(toTModel);
         }
@@ -222,12 +226,16 @@ public class InfluxRepository<TModel, TDto> : IInfluxRepository<TModel>
         return listOfTModels;
     }
 
-    // Asumption that nr of records in each Measurement (field) is the same for everyone in given object
+    // BB: WRONG: Assumption that nr of records in each Measurement (field) is the same for everyone in given object
     private List<FluxTable> GetOneSampleAsFluxTables(List<FluxTable> oneObjectAllRecordsFluxTables, int recordNr)
     {
         List<FluxTable> oneSampleAsFluxTables = new();
         foreach (var fluxTable in oneObjectAllRecordsFluxTables)
         {
+            if (recordNr > fluxTable.Records.Count - 1)
+            {
+                continue;
+            }
             var record = fluxTable.Records[recordNr];
             FluxTable oneRecordAsFluxTable = new();
             oneRecordAsFluxTable.Records.Add(record);
@@ -247,10 +255,9 @@ public class InfluxRepository<TModel, TDto> : IInfluxRepository<TModel>
         return dto.ToModel() as TModel ?? throw new MappingException(typeof(TDto), typeof(TModel));
     }
 
-    protected TDto FromInfluxDataToDto(TDto dto, List<FluxTable> fluxTables)
+    protected TDto? FromInfluxDataToDto(TDto dto, List<FluxTable> fluxTables)
     {
-        return dto.FromInfluxDataToDto(fluxTables) as TDto ??
-               throw new MappingException(typeof(FluxTable), typeof(TDto));
+        return dto.FromInfluxDataToDto(fluxTables) as TDto;// ?? throw new MappingException(typeof(FluxTable), typeof(TDto));
     }
 
     protected PointData FromDtoToInflux(TDto dto)

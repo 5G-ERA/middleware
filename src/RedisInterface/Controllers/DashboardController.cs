@@ -10,7 +10,7 @@ namespace Middleware.RedisInterface.Controllers;
 
 [Route("api/v1/[controller]")]
 [ApiController]
-public class DashboardController : ControllerBase
+public class DashboardController : MiddlewareController
 {
     private readonly IDashboardService _dashboardService;
     private readonly ILogger<DashboardController> _logger;
@@ -39,14 +39,14 @@ public class DashboardController : ControllerBase
             var route = Request.Path.Value;
             var (data, count) = await _dashboardService.GetRobotStatusListAsync(filter);
 
-            var pagedResponse = data.ToPagedResponse(filter, count, _uriService, route);
+            var pagedResponse = data.ToPagedResponse(filter, count, _uriService, route!);
             return Ok(pagedResponse);
         }
         catch (Exception ex)
         {
-            var statusCode = (int)HttpStatusCode.InternalServerError;
             _logger.LogError(ex, "An error occurred:");
-            return StatusCode(statusCode, new ApiResponse(statusCode, $"An error has occurred: {ex.Message}"));
+            return ErrorMessageResponse(HttpStatusCode.InternalServerError, "system",
+                $"An error has occurred: {ex.Message}");
         }
     }
 
@@ -65,14 +65,14 @@ public class DashboardController : ControllerBase
             var route = Request.Path.Value;
             var (data, count) = await _dashboardService.GetLocationsStatusListAsync(filter);
 
-            var pagedResponse = data.ToPagedResponse(filter, count, _uriService, route);
+            var pagedResponse = data.ToPagedResponse(filter, count, _uriService, route!);
             return Ok(pagedResponse);
         }
         catch (Exception ex)
         {
-            var statusCode = (int)HttpStatusCode.InternalServerError;
             _logger.LogError(ex, "An error occurred:");
-            return StatusCode(statusCode, new ApiResponse(statusCode, $"An error has occurred: {ex.Message}"));
+            return ErrorMessageResponse(HttpStatusCode.InternalServerError, "system",
+                $"An error has occurred: {ex.Message}");
         }
     }
 
@@ -92,9 +92,9 @@ public class DashboardController : ControllerBase
         }
         catch (Exception ex)
         {
-            var statusCode = (int)HttpStatusCode.InternalServerError;
             _logger.LogError(ex, "An error occurred:");
-            return StatusCode(statusCode, new ApiResponse(statusCode, $"An error has occurred: {ex.Message}"));
+            return ErrorMessageResponse(HttpStatusCode.InternalServerError, "system",
+                $"An error has occurred: {ex.Message}");
         }
     }
 
@@ -105,7 +105,7 @@ public class DashboardController : ControllerBase
     [HttpGet("types")]
     [ProducesResponseType(typeof(ActionSequenceResponse), (int)HttpStatusCode.OK)]
     [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.InternalServerError)]
-    public async Task<IActionResult> GetOnboardingItemTypesAsync()
+    public IActionResult GetOnboardingItemTypesAsync()
     {
         try
         {
@@ -114,9 +114,9 @@ public class DashboardController : ControllerBase
         }
         catch (Exception ex)
         {
-            var statusCode = (int)HttpStatusCode.InternalServerError;
             _logger.LogError(ex, "An error occurred:");
-            return StatusCode(statusCode, new ApiResponse(statusCode, $"An error has occurred: {ex.Message}"));
+            return ErrorMessageResponse(HttpStatusCode.InternalServerError, "system",
+                $"An error has occurred: {ex.Message}");
         }
     }
 
@@ -135,14 +135,14 @@ public class DashboardController : ControllerBase
             var route = Request.Path.Value;
             var (data, count) = await _dashboardService.GetNetAppsDataListAsync(filter);
 
-            var pagedResponse = data.ToPagedResponse(filter, count, _uriService, route);
+            var pagedResponse = data.ToPagedResponse(filter, count, _uriService, route!);
             return Ok(pagedResponse);
         }
         catch (Exception ex)
         {
-            var statusCode = (int)HttpStatusCode.InternalServerError;
             _logger.LogError(ex, "An error occurred:");
-            return StatusCode(statusCode, new ApiResponse(statusCode, $"An error has occurred: {ex.Message}"));
+            return ErrorMessageResponse(HttpStatusCode.InternalServerError, "system",
+                $"An error has occurred: {ex.Message}");
         }
     }
 
@@ -161,14 +161,14 @@ public class DashboardController : ControllerBase
             var route = Request.Path.Value;
             var (data, count) = await _dashboardService.GetRobotsDataAsync(filter);
 
-            var pagedResponse = data.ToPagedResponse(filter, count, _uriService, route);
+            var pagedResponse = data.ToPagedResponse(filter, count, _uriService, route!);
             return Ok(pagedResponse);
         }
         catch (Exception ex)
         {
-            var statusCode = (int)HttpStatusCode.InternalServerError;
             _logger.LogError(ex, "An error occurred:");
-            return StatusCode(statusCode, new ApiResponse(statusCode, $"An error has occurred: {ex.Message}"));
+            return ErrorMessageResponse(HttpStatusCode.InternalServerError, "system",
+                $"An error has occurred: {ex.Message}");
         }
     }
 
@@ -189,9 +189,9 @@ public class DashboardController : ControllerBase
         }
         catch (Exception ex)
         {
-            var statusCode = (int)HttpStatusCode.InternalServerError;
             _logger.LogError(ex, "An error occurred:");
-            return StatusCode(statusCode, new ApiResponse(statusCode, $"An error has occurred: {ex.Message}"));
+            return ErrorMessageResponse(HttpStatusCode.InternalServerError, "system",
+                $"An error has occurred: {ex.Message}");
         }
     }
 
@@ -209,8 +209,8 @@ public class DashboardController : ControllerBase
             var structure = await _dashboardService.GetOrganizationStructureAsync(orgName);
             if (structure is null || !structure.Any())
             {
-                return NotFound(new ApiResponse((int)HttpStatusCode.NotFound,
-                    "The structure for the following organization was not found."));
+                return ErrorMessageResponse(HttpStatusCode.NotFound, nameof(orgName),
+                    $"The structure for the following organization {orgName} was not found.");
             }
 
             var resp = new OrgStructureResponse
@@ -221,9 +221,9 @@ public class DashboardController : ControllerBase
         }
         catch (Exception ex)
         {
-            var statusCode = (int)HttpStatusCode.InternalServerError;
             _logger.LogError(ex, "An error occurred:");
-            return StatusCode(statusCode, new ApiResponse(statusCode, $"An error has occurred: {ex.Message}"));
+            return ErrorMessageResponse(HttpStatusCode.InternalServerError, "system",
+                $"An error has occurred: {ex.Message}");
         }
     }
 }
