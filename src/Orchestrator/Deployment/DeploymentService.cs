@@ -536,6 +536,8 @@ internal class DeploymentService : IDeploymentService
             deployment = builder.EnableRosCommunication(deployment, rosSpec);
         }
 
+        deployment = _kubeObjectBuilder.AddLinkerdAnnotation(deployment);
+        
         var service = string.IsNullOrWhiteSpace(cim.K8SService)
             ? _kubeObjectBuilder.CreateDefaultService(instanceName, instanceId, deployment)
             : _kubeObjectBuilder.DeserializeAndConfigureService(cim.K8SService, instanceName, instanceId);
@@ -544,4 +546,7 @@ internal class DeploymentService : IDeploymentService
 
         return new(deployment, service, instanceId, instance);
     }
+
+
+    
 }

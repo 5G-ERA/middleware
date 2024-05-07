@@ -88,4 +88,6 @@ public interface IKubernetesObjectBuilder
     /// <param name="actionId"></param>
     /// <returns></returns>
     Dictionary<string, string> CreateInterRelayNetAppLabels(Guid actionPlanId, Guid actionId);
+
+    V1Deployment AddLinkerdAnnotation(V1Deployment deployment);
 }
