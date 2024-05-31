@@ -1,5 +1,13 @@
 # Changelog
 
+### [1.0.2](https://github.com/5G-ERA/middleware/compare/v1.0.1...v1.0.2) (2024-05-31)
+
+
+### Bug Fixes
+
+* add automatic integration of deployed netapps with linkerd ([#303](https://github.com/5G-ERA/middleware/issues/303)) ([5ff0188](https://github.com/5G-ERA/middleware/commit/5ff018861c7e28a4fa4cf3725f12e4be95c2c05c))
+* remove unnecesary json property mappings ([5e2a3de](https://github.com/5G-ERA/middleware/commit/5e2a3de028b0c3d4c93336055de544ed0ee36fe4))
+
 ### [1.0.1](https://github.com/5G-ERA/middleware/compare/v1.0.0...v1.0.1) (2024-04-17)
 
 
