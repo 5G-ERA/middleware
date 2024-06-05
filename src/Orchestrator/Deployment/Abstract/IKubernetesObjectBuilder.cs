@@ -24,9 +24,10 @@ public interface IKubernetesObjectBuilder
     /// <param name="serviceInstanceId"></param>
     /// <param name="name"></param>
     /// <param name="thisLocation"></param>
+    /// <param name="shouldUseSimTime"></param>
     /// <returns></returns>
     V1Deployment DeserializeAndConfigureDeployment(string deployment, Guid serviceInstanceId, string name,
-        ILocation thisLocation);
+        ILocation thisLocation, bool shouldUseSimTime);
 
     /// <summary>
     /// Enable data persistence for nhe NetApp using AWS S3

@@ -308,7 +308,7 @@ internal class KubernetesObjectBuilder : IKubernetesObjectBuilder
 
     /// <inheritdoc />
     public V1Deployment DeserializeAndConfigureDeployment(string deploymentStr, Guid serviceInstanceId, string name,
-        ILocation thisLocation)
+        ILocation thisLocation, bool shouldUseSimTime)
     {
         if (string.IsNullOrWhiteSpace(deploymentStr))
             throw new ArgumentException("Service definition cannot be empty.", nameof(deploymentStr));
@@ -341,7 +341,10 @@ internal class KubernetesObjectBuilder : IKubernetesObjectBuilder
             envVars.Add(new("NETAPP_NAME", name));
             envVars.Add(new("MIDDLEWARE_ADDRESS", thisLocation.GetNetAppStatusReportAddress()));
             envVars.Add(new("MIDDLEWARE_REPORT_INTERVAL", ReportIntervalInSeconds.ToString()));
-
+            if (shouldUseSimTime)
+            {
+                envVars.Add(new("USE_SIM_TIME", "True"));
+            }
             container.Env = envVars;
         }
 

@@ -509,7 +509,7 @@ internal class DeploymentService : IDeploymentService
 
         var deployment =
             _kubeObjectBuilder.DeserializeAndConfigureDeployment(cim!.K8SDeployment, instanceId, instanceName,
-                config.Location);
+                config.Location, instance.Transforms.Count > 0);
 
         if (instance.IsPersistent && string.IsNullOrWhiteSpace(config.NetAppDataKey) == false)
         {
