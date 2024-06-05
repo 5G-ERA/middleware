@@ -1,5 +1,12 @@
 # Changelog
 
+### [1.0.3](https://github.com/5G-ERA/middleware/compare/v1.0.2...v1.0.3) (2024-06-05)
+
+
+### Bug Fixes
+
+* time zone conflicts for the relay NetApp with ros transforms ([21a0939](https://github.com/5G-ERA/middleware/commit/21a0939fa63a15278d200f0babfb352d2e76b4f6))
+
 ### [1.0.2](https://github.com/5G-ERA/middleware/compare/v1.0.1...v1.0.2) (2024-05-31)
 
 
