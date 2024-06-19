@@ -1,5 +1,12 @@
 # Changelog
 
+### [1.0.4](https://github.com/5G-ERA/middleware/compare/v1.0.3...v1.0.4) (2024-06-19)
+
+
+### Bug Fixes
+
+* logging reason for deployment error ([a3072b5](https://github.com/5G-ERA/middleware/commit/a3072b55990b5be5712bb3ae198e74784f0baf7e))
+
 ### [1.0.3](https://github.com/5G-ERA/middleware/compare/v1.0.2...v1.0.3) (2024-06-05)
 
 
