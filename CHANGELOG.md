@@ -1,5 +1,12 @@
 # Changelog
 
+### [1.0.5](https://github.com/5G-ERA/middleware/compare/v1.0.4...v1.0.5) (2024-06-20)
+
+
+### Bug Fixes
+
+* log content of the k8s error response ([65247d7](https://github.com/5G-ERA/middleware/commit/65247d73782e348cb951b4702e30bcf4b1d05811))
+
 ### [1.0.4](https://github.com/5G-ERA/middleware/compare/v1.0.3...v1.0.4) (2024-06-19)
 
 
