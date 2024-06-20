@@ -40,7 +40,7 @@ public class KubernetesWrapper : IKubernetesWrapper
         }
         catch (HttpOperationException ex)
         {
-            _logger.LogError("Failed to deploy NetApp: {reason}", ex.Response);
+            _logger.LogError("Failed to deploy NetApp: {reason}", ex.Response.Content);
             return Result.Failure(ex.Response.ReasonPhrase);
         }
     }
